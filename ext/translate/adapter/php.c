@@ -17,7 +17,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "translate/adapter/nativearray.h"
+#include "translate/adapter/php.h"
 #include "translate/adapter.h"
 #include "translate/adapterinterface.h"
 #include "translate/exception.h"
@@ -31,51 +31,58 @@
 #include "kernel/concat.h"
 #include "kernel/fcall.h"
 #include "kernel/string.h"
+#include "kernel/require.h"
 
 /**
- * Phalcon\Translate\Adapter\NativeArray
+ * Phalcon\Translate\Adapter\Php
  *
- * Allows to define translation lists using PHP arrays
+ * Allows to define translation lists using PHP file
  *
+ *<code>
+ *  $t = new \Phalcon\Translate\Adapter\Php(array(
+ *      'locale' => 'en_US.utf8',
+ *      'directory' => __DIR__ . DIRECTORY_SEPARATOR . 'locale'
+ * ));
+ *</code>
  */
-zend_class_entry *phalcon_translate_adapter_nativearray_ce;
+zend_class_entry *phalcon_translate_adapter_php_ce;
 
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct);
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query);
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists);
+PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct);
+PHP_METHOD(Phalcon_Translate_Adapter_Php, query);
+PHP_METHOD(Phalcon_Translate_Adapter_Php, exists);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_translate_adapter_nativearray___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_translate_adapter_php___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_translate_adapter_nativearray_method_entry[] = {
-	PHP_ME(Phalcon_Translate_Adapter_NativeArray, __construct, arginfo_phalcon_translate_adapter_nativearray___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Translate_Adapter_NativeArray, query, arginfo_phalcon_translate_adapterinterface_query, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Translate_Adapter_NativeArray, exists, arginfo_phalcon_translate_adapterinterface_exists, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_translate_adapter_php_method_entry[] = {
+	PHP_ME(Phalcon_Translate_Adapter_Php, __construct, arginfo_phalcon_translate_adapter_php___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Translate_Adapter_Php, query, arginfo_phalcon_translate_adapterinterface_query, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Translate_Adapter_Php, exists, arginfo_phalcon_translate_adapterinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Translate\Adapter\NativeArray initializer
+ * Phalcon\Translate\Adapter\Php initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_NativeArray){
+PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Php){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Translate\\Adapter, NativeArray, translate_adapter_nativearray, phalcon_translate_adapter_ce, phalcon_translate_adapter_nativearray_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Translate\\Adapter, Php, translate_adapter_php, phalcon_translate_adapter_ce, phalcon_translate_adapter_php_method_entry, 0);
 
-	zend_declare_property_null(phalcon_translate_adapter_nativearray_ce, SL("_translate"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_translate_adapter_php_ce, SL("_translate"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_translate_adapter_nativearray_ce, 1, phalcon_translate_adapterinterface_ce);
+	zend_class_implements(phalcon_translate_adapter_php_ce, 1, phalcon_translate_adapterinterface_ce);
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Translate\Adapter\NativeArray constructor
+ * Phalcon\Translate\Adapter\Php constructor
  *
  * @param array $options
  */
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
+PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 
-	zval *options, data = {};
+	zval *options, locale = {}, directory = {}, file = {}, translate = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -84,17 +91,29 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&data, options, SL("content"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation content was not provided");
+	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation locale was not provided");
 		return;
 	}
 
-	if (Z_TYPE(data) != IS_ARRAY) { 
+	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
+		phalcon_add_trailing_slash(&directory);
+		PHALCON_CONCAT_VVS(&file, &directory, &locale, ".php");
+	} else {
+		PHALCON_CONCAT_VS(&file, &locale, ".php");
+	}
+
+	if (phalcon_require_ret(&translate, Z_STRVAL(file)) == FAILURE) {
+		zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "Translation file '%s' cannot be read", Z_STRVAL(file));
+		return;
+	}
+
+	if (Z_TYPE(translate) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation data must be an array");
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_translate"), &data);
+	phalcon_update_property_zval(getThis(), SL("_translate"), &translate);
 }
 
 /**
@@ -104,7 +123,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
  * @param array $placeholders
  * @return string
  */
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
+PHP_METHOD(Phalcon_Translate_Adapter_Php, query){
 
 	zval *index, *placeholders = NULL, translate = {}, translation = {};
 	zval *value;
@@ -148,7 +167,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
  * @param string $index
  * @return boolean
  */
-PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, exists){
+PHP_METHOD(Phalcon_Translate_Adapter_Php, exists){
 
 	zval *index, translate = {};
 

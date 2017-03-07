@@ -28,6 +28,7 @@
 #include "di/injectable.h"
 #include "filterinterface.h"
 #include "kernel.h"
+#include "translate/adapterinterface.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -38,6 +39,7 @@
 #include "kernel/concat.h"
 #include "kernel/operators.h"
 #include "kernel/string.h"
+#include "kernel/require.h"
 
 #include "interned-strings.h"
 
@@ -614,7 +616,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, value = {}, entity = {};
+	zval *field_param = NULL, labels = {}, value = {}, entity = {}, service = {}, translate = {};
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
@@ -629,13 +631,13 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 
 	if (Z_TYPE_P(field_param) == IS_ARRAY) {
 		phalcon_fast_join_str(&value, SL(", "), field_param);
-		RETURN_CTOR(&value);
+goto end;
 	}
 
 	phalcon_return_property(&labels, getThis(), SL("_labels"));
 	if (Z_TYPE(labels) == IS_ARRAY && Z_TYPE_P(field_param) == IS_STRING) {
 		if (phalcon_array_isset_fetch(&value, &labels, field_param, 0)) {
-			RETURN_CTOR(&value);
+goto end;
 		}
 	}
 
@@ -643,12 +645,22 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	if (Z_TYPE(entity) == IS_OBJECT) {
 		if (phalcon_method_exists_ex(&entity, SL("getlabel")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
+goto end;
 		}
-
-		RETURN_CTOR(&value);
 	}
 
-	RETURN_CTOR(field_param);
+	PHALCON_CPY_WRT(&value, field_param);
+
+end:
+	ZVAL_STRING(&service, ISV(translate));
+
+	PHALCON_CALL_METHOD(&translate, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
+		PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
+		PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
+	} else {
+		RETURN_CTOR(&value);
+	}
 }
 
 PHP_METHOD(Phalcon_Validation, setFile)

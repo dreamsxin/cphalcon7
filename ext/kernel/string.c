@@ -1737,17 +1737,8 @@ void phalcon_add_trailing_slash(zval* v)
 #endif
 		{
 			SEPARATE_ZVAL(v);
+			Z_STR_P(v) = zend_string_extend(Z_STR_P(v), len+2, 0);
 			c = Z_STRVAL_P(v);
-
-			if (!IS_INTERNED(Z_STR_P(v))) {
-				c = erealloc(c, len+2);
-			}
-			else {
-				c = emalloc(len + 2);
-				if (c != NULL) {
-					memcpy(c, Z_STRVAL_P(v), Z_STRLEN_P(v));
-				}
-			}
 
 			if (c != NULL) {
 				c[len]   = PHP_DIR_SEPARATOR;

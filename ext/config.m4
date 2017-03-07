@@ -666,6 +666,7 @@ translate/exception.c \
 translate/adapterinterface.c \
 translate/adapter.c \
 translate/adapter/gettext.c \
+translate/adapter/php.c \
 validation/validatorinterface.c \
 validation/message/group.c \
 validation/exception.c \

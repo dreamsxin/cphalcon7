@@ -161,7 +161,7 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 
 	filename = Z_STR_P(file);
 
-	if (!VCWD_REALPATH(ZSTR_VAL(filename), realpath)) {
+	if (unlikely(!VCWD_REALPATH(ZSTR_VAL(filename), realpath))) {
 		zend_error_noreturn(E_CORE_ERROR, "Failed opening file %s: %s", ZSTR_VAL(filename), strerror(errno));
 		return 0;
 	}
@@ -237,7 +237,13 @@ int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 	zend_file_handle file_handle;
 	zend_op_array *new_op_array;
 	zval dummy, local_retval;
+	char realpath[MAXPATHLEN];
 	int ret;
+
+	if (unlikely(!VCWD_REALPATH(require_path, realpath))) {
+		zend_error_noreturn(E_CORE_ERROR, "Failed opening file %s: %s", require_path, strerror(errno));
+		return FAILURE;
+	}
 
 	ZVAL_UNDEF(&local_retval);
 

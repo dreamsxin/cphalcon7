@@ -1353,27 +1353,29 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 					if (phalcon_fast_in_array(&key, column_map)) {
 						PHALCON_CPY_WRT(&attribute, &key);
 					} else {
-						PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-						return;
+						if (PHALCON_GLOBAL(orm).enable_property_method) {
+							PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
+							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+							return;
+						} else {
+							continue;
+						}
 					}
 				}
 
 				/**
 				 * If the white-list is an array check if the attribute is on that list
 				 */
-				if (Z_TYPE_P(white_list) != IS_ARRAY || phalcon_fast_in_array(&attribute, white_list)) {
-					if (PHALCON_GLOBAL(orm).enable_property_method) {
-						PHALCON_CONCAT_SV(&possible_setter, "set", &attribute);
-						zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
-						if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-							PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
-						} else {
-							phalcon_update_property_zval_zval(getThis(), &attribute, value);
-						}
+				if (PHALCON_GLOBAL(orm).enable_property_method) {
+					PHALCON_CONCAT_SV(&possible_setter, "set", &attribute);
+					zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
+					if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+						PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &attribute, value);
 					}
+				} else {
+					phalcon_update_property_zval_zval(getThis(), &attribute, value);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();

@@ -387,6 +387,8 @@
 
 #include "intrusive/avltree.h"
 #include "intrusive/avltree/node.h"
+#include "intrusive/rbtree.h"
+#include "intrusive/rbtree/node.h"
 
 #include "validationinterface.h"
 #include "validation.h"

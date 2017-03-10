@@ -522,6 +522,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_INTRUSIVE
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
+		PHALCON_INIT(Phalcon_Intrusive_Rbtree);
+		PHALCON_INIT(Phalcon_Intrusive_Rbtree_Node);
 #endif
 
 #ifdef PHALCON_STORAGE_BTREE

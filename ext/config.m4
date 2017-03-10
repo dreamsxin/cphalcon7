@@ -328,6 +328,7 @@ kernel/memory.c \
 kernel/shm.c \
 kernel/mpool.c \
 kernel/avltree.c \
+kernel/rbtree.c \
 kernel/list.c \
 kernel/session.c \
 kernel/variables.c \
@@ -718,7 +719,7 @@ server/exception.c"
 	fi
 
 	if test "$PHP_INTRUSIVE" = "yes"; then
-		phalcon_sources="$phalcon_sources intrusive/avltree.c intrusive/avltree/node.c"
+		phalcon_sources="$phalcon_sources intrusive/avltree.c intrusive/avltree/node.c intrusive/rbtree.c intrusive/rbtree/node.c"
 	fi
 
 	if test "$PHP_PROCESS" = "yes"; then

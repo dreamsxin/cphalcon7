@@ -65,6 +65,7 @@ int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index);
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
 int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length);
+int ZEND_FASTCALL phalcon_array_isset_fetch_str2(zval *fetched, const zval *arr, const char *index, uint index_length, int readonly);
 int ZEND_FASTCALL phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index);
 
 

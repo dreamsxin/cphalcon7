@@ -51,6 +51,16 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	return status;
 }
 
+int phalcon_array_isset_fetch_str2(zval *fetched, const zval *arr, const char *index, uint index_length, int readonly)
+{
+	zval z_index = {};
+	int status;
+	ZVAL_STRINGL(&z_index, index, index_length);
+
+	status = phalcon_array_isset_fetch(fetched, arr, &z_index, readonly);
+	return status;
+}
+
 int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index)
 {
 	zval z_index = {};

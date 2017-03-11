@@ -1604,7 +1604,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationByAlias){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
-	zval *relation, *method, *record, *p = NULL, parameters = {}, pre_conditions = {}, placeholders = {}, referenced_model = {}, is_through = {}, conditions = {};
+	zval *relation, *method, *record, *p = NULL, parameters = {}, pre_conditions = {}, bind = {}, placeholders = {}, referenced_model = {}, is_through = {}, conditions = {};
 	zval intermediate_model = {}, intermediate_fields = {}, fields = {}, value = {}, condition = {}, join_conditions = {}, referenced_fields = {}, joined_join_conditions = {};
 	zval joined_conditions = {}, builder = {}, query = {}, referenced_field = {}, *field, dependency_injector = {}, find_params = {}, find_arguments = {}, arguments = {};
 	zval type = {}, retrieve_method = {}, reusable = {}, unique_key = {}, records = {}, referenced_entity = {}, call_object = {};
@@ -1623,18 +1623,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * Re-use conditions
 		 */
 		if (phalcon_array_isset_fetch_long(&pre_conditions, &parameters, 0)) {
-			phalcon_array_unset_long(&parameters, 0, PH_COPY);
+			phalcon_array_unset_long(&parameters, 0, PH_SEPARATE);
 		} else {
 			if (phalcon_array_isset_fetch_str(&pre_conditions, &parameters, SL("conditions"))) {
-				phalcon_array_unset_str(&parameters, SL("conditions"), 0);
+				phalcon_array_unset_str(&parameters, SL("conditions"), PH_SEPARATE);
 			}
 		}
 
 		/**
 		 * Re-use bound parameters
 		 */
-		if (phalcon_array_isset_fetch_str(&placeholders, &parameters, SL("bind"))) {
-			phalcon_array_unset_str(&parameters, SL("bind"), 0);
+		if (phalcon_array_isset_fetch_str(&bind, &parameters, SL("bind"))) {
+			phalcon_array_unset_str(&parameters, SL("bind"), PH_SEPARATE);
+			PHALCON_CPY_WRT_CTOR(&placeholders, &bind);
 		} else {
 			array_init(&placeholders);
 		}
@@ -1669,8 +1670,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			PHALCON_CALL_METHOD(&value, record, "readattribute", &fields);
 
 			PHALCON_CONCAT_SVSVS(&condition, "[", &intermediate_model, "].[", &intermediate_fields, "] = ?0");
-			phalcon_array_append(&conditions, &condition, PH_COPY);
-			phalcon_array_append(&placeholders, &value, PH_COPY);
+			phalcon_array_append(&conditions, &condition, PH_COPY|PH_SEPARATE);
+			phalcon_array_append(&placeholders, &value, PH_COPY|PH_SEPARATE);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;

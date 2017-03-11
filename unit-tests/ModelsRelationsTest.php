@@ -84,9 +84,6 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 
 	public function testModelsPostgresql()
 	{
-		$this->markTestSkipped("Skipped");
-		return;
-
 		require 'unit-tests/config.db.php';
 		if (empty($configPostgresql)) {
 			$this->markTestSkipped("Skipped");
@@ -170,6 +167,7 @@ class ModelsRelationsTest extends PHPUnit_Framework_TestCase
 			"parts_id > :parts_id:",
 			"bind" => array("parts_id" => 1)
 		));
+
 		$this->assertEquals(get_class($robotsParts), 'Phalcon\Mvc\Model\Resultset\Simple');
 		$this->assertEquals(count($robotsParts), 2);
 		$this->assertEquals($robotsParts->getFirst()->parts_id, 2);

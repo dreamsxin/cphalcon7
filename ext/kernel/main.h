@@ -33,18 +33,15 @@
 #include "kernel/backtrace.h"
 
 /** Main macros */
-#define PH_DEBUG 0
+#define PH_DEBUG		0
 
-#define PH_NOISY 256
-#define PH_SILENT 1024
-#define PH_READONLY 4096
+#define PH_NOISY		256
+#define PH_SILENT		512
+#define PH_READONLY		1024
 
-#define PH_NOISY_CC PH_NOISY
-#define PH_SILENT_CC PH_SILENT
-
-#define PH_SEPARATE 256
-#define PH_COPY 1024
-#define PH_CTOR 4096
+#define PH_SEPARATE		2048
+#define PH_COPY			4096
+#define PH_CTOR			8192
 
 #define SL(str)   (str), (sizeof(str)-1)
 #define SS(str)   (str), (sizeof(str))

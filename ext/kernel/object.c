@@ -865,7 +865,9 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 	ZVAL_STRINGL(&property, property_name, property_length);
 
 	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &rv);
-	if ((flags & PH_READONLY) == PH_READONLY) {
+	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
+		ZVAL_DUP(result, res);
+	} else if ((flags & PH_READONLY) == PH_READONLY) {
 		ZVAL_COPY_VALUE(result, res);
 	} else {
 		ZVAL_COPY(result, res);

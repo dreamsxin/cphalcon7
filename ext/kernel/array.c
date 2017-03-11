@@ -417,7 +417,9 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 		}
 
 		if (result != FAILURE && found == 1) {
-			if ((flags & PH_READONLY) == PH_READONLY) {
+			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
+				ZVAL_DUP(return_value, zv);
+			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {
 				ZVAL_COPY(return_value, zv);

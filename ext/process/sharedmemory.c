@@ -208,7 +208,8 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, create){
 
 	m = phalcon_shared_memory_create(Z_STRVAL(name), Z_LVAL_P(size));
 	if (NULL == m) {
-		RETURN_FALSE;
+		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Failed to create shared memory");
+		return;
 	}
 
 	ZVAL_RES(&shm, zend_register_resource(m, phalcon_sharedmemory_handle));

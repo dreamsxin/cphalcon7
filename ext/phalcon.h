@@ -428,10 +428,11 @@
 #include "process/proc.h"
 #include "process/exception.h"
 
+#include "storage/exception.h"
 #include "storage/btree.h"
 #include "storage/wiredtiger.h"
 #include "storage/wiredtiger/cursor.h"
-#include "storage/exception.h"
+#include "storage/bloomfilter.h"
 
 #include "server.h"
 #include "server/exception.h"

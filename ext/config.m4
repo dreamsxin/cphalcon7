@@ -126,6 +126,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-bloomfilter, whether to enable storage bloomfilter support,
+[  --enable-storage-bloomfilter   Enable storage bloomfilter support], no, no)
+
+if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_BLOOMFILTER], [1], [Whether storage bloomfilter are available])
+	AC_MSG_RESULT([yes, storage bloomfilter])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(server, whether to enable server support,
 [  --enable-server   Enable server support], no, no)
 
@@ -329,6 +339,7 @@ kernel/shm.c \
 kernel/mpool.c \
 kernel/avltree.c \
 kernel/rbtree.c \
+kernel/bloomfilter.c \
 kernel/list.c \
 kernel/session.c \
 kernel/variables.c \
@@ -1072,6 +1083,11 @@ server/exception.c"
 				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
+	fi
+
+	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then
+		AC_DEFINE(PHALCON_USE_BLOOMFILTER, 1, [Have bloomfilter support])
+		phalcon_sources="$phalcon_sources storage/bloomfilter.c "
 	fi
 
 	if test "$PHP_SERVER" = "yes"; then

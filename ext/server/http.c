@@ -95,7 +95,6 @@ PHALCON_INIT_CLASS(Phalcon_Server_Http){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Server, Http, server_http, phalcon_server_http_method_entry, 0);
 
-	zend_declare_property_null(phalcon_server_http_ce, SL("_appliction"), ZEND_ACC_PROTECTED);
 	return SUCCESS;
 }
 

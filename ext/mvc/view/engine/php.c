@@ -91,6 +91,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		phalcon_ob_clean();
 	}
 
+	// phalcon_exec_file(NULL, getThis(), path, params);
 	symbol_table = zend_rebuild_symbol_table();
 
 	/**

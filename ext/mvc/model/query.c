@@ -3566,6 +3566,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				PHALCON_STR(&sql_select, Z_STRVAL(sql_tmp));
 
 				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				array_init(&bind_keys);
+				ZVAL_LONG(&hidden_param, 0);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
+					zval k = {}, query_key = {};
+					/**
+					 * Key with auto bind-params
+					 */
+					PHALCON_CONCAT_SVV(&k, "phi", &wildcard, &hidden_param);
+
+					PHALCON_CONCAT_SV(&query_key, ":", &k);
+					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					phalcon_array_update_zval(&processed, &k, v, PH_COPY);
+					phalcon_increment(&hidden_param);
+				} ZEND_HASH_FOREACH_END();
+				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_select);
+				PHALCON_STR(&sql_select, Z_STRVAL(sql_tmp));
+				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(&processed, &string_wildcard, value, PH_COPY);
@@ -3750,6 +3771,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				PHALCON_STR(&sql_insert, Z_STRVAL(sql_tmp));
 
 				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				array_init(&bind_keys);
+				ZVAL_LONG(&hidden_param, 0);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
+					zval k = {}, query_key = {};
+					/**
+					 * Key with auto bind-params
+					 */
+					PHALCON_CONCAT_SVV(&k, "phi", &wildcard, &hidden_param);
+
+					PHALCON_CONCAT_SV(&query_key, ":", &k);
+					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					phalcon_array_update_zval(&processed, &k, v, PH_COPY);
+					phalcon_increment(&hidden_param);
+				} ZEND_HASH_FOREACH_END();
+				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_insert);
+				PHALCON_STR(&sql_insert, Z_STRVAL(sql_tmp));
+				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(&processed, &string_wildcard, value, PH_COPY);
@@ -3898,6 +3940,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				PHALCON_STR(&update_sql, Z_STRVAL(sql_tmp));
 
 				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				array_init(&bind_keys);
+				ZVAL_LONG(&hidden_param, 0);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
+					zval k = {}, query_key = {};
+					/**
+					 * Key with auto bind-params
+					 */
+					PHALCON_CONCAT_SVV(&k, "phi", &wildcard, &hidden_param);
+
+					PHALCON_CONCAT_SV(&query_key, ":", &k);
+					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					phalcon_array_update_zval(&processed, &k, v, PH_COPY);
+					phalcon_increment(&hidden_param);
+				} ZEND_HASH_FOREACH_END();
+				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &update_sql);
+				PHALCON_STR(&update_sql, Z_STRVAL(sql_tmp));
+				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
 			} else {
 				phalcon_array_update_zval(&processed, &wildcard, value, PH_COPY);
 			}
@@ -3912,18 +3975,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	if (Z_TYPE(bind_types) == IS_ARRAY) {
 		array_init(&processed_types);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
-			zval tmp = {}, string_wildcard = {};
+			zval wildcard = {}, string_wildcard = {};
 			if (str_key) {
-				ZVAL_STR(&tmp, str_key);
+				ZVAL_STR(&wildcard, str_key);
 			} else {
-				ZVAL_LONG(&tmp, idx);
+				ZVAL_LONG(&wildcard, idx);
 			}
 
-			if (Z_TYPE(tmp) == IS_LONG) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
+			if (Z_TYPE(wildcard) == IS_LONG) {
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update_zval(&processed_types, &string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed_types, &tmp, value, PH_COPY);
+				phalcon_array_update_zval(&processed_types, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -3995,15 +4058,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval tmp = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
+			zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
 			if (str_key) {
-				ZVAL_STR(&tmp, str_key);
+				ZVAL_STR(&wildcard, str_key);
 			} else {
-				ZVAL_LONG(&tmp, idx);
+				ZVAL_LONG(&wildcard, idx);
 			}
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
 
@@ -4011,9 +4074,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 				PHALCON_STR(&delete_sql, Z_STRVAL(sql_tmp));
 
-				phalcon_array_unset(&bind_types, &tmp, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				array_init(&bind_keys);
+				ZVAL_LONG(&hidden_param, 0);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
+					zval k = {}, query_key = {};
+					/**
+					 * Key with auto bind-params
+					 */
+					PHALCON_CONCAT_SVV(&k, "phi", &wildcard, &hidden_param);
+
+					PHALCON_CONCAT_SV(&query_key, ":", &k);
+					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					phalcon_array_update_zval(&processed, &k, v, PH_COPY);
+					phalcon_increment(&hidden_param);
+				} ZEND_HASH_FOREACH_END();
+				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &delete_sql);
+				PHALCON_STR(&delete_sql, Z_STRVAL(sql_tmp));
+				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed, &tmp, value, PH_COPY);
+				phalcon_array_update_zval(&processed, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {

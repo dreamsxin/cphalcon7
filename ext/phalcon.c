@@ -489,10 +489,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Arr);
 
 #ifdef PHALCON_CHART
-# if PHALCON_USE_QRENCODE
-	PHALCON_INIT(Phalcon_Chart_QRcode);
-# endif
 	PHALCON_INIT(Phalcon_Chart_Captcha);
+#endif
+#if PHALCON_USE_QRENCODE
+	PHALCON_INIT(Phalcon_Chart_QRcode);
 #endif
 
 	PHALCON_INIT(Phalcon_Async);
@@ -505,25 +505,23 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Process_Sharedmemory);
 #endif
 
-#ifdef PHALCON_SOCKET
-	#if PHALCON_USE_PHP_SOCKET
+#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket);
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
-	#endif
+#endif
 
-	#ifdef PHALCON_USE_WEBSOCKET
-		PHALCON_INIT(Phalcon_Websocket_Connection);
-		PHALCON_INIT(Phalcon_Websocket_Client);
-		PHALCON_INIT(Phalcon_Websocket_Server);
-	#endif
+#ifdef PHALCON_USE_WEBSOCKET
+	PHALCON_INIT(Phalcon_Websocket_Connection);
+	PHALCON_INIT(Phalcon_Websocket_Client);
+	PHALCON_INIT(Phalcon_Websocket_Server);
 #endif
 
 #ifdef PHALCON_INTRUSIVE
 	PHALCON_INIT(Phalcon_Intrusive_Avltree);
 	PHALCON_INIT(Phalcon_Intrusive_Avltree_Node);
-		PHALCON_INIT(Phalcon_Intrusive_Rbtree);
-		PHALCON_INIT(Phalcon_Intrusive_Rbtree_Node);
+	PHALCON_INIT(Phalcon_Intrusive_Rbtree);
+	PHALCON_INIT(Phalcon_Intrusive_Rbtree_Node);
 #endif
 
 #ifdef PHALCON_STORAGE_BTREE
@@ -591,6 +589,53 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
+#ifdef PHALCON_CACHE_SHMEMORY
+	php_info_print_table_row(2, "Cache SHMemory", "enabled");
+#endif
+
+#ifdef PHALCON_USE_MONGOC
+	php_info_print_table_row(2, "Cache Backend Mongo", "enabled");
+#endif
+
+#ifdef PHALCON_CHART
+	php_info_print_table_row(2, "Chart Captcha", "enabled");
+#endif
+
+#if PHALCON_USE_QRENCODE
+	php_info_print_table_row(2, "Chart QRcode", "enabled");
+#endif
+
+#ifdef PHALCON_PROCESS
+	php_info_print_table_row(2, "Process", "enabled");
+#endif
+
+#if PHALCON_USE_PHP_SOCKET
+	php_info_print_table_row(2, "Socket", "enabled");
+#endif
+
+#ifdef PHALCON_USE_WEBSOCKET
+	php_info_print_table_row(2, "Websocket", "enabled");
+#endif
+
+#ifdef PHALCON_INTRUSIVE
+	php_info_print_table_row(2, "Intrusive", "enabled");
+#endif
+
+#ifdef PHALCON_STORAGE_BTREE
+	php_info_print_table_row(2, "Storage B+Tree", "enabled");
+#endif
+
+#if PHALCON_USE_WIREDTIGER
+	php_info_print_table_row(2, "Storage Wiredtiger", "enabled");
+#endif
+
+#if PHALCON_USE_BLOOMFILTER
+	php_info_print_table_row(2, "Storage Bloomfilter", "enabled");
+#endif
+
+#if PHALCON_USE_SERVER
+	php_info_print_table_row(2, "Server", "enabled");
+#endif
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES();

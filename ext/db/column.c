@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 
 	phalcon_update_property_zval(getThis(), SL("_columnName"), column_name);
 
-	/** 
+	/**
 	 * Get the column type, one of the TYPE_* constants
 	 */
 	if (phalcon_array_isset_fetch_str(&type, definition, SL("type"))) {
@@ -199,14 +199,14 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		phalcon_update_property_zval(getThis(), SL("_typeValues"), &type_values);
 	}
 
-	/** 
+	/**
 	 * Check if the field is nullable
 	 */
 	if (phalcon_array_isset_fetch_str(&not_null, definition, SL("notNull"))) {
 		phalcon_update_property_zval(getThis(), SL("_notNull"), &not_null);
 	}
 
-	/** 
+	/**
 	 * Check if the field is primary key
 	 */
 	if (phalcon_array_isset_fetch_str(&primary, definition, SL("primary"))) {
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		phalcon_update_property_zval(getThis(), SL("_bytes"), &bytes);
 	}
 
-	/** 
+	/**
 	 * Check if the column has a decimal scale
 	 */
 	if (phalcon_array_isset_fetch_str(&scale, definition, SL("scale"))) {
@@ -234,25 +234,25 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		}
 	}
 
-	/** 
+	/**
 	 * Check if the field is unsigned (only MySQL)
 	 */
 	if (phalcon_array_isset_fetch_str(&dunsigned, definition, SL("unsigned"))) {
 		phalcon_update_property_zval(getThis(), SL("_unsigned"), &dunsigned);
 	}
 
-	/** 
+	/**
 	 * Check if the field is numeric
 	 */
 	if (phalcon_array_isset_fetch_str(&is_numeric, definition, SL("isNumeric"))) {
 		phalcon_update_property_zval(getThis(), SL("_isNumeric"), &is_numeric);
 	}
 
-	/** 
+	/**
 	 * Check if the field is auto-increment/serial
 	 */
 	if (phalcon_array_isset_fetch_str(&auto_increment, definition, SL("autoIncrement"))) {
-		if (PHALCON_IS_LONG(&type, 0)) {
+		if (PHALCON_LE_LONG(&type, PHALCON_DB_COLUMN_TYPE_BIGINTEGER)) {
 			phalcon_update_property_zval(getThis(), SL("_autoIncrement"), &auto_increment);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column type cannot be auto-increment");
@@ -260,28 +260,28 @@ PHP_METHOD(Phalcon_Db_Column, __construct){
 		}
 	}
 
-	/** 
+	/**
 	 * Check if the field is placed at the first position of the table
 	 */
 	if (phalcon_array_isset_fetch_str(&first, definition, SL("first"))) {
 		phalcon_update_property_zval(getThis(), SL("_first"), &first);
 	}
 
-	/** 
+	/**
 	 * Name of the column which is placed before the current field
 	 */
 	if (phalcon_array_isset_fetch_str(&after, definition, SL("after"))) {
 		phalcon_update_property_zval(getThis(), SL("_after"), &after);
 	}
 
-	/** 
+	/**
 	 * The bind type to cast the field when passing it to PDO
 	 */
 	if (phalcon_array_isset_fetch_str(&bind_type, definition, SL("bindType"))) {
 		phalcon_update_property_zval(getThis(), SL("_bindType"), &bind_type);
 	}
 
-	/** 
+	/**
 	 * Default values
 	 */
 	if (phalcon_array_isset_fetch_str(&default_value, definition, SL("default"))) {
@@ -488,7 +488,7 @@ PHP_METHOD(Phalcon_Db_Column, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	if (Z_TYPE_P(data) != IS_ARRAY) { 
+	if (Z_TYPE_P(data) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Column state must be an array");
 		return;
 	}

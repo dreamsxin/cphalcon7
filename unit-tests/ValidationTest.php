@@ -1319,6 +1319,7 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 
 	public function testValidationMessages()
 	{
+		Phalcon\Kernel::setMessagesDir("messages/");
 		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "Field :field scale is out of range");
 		$this->assertEquals(Phalcon\Validation::getMessage('Alnum'), "字段 :field 只能包含字母和数字");
 

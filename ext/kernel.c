@@ -45,6 +45,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey);
 PHP_METHOD(Phalcon_Kernel, preComputeHashKey32);
 PHP_METHOD(Phalcon_Kernel, preComputeHashKey64);
 PHP_METHOD(Phalcon_Kernel, setBasePath);
+PHP_METHOD(Phalcon_Kernel, setMessagesDir);
 PHP_METHOD(Phalcon_Kernel, message);
 PHP_METHOD(Phalcon_Kernel, setMessages);
 PHP_METHOD(Phalcon_Kernel, getMessages);
@@ -54,6 +55,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setbasepath, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setmessagesdir, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
@@ -73,6 +78,7 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, preComputeHashKey32, arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, preComputeHashKey64, arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setBasePath, arginfo_phalcon_kernel_setbasepath, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, setMessagesDir, arginfo_phalcon_kernel_setmessagesdir, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, message, arginfo_phalcon_kernel_message, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, getMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -89,6 +95,7 @@ PHALCON_INIT_CLASS(Phalcon_Kernel){
 	zend_declare_property_null(phalcon_kernel_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_kernel_ce, SL("_messages"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_kernel_ce, SL("_basePath"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_kernel_ce, SL("_messagesDir"), "messages/", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_declare_class_constant_string(phalcon_kernel_ce, SL("EXT"), "php");
 
@@ -227,7 +234,6 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey64){
  * Sets base path
  *
  * @param string $basePath
- * @return Phalcon\Config\Adapter
  */
 PHP_METHOD(Phalcon_Kernel, setBasePath){
 
@@ -237,6 +243,21 @@ PHP_METHOD(Phalcon_Kernel, setBasePath){
 
 	phalcon_add_trailing_slash(base_path);
 	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_basePath"), base_path);
+}
+
+/**
+ * Sets base path
+ *
+ * @param string $messagesDir
+ */
+PHP_METHOD(Phalcon_Kernel, setMessagesDir){
+
+	zval *messages_dir;
+
+	phalcon_fetch_params(0, 1, 0, &messages_dir);
+
+	phalcon_add_trailing_slash(messages_dir);
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"), messages_dir);
 }
 
 /**
@@ -250,7 +271,7 @@ PHP_METHOD(Phalcon_Kernel, setBasePath){
  */
 PHP_METHOD(Phalcon_Kernel, message){
 
-	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, ext = {}, file_messages1 = {}, *base_path, file_path = {}, *_default_messages;
+	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, ext = {}, file_messages1 = {}, *base_path, *messages_dir, file_path = {}, *_default_messages;
 	zval default_messages = {}, validation_messages = {}, file_messages2 = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
 
 	phalcon_fetch_params(0, 1, 3, &file, &path, &default_value, &_ext);
@@ -269,10 +290,12 @@ PHP_METHOD(Phalcon_Kernel, message){
 		PHALCON_CPY_WRT(&ext, _ext);
 	}
 
-	if (!phalcon_read_static_property_array_ce(&file_messages1, phalcon_kernel_ce, SL("_messages"), file)) {
-		base_path = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_basePath"));
+	base_path = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_basePath"));
+	messages_dir = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"));
 
-		PHALCON_CONCAT_VSVSV(&file_path, base_path, "messages/", file, ".", &ext);
+	PHALCON_CONCAT_VVVSV(&file_path, base_path, messages_dir, file, ".", &ext);
+
+	if (!phalcon_read_static_property_array_ce(&file_messages1, phalcon_kernel_ce, SL("_messages"), &file_path)) {
 		if (phalcon_require_ret(&file_messages1, Z_STRVAL(file_path)) != FAILURE) {
 			if (Z_TYPE(file_messages1) != IS_ARRAY) {
 				zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));

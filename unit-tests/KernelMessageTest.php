@@ -36,4 +36,11 @@ class KernelMessageTest extends PHPUnit_Framework_TestCase
 		});
 		$this->assertEquals(Phalcon\Kernel::message('validation', 'Url'), "字段 :field 必须是 url");
 	}
+
+	public function testMessagesDir()
+	{
+		Phalcon\Kernel::setBasePath("unit-tests/");
+		Phalcon\Kernel::setMessagesDir("locale/");
+		$this->assertEquals(Phalcon\Kernel::message('validation', 'Field :field must be a url'), "字段 :field 必须是 url");
+	}
 }

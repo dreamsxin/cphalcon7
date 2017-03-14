@@ -217,6 +217,11 @@ class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf('Robots', $robots[0]);
 		$this->assertEquals(count($robots), 3);
 
+		$songs = $manager->executeQuery('SELECT * FROM Songs WHERE id NOT IN (:id:)', array('id' => array(1,2,3,4)));
+		$this->assertInstanceOf('Phalcon\Mvc\Model\Resultset\Simple', $songs);
+		$this->assertEquals(count($songs), 3);
+		$this->assertInstanceOf('Songs', $songs[0]);
+
 		$result = $manager->executeQuery('SELECT id, name FROM Robots');
 		$this->assertInstanceOf('Phalcon\Mvc\Model\Resultset\Simple', $result);
 		$this->assertEquals(count($result), 3);
@@ -939,7 +944,7 @@ class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
 		$manager = $di->getShared('modelsManager');
 
 		$result = $manager->executeQuery('SELECT r1.*, r2.*, r3.* FROM Robots AS r1 LEFT JOIN Robots AS r2 ON r2.id = r1.id LEFT JOIN Robots AS r3 ON r3.id = r1.id LIMIT 1');
-		
+
 		$this->assertInstanceOf('Phalcon\Mvc\Model\Resultset\Complex', $result);
 		$this->assertEquals(gettype($result[0]->r1), 'object');
 		$this->assertEquals(get_class($result[0]->r1), 'Robots');

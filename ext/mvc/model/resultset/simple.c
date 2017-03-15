@@ -60,6 +60,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_simple___construct, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_simple_toarray, 0, 0, 0)
+	ZEND_ARG_INFO(0, columns)
 	ZEND_ARG_INFO(0, renameColumns)
 ZEND_END_ARG_INFO()
 
@@ -120,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 		RETURN_NULL();
 	}
 
-	/** 
+	/**
 	 * Use only fetch assoc
 	 */
 	ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
@@ -130,7 +131,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
 	PHALCON_CALL_METHOD(&row_count, result, "numrows");
 
-	/** 
+	/**
 	 * Check if it's a big resultset
 	 */
 	is_smaller_function(&big_resultset, &limit, &row_count);
@@ -140,7 +141,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 		phalcon_update_property_long(getThis(), SL("_type"), 0);
 	}
 
-	/** 
+	/**
 	 * Update the row-count
 	 */
 	phalcon_update_property_zval(getThis(), SL("_count"), &row_count);
@@ -193,17 +194,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 		RETURN_FALSE;
 	}
 
-	/** 
+	/**
 	 * Set records as dirty state PERSISTENT by default
 	 */
 	ZVAL_LONG(&dirty_state, 0);
 
-	/** 
+	/**
 	 * Get current hydration mode
 	 */
 	phalcon_read_property(&hydrate_mode, getThis(), SL("_hydrateMode"), PH_NOISY);
 
-	/** 
+	/**
 	 * Get the resultset column map
 	 */
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
@@ -218,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 		ce = phalcon_mvc_model_ce;
 	}
 
-	/** 
+	/**
 	 * Hydrate based on the current hydration
 	 */
 	switch (phalcon_get_intval(&hydrate_mode)) {
@@ -226,12 +227,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 		case 0:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsModels"), PH_NOISY);
 			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, 0)) {
-				/** 
+				/**
 				 * this_ptr->model is the base entity
 				 */
 				phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
 
-				/** 
+				/**
 				 * Performs the standard hydration based on objects
 				 */
 				PHALCON_CALL_CE_STATIC(&active_row, ce, "cloneresultmap", &model, &row, &column_map, &dirty_state, &source_model);
@@ -243,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 		default:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsOthers"), PH_NOISY);
 			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, 0)) {
-				/** 
+				/**
 				 * Other kinds of hydrations
 				 */
 				PHALCON_CALL_CE_STATIC(&active_row, ce, "cloneresultmaphydrate", &row, &column_map, &hydrate_mode, &source_model);
@@ -268,9 +269,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
-	zval *rename_columns = NULL, records = {};
+	zval *columns = NULL, *rename_columns = NULL, records = {};
 
-	phalcon_fetch_params(0, 0, 1, &rename_columns);
+	phalcon_fetch_params(0, 0, 2, &columns, &rename_columns);
+
+	if (!columns) {
+		columns = &PHALCON_GLOBAL(z_null);
+	}
 
 	if (!rename_columns) {
 		rename_columns = &PHALCON_GLOBAL(z_true);
@@ -290,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&arr, &current, "toarray", &PHALCON_GLOBAL(z_null), rename_columns);
+			PHALCON_CALL_METHOD(&arr, &current, "toarray", columns, rename_columns);
 			phalcon_array_append(&records, &arr, PH_COPY);
 		} else {
 			phalcon_array_append(&records, &current, PH_COPY);
@@ -324,12 +329,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, serialize){
 	phalcon_array_update_str(&data, SL("columnMap"), &column_map, PH_COPY);
 	phalcon_array_update_str(&data, SL("hydrateMode"), &hydrate_mode, PH_COPY);
 
-	/** 
+	/**
 	 * Force to re-execute the query
 	 */
 	phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
 
-	/** 
+	/**
 	 * Serialize the cache using the serialize function
 	 */
 	phalcon_serialize(return_value, &data);

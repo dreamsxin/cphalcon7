@@ -1353,7 +1353,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 					if (phalcon_fast_in_array(&key, column_map)) {
 						PHALCON_CPY_WRT(&attribute, &key);
 					} else {
-						if (PHALCON_GLOBAL(orm).enable_property_method) {
+						if (PHALCON_GLOBAL(orm).enable_strict) {
 							PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
 							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 							return;

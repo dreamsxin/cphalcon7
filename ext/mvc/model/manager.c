@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, load){
 /**
  * Sets the mapped source for a model
  *
- * @param Phalcon\Mvc\Model $model
+ * @param Phalcon\Mvc\Model|string $model
  * @param string $source
  * @return string
  */
@@ -518,7 +518,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 
 	phalcon_fetch_params(0, 2, 0, &model, &source);
 
-	if (Z_TYPE_P(model) != IS_OBJECT) {
+	if (Z_TYPE_P(model) != IS_OBJECT && Z_TYPE_P(model) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}
@@ -526,7 +526,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Source must be a string");
 		return;
 	}
-
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, source);
 }
@@ -534,7 +533,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 /**
  * Returns the mapped source for a model
  *
- * @param Phalcon\Mvc\Model $model
+ * @param Phalcon\Mvc\Model|string $model
  * @return string
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
@@ -543,7 +542,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	if (Z_TYPE_P(model) != IS_OBJECT) {
+	if (Z_TYPE_P(model) != IS_OBJECT && Z_TYPE_P(model) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Model is not an object");
 		return;
 	}

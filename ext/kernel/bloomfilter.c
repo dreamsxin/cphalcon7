@@ -21,6 +21,8 @@
 
 #include "kernel/bloomfilter.h"
 
+#include <sys/file.h>
+
 static zend_always_inline void __bloomfilter_calc(phalcon_bloomfilter *bloomfilter)
 {
     uint32_t m, k;
@@ -134,7 +136,7 @@ int phalcon_bloomfilter_free(phalcon_bloomfilter *bloomfilter)
 
 int phalcon_bloomfilter_load(phalcon_bloomfilter *bloomfilter, char *filename)
 {
-	int ret;
+	int ret, fd;
 	FILE *fp;
 	static phalcon_bloomfilter_file_head file_head = {0};
 
@@ -145,14 +147,21 @@ int phalcon_bloomfilter_load(phalcon_bloomfilter *bloomfilter, char *filename)
     if (fp == NULL) {
         return -1;
     }
+	fd = fileno(fp);
+    if (flock(fd, LOCK_SH) !=0) {
+		ret = -1;
+		goto end;
+    }
 
     ret = fread((void*)&file_head, sizeof(file_head), 1, fp);
     if (ret != 1) {
-		goto fail;
+		ret = -1;
+        goto end;
     }
 
     if ((file_head.file_magic_code != PHALCON_BLOOMFILTER_FILE_MAGIC_CODE) || (file_head.bits != file_head.bytes*8)) {
-        goto fail;
+		ret = -1;
+        goto end;
 	}
 
     phalcon_bloomfilter_free(bloomfilter);
@@ -166,34 +175,36 @@ int phalcon_bloomfilter_load(phalcon_bloomfilter *bloomfilter, char *filename)
 
     bloomfilter->data = (unsigned char *) emalloc(bloomfilter->bytes);
     if (NULL == bloomfilter->data) {
-        goto fail;
+		ret = -1;
+        goto end;
 	}
 
     bloomfilter->hash_value = (uint32_t*) emalloc(bloomfilter->hash_num * sizeof(uint32_t));
     if (NULL == bloomfilter->hash_value) {
-		goto fail;
+		ret = -1;
+        goto end;
 	}
 
 
     // 将后面的Data部分读入 data
     ret = fread((void*)(bloomfilter->data), 1, bloomfilter->bytes, fp);
     if ((uint32_t)ret != bloomfilter->bytes) {
-		goto fail;
+		ret = -1;
+        goto end;
     }
 
     bloomfilter->flag = 1;
+	ret = 0;
 
+end:
+	flock(fd, LOCK_UN);
 	fclose(fp);
-    return 0;
-
-fail:
-	fclose(fp);
-	return -1;
+	return ret;
 }
 
 int phalcon_bloomfilter_save(phalcon_bloomfilter *bloomfilter, char *filename)
 {
-	int ret;
+	int ret, fd;
 	FILE *fp;
 	static phalcon_bloomfilter_file_head file_head = {0};
 
@@ -203,6 +214,11 @@ int phalcon_bloomfilter_save(phalcon_bloomfilter *bloomfilter, char *filename)
     fp = fopen(filename, "wb");
     if (fp == NULL) {
         return -1;
+    }
+	fd = fileno(fp);
+    if (flock(fd, LOCK_EX) !=0) {
+		ret = -1;
+		goto end;
     }
 
     file_head.file_magic_code = PHALCON_BLOOMFILTER_FILE_MAGIC_CODE;
@@ -216,18 +232,21 @@ int phalcon_bloomfilter_save(phalcon_bloomfilter *bloomfilter, char *filename)
 
     ret = fwrite((const void*)&file_head, sizeof(file_head), 1, fp);
     if (ret != 1) {
-       goto fail;
+		ret = -1;
+		goto end;
     }
 
     ret = fwrite(bloomfilter->data, 1, bloomfilter->bytes, fp);
     if ((uint32_t)ret != bloomfilter->bytes) {
-        goto fail;
+		ret = -1;
+        goto end;
     }
 
-	fclose(fp);
-    return 0;
+	ret = 0;
 
-fail:
+end:
+	flock(fd, LOCK_UN);
 	fclose(fp);
-	return -1;
+
+    return ret;
 }

@@ -92,6 +92,7 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_STRIPTAGS"), "striptags", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_LOWER"), "lower", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_UPPER"), "upper", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_XSS"), "xss", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_filter_ce, 1, phalcon_filterinterface_ce);
 
@@ -402,7 +403,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
-	if (PHALCON_IS_STRING(filter, "xssclean")) {
+	if (PHALCON_IS_STRING(filter, "xss") || PHALCON_IS_STRING(filter, "xssclean")) {
 		phalcon_return_property(&allow_tags, getThis(), SL("_allowTags"));
 		phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
 

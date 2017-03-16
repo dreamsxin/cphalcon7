@@ -2792,7 +2792,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getMessages){
 
 	phalcon_fetch_params(0, 0, 1, &filter);
 
-	if (!filter || Z_TYPE_P(filter) != IS_STRING) {
+	if (!filter || (Z_TYPE_P(filter) != IS_STRING && Z_TYPE_P(filter) != IS_ARRAY)) {
 		RETURN_MEMBER(getThis(), "_errorMessages");
 	}
 
@@ -2800,13 +2800,23 @@ PHP_METHOD(Phalcon_Mvc_Model, getMessages){
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		array_init(return_value);
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), value) {
-			PHALCON_CALL_METHOD(&field, value, "getfield");
+		if (Z_TYPE_P(filter) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), value) {
+				PHALCON_CALL_METHOD(&field, value, "getfield");
 
-			if (PHALCON_IS_EQUAL(filter, &field)) {
-				phalcon_array_append(return_value, value, PH_COPY);
-			}
-		} ZEND_HASH_FOREACH_END();
+				if (phalcon_fast_in_array(&field, filter)) {
+					phalcon_array_append(return_value, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), value) {
+				PHALCON_CALL_METHOD(&field, value, "getfield");
+
+				if (PHALCON_IS_EQUAL(&field, filter)) {
+					phalcon_array_append(return_value, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
 	}
 }
 

@@ -271,10 +271,10 @@ PHP_METHOD(Phalcon_Kernel, setMessagesDir){
  */
 PHP_METHOD(Phalcon_Kernel, message){
 
-	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, ext = {}, file_messages1 = {}, *base_path, *messages_dir, file_path = {}, *_default_messages;
+	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, *absolute_path = NULL, ext = {}, file_messages1 = {}, *base_path, *messages_dir, file_path = {}, *_default_messages;
 	zval default_messages = {}, validation_messages = {}, file_messages2 = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
 
-	phalcon_fetch_params(0, 1, 3, &file, &path, &default_value, &_ext);
+	phalcon_fetch_params(0, 1, 4, &file, &path, &default_value, &_ext, &absolute_path);
 
 	if (!path) {
 		path = &PHALCON_GLOBAL(z_null);
@@ -284,16 +284,24 @@ PHP_METHOD(Phalcon_Kernel, message){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!_ext) {
+	if (!_ext || Z_TYPE_P(_ext) == IS_NULL) {
 		ZVAL_STRING(&ext, "php");
 	} else {
 		PHALCON_CPY_WRT(&ext, _ext);
 	}
 
-	base_path = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_basePath"));
-	messages_dir = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"));
+	if (!absolute_path) {
+		absolute_path = &PHALCON_GLOBAL(z_false);
+	}
 
-	PHALCON_CONCAT_VVVSV(&file_path, base_path, messages_dir, file, ".", &ext);
+	if (unlikely(zend_is_true(absolute_path))) {
+		PHALCON_CONCAT_VSV(&file_path, file, ".", &ext);
+	} else {
+		base_path = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_basePath"));
+		messages_dir = phalcon_read_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"));
+
+		PHALCON_CONCAT_VVVSV(&file_path, base_path, messages_dir, file, ".", &ext);
+	}
 
 	if (!phalcon_read_static_property_array_ce(&file_messages1, phalcon_kernel_ce, SL("_messages"), &file_path)) {
 		if (phalcon_require_ret(&file_messages1, Z_STRVAL(file_path)) != FAILURE) {

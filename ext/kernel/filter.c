@@ -398,7 +398,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		int element_attrs_length, j;
 
 		ZVAL_LONG(&t, i);
-	
+
 		PHALCON_CALL_METHOD(&element, &elements, "item", &t);
 
 		phalcon_return_property(&element_name, &element, SL("nodeName"));

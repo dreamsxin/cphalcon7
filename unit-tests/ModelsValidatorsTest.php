@@ -82,6 +82,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 
 		$this->_testValidatorsNormal($di);
 		$this->_testValidatorsRenamed($di);
+		$this->_testValidatorsLabel($di);
 	}
 
 	public function testValidatorsPostgresql()
@@ -101,6 +102,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 
 		$this->_testValidatorsNormal($di);
 		$this->_testValidatorsRenamed($di);
+		$this->_testValidatorsLabel($di);
 	}
 
 	public function testValidatorsSqlite()
@@ -122,6 +124,7 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 
 		$this->_testValidatorsNormal($di);
 		$this->_testValidatorsRenamed($di);
+		$this->_testValidatorsLabel($di);
 	}
 
 	protected function _testValidatorsNormal($di)
@@ -372,6 +375,31 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($messages[0]->getType(), "Email");
 		$this->assertEquals($messages[0]->getField(), "courrierElectronique");
 		$this->assertEquals($messages[0]->getMessage(), "Le courrier électronique est invalide");
+	}
+
+	protected function _testValidatorsLabel($di)
+	{
+		Phalcon\Kernel::setBasePath("unit-tests/");
+		Phalcon\Kernel::setMessagesDir("messages/");
+
+		$song = new Songs();
+		$song->albums_id = 'one';
+		$song->name = '水调歌头';
+		$this->assertFalse($song->save());
+		$messages = $song->getMessages();
+		$this->assertEquals(count($messages), 2);
+
+		$messages = $song->getMessages('albums_id');
+		$this->assertEquals(count($messages), 1);
+		$this->assertEquals($messages[0]->getType(), "Digit");
+		$this->assertEquals($messages[0]->getField(), "albums_id");
+		$this->assertEquals($messages[0]->getMessage(), "专辑ID 必须是数字");
+
+		$messages = $song->getMessages('name');
+		$this->assertEquals(count($messages), 1);
+		$this->assertEquals($messages[0]->getType(), "TooShort");
+		$this->assertEquals($messages[0]->getField(), "name");
+		$this->assertEquals($messages[0]->getMessage(), "Field 歌名 must be at least 12 characters long");
 	}
 
 }

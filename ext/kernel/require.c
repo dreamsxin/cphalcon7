@@ -241,7 +241,7 @@ int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 	int ret;
 
 	if (unlikely(!VCWD_REALPATH(require_path, realpath))) {
-		zend_error_noreturn(E_CORE_ERROR, "Failed opening file %s: %s", require_path, strerror(errno));
+		//zend_error_noreturn(E_CORE_ERROR, "Failed opening file %s: %s", require_path, strerror(errno));
 		return FAILURE;
 	}
 

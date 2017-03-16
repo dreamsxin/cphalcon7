@@ -220,6 +220,8 @@ void phalcon_get_class(zval *result, const zval *object, int lower) {
 			phalcon_strtolower_inplace(result);
 		}
 
+	} else if (Z_TYPE_P(object) == IS_STRING && phalcon_class_exists_ex(object, 1)) {
+		ZVAL_COPY(result, object);
 	} else {
 		ZVAL_NULL(result);
 		php_error_docref(NULL, E_WARNING, "phalcon_get_class expects an object");

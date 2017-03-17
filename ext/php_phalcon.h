@@ -43,6 +43,11 @@ typedef struct _phalcon_debug_options {
 	zend_bool enable_debug;
 } phalcon_debug_options;
 
+/** CORE options */
+typedef struct _phalcon_core_options {
+	zend_bool enable_failure_exception;
+} phalcon_core_options;
+
 /** ORM options */
 typedef struct _phalcon_orm_options {
 	HashTable *ast_cache;
@@ -99,6 +104,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/** DEBUG */
 	phalcon_debug_options debug;
+
+	/** CORE */
+	phalcon_core_options core;
 
 	/** ORM */
 	phalcon_orm_options orm;

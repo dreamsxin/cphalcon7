@@ -3338,7 +3338,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getCache){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
-	zval model_name = {}, model = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
+	zval model_name = {}, model = {}, instance = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
 	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {};
 	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {}, result_object = {};
 	zval service_name = {}, has = {}, service_params = {}, resultset = {};
@@ -3439,7 +3439,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	array_init(&simple_column_map);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
-		zval key = {}, type = {}, sql_column = {}, model_name = {}, instance = {}, attributes = {}, column_map = {}, *attribute, column_alias = {}, sql_alias = {};
+		zval key = {}, type = {}, sql_column = {}, model_name = {}, attributes = {}, column_map = {}, *attribute, column_alias = {}, sql_alias = {};
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -3655,7 +3655,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			 */
 			object_init_ex(&result_object, phalcon_mvc_model_row_ce);
 		} else {
-			PHALCON_CPY_WRT(&result_object, &model);
+			if (Z_TYPE(instance) == IS_OBJECT) {
+				PHALCON_CPY_WRT(&result_object, &instance);
+			} else {
+				PHALCON_CPY_WRT(&result_object, &model);
+			}
 
 			PHALCON_CALL_METHOD(NULL, &result_object, "reset");
 

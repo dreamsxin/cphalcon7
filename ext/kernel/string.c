@@ -1273,7 +1273,7 @@ int phalcon_spprintf(char **message, int max_len, char *format, ...)
 /**
  * Makes a substr like the PHP function. This function doesn't support negative lengths
  */
-void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned long length) {
+void phalcon_substr(zval *return_value, zval *str, unsigned long from, long length) {
 	uint str_len;
 
 	if (Z_TYPE_P(str) != IS_STRING) {
@@ -1299,7 +1299,9 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 		return;
 	}
 
-	if (!length || (str_len < length + from)) {
+	if (length < 0) {
+		length = str_len - from + length;
+	} else if (!length || (str_len < length + from)) {
 		length = str_len - from;
 	}
 
@@ -1310,7 +1312,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned 
 	}
 }
 
-void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length) {
+void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, long length) {
 
 	uint str_len = (uint)(ZSTR_LEN(str));
 
@@ -1319,7 +1321,9 @@ void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long f
 		return;
 	}
 
-	if (!length || (str_len < length + from)) {
+	if (length < 0) {
+		length = str_len - from + length;
+	} else if (!length || (str_len < length + from)) {
 		length = str_len - from;
 	}
 

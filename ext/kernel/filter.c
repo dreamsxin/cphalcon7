@@ -358,9 +358,20 @@ void phalcon_escape_html(zval *return_value, zval *str, const zval *quote_style,
  */
 void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *allow_attributes)
 {
-	zval document = {}, ret = {}, tmp = {}, elements = {}, matched = {}, regexp = {}, joined_tags = {}, clean_str = {};
+	zval replaced_str = {}, replace = {}, document = {}, ret = {}, elements = {}, matched = {}, regexp = {}, joined_tags = {}, clean_str = {}, body = {}, tmp = {};
 	zend_class_entry *ce0;
 	int i, element_length;
+
+	ZVAL_EMPTY_STRING(&replace);
+
+	PHALCON_STR(&regexp, "#<!--\\[.*\\]>.*<!\\[endif\\]-->#isU");
+	PHALCON_PREG_REPLACE(&replaced_str, &regexp, &replace, str);
+
+	PHALCON_STR(&regexp, "#<!--.*-->#i");
+	PHALCON_PREG_REPLACE(&tmp, &regexp, &replace, &replaced_str);
+
+	PHALCON_STR(&regexp, "#<script.*>.*</script>#isU");
+	PHALCON_PREG_REPLACE(&replaced_str, &regexp, &replace, &tmp);
 
 	ce0 = phalcon_fetch_str_class(SL("DOMDocument"), ZEND_FETCH_CLASS_AUTO);
 
@@ -373,13 +384,17 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		PHALCON_CALL_FUNCTION(NULL, "libxml_use_internal_errors", &PHALCON_GLOBAL(z_true));
 	}
 
-	PHALCON_CALL_METHOD(&ret, &document, "loadhtml", str);
+	PHALCON_CALL_METHOD(&ret, &document, "loadhtml", &replaced_str);
 
 	if (phalcon_function_exists_ex(SL("libxml_clear_errors")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(NULL, "libxml_clear_errors");
 	}
 
 	if (!zend_is_true(&ret)) {
+		phalcon_fast_join_str(&tmp, SL("><"), allow_tags);
+		PHALCON_CONCAT_SVS(&joined_tags, "<", &tmp, ">");
+		PHALCON_CALL_FUNCTION(&tmp, "strip_tags", &replaced_str, &joined_tags);
+		ZVAL_STR(return_value, phalcon_trim(&tmp, NULL, PHALCON_TRIM_BOTH));
 		return;
 	}
 
@@ -393,8 +408,8 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	element_length = Z_LVAL_P(&tmp);
 
-	for (i = 0; i < element_length; i++) {
-		zval t = {}, element = {}, element_name = {}, element_attrs = {};
+	for (i = element_length - 1; i >= 0; i--) {
+		zval t = {}, element = {}, element_name = {}, parent = {}, element_attrs = {};
 		int element_attrs_length, j;
 
 		ZVAL_LONG(&t, i);
@@ -404,6 +419,8 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		phalcon_return_property(&element_name, &element, SL("nodeName"));
 
 		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(&element_name, allow_tags)) {
+			phalcon_return_property(&parent, &element, SL("parentNode"));
+			PHALCON_CALL_METHOD(NULL, &parent, "removechild", &element);
 			continue;
 		}
 
@@ -412,7 +429,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 		element_attrs_length = Z_LVAL_P(&tmp);
 
-		for (j = 0; j < element_attrs_length; j++) {
+		for (j = element_attrs_length - 1; j >= 0; j--) {
 			zval t2 = {}, element_attr = {}, element_attr_name = {}, element_attr_value = {};
 			ZVAL_LONG(&t2, j);
 
@@ -421,6 +438,12 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 			phalcon_return_property(&element_attr_name, &element_attr, SL("nodeName"));
 			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(&element_attr_name, allow_attributes)) {
 				PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", &element_attr);
+			} else if (phalcon_memnstr_str(&element_attr_name, SL("href")) || phalcon_memnstr_str(&element_attr_name, SL("href"))) {
+				phalcon_return_property(&element_attr_value, &element_attr, SL("nodeValue"));
+
+				if (phalcon_memnstr_str(&element_attr_value, SL("javascript:"))) {
+					PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", &element_attr);
+				}
 			} else if (phalcon_memnstr_str(&element_attr_name, SL("style"))) {
 				phalcon_return_property(&element_attr_value, &element_attr, SL("nodeValue"));
 
@@ -433,12 +456,12 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		}
 	}
 
-	phalcon_fast_join_str(&tmp, SL("><"), allow_tags);
+	PHALCON_STR(&tmp, "body");
 
-	PHALCON_CONCAT_SVS(&joined_tags, "<", &tmp, ">");
+	PHALCON_CALL_METHOD(&elements, &document, "getelementsbytagname", &tmp);
+	PHALCON_CALL_METHOD(&body, &elements, "item", &PHALCON_GLOBAL(z_zero));
 
-	PHALCON_CALL_METHOD(&ret, &document, "savehtml");
-	PHALCON_CALL_FUNCTION(&clean_str, "strip_tags", &ret, &joined_tags);
-
-	ZVAL_STR(return_value, phalcon_trim(&clean_str, NULL, PHALCON_TRIM_BOTH));
+	PHALCON_CALL_METHOD(&clean_str, &document, "savehtml", &body);
+	phalcon_substr(&tmp, &clean_str, 6, -7);
+	ZVAL_STR(return_value, phalcon_trim(&tmp, NULL, PHALCON_TRIM_BOTH));
 }

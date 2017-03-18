@@ -32,6 +32,8 @@
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject)  PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
 
+#define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) PHALCON_CALL_FUNCTION(return_value, "preg_replace", regex, replace, subject)
+
 #define PHALCON_RANDOM_ALNUM   0
 #define PHALCON_RANDOM_ALPHA   1
 #define PHALCON_RANDOM_HEXDEC  2
@@ -98,8 +100,8 @@ void phalcon_unique_key(zval *return_value, zval *prefix, zval *value);
 int phalcon_spprintf(char **message, int max_len, char *format, ...);
 
 /* Substr */
-void phalcon_substr(zval *return_value, zval *str, unsigned long from, unsigned long length);
-void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, unsigned long length);
+void phalcon_substr(zval *return_value, zval *str, unsigned long from, long length);
+void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, long length);
 
 /** Preg-Match */
 int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches) PHALCON_ATTR_WARN_UNUSED_RESULT;

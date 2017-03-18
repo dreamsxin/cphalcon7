@@ -34,6 +34,8 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_filterinterface_sanitize, 0, 0, 2)
 	ZEND_ARG_INFO(0, value)
 	ZEND_ARG_INFO(0, filters)
+	ZEND_ARG_TYPE_INFO(0, noRecursive, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_FILTERINTERFACE_H */

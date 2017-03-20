@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 	phalcon_read_property(&number, getThis(), SL("_number"), PH_NOISY);
 	if (zend_is_true(&number)) {
 		phalcon_read_property(&transactions, getThis(), SL("_transactions"), PH_NOISY);
-		if (Z_TYPE(transactions) == IS_ARRAY) { 
+		if (Z_TYPE(transactions) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(transactions), transaction) {
 				if (Z_TYPE_P(transaction) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(NULL, transaction, "setisnewtransaction", &PHALCON_GLOBAL(z_false));

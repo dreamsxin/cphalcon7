@@ -26,6 +26,7 @@ zend_class_entry *phalcon_di_injectionawareinterface_ce;
 static const zend_function_entry phalcon_di_injectionawareinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Di_InjectionAwareInterface, setDI, arginfo_phalcon_di_injectionawareinterface_setdi)
 	PHP_ABSTRACT_ME(Phalcon_Di_InjectionAwareInterface, getDI, arginfo_phalcon_di_injectionawareinterface_getdi)
+	PHP_ABSTRACT_ME(Phalcon_Di_InjectionAwareInterface, hasDI, NULL)
 	PHP_FE_END
 };
 
@@ -52,3 +53,10 @@ PHALCON_DOC_METHOD(Phalcon_Di_InjectionAwareInterface, setDI);
  * @return Phalcon\DiInterface
  */
 PHALCON_DOC_METHOD(Phalcon_Di_InjectionAwareInterface, getDI);
+
+/**
+ * Checks whether the internal dependency injector has set
+ *
+ * @return boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_Di_InjectionAwareInterface, hasDI);

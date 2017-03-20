@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Mvc_Application, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &dependency_injector);
 
-	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
+	if (dependency_injector) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 }

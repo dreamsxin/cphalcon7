@@ -50,6 +50,7 @@ zend_class_entry *phalcon_di_injectable_ce;
 
 PHP_METHOD(Phalcon_Di_Injectable, setDI);
 PHP_METHOD(Phalcon_Di_Injectable, getDI);
+PHP_METHOD(Phalcon_Di_Injectable, hasDI);
 PHP_METHOD(Phalcon_Di_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
@@ -63,6 +64,7 @@ PHP_METHOD(Phalcon_Di_Injectable, __debugInfo);
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getDI, arginfo_phalcon_di_injectionawareinterface_getdi, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, hasDI, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, setEventsManager, arginfo_phalcon_events_eventsawareinterface_seteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
@@ -94,18 +96,17 @@ PHALCON_INIT_CLASS(Phalcon_Di_Injectable){
 /**
  * Sets the dependency injector
  *
- * @param Phalcon\DiInterface $dependencyInjector
+ * @param Phalcon\DiInterface|string $dependencyInjector
  * @throw Phalcon\Di\Exception
  */
 PHP_METHOD(Phalcon_Di_Injectable, setDI){
 
-	zval *dependency_injector, di = {};
+	zval *dependency_injector;
 
 	phalcon_fetch_params(0, 1, 0, &dependency_injector);
 
-	if (Z_TYPE_P(dependency_injector) != IS_OBJECT && PHALCON_IS_NOT_EMPTY(dependency_injector)) {
-		PHALCON_CALL_METHOD(&di, getThis(), "getdi", dependency_injector);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &di);
+	if (Z_TYPE_P(dependency_injector) == IS_NULL || Z_TYPE_P(dependency_injector) == IS_STRING) {
+		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
 	} else {
 		PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce);
 		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
@@ -134,16 +135,39 @@ PHP_METHOD(Phalcon_Di_Injectable, getDI)
 	}
 
 	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
-	if (Z_TYPE(dependency_injector) != IS_OBJECT && !zend_is_true(not_use_default)) {
+	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
+		RETURN_CTOR(&dependency_injector);
+	}
+	if (likely(!zend_is_true(not_use_default)) || PHALCON_IS_NOT_EMPTY(&dependency_injector)) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
+		if (Z_TYPE(dependency_injector) == IS_OBJECT) {
+			RETURN_CTOR(&dependency_injector);
+		}
 	}
 
-	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
+	if (zend_is_true(error)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "A dependency injection container is not object");
 		return;
 	}
 
-	RETURN_CTOR(&dependency_injector);
+	RETURN_NULL();
+}
+
+/**
+ * Checks whether the internal dependency injector has set
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Di_Injectable, hasDI){
+
+	zval dependency_injector = {};
+
+	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	if (Z_TYPE(dependency_injector) == IS_OBJECT || PHALCON_IS_NOT_EMPTY(&dependency_injector)) {
+		RETURN_TRUE;
+	}
+
+	RETURN_FALSE;
 }
 
 /**

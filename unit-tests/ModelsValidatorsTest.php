@@ -400,6 +400,14 @@ class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($messages[0]->getType(), "TooShort");
 		$this->assertEquals($messages[0]->getField(), "name");
 		$this->assertEquals($messages[0]->getMessage(), "Field 歌名 must be at least 12 characters long");
+
+		$song->name = '水调歌头水调歌头水调歌头水调歌头水调歌头水调歌头';
+		$this->assertFalse($song->save());
+		$messages = $song->getMessages('name');
+		$this->assertEquals(count($messages), 1);
+		$this->assertEquals($messages[0]->getType(), "TooLong");
+		$this->assertEquals($messages[0]->getField(), "name");
+		$this->assertEquals($messages[0]->getMessage(), "Field 歌名 must not exceed :max characters long");
 	}
 
 }

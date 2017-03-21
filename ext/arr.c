@@ -329,7 +329,7 @@ PHP_METHOD(Phalcon_Arr, path){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), arr) {
 				PHALCON_CALL_SELF(&value, "path", arr, &keys);
-				
+
 				if (Z_TYPE(value) != IS_NULL) {
 					phalcon_array_append(&values, &value, PH_COPY);
 				}
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 			break;
 		} else {
 			PHALCON_CALL_FUNCTION(&is_digit, "ctype_digit", &key);
-		
+
 			if (zend_is_true(&is_digit)) {
 				convert_to_long(&key);
 			}
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Arr, choice){
  *
  *     // Get the values "username", "password" from $_POST
  *     $auth = \Phalcon\Arr::extract($_POST, array('username', 'password'));
- *     
+ *
  *     // Get the value "level1.level2a" from $data
  *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
  *     \Phalcon\Arr::extract($data, array('level1.level2a', 'password'));
@@ -802,7 +802,7 @@ PHP_METHOD(Phalcon_Arr, merge){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
- 
+
 	if (ZEND_NUM_ARGS() > 2) {
 		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
 		if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
@@ -858,7 +858,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 			phalcon_array_update_long(return_value, idx, value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
- 
+
 	if (ZEND_NUM_ARGS() > 2) {
 		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
 		if (zend_get_parameters_array_ex(ZEND_NUM_ARGS(), args) == FAILURE) {
@@ -1146,7 +1146,7 @@ PHP_METHOD(Phalcon_Arr, toArray){
 				} else {
 					ZVAL_LONG(&tmp, idx);
 				}
-				
+
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
 					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);

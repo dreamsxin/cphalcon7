@@ -10,6 +10,8 @@ class Songs extends Phalcon\Mvc\Model
 			'min' => 12,
 		)));
 
+		$this->validate(array('field' => 'name', 'label' => '名称', 'type' => 'TooLong', 'validator' => function($v){ return empty($v) || strlen($v) < 30;}));
+
 		return $this->validate($validation);
 	}
 

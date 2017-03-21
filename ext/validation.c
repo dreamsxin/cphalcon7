@@ -24,11 +24,12 @@
 #include "validation/message/group.h"
 #include "validation/validator.h"
 #include "validation/validatorinterface.h"
+#include "translate/adapterinterface.h"
 #include "di.h"
 #include "di/injectable.h"
 #include "filterinterface.h"
 #include "kernel.h"
-#include "translate/adapterinterface.h"
+#include "arr.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -80,24 +81,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfilters, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getfilters, 0, 0, 0)
-	ZEND_ARG_INFO(0, attribute)
+	ZEND_ARG_TYPE_INFO(0, attribute, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setentity, 0, 0, 0)
-	ZEND_ARG_INFO(0, entity)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_appendmessage, 0, 0, 1)
-	ZEND_ARG_INFO(0, message)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setentity, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, entity, IS_OBJECT, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_bind, 0, 0, 2)
-	ZEND_ARG_INFO(0, entity)
+	ZEND_ARG_TYPE_INFO(0, entity, IS_OBJECT, 0)
 	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getvalue, 0, 0, 1)
-	ZEND_ARG_INFO(0, attribute)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setdefaultmessages, 0, 0, 1)
@@ -106,14 +99,11 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getdefaultmessage, 0, 0, 1)
 	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, defaultValue, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setlabels, 0, 0, 1)
 	ZEND_ARG_INFO(0, labels)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getlabel, 0, 0, 1)
-	ZEND_ARG_INFO(0, field)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfile, 0, 0, 1)
@@ -134,13 +124,13 @@ static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, setEntity, arginfo_phalcon_validation_setentity, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getEntity, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getMessages, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation, appendMessage, arginfo_phalcon_validation_appendmessage, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, appendMessage, arginfo_phalcon_validationinterface_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, bind, arginfo_phalcon_validation_bind, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation, getValue, arginfo_phalcon_validation_getvalue, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, getValue, arginfo_phalcon_validationinterface_getvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setDefaultMessages, arginfo_phalcon_validation_setdefaultmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getDefaultMessage, arginfo_phalcon_validation_getdefaultmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setLabels, arginfo_phalcon_validation_setlabels, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation, getLabel, arginfo_phalcon_validation_getlabel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, getLabel, arginfo_phalcon_validationinterface_getlabel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setFile, arginfo_phalcon_validation_setfile, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Validation, getMessage, arginfo_phalcon_validation_getmessage, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
@@ -434,9 +424,15 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 	phalcon_fetch_params(0, 1, 0, &message);
 
 	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
-	if (Z_TYPE(messages) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &messages, "appendmessage", message);
+	if (Z_TYPE(messages) != IS_OBJECT) {
+	   object_init_ex(&messages, phalcon_validation_message_group_ce);
+	   PHALCON_CALL_METHOD(NULL, &messages, "__construct");
+
+	   phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
 	}
+
+	PHALCON_CALL_METHOD(NULL, &messages, "appendmessage", message);
+
 	RETURN_THIS();
 }
 
@@ -454,15 +450,8 @@ PHP_METHOD(Phalcon_Validation, bind){
 
 	phalcon_fetch_params(0, 2, 0, &entity, &data);
 
-	if (Z_TYPE_P(entity) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The entity must be an object");
-		return;
-	}
-	if (Z_TYPE_P(data) != IS_ARRAY) {
-		if (Z_TYPE_P(data) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The data to validate must be an array or object");
-			return;
-		}
+	if (Z_TYPE_P(data) != IS_ARRAY && Z_TYPE_P(data) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The data to validate must be an array or object");
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
@@ -483,29 +472,6 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
-	phalcon_return_property(&entity, getThis(), SL("_entity"));
-
-	/**
-	 * If the entity is an object use it to retrieve the values
-	 */
-	if (Z_TYPE(entity) == IS_OBJECT) {
-		if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&value, &entity, "readattribute", attribute);
-		} else {
-			phalcon_return_property_zval(&value, &entity, attribute);
-		}
-
-		RETURN_CTOR(&value);
-	}
-
-	phalcon_return_property(&data, getThis(), SL("_data"));
-	if (Z_TYPE(data) != IS_ARRAY) {
-		if (Z_TYPE(data) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no data to validate");
-			return;
-		}
-	}
-
 	/**
 	 * Check if there is a calculated value
 	 */
@@ -514,12 +480,27 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		RETURN_CTOR(&value);
 	}
 
-	if (Z_TYPE(data) == IS_ARRAY) {
-		if (phalcon_array_isset(&data, attribute)) {
-			phalcon_array_fetch(&value, &data, attribute, PH_NOISY);
+	phalcon_return_property(&entity, getThis(), SL("_entity"));
+
+	phalcon_return_property(&data, getThis(), SL("_data"));
+	if (Z_TYPE(data) != IS_ARRAY && Z_TYPE(data) != IS_OBJECT) {
+		/**
+		 * If the entity is an object use it to retrieve the values
+		 */
+		if (Z_TYPE(entity) == IS_OBJECT) {
+			if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
+				PHALCON_CALL_METHOD(&value, &entity, "readattribute", attribute);
+			} else {
+				phalcon_return_property_zval(&value, &entity, attribute);
+			}
+			RETURN_CTOR(&value);
+		} else {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no data to validate");
 		}
-	} else if (Z_TYPE(data) == IS_OBJECT) {
-		if (phalcon_isset_property_zval(&data, attribute)) {
+	} else {
+		if (Z_TYPE(data) == IS_ARRAY && phalcon_array_isset(&data, attribute)) {
+			phalcon_array_fetch(&value, &data, attribute, PH_NOISY);
+		} else if (Z_TYPE(data) == IS_OBJECT && phalcon_isset_property_zval(&data, attribute)) {
 			phalcon_return_property_zval(&value, &data, attribute);
 		}
 	}
@@ -529,6 +510,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		if (Z_TYPE(filters) == IS_ARRAY) {
 			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute, 0)) {
 				if (zend_is_true(&field_filters)) {
+					zval filter_value = {};
 					ZVAL_STRING(&service_name, ISV(filter));
 
 					PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
@@ -544,19 +526,27 @@ PHP_METHOD(Phalcon_Validation, getValue){
 					}
 
 					PHALCON_VERIFY_INTERFACE(&filter_service, phalcon_filterinterface_ce);
-					PHALCON_RETURN_CALL_METHOD(&filter_service, "sanitize", &value, &field_filters);
-					return;
+					PHALCON_CALL_METHOD(&filter_value, &filter_service, "sanitize", &value, &field_filters);
+					PHALCON_CPY_WRT(&value, &filter_value);
 				}
 			}
 		}
+
+	   	if (Z_TYPE(entity) == IS_OBJECT) {
+	   		if (phalcon_method_exists_ex(&entity, SL("writeattribute")) == SUCCESS) {
+	   			PHALCON_CALL_METHOD(&value, &entity, "writeattribute", attribute, &value);
+	   		} else {
+	   			phalcon_update_property_zval_zval(&entity, attribute, &value);
+	   		}
+	   	}
 
 		/**
 		 * Cache the calculated value
 		 */
 		phalcon_update_property_array(getThis(), SL("_values"), attribute, &value);
-
-		RETURN_CTOR(&value);
 	}
+
+	RETURN_CTOR(&value);
 }
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
@@ -576,16 +566,20 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, filename = {}, *file;
+	zval *type, *default_value = NULL, filename = {}, *file;
 
-	phalcon_fetch_params(0, 1, 0, &type);
+	phalcon_fetch_params(0, 1, 1, &type, &default_value);
+
+	if (!default_value) {
+		default_value = &PHALCON_GLOBAL(z_null);
+	}
 
 	phalcon_read_property(&filename, getThis(), SL("_filename"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(&filename)) {
 		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
-		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type, default_value);
 	} else {
-		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type);
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type, default_value);
 	}
 
 }
@@ -612,11 +606,12 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  * Get label for field
  *
  * @param string|array field
- * @return mixed
+ * @return string
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, value = {}, entity = {}, service = {}, translate = {};
+	zval *field_param = NULL, labels = {}, value = {}, entity = {};
+	int exists = 0;
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
 
@@ -629,38 +624,46 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 		RETURN_NULL();
 	}
 
-	if (Z_TYPE_P(field_param) == IS_ARRAY) {
-		phalcon_fast_join_str(&value, SL(", "), field_param);
-goto end;
-	}
-
 	phalcon_return_property(&labels, getThis(), SL("_labels"));
-	if (Z_TYPE(labels) == IS_ARRAY && Z_TYPE_P(field_param) == IS_STRING) {
-		if (phalcon_array_isset_fetch(&value, &labels, field_param, 0)) {
-goto end;
-		}
-	}
-
 	phalcon_return_property(&entity, getThis(), SL("_entity"));
-	if (Z_TYPE(entity) == IS_OBJECT) {
-		if (phalcon_method_exists_ex(&entity, SL("getlabel")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
-goto end;
+	if (Z_TYPE(entity) == IS_OBJECT && phalcon_method_exists_ex(&entity, SL("getlabel")) == SUCCESS) {
+		exists = 1;
+	}
+
+	if (Z_TYPE_P(field_param) == IS_ARRAY) {
+		zval label_values = {}, *field;
+		array_init(&label_values);
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(field_param), field) {
+			zval label = {};
+			if (Z_TYPE(labels) == IS_ARRAY && phalcon_array_isset_fetch(&label, &labels, field, 0) && Z_TYPE(label) == IS_STRING) {
+				phalcon_array_append(&label_values, &label, PH_COPY);
+			} else if (exists) {
+				PHALCON_CALL_METHOD(&label, &entity, "getlabel", field_param);
+				if (Z_TYPE(label) == IS_STRING) {
+					phalcon_array_append(&label_values, &label, PH_COPY);
+				} else {
+					phalcon_array_append(&label_values, field, PH_COPY);
+				}
+			} else {
+				phalcon_array_append(&label_values, field, PH_COPY);
+			}
+		} ZEND_HASH_FOREACH_END();
+		phalcon_fast_join_str(&value, SL(", "), &label_values);
+	} else {
+		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(&value, &labels, field_param, 0) || Z_TYPE(value) != IS_STRING) {
+			if (exists) {
+				PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
+				if (Z_TYPE(value) != IS_STRING) {
+					PHALCON_CPY_WRT(&value, field_param);
+				}
+			} else {
+				PHALCON_CPY_WRT(&value, field_param);
+			}
 		}
 	}
 
-	PHALCON_CPY_WRT(&value, field_param);
-
-end:
-	ZVAL_STRING(&service, ISV(translate));
-
-	PHALCON_CALL_METHOD(&translate, getThis(), "getresolveservice", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
-	if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
-		PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
-		PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
-	} else {
-		RETURN_CTOR(&value);
-	}
+	RETURN_CTOR(&value);
 }
 
 PHP_METHOD(Phalcon_Validation, setFile)

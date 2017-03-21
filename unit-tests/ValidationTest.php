@@ -51,6 +51,9 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		if (file_exists('unit-tests/models/'.$className.'.php')) {
 			require 'unit-tests/models/'.$className.'.php';
 		}
+		if (file_exists('unit-tests/validators/'.$className.'.php')) {
+			require 'unit-tests/validators/'.$className.'.php';
+		}
 	}
 
 	protected function _getDI(){
@@ -1334,5 +1337,18 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$validation->add('username', new Phalcon\Validation\Validator\Digit());
 		$messages = $validation->validate($_POST);
 		$this->assertEquals($messages[0]->getMessage(), "用户名只能使用数字字符");
+	}
+
+	public function testCustomValidators()
+	{
+		Phalcon\Kernel::setBasePath("unit-tests/");
+		Phalcon\Kernel::setMessagesDir("messages/");
+
+		$_POST = array('idcard' => 'Phalcon7');
+
+		$validation = new Phalcon\Validation();
+		$validation->add('idcard', new IdCard(array('label' => '身份证', 'message' => ':field格式不正确')));
+		$messages = $validation->validate($_POST);
+		$this->assertEquals($messages[0]->getMessage(), "身份证格式不正确");
 	}
 }

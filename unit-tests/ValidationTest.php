@@ -1351,10 +1351,11 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$messages = $validation->validate($_POST);
 		$this->assertEquals($messages[0]->getMessage(), "身份证格式不正确");
 
+		Phalcon\Validation::setLabelDelimiter('、');
 		$validation = new Phalcon\Validation();
 		$validation->setLabels(array('id'=>'编号', 'name' => '姓名'));
 		$validation->add(array('id', 'name', 'sex'), new MultiCheck(array('num' => 2)));
 		$messages = $validation->validate($_POST);
-		$this->assertEquals($messages[0]->getMessage(), "Field 编号, 姓名, sex must set more than 2");
+		$this->assertEquals($messages[0]->getMessage(), "Field 编号、姓名、sex must set more than 2");
 	}
 }

@@ -29,9 +29,7 @@
 #define PHALCON_TRIM_RIGHT 2
 #define PHALCON_TRIM_BOTH  3
 
-#define PHALCON_STR_REPLACE(return_value, search, replace, subject)  PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
-
 #define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) PHALCON_CALL_FUNCTION(return_value, "preg_replace", regex, replace, subject)
 
 #define PHALCON_RANDOM_ALNUM   0

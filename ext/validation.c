@@ -67,6 +67,7 @@ PHP_METHOD(Phalcon_Validation, setDefaultMessages);
 PHP_METHOD(Phalcon_Validation, getDefaultMessage);
 PHP_METHOD(Phalcon_Validation, setLabels);
 PHP_METHOD(Phalcon_Validation, getLabel);
+PHP_METHOD(Phalcon_Validation, setLabelDelimiter);
 PHP_METHOD(Phalcon_Validation, setFile);
 PHP_METHOD(Phalcon_Validation, getMessage);
 
@@ -106,6 +107,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setlabels, 0, 0, 1)
 	ZEND_ARG_INFO(0, labels)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setlabeldelimiter, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, delimiter, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfile, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -131,6 +136,7 @@ static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, getDefaultMessage, arginfo_phalcon_validation_getdefaultmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setLabels, arginfo_phalcon_validation_setlabels, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getLabel, arginfo_phalcon_validationinterface_getlabel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, setLabelDelimiter, arginfo_phalcon_validation_setlabeldelimiter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Validation, setFile, arginfo_phalcon_validation_setfile, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Validation, getMessage, arginfo_phalcon_validation_getmessage, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
@@ -151,6 +157,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_filename"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_validation_ce, SL("_delimiter"), ", ", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_validation_ce, SL("_file"), "validation", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
@@ -603,7 +610,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 }
 
 /**
- * Get label for field
+ * Gets label for field
  *
  * @param string|array field
  * @return string
@@ -631,7 +638,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	}
 
 	if (Z_TYPE_P(field_param) == IS_ARRAY) {
-		zval label_values = {}, *field;
+		zval label_values = {}, *field, *delimiter;
 		array_init(&label_values);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(field_param), field) {
@@ -649,7 +656,8 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 				phalcon_array_append(&label_values, field, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
-		phalcon_fast_join_str(&value, SL(", "), &label_values);
+		delimiter = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_delimiter"));
+		phalcon_fast_join_str(&value, Z_STRVAL_P(delimiter), Z_STRLEN_P(delimiter), &label_values);
 	} else {
 		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(&value, &labels, field_param, 0) || Z_TYPE(value) != IS_STRING) {
 			if (exists) {
@@ -666,6 +674,25 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	RETURN_CTOR(&value);
 }
 
+/**
+ * Sets delimiter for label
+ *
+ * @param string
+ */
+PHP_METHOD(Phalcon_Validation, setLabelDelimiter)
+{
+	zval *delimiter;
+
+	phalcon_fetch_params(0, 1, 0, &delimiter);
+
+	phalcon_update_static_property_ce(phalcon_validation_ce, SL("_delimiter"), delimiter);
+}
+
+/**
+ * Sets validation message file name
+ *
+ * @param string
+ */
 PHP_METHOD(Phalcon_Validation, setFile)
 {
 	zval *file;
@@ -675,6 +702,11 @@ PHP_METHOD(Phalcon_Validation, setFile)
 	phalcon_update_static_property_ce(phalcon_validation_ce, SL("_file"), file);
 }
 
+/**
+ * Gets message
+ *
+ * @param string
+ */
 PHP_METHOD(Phalcon_Validation, getMessage)
 {
 	zval *type, *file;

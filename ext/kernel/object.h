@@ -61,6 +61,7 @@ int phalcon_zval_is_traversable(zval *object);
 
 /** Method exists */
 int phalcon_method_exists(const zval *object, const zval *method_name);
+int phalcon_internal_method_exists(const zval *object, const zval *method_name);
 int phalcon_method_exists_ex(const zval *object, const char *method_name, uint32_t method_len);
 int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name);
 int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len);

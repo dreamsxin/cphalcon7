@@ -1344,6 +1344,21 @@ int phalcon_method_exists(const zval *object, const zval *method_name){
 	return FAILURE;
 }
 
+
+int phalcon_internal_method_exists(const zval *object, const zval *method_name){
+
+	zend_class_entry *ce;
+
+	ce = Z_OBJCE_P(object);
+	while (ce && ce->type != ZEND_INTERNAL_CLASS) {
+		ce = ce->parent;
+	}
+	if (ce) {
+		return phalcon_method_exists_ce(ce, method_name);
+	}
+	return FAILURE;
+}
+
 /**
  * Check if method exists on certain object using explicit char param
  *

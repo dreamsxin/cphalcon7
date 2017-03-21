@@ -89,17 +89,18 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Uniqueness){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 
-	zval *validator, *attribute, record = {}, meta_data = {}, except = {}, operation_made = {}, excepts = {}, column_map = {}, primary_fields = {};
+	zval *validaton, *attribute, record = {}, meta_data = {}, except = {}, operation_made = {}, excepts = {}, column_map = {}, primary_fields = {};
 	zval *primary_field, values = {}, *field = NULL, value = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {};
 	zval message = {}, exception_message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
+	phalcon_fetch_params(0, 2, 0, &validaton, &attribute);
+	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&record, ce, getThis(), ISV(model)));
 
 	if (Z_TYPE(record) != IS_OBJECT) {
-		PHALCON_CALL_METHOD(&record, validator, "getentity");
+		PHALCON_CALL_METHOD(&record, validaton, "getentity");
 	}
 	PHALCON_VERIFY_INTERFACE_EX(&record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
 
@@ -177,14 +178,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(&label)) {
-				if (Z_TYPE_P(attribute) == IS_ARRAY) {
-					phalcon_fast_join_str(&label, SL(", "), attribute);
-				} else {
-					PHALCON_CPY_WRT_CTOR(&label, attribute);
-				}
-			}
+			PHALCON_CALL_METHOD(&label, validaton, "getlabel", attribute);
 		}
 
 		array_init_size(&pairs, 1);
@@ -192,7 +186,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Uniqueness"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validaton), validaton, "Uniqueness"));
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
@@ -204,7 +198,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Uniqueness", &code);
 
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validaton, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 

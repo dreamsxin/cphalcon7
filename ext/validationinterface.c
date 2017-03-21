@@ -26,7 +26,10 @@ zend_class_entry *phalcon_validationinterface_ce;
 static const zend_function_entry phalcon_validationinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, validate, arginfo_phalcon_validationinterface_validate)
 	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, add, arginfo_phalcon_validationinterface_add)
-	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, getMessages, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, getLabel, arginfo_phalcon_validationinterface_getlabel)
+	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, getValue, arginfo_phalcon_validationinterface_getvalue)
+	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, appendMessage, arginfo_phalcon_validationinterface_appendmessage)
+	PHP_ABSTRACT_ME(Phalcon_ValidationInterface, getMessages, arginfo_phalcon_validationinterface_getmessage)
 	PHP_FE_END
 };
 
@@ -57,6 +60,30 @@ PHALCON_DOC_METHOD(Phalcon_ValidationInterface, validate);
  * @return Phalcon\Validation
  */
 PHALCON_DOC_METHOD(Phalcon_ValidationInterface, add);
+
+/**
+ * Get label for field
+ *
+ * @param string|array field
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_ValidationInterface, getLabel);
+
+/**
+ * Gets the a value to validate in the array/object data source
+ *
+ * @param string $attribute
+ * @return mixed
+ */
+PHALCON_DOC_METHOD(Phalcon_ValidationInterface, getValue);
+
+/**
+ * Appends a message to the messages list
+ *
+ * @param Phalcon\Validation\MessageInterface $message
+ * @return Phalcon\Validation
+ */
+PHALCON_DOC_METHOD(Phalcon_ValidationInterface, appendMessages);
 
 /**
  * Returns the registered validators

@@ -81,14 +81,13 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Date){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Date, validate){
 
-	zval *validator, *attribute, value = {}, allow_empty = {}, format = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
+	zval *validaton, *attribute, value = {}, allow_empty = {}, format = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 0, &validator, &attribute);
+	phalcon_fetch_params(0, 2, 0, &validaton, &attribute);
+	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
-	PHALCON_VERIFY_CLASS_EX(validator, phalcon_validation_ce, phalcon_validation_exception_ce);
-
-	PHALCON_CALL_METHOD(&value, validator, "getvalue", attribute);
+	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
@@ -102,10 +101,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, validate){
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
-			PHALCON_CALL_METHOD(&label, validator, "getlabel", attribute);
-			if (!zend_is_true(&label)) {
-				PHALCON_CPY_WRT_CTOR(&label, attribute);
-			}
+			PHALCON_CALL_METHOD(&label, validaton, "getlabel", attribute);
 		}
 
 		array_init_size(&pairs, 1);
@@ -113,7 +109,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, validate){
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
-			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validator), validator, "Date"));
+			RETURN_ON_FAILURE(phalcon_validation_getdefaultmessage_helper(&message_str, Z_OBJCE_P(validaton), validaton, "Date"));
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
@@ -125,7 +121,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, validate){
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Date", &code);
 
-		PHALCON_CALL_METHOD(NULL, validator, "appendmessage", &message);
+		PHALCON_CALL_METHOD(NULL, validaton, "appendmessage", &message);
 		RETURN_FALSE;
 	}
 

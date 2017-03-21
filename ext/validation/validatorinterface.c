@@ -69,8 +69,8 @@ PHALCON_DOC_METHOD(Phalcon_Validation_ValidatorInterface, setOption);
 /**
  * Executes the validation
  *
- * @param Phalcon\Validator $validator
- * @param string $attribute
+ * @param Phalcon\ValidationInterface $validator
+ * @param string|array $attribute
  * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Validation_ValidatorInterface, validate);

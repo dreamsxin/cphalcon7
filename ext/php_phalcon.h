@@ -60,6 +60,11 @@ typedef struct _phalcon_orm_options {
 	zend_bool enable_strict;
 } phalcon_orm_options;
 
+/** Validation options */
+typedef struct _phalcon_validation_options {
+	zend_bool allow_empty;
+} phalcon_validation_options;
+
 /** Security options */
 typedef struct _phalcon_security_options {
 	zend_bool crypt_std_des_supported;
@@ -102,6 +107,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/** ORM */
 	phalcon_orm_options orm;
+
+	/** Validation */
+	phalcon_validation_options validation;
 
 	/** Max recursion control */
 	unsigned int recursive_lock;

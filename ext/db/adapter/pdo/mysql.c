@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		 * If the column set the default values, get it
 		 */
 		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY);
-		if (Z_TYPE_P(&attribute) == IS_STRING) {
+		if (Z_TYPE(attribute) == IS_STRING) {
 			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
 

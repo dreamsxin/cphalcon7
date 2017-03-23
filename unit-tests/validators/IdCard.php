@@ -4,7 +4,7 @@ use Phalcon\Validation\Validator,
 
 class IdCard extends Validator implements ValidatorInterface
 {
-	public function validate(Phalcon\ValidationInterface $validation, $attribute)
+	public function validate(Phalcon\ValidationInterface $validation, $attribute, bool $allowEmpty = NULL)
 	{
 		if (!is_string($attribute)) {
 			throw new Exception("Field must be string");

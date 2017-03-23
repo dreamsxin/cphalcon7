@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			return;
 		}
 
-		if (Z_TYPE_P(&module) != IS_ARRAY) {
+		if (Z_TYPE(module) != IS_ARRAY) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_console_exception_ce, "Invalid module definition path");
 			return;
 		}

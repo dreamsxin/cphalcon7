@@ -686,7 +686,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	PHALCON_CALL_METHOD(&escape_char, getThis(), "getescapechar");
 
-	if (Z_TYPE_P(&columns) == IS_ARRAY) {
+	if (Z_TYPE(columns) == IS_ARRAY) {
 		array_init(&selected_columns);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&columns), column) {
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 				    phalcon_array_isset_fetch_long(&column_item, column, 0)
 				 || phalcon_array_isset_fetch_str(&column_item, column, SL("column"))
 			) {
-				if (Z_TYPE_P(&column_item) == IS_ARRAY) {
+				if (Z_TYPE(column_item) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
 				} else if (PHALCON_IS_STRING(&column_item, "*")) {
 					PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
@@ -757,7 +757,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check and escape tables
 	 */
-	if (Z_TYPE_P(&tables) == IS_ARRAY) {
+	if (Z_TYPE(tables) == IS_ARRAY) {
 		array_init(&selected_tables);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
-		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
+		if (Z_TYPE(where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
@@ -888,7 +888,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	 * Check for a LIMIT condition
 	 */
 	if (phalcon_array_isset_fetch_str(&limit_value, definition, SL("limit"))) {
-		if (likely(Z_TYPE_P(&limit_value) == IS_ARRAY)) {
+		if (likely(Z_TYPE(limit_value) == IS_ARRAY)) {
 			if (likely(phalcon_array_isset_fetch_str(&number, &limit_value, SL("number")))) {
 				phalcon_array_fetch_str(&tmp1, &number, SL("value"), PH_NOISY);
 
@@ -1153,7 +1153,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	 * Check for a LIMIT condition
 	 */
 	if (phalcon_array_isset_fetch_str(&limit_value, definition, SL("limit"))) {
-		if (likely(Z_TYPE_P(&limit_value) == IS_ARRAY)) {
+		if (likely(Z_TYPE(limit_value) == IS_ARRAY)) {
 			if (likely(phalcon_array_isset_fetch_str(&number, &limit_value, SL("number")))) {
 				phalcon_array_fetch_str(&tmp1, &number, SL("value"), PH_NOISY);
 
@@ -1218,7 +1218,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"))) {
-		if (Z_TYPE_P(&where_conditions) == IS_ARRAY) {
+		if (Z_TYPE(where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 		} else {
@@ -1256,7 +1256,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	 * Check for a LIMIT condition
 	 */
 	if (phalcon_array_isset_fetch_str(&limit_value, definition, SL("limit"))) {
-		if (likely(Z_TYPE_P(&limit_value) == IS_ARRAY)) {
+		if (likely(Z_TYPE(limit_value) == IS_ARRAY)) {
 			if (likely(phalcon_array_isset_fetch_str(&number, &limit_value, SL("number")))) {
 				phalcon_array_fetch_str(&tmp1, &number, SL("value"), PH_NOISY);
 

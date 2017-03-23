@@ -231,14 +231,14 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	/**
 	 * Create the instance only if the dialect is a string
 	 */
-	if (likely(Z_TYPE_P(&dialect_class) == IS_STRING)) {
+	if (likely(Z_TYPE(dialect_class) == IS_STRING)) {
 		ce0 = phalcon_fetch_class(&dialect_class, ZEND_FETCH_CLASS_DEFAULT);
 		PHALCON_OBJECT_INIT(&dialect_object, ce0);
 		if (phalcon_has_constructor(&dialect_object)) {
 			PHALCON_CALL_METHOD(NULL, &dialect_object, "__construct");
 		}
 		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_object);
-	} else if (Z_TYPE_P(&dialect_class) == IS_OBJECT) {
+	} else if (Z_TYPE(dialect_class) == IS_OBJECT) {
 		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_class);
 	}
 

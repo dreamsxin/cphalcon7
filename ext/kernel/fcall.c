@@ -310,7 +310,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			}
 		}
 	}
-
+	zval_ptr_dtor(&func_name);
 	efree(arguments);
 	if (retval == NULL) {
 		if (!Z_ISUNDEF(ret)) {

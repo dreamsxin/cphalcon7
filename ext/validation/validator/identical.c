@@ -81,13 +81,23 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Identical){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 
-	zval *validaton, *attribute, value = {}, identical_value = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
+	zval *validaton, *attribute, *_allow_empty = NULL, value = {}, allow_empty = {}, identical_value = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 0, &validaton, &attribute);
+	phalcon_fetch_params(0, 2, 1, &validaton, &attribute, &_allow_empty);
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
 	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
+
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (Z_TYPE(allow_empty) == IS_NULL) {
+		if (_allow_empty && zend_is_true(_allow_empty)) {
+			PHALCON_CPY_WRT(&allow_empty, _allow_empty);
+		}
+	}
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
+		RETURN_TRUE;
+	}
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&identical_value, ce, getThis(), ISV(value)));
 
@@ -108,7 +118,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Identical, validate){
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		if (Z_TYPE(code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 

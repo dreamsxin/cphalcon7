@@ -574,7 +574,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 
 	if (status != FAILURE) {
 		if (parser_status->status == PHQL_PARSING_OK) {
-			if (Z_TYPE_P(&parser_status->ret) == IS_ARRAY) {
+			if (Z_TYPE(parser_status->ret) == IS_ARRAY) {
 
 				/**
 				 * Set a unique id for the parsed ast

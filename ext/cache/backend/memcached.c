@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, flush){
 	}
 
 	/* Get the key from memcached */
-	if (Z_TYPE_P(&special_key) != IS_NULL) {
+	if (Z_TYPE(special_key) != IS_NULL) {
 		PHALCON_CALL_METHOD(&keys, &memcache, "get", &special_key);
 		if (Z_TYPE(keys) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY(Z_ARRVAL(keys), idx, str_key) {

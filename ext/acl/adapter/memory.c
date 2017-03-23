@@ -172,10 +172,12 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 	array_init_size(&resources_names, 1);
 	phalcon_array_update_str(&resources_names, SL("*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_zval(getThis(), SL("_resourcesNames"), &resources_names);
+	zval_ptr_dtor(&resources_names);
 
 	array_init_size(&access_list, 1);
 	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_zval(getThis(), SL("_accessList"), &access_list);
+	zval_ptr_dtor(&access_list);
 }
 
 /**
@@ -252,7 +254,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 		PHALCON_CPY_WRT(&role_inherit_name, role_to_inherit);
 	}
 
-	/** 
+	/**
 	 * Check if the role to inherit is valid
 	 */
 	if (!phalcon_array_isset(&roles_names, &role_inherit_name)) {
@@ -490,7 +492,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 
 		PHALCON_CONCAT_VSVSV(&access_key, role_name, "!", resource_name, "!", access);
 
-		/** 
+		/**
 		 * Define the access action for the specified accessKey
 		 */
 		phalcon_update_property_array(getThis(), SL("_access"), &access_key, action);
@@ -775,7 +777,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	phalcon_read_property(&default_access, getThis(), SL("_defaultAccess"), PH_NOISY);
 
-	/** 
+	/**
 	 * Check if the role exists
 	 */
 	phalcon_read_property(&roles_names, getThis(), SL("_rolesNames"), PH_NOISY);
@@ -787,7 +789,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
 	PHALCON_CONCAT_VSVSV(&access_key, &role_name, "!", &resource_name, "!", access);
 
-	/** 
+	/**
 	 * Check if there is a direct combination for role-resource-access
 	 */
 	if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
@@ -796,7 +798,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		allow_access = PHALCON_ACL_DUNNO;
 	}
 
-	/** 
+	/**
 	 * Check in the inherits roles
 	 */
 	if (PHALCON_ACL_DUNNO == allow_access) {
@@ -804,13 +806,13 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		allow_access  = phalcon_role_adapter_memory_check_inheritance(role, resource, access, &access_list, &role_inherits);
 	}
 
-	/** 
+	/**
 	 * If access wasn't found yet, try role-resource-*
 	 */
 	if (PHALCON_ACL_DUNNO == allow_access) {
 		PHALCON_CONCAT_VSVS(&access_key, &role_name, "!", &resource_name, "!*");
 
-		/** 
+		/**
 		 * In the direct role
 		 */
 		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
@@ -820,13 +822,13 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		}
 	}
 
-	/** 
+	/**
 	 * If access wasn't found yet, try role-*-*
 	 */
 	if (PHALCON_ACL_DUNNO == allow_access) {
 		PHALCON_CONCAT_VS(&access_key, &role_name, "!*!*");
 
-		/** 
+		/**
 		 * Try in the direct role
 		 */
 		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
@@ -851,6 +853,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 			if (!zend_is_true(&ret)) {
 				ZVAL_BOOL(return_value, PHALCON_ACL_DENY == allow_access);
 			}
+			zval_ptr_dtor(&arguments);
 		}
 	}
 

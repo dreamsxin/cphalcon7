@@ -1326,7 +1326,7 @@ PHP_METHOD(Phalcon_Debug, onUserDefinedError){
 	if (context && Z_TYPE_P(context) == IS_ARRAY) {
 		if (
 			!phalcon_array_isset_fetch_str(&previous, context, SL("e")) ||
-			Z_TYPE_P(&previous) != IS_OBJECT ||
+			Z_TYPE(previous) != IS_OBJECT ||
 			!instanceof_function_ex(Z_OBJCE_P(&previous), zend_exception_get_default(), 1)
 		) {
 			ZVAL_NULL(&previous);

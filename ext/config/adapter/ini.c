@@ -139,7 +139,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	if (!phalcon_array_isset_fetch(&t1, arr, section, 0)) {
 		array_init(&t1);
 		phalcon_array_update_zval(arr, section, &t1, 0);
-	} else if (Z_TYPE_P(&t1) != IS_ARRAY) {
+	} else if (Z_TYPE(t1) != IS_ARRAY) {
 		convert_to_array_ex(&t1);
 	}
 	ZVAL_COPY(&tmp, &t1);

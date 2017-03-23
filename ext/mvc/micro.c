@@ -494,11 +494,11 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 
 			/* Map the route manually */
 			PHALCON_CALL_METHOD(&route, getThis(), "map", &prefixed_pattern, &real_handler);
-			if (Z_TYPE_P(&methods) != IS_NULL) {
+			if (Z_TYPE(methods) != IS_NULL) {
 				PHALCON_CALL_METHOD(NULL, &route, "via", &methods);
 			}
 
-			if (Z_TYPE_P(&name) != IS_NULL) {
+			if (Z_TYPE(name) != IS_NULL) {
 				PHALCON_CALL_METHOD(NULL, &route, "setname", &name);
 			}
 		} ZEND_HASH_FOREACH_END();

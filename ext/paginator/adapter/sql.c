@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	}
 
 	if (phalcon_array_isset_fetch_str(&bind, config, SL("bind"))) {
-		if (Z_TYPE_P(&bind) != IS_ARRAY) {
+		if (Z_TYPE(bind) != IS_ARRAY) {
 			phalcon_update_property_empty_array(getThis(), SL("_bind"));
 		} else {
 			phalcon_update_property_zval(getThis(), SL("_bind"), &bind);

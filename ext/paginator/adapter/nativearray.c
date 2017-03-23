@@ -106,7 +106,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'data' is required");
 		return;
-	} else if (Z_TYPE_P(&data) != IS_ARRAY) {
+	} else if (Z_TYPE(data) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "'data' should be an array");
 		return;
 	}

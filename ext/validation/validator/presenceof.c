@@ -86,6 +86,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
 	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
+
 	PHALCON_CALL_SELF(&valid, "valid", &value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
@@ -103,7 +104,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		if (Z_TYPE(code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 
@@ -130,9 +131,9 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, valid){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	if (PHALCON_IS_EMPTY(value)) {
-		RETURN_FALSE;
+	if (PHALCON_IS_NOT_EMPTY(value)) {
+		RETURN_TRUE;
 	}
 
-	RETURN_TRUE;
+	RETURN_FALSE;
 }

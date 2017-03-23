@@ -735,6 +735,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				phalcon_concat_self(&output, &html);
 			}
 
+			zval_ptr_dtor(&parameters);
 			continue;
 		}
 
@@ -861,6 +862,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_concat_self(&output, &html);
 			}
+			zval_ptr_dtor(&parameters);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -916,6 +918,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_concat_self(&output, &html);
 			}
+			zval_ptr_dtor(&parameters);
 		}
 	}
 
@@ -954,7 +957,8 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 
 	ZVAL_STRING(&type, "css");
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "output", &collection, &callback, &type, args);
+	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	zval_ptr_dtor(&callback);
 }
 
 /**
@@ -989,5 +993,6 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 
 	ZVAL_STRING(&type, "js");
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "output", &collection, &callback, &type, args);
+	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	zval_ptr_dtor(&callback);
 }

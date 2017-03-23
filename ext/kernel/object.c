@@ -110,6 +110,7 @@ int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *pr
 	phalcon_array_update_zval(&arr, index,  value, PH_COPY);
 	phalcon_update_static_property_ce(ce, property, property_length, &arr);
 
+	zval_ptr_dtor(&arr);
 	return SUCCESS;
 }
 
@@ -151,8 +152,11 @@ int phalcon_update_static_property_bool_ce(zend_class_entry *ce, const char *pro
 int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const char *name, uint32_t len)
 {
 	zval empty_array = {};
+	int ret;
 	array_init(&empty_array);
-	return zend_update_static_property(ce, name, len, &empty_array);
+	ret = zend_update_static_property(ce, name, len, &empty_array);
+	zval_ptr_dtor(&empty_array);
+	return ret;
 }
 
 int phalcon_update_static_property_array_append_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value)

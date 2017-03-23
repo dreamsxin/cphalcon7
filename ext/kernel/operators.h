@@ -47,10 +47,10 @@
 #define PHALCON_IS_BOOL(var)        (Z_TYPE_P(var) == IS_FALSE || Z_TYPE_P(var) == IS_TRUE)
 
 /** SQL null empty **/
-#define PHALCON_IS_EMPTY_STRING(var)		(Z_TYPE_P(var) == IS_STRING && !Z_STRLEN_P(var))
+#define PHALCON_IS_EMPTY_STRING(var)		(Z_TYPE_P(var) <= IS_NULL || (Z_TYPE_P(var) == IS_STRING && !Z_STRLEN_P(var)))
 #define PHALCON_IS_NOT_EMPTY_STRING(var)	(Z_TYPE_P(var) == IS_STRING && Z_STRLEN_P(var))
 #define PHALCON_IS_EMPTY_ARR(var)			(Z_TYPE_P(var) == IS_ARRAY && !zend_hash_num_elements(Z_ARRVAL_P(var)))
-#define PHALCON_IS_EMPTY(var)				(Z_TYPE_P(var) <= IS_NULL || PHALCON_IS_EMPTY_STRING(var) || PHALCON_IS_EMPTY_ARR(var))
+#define PHALCON_IS_EMPTY(var)				(PHALCON_IS_EMPTY_STRING(var) || PHALCON_IS_EMPTY_ARR(var))
 #define PHALCON_IS_NOT_EMPTY(var)			(!PHALCON_IS_EMPTY(var))
 
 /** Is scalar */

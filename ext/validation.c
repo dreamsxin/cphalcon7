@@ -62,18 +62,19 @@ PHP_METHOD(Phalcon_Validation, getEntity);
 PHP_METHOD(Phalcon_Validation, getMessages);
 PHP_METHOD(Phalcon_Validation, appendMessage);
 PHP_METHOD(Phalcon_Validation, bind);
+PHP_METHOD(Phalcon_Validation, getData);
 PHP_METHOD(Phalcon_Validation, getValue);
 PHP_METHOD(Phalcon_Validation, setDefaultMessages);
 PHP_METHOD(Phalcon_Validation, getDefaultMessage);
 PHP_METHOD(Phalcon_Validation, setLabels);
 PHP_METHOD(Phalcon_Validation, getLabel);
 PHP_METHOD(Phalcon_Validation, setLabelDelimiter);
-PHP_METHOD(Phalcon_Validation, setFile);
+PHP_METHOD(Phalcon_Validation, setMessageFilename);
 PHP_METHOD(Phalcon_Validation, getMessage);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, validators)
-	ZEND_ARG_INFO(0, file)
+	ZEND_ARG_TYPE_INFO(0, validators, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfilters, 0, 0, 2)
@@ -111,8 +112,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setlabeldelimiter, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, delimiter, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setfile, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_setmessagefilename, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_getmessage, 0, 0, 1)
@@ -131,13 +132,14 @@ static const zend_function_entry phalcon_validation_method_entry[] = {
 	PHP_ME(Phalcon_Validation, getMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, appendMessage, arginfo_phalcon_validationinterface_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, bind, arginfo_phalcon_validation_bind, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation, getData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getValue, arginfo_phalcon_validationinterface_getvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setDefaultMessages, arginfo_phalcon_validation_setdefaultmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getDefaultMessage, arginfo_phalcon_validation_getdefaultmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setLabels, arginfo_phalcon_validation_setlabels, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, getLabel, arginfo_phalcon_validationinterface_getlabel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation, setLabelDelimiter, arginfo_phalcon_validation_setlabeldelimiter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Validation, setFile, arginfo_phalcon_validation_setfile, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Validation, setMessageFilename, arginfo_phalcon_validation_setmessagefilename, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Validation, getMessage, arginfo_phalcon_validation_getmessage, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -156,9 +158,10 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 	zend_declare_property_null(phalcon_validation_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_ce, SL("_labels"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_validation_ce, SL("_filename"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_validation_ce, SL("_messageFilename"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_validation_ce, SL("_allowEmpty"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_validation_ce, SL("_delimiter"), ", ", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
-	zend_declare_property_string(phalcon_validation_ce, SL("_file"), "validation", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_validation_ce, SL("_defaultMessageFilename"), "validation", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_validation_ce, 1, phalcon_validationinterface_ce);
 
@@ -178,20 +181,15 @@ int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_e
  * Phalcon\Validation constructor
  *
  * @param array $validators
+ * @param array $options
  */
 PHP_METHOD(Phalcon_Validation, __construct){
 
-	zval *validators = NULL, *file = NULL;
+	zval *validators = NULL, *options = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &validators, &file);
+	phalcon_fetch_params(0, 0, 2, &validators, &options);
 
-	if (!validators) {
-		validators = &PHALCON_GLOBAL(z_null);
-	} else if (PHALCON_TYPE_P(validators) != IS_NULL) {
-		if (PHALCON_TYPE_P(validators) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Validators must be an array");
-			return;
-		}
+	if (validators && Z_TYPE_P(validators) == IS_ARRAY) {
 		phalcon_update_property_zval(getThis(), SL("_validators"), validators);
 	}
 
@@ -200,8 +198,14 @@ PHP_METHOD(Phalcon_Validation, __construct){
 		PHALCON_CALL_METHOD(NULL, getThis(), "initialize");
 	}
 
-	if (file && zend_is_true(file)) {
-		phalcon_update_property_zval(getThis(), SL("_filename"), file);
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		zval filename = {}, allow_empty = {};
+		if (phalcon_array_isset_fetch_str(&filename, options, SL("messageFilename"))) {
+			phalcon_update_property_zval(getThis(), SL("_messageFilename"), &filename);
+		}
+		if (phalcon_array_isset_fetch_str(&allow_empty, options, SL("allowEmpty"))) {
+			phalcon_update_property_zval(getThis(), SL("_allowEmpty"), &allow_empty);
+		}
 	}
 }
 
@@ -214,7 +218,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
  */
 PHP_METHOD(Phalcon_Validation, validate){
 
-	zval *data = NULL, *entity = NULL, validators = {}, messages = {}, status = {}, *scope;
+	zval *data = NULL, *entity = NULL, validators = {}, allow_empty = {}, messages = {}, status = {}, *scope;
 
 	phalcon_fetch_params(0, 0, 2, &data, &entity);
 
@@ -234,6 +238,8 @@ PHP_METHOD(Phalcon_Validation, validate){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no validators to validate");
 		return;
 	}
+
+	phalcon_return_property(&allow_empty, getThis(), SL("_allowEmpty"));
 
 	/**
 	 * Clear pre-calculated values
@@ -276,7 +282,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 			return;
 		}
 
-		PHALCON_CALL_METHOD(&status, &validator, "validate", getThis(), &attribute);
+		PHALCON_CALL_METHOD(&status, &validator, "validate", getThis(), &attribute, &allow_empty);
 
 		/**
 		 * Check if the validation must be canceled if this validator fails
@@ -468,16 +474,28 @@ PHP_METHOD(Phalcon_Validation, bind){
 }
 
 /**
+ * Gets the a array data source
+ *
+ * @return array|null
+ */
+PHP_METHOD(Phalcon_Validation, getData){
+
+
+	RETURN_MEMBER(getThis(), "_data");
+}
+
+/**
  * Gets the a value to validate in the array/object data source
  *
  * @param string $attribute
+ * @param object entity
  * @return mixed
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, entity = {}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
+	zval *attribute, *_entity = NULL, entity ={}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(0, 1, 1, &attribute, &_entity);
 
 	/**
 	 * Check if there is a calculated value
@@ -487,7 +505,11 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		RETURN_CTOR(&value);
 	}
 
-	phalcon_return_property(&entity, getThis(), SL("_entity"));
+	if (!_entity || Z_TYPE_P(_entity) != IS_OBJECT) {
+		phalcon_return_property(&entity, getThis(), SL("_entity"));
+	} else {
+		PHALCON_CPY_WRT(&entity, _entity);
+	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
 	if (Z_TYPE(data) != IS_ARRAY && Z_TYPE(data) != IS_OBJECT) {
@@ -541,7 +563,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 	   	if (Z_TYPE(entity) == IS_OBJECT) {
 	   		if (phalcon_method_exists_ex(&entity, SL("writeattribute")) == SUCCESS) {
-	   			PHALCON_CALL_METHOD(&value, &entity, "writeattribute", attribute, &value);
+	   			PHALCON_CALL_METHOD(NULL, &entity, "writeattribute", attribute, &value);
 	   		} else {
 	   			phalcon_update_property_zval_zval(&entity, attribute, &value);
 	   		}
@@ -581,9 +603,9 @@ PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&filename, getThis(), SL("_filename"), PH_NOISY);
+	phalcon_read_property(&filename, getThis(), SL("_messageFilename"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(&filename)) {
-		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"));
 		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type, default_value);
 	} else {
 		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type, default_value);
@@ -691,15 +713,15 @@ PHP_METHOD(Phalcon_Validation, setLabelDelimiter)
 /**
  * Sets validation message file name
  *
- * @param string
+ * @param string filename
  */
-PHP_METHOD(Phalcon_Validation, setFile)
+PHP_METHOD(Phalcon_Validation, setMessageFilename)
 {
-	zval *file;
+	zval *filename;
 
-	phalcon_fetch_params(0, 1, 0, &file);
+	phalcon_fetch_params(0, 1, 0, &filename);
 
-	phalcon_update_static_property_ce(phalcon_validation_ce, SL("_file"), file);
+	phalcon_update_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"), filename);
 }
 
 /**
@@ -709,11 +731,11 @@ PHP_METHOD(Phalcon_Validation, setFile)
  */
 PHP_METHOD(Phalcon_Validation, getMessage)
 {
-	zval *type, *file;
+	zval *type, *filename;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+	filename = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"));
 
-	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type);
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", filename, type);
 }

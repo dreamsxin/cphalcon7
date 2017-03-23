@@ -404,7 +404,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, save){
 	phalcon_fetch_params(0, 1, 0, &filename);
 
 	phalcon_read_property(&imagick, getThis(), SL("_imagick"), PH_NOISY);
-	if (Z_TYPE_P(&imagick) != IS_OBJECT) {
+	if (Z_TYPE(imagick) != IS_OBJECT) {
 		RETURN_FALSE;
 	}
 	PHALCON_RETURN_CALL_METHOD(&imagick, "writeImage", filename);

@@ -86,17 +86,22 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_StringLength){
  */
 PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
 {
-	zval *validaton, *attribute, value = {}, allow_empty = {}, valid = {}, type = {}, maximum = {}, minimum = {}, label = {};
+	zval *validaton, *attribute, *_allow_empty = NULL, value = {}, allow_empty = {}, valid = {}, type = {}, maximum = {}, minimum = {}, label = {};
 	zval code = {}, pairs = {}, message_str = {}, prepared = {}, message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 0, &validaton, &attribute);
+	phalcon_fetch_params(0, 2, 1, &validaton, &attribute, &_allow_empty);
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
 	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
-	if (zend_is_true(&allow_empty) && phalcon_validation_validator_isempty_helper(&value)) {
+	if (Z_TYPE(allow_empty) == IS_NULL) {
+		if (_allow_empty && zend_is_true(_allow_empty)) {
+			PHALCON_CPY_WRT(&allow_empty, _allow_empty);
+		}
+	}
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
 		RETURN_TRUE;
 	}
 

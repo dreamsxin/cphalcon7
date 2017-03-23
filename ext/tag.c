@@ -411,7 +411,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		zval tmp = {}, escaped = {};
 		if (key && Z_TYPE_P(value) > IS_NULL) {
 			ZVAL_STR(&tmp, key);
-			if (Z_TYPE_P(&escaper) == IS_OBJECT) {
+			if (Z_TYPE(escaper) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&escaped, &escaper, "escapehtmlattr", value);
 				PHALCON_SCONCAT_SVSVS(code, " ", &tmp, "=\"", &escaped, "\"");
 			} else {

@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 
 		/* An array module definition contains a path to a module definition class */
-		if (Z_TYPE_P(&module) == IS_ARRAY) {
+		if (Z_TYPE(module) == IS_ARRAY) {
 			/* Class name used to load the module definition */
 			if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
 				PHALCON_STR(&class_name, "Module");

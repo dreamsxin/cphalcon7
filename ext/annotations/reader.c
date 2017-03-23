@@ -68,7 +68,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Reader){
  */
 PHP_METHOD(Phalcon_Annotations_Reader, parse){
 
-	zval *class_name, annotations = {}, class_annotations = {}, annotations_properties = {}, annotations_methods = {};
+	zval *class_name, class_annotations = {}, annotations_properties = {}, annotations_methods = {};
 	zend_property_info *property;
 	zend_class_entry *class_ce;
 	zend_function *method;
@@ -90,12 +90,10 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		return;
 	}
 
+	array_init(return_value);
 	if (class_ce->type != ZEND_USER_CLASS) {
-		array_init(return_value);
 		return;
 	}
-
-	array_init(&annotations);
 
 	file = ZSTR_VAL(phalcon_get_class_filename(class_ce));
 	if (!file) {
@@ -109,8 +107,9 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		RETURN_ON_FAILURE(phannot_parse_annotations(&class_annotations, cmt, file, line));
 
 		if (Z_TYPE(class_annotations) == IS_ARRAY) {
-			phalcon_array_update_str(&annotations, SL("class"), &class_annotations, PH_COPY);
+			phalcon_array_update_str(return_value, SL("class"), &class_annotations, PH_COPY);
 		}
+		zval_ptr_dtor(&class_annotations);
 	}
 
 	/* Get class properties */
@@ -137,8 +136,9 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		} ZEND_HASH_FOREACH_END();
 
 		if (zend_hash_num_elements(Z_ARRVAL(annotations_properties))) {
-			phalcon_array_update_str(&annotations, SL("properties"), &annotations_properties, PH_COPY);
+			phalcon_array_update_str(return_value, SL("properties"), &annotations_properties, PH_COPY);
 		}
+		zval_ptr_dtor(&annotations_properties);
 	}
 
 	/* Get class methods */
@@ -164,11 +164,10 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		} ZEND_HASH_FOREACH_END();
 
 		if (zend_hash_num_elements(Z_ARRVAL(annotations_methods))) {
-			phalcon_array_update_str(&annotations, SL("methods"), &annotations_methods, PH_COPY);
+			phalcon_array_update_str(return_value, SL("methods"), &annotations_methods, PH_COPY);
 		}
+		zval_ptr_dtor(&annotations_methods);
 	}
-
-	RETURN_CTOR(&annotations);
 }
 
 /**

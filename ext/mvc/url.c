@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 
 	if (zend_is_true(args)) {
 		phalcon_http_build_query(&query_string, args, "&");
-		if (Z_TYPE_P(&query_string) == IS_STRING && Z_STRLEN_P(&query_string)) {
+		if (Z_TYPE(query_string) == IS_STRING && Z_STRLEN_P(&query_string)) {
 			if (phalcon_memnstr_str(return_value, "?", 1)) {
 				PHALCON_SCONCAT_SV(return_value, "&", &query_string);
 			}

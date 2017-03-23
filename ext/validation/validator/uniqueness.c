@@ -89,18 +89,18 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator_Uniqueness){
  */
 PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 
-	zval *validaton, *attribute, record = {}, meta_data = {}, except = {}, operation_made = {}, excepts = {}, column_map = {}, primary_fields = {};
-	zval *primary_field, values = {}, *field = NULL, value = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {};
+	zval *validaton, *attribute, *_allow_empty = NULL, record = {}, meta_data = {}, except = {}, operation_made = {}, excepts = {}, column_map = {}, primary_fields = {};
+	zval *primary_field, values = {}, allow_empty = {}, *field = NULL, value = {}, valid = {}, label = {}, pairs = {}, message_str = {}, code = {}, prepared = {};
 	zval message = {}, exception_message = {};
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 0, &validaton, &attribute);
+	phalcon_fetch_params(0, 2, 1, &validaton, &attribute, &_allow_empty);
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
-	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&record, ce, getThis(), ISV(model)));
+	PHALCON_CALL_METHOD(&record, validaton, "getentity");
 
 	if (Z_TYPE(record) != IS_OBJECT) {
-		PHALCON_CALL_METHOD(&record, validaton, "getentity");
+		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&record, ce, getThis(), ISV(model)));
 	}
 	PHALCON_VERIFY_INTERFACE_EX(&record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
 
@@ -114,13 +114,13 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(except), field) {
 			zval field_value = {};
 
-			PHALCON_CALL_METHOD(&field_value, &record, "readattribute", field);
+			PHALCON_CALL_METHOD(&field_value, validaton, "getvalue", field, &record);
 
 			phalcon_array_update_zval(&excepts, field, &field_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	} else if (PHALCON_IS_NOT_EMPTY(&except)) {
-		PHALCON_CALL_METHOD(&value, &record, "readattribute", &except);
+		PHALCON_CALL_METHOD(&value, validaton, "getvalue", &except, &record);
 		phalcon_array_update_zval(&excepts, &except, &value, PH_COPY);
 	}
 
@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 			/**
 			 * Create a condition based on the renamed primary key
 			 */
-			PHALCON_CALL_METHOD(&attribute_value, &record, "readattribute", primary_field);
+			PHALCON_CALL_METHOD(&attribute_value, validaton, "getvalue", primary_field, &record);
 
 			phalcon_array_update_zval(&excepts, &attribute_field, &attribute_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -163,14 +163,24 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attribute), field) {
 			zval field_value = {};
 
-			PHALCON_CALL_METHOD(&field_value, &record, "readattribute", field);
+			PHALCON_CALL_METHOD(&field_value, validaton, "getvalue", field, &record);
 
 			phalcon_array_update_zval(&values, field, &field_value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CALL_METHOD(&value, &record, "readattribute", attribute);
+		PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute, &record);
 		phalcon_array_update_zval(&values, attribute, &value, PH_COPY);
+	}
+
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
+	if (Z_TYPE(allow_empty) == IS_NULL) {
+		if (_allow_empty && zend_is_true(_allow_empty)) {
+			PHALCON_CPY_WRT(&allow_empty, _allow_empty);
+		}
+	}
+	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&values)) {
+		RETURN_TRUE;
 	}
 
 	PHALCON_CALL_SELF(&valid, "valid", &record, &values, &excepts);
@@ -190,7 +200,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 		}
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&code, ce, getThis(), ISV(code)));
-		if (Z_TYPE_P(&code) == IS_NULL) {
+		if (Z_TYPE(code) == IS_NULL) {
 			ZVAL_LONG(&code, 0);
 		}
 

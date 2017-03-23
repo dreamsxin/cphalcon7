@@ -1320,6 +1320,51 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(count($messages) > 0);
 	}
 
+	public function testValidationAllowEmpty()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+		$validation->add('data', new Phalcon\Validation\Validator\Alnum(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Alpha(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Between(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Confirmation(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Date(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Digit(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Email(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\ExclusionIn(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\File(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Identical(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\InclusionIn(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Numericality(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Regex(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\StringLength(array('allowEmpty' => TRUE)));
+		$validation->add('data', new Phalcon\Validation\Validator\Url(array('allowEmpty' => TRUE)));
+
+		$messages = $validation->validate($_POST);
+		$this->assertEquals(count($messages), 0);
+
+		$validation = new Phalcon\Validation(NULL, array('allowEmpty' => TRUE));
+		$validation->add('data', new Phalcon\Validation\Validator\Alnum());
+		$validation->add('data', new Phalcon\Validation\Validator\Alpha());
+		$validation->add('data', new Phalcon\Validation\Validator\Between());
+		$validation->add('data', new Phalcon\Validation\Validator\Confirmation());
+		$validation->add('data', new Phalcon\Validation\Validator\Date());
+		$validation->add('data', new Phalcon\Validation\Validator\Digit());
+		$validation->add('data', new Phalcon\Validation\Validator\Email());
+		$validation->add('data', new Phalcon\Validation\Validator\ExclusionIn());
+		$validation->add('data', new Phalcon\Validation\Validator\File());
+		$validation->add('data', new Phalcon\Validation\Validator\Identical());
+		$validation->add('data', new Phalcon\Validation\Validator\InclusionIn());
+		$validation->add('data', new Phalcon\Validation\Validator\Numericality());
+		$validation->add('data', new Phalcon\Validation\Validator\Regex());
+		$validation->add('data', new Phalcon\Validation\Validator\StringLength());
+		$validation->add('data', new Phalcon\Validation\Validator\Url());
+
+		$messages = $validation->validate($_POST);
+		$this->assertEquals(count($messages), 0);
+	}
+
 	public function testValidationMessages()
 	{
 		Phalcon\Kernel::setBasePath("unit-tests/");
@@ -1327,13 +1372,13 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "Field :field scale is out of range");
 		$this->assertEquals(Phalcon\Validation::getMessage('Alnum'), "字段 :field 只能包含字母和数字");
 
-		Phalcon\Validation::setFile('MyValidation');
+		Phalcon\Validation::setMessageFilename('MyValidation');
 		$this->assertEquals(Phalcon\Validation::getMessage('TooLarge'), "字段 :field 精度超出了范围");
 
 
 		$_POST = array('username' => 'Phalcon7');
 
-		$validation = new Phalcon\Validation(NULL, 'MyValidation2');
+		$validation = new Phalcon\Validation(NULL, array('messageFilename' => 'MyValidation2'));
 		$validation->add('username', new Phalcon\Validation\Validator\Digit());
 		$messages = $validation->validate($_POST);
 		$this->assertEquals($messages[0]->getMessage(), "用户名只能使用数字字符");

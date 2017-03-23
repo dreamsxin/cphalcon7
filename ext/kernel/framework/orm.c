@@ -210,7 +210,7 @@ void phalcon_orm_phql_build_limit(zval *return_value, zval *limit) {
 	if (PHALCON_IS_NOT_EMPTY(limit)) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
 			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE_P(&offset) != IS_NULL) {
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(return_value, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
 				PHALCON_SCONCAT_SV(return_value, " LIMIT ", &number);

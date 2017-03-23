@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
 		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY);
-		if (Z_TYPE_P(&char_size) != IS_NULL) {
+		if (Z_TYPE(char_size) != IS_NULL) {
 			convert_to_long(&char_size);
 		}
 

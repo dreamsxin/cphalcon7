@@ -1310,11 +1310,11 @@ PHP_METHOD(Phalcon_Http_Request, hasFiles){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(_FILES), file) {
 		zval error = {};
 		if (phalcon_array_isset_fetch_str(&error, file, SL("error"))) {
-			if (Z_TYPE_P(&error) < IS_ARRAY) {
+			if (Z_TYPE(error) < IS_ARRAY) {
 				if (!zend_is_true(&error) || !only_successful) {
 					++nfiles;
 				}
-			} else if (Z_TYPE_P(&error) == IS_ARRAY) {
+			} else if (Z_TYPE(error) == IS_ARRAY) {
 				nfiles += phalcon_http_request_hasfiles_helper(&error, only_successful);
 			}
 		}

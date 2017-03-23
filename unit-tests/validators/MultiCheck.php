@@ -4,7 +4,7 @@ use Phalcon\Validation\Validator,
 
 class MultiCheck extends Validator implements ValidatorInterface
 {
-	public function validate(Phalcon\ValidationInterface $validation, $attributes)
+	public function validate(Phalcon\ValidationInterface $validation, $attributes, bool $allowEmpty = NULL)
 	{
 		if (!is_array($attributes)) {
 			throw new Exception("Field must be array");

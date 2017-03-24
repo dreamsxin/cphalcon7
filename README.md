@@ -90,8 +90,8 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-process=yes
 # enable intrusive
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-intrusive=yes
-# enable shared memory cache
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-shmemory=yes
+# enable yac cache
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-yac=yes
 # enable storage btree
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-btree=yes
 # enable storage wiredtiger

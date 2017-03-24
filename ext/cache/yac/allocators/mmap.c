@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
    */
 
-#include "cache/shmemory/storage.h"
-#include "cache/shmemory/allocator.h"
+#include "cache/yac/storage.h"
+#include "cache/yac/allocator.h"
 
 #ifdef USE_MMAP
 
@@ -36,19 +36,19 @@
 #endif
 
 typedef struct  {
-	phalcon_cache_shmemory_shared_segment common;
+	phalcon_cache_yac_shared_segment common;
 	unsigned long size;
-} phalcon_cache_shmemory_shared_segment_mmap;
+} phalcon_cache_yac_shared_segment_mmap;
 
-static int create_segments(unsigned long k_size, unsigned long v_size, phalcon_cache_shmemory_shared_segment_mmap **shared_segments_p, int *shared_segments_count, char **error_in) /* {{{ */ {
+static int create_segments(unsigned long k_size, unsigned long v_size, phalcon_cache_yac_shared_segment_mmap **shared_segments_p, int *shared_segments_count, char **error_in) /* {{{ */ {
 	unsigned long allocate_size, occupied_size =  0;
 	unsigned int i, segment_size, segments_num = 1024;
-	phalcon_cache_shmemory_shared_segment_mmap first_segment;
+	phalcon_cache_yac_shared_segment_mmap first_segment;
 
-	k_size = PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(k_size);
-	v_size = PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(v_size);
+	k_size = PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(k_size);
+	v_size = PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(v_size);
 
-	while ((v_size / segments_num) < PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE) {
+	while ((v_size / segments_num) < PHALCON_CACHE_YAC_SMM_SEGMENT_MIN_SIZE) {
 		segments_num >>= 1;
 	}
 
@@ -66,7 +66,7 @@ static int create_segments(unsigned long k_size, unsigned long v_size, phalcon_c
 	first_segment.common.size = k_size;
 	first_segment.common.pos = 0;
 
-	*shared_segments_p = (phalcon_cache_shmemory_shared_segment_mmap *)calloc(1, segments_num * sizeof(phalcon_cache_shmemory_shared_segment_mmap));
+	*shared_segments_p = (phalcon_cache_yac_shared_segment_mmap *)calloc(1, segments_num * sizeof(phalcon_cache_yac_shared_segment_mmap));
 	if (!*shared_segments_p) {
 		munmap(first_segment.common.p, first_segment.size);
 		*error_in = "calloc";
@@ -81,9 +81,9 @@ static int create_segments(unsigned long k_size, unsigned long v_size, phalcon_c
 		(*shared_segments_p)[i].size = 0;
 		(*shared_segments_p)[i].common.pos = 0;
 		(*shared_segments_p)[i].common.p = first_segment.common.p + occupied_size;
-		if ((allocate_size - occupied_size) >= PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size)) {
-			(*shared_segments_p)[i].common.size = PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size);
-			occupied_size += PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size);
+		if ((allocate_size - occupied_size) >= PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size)) {
+			(*shared_segments_p)[i].common.size = PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size);
+			occupied_size += PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size);
 		} else {
 			(*shared_segments_p)[i].common.size = (allocate_size - occupied_size);
 			break;
@@ -94,7 +94,7 @@ static int create_segments(unsigned long k_size, unsigned long v_size, phalcon_c
 }
 /* }}} */
 
-static int detach_segment(phalcon_cache_shmemory_shared_segment *shared_segment) /* {{{ */ {
+static int detach_segment(phalcon_cache_yac_shared_segment *shared_segment) /* {{{ */ {
 	if (shared_segment->size) {
 		munmap(shared_segment->p, shared_segment->size);
 	}
@@ -103,11 +103,11 @@ static int detach_segment(phalcon_cache_shmemory_shared_segment *shared_segment)
 /* }}} */
 
 static unsigned long segment_type_size(void) /* {{{ */ {
-	return sizeof(phalcon_cache_shmemory_shared_segment_mmap);
+	return sizeof(phalcon_cache_yac_shared_segment_mmap);
 }
 /* }}} */
 
-phalcon_cache_shmemory_shared_shmemory_handlers phalcon_cache_shmemory_alloc_mmap_handlers = /* {{{ */ {
+phalcon_cache_yac_shared_yac_handlers phalcon_cache_yac_alloc_mmap_handlers = /* {{{ */ {
 	(create_segments_t)create_segments,
 	detach_segment,
 	segment_type_size

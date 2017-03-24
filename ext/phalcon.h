@@ -54,6 +54,7 @@
 #include "cache/backend/mongo.h"
 #include "cache/backend/xcache.h"
 #include "cache/backend/redis.h"
+#include "cache/backend/yac.h"
 #include "cache/exception.h"
 #include "cache/frontendinterface.h"
 #include "cache/frontend/base64.h"
@@ -63,7 +64,7 @@
 #include "cache/frontend/none.h"
 #include "cache/frontend/output.h"
 #include "cache/multiple.h"
-#include "cache/shmemory.h"
+#include "cache/yac.h"
 
 #include "pconfig.h"
 #include "config/adapter.h"

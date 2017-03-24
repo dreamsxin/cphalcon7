@@ -25,8 +25,8 @@
 #include <Zend/zend_extensions.h>
 #include <main/SAPI.h>
 
-#include "cache/shmemory/storage.h"
-#include "cache/shmemory/allocator.h"
+#include "cache/yac/storage.h"
+#include "cache/yac/allocator.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -41,14 +41,14 @@ ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
 static PHP_INI_MH(OnChangeKeysMemoryLimit) {
 	if (new_value) {
-		PHALCON_GLOBAL(cache).shmemory_keys_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
+		PHALCON_GLOBAL(cache).yac_keys_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	}
 	return SUCCESS;
 }
 
 static PHP_INI_MH(OnChangeValsMemoryLimit) {
 	if (new_value) {
-		PHALCON_GLOBAL(cache).shmemory_values_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
+		PHALCON_GLOBAL(cache).yac_values_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
 	}
 	return SUCCESS;
 }
@@ -81,34 +81,34 @@ PHP_INI_BEGIN()
 	/* Enables/Disables auttomatic escape */
 	STD_PHP_INI_BOOLEAN("phalcon.db.escape_identifiers",        "1",    PHP_INI_ALL,    OnUpdateBool, db.escape_identifiers,        zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables cache memory */
-	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_shmemory",        "1",   PHP_INI_ALL,    OnUpdateBool, cache.enable_shmemory,          zend_phalcon_globals, phalcon_globals)
-	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_shmemory_cli",    "0",   PHP_INI_ALL,    OnUpdateBool, cache.enable_shmemory_cli,      zend_phalcon_globals, phalcon_globals)
-    STD_PHP_INI_ENTRY("phalcon.cache.shmemory_keys_size",       "4M",  PHP_INI_SYSTEM, OnChangeKeysMemoryLimit, cache.shmemory_keys_size,       zend_phalcon_globals, phalcon_globals)
-    STD_PHP_INI_ENTRY("phalcon.cache.shmemory_values_size",     "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.shmemory_values_size,     zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_yac",             "1",   PHP_INI_ALL,    OnUpdateBool, cache.enable_yac,          zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_yac_cli",         "0",   PHP_INI_ALL,    OnUpdateBool, cache.enable_yac_cli,      zend_phalcon_globals, phalcon_globals)
+    STD_PHP_INI_ENTRY("phalcon.cache.yac_keys_size",            "4M",  PHP_INI_SYSTEM, OnChangeKeysMemoryLimit, cache.yac_keys_size,       zend_phalcon_globals, phalcon_globals)
+    STD_PHP_INI_ENTRY("phalcon.cache.yac_values_size",          "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.yac_values_size,     zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
 	REGISTER_INI_ENTRIES();
 
-#ifdef PHALCON_CACHE_SHMEMORY
-	if (!PHALCON_GLOBAL(cache).enable_shmemory_cli && !strcmp(sapi_module.name, "cli")) {
-		PHALCON_GLOBAL(cache).enable_shmemory = 0;
+#ifdef PHALCON_CACHE_YAC
+	if (!PHALCON_GLOBAL(cache).enable_yac_cli && !strcmp(sapi_module.name, "cli")) {
+		PHALCON_GLOBAL(cache).enable_yac = 0;
 	}
 
-	if (PHALCON_GLOBAL(cache).enable_shmemory) {
+	if (PHALCON_GLOBAL(cache).enable_yac) {
 		char *msg;
-		if (PHALCON_GLOBAL(cache).shmemory_values_size < PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE) {
-			php_error(E_ERROR, "Shared memory values(values_memory_size) must be at least '%d'", PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE);
+		if (PHALCON_GLOBAL(cache).yac_values_size < PHALCON_CACHE_YAC_SMM_SEGMENT_MIN_SIZE) {
+			php_error(E_ERROR, "Shared memory values(values_memory_size) must be at least '%d'", PHALCON_CACHE_YAC_SMM_SEGMENT_MIN_SIZE);
 			return FAILURE;
 		}
-		if (!phalcon_cache_shmemory_storage_startup(PHALCON_GLOBAL(cache).shmemory_keys_size, PHALCON_GLOBAL(cache).shmemory_values_size, &msg)) {
+		if (!phalcon_cache_yac_storage_startup(PHALCON_GLOBAL(cache).yac_keys_size, PHALCON_GLOBAL(cache).yac_values_size, &msg)) {
 			php_error(E_ERROR, "Shared memory allocator startup failed at '%s': %s", msg, strerror(errno));
 			return FAILURE;
 		}
 	}
 #else
-	PHALCON_GLOBAL(cache).enable_shmemory = 0;
+	PHALCON_GLOBAL(cache).enable_yac = 0;
 #endif
 
 #if PHALCON_USE_MONGOC
@@ -267,8 +267,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Acl_Resource);
 	PHALCON_INIT(Phalcon_Acl_Adapter_Memory);
 	PHALCON_INIT(Phalcon_Session_Adapter);
-#ifdef PHALCON_CACHE_SHMEMORY
-	PHALCON_INIT(Phalcon_Cache_SHMemory);
+#ifdef PHALCON_CACHE_YAC
+	PHALCON_INIT(Phalcon_Cache_Yac);
 #endif
 	PHALCON_INIT(Phalcon_Cache_Backend);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Data);
@@ -282,6 +282,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 	PHALCON_INIT(Phalcon_Cache_Backend_Memcached);
 	PHALCON_INIT(Phalcon_Cache_Backend_Redis);
+	PHALCON_INIT(Phalcon_Cache_Backend_Yac);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Json);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Output);
 	PHALCON_INIT(Phalcon_Cache_Frontend_None);
@@ -551,9 +552,9 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	phalcon_deinitialize_memory();
 
 	assert(PHALCON_GLOBAL(orm).ast_cache == NULL);
-#ifdef PHALCON_CACHE_SHMEMORY
-	if (PHALCON_GLOBAL(cache).enable_shmemory) {
-		phalcon_cache_shmemory_storage_shutdown();
+#ifdef PHALCON_CACHE_YAC
+	if (PHALCON_GLOBAL(cache).enable_yac) {
+		phalcon_cache_yac_storage_shutdown();
 	}
 #endif
 
@@ -591,8 +592,8 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
-#ifdef PHALCON_CACHE_SHMEMORY
-	php_info_print_table_row(2, "Cache SHMemory", "enabled");
+#ifdef PHALCON_CACHE_YAC
+	php_info_print_table_row(2, "Cache Yac", "enabled");
 #endif
 
 #ifdef PHALCON_USE_MONGOC
@@ -646,12 +647,12 @@ static PHP_MINFO_FUNCTION(phalcon)
 static PHP_GINIT_FUNCTION(phalcon)
 {
 	php_phalcon_init_globals(phalcon_globals);
-#ifdef PHALCON_CACHE_SHMEMORY
+#ifdef PHALCON_CACHE_YAC
 	/* Cache options */
-	phalcon_globals->cache.enable_shmemory = 1;
-	phalcon_globals->cache.enable_shmemory_cli = 0;
-	phalcon_globals->cache.shmemory_keys_size = (4 * 1024 * 1024);
-	phalcon_globals->cache.shmemory_values_size = (64 * 1024 * 1024);
+	phalcon_globals->cache.enable_yac = 1;
+	phalcon_globals->cache.enable_yac_cli = 0;
+	phalcon_globals->cache.yac_keys_size = (4 * 1024 * 1024);
+	phalcon_globals->cache.yac_values_size = (64 * 1024 * 1024);
 #endif
 }
 

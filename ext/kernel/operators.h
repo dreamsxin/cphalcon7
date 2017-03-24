@@ -126,24 +126,24 @@ int phalcon_is_equal_long(zval *op1, long op2);
 int phalcon_is_equal_object(zval *obj1, zval *obj2);
 
 int phalcon_less(zval *op1, zval *op2);
-int phalcon_less_long(zval *op1, long op2);
+int phalcon_less_long(zval *op1, zend_long op2);
 
 int phalcon_greater(zval *op1, zval *op2);
-int phalcon_greater_long(zval *op1, long op2);
+int phalcon_greater_long(zval *op1, zend_long op2);
 
 int phalcon_less_equal(zval *op1, zval *op2);
-int phalcon_less_equal_long(zval *op1, long op2);
+int phalcon_less_equal_long(zval *op1, zend_long op2);
 
 int phalcon_greater_equal(zval *op1, zval *op2);
-int phalcon_greater_equal_long(zval *op1, long op2);
+int phalcon_greater_equal_long(zval *op1, zend_long op2);
 
-long phalcon_safe_mod_long_long(long op1, long op2);
-long phalcon_safe_mod_long_double(long op1, double op2);
-long phalcon_safe_mod_double_long(double op1, long op2);
-long phalcon_safe_mod_double_double(double op1, double op2);
-long phalcon_safe_mod_zval_long(zval *op1, long op2);
-long phalcon_safe_mod_zval_double(zval *op1, double op2);
-long phalcon_safe_mod_long_zval(long op1, zval *op2);
-long phalcon_safe_mod_double_zval(double op1, zval *op2);
+zend_long phalcon_safe_mod_long_long(zend_long op1, zend_long op2);
+zend_long phalcon_safe_mod_long_double(zend_long op1, double op2);
+zend_long phalcon_safe_mod_double_long(double op1, zend_long op2);
+zend_long phalcon_safe_mod_double_double(double op1, double op2);
+zend_long phalcon_safe_mod_zval_long(zval *op1, zend_long op2);
+zend_long phalcon_safe_mod_zval_double(zval *op1, double op2);
+zend_long phalcon_safe_mod_long_zval(zend_long op1, zval *op2);
+zend_long phalcon_safe_mod_double_zval(double op1, zval *op2);
 
 #endif /* PHALCON_KERNEL_OPERATORS_H */

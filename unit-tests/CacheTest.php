@@ -1406,8 +1406,6 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 	public function testCacheRedisFlush()
 	{
-		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 10));
-
 		$redis = $this->_prepareRedis();
 		if (!$redis) {
 			return false;
@@ -1434,18 +1432,143 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($cache->exists('data2'));
 	}
 
-	public function testCacheSHMemory()
+	public function testYacIncrement()
 	{
-		if (!class_exists('Phalcon\Cache\SHMemory')) {
-			$this->markTestSkipped('Class `Phalcon\Cache\SHMemory` is not exists');
+		if (!class_exists('Phalcon\Cache\Yac')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Yac` is not exists');
 			return false;
 		}
-		if (!ini_get('phalcon.cache.enable_shmemory_cli')) {
-			$this->markTestSkipped('Warning: phalcon.cache.enable_shmemory_cli is not enbale');
+		if (!ini_get('phalcon.cache.enable_yac_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_yac_cli is not enbale');
 			return false;
 		}
 
-		$cache = new Phalcon\Cache\SHMemory();
+		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 20));
+		$cache = new Phalcon\Cache\Backend\Yac($frontCache, array(
+			'prefix' => 'unit'
+		));
+
+		$cache->delete('increment');
+
+		$cache->save('increment', 1);
+		$this->assertEquals(2, $cache->increment('increment'));
+		$this->assertEquals(4, $cache->increment('increment', 2));
+		$this->assertEquals(14, $cache->increment('increment', 10));
+	}
+
+	public function testYacDecrement()
+	{
+		if (!class_exists('Phalcon\Cache\Yac')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Yac` is not exists');
+			return false;
+		}
+		if (!ini_get('phalcon.cache.enable_yac_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_yac_cli is not enbale');
+			return false;
+		}
+
+		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 20));
+		$cache = new Phalcon\Cache\Backend\Yac($frontCache, array(
+			'prefix' => 'unit'
+		));
+
+		$cache->delete('decrement');
+
+		$cache->save('decrement', 100);
+		$this->assertEquals(99, $cache->decrement('decrement'));
+		$this->assertEquals(97, $cache->decrement('decrement', 2));
+		$this->assertEquals(87, $cache->decrement('decrement', 10));
+	}
+
+	public function testDataYacCache()
+	{
+		if (!class_exists('Phalcon\Cache\Yac')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Yac` is not exists');
+			return false;
+		}
+		if (!ini_get('phalcon.cache.enable_yac_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_yac_cli is not enbale');
+			return false;
+		}
+
+		$frontCache = new Phalcon\Cache\Frontend\Data();
+		$cache = new Phalcon\Cache\Backend\Yac($frontCache, array(
+			'prefix' => 'unit'
+		));
+
+		$data = array(1, 2, 3, 4, 5);
+
+		$cache->save('test-data', $data);
+
+		$cachedContent = $cache->get('test-data');
+		$this->assertEquals($cachedContent, $data);
+
+		$cache->save('test-data', "sure, nothing interesting");
+
+		$cachedContent = $cache->get('test-data');
+		$this->assertEquals($cachedContent, "sure, nothing interesting");
+
+		$this->assertTrue($cache->delete('test-data'));
+
+		$cache->save('a', 1);
+		$cache->save('long-key', 'long-val');
+		$cache->save('bcd', 3);
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('a', 'bcd', 'decrement', 'increment', 'long-key'));
+		$this->assertEquals($cache->queryKeys('long'), array('long-key'));
+
+		$this->assertTrue($cache->delete('a'));
+		$this->assertTrue($cache->delete('long-key'));
+		$this->assertTrue($cache->delete('bcd'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('decrement', 'increment'));
+	}
+
+	public function testCacheYacFlush()
+	{
+		if (!class_exists('Phalcon\Cache\Yac')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Yac` is not exists');
+			return false;
+		}
+		if (!ini_get('phalcon.cache.enable_yac_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_yac_cli is not enbale');
+			return false;
+		}
+
+		$frontCache = new Phalcon\Cache\Frontend\Data();
+		$cache = new Phalcon\Cache\Backend\Yac($frontCache, array(
+			'prefix' => 'unit'
+		));
+
+		$this->assertTrue($cache->flush());
+
+		$cache->save('data', "1");
+		$cache->save('data2', "2");
+
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
+		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
+
+		$this->assertFalse($cache->exists('data'));
+		$this->assertFalse($cache->exists('data2'));
+	}
+
+	public function testCacheYac()
+	{
+		if (!class_exists('Phalcon\Cache\Yac')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Yac` is not exists');
+			return false;
+		}
+		if (!ini_get('phalcon.cache.enable_yac_cli')) {
+			$this->markTestSkipped('Warning: phalcon.cache.enable_yac_cli is not enbale');
+			return false;
+		}
+
+		$cache = new Phalcon\Cache\Yac();
 
 		$key = "foo";
 		$value = "dummy";
@@ -1485,7 +1608,7 @@ class CacheTest extends PHPUnit_Framework_TestCase
 			$value = fopen("php://input", "r");
 			$cache->set($key, $value);
 		} catch (Exception $e) {
-			$this->assertEquals("Phalcon\Cache\SHMemory::set(): Type 'IS_RESOURCE' cannot be stored", $e->getMessage());
+			$this->assertEquals("Phalcon\Cache\Yac::set(): Type 'IS_RESOURCE' cannot be stored", $e->getMessage());
 		}
 
 

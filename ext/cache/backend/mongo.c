@@ -240,7 +240,7 @@ static int phalcon_cache_mongo_get_value(zval* return_value, const bson_t* doc, 
  */
 PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
-	zval *key_name, frontend = {}, prefix = {}, prefixed_key = {};
+	zval *key_name, frontend = {}, prefix = {}, prefixed_key = {}, ttl = {};
 	phalcon_cache_backend_mongo_object *mongo_object;
 	mongoc_cursor_t *cursor;
 	bson_t *query;
@@ -257,12 +257,23 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	query = BCON_NEW (
-		"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
-		"time", "{",
-			"$gt", BCON_DATE_TIME(time(NULL) * 1000),
-		"}"
-	);
+	PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
+
+	if (likely(zend_is_true(&ttl))) {
+		query = BCON_NEW (
+			"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
+			"time", "{",
+				"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+			"}"
+		);
+	} else {
+		query = BCON_NEW (
+			"key", BCON_UTF8(Z_STRVAL(prefixed_key)),
+			"time", "{",
+				"$gt", BCON_DATE_TIME(time(NULL) * 1000),
+			"}"
+		);
+	}
 
 	ZVAL_NULL(return_value);
 

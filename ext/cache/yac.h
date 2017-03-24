@@ -18,19 +18,19 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_CACHE_SHMEMORY_H
-#define PHALCON_CACHE_SHMEMORY_H
+#ifndef PHALCON_CACHE_YAC_H
+#define PHALCON_CACHE_YAC_H
 
 #include "php_phalcon.h"
 
-#define PHALCON_CACHE_SHMEMORY_CLASS_PROPERTY_PREFIX  "_prefix"
-#define PHALCON_CACHE_SHMEMORY_ENTRY_COMPRESSED	    0x0020
-#define PHALCON_CACHE_SHMEMORY_ENTRY_TYPE_MASK        0x1f
-#define PHALCON_CACHE_SHMEMORY_ENTRY_ORIG_LEN_SHIT    6
-#define PHALCON_CACHE_SHMEMORY_ENTRY_MAX_ORIG_LEN     ((1U << ((sizeof(int)*8 - PHALCON_CACHE_SHMEMORY_ENTRY_ORIG_LEN_SHIT))) - 1)
+#define PHALCON_CACHE_YAC_CLASS_PROPERTY_PREFIX  "_prefix"
+#define PHALCON_CACHE_YAC_ENTRY_COMPRESSED	    0x0020
+#define PHALCON_CACHE_YAC_ENTRY_TYPE_MASK        0x1f
+#define PHALCON_CACHE_YAC_ENTRY_ORIG_LEN_SHIT    6
+#define PHALCON_CACHE_YAC_ENTRY_MAX_ORIG_LEN     ((1U << ((sizeof(int)*8 - PHALCON_CACHE_YAC_ENTRY_ORIG_LEN_SHIT))) - 1)
 
-extern zend_class_entry *phalcon_cache_shmemory_ce;
+extern zend_class_entry *phalcon_cache_yac_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Cache_SHMemory);
+PHALCON_INIT_CLASS(Phalcon_Cache_Yac);
 
-#endif /* PHALCON_CACHE_SHMEMORY_H */
+#endif /* PHALCON_CACHE_YAC_H */

@@ -26,9 +26,9 @@
 #include "ext/standard/php_var.h"
 #include "zend_smart_str.h"
 
-#include "cache/shmemory/serializer.h"
+#include "cache/yac/serializer.h"
 
-int phalcon_cache_shmemory_serializer_php_pack(zval *pzval, smart_str *buf, char **msg) {
+int phalcon_cache_yac_serializer_php_pack(zval *pzval, smart_str *buf, char **msg) {
 	php_serialize_data_t var_hash;
 
 	PHP_VAR_SERIALIZE_INIT(var_hash);
@@ -38,7 +38,7 @@ int phalcon_cache_shmemory_serializer_php_pack(zval *pzval, smart_str *buf, char
 	return 1;
 }
 
-zval * phalcon_cache_shmemory_serializer_php_unpack(char *content, size_t len, char **msg, zval *rv) {
+zval * phalcon_cache_yac_serializer_php_unpack(char *content, size_t len, char **msg, zval *rv) {
 	const unsigned char *p;
 	php_unserialize_data_t var_hash;
 	p = (const unsigned char*)content;

@@ -16,8 +16,8 @@
    +----------------------------------------------------------------------+
 */
 
-#include "cache/shmemory/storage.h"
-#include "cache/shmemory/allocator.h"
+#include "cache/yac/storage.h"
+#include "cache/yac/allocator.h"
 
 #ifdef USE_SHM
 
@@ -38,23 +38,23 @@
 #include <fcntl.h>
 
 typedef struct  {
-    phalcon_cache_shmemory_shared_segment common;
+    phalcon_cache_yac_shared_segment common;
     int shm_id;
-} phalcon_cache_shmemory_shared_segment_shm;
+} phalcon_cache_yac_shared_segment_shm;
 
-static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_shared_segment_shm **shared_segments_p, int *shared_segments_count, char **error_in) /* {{{ */ {
+static int create_segments(size_t k_size, size_t v_size, phalcon_cache_yac_shared_segment_shm **shared_segments_p, int *shared_segments_count, char **error_in) /* {{{ */ {
 	struct shmid_ds sds;
 	int shm_id, shmget_flags;
-	phalcon_cache_shmemory_shared_segment_shm *shared_segments, first_segment;
+	phalcon_cache_yac_shared_segment_shm *shared_segments, first_segment;
     unsigned int i, j, allocate_size, allocated_num, segments_num, segment_size;
 
 	shmget_flags = IPC_CREAT|SHM_R|SHM_W|IPC_EXCL;
     segments_num = 1024;
-    while ((v_size / segments_num) < PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE) {
+    while ((v_size / segments_num) < PHALCON_CACHE_YAC_SMM_SEGMENT_MIN_SIZE) {
         segments_num >>= 1;
     }
     segment_size = v_size / segments_num;
-    allocate_size = PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MAX_SIZE;
+    allocate_size = PHALCON_CACHE_YAC_SMM_SEGMENT_MAX_SIZE;
 
     while ((shm_id = shmget(IPC_PRIVATE, allocate_size, shmget_flags)) < 0) {
         allocate_size >>= 1;
@@ -66,7 +66,7 @@ static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_
         return 0;
     }
 
-    if (allocate_size < PHALCON_CACHE_SHMEMORY_SMM_SEGMENT_MIN_SIZE) {
+    if (allocate_size < PHALCON_CACHE_YAC_SMM_SEGMENT_MIN_SIZE) {
         /* this should never happen */
         *error_in = "shmget";
         return 0;
@@ -89,7 +89,7 @@ static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_
     }
 
     allocated_num = (v_size % allocate_size)? (v_size / allocate_size) + 1 : (v_size / allocate_size);
-    shared_segments = (phalcon_cache_shmemory_shared_segment_shm *)calloc(1, (allocated_num) * sizeof(phalcon_cache_shmemory_shared_segment_shm));
+    shared_segments = (phalcon_cache_yac_shared_segment_shm *)calloc(1, (allocated_num) * sizeof(phalcon_cache_yac_shared_segment_shm));
     if (!shared_segments) {
         *error_in = "calloc";
         return 0;
@@ -121,7 +121,7 @@ static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_
     }
 
     ++segments_num;
-    *shared_segments_p = (phalcon_cache_shmemory_shared_segment_shm *)calloc(1, segments_num * sizeof(phalcon_cache_shmemory_shared_segment_shm));
+    *shared_segments_p = (phalcon_cache_yac_shared_segment_shm *)calloc(1, segments_num * sizeof(phalcon_cache_yac_shared_segment_shm));
     if (!*shared_segments_p) {
 		free(shared_segments);
         *error_in = "calloc";
@@ -137,15 +137,15 @@ static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_
             (*shared_segments_p)[i].shm_id = shared_segments[j].shm_id;
         }
 
-        if ((shared_segments[j].common.size - shared_segments[j].common.pos) >= (2 * PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size))) {
+        if ((shared_segments[j].common.size - shared_segments[j].common.pos) >= (2 * PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size))) {
             (*shared_segments_p)[i].common.pos = 0;
-            (*shared_segments_p)[i].common.size = PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size);
-            (*shared_segments_p)[i].common.p = shared_segments[j].common.p + PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(shared_segments[j].common.pos);
-            shared_segments[j].common.pos += PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(segment_size);
+            (*shared_segments_p)[i].common.size = PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size);
+            (*shared_segments_p)[i].common.p = shared_segments[j].common.p + PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(shared_segments[j].common.pos);
+            shared_segments[j].common.pos += PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(segment_size);
         } else {
             (*shared_segments_p)[i].common.pos = 0;
             (*shared_segments_p)[i].common.size = shared_segments[j].common.size - shared_segments[j].common.pos;
-            (*shared_segments_p)[i].common.p = shared_segments[j].common.p + PHALCON_CACHE_SHMEMORY_SMM_ALIGNED_SIZE(shared_segments[j].common.pos);
+            (*shared_segments_p)[i].common.p = shared_segments[j].common.p + PHALCON_CACHE_YAC_SMM_ALIGNED_SIZE(shared_segments[j].common.pos);
             j++;
         }
     }
@@ -156,7 +156,7 @@ static int create_segments(size_t k_size, size_t v_size, phalcon_cache_shmemory_
 }
 /* }}} */
 
-static int detach_segment(phalcon_cache_shmemory_shared_segment_shm *shared_segment) /* {{{ */ {
+static int detach_segment(phalcon_cache_yac_shared_segment_shm *shared_segment) /* {{{ */ {
     if (shared_segment->shm_id) {
         shmdt(shared_segment->common.p);
     }
@@ -165,11 +165,11 @@ static int detach_segment(phalcon_cache_shmemory_shared_segment_shm *shared_segm
 /* }}} */
 
 static size_t segment_type_size(void) /* {{{ */ {
-	return sizeof(phalcon_cache_shmemory_shared_segment_shm);
+	return sizeof(phalcon_cache_yac_shared_segment_shm);
 }
 /* }}} */
 
-phalcon_cache_shmemory_shared_shmemory_handlers phalcon_cache_shmemory_alloc_shm_handlers = /* {{{ */ {
+phalcon_cache_yac_shared_yac_handlers phalcon_cache_yac_alloc_shm_handlers = /* {{{ */ {
 	(create_segments_t)create_segments,
 	(detach_segment_t)detach_segment,
 	segment_type_size

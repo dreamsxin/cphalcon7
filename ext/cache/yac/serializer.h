@@ -16,10 +16,10 @@
   +----------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_CACHE_SHMEMORY_SERIALIZER_H
-#define PHALCON_CACHE_SHMEMORY_SERIALIZER_H
+#ifndef PHALCON_CACHE_YAC_SERIALIZER_H
+#define PHALCON_CACHE_YAC_SERIALIZER_H
 
-int phalcon_cache_shmemory_serializer_php_pack(zval *pzval, smart_str *buf, char **msg);
-zval * phalcon_cache_shmemory_serializer_php_unpack(char *content, size_t len, char **msg, zval *rv);
+int phalcon_cache_yac_serializer_php_pack(zval *pzval, smart_str *buf, char **msg);
+zval * phalcon_cache_yac_serializer_php_unpack(char *content, size_t len, char **msg, zval *rv);
 
-#endif	/* PHALCON_CACHE_SHMEMORY_SERIALIZER_H */
+#endif	/* PHALCON_CACHE_YAC_SERIALIZER_H */

@@ -60,13 +60,13 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_ENABLE(cache-shmemory, whether to enable cache shared memory support,
-[  --enable-cache-shmemory   Enable cache shared memory support], no, no)
+PHP_ARG_ENABLE(cache-yac, whether to enable yac support,
+[  --enable-cache-yac   Enable yac support], no, no)
 
-AC_MSG_CHECKING([Include cache-shmemory])
-if test "$PHP_CACHE_SHMEMORY" = "yes"; then
-	AC_DEFINE([PHALCON_CACHE_SHMEMORY], [1], [Whether cache shared memory are available])
-	AC_MSG_RESULT([yes, cache shared memory])
+AC_MSG_CHECKING([Include cache-yac])
+if test "$PHP_CACHE_YAC" = "yes"; then
+	AC_DEFINE([PHALCON_CACHE_YAC], [1], [Whether yac are available])
+	AC_MSG_RESULT([yes, yac])
 else
 	AC_MSG_RESULT([no])
 fi
@@ -612,6 +612,7 @@ cache/backend/xcache.c \
 cache/backend/memcached.c \
 cache/backend/memory.c \
 cache/backend/redis.c \
+cache/backend/yac.c \
 cache/exception.c \
 cache/backendinterface.c \
 cache/frontendinterface.c \
@@ -721,8 +722,8 @@ process/exception.c \
 storage/exception.c \
 server/exception.c"
 
-	if test "$PHP_CACHE_SHMEMORY" = "yes"; then
-		phalcon_sources="$phalcon_sources cache/shmemory/allocators/mmap.c cache/shmemory/allocators/shm.c cache/shmemory/serializer.c cache/shmemory/storage.c cache/shmemory/allocator.c cache/shmemory.c"
+	if test "$PHP_CACHE_YAC" = "yes"; then
+		phalcon_sources="$phalcon_sources cache/yac/allocators/mmap.c cache/yac/allocators/shm.c cache/yac/serializer.c cache/yac/storage.c cache/yac/allocator.c cache/yac.c"
 	fi
 
 	if test "$PHP_CHART" = "yes"; then

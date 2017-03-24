@@ -107,7 +107,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Xcache){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 
-	zval *frontend, *_options = NULL, options = {};
+	zval *frontend, *_options = NULL, options = {}, special_key = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 		}
 	}
 
-	if (!phalcon_array_isset_str(&options, SL("statsKey"))) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")) || PHALCON_IS_EMPTY_STRING(&special_key)) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCX"), PH_COPY);
 	}
 
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCX", &prefix, key_name);
 
-	PHALCON_RETURN_CALL_FUNCTION("xcache_unset", &prefixed_key);
+	PHALCON_CALL_FUNCTION(NULL, "xcache_unset", &prefixed_key);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");

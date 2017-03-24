@@ -468,7 +468,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 				return;
 			}
 
-			add_function(return_value, value, &cached_content);
+			phalcon_add_function(return_value, &cached_content, value);
 
 			phalcon_file_put_contents(&status, &cache_file, return_value);
 

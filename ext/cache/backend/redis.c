@@ -128,7 +128,8 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Redis)
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
-	zval *frontend, *_options = NULL, options = {}, special_key = {};
+	zval *frontend, *_options = NULL, options = {}, redis = {}, special_key = {};
+	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
@@ -142,20 +143,30 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 		}
 	}
 
-	if (!phalcon_array_isset_str(&options, SL("host"))) {
-		phalcon_array_update_str_str(&options, SL("host"), SL("127.0.0.1"), PH_COPY);
-	}
-
-	if (!phalcon_array_isset_str(&options, SL("port"))) {
-		phalcon_array_update_str_long(&options, SL("port"), 6379, 0);
-	}
-
-	if (!phalcon_array_isset_str(&options, SL("persistent"))) {
-		phalcon_array_update_str_bool(&options, SL("persistent"), 0, 0);
-	}
-
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")) || PHALCON_IS_EMPTY_STRING(&special_key)) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
+  }
+
+	if (!phalcon_array_isset_fetch_str(&redis, &options, SL("redis"))) {
+		if (!phalcon_array_isset_str(&options, SL("host"))) {
+			phalcon_array_update_str_str(&options, SL("host"), SL("127.0.0.1"), PH_COPY);
+		}
+
+		if (!phalcon_array_isset_str(&options, SL("port"))) {
+			phalcon_array_update_str_long(&options, SL("port"), 6379, 0);
+		}
+
+		if (!phalcon_array_isset_str(&options, SL("persistent"))) {
+			phalcon_array_update_str_bool(&options, SL("persistent"), 0, 0);
+		}
+
+		if (!phalcon_array_isset_str(&options, SL("statsKey"))) {
+			phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
+		}
+	} else {
+		ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
+		PHALCON_VERIFY_CLASS(&redis, ce0);
+		phalcon_update_property_zval(getThis(), SL("_redis"), &redis);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
@@ -166,7 +177,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 {
-	zval options = {}, redis = {}, host = {}, port = {}, persistent = {}, success = {}, auth = {};
+	zval options = {}, redis = {}, host = {}, port = {}, persistent = {}, success = {}, auth = {}, db = {};
 	zend_class_entry *ce0;
 
 	phalcon_return_property(&options, getThis(), SL("_options"));
@@ -203,6 +214,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Redisd server is authentication failed");
 			return;
 		}
+	}
+
+	if (phalcon_array_isset_fetch_str(&db, &options, SL("db"))) {
+		PHALCON_CALL_METHOD(NULL, &redis, "select", &db);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_redis"), &redis);

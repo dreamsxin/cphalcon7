@@ -120,6 +120,10 @@ int phalcon_is_numeric_ex(const zval *op);
 
 #define phalcon_is_numeric(value) (Z_TYPE_P(value) == IS_LONG || Z_TYPE_P(value) == IS_DOUBLE || phalcon_is_numeric_ex(value))
 
+int phalcon_is_long_ex(const zval *op);
+
+#define phalcon_is_long(value) (Z_TYPE_P(value) == IS_LONG || phalcon_is_long_ex(value))
+
 int phalcon_is_equal(zval *op1, zval *op2);
 int phalcon_is_identical(zval *op1, zval *op2);
 int phalcon_is_equal_long(zval *op1, long op2);

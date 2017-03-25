@@ -142,12 +142,14 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	} else if (Z_TYPE(t1) != IS_ARRAY) {
 		convert_to_array_ex(&t1);
 	}
-	ZVAL_COPY(&tmp, &t1);
+	ZVAL_COPY_VALUE(&tmp, &t1);
 
 	for (i = 0; i < n - 1; i++) {
 		zval t2 = {};
 		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
-
+		if (phalcon_is_long_ex(&index)) {
+			convert_to_long(&index);
+		}
 		if (!phalcon_array_isset_fetch(&t2, &tmp, &index, 0)) {
 			array_init(&t2);
 			phalcon_array_update_zval(&tmp, &index, &t2, 0);
@@ -155,9 +157,8 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 			convert_to_array_ex(&t2);
 		}
 
-		ZVAL_COPY(&tmp, &t2);
+		ZVAL_COPY_VALUE(&tmp, &t2);
 	}
-
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
 	phalcon_array_update_zval(&tmp, &index, value, 0);

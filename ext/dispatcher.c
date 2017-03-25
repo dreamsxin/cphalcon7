@@ -82,6 +82,7 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeController);
 PHP_METHOD(Phalcon_Dispatcher, setErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, fireEvent);
+PHP_METHOD(Phalcon_Dispatcher, getLastException);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setmodulename, 0, 0, 1)
 	ZEND_ARG_INFO(0, moduleName)
@@ -133,6 +134,7 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, setErrorHandler, arginfo_phalcon_dispatcherinterface_seterrorhandler, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getErrorHandler, arginfo_phalcon_dispatcherinterface_geterrorhandler, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getLastException, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -167,6 +169,7 @@ PHALCON_INIT_CLASS(Phalcon_Dispatcher){
 	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_camelizeNamespace"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_camelizeController"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_errorHandlers"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_lastException"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_dispatcher_ce, SL("EXCEPTION_NO_DI"), PHALCON_EXCEPTION_NO_DI);
 	zend_declare_class_constant_long(phalcon_dispatcher_ce, SL("EXCEPTION_CYCLIC_ROUTING"), PHALCON_EXCEPTION_CYCLIC_ROUTING);
@@ -985,7 +988,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/* Try to handle the exception */
 			PHALCON_CALL_METHOD(&status, getThis(), "_handleexception", &exception);
 
-			if (likely(!instanceof_function_ex(Z_OBJCE(e), phalcon_continueexception_ce, 0))) {
+			if (likely(!instanceof_function_ex(Z_OBJCE(exception), phalcon_continueexception_ce, 0))) {
 				if (PHALCON_IS_FALSE(&status)) {
 					phalcon_return_property(&finished, getThis(), SL("_finished"));
 					if (PHALCON_IS_FALSE(&finished)) {
@@ -1404,4 +1407,15 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	}
 
 	RETURN_TRUE;
+}
+
+/**
+ * Returns the last exception
+ *
+ * @return \Exception
+ */
+PHP_METHOD(Phalcon_Dispatcher, getLastException){
+
+
+	RETURN_MEMBER(getThis(), "_lastException");
 }

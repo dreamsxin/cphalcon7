@@ -58,7 +58,11 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 								foreach ($vv as $kkk => $vvv) {
 									if (isset($config->$k->$kk->$kkk)) {
 										$this->assertTrue(isset($config->$k->$kk->$kkk));
-										$this->assertEquals($vvv, $config->$k->$kk->$kkk);
+										if (is_object($config->$k->$kk->$kkk)) {
+											$this->_compareConfig($vvv, $config->$k->$kk->$kkk);
+										} else {
+											$this->assertEquals($vvv, $config->$k->$kk->$kkk);
+										}
 									}
 								}
 							} else {
@@ -76,6 +80,16 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 	{
 		$config = new Phalcon\Config\Adapter\Ini('unit-tests/config/config.ini');
 		$this->assertTrue($this->_compareConfig($this->_config, $config));
+
+		$data = array(
+			'phalcon7' => array(
+				'core' => array(
+					'0' => array('version' => 1, 'debug' => 1)
+				)
+			)
+		);
+		$config = new Phalcon\Config\Adapter\Ini('unit-tests/config/config2.ini');
+		$this->assertTrue($this->_compareConfig($data, $config));
 	}
 
 	public function testStandardConfig()

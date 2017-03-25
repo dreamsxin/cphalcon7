@@ -596,6 +596,7 @@ acl/adapterinterface.c \
 acl/adapter.c \
 acl/roleinterface.c \
 exception.c \
+continueexception.c \
 crypt.c \
 filter.c \
 dispatcher.c \

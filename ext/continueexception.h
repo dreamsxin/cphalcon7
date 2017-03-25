@@ -14,28 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#include "exception.h"
+#ifndef PHALCON_CONTINUEEXCEPTION_H
+#define PHALCON_CONTINUEEXCEPTION_H
 
-#include <Zend/zend_exceptions.h>
+#include "php_phalcon.h"
 
-#include "kernel/main.h"
+extern zend_class_entry *phalcon_continueexception_ce;
 
-/**
- * Phalcon\Exception
- *
- * All framework exceptions should use or extend this exception
- */
-zend_class_entry *phalcon_exception_ce;
+PHALCON_INIT_CLASS(Phalcon_ContinueException);
 
-/**
- * Phalcon\Exception initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Exception){
-
-	PHALCON_REGISTER_CLASS_EX(Phalcon, Exception, exception, zend_ce_exception, NULL, 0);
-
-	return SUCCESS;
-}
+#endif /* PHALCON_CONTINUEEXCEPTION_H */

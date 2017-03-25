@@ -135,6 +135,7 @@
 #include "events/listener.h"
 
 #include "exception.h"
+#include "continueexception.h"
 
 #include "filter.h"
 #include "filterinterface.h"

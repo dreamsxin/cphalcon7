@@ -25,6 +25,7 @@
 #include "di/injectable.h"
 #include "events/eventsawareinterface.h"
 #include "exception.h"
+#include "continueexception.h"
 #include "filterinterface.h"
 #include "mvc/user/logic.h"
 
@@ -984,15 +985,17 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/* Try to handle the exception */
 			PHALCON_CALL_METHOD(&status, getThis(), "_handleexception", &exception);
 
-			if (PHALCON_IS_FALSE(&status)) {
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
-				if (PHALCON_IS_FALSE(&finished)) {
-					continue;
+			if (likely(!instanceof_function_ex(Z_OBJCE(e), phalcon_continueexception_ce, 0))) {
+				if (PHALCON_IS_FALSE(&status)) {
+					phalcon_return_property(&finished, getThis(), SL("_finished"));
+					if (PHALCON_IS_FALSE(&finished)) {
+						continue;
+					}
+				} else {
+					/* Exception was not handled, rethrow it */
+					phalcon_throw_exception(&exception);
+					return;
 				}
-			} else {
-				/* Exception was not handled, rethrow it */
-				phalcon_throw_exception(&exception);
-				return;
 			}
 		} else {
 			/* Update the latest value produced by the latest handler */

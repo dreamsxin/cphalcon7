@@ -145,7 +145,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	ZVAL_COPY(&tmp, &t1);
 
 	for (i = 0; i < n - 1; i++) {
-		zval t2 = {}; 
+		zval t2 = {};
 		phalcon_array_fetch_long(&index, directive, i, PH_NOISY);
 
 		if (!phalcon_array_isset_fetch(&t2, &tmp, &index, 0)) {
@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 		PHALCON_CONCAT_VV(&config_dir_path, &base_path, file_path);
 	}
 
-	/** 
+	/**
 	 * Use the standard parse_ini_file
 	 */
 	if (scanner_mode && Z_TYPE_P(scanner_mode) == IS_LONG) {
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 		PHALCON_CALL_FUNCTION(&ini_config, "parse_ini_file", &config_dir_path, &PHALCON_GLOBAL(z_true));
 	}
 
-	/** 
+	/**
 	 * Check if the file had errors
 	 */
 	if (Z_TYPE(ini_config) != IS_ARRAY) {

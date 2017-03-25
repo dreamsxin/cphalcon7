@@ -483,6 +483,13 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_di_ce, "setdefault", &dependency_injector_new);
 
 	/**
+	 * Mvc Router
+	 */
+	PHALCON_STR(&service, ISV(router));
+	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
+	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
+
+	/**
 	 * Mvc Dispatcher
 	 */
 	PHALCON_STR(&service, ISV(dispatcher));

@@ -981,6 +981,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
 			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+			phalcon_update_property_zval(getThis(), SL("_lastException"), &exception);
 
 			/* Clear the exception  */
 			zend_clear_exception();

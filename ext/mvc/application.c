@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle);
 PHP_METHOD(Phalcon_Mvc_Application, request);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, dependencyInjector)
+	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_useimplicitview, 0, 0, 1)
@@ -107,7 +107,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_useimplicitview, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_request, 0, 0, 1)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 0)
+	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_application_method_entry[] = {
@@ -197,7 +198,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	}
 
 	PHALCON_STR(&service, ISV(app));
-	PHALCON_CALL_METHOD(NULL, &dependency_injector, "setShared", &service, getThis());
+	PHALCON_CALL_METHOD(NULL, &dependency_injector, "setshared", &service, getThis());
 
 	PHALCON_STR(&service, ISV(router));
 	PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
@@ -466,13 +467,18 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
  */
 PHP_METHOD(Phalcon_Mvc_Application, request){
 
-	zval *uri, dependency_injector = {}, dependency_injector_new = {}, service = {}, definition = {}, app = {}, response = {};
+	zval *uri, *_dependency_injector = NULL, dependency_injector = {}, dependency_injector_new = {}, service = {}, definition = {};
+	zval app = {}, response = {};
 
-	phalcon_fetch_params(0, 1, 0, &uri);
+	phalcon_fetch_params(0, 1, 1, &uri, &_dependency_injector);
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
-	ZVAL_OBJ(&dependency_injector_new, zend_objects_clone_obj(&dependency_injector));
+	if (!_dependency_injector || Z_TYPE_P(_dependency_injector) == IS_NULL) {
+		ZVAL_OBJ(&dependency_injector_new, zend_objects_clone_obj(&dependency_injector));
+	} else {
+		PHALCON_CPY_WRT(&dependency_injector_new, _dependency_injector);
+	}
 
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_di_ce, "setdefault", &dependency_injector_new);
 
@@ -480,12 +486,19 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	 * Mvc Dispatcher
 	 */
 	PHALCON_STR(&service, ISV(dispatcher));
-	PHALCON_STR(&definition, "Phalcon\\Mvc\\Dispatcher");
+	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
+	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
+
+	/**
+	 * Mvc View
+	 */
+	PHALCON_STR(&service, ISV(view));
+	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
 	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
 
 	ZVAL_OBJ(&app, zend_objects_clone_obj(getThis()));
 
-	PHALCON_CALL_METHOD(&response, &app, "setdi", &dependency_injector_new);
+	PHALCON_CALL_METHOD(NULL, &app, "setdi", &dependency_injector_new);
 	PHALCON_CALL_METHOD(&response, &app, "handle", uri);
 	if (Z_TYPE(response) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(&response, "getcontent");

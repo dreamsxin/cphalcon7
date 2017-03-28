@@ -391,7 +391,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "modelsManager:beforeInitialize");
+		ZVAL_STRING(&event_name, "modelsManager:beforeInitialize");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
 	}
 
@@ -417,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * If an EventsManager is available we pass to it every initialized model
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "modelsManager:afterInitialize");
+		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
 	}
 
@@ -1049,7 +1049,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
+		ZVAL_COPY_VALUE(&lower_alias, &referenced_entity);
 	}
 
 	/**
@@ -1149,7 +1149,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT_CTOR(&lower_alias, &referenced_entity);
 	}
 
 	/**
@@ -1250,7 +1250,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
+		ZVAL_COPY_VALUE(&lower_alias, &referenced_entity);
 	}
 
 	/**
@@ -1374,7 +1374,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"))) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT(&lower_alias, &referenced_entity);
+		PHALCON_CPY_WRT_CTOR(&lower_alias, &referenced_entity);
 	}
 
 	/**
@@ -1640,7 +1640,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		}
 	} else {
 		if (Z_TYPE(parameters) == IS_STRING) {
-			PHALCON_CPY_WRT(&pre_conditions, &parameters);
+			ZVAL_COPY_VALUE(&pre_conditions, &parameters);
 		}
 
 		array_init(&placeholders);
@@ -1789,7 +1789,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	if (Z_TYPE(parameters) == IS_ARRAY) {
 		phalcon_fast_array_merge(&find_arguments, &find_params, &parameters);
 	} else {
-		PHALCON_CPY_WRT(&find_arguments, &find_params);
+		ZVAL_COPY_VALUE(&find_arguments, &find_params);
 	}
 
 	array_init_size(&arguments, 1);
@@ -1804,20 +1804,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		switch (phalcon_get_intval(&type)) {
 
 			case 0:
-				PHALCON_STR(&retrieve_method, "findFirst");
+				ZVAL_STRING(&retrieve_method, "findFirst");
 				break;
 
 			case 1:
-				PHALCON_STR(&retrieve_method, "findFirst");
+				ZVAL_STRING(&retrieve_method, "findFirst");
 				break;
 
 			case 2:
-				PHALCON_STR(&retrieve_method, "find");
+				ZVAL_STRING(&retrieve_method, "find");
 				break;
 
 		}
 	} else {
-		PHALCON_CPY_WRT(&retrieve_method, method);
+		PHALCON_CPY_WRT_CTOR(&retrieve_method, method);
 	}
 
 	/**
@@ -2303,7 +2303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	/**
 	 * Create a query
 	 */
-	PHALCON_STR(&service_name, ISV(modelsQuery));
+	ZVAL_STRING(&service_name, ISV(modelsQuery));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2369,7 +2369,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	if (!_type) {
 		phalcon_get_class_constant(&type, phalcon_mvc_model_query_ce, SL("TYPE_SELECT"));
 	} else {
-		PHALCON_CPY_WRT(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	if (params) {

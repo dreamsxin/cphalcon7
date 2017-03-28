@@ -444,7 +444,7 @@ PHP_METHOD(Phalcon_Di, get){
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "di:beforeServiceResolve");
+		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
 		array_init(&event_data);
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
@@ -476,7 +476,7 @@ PHP_METHOD(Phalcon_Di, get){
 	}
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		PHALCON_STR(&event_name, "di:afterServiceResolve");
+		ZVAL_STRING(&event_name, "di:afterServiceResolve");
 
 		array_init(&event_data);
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);

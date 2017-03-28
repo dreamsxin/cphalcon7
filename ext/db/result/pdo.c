@@ -299,7 +299,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
 		PHALCON_CALL_METHOD(&type, &connection, "gettype");
 
-		/** 
+		/**
 		 * MySQL/PostgreSQL library property returns the number of records
 		 */
 		if (PHALCON_IS_STRING(&type, "mysql") || PHALCON_IS_STRING(&type, "pgsql")) {
@@ -307,17 +307,17 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			PHALCON_CALL_METHOD(&row_count, &pdo_statement, "rowcount");
 		}
 
-		/** 
+		/**
 		 * We should get the count using a new statement :(
 		 */
 		if (PHALCON_IS_FALSE(&row_count)) {
-			/** 
+			/**
 			 * SQLite/Oracle/SQLServer returns resultsets that to the client eyes (PDO) has an
 			 * arbitrary number of rows, so we need to perform an extra count to know that
 			 */
 			phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY);
 
-			/** 
+			/**
 			 * If the sql_statement starts with SELECT COUNT(*) we don't make the count
 			 */
 			if (!phalcon_start_with_str(&sql_statement, SL("SELECT COUNT(*) "))) {
@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			}
 		}
 
-		/** 
+		/**
 		 * Update the value to avoid further calculations
 		 */
 		phalcon_update_property_zval(getThis(), SL("_rowCount"), &row_count);
@@ -391,7 +391,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", &sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&temp_statement, &connection, "executeprepared", &statement, &bind_params, &bind_types);
-			PHALCON_CPY_WRT_CTOR(&statement, &temp_statement);
+			ZVAL_COPY_VALUE(&statement, &temp_statement);
 		}
 
 	} else {
@@ -464,7 +464,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, setFetchMode){
 		} else {
 			PHALCON_CALL_METHOD(NULL, &pdo_statement, "setfetchmode", fetch_mode);
 		}
-		
+
 		phalcon_update_property_long(getThis(), SL("_fetchMode"), Z_LVAL_P(fetch_mode));
 	}
 

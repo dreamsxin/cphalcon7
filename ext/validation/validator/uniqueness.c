@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 					return;
 				}
 			} else {
-				PHALCON_CPY_WRT(&attribute_field, primary_field);
+				ZVAL_COPY_VALUE(&attribute_field, primary_field);
 			}
 
 			/**
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (Z_TYPE(allow_empty) == IS_NULL) {
 		if (_allow_empty && zend_is_true(_allow_empty)) {
-			PHALCON_CPY_WRT(&allow_empty, _allow_empty);
+			ZVAL_COPY_VALUE(&allow_empty, _allow_empty);
 		}
 	}
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&values)) {

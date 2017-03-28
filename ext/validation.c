@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	if (!_entity || Z_TYPE_P(_entity) != IS_OBJECT) {
 		phalcon_return_property(&entity, getThis(), SL("_entity"));
 	} else {
-		PHALCON_CPY_WRT(&entity, _entity);
+		ZVAL_COPY_VALUE(&entity, _entity);
 	}
 
 	phalcon_return_property(&data, getThis(), SL("_data"));
@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 					PHALCON_VERIFY_INTERFACE(&filter_service, phalcon_filterinterface_ce);
 					PHALCON_CALL_METHOD(&filter_value, &filter_service, "sanitize", &value, &field_filters);
-					PHALCON_CPY_WRT(&value, &filter_value);
+					ZVAL_COPY_VALUE(&value, &filter_value);
 				}
 			}
 		}
@@ -685,10 +685,10 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 			if (exists) {
 				PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
 				if (Z_TYPE(value) != IS_STRING) {
-					PHALCON_CPY_WRT(&value, field_param);
+					ZVAL_COPY_VALUE(&value, field_param);
 				}
 			} else {
-				PHALCON_CPY_WRT(&value, field_param);
+				ZVAL_COPY_VALUE(&value, field_param);
 			}
 		}
 	}

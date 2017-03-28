@@ -550,12 +550,12 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	}
 
 	if (Z_TYPE_P(location) == IS_STRING && zend_is_true(external_redirect)) {
-		PHALCON_CPY_WRT(&header, location);
+		PHALCON_CPY_WRT_CTOR(&header, location);
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
 		ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
 		RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL));
 		if (zend_is_true(&matched)) {
-			PHALCON_CPY_WRT(&header, location);
+			PHALCON_CPY_WRT_CTOR(&header, location);
 		} else {
 			ZVAL_NULL(&header);
 		}

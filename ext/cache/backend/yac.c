@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, setTrackingKey);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_yac___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_yac_settrackingkey, 0, 0, 1)
@@ -130,14 +130,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, __construct){
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
-	if (!_options) {
+	if (!_options || Z_TYPE_P(_options) == IS_NULL) {
 		array_init_size(&options, 4);
 	} else {
-		if (Z_TYPE_P(_options) != IS_ARRAY) {
-			array_init_size(&options, 4);
-		} else {
-			PHALCON_CPY_WRT(&options, _options);
-		}
+		PHALCON_CPY_WRT_CTOR(&options, _options);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")) || PHALCON_IS_EMPTY_STRING(&special_key)) {
@@ -242,7 +238,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
-		PHALCON_CPY_WRT(&ttl, lifetime);
+		ZVAL_COPY_VALUE(&ttl, lifetime);
 	}
 
 	PHALCON_CONCAT_SV(&last_key, "_PHCY", key_name);
@@ -259,7 +255,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		PHALCON_CPY_WRT(&cached_content, content);
+		ZVAL_COPY_VALUE(&cached_content, content);
 	}
 
 	/**

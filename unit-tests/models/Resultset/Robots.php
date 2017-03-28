@@ -4,7 +4,7 @@ namespace Resultset;
 
 class Robots extends \Phalcon\Mvc\Model
 {
-	public static function cloneResultMap($base, $data, $column_map, $dirty_state = 0, $keep_snapshots = NULL, $source_model = NULL) {
+	public static function cloneResultMap($base, array $data, array $columnMap, int $dirtyState, $keepSnapshots = NULL, $sourceModel = NULL) {
 		return new \ArrayObject($data);
 	}
 }

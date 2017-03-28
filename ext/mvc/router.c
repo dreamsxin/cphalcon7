@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		array_init_size(&paths, 1);
 		add_assoc_long_ex(&paths, ISL(controller), 1);
 
-		PHALCON_STR(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
+		ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, &route, "__construct", &params_pattern, &paths);
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		add_assoc_long_ex(&paths, ISL(action), 2);
 		add_assoc_long_ex(&paths, ISL(params), 3);
 
-		PHALCON_STR(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
+		ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, &route, "__construct", &params_pattern, &paths);
@@ -305,9 +305,10 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
 		array_init(&longopts);
 		phalcon_array_append_string(&longopts, SL("url::"), 0);
+		phalcon_array_append_string(&longopts, SL("uri::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
-		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"))) {
+		if (phalcon_array_isset_fetch_str(&url, &options, SL("url")) || phalcon_array_isset_fetch_str(&url, &options, SL("uri"))) {
 			RETURN_CTOR(&url);
 		}
 	}
@@ -591,7 +592,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
-		PHALCON_CPY_WRT(&real_uri, uri);
+		PHALCON_CPY_WRT_CTOR(&real_uri, uri);
 	}
 
 	/**
@@ -601,7 +602,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	if (zend_is_true(&removeextraslashes)) {
 		phalcon_remove_extra_slashes(&handled_uri, &real_uri);
 	} else {
-		PHALCON_CPY_WRT(&handled_uri, &real_uri);
+		PHALCON_CPY_WRT_CTOR(&handled_uri, &real_uri);
 	}
 
 	ZVAL_FALSE(&route_found);
@@ -611,7 +612,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	/**
 	 * Retrieve the request service from the container
 	 */
-	PHALCON_STR(&service, ISV(request));
+	ZVAL_STRING(&service, ISV(request));
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_mvc_router_exception_ce);
@@ -628,7 +629,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	}
 
 
-	PHALCON_STR(&event_name, "router:beforeCheckRoutes");
+	ZVAL_STRING(&event_name, "router:beforeCheckRoutes");
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &handled_uri);
 	PHALCON_CALL_METHOD(&current_host_name, &request, "gethttphost");
@@ -639,7 +640,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
 
 	ZEND_HASH_REVERSE_FOREACH_VAL(Z_ARRVAL(routes), route) {
-		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, regex_host_name = {}, matched = {};
+		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, prefix = {}, regex_host_name = {}, matched = {};
 		zval pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
 		zval converters = {}, *position;
 
@@ -679,7 +680,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 					/* FIXME: handle mixed case */
 					PHALCON_CONCAT_SVS(&regex_host_name, "#^", &hostname, "$#");
 				} else {
-					PHALCON_CPY_WRT(&regex_host_name, &hostname);
+					PHALCON_CPY_WRT_CTOR(&regex_host_name, &hostname);
 				}
 
 				RETURN_ON_FAILURE(phalcon_preg_match(&matched, &regex_host_name, &current_host_name, NULL));
@@ -697,7 +698,17 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 		}
 
-		PHALCON_STR(&event_name, "router:beforeCheckRoute");
+		/**
+		 * Look for hostname constraints
+		 */
+		PHALCON_CALL_METHOD(&prefix, route, "getprefix");
+		if (PHALCON_IS_NOT_EMPTY(&prefix)) {
+			if (!phalcon_start_with(&prefix, &handled_uri, &case_sensitive)) {
+				continue;
+			}
+		}
+
+		ZVAL_STRING(&event_name, "router:beforeCheckRoute");
 
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
@@ -732,7 +743,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 * Check for beforeMatch conditions
 		 */
 		if (zend_is_true(&route_found)) {
-			PHALCON_STR(&event_name, "router:matchedRoute");
+			ZVAL_STRING(&event_name, "router:matchedRoute");
 
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, route);
 
@@ -762,7 +773,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 			if (zend_is_true(&route_found)) {
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-					PHALCON_STR(&debug_message, "--Found matches: ");
+					ZVAL_STRING(&debug_message, "--Found matches: ");
 					PHALCON_DEBUG_LOG(&debug_message);
 					PHALCON_DEBUG_LOG(&matches);
 				}
@@ -774,7 +785,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				PHALCON_CPY_WRT_CTOR(&parts, &paths);
 
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-					PHALCON_STR(&debug_message, "--Route paths: ");
+					ZVAL_STRING(&debug_message, "--Route paths: ");
 					PHALCON_DEBUG_LOG(&debug_message);
 					PHALCON_DEBUG_LOG(&paths);
 				}
@@ -831,7 +842,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				PHALCON_DEBUG_LOG(&debug_message);
 			}
 		} else {
-			PHALCON_STR(&event_name, "router:notMatchedRoute");
+			ZVAL_STRING(&event_name, "router:notMatchedRoute");
 
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, route);
 		}
@@ -856,7 +867,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	if (zend_is_true(&route_found)) {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_STR(&debug_message, "--Route Parts: ");
+			ZVAL_STRING(&debug_message, "--Route Parts: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			PHALCON_DEBUG_LOG(&parts);
 		}
@@ -938,7 +949,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 				if (zend_is_true(&str_params)) {
 					zval slash = {};
-					PHALCON_STRL(&slash, "/", 1);
+					ZVAL_STRINGL(&slash, "/", 1);
 					phalcon_fast_explode(&params, &slash, &str_params);
 				} else if (!PHALCON_IS_EMPTY(&str_params)) {
 					phalcon_array_append(&params, &str_params, PH_COPY);
@@ -951,7 +962,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (zend_hash_num_elements(Z_ARRVAL(params))) {
 			phalcon_fast_array_merge(&params_merge, &params, &parts);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&params_merge, &parts);
+			ZVAL_COPY_VALUE(&params_merge, &parts);
 		}
 
 		if (PHALCON_IS_EMPTY(&params_merge)) {
@@ -966,7 +977,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		}
 	} else {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			PHALCON_STR(&debug_message, "--Use Debug");
+			ZVAL_STRING(&debug_message, "--Use Debug");
 			PHALCON_DEBUG_LOG(&debug_message);
 		}
 
@@ -989,7 +1000,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		PHALCON_CALL_METHOD(NULL, getThis(), "setparams", &default_params);
 	}
 
-	PHALCON_STR(&event_name, "router:afterCheckRoutes");
+	ZVAL_STRING(&event_name, "router:afterCheckRoutes");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	if (zend_is_true(&route_found)) {
@@ -1169,7 +1180,7 @@ static int phalcon_router_call_convert(zval *pDest, int num_args, va_list args, 
  */
 PHP_METHOD(Phalcon_Mvc_Router, mount){
 
-	zval *group, group_routes = {}, before_match = {}, hostname = {}, converters = {}, *route, routes = {}, new_routes = {};
+	zval *group, group_routes = {}, before_match = {}, prefix = {}, hostname = {}, converters = {}, *route, routes = {}, new_routes = {};
 
 	phalcon_fetch_params(0, 1, 0, &group);
 	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce);
@@ -1186,12 +1197,16 @@ PHP_METHOD(Phalcon_Mvc_Router, mount){
 	/* Get the hostname restriction */
 	PHALCON_CALL_METHOD(&hostname, group, "gethostname");
 
+	/* Get the prefix restriction */
+	PHALCON_CALL_METHOD(&prefix, group, "getprefix");
+
 	/* Get converters */
 	PHALCON_CALL_METHOD(&converters, group, "getconverters");
 
 	if (Z_TYPE(before_match) != IS_NULL || Z_TYPE(hostname) != IS_NULL || Z_TYPE(converters) != IS_NULL) {
 		int has_before_match = (Z_TYPE(before_match) != IS_NULL);
 		int has_hostname     = (Z_TYPE(hostname) != IS_NULL);
+		int has_prefix     = (Z_TYPE(prefix) != IS_NULL);
 		int has_converters   = (Z_TYPE(converters) != IS_NULL);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group_routes), route) {
@@ -1201,6 +1216,10 @@ PHP_METHOD(Phalcon_Mvc_Router, mount){
 
 			if (has_hostname) {
 				PHALCON_CALL_METHOD(NULL, route, "sethostname", &hostname);
+			}
+
+			if (has_prefix) {
+				PHALCON_CALL_METHOD(NULL, route, "setprefix", &prefix);
 			}
 
 			if (has_converters) {

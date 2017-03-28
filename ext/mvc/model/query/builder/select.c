@@ -646,12 +646,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	phalcon_read_property(&distinct, getThis(), SL("_distinct"), PH_NOISY);
 	if (PHALCON_IS_BOOL(&distinct)) {
 		if (Z_TYPE(distinct) == IS_TRUE) {
-			PHALCON_STR(&phql, "SELECT DISTINCT ");
+			ZVAL_STRING(&phql, "SELECT DISTINCT ");
 		} else {
-			PHALCON_STR(&phql, "SELECT ALL ");
+			ZVAL_STRING(&phql, "SELECT ALL ");
 		}
 	} else {
-		PHALCON_STR(&phql, "SELECT ");
+		ZVAL_STRING(&phql, "SELECT ");
 	}
 
 	phalcon_read_property(&columns, getThis(), SL("_columns"), PH_NOISY);

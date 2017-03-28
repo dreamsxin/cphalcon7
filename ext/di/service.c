@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Di_Service, resolve){
 				PHALCON_CALL_USER_FUNC(return_value, &definition);
 			}
 		} else {
-			PHALCON_CPY_WRT(return_value, &definition);
+			ZVAL_COPY(return_value, &definition);
 		}
 	} else if (Z_TYPE(definition) == IS_ARRAY) {
 		found = 1;

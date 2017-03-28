@@ -15,7 +15,7 @@
 	1.Register an autoloader
 	2.Create a DI - Phalcon\Di\FactoryDefault
 	3.Setup the view component
-	4.Setup a base URI 
+	4.Setup a base URI
 	5.Handle the request - Phalcon\Mvc\Application::handle
 		5.1.Fire event – application:boot
 		5.2.Handle the URI pattern (if any)
@@ -49,7 +49,7 @@
 					5.7.2.1.Load the template engines
 					5.7.2.2.Fire event  - view:beforeRender
 					5.7.2.3.Hierarchical Rendering
-						5.7.2.3.1Render action view 
+						5.7.2.3.1Render action view
 						5.7.2.3.2Render before layout view
 						5.7.2.3.3Render controller layout view
 						5.7.2.3.4Render namespace layout view
@@ -94,7 +94,6 @@
 - afterExecuteRoute
 - afterDispatch
 - afterDispatchLoop
-- beforeException
 
 ### Load Events
 

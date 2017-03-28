@@ -235,32 +235,44 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			}
 		}
 
-		array_init_size(&func_name, 2);
 		switch (type) {
 			case phalcon_fcall_ce:
 				assert(ce != NULL);
+				array_init_size(&func_name, 2);
 				add_next_index_string(&func_name, ce->name->val);
+				add_next_index_stringl(&func_name, method_name, method_len);
 				break;
 			case phalcon_fcall_parent:
 				assert(ce != NULL);
+				array_init_size(&func_name, 2);
 				add_next_index_string(&func_name, ISV(parent));
+				add_next_index_stringl(&func_name, method_name, method_len);
 				break;
 			case phalcon_fcall_self:
+				array_init_size(&func_name, 2);
 				add_next_index_string(&func_name, ISV(self));
+				add_next_index_stringl(&func_name, method_name, method_len);
 				break;
 			case phalcon_fcall_static:
-				add_next_index_string(&func_name, ISV(static));
+				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
+					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
+				} else {
+					array_init_size(&func_name, 2);
+					add_next_index_string(&func_name, ISV(static));
+					add_next_index_stringl(&func_name, method_name, method_len);
+				}
 				break;
 			case phalcon_fcall_method:
+				array_init_size(&func_name, 2);
 				Z_TRY_ADDREF_P(object);
 				add_next_index_zval(&func_name, object);
+				add_next_index_stringl(&func_name, method_name, method_len);
 				break;
 			default:
 				phalcon_throw_exception_format(spl_ce_RuntimeException, "Error call type %d for cmethod %s", type, method_name);
 				return FAILURE;
 		}
 
-		add_next_index_stringl(&func_name, method_name, method_len);
 		if (!ce && object && Z_TYPE_P(object) == IS_OBJECT) {
 			ce = Z_OBJCE_P(object);
 		}

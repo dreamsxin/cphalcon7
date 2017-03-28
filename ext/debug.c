@@ -139,8 +139,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_enable, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_log, 0, 0, 1)
-	ZEND_ARG_INFO(0, message)
-	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, message, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 	ZEND_ARG_INFO(0, context)
 ZEND_END_ARG_INFO()
 
@@ -827,9 +827,9 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Check for overflows
 				 */
 				if (PHALCON_LT_LONG(&before_line, 1)) {
-					PHALCON_CPY_WRT_CTOR(&first_line, &PHALCON_GLOBAL(z_one));
+					ZVAL_COPY_VALUE(&first_line, &PHALCON_GLOBAL(z_one));
 				} else {
-					PHALCON_CPY_WRT_CTOR(&first_line, &before_line);
+					ZVAL_COPY_VALUE(&first_line, &before_line);
 				}
 
 				/**
@@ -843,15 +843,15 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 * Check for overflows
 				 */
 				if (PHALCON_GT(&after_line, &number_lines)) {
-					PHALCON_CPY_WRT_CTOR(&last_line, &number_lines);
+					ZVAL_COPY_VALUE(&last_line, &number_lines);
 				} else {
-					PHALCON_CPY_WRT_CTOR(&last_line, &after_line);
+					ZVAL_COPY_VALUE(&last_line, &after_line);
 				}
 
 				PHALCON_SCONCAT_SVSVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums:", &first_line, "'>");
 			} else {
-				PHALCON_CPY_WRT_CTOR(&first_line, &PHALCON_GLOBAL(z_one));
-				PHALCON_CPY_WRT_CTOR(&last_line, &number_lines);
+				ZVAL_COPY_VALUE(&first_line, &PHALCON_GLOBAL(z_one));
+				ZVAL_COPY_VALUE(&last_line, &number_lines);
 				PHALCON_SCONCAT_SVSVS(&html, "<pre class='prettyprint highlight:", &first_line, ":", &line, " linenums error-scroll'>");
 			}
 
@@ -862,7 +862,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			ZVAL_STRING(&tab, "\t");
 			ZVAL_STRING(&comment, "* /");
 
-			PHALCON_CPY_WRT_CTOR(&i, &first_line);
+			ZVAL_COPY_VALUE(&i, &first_line);
 
 			while (PHALCON_LE(&i, &last_line)) {
 				zval line_position = {}, current_line = {}, trimmed = {}, is_comment = {}, spaced_current_line = {}, escaped_line = {};
@@ -887,7 +887,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 						if (zend_is_true(&is_comment)) {
 							PHALCON_STR_REPLACE(&spaced_current_line, &comment, &space, &current_line);
-							PHALCON_CPY_WRT_CTOR(&current_line, &spaced_current_line);
+							ZVAL_COPY_VALUE(&current_line, &spaced_current_line);
 						}
 					}
 				}
@@ -975,7 +975,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	/**
 	 * Escape the exception's message avoiding possible XSS injections?
 	 */
-	PHALCON_CPY_WRT_CTOR(&escaped_message, &message);
+	ZVAL_COPY_VALUE(&escaped_message, &message);
 
 	/**
 	 * Use the exception info as document's title
@@ -1182,7 +1182,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<tr><th>Pattern</th><th>Paths</th><th>Methods</th></tr>"));
 
 		if (Z_TYPE(di) == IS_OBJECT) {
-			PHALCON_STR(&service_name, ISV(router));
+			ZVAL_STRING(&service_name, ISV(router));
 			PHALCON_CALL_METHOD(&router, &di, "getshared", &service_name);
 			if (Z_TYPE(router) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&routes, &router, "getroutes");
@@ -1474,10 +1474,10 @@ PHP_METHOD(Phalcon_Debug, log){
 
 	phalcon_fetch_params(0, 1, 2, &message, &_type, &context);
 
-	if (!_type) {
+	if (!_type || Z_TYPE_P(_type) == IS_NULL) {
 		ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	if (!context) {

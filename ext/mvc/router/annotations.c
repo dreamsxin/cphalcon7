@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 		 */
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
-		PHALCON_CPY_WRT(&real_uri, uri);
+		PHALCON_CPY_WRT_CTOR(&real_uri, uri);
 	}
 
 	ZVAL_STRING(&service, "annotations");
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						 */
 						phalcon_get_ns_class(&namespace_name, &handler, 0);
 					} else {
-						PHALCON_CPY_WRT(&controller_name, &handler);
+						PHALCON_CPY_WRT_CTOR(&controller_name, &handler);
 					}
 
 					phalcon_update_property_null(getThis(), SL("_routePrefix"));
@@ -453,9 +453,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				PHALCON_CONCAT_VV(&uri, &route_prefix, &value);
 			} else {
 				if (Z_TYPE(route_prefix) != IS_NULL) {
-					PHALCON_CPY_WRT(&uri, &route_prefix);
+					PHALCON_CPY_WRT_CTOR(&uri, &route_prefix);
 				} else {
-					PHALCON_CPY_WRT(&uri, &value);
+					PHALCON_CPY_WRT_CTOR(&uri, &value);
 				}
 			}
 		} else {

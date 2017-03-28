@@ -82,9 +82,9 @@ PHP_METHOD(Phalcon_Forms_Element_Submit, __construct){
 	}
 
 	if (!_type || PHALCON_IS_EMPTY(_type)) {
-		PHALCON_STR(&type, "submit");
+		ZVAL_STRING(&type, "submit");
 	} else {
-		PHALCON_CPY_WRT(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_submit_ce, getThis(), "__construct", name, attributes, options, options_values, &type);

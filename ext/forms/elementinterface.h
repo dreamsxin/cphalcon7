@@ -27,11 +27,11 @@ extern zend_class_entry *phalcon_forms_elementinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_Forms_ElementInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface___construct, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, attributes)
 	ZEND_ARG_INFO(0, options)
 	ZEND_ARG_INFO(0, optionsValues)
-	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, type, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface_setform, 0, 0, 1)
@@ -60,7 +60,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface_addvalidator, 0, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_elementinterface_prepareattributes, 0, 0, 0)
-	ZEND_ARG_INFO(0, attributes)
+	ZEND_ARG_TYPE_INFO(0, attributes, IS_ARRAY, 1)
 	ZEND_ARG_INFO(0, useChecked)
 ZEND_END_ARG_INFO()
 

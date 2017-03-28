@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	if (!_priority) {
 		ZVAL_LONG(&priority, 100);
 	} else {
-		PHALCON_CPY_WRT(&priority, _priority);
+		ZVAL_COPY_VALUE(&priority, _priority);
 	}
 
 	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	}
 
 	if (phalcon_instance_of_ev(handler, phalcon_events_listener_ce)) {
-		PHALCON_CPY_WRT(&listener, handler);
+		ZVAL_COPY_VALUE(&listener, handler);
 		PHALCON_CALL_METHOD(NULL, &listener, "setpriority", &priority);
 		PHALCON_CALL_METHOD(NULL, &listener, "setevent", event_type);
 	} else {
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(NULL, &queue, "next");
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&priority_queue, &queue);
+		ZVAL_DUP(&priority_queue, &queue);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(queue), idx, str_key, listener) {
 			zval key = {}, handler_embeded = {};
 			if (str_key) {
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					}
 
 				} else {
-					PHALCON_CPY_WRT(&handler, &handler_embeded);
+					ZVAL_COPY_VALUE(&handler, &handler_embeded);
 				}
 
 				/**
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					}
 
 				} else {
-					PHALCON_CPY_WRT(&handler, &handler_embeded);
+					ZVAL_COPY_VALUE(&handler, &handler_embeded);
 				}
 
 				/**

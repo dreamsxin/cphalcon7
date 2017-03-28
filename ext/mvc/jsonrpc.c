@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		if (Z_TYPE(registered_modules) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
 		} else {
-			PHALCON_CPY_WRT(&merged_modules, modules);
+			ZVAL_COPY_VALUE(&merged_modules, modules);
 		}
 
 		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);

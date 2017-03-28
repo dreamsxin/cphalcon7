@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		if (PHALCON_IS_EMPTY(&type)) {
 			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
 		} else {
-			PHALCON_CPY_WRT(&key_value, &type);
+			PHALCON_CPY_WRT_CTOR(&key_value, &type);
 		}
 
 		PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);

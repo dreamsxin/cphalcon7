@@ -82,9 +82,9 @@ PHP_METHOD(Phalcon_Forms_Element_Email, __construct){
 	}
 
 	if (!_type || PHALCON_IS_EMPTY(_type)) {
-		PHALCON_STR(&type, "email");
+		ZVAL_STRING(&type, "email");
 	} else {
-		PHALCON_CPY_WRT(&type, _type);
+		PHALCON_CPY_WRT_CTOR(&type, _type);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_email_ce, getThis(), "__construct", name, attributes, options, options_values, &type);

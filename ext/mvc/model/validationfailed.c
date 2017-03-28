@@ -26,6 +26,7 @@
 #include "kernel/array.h"
 #include "kernel/fcall.h"
 #include "kernel/object.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Mvc\Model\ValidationFailed
@@ -82,7 +83,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		 */
 		phalcon_array_fetch_long(&message, validation_messages, 0, PH_NOISY);
 
-		/** 
+		/**
 		 * Get the message to use it in the exception
 		 */
 		PHALCON_CALL_METHOD(&message_str, &message, "getmessage");

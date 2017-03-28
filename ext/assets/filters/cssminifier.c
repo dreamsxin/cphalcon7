@@ -260,7 +260,7 @@ static int phalcon_cssmin_internal(zval *return_value, zval *style, const char *
 	smart_str_0(&minified);
 
 	if (minified.s) {
-		PHALCON_STRL(return_value, minified.s->val, minified.s->len);
+		ZVAL_STRINGL(return_value, minified.s->val, minified.s->len);
 	} else {
 		ZVAL_EMPTY_STRING(return_value);
 	}

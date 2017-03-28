@@ -380,7 +380,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CPY_WRT(&processed, &bind_params);
+		PHALCON_CPY_WRT_CTOR(&processed, &bind_params);
 	}
 
 	/**
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CPY_WRT(&processed_types, &bind_types);
+		PHALCON_CPY_WRT_CTOR(&processed_types, &bind_types);
 	}
 
 	PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &processed, &processed_types);

@@ -226,8 +226,7 @@ int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int fla
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
-		Z_TRY_ADDREF_P(&new_value);
+		ZVAL_DUP(&new_value, value);
 		value = &new_value;
 	}
 
@@ -295,7 +294,7 @@ int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zv
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		ZVAL_DUP(&new_value, value);
 		Z_TRY_ADDREF_P(&new_value);
 		value = &new_value;
 	}
@@ -324,8 +323,7 @@ int phalcon_array_update_string(zval *arr, zend_string *index, zval *value, int 
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
-		Z_TRY_ADDREF_P(&new_value);
+		ZVAL_DUP(&new_value, value);
 		value = &new_value;
 	}
 
@@ -350,8 +348,7 @@ int phalcon_array_update_long(zval *arr, ulong index, zval *value, int flags)
 	}
 
 	if ((flags & PH_CTOR) == PH_CTOR) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
-		Z_TRY_ADDREF_P(&new_value);
+		ZVAL_DUP(&new_value, value);
 		value = &new_value;
 	}
 
@@ -418,7 +415,8 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 
 		if (result != FAILURE && found == 1) {
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-				ZVAL_DUP(return_value, zv);
+				SEPARATE_ZVAL_IF_NOT_REF(zv);
+				ZVAL_COPY_VALUE(return_value, zv);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {

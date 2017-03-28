@@ -51,12 +51,12 @@ PHP_METHOD(Phalcon_Flash_Session, has);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_session_getmessages, 0, 0, 0)
 	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, remove)
+	ZEND_ARG_TYPE_INFO(0, remove, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_session_output, 0, 0, 0)
 	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, remove)
+	ZEND_ARG_TYPE_INFO(0, remove, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_session_has, 0, 0, 1)
@@ -98,12 +98,12 @@ PHP_METHOD(Phalcon_Flash_Session, _getSessionMessages){
 	phalcon_fetch_params(0, 1, 0, &remove);
 
 	ZVAL_STR(&service, IS(session));
-	
+
 	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
 	ZVAL_STRING(&index_name, "_flashMessages");
-	
+
 	PHALCON_RETURN_CALL_METHOD(&session, "get", &index_name);
 	if (PHALCON_IS_TRUE(remove)) {
 		PHALCON_CALL_METHOD(NULL, &session, "remove", &index_name);
@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Flash_Session, message){
 	phalcon_fetch_params(0, 2, 0, &type, &message);
 
 	PHALCON_CALL_METHOD(&messages, getThis(), "_getsessionmessages", &PHALCON_GLOBAL(z_false));
-	if (Z_TYPE(messages) != IS_ARRAY) { 
+	if (Z_TYPE(messages) != IS_ARRAY) {
 		array_init(&messages);
 	}
 
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 	if (Z_TYPE_P(type) != IS_NULL) {
 		ZVAL_FALSE(&do_remove);
 	} else {
-		PHALCON_CPY_WRT(&do_remove, remove);
+		ZVAL_COPY_VALUE(&do_remove, remove);
 	}
 
 	PHALCON_CALL_METHOD(&messages, getThis(), "_getsessionmessages", &do_remove);
@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 					phalcon_array_unset(&messages, type, 0);
 					PHALCON_CALL_METHOD(NULL, getThis(), "_setsessionmessages", &messages);
 				}
-				
+
 				RETURN_CTOR(&return_messages);
 			}
 		} else {

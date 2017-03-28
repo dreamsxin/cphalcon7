@@ -686,14 +686,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
 			phalcon_return_property(&camelize, getThis(), SL("_camelizeController"));
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT(&camelized_class, &handler_name);
+				PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
 			} else {
 				phalcon_camelize(&camelized_class, &handler_name);
 			}
 		} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 			ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 		} else {
-			PHALCON_CPY_WRT(&camelized_class, &handler_name);
+			PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
 		}
 
 		/**
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (zend_is_true(&namespace_name)) {
 			phalcon_return_property(&camelize, getThis(), SL("_camelizeNamespace"));
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT(&camelized_namespace, &namespace_name);
+				PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
 			} else {
 				phalcon_camelize(&camelized_namespace, &namespace_name);
 			}
@@ -964,7 +964,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				phalcon_array_append(&params, param, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CPY_WRT(&params, &action_params);
+			PHALCON_CPY_WRT_CTOR(&params, &action_params);
 		}
 
 		/**
@@ -1242,7 +1242,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 		ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 	} else {
-		PHALCON_CPY_WRT(&camelized_class, &handler_name);
+		PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
 	}
 
 	/**
@@ -1251,7 +1251,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	if (zend_is_true(&namespace_name)) {
 		phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_NOISY);
 		if (!zend_is_true(&camelize)) {
-			PHALCON_CPY_WRT(&camelized_namespace, &namespace_name);
+			PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
 		} else {
 			phalcon_camelize(&camelized_namespace, &namespace_name);
 		}

@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	if (Z_TYPE(data) != IS_ARRAY) { 
+	if (Z_TYPE(data) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation data must be an array");
 		return;
 	}
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
 
-			PHALCON_CPY_WRT_CTOR(&translation, &replaced);
+			ZVAL_COPY_VALUE(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 

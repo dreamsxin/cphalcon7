@@ -29,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/file.h"
 #include "kernel/hash.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Annotations\Reflection
@@ -100,7 +101,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __construct){
 	zval *reflection_data = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
-	
+
 	if (reflection_data && Z_TYPE_P(reflection_data) == IS_ARRAY) {
 		phalcon_update_property_zval(getThis(), SL("_reflectionData"), reflection_data);
 	}
@@ -145,7 +146,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 	ulong idx;
 
 	phalcon_return_property(&annotations, getThis(), SL("_methodAnnotations"));
-	if (Z_TYPE(annotations) != IS_OBJECT) {	
+	if (Z_TYPE(annotations) != IS_OBJECT) {
 		phalcon_return_property(&reflection_data, getThis(), SL("_reflectionData"));
 		if (phalcon_array_isset_fetch_str(&reflection_methods, &reflection_data, SL("methods"))) {
 			if (phalcon_fast_count_ev(&reflection_methods)) {
@@ -244,7 +245,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __set_state){
 	phalcon_fetch_params(0, 1, 0, &data);
 
 	if (Z_TYPE_P(data) == IS_ARRAY) {
-		/** 
+		/**
 		 * Check for a '_reflectionData' in the array to build the Reflection
 		 */
 		if (phalcon_array_isset_fetch_str(&reflection_data, data, SL("_reflectionData"))) {

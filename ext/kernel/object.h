@@ -23,6 +23,12 @@
 #include "php_phalcon.h"
 #include "kernel/main.h"
 
+static inline int is_phalcon_class(const zend_class_entry *ce)
+{
+	return ce->type == ZEND_INTERNAL_CLASS
+		 && ce->info.internal.module->module_number == phalcon_module_entry.module_number;
+}
+
 /** Class Retrieving/Checking */
 zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload);
 zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload);
@@ -41,6 +47,7 @@ zend_class_entry* phalcon_fetch_class(const zval *class_name, int fetch_type);
 zend_class_entry* phalcon_fetch_self_class();
 zend_class_entry* phalcon_fetch_parent_class();
 zend_class_entry* phalcon_fetch_static_class();
+zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int class_name_len);
 
 #define PHALCON_GET_CLASS_CONSTANT(return_value, ce, const_name) \
 	do { \

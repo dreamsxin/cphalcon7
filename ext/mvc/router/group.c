@@ -413,7 +413,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 		 */
 		phalcon_fast_array_merge(&merged_paths, &default_paths, paths);
 	} else {
-		PHALCON_CPY_WRT(&merged_paths, paths);
+		ZVAL_COPY_VALUE(&merged_paths, paths);
 	}
 
 	/**

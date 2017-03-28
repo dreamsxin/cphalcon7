@@ -47,7 +47,7 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 		object_init_ex(&exception, zend_exception_get_default());
 		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_zero), object);
 	} else {
-		PHALCON_CPY_WRT(&exception, object);
+		ZVAL_COPY_VALUE(&exception, object);
 	}
 
 	if (line > 0) {

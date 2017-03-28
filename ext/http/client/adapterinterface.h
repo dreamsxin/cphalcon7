@@ -37,11 +37,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setuseragent
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setauth, 0, 0, 2)
-	ZEND_ARG_INFO(0, username)
-	ZEND_ARG_INFO(0, password)
-	ZEND_ARG_INFO(0, authtype)
-	ZEND_ARG_INFO(0, digest)
-	ZEND_ARG_INFO(0, entityBody)
+	ZEND_ARG_TYPE_INFO(0, username, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, password, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, authtype, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, digest, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, entityBody, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setheader, 0, 0, 2)

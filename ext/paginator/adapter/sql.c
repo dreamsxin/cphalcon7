@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	if (Z_TYPE(dbname) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", &dbname);
 	} else {
-		PHALCON_CPY_WRT(&db, &dbname);
+		PHALCON_CPY_WRT_CTOR(&db, &dbname);
 	}
 
 	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 	if (Z_TYPE_P(dbname) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", dbname);
 	} else {
-		PHALCON_CPY_WRT(&db, dbname);
+		PHALCON_CPY_WRT_CTOR(&db, dbname);
 	}
 	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
 

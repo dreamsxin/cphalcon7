@@ -82,7 +82,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, delete);
 PHP_METHOD(Phalcon_Cache_Multiple, exists);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_multiple___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, backends)
+	ZEND_ARG_TYPE_INFO(0, backends, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_multiple_push, 0, 0, 1)
@@ -149,15 +149,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &backends);
 
-	if (!backends) {
-		backends = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (Z_TYPE_P(backends) != IS_NULL) {
-		if (Z_TYPE_P(backends) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The backends must be an array");
-			return;
-		}
+	if (backends) {
 		phalcon_update_property_zval(getThis(), SL("_backends"), backends);
 	}
 }

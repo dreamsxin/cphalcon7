@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 	if (!_fetch_mode) {
 		ZVAL_LONG(&fetch_mode, PDO_FETCH_BOTH);
 	} else {
-		PHALCON_CPY_WRT(&fetch_mode, _fetch_mode);
+		ZVAL_COPY_VALUE(&fetch_mode, _fetch_mode);
 	}
 
 	if (!bind_params) {
@@ -405,7 +405,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 	if (!_fetch_mode) {
 		ZVAL_LONG(&fetch_mode, PDO_FETCH_BOTH);
 	} else {
-		PHALCON_CPY_WRT(&fetch_mode, _fetch_mode);
+		ZVAL_COPY_VALUE(&fetch_mode, _fetch_mode);
 	}
 
 	if (!bind_params) {
@@ -500,7 +500,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	if (Z_TYPE_P(data_types) == IS_ARRAY) {
 		array_init(&bind_data_types);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&bind_data_types, data_types);
+		ZVAL_COPY_VALUE(&bind_data_types, data_types);
 	}
 
 	/**
@@ -538,7 +538,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&escaped_table, table);
+		ZVAL_COPY_VALUE(&escaped_table, table);
 	}
 
 	/**
@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			PHALCON_CPY_WRT_CTOR(&escaped_fields, fields);
+			ZVAL_COPY_VALUE(&escaped_fields, fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
@@ -674,7 +674,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	if (Z_TYPE_P(data_types) == IS_ARRAY) {
 		array_init(&bind_data_types);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&bind_data_types, data_types);
+		ZVAL_COPY_VALUE(&bind_data_types, data_types);
 	}
 
 	/**
@@ -696,7 +696,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", &field);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&escaped_field, &field);
+			ZVAL_COPY_VALUE(&escaped_field, &field);
 		}
 
 		if (Z_TYPE_P(value) == IS_OBJECT) {
@@ -724,7 +724,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&escaped_table, table);
+		ZVAL_COPY_VALUE(&escaped_table, table);
 	}
 
 	phalcon_fast_join_str(&set_clause, SL(", "), &placeholders);
@@ -819,7 +819,7 @@ PHP_METHOD(Phalcon_Db_Adapter, delete){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&escaped_table, table);
+		ZVAL_COPY_VALUE(&escaped_table, table);
 	}
 
 	if (PHALCON_IS_NOT_EMPTY(where_condition)) {

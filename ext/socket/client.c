@@ -143,18 +143,18 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 				}
 			}
 		} else {
-			PHALCON_CPY_WRT(&domain, _domain);
+			PHALCON_CPY_WRT_CTOR(&domain, _domain);
 		}
 		if (!_type || Z_TYPE_P(_type) == IS_NULL) {
 			phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
 		} else {
-			PHALCON_CPY_WRT(&type, _type);
+			PHALCON_CPY_WRT_CTOR(&type, _type);
 		}
 
 		if (!_protocol || Z_TYPE_P(_protocol) == IS_NULL) {
 			phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY);
 		} else {
-			PHALCON_CPY_WRT(&protocol, _protocol);
+			PHALCON_CPY_WRT_CTOR(&protocol, _protocol);
 		}
 
 		PHALCON_CALL_FUNCTION(&socket, "socket_create", &domain, &type, &protocol);

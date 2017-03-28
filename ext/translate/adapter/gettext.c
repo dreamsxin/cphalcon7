@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
 
-			PHALCON_CPY_WRT(&translation, &replaced);
+			ZVAL_COPY_VALUE(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 

@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY);
 
 	if (Z_TYPE(page_number) == IS_NULL || PHALCON_LT(&show, &PHALCON_GLOBAL(z_zero))) {
-		PHALCON_CPY_WRT_CTOR(&page_number, &PHALCON_GLOBAL(z_one));
+		ZVAL_COPY_VALUE(&page_number, &PHALCON_GLOBAL(z_one));
 	}
 
 	phalcon_fast_count(&rowcount, &items);
@@ -150,18 +150,18 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
 	array_init(&page_items);
 	if (PHALCON_GT(&rowcount, &PHALCON_GLOBAL(z_zero))) {
-		/** 
+		/**
 		 * Seek to the desired position
 		 */
 		if (PHALCON_LT(&start, &rowcount)) {
 			PHALCON_CALL_METHOD(NULL, &items, "seek", &start);
 		} else {
 			PHALCON_CALL_METHOD(NULL, &items, "rewind");
-			PHALCON_CPY_WRT_CTOR(&page_number, &PHALCON_GLOBAL(z_one));
-			PHALCON_CPY_WRT_CTOR(&start, &PHALCON_GLOBAL(z_zero));
+			ZVAL_COPY_VALUE(&page_number, &PHALCON_GLOBAL(z_one));
+			ZVAL_COPY_VALUE(&start, &PHALCON_GLOBAL(z_zero));
 		}
 
-		/** 
+		/**
 		 * The record must be iterable
 		 */
 		for (i=1; ; ++i) {
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	if (PHALCON_LT(&maximum_pages, &rowcount)) {
 		phalcon_add_function(&next, &page_number, &PHALCON_GLOBAL(z_one));
 	} else if (PHALCON_IS_EQUAL(&maximum_pages, &rowcount)) {
-			PHALCON_CPY_WRT_CTOR(&next, &rowcount);
+			ZVAL_COPY_VALUE(&next, &rowcount);
 	} else {
 		phalcon_div_function(&possible_pages, &rowcount, &show);
 
@@ -196,14 +196,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	}
 
 	if (PHALCON_GT(&next, &total_pages)) {
-		PHALCON_CPY_WRT_CTOR(&next, &total_pages);
+		ZVAL_COPY_VALUE(&next, &total_pages);
 	}
 
 	phalcon_update_property_zval(&page, SL("next"), &next);
 	if (PHALCON_GT(&page_number, &PHALCON_GLOBAL(z_one))) {
 		phalcon_sub_function(&before, &page_number, &PHALCON_GLOBAL(z_one));
 	} else {
-		PHALCON_CPY_WRT_CTOR(&before, &PHALCON_GLOBAL(z_one));
+		ZVAL_COPY_VALUE(&before, &PHALCON_GLOBAL(z_one));
 	}
 
 	phalcon_update_property_zval(&page, SL("first"), &PHALCON_GLOBAL(z_one));
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
 		ZVAL_LONG(&pages_total, phalcon_get_intval(&next));
 	} else {
-		PHALCON_CPY_WRT_CTOR(&pages_total, &possible_pages);
+		ZVAL_COPY_VALUE(&pages_total, &possible_pages);
 	}
 
 	phalcon_update_property_zval(&page, SL("last"), &pages_total);

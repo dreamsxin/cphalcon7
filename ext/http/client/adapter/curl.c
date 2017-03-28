@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		if (PHALCON_IS_EMPTY(&type)) {
 			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
 		} else {
-			PHALCON_CPY_WRT(&key_value, &type);
+			ZVAL_COPY_VALUE(&key_value, &type);
 		}
 
 		PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		if (Z_TYPE(data) != IS_ARRAY) {
 			array_init(&curl_data);
 		} else {
-			PHALCON_CPY_WRT(&curl_data, &data);
+			ZVAL_COPY_VALUE(&curl_data, &data);
 		}
 
 		if (Z_TYPE(files) == IS_ARRAY) {

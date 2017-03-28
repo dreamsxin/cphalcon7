@@ -28,12 +28,12 @@ extern zend_class_entry *phalcon_application_ce;
 PHALCON_INIT_CLASS(Phalcon_Application);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_INFO(0, modules)
-	ZEND_ARG_INFO(0, merge)
+	ZEND_ARG_TYPE_INFO(0, modules, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaultModule)
+	ZEND_ARG_TYPE_INFO(0, defaultModule, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 #if PHP_VERSION_ID >= 70200

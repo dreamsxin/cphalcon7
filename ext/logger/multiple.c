@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 	if (!_type) {
 		ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
 	} else {
-		PHALCON_CPY_WRT(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	if (!context) {

@@ -242,12 +242,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	phalcon_fetch_params(0, 1, 1, &method, &args);
 
-	PHALCON_CPY_WRT(&method_name, method);
+	PHALCON_CPY_WRT_CTOR(&method_name, method);
 
 	if (!args) {
 		array_init(&arguments);
 	} else {
-		PHALCON_CPY_WRT(&arguments, args);
+		PHALCON_CPY_WRT_CTOR(&arguments, args);
 	}
 
 	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY);

@@ -786,11 +786,11 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _text) {
 	imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
 	if (ofs_x) {
-		PHALCON_CPY_WRT(&offset_x, ofs_x);
+		PHALCON_CPY_WRT_CTOR(&offset_x, ofs_x);
 	}
 
 	if (ofs_y) {
-		PHALCON_CPY_WRT(&offset_y, ofs_y);
+		PHALCON_CPY_WRT_CTOR(&offset_y, ofs_y);
 	}
 
 	if (!r) {
@@ -1428,9 +1428,9 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
 					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
 				}
 			} else {
-				PHALCON_CPY_WRT(&x, &_p->val);
+				PHALCON_CPY_WRT_CTOR(&x, &_p->val);
 				_p++;
-				PHALCON_CPY_WRT(&y, &_p->val);
+				PHALCON_CPY_WRT_CTOR(&y, &_p->val);
 			}
 			phalcon_array_update_str(&newpoint, SL("x"), &x, PH_COPY);
 			phalcon_array_update_str(&newpoint, SL("y"), &y, PH_COPY);
@@ -1457,31 +1457,31 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, shadow)
 	if (!_color) {
 		ZVAL_STRING(&color, "black");
 	} else {
-		PHALCON_CPY_WRT(&color, _color);
+		PHALCON_CPY_WRT_CTOR(&color, _color);
 	}
 
 	if (!_opacity) {
 		ZVAL_LONG(&opacity, 80);
 	} else {
-		PHALCON_CPY_WRT(&opacity, _opacity);
+		PHALCON_CPY_WRT_CTOR(&opacity, _opacity);
 	}
 
 	if (!_sigma) {
 		ZVAL_LONG(&sigma, 3);
 	} else {
-		PHALCON_CPY_WRT(&sigma, _sigma);
+		PHALCON_CPY_WRT_CTOR(&sigma, _sigma);
 	}
 
 	if (!_x) {
 		ZVAL_LONG(&x, 5);
 	} else {
-		PHALCON_CPY_WRT(&x, _x);
+		PHALCON_CPY_WRT_CTOR(&x, _x);
 	}
 
 	if (!_y) {
 		ZVAL_LONG(&y, 5);
 	} else {
-		PHALCON_CPY_WRT(&y, _y);
+		PHALCON_CPY_WRT_CTOR(&y, _y);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1552,7 +1552,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, colorize)
 	if (!_composition) {
 		phalcon_get_class_constant(&composition, imagick_ce, SL("COMPOSITE_MULTIPLY"));
 	} else {
-		PHALCON_CPY_WRT(&composition, _composition);
+		PHALCON_CPY_WRT_CTOR(&composition, _composition);
 	}
 
 	PHALCON_CONCAT_SV(&pseudo_string, "canvas:", color);
@@ -1593,7 +1593,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, gamma)
 	if (!_channel) {
 		phalcon_get_class_constant(&channel, imagick_ce, SL("CHANNEL_ALL"));
 	} else {
-		PHALCON_CPY_WRT(&channel, _channel);
+		PHALCON_CPY_WRT_CTOR(&channel, _channel);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1628,37 +1628,37 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 	if (!_gamma) {
 		ZVAL_LONG(&gamma, 1);
 	} else {
-		PHALCON_CPY_WRT(&gamma, _gamma);
+		PHALCON_CPY_WRT_CTOR(&gamma, _gamma);
 	}
 
 	if (!_input_min) {
 		ZVAL_LONG(&input_min, 0);
 	} else {
-		PHALCON_CPY_WRT(&input_min, _input_min);
+		PHALCON_CPY_WRT_CTOR(&input_min, _input_min);
 	}
 
 	if (!_input_max) {
 		ZVAL_LONG(&input_max, 255);
 	} else {
-		PHALCON_CPY_WRT(&input_max, _input_max);
+		PHALCON_CPY_WRT_CTOR(&input_max, _input_max);
 	}
 
 	if (!_output_min) {
 		ZVAL_LONG(&output_min, 0);
 	} else {
-		PHALCON_CPY_WRT(&output_min, _output_min);
+		PHALCON_CPY_WRT_CTOR(&output_min, _output_min);
 	}
 
 	if (!_output_max) {
 		ZVAL_LONG(&output_max, 255);
 	} else {
-		PHALCON_CPY_WRT(&output_max, _output_max);
+		PHALCON_CPY_WRT_CTOR(&output_max, _output_max);
 	}
 
 	if (!_channel) {
 		phalcon_get_class_constant(&channel, imagick_ce, SL("CHANNEL_ALL"));
 	} else {
-		PHALCON_CPY_WRT(&channel, _channel);
+		PHALCON_CPY_WRT_CTOR(&channel, _channel);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));
@@ -1836,13 +1836,13 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, vignette)
 	if (!_composition) {
 		phalcon_get_class_constant(&composition, imagick_ce, SL("COMPOSITE_DEFAULT"));
 	} else {
-		PHALCON_CPY_WRT(&composition, _composition);
+		PHALCON_CPY_WRT_CTOR(&composition, _composition);
 	}
 
 	if (!_crop_factor) {
 		ZVAL_DOUBLE(&crop_factor, 1.5);
 	} else {
-		PHALCON_CPY_WRT(&crop_factor, _crop_factor);
+		PHALCON_CPY_WRT_CTOR(&crop_factor, _crop_factor);
 	}
 
 	phalcon_return_property(&im, getThis(), SL("_image"));

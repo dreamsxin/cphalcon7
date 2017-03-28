@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	if (!_descriptor || Z_TYPE_P(_descriptor) == IS_NULL) {
 		phalcon_return_property(&descriptor, getThis(), SL("_descriptor"));
 	} else {
-		PHALCON_CPY_WRT(&descriptor, _descriptor);
+		PHALCON_CPY_WRT_CTOR(&descriptor, _descriptor);
 	}
 
 	if (Z_TYPE(descriptor) != IS_ARRAY) {
@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				phalcon_add_function(&parameter, &wildcard, z_one);
 			} else {
 				if (Z_TYPE(wildcard) == IS_STRING) {
-					PHALCON_CPY_WRT_CTOR(&parameter, &wildcard);
+					ZVAL_COPY_VALUE(&parameter, &wildcard);
 				} else {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind parameter");
 					return;
@@ -437,12 +437,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		PHALCON_DEBUG_LOG(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
-			PHALCON_STR(&debug_message, "Bind Params: ");
+			ZVAL_STRING(&debug_message, "Bind Params: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
-			PHALCON_STR(&debug_message, "Bind Types: ");
+			ZVAL_STRING(&debug_message, "Bind Types: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			PHALCON_DEBUG_LOG(bind_types);
 		}
@@ -466,7 +466,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		phalcon_update_property_zval(getThis(), SL("_sqlVariables"), bind_params);
 		phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), bind_types);
 
-		PHALCON_STR(&event_name, "db:beforeQuery");
+		ZVAL_STRING(&event_name, "db:beforeQuery");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -475,14 +475,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
 	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
 	PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-	PHALCON_CPY_WRT_CTOR(&statement, &new_statement);
+	ZVAL_COPY_VALUE(&statement, &new_statement);
 
 	/**
 	 * Execute the afterQuery event if a EventsManager is available
 	 */
 	if (likely(Z_TYPE(statement) == IS_OBJECT)) {
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_STR(&event_name, "db:afterQuery");
+			ZVAL_STRING(&event_name, "db:afterQuery");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
 		}
 
@@ -521,12 +521,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		PHALCON_DEBUG_LOG(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
-			PHALCON_STR(&debug_message, "Bind Params: ");
+			ZVAL_STRING(&debug_message, "Bind Params: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
-			PHALCON_STR(&debug_message, "Bind Types: ");
+			ZVAL_STRING(&debug_message, "Bind Types: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			PHALCON_DEBUG_LOG(bind_types);
 		}
@@ -549,7 +549,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		phalcon_update_property_zval(getThis(), SL("_sqlVariables"), bind_params);
 		phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), bind_types);
 
-		PHALCON_STR(&event_name, "db:beforeExecute");
+		ZVAL_STRING(&event_name, "db:beforeExecute");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	if (Z_TYPE(affected_rows) == IS_LONG) {
 		phalcon_update_property_zval(getThis(), SL("_affectedRows"), &affected_rows);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_STR(&event_name, "db:afterExecute");
+			ZVAL_STRING(&event_name, "db:afterExecute");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
 		}
 	}
@@ -693,7 +693,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 	array_init(&placeholders);
 	ZVAL_LONG(&set_order, 2);
 
-	PHALCON_STR(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
+	ZVAL_STRING(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
 
 	ZVAL_MAKE_REF(&matches);
 	PHALCON_CALL_FUNCTION(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
@@ -718,11 +718,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 			phalcon_array_append(&placeholders, &value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		PHALCON_STR(&question, "?");
+		ZVAL_STRING(&question, "?");
 
 		PHALCON_CALL_FUNCTION(&bound_sql, "preg_replace", &bind_pattern, &question, sql);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&bound_sql, sql);
+		ZVAL_COPY_VALUE(&bound_sql, sql);
 	}
 
 	/**
@@ -812,7 +812,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 		 * Notify the events manager about the started transaction
 		 */
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_STR(&event_name, "db:beginTransaction");
+			ZVAL_STRING(&event_name, "db:beginTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 		}
 
@@ -830,7 +830,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 				 * Notify the events manager about the created savepoint
 				 */
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					PHALCON_STR(&event_name, "db:createSavepoint");
+					ZVAL_STRING(&event_name, "db:createSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 				}
 
@@ -886,7 +886,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		 * Notify the events manager about the rollbacked transaction
 		 */
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_STR(&event_name, "db:rollbackTransaction");
+			ZVAL_STRING(&event_name, "db:rollbackTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 		}
 
@@ -908,7 +908,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 				 * Notify the events manager about the rollbacked savepoint
 				 */
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					PHALCON_STR(&event_name, "db:rollbackSavepoint");
+					ZVAL_STRING(&event_name, "db:rollbackSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 				}
 
@@ -974,7 +974,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		 * Notify the events manager about the commited transaction
 		 */
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_STR(&event_name, "db:commitTransaction");
+			ZVAL_STRING(&event_name, "db:commitTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 		}
 
@@ -1000,7 +1000,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 				 * Notify the events manager about the commited savepoint
 				 */
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					PHALCON_STR(&event_name, "db:releaseSavepoint");
+					ZVAL_STRING(&event_name, "db:releaseSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 				}
 

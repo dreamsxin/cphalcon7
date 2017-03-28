@@ -78,7 +78,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_mongo___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_mongo_empty, 0, 0, 0)
@@ -154,11 +154,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 	phalcon_cache_backend_mongo_object *mongo_object;
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
-
-	if (!options || Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The options is required");
-		return;
-	}
 
 	if (phalcon_array_isset_fetch_str(&uri, options, SL("uri"))) {
 		phalcon_update_property_zval(getThis(), SL("_uri"), &uri);
@@ -288,7 +283,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 			if (Z_TYPE(cached_content) == IS_STRING) {
 				PHALCON_CALL_METHOD(return_value, &frontend, "afterretrieve", &cached_content);
 			} else {
-				PHALCON_CPY_WRT_CTOR(return_value, &cached_content);
+				ZVAL_COPY(return_value, &cached_content);
 			}
 			break;
 		}
@@ -337,13 +332,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		PHALCON_CPY_WRT(&cached_content, content);
+		ZVAL_COPY_VALUE(&cached_content, content);
 	}
 
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
-		PHALCON_CPY_WRT(&ttl, lifetime);
+		ZVAL_COPY_VALUE(&ttl, lifetime);
 	}
 
 	query = BCON_NEW (
@@ -472,7 +467,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	if (!_prefix || Z_TYPE_P(_prefix) != IS_NULL) {
 		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&prefix, _prefix);
+		ZVAL_COPY_VALUE(&prefix, _prefix);
 	}
 
 	query = bson_new();

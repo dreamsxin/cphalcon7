@@ -881,7 +881,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 		} else if (r > 100) {
 			ZVAL_LONG(&radius, 100);
 		} else {
-			PHALCON_CPY_WRT(&radius, _radius);
+			PHALCON_CPY_WRT_CTOR(&radius, _radius);
 		}
 	}
 
@@ -1011,13 +1011,13 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 			ZVAL_STRING(&format, "png");
 		}
 	} else {
-		PHALCON_CPY_WRT(&format, ext);
+		PHALCON_CPY_WRT_CTOR(&format, ext);
 	}
 
 	if (!_quality) {
 		ZVAL_LONG(&quality, 100);
 	} else {
-		PHALCON_CPY_WRT(&quality, _quality);
+		PHALCON_CPY_WRT_CTOR(&quality, _quality);
         if (Z_TYPE(quality) != IS_LONG) {
             convert_to_long(&quality);
         }

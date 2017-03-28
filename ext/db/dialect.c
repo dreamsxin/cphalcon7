@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 		if (!_escape_char) {
 			 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
 		} else {
-			PHALCON_CPY_WRT(&escape_char, _escape_char);
+			ZVAL_COPY_VALUE(&escape_char, _escape_char);
 		}
 	} else {
 		ZVAL_NULL(&escape_char);
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionCase){
 		escape_char = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(return_value, "CASE ");
+	ZVAL_STRING(return_value, "CASE ");
 
 	phalcon_array_fetch_str(&expr, expression, SL("expr"), PH_NOISY);
 
@@ -603,7 +603,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 	if (!escape || Z_TYPE_P(escape) == IS_NULL) {
 		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&escape_char, escape);
+		ZVAL_COPY_VALUE(&escape_char, escape);
 	}
 
 	if (Z_TYPE_P(table) == IS_ARRAY) {
@@ -614,7 +614,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_VVV(&sql_table, &escape_char, &table_name, &escape_char);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&sql_table, &table_name);
+			ZVAL_COPY_VALUE(&sql_table, &table_name);
 		}
 
 		/**
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_schema, &schema_name, ".", &sql_table);
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(&sql_schema, &sql_table);
+			ZVAL_COPY_VALUE(&sql_schema, &sql_table);
 		}
 
 		/**
@@ -641,7 +641,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 				PHALCON_CONCAT_VSV(&sql_table_alias, &sql_schema, " AS ", &alias_name);
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(&sql_table_alias, &sql_schema);
+			ZVAL_COPY_VALUE(&sql_table_alias, &sql_schema);
 		}
 
 		RETURN_CTOR(&sql_table_alias);
@@ -701,11 +701,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 				if (Z_TYPE(column_item) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&column_sql, getThis(), "getsqlexpression", &column_item, &escape_char);
 				} else if (PHALCON_IS_STRING(&column_item, "*")) {
-					PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
+					ZVAL_COPY_VALUE(&column_sql, &column_item);
 				} else if (PHALCON_GLOBAL(db).escape_identifiers) {
 					PHALCON_CONCAT_VVV(&column_sql, &escape_char, &column_item, &escape_char);
 				} else {
-					PHALCON_CPY_WRT_CTOR(&column_sql, &column_item);
+					ZVAL_COPY_VALUE(&column_sql, &column_item);
 				}
 			} else {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
@@ -723,10 +723,10 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						PHALCON_CONCAT_VSV(&column_domain_sql, &column_domain, ".", &column_sql);
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
+					ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
 				}
 			} else {
-				PHALCON_CPY_WRT_CTOR(&column_domain_sql, &column_sql);
+				ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
 			}
 
 			/**
@@ -740,10 +740,10 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						PHALCON_CONCAT_VSV(&column_alias_sql, &column_domain_sql, " AS ", &column_alias);
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
+					ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
 				}
 			} else {
-				PHALCON_CPY_WRT_CTOR(&column_alias_sql, &column_domain_sql);
+				ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
 			}
 
 			phalcon_array_append(&selected_columns, &column_alias_sql, PH_COPY);
@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&columns_sql, &columns);
+		ZVAL_COPY_VALUE(&columns_sql, &columns);
 	}
 
 	/**
@@ -768,23 +768,23 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&tables_sql, &tables);
+		ZVAL_COPY_VALUE(&tables_sql, &tables);
 	}
 
 	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"))) {
 		if (Z_TYPE(distinct) == IS_LONG) {
 			if (Z_LVAL(distinct) == 0) {
-				PHALCON_STR(&sql, "SELECT ALL ");
+				ZVAL_STRING(&sql, "SELECT ALL ");
 			} else if (Z_LVAL(distinct) == 1) {
-				PHALCON_STR(&sql, "SELECT DISTINCT ");
+				ZVAL_STRING(&sql, "SELECT DISTINCT ");
 			} else {
-				PHALCON_STR(&sql, "SELECT ");
+				ZVAL_STRING(&sql, "SELECT ");
 			}
 		} else {
-			PHALCON_STR(&sql, "SELECT ");
+			ZVAL_STRING(&sql, "SELECT ");
 		}
 	} else {
-		PHALCON_STR(&sql, "SELECT ");
+		ZVAL_STRING(&sql, "SELECT ");
 	}
 
 	PHALCON_SCONCAT_VSV(&sql, &columns_sql, " FROM ", &tables_sql);
@@ -874,7 +874,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
+				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
 
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
@@ -1016,7 +1016,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			PHALCON_CPY_WRT_CTOR(&escaped_fields, &fields);
+			ZVAL_COPY_VALUE(&escaped_fields, &fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
@@ -1140,7 +1140,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
+				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1243,7 +1243,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				PHALCON_CPY_WRT_CTOR(&order_sql_item_type, &order_sql_item);
+				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
 			}
 			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
@@ -1390,7 +1390,7 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 	if (!escape || Z_TYPE_P(escape) == IS_NULL) {
 		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&escape_char, escape);
+		ZVAL_COPY_VALUE(&escape_char, escape);
 	}
 
 	if (PHALCON_IS_EMPTY(&escape_char)) {
@@ -1413,7 +1413,7 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 
 			if (PHALCON_IS_EMPTY(part) || phalcon_start_with_str(part, SL("*"))) {
 				if (PHALCON_IS_EMPTY(return_value)) {
-					ZVAL_COPY_VALUE(return_value, part);
+					ZVAL_COPY(return_value, part);
 				} else {
 					PHALCON_SCONCAT_SV(return_value, ".", part);
 				}
@@ -1446,7 +1446,7 @@ PHP_METHOD(Phalcon_Db_Dialect, escapeSchema){
 	if (!escape || Z_TYPE_P(escape) == IS_NULL) {
 		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&escape_char, escape);
+		ZVAL_COPY_VALUE(&escape_char, escape);
 	}
 
 	if (PHALCON_IS_EMPTY(&escape_char)) {
@@ -1487,7 +1487,7 @@ PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
 			PHALCON_CALL_METHOD(&schema, getThis(), "escapeschema", _schema, escape);
 			PHALCON_CONCAT_VSV(return_value, &schema, ".", &table);
 		} else {
-			PHALCON_CPY_WRT(return_value, &table);
+			ZVAL_COPY(return_value, &table);
 		}
 
 		if (_alias && PHALCON_IS_NOT_EMPTY(_alias)) {
@@ -1498,7 +1498,7 @@ PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
 		if (_schema && PHALCON_IS_NOT_EMPTY(_schema)) {
 			PHALCON_CONCAT_VSV(return_value, _schema, ".", &table);
 		} else {
-			PHALCON_CPY_WRT_CTOR(return_value, _table);
+			ZVAL_COPY(return_value, _table);
 		}
 
 		if (_alias && PHALCON_IS_NOT_EMPTY(_alias)) {

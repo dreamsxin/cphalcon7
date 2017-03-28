@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
 	} else {
-		PHALCON_CPY_WRT(&interpolated, message);
+		ZVAL_COPY_VALUE(&interpolated, message);
 	}
 
 	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 	}
 
 	if (!i_enable_labels && !i_show_backtrace) {
-		PHALCON_CPY_WRT(&body, &interpolated);
+		ZVAL_COPY_VALUE(&body, &interpolated);
 	} else if (i_enable_labels && !i_show_backtrace) {
 		ZVAL_EMPTY_STRING(&body);
 	} else {

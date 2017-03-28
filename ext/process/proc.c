@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 	if (!_signal){
 		ZVAL_LONG(&signal, 15);
 	} else {
-		PHALCON_CPY_WRT(&signal, _signal);
+		ZVAL_COPY_VALUE(&signal, _signal);
 	}
 
 	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
@@ -896,9 +896,9 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 
 	if (_onrecv) {
 		if (instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
-				PHALCON_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
+			PHALCON_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
 		} else {
-			PHALCON_CPY_WRT(&onrecv, _onrecv);
+			ZVAL_COPY_VALUE(&onrecv, _onrecv);
 		}
 	}
 
@@ -906,7 +906,7 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		if (instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
 		} else {
-			PHALCON_CPY_WRT(&onsend, _onsend);
+			ZVAL_COPY_VALUE(&onsend, _onsend);
 		}
 	}
 
@@ -914,7 +914,7 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		if (instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
 		} else {
-			PHALCON_CPY_WRT(&onerror, _onerror);
+			ZVAL_COPY_VALUE(&onerror, _onerror);
 		}
 	}
 
@@ -922,7 +922,7 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		if (instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
 		} else {
-			PHALCON_CPY_WRT(&ontimeout, _ontimeout);
+			ZVAL_COPY_VALUE(&ontimeout, _ontimeout);
 		}
 	}
 

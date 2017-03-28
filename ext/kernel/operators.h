@@ -21,13 +21,13 @@
 #define PHALCON_KERNEL_OPERATORS_H
 
 #include "php_phalcon.h"
+#include "kernel/main.h"
 
 #include <ctype.h>
 
 #define PHALCON_IS_SPACE(x) isspace((int)(x))
 
-#define PHALCON_TYPE_P(var)   (Z_TYPE_P(var) == IS_REFERENCE ? Z_TYPE_P(Z_REFVAL_P(var)) : Z_TYPE_P(var))
-#define PHALCON_IS_TYPE(var, type)   (Z_TYPE_P(var) == type || (Z_TYPE_P(var) == IS_REFERENCE && Z_TYPE_P(Z_REFVAL_P(var)) == type))
+#define PHALCON_IS_TYPE(var, type)   	(PHALCON_TYPE_P(var) == type)
 #define PHALCON_IS_NOT_TYPE(var, type)   !(PHALCON_IS_TYPE(var, type))
 
 /** Strict comparing */
@@ -74,7 +74,7 @@
 #define PHALCON_GT_LONG(op1, op2)  phalcon_greater_long(op1, op2)
 #define PHALCON_GT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) > op2) || phalcon_greater_double(op1, op2))
 
-#define PHALCON_STRING_OFFSET(op1, index) ((index >= 0 && index < Z_STRLEN_P(op1)) ? Z_STRVAL_P(op1)[index] : '\0')
+#define ZVAL_STRINGING_OFFSET(op1, index) ((index >= 0 && index < Z_STRLEN_P(op1)) ? Z_STRVAL_P(op1)[index] : '\0')
 
 #define phalcon_increment(var) increment_function(var)
 #define phalcon_decrement(var) decrement_function(var)
@@ -149,5 +149,12 @@ zend_long phalcon_safe_mod_zval_long(zval *op1, zend_long op2);
 zend_long phalcon_safe_mod_zval_double(zval *op1, double op2);
 zend_long phalcon_safe_mod_long_zval(zend_long op1, zval *op2);
 zend_long phalcon_safe_mod_double_zval(double op1, zval *op2);
+
+int phalcon_is_scalar(zval *var);
+
+/* Count */
+long int phalcon_fast_count_int(zval *value);
+void phalcon_fast_count(zval *result, zval *array);
+int phalcon_fast_count_ev(zval *array);
 
 #endif /* PHALCON_KERNEL_OPERATORS_H */

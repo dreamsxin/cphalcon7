@@ -178,6 +178,8 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, __construct){
 	phalcon_array_update_str(&access_list, SL("*!*"), &PHALCON_GLOBAL(z_true), PH_COPY);
 	phalcon_update_property_zval(getThis(), SL("_accessList"), &access_list);
 	zval_ptr_dtor(&access_list);
+
+	phalcon_update_property_empty_array(getThis(), SL("_access"));
 }
 
 /**
@@ -205,9 +207,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addRole){
 
 	if (Z_TYPE_P(role) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&role_name, role, "getname");
-		PHALCON_CPY_WRT(&object, role);
+		ZVAL_COPY_VALUE(&object, role);
 	} else {
-		PHALCON_CPY_WRT(&role_name, role);
+		ZVAL_COPY_VALUE(&role_name, role);
 
 		object_init_ex(&object, phalcon_acl_role_ce);
 		PHALCON_CALL_METHOD(NULL, &object, "__construct", &role_name);
@@ -251,7 +253,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addInherit){
 	if (Z_TYPE_P(role_to_inherit) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&role_inherit_name, role_to_inherit, "getname");
 	} else {
-		PHALCON_CPY_WRT(&role_inherit_name, role_to_inherit);
+		ZVAL_COPY_VALUE(&role_inherit_name, role_to_inherit);
 	}
 
 	/**
@@ -346,9 +348,9 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, addResource){
 
 	if (Z_TYPE_P(resource) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&resource_name, resource, "getname");
-		PHALCON_CPY_WRT(&object, resource);
+		ZVAL_COPY_VALUE(&object, resource);
 	} else {
-		PHALCON_CPY_WRT(&resource_name, resource);
+		ZVAL_COPY_VALUE(&resource_name, resource);
 
 		object_init_ex(&object, phalcon_acl_resource_ce);
 		PHALCON_CALL_METHOD(NULL, &object, "__construct", &resource_name);
@@ -745,7 +747,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 			PHALCON_CALL_METHOD(&role_name, role, "getrolename");
 		}
 	} else {
-		PHALCON_CPY_WRT(&role_name, role);
+		ZVAL_COPY_VALUE(&role_name, role);
 	}
 
 	if (Z_TYPE_P(resource) == IS_OBJECT) {
@@ -756,7 +758,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 			PHALCON_CALL_METHOD(&resource_name, resource, "getresourcename");
 		}
 	} else {
-		PHALCON_CPY_WRT(&resource_name, resource);
+		ZVAL_COPY_VALUE(&resource_name, resource);
 	}
 
 	ZVAL_STRING(&star, "*");

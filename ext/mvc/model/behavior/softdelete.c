@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 			 */
 			PHALCON_CALL_METHOD(NULL, model, "writeattribute", &field, &value);
 
-			PHALCON_STR(&event_name, "afterDelete");
+			ZVAL_STRING(&event_name, "afterDelete");
 
 			/**
 			 * Fire the beforeDelete event

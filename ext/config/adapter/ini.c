@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	}
 
 	if (zend_is_true(absolute_path)) {
-		PHALCON_CPY_WRT_CTOR(&config_dir_path, file_path);
+		ZVAL_COPY_VALUE(&config_dir_path, file_path);
 	} else {
 		phalcon_return_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"));
 

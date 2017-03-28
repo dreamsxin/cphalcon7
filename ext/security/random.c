@@ -340,7 +340,7 @@ PHP_METHOD(Phalcon_Security_Random, base58){
 			PHALCON_CALL_SELF(&idx, "number", &tmp);
 		}
 
-		c = PHALCON_STRING_OFFSET(&alphabet, phalcon_get_intval(&idx));
+		c = ZVAL_STRINGING_OFFSET(&alphabet, phalcon_get_intval(&idx));
 		phalcon_concat_self_char(&byte_string, c);
 	} ZEND_HASH_FOREACH_END();
 
@@ -526,7 +526,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	phalcon_concat_self(&bin, &pack);
 
-	c = PHALCON_STRING_OFFSET(&bin, 0);
+	c = ZVAL_STRINGING_OFFSET(&bin, 0);
 
 	ZVAL_LONG(&tmp, c);
 

@@ -69,7 +69,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Syslog, format){
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
 	} else {
-		PHALCON_CPY_WRT(&interpolated, message);
+		PHALCON_CPY_WRT_CTOR(&interpolated, message);
 	}
 
 	array_init_size(return_value, 2);

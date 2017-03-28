@@ -125,7 +125,7 @@ void phalcon_fix_path(zval *return_value, zval *path, zval *directory_separator)
 		}
 	}
 
-	PHALCON_CPY_WRT_CTOR(return_value, path);
+	ZVAL_DUP(return_value, path);
 	return;
 }
 

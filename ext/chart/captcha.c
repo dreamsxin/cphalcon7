@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!_word || Z_TYPE_P(_word) == IS_NULL) {
 		phalcon_read_property(&word, getThis(), SL("_word"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&word, _word);
+		ZVAL_COPY_VALUE(&word, _word);
 	}
 
 	if (!offset_x || Z_TYPE_P(offset_x) == IS_NULL) {
@@ -245,25 +245,25 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!_foreground || Z_TYPE_P(_foreground) == IS_NULL) {
 		PHALCON_CALL_METHOD(&foreground, &random, "color", &color_type);
 	} else {
-		PHALCON_CPY_WRT(&foreground, _foreground);
+		ZVAL_COPY_VALUE(&foreground, _foreground);
 	}
 
 	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
 		PHALCON_CALL_METHOD(&background, &random, "color", &color_type);
 	} else {
-		PHALCON_CPY_WRT(&background, _background);
+		ZVAL_COPY_VALUE(&background, _background);
 	}
 
 	if (!_width || Z_TYPE_P(_width) == IS_NULL) {
 		phalcon_read_property(&width, getThis(), SL("_width"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&width, _width);
+		ZVAL_COPY_VALUE(&width, _width);
 	}
 
 	if (!_height || Z_TYPE_P(_height) == IS_NULL) {
 		phalcon_read_property(&height, getThis(), SL("_height"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&height, _height);
+		ZVAL_COPY_VALUE(&height, _height);
 	}
 
 	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);

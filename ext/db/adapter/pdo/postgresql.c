@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	if (!desc || !zend_is_true(desc)) {
 		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&descriptor, desc);
+		PHALCON_CPY_WRT_CTOR(&descriptor, desc);
 	}
 
 	if (Z_TYPE(descriptor) != IS_ARRAY) {
@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 
 	PHALCON_CALL_PARENT(NULL, phalcon_db_adapter_pdo_postgresql_ce, getThis(), "connect", &descriptor);
 
-	/** 
+	/**
 	 * Execute the search path in the after connect
 	 */
 	if (Z_TYPE(schema) == IS_STRING) {
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	if (!_schema || !zend_is_true(_schema)) {
 		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&schema, _schema);
+		ZVAL_COPY_VALUE(&schema, _schema);
 	}
 
 	array_init(&columns);
@@ -172,14 +172,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "describecolumns", table, &schema);
 
-	/** 
+	/**
 	 * We're using FETCH_NUM to fetch the columns
 	 */
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
-	/** 
+	/**
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
 		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
 
-		/** 
+		/**
 		 * Check the column type to get the correct Phalcon type
 		 */
 		while (1) {
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			if (phalcon_memnstr_str(&column_type, SL("float"))) {
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
 				phalcon_array_update_str_bool(&definition, SL("isNumeric"), 1, 0);
-				
+
 				phalcon_array_update_str_long(&definition, SL("size"), 30, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 10, 0);
 
@@ -449,7 +449,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			phalcon_array_update_str(&definition, SL("after"), &old_column, PH_COPY);
 		}
 
-		/** 
+		/**
 		 * Check if the field is primary key
 		 */
 		phalcon_array_fetch_long(&attribute, field, 6, PH_NOISY);
@@ -457,7 +457,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			phalcon_array_update_str_bool(&definition, SL("primary"), 1, 0);
 		}
 
-		/** 
+		/**
 		 * Check if the column allows null values
 		 */
 		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			phalcon_array_update_str_bool(&definition, SL("notNull"), 1, 0);
 		}
 
-		/** 
+		/**
 		 * Check if the column is auto increment
 		 */
 		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY);
@@ -477,14 +477,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 
 		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
 
-		/** 
+		/**
 		 * Create a Phalcon\Db\Column to abstract the column
 		 */
 		object_init_ex(&column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
 		phalcon_array_append(&columns, &column, PH_COPY);
-		PHALCON_CPY_WRT_CTOR(&old_column, &column_name);
+		ZVAL_COPY_VALUE(&old_column, &column_name);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(&columns);
@@ -665,7 +665,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray){
 	if (Z_LVAL_P(type) != PHALCON_DB_COLUMN_TYPE_INT_ARRAY) {
 		pg_text_array_parse(&parse_value, value);
 	} else {
-		PHALCON_CPY_WRT(&parse_value, value);
+		ZVAL_COPY_VALUE(&parse_value, value);
 	}
 
 	array_init_size(&search, 2);

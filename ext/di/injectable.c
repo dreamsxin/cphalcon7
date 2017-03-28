@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&name, &lower);
+		ZVAL_COPY_VALUE(&name, &lower);
 	}
 
 	/**
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&name, &lower);
+		ZVAL_COPY_VALUE(&name, &lower);
 	}
 
 	/**
@@ -373,12 +373,12 @@ PHP_METHOD(Phalcon_Di_Injectable, __get){
 	 * Accessing the persistent property will create a session bag in any class
 	 */
 	if (Z_STRLEN_P(property_name) == sizeof("persistent")-1 && !memcmp(Z_STRVAL_P(property_name), "persistent", sizeof("persistent")-1)) {
-		PHALCON_STR(&class_name, Z_OBJCE_P(getThis())->name->val);
+		ZVAL_STRING(&class_name, Z_OBJCE_P(getThis())->name->val);
 
 		array_init_size(&arguments, 1);
 		add_next_index_zval(&arguments, &class_name);
 
-		PHALCON_STR(&service, "sessionBag");
+		ZVAL_STRING(&service, "sessionBag");
 		PHALCON_CALL_METHOD(&result, &dependency_injector, "get", &service, &arguments);
 
 		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Di_Injectable, __sleep){
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&dependency_name, &dependency_injector, "getname");
 	} else {
-		PHALCON_CPY_WRT(&dependency_name, &dependency_injector);
+		ZVAL_COPY_VALUE(&dependency_name, &dependency_injector);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_name);

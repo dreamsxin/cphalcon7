@@ -268,15 +268,15 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 				PHALCON_CALL_METHOD(&crypt, &dependency_injector, "getshared", &service);
 				PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);
 
-				/** 
+				/**
 				 * Decrypt the value also decoding it with base64
 				 */
 				PHALCON_CALL_METHOD(&decrypted_value, &crypt, "decryptbase64", &value);
 			} else {
-				PHALCON_CPY_WRT_CTOR(&decrypted_value, &value);
+				ZVAL_COPY_VALUE(&decrypted_value, &value);
 			}
 
-			/** 
+			/**
 			 * Update the decrypted value
 			 */
 			phalcon_update_property_zval(getThis(), SL("_value"), &decrypted_value);
@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 				return;
 			}
 
-			/** 
+			/**
 			 * Return the value without filtering
 			 */
 
@@ -388,10 +388,10 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 		 */
 		PHALCON_CALL_METHOD(&encrypt_value, &crypt, "encryptbase64", &value);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&encrypt_value, &value);
+		ZVAL_COPY_VALUE(&encrypt_value, &value);
 	}
 
-	/** 
+	/**
 	 * Sets the cookie using the standard 'setcookie' function
 	 */
 	convert_to_string_ex(&name);
@@ -432,7 +432,7 @@ PHP_METHOD(Phalcon_Http_Cookie, restore)
 			PHALCON_CONCAT_SV(&key, "_PHCOOKIE_", &name);
 
 			PHALCON_CALL_METHOD(&definition, &session, "get", &key);
-			if (Z_TYPE(definition) == IS_ARRAY) { 
+			if (Z_TYPE(definition) == IS_ARRAY) {
 				if (phalcon_array_isset_fetch_str(&expire, &definition, SL("expire"))) {
 					phalcon_update_property_zval(getThis(), SL("_expire"), &expire);
 				}

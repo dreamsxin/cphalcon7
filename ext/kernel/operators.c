@@ -805,3 +805,143 @@ long phalcon_safe_mod_double_zval(double op1, zval *op2) {
 	}
 	return (long) op1 % ((long) phalcon_get_numberval(op2));
 }
+
+/**
+ * Checks whether a variable has a scalar type
+ */
+int phalcon_is_scalar(zval *var)
+{
+	switch (Z_TYPE_P(var)) {
+		case IS_TRUE:
+		case IS_FALSE:
+		case IS_DOUBLE:
+		case IS_LONG:
+		case IS_STRING:
+			return 1;
+			break;
+	}
+
+	return 0;
+}
+
+/**
+ * Makes fast count on implicit array types
+ */
+long int phalcon_fast_count_int(zval *value)
+{
+	zval retval = {};
+	long int result = 0;
+
+	if (Z_TYPE_P(value) == IS_ARRAY) {
+		return zend_hash_num_elements(Z_ARRVAL_P(value));
+	}
+
+	if (Z_TYPE_P(value) == IS_OBJECT) {
+		if (Z_OBJ_HT_P(value)->count_elements) {
+			long int result;
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &result)) {
+				return result;
+			}
+		}
+
+		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
+			zend_call_method_with_0_params(value, Z_OBJCE_P(value), NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
+				convert_to_long_ex(&retval);
+				result = Z_LVAL(retval);
+				zval_dtor(&retval);
+			}
+
+			return result;
+		}
+
+		return 0;
+	}
+
+	if (Z_TYPE_P(value) == IS_NULL) {
+		return 0;
+	}
+
+	return 1;
+}
+
+/**
+ * Makes fast count on implicit array types
+ */
+void phalcon_fast_count(zval *result, zval *value)
+{
+	zval retval = {};
+
+	if (Z_TYPE_P(value) == IS_ARRAY) {
+		ZVAL_LONG(result, zend_hash_num_elements(Z_ARRVAL_P(value)));
+		return;
+	}
+
+	if (Z_TYPE_P(value) == IS_OBJECT) {
+		if (Z_OBJ_HT_P(value)->count_elements) {
+			ZVAL_LONG(result, 1);
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &Z_LVAL_P(result))) {
+				return;
+			}
+		}
+
+		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
+				convert_to_long_ex(&retval);
+				ZVAL_LONG(result, Z_LVAL(retval));
+				zval_dtor(&retval);
+			}
+			return;
+		}
+
+		ZVAL_LONG(result, 0);
+		return;
+	}
+
+	if (Z_TYPE_P(value) == IS_NULL) {
+		ZVAL_LONG(result, 0);
+		return;
+	}
+
+	ZVAL_LONG(result, 1);
+}
+
+/**
+ * Makes fast count on implicit array types without creating a return zval value
+ */
+int phalcon_fast_count_ev(zval *value)
+{
+	zval retval = {};
+	long count = 0;
+
+	if (Z_TYPE_P(value) == IS_ARRAY) {
+		return (int) zend_hash_num_elements(Z_ARRVAL_P(value)) > 0;
+	}
+
+	if (Z_TYPE_P(value) == IS_OBJECT) {
+		if (Z_OBJ_HT_P(value)->count_elements) {
+			Z_OBJ_HT(*value)->count_elements(value, &count);
+			return (int) count > 0;
+		}
+
+		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+			if (!Z_ISUNDEF(retval)) {
+				convert_to_long_ex(&retval);
+				count = Z_LVAL(retval);
+				zval_dtor(&retval);
+				return (int) count > 0;
+			}
+			return 0;
+		}
+
+		return 0;
+	}
+
+	if (Z_TYPE_P(value) == IS_NULL) {
+		return 0;
+	}
+
+	return 1;
+}

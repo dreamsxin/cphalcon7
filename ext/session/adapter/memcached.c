@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, destroy){
 	if (!_sid) {
 		PHALCON_CALL_SELF(&sid, "getid");
 	} else {
-		PHALCON_CPY_WRT(&sid, _sid);
+		ZVAL_COPY_VALUE(&sid, _sid);
 	}
 
 	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);

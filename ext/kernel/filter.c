@@ -364,13 +364,13 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	ZVAL_EMPTY_STRING(&replace);
 
-	PHALCON_STR(&regexp, "#<!--\\[.*\\]>.*<!\\[endif\\]-->#isU");
+	ZVAL_STRING(&regexp, "#<!--\\[.*\\]>.*<!\\[endif\\]-->#isU");
 	PHALCON_PREG_REPLACE(&replaced_str, &regexp, &replace, str);
 
-	PHALCON_STR(&regexp, "#<!--.*-->#i");
+	ZVAL_STRING(&regexp, "#<!--.*-->#i");
 	PHALCON_PREG_REPLACE(&tmp, &regexp, &replace, &replaced_str);
 
-	PHALCON_STR(&regexp, "#<script.*>.*</script>#isU");
+	ZVAL_STRING(&regexp, "#<script.*>.*</script>#isU");
 	PHALCON_PREG_REPLACE(&replaced_str, &regexp, &replace, &tmp);
 
 	ce0 = phalcon_fetch_str_class(SL("DOMDocument"), ZEND_FETCH_CLASS_AUTO);
@@ -398,11 +398,11 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		return;
 	}
 
-	PHALCON_STR(&tmp, "*");
+	ZVAL_STRING(&tmp, "*");
 
 	PHALCON_CALL_METHOD(&elements, &document, "getelementsbytagname", &tmp);
 
-	PHALCON_STR(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
+	ZVAL_STRING(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
 	phalcon_return_property(&tmp, &elements, SL("length"));
 
@@ -456,7 +456,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 		}
 	}
 
-	PHALCON_STR(&tmp, "body");
+	ZVAL_STRING(&tmp, "body");
 
 	PHALCON_CALL_METHOD(&elements, &document, "getelementsbytagname", &tmp);
 	PHALCON_CALL_METHOD(&body, &elements, "item", &PHALCON_GLOBAL(z_zero));

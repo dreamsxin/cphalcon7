@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 				ZVAL_STRING(&using_zero, "id");
 			}
 			if (!phalcon_array_isset_fetch_long(&using_one, using, 1)) {
-				PHALCON_CPY_WRT(&using_one, &using_zero);
+				PHALCON_CPY_WRT_CTOR(&using_one, &using_zero);
 			}
 			if (Z_TYPE(option) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(&option, SL("readattribute")) == SUCCESS) {

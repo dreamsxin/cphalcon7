@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, create)
 	if (!_config || Z_TYPE_P(_config) != IS_STRING) {
 		ZVAL_STRING(&config, "key_format=S,value_format=S");
 	} else {
-		PHALCON_CPY_WRT(&config, _config);
+		PHALCON_CPY_WRT_CTOR(&config, _config);
 	}
 
 	intern = phalcon_storage_wiredtiger_object_from_obj(Z_OBJ_P(getThis()));
@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, open)
 	if (!_config || Z_TYPE_P(_config) != IS_STRING) {
 		ZVAL_NULL(&config);
 	} else {
-		PHALCON_CPY_WRT(&config, _config);
+		PHALCON_CPY_WRT_CTOR(&config, _config);
 	}
 
 	object_init_ex(return_value, phalcon_storage_wiredtiger_cursor_ce);

@@ -37,7 +37,7 @@
 /**
  * Phalcon\Http\Client\Adapter
  */
-zend_class_entry *phalcon_http_client_adapter_ce; 
+zend_class_entry *phalcon_http_client_adapter_ce;
 
 PHP_METHOD(Phalcon_Http_Client_Adapter, setUserAgent);
 PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth);
@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setAuth){
 	if (!_authtype) {
 		ZVAL_STRING(&authtype, "any");
 	} else {
-		PHALCON_CPY_WRT(&authtype, _authtype);
+		ZVAL_COPY_VALUE(&authtype, _authtype);
 	}
 
 	phalcon_update_property_zval(getThis(), SL("_authtype"), &authtype);
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("GET"));
-	
+
 	PHALCON_RETURN_CALL_METHOD(getThis(), "send");
 }
 
@@ -546,4 +546,3 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, send){
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "sendinternal");
 }
-

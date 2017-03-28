@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 				&& phalcon_array_isset_fetch_long(&tmp_bind_params, single_condition_array, 1)
 				&& Z_TYPE(condition_string) == IS_STRING
 				&& Z_TYPE(tmp_bind_params) == IS_ARRAY
-			) {	
+			) {
 				phalcon_array_update_zval(&merged_conditions, &condition_string, &condition_string, PH_COPY);
 				phalcon_array_merge_recursive_n(&merged_bind_params, &tmp_bind_params);
 
@@ -234,9 +234,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 			phalcon_array_merge_recursive_n(&merged_bind_types, bind_types);
 		}
 	} else {
-		PHALCON_CPY_WRT(&joind_condition, conditions);
-		PHALCON_CPY_WRT(&merged_bind_params, bind_params);
-		PHALCON_CPY_WRT(&merged_bind_types, bind_types);
+		PHALCON_CPY_WRT_CTOR(&joind_condition, conditions);
+		PHALCON_CPY_WRT_CTOR(&merged_bind_params, bind_params);
+		PHALCON_CPY_WRT_CTOR(&merged_bind_types, bind_types);
 	}
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "setbindparams", &merged_bind_params, &merge);
@@ -246,19 +246,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 		PHALCON_CALL_SELF(&current_conditions, "getConditions");
 
 		if (zend_is_true(type)) {
-			/** 
+			/**
 			 * Nest the condition to current ones or set as unique
 			 */
 			if (zend_is_true(&current_conditions)) {
 				PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") AND (", &joind_condition, ")");
 			} else {
-				PHALCON_CPY_WRT(&new_conditions, &joind_condition);
+				PHALCON_CPY_WRT_CTOR(&new_conditions, &joind_condition);
 			}
 		} else {
 			if (zend_is_true(&current_conditions)) {
 				PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") OR (", &joind_condition, ")");
 			} else {
-				PHALCON_CPY_WRT(&new_conditions, &joind_condition);
+				PHALCON_CPY_WRT_CTOR(&new_conditions, &joind_condition);
 			}
 		}
 
@@ -300,7 +300,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 			return;
 		}
 
-		/** 
+		/**
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
@@ -314,14 +314,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 
 			phalcon_array_fetch_long(&model, &models, 0, PH_NOISY);
 		} else {
-			PHALCON_CPY_WRT(&model, &models);
+			PHALCON_CPY_WRT_CTOR(&model, &models);
 		}
 
-		PHALCON_STR(&service_name, ISV(modelsMetadata));
+		ZVAL_STRING(&service_name, ISV(modelsMetadata));
 
 		PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
-			/** 
+			/**
 			 * Get the models metadata service to obtain the column names, column map and
 			 * primary key
 			 */
@@ -341,19 +341,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
 			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
-				/** 
+				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
-				if (Z_TYPE(column_map) == IS_ARRAY) { 
+				if (Z_TYPE(column_map) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT(&attribute_field, &first_primary_key);
+					PHALCON_CPY_WRT_CTOR(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(return_value, "[", &model, "].[", &attribute_field, "] = ", &conditions);
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 			}
 		}
 
-		/** 
+		/**
 		 * A primary key is mandatory in these cases
 		 */
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Source related to this model does not have a primary key defined");
@@ -495,17 +495,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	phalcon_read_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_NOISY);
 	phalcon_add_function(&next_hidden_param, &hidden_param, &PHALCON_GLOBAL(z_one));
 
-	/** 
+	/**
 	 * Minimum key with auto bind-params
 	 */
 	PHALCON_CONCAT_SV(&minimum_key, "phb", &hidden_param);
 
-	/** 
+	/**
 	 * Maximum key with auto bind-params
 	 */
 	PHALCON_CONCAT_SV(&maximum_key, "phb", &next_hidden_param);
 
-	/** 
+	/**
 	 * Create a standard BETWEEN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVSVS(&conditions, expr, " BETWEEN :", &minimum_key, ": AND :", &maximum_key, ":");
@@ -514,7 +514,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	phalcon_array_update_zval(&bind_params, &minimum_key, minimum, PH_COPY);
 	phalcon_array_update_zval(&bind_params, &maximum_key, maximum, PH_COPY);
 
-	/** 
+	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
@@ -554,17 +554,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	phalcon_read_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_NOISY);
 	phalcon_add_function(&next_hidden_param, &hidden_param, &PHALCON_GLOBAL(z_one));
 
-	/** 
+	/**
 	 * Minimum key with auto bind-params
 	 */
 	PHALCON_CONCAT_SV(&minimum_key, "phb", &hidden_param);
 
-	/** 
+	/**
 	 * Maximum key with auto bind-params
 	 */
 	PHALCON_CONCAT_SV(&maximum_key, "phb", &next_hidden_param);
 
-	/** 
+	/**
 	 * Create a standard BETWEEN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVSVS(&conditions, expr, " NOT BETWEEN :", &minimum_key, ": AND :", &maximum_key, ":");
@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	phalcon_array_update_zval(&bind_params, &minimum_key, minimum, PH_COPY);
 	phalcon_array_update_zval(&bind_params, &maximum_key, maximum, PH_COPY);
 
-	/** 
+	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 		use_orwhere = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (Z_TYPE_P(values) != IS_ARRAY) { 
+	if (Z_TYPE_P(values) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be an array");
 		return;
 	}
@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(values), value) {
 		zval key = {}, query_key = {};
-		/** 
+		/**
 		 * Key with auto bind-params
 		 */
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
@@ -634,12 +634,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 
 	phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 
-	/** 
+	/**
 	 * Create a standard IN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVS(&conditions, expr, " IN (", &joined_keys, ")");
 
-	/** 
+	/**
 	 * Append the IN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
@@ -674,7 +674,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 		use_orwhere = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (Z_TYPE_P(values) != IS_ARRAY) { 
+	if (Z_TYPE_P(values) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be an array");
 		return;
 	}
@@ -686,7 +686,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(values), value) {
 		zval key = {}, query_key = {};
-		/** 
+		/**
 		 * Key with auto bind-params
 		 */
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
@@ -699,12 +699,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 
 	phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 
-	/** 
+	/**
 	 * Create a standard IN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVS(&conditions, expr, " NOT IN (", &joined_keys, ")");
 
-	/** 
+	/**
 	 * Append the IN to the current conditions using and 'and'
 	 */
 	if (zend_is_true(use_orwhere)) {
@@ -763,7 +763,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 
 	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {}, query = {};
 
-	/** 
+	/**
 	 * Process the PHQL
 	 */
 	PHALCON_CALL_METHOD(&phql, getThis(), "getphql");
@@ -773,7 +773,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
-	PHALCON_STR(&service_name, ISV(modelsQuery));
+	ZVAL_STRING(&service_name, ISV(modelsQuery));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 
@@ -788,17 +788,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 		PHALCON_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
 	}
 
-	/** 
+	/**
 	 * Set default bind params
 	 */
-	if (Z_TYPE(bind_params) == IS_ARRAY) { 
+	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
 	}
 
-	/** 
+	/**
 	 * Set default bind params
 	 */
-	if (Z_TYPE(bind_types) == IS_ARRAY) { 
+	if (Z_TYPE(bind_types) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
 	}
 

@@ -50,7 +50,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, write);
 
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_adapter_cache___construct, 0, 0, 1)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_adapter_cache_read, 0, 0, 1)
@@ -95,11 +95,6 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The options must be an array");
-		return;
-	}
-
 	if (!phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "No service given in options");
 		return;
@@ -108,7 +103,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, __construct){
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&cache, getThis(), "getresolveservice", &service);
 	} else {
-		PHALCON_CPY_WRT(&cache, &service);
+		ZVAL_COPY_VALUE(&cache, &service);
 	}
 	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
@@ -154,5 +149,5 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, write){
 	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
 
-	PHALCON_CALL_METHOD(NULL, &cache, "save", key, data, &lifetime);	
+	PHALCON_CALL_METHOD(NULL, &cache, "save", key, data, &lifetime);
 }

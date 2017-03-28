@@ -117,7 +117,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getoption, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setoptions, 0, 0, 1)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setentity, 0, 0, 1)
@@ -125,14 +125,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setentity, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_bind, 0, 0, 1)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, entity)
-	ZEND_ARG_INFO(0, whitelist)
+	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, entity, IS_OBJECT, 1)
+	ZEND_ARG_TYPE_INFO(0, whitelist, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_isvalid, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_INFO(0, entity)
+	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, entity, IS_OBJECT, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getmessages, 0, 0, 0)
@@ -475,10 +475,6 @@ PHP_METHOD(Phalcon_Forms_Form, setOptions){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "Parameter 'options' must be an array");
-		return;
-	}
 	phalcon_update_property_zval(getThis(), SL("_options"), options);
 
 	RETURN_THIS();
@@ -562,14 +558,6 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		whitelist = &PHALCON_GLOBAL(z_null);
 	}
 
-	/**
-	 * The data must be an array
-	 */
-	if (Z_TYPE_P(data) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "The data must be an array");
-		return;
-	}
-
 	PHALCON_CALL_METHOD(NULL, getThis(), "setentity", entity);
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY);
@@ -619,7 +607,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 			 */
 			PHALCON_CALL_METHOD(&filtered_value, &filter, "sanitize", value, &filters);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&filtered_value, value);
+			ZVAL_COPY_VALUE(&filtered_value, value);
 		}
 
 		if (Z_TYPE_P(entity) == IS_OBJECT) {

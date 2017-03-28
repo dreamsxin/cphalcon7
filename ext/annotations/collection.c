@@ -63,7 +63,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll);
 PHP_METHOD(Phalcon_Annotations_Collection, has);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_collection___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, reflectionData)
+	ZEND_ARG_TYPE_INFO(0, reflectionData, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_collection_get, 0, 0, 1)
@@ -121,11 +121,6 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
 
 	if (reflection_data && Z_TYPE_P(reflection_data) != IS_NULL) {
-		if (Z_TYPE_P(reflection_data) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
-			return;
-		}
-
 		array_init(&annotations);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(reflection_data), annotation_data) {

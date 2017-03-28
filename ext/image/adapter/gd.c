@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 				ZVAL_EMPTY_STRING(&version);
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(&version, &gd_version);
+			ZVAL_COPY_VALUE(&version, &gd_version);
 		}
 	}
 
@@ -843,7 +843,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 		PHALCON_CALL_FUNCTION(NULL, "imagecopyresampled", &temp_image, &mask_image, &c, &c, &c, &c, &image_width, &image_height, &mask_image_width, &mask_image_height);
 		PHALCON_CALL_FUNCTION(NULL, "imagedestroy", &mask_image);
 
-		PHALCON_CPY_WRT_CTOR(&mask_image, &temp_image);
+		ZVAL_COPY_VALUE(&mask_image, &temp_image);
 	}
 
 	w = phalcon_get_intval(&image_width);

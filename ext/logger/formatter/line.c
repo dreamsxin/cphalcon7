@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	phalcon_return_property(&format, getThis(), SL("_format"));
 
-	/** 
+	/**
 	 * Check if the format has the %date% placeholder
 	 */
 	if (phalcon_memnstr_str(&format, SL("%date%"))) {
@@ -184,10 +184,10 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 		PHALCON_STR_REPLACE(&new_format, &date_wildcard, &date, &format);
 	} else {
-		PHALCON_CPY_WRT(&new_format, &format);
+		ZVAL_COPY_VALUE(&new_format, &format);
 	}
 
-	/** 
+	/**
 	 * Check if the format has the %type% placeholder
 	 */
 	if (phalcon_memnstr_str(&format, SL("%type%"))) {
@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 		PHALCON_STR_REPLACE(&format, &type_wildcard, &type_string, &new_format);
 	} else {
-		PHALCON_CPY_WRT(&format, &new_format);
+		ZVAL_COPY_VALUE(&format, &new_format);
 	}
 
 	ZVAL_STRING(&message_wildcard, "%message%");
@@ -206,9 +206,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	if (Z_TYPE_P(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(context)) > 0) {
 		PHALCON_CALL_METHOD(&format, getThis(), "interpolate", &new_format, context);
-	}
-	else {
-		PHALCON_CPY_WRT(&format, &new_format);
+	} else {
+		ZVAL_COPY_VALUE(&format, &new_format);
 	}
 
 	PHALCON_CONCAT_VS(return_value, &format, PHP_EOL);

@@ -146,9 +146,9 @@ static void phql_scanner_error_msg(phql_parser_status *parser_status, zval *erro
 			snprintf(error, length, "Scanning error before '%s' when parsing: %s (%d)", state->start, parser_status->phql, parser_status->phql_length);
 		}
 		error[length - 1] = '\0';
-		PHALCON_STR(error_msg, error);
+		ZVAL_STRING(error_msg, error);
 	} else {
-		PHALCON_STR(error_msg, "Scanning error near to EOF");
+		ZVAL_STRING(error_msg, "Scanning error near to EOF");
 	}
 
 	if (error) {
@@ -197,7 +197,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 	zval unique_id = {};
 
 	if (!phql) {
-		PHALCON_STR(error_msg, "PHQL statement cannot be NULL");
+		ZVAL_STRING(error_msg, "PHQL statement cannot be NULL");
 		return FAILURE;
 	}
 
@@ -211,7 +211,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 
 	phql_parser = phql_Alloc(phql_wrapper_alloc);
 	if (unlikely(!phql_parser)) {
-		PHALCON_STR(error_msg, "Memory allocation error");
+		ZVAL_STRING(error_msg, "Memory allocation error");
 		return FAILURE;
 	}
 
@@ -348,7 +348,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_INTEGER, PHQL_INTEGER, &token, parser_status);
 				} else {
-					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
+					ZVAL_STRING(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -356,7 +356,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_DOUBLE, PHQL_DOUBLE, &token, parser_status);
 				} else {
-					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
+					ZVAL_STRING(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -364,7 +364,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				if (parser_status->enable_literals) {
 					phql_parse_with_token(phql_parser, PHQL_T_STRING, PHQL_STRING, &token, parser_status);
 				} else {
-					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
+					ZVAL_STRING(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -372,7 +372,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_TRUE, NULL, parser_status);
 				} else {
-					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
+					ZVAL_STRING(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -380,7 +380,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				if (parser_status->enable_literals) {
 					phql_(phql_parser, PHQL_FALSE, NULL, parser_status);
 				} else {
-					PHALCON_STR(error_msg, "Literals are disabled in PHQL statements");
+					ZVAL_STRING(error_msg, "Literals are disabled in PHQL statements");
 					parser_status->status = PHQL_PARSING_FAILED;
 				}
 				break;
@@ -530,7 +530,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 				error = emalloc(error_length);
 				snprintf(error, error_length, "Scanner: Unknown opcode %c", token.opcode);
 				error[error_length - 1] = '\0';
-				PHALCON_STR(error_msg, error);
+				ZVAL_STRING(error_msg, error);
 				efree(error);
 				break;
 		}
@@ -564,7 +564,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 		status = FAILURE;
 		if (parser_status->syntax_error) {
 			if (Z_TYPE_P(error_msg) <= IS_NULL) {
-				PHALCON_STR(error_msg, parser_status->syntax_error);
+				ZVAL_STRING(error_msg, parser_status->syntax_error);
 			}
 			efree(parser_status->syntax_error);
 		}

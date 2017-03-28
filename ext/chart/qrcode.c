@@ -225,7 +225,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
 			return;
 		}
-		PHALCON_CPY_WRT(&version, _version);
+		ZVAL_COPY_VALUE(&version, _version);
 	}
 
 	if (!_level || Z_TYPE_P(_level) == IS_NULL) {
@@ -235,7 +235,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
 			return;
 		}
-		PHALCON_CPY_WRT(&level, _level);
+		ZVAL_COPY_VALUE(&level, _level);
 	}
 
 
@@ -246,13 +246,13 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
 			return;
 		}
-		PHALCON_CPY_WRT(&mode, _mode);
+		ZVAL_COPY_VALUE(&mode, _mode);
 	}
 
 	if (!_casesensitive || Z_TYPE_P(_casesensitive) == IS_NULL) {
 		phalcon_read_property(&casesensitive, getThis(), SL("_casesensitive"), PH_NOISY);
 	} else {
-		PHALCON_CPY_WRT(&casesensitive, _casesensitive);
+		ZVAL_COPY_VALUE(&casesensitive, _casesensitive);
 	}
 
 	qr = (php_qrcode *) emalloc (sizeof (php_qrcode));

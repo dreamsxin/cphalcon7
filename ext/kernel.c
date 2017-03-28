@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Kernel, message){
 	if (!_ext || Z_TYPE_P(_ext) == IS_NULL) {
 		ZVAL_STRING(&ext, "php");
 	} else {
-		PHALCON_CPY_WRT(&ext, _ext);
+		ZVAL_COPY_VALUE(&ext, _ext);
 	}
 
 	if (!absolute_path) {
@@ -363,18 +363,20 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 	if (phalcon_array_isset_fetch(&file_messages2, _default_messages, file, 0)) {
 		phalcon_array_merge_recursive_n(&file_messages2, &file_messages1);
+		zval_ptr_dtor(&file_messages1);
 	} else {
-		PHALCON_CPY_WRT(&file_messages2, &file_messages1);
+		ZVAL_COPY_VALUE(&file_messages2, &file_messages1);
 	}
 
 	if (Z_TYPE_P(path) != IS_NULL) {
 		if  (Z_TYPE(file_messages2) == IS_ARRAY) {
 			PHALCON_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages2, path, default_value);
 		} else {
-			PHALCON_CPY_WRT(&value, default_value);
+			ZVAL_COPY_VALUE(&value, default_value);
 		}
+		zval_ptr_dtor(&file_messages2);
 	} else {
-		PHALCON_CPY_WRT(&value, &file_messages2);
+		ZVAL_COPY_VALUE(&value, &file_messages2);
 	}
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");

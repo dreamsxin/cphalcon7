@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, innerJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "INNER");
+	ZVAL_STRING(&type, "INNER");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, leftJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "LEFT");
+	ZVAL_STRING(&type, "LEFT");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, rightJoin){
 		alias = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_STR(&type, "RIGHT");
+	ZVAL_STRING(&type, "RIGHT");
 
 	array_init_size(&join, 4);
 	phalcon_array_append(&join, model, PH_COPY);

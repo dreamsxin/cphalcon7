@@ -1922,7 +1922,7 @@ PHP_METHOD(Phalcon_Tag, friendlyTitle){
 	if (!separator) {
 		ZVAL_STRING(&sep, "-");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&sep, separator);
+		ZVAL_COPY_VALUE(&sep, separator);
 	}
 
 	if (!lowercase) {

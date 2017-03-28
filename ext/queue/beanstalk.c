@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 				buf = erealloc(buf, line_len + 1);
 			}
 
-			PHALCON_STRL(return_value, buf, line_len);
+			ZVAL_STRINGL(return_value, buf, line_len);
 		} else {
 			efree(buf);
 			ZVAL_FALSE(return_value);

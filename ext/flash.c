@@ -56,7 +56,7 @@ PHP_METHOD(Phalcon_Flash, warning);
 PHP_METHOD(Phalcon_Flash, outputMessage);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, cssClasses)
+	ZEND_ARG_TYPE_INFO(0, cssClasses, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_setimplicitflush, 0, 0, 1)
@@ -68,7 +68,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_setautomatichtml, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_setcssclasses, 0, 0, 1)
-	ZEND_ARG_INFO(0, cssClasses)
+	ZEND_ARG_TYPE_INFO(0, cssClasses, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_flash_method_entry[] = {
@@ -109,19 +109,16 @@ PHP_METHOD(Phalcon_Flash, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &_css_classes);
 
-	if (!_css_classes) {
-		array_init(&css_classes);
-	} else {
-		PHALCON_CPY_WRT_CTOR(&css_classes, _css_classes);
-	}
-
-	if (Z_TYPE(css_classes) != IS_ARRAY) {
+	if (!_css_classes || Z_TYPE_P(_css_classes) == IS_NULL) {
 		array_init_size(&css_classes, 4);
 		phalcon_array_update_str_str(&css_classes, SL("error"), SL("errorMessage"), PH_COPY);
 		phalcon_array_update_str_str(&css_classes, SL("notice"), SL("noticeMessage"), PH_COPY);
 		phalcon_array_update_str_str(&css_classes, SL("success"), SL("successMessage"), PH_COPY);
 		phalcon_array_update_str_str(&css_classes, SL("warning"), SL("warningMessage"), PH_COPY);
+	} else {
+		ZVAL_COPY_VALUE(&css_classes, _css_classes);
 	}
+
 	phalcon_update_property_zval(getThis(), SL("_cssClasses"), &css_classes);
 }
 
@@ -169,7 +166,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 
 	phalcon_fetch_params(0, 1, 0, &css_classes);
 
-	if (Z_TYPE_P(css_classes) == IS_ARRAY) { 
+	if (Z_TYPE_P(css_classes) == IS_ARRAY) {
 		phalcon_update_property_zval(getThis(), SL("_cssClasses"), css_classes);
 		RETURN_THIS();
 	}
@@ -305,7 +302,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			if (flag_automatic_html) {
 				PHALCON_CONCAT_SVSVS(&html_message0, "<div", &css_classes, ">", msg, "</div>" PHP_EOL);
 			} else {
-				PHALCON_CPY_WRT(&html_message0, msg);
+				ZVAL_COPY_VALUE(&html_message0, msg);
 			}
 
 			if (flag_implicit_flush) {
@@ -328,7 +325,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (flag_automatic_html) {
 			PHALCON_CONCAT_SVSVS(&html_message, "<div", &css_classes, ">", message, "</div>" PHP_EOL);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&html_message, message);
+			ZVAL_COPY_VALUE(&html_message, message);
 		}
 
 		/**

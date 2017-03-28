@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	if (!s || Z_TYPE_P(s) != IS_STRING) {
 		ZVAL_STRING(&service, "db");
 	} else {
-		PHALCON_CPY_WRT(&service, s);
+		PHALCON_CPY_WRT_CTOR(&service, s);
 	}
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -222,7 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 	if (!message || !zend_is_true(message)) {
 		ZVAL_STRING(&rollback_message, "Transaction aborted");
 	} else {
-		PHALCON_CPY_WRT(&rollback_message, message);
+		PHALCON_CPY_WRT_CTOR(&rollback_message, message);
 	}
 
 	if (_rollback_record && Z_TYPE_P(_rollback_record) != IS_OBJECT) {

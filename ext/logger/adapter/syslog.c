@@ -95,18 +95,18 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	/** 
+	/**
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	if (zend_is_true(name)) {
 		if (!phalcon_array_isset_fetch_str(&option, options, SL("option"))) {
-			/** 
+			/**
 			 * Open the log in LOG_ODELAY mode
 			 */
 			ZVAL_LONG(&option, 4);
 		}
 		if (!phalcon_array_isset_fetch_str(&facility, options, SL("facility"))) {
-			/** 
+			/**
 			 * By default the facility is LOG_USER
 			 */
 			ZVAL_LONG(&facility, 8);
@@ -151,9 +151,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
-	if (Z_TYPE(applied_format) != IS_ARRAY) { 
-		PHALCON_CPY_WRT(&syslog_type, type);
-		PHALCON_CPY_WRT(&syslog_message, &applied_format);
+	if (Z_TYPE(applied_format) != IS_ARRAY) {
+		ZVAL_COPY_VALUE(&syslog_type, type);
+		ZVAL_COPY_VALUE(&syslog_message, &applied_format);
 	} else {
 		phalcon_array_fetch_long(&syslog_type, &applied_format, 0, PH_NOISY);
 		phalcon_array_fetch_long(&syslog_message, &applied_format, 1, PH_NOISY);

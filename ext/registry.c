@@ -30,6 +30,7 @@
 #include "kernel/hash.h"
 #include "kernel/object.h"
 #include "kernel/fcall.h"
+#include "kernel/operators.h"
 
 /**
  * Phalcon\Registry

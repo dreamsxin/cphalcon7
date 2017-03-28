@@ -74,41 +74,15 @@ PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function(zend_st
 	return zend_hash_find_ptr(EG(function_table), function_name);
 }
 
-/* Count */
-long int phalcon_fast_count_int(zval *value);
-void phalcon_fast_count(zval *result, zval *array);
-int phalcon_fast_count_ev(zval *array);
-
-static inline int is_phalcon_class(const zend_class_entry *ce)
-{
-	return
-			ce->type == ZEND_INTERNAL_CLASS
-		 && ce->info.internal.module->module_number == phalcon_module_entry.module_number;
-}
-
-int phalcon_is_scalar(zval *var);
-
-/* types */
-void phalcon_gettype(zval *return_value, zval *arg);
-
-zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int class_name_len);
-
 /* Fetch Parameters */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...);
 
 int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 
-#ifndef ZVAL_COPY_VALUE
- #define ZVAL_COPY_VALUE(z, v)\
-  (z)->value = (v)->value;\
-  Z_TYPE_P(z) = Z_TYPE_P(v);
-#endif
+#define PHALCON_TYPE_P(var)	 (Z_ISREF_P(var) ? Z_TYPE_P(Z_REFVAL_P(var)) : Z_TYPE_P(var))
 
-/** Return zval checking if it's needed to ctor */
-#define RETURN_CCTOR(var) { \
-		ZVAL_DUP(return_value, var); \
-	} \
-	return;
+/* types */
+void phalcon_gettype(zval *return_value, zval *arg);
 
 /** Return zval with always ctor */
 #define RETURN_CTOR(var) { \

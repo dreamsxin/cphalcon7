@@ -118,7 +118,7 @@ PHALCON_INIT_CLASS(Phalcon_Crypt){
 
 	zend_declare_property_null(phalcon_crypt_ce, SL("_key"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_crypt_ce, SL("_method"), "aes-256-cbc", ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_crypt_ce, SL("_options"), 1, ZEND_ACC_PROTECTED);	
+	zend_declare_property_long(phalcon_crypt_ce, SL("_options"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeEncrypt"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_afterEncrypt"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeDecrypt"), ZEND_ACC_PROTECTED);
@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&text, source);
+		ZVAL_COPY_VALUE(&text, source);
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
@@ -359,7 +359,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	if (!options || Z_TYPE_P(options) == IS_NULL) {
 		phalcon_return_property(&encrypt_options, getThis(), SL("_options"));
 	} else {
-		PHALCON_CPY_WRT_CTOR(&encrypt_options, options);
+		ZVAL_COPY_VALUE(&encrypt_options, options);
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	if (Z_LVAL(iv_size) <= 0) {
 		ZVAL_NULL(&iv);
-		PHALCON_CPY_WRT_CTOR(&text_to_decipher, &text);
+		ZVAL_COPY_VALUE(&text_to_decipher, &text);
 	} else {
 		phalcon_substr(&iv, &text, 0, Z_LVAL(iv_size));
 		phalcon_substr(&text_to_decipher, &text, Z_LVAL(iv_size), 0);
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		ZVAL_NEW_STR(&decrypt_text, zend_string_dup(Z_STR_P(text), 0));
 		php_strtr(Z_STRVAL(decrypt_text), Z_STRLEN(decrypt_text), "-_", "+/", 2);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&decrypt_text, text);
+		ZVAL_COPY_VALUE(&decrypt_text, text);
 	}
 
 	phalcon_base64_decode(&decrypt_value, &decrypt_text);
@@ -473,12 +473,12 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 	zval *handler;
 
 	phalcon_fetch_params(0, 1, 0, &handler);
-	
+
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_beforeEncrypt"), handler);
 	RETURN_THIS();
 }
@@ -493,12 +493,12 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 	zval *handler;
 
 	phalcon_fetch_params(0, 1, 0, &handler);
-	
+
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_afterEncrypt"), handler);
 	RETURN_THIS();
 }
@@ -513,12 +513,12 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 	zval *handler;
 
 	phalcon_fetch_params(0, 1, 0, &handler);
-	
+
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_beforeDecrypt"), handler);
 	RETURN_THIS();
 }
@@ -533,12 +533,12 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 	zval *handler;
 
 	phalcon_fetch_params(0, 1, 0, &handler);
-	
+
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Handler must be an callable");
 		return;
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_afterDecrypt"), handler);
 	RETURN_THIS();
 }

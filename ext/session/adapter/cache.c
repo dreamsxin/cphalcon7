@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&cache, getThis(), "getresolveservice", &service);
 	} else {
-		PHALCON_CPY_WRT(&cache, &service);
+		ZVAL_COPY_VALUE(&cache, &service);
 	}
 	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
@@ -140,9 +140,6 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 
 	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
 
-//#ifdef PHALCON_USE_PHP_SESSION
-//	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
-//#else
 	/* open callback */
 	array_init_size(&callable_open, 2);
 	phalcon_array_append(&callable_open, getThis(), 0);
@@ -175,7 +172,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 
 	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
 	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");
-//#endif
+
 	if (!zend_is_true(return_value)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "Sets user-level session storage functions failed");
 		RETURN_FALSE;
@@ -253,7 +250,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy){
 	if (!_sid) {
 		PHALCON_CALL_SELF(&sid, "getid");
 	} else {
-		PHALCON_CPY_WRT(&sid, _sid);
+		ZVAL_COPY_VALUE(&sid, _sid);
 	}
 
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);

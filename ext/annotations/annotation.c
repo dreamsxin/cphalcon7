@@ -48,11 +48,11 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument);
 PHP_METHOD(Phalcon_Annotations_Annotation, hasArgument);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_annotation___construct, 0, 0, 1)
-	ZEND_ARG_INFO(0, reflectionData)
+	ZEND_ARG_TYPE_INFO(0, reflectionData, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_annotation_getexpression, 0, 0, 1)
-	ZEND_ARG_INFO(0, expr)
+	ZEND_ARG_TYPE_INFO(0, expr, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_annotations_annotation_getargument, 0, 0, 1)
@@ -102,11 +102,6 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 	zval *reflection_data, name = {}, arguments = {}, expr_arguments = {}, *argument;
 
 	phalcon_fetch_params(0, 1, 0, &reflection_data);
-
-	if (Z_TYPE_P(reflection_data) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "Reflection data must be an array");
-		return;
-	}
 
 	phalcon_array_fetch_str(&name, reflection_data, SL("name"), PH_NOISY);
 	phalcon_update_property_zval(getThis(), SL("_name"), &name);
@@ -158,12 +153,6 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 	zval *expr, type = {}, items = {}, *item, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 0, &expr);
-	PHALCON_SEPARATE_PARAM(expr);
-
-	if (Z_TYPE_P(expr) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The expression is not valid");
-		return;
-	}
 
 	phalcon_array_fetch_str(&type, expr, SL("type"), PH_NOISY);
 

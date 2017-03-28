@@ -44,7 +44,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 		return FAILURE;
 	}
 
-	PHALCON_CPY_WRT(return_value, &cc->value);
+	ZVAL_COPY_VALUE(return_value, &cc->value);
 #else
 	zval *result;
 
@@ -53,7 +53,7 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 		return FAILURE;
 	}
 
-	PHALCON_CPY_WRT(return_value, result);
+	ZVAL_COPY_VALUE(return_value, result);
 #endif
 	return SUCCESS;
 }
@@ -623,6 +623,18 @@ zend_class_entry* phalcon_fetch_static_class() {
 	return zend_fetch_class(NULL, ZEND_FETCH_CLASS_STATIC);
 }
 
+zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int class_name_len)
+{
+    zend_class_entry* temp_ce;
+
+    if ((temp_ce = zend_hash_str_find_ptr(CG(class_table), class_name, class_name_len)) == NULL) {
+        zend_error(E_WARNING, "Class '%s' not found", class_name);
+        return NULL;
+    }
+
+    return temp_ce;
+}
+
 /**
  * Checks if a class exist
  */
@@ -884,6 +896,7 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 #else
 	EG(scope) = old_scope;
 #endif
+	zval_ptr_dtor(&property);
 	return SUCCESS;
 }
 
@@ -934,7 +947,7 @@ int phalcon_update_property_zval(zval *object, const char *property_name, uint32
 #else
 	EG(scope) = old_scope;
 #endif
-
+	zval_ptr_dtor(&property);
 	return SUCCESS;
 }
 
@@ -1560,7 +1573,7 @@ int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *proper
 		value = Z_REFVAL_P(value);
 	}
 
-	PHALCON_CPY_WRT(fetched, value);
+	ZVAL_COPY_VALUE(fetched, value);
 	return 1;
 }
 

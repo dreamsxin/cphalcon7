@@ -73,11 +73,11 @@ PHP_METHOD(Phalcon_Config, __wakeup);
 PHP_METHOD(Phalcon_Config, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, arrayConfig)
+	ZEND_ARG_TYPE_INFO(0, arrayConfig, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_val, 0, 0, 1)
-	ZEND_ARG_INFO(0, arrayConfig)
+	ZEND_ARG_TYPE_INFO(0, arrayConfig, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_get, 0, 0, 1)
@@ -138,12 +138,8 @@ PHP_METHOD(Phalcon_Config, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &array_config);
 
-	if (array_config) {
-		if (Z_TYPE_P(array_config) == IS_ARRAY) {
-			PHALCON_CALL_SELF(NULL, "val", array_config);
-		} else if (Z_TYPE_P(array_config) != IS_NULL) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "The configuration must be an Array");
-		}
+	if (array_config && Z_TYPE_P(array_config) == IS_ARRAY) {
+		PHALCON_CALL_SELF(NULL, "val", array_config);
 	}
 }
 
@@ -159,14 +155,6 @@ PHP_METHOD(Phalcon_Config, val){
 	ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &array_config);
-
-	/** 
-	 * Throw exceptions if bad parameters are passed
-	 */
-	if (Z_TYPE_P(array_config) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_config_exception_ce, "The configuration must be an Array");
-		return;
-	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
 		zval key = {}, instance = {};
@@ -317,7 +305,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	if (Z_TYPE_P(config) == IS_OBJECT) {
 		phalcon_get_object_vars(&array_config, config, 0);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&array_config, config);
+		ZVAL_COPY_VALUE(&array_config, config);
 	}
 
 	if (Z_TYPE(array_config) == IS_ARRAY) {

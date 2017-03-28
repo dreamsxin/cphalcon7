@@ -43,6 +43,7 @@ PHP_METHOD(Phalcon_Async, clear);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_call, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, closure, Closure, 0)
+	ZEND_ARG_TYPE_INFO(0, arguments, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_recv, 0, 0, 1)
@@ -104,14 +105,10 @@ PHP_METHOD(Phalcon_Async, call){
 		return;
 	}
 
-	if (!_arguments) {
+	if (!_arguments || Z_TYPE_P(_arguments) == IS_ARRAY) {
 		array_init(&arguments);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&arguments, _arguments);
-	}
-
-	if (Z_TYPE(arguments) != IS_ARRAY) {
-		array_init(&arguments);
+		ZVAL_COPY_VALUE(&arguments, _arguments);
 	}
 
 	PHALCON_CALL_FUNCTION(&pid, "pcntl_fork");
@@ -160,18 +157,8 @@ PHP_METHOD(Phalcon_Async, recv){
 
 	phalcon_fetch_params(0, 1, 1, &_pid, &_flag);
 
-	if (!_pid) {
-		ZVAL_LONG(&pid, 0);
-	} else {
-		PHALCON_CPY_WRT_CTOR(&pid, _pid);
-		convert_to_long_ex(&pid);
-	}
-
-	if (!_flag) {
+	if (!_flag || Z_TYPE_P(_flag) == IS_NULL) {
 		ZVAL_LONG(&flag, 0);
-	} else {
-		PHALCON_CPY_WRT_CTOR(&flag, _flag);
-		convert_to_long_ex(&flag);
 	}
 
 	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
@@ -210,11 +197,8 @@ PHP_METHOD(Phalcon_Async, recvAll){
 
 	phalcon_fetch_params(0, 0, 1, &_flag);
 
-	if (!_flag) {
+	if (!_flag || Z_TYPE_P(_flag) == IS_NULL) {
 		ZVAL_LONG(&flag, 0);
-	} else {
-		PHALCON_CPY_WRT_CTOR(&flag, _flag);
-		convert_to_long_ex(&flag);
 	}
 
 	phalcon_return_static_property_ce(&num, phalcon_async_ce, SL("_num"));
@@ -249,7 +233,7 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		} else {
 			phalcon_array_update_zval(return_value, &type, &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
-		
+
 	}
 }
 

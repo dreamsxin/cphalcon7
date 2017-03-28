@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, setTrackingKey);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_memcached___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_memcached_settrackingkey, 0, 0, 1)
@@ -136,12 +136,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &opts);
 
-	if (opts) {
-		PHALCON_CPY_WRT_CTOR(&options, opts);
-	}
-
-	if (Z_TYPE(options) != IS_ARRAY) {
+	if (!opts || Z_TYPE_P(opts) == IS_NULL) {
 		array_init(&options);
+	} else {
+		PHALCON_CPY_WRT_CTOR(&options, opts);
 	}
 
 	if (!phalcon_array_isset_str(&options, SL("servers"))) {
@@ -291,7 +289,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		PHALCON_CPY_WRT(&cached_content, content);
+		ZVAL_COPY_VALUE(&cached_content, content);
 	}
 
 	/**
@@ -304,7 +302,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
-		PHALCON_CPY_WRT(&ttl, lifetime);
+		ZVAL_COPY_VALUE(&ttl, lifetime);
 	}
 
 	if (Z_TYPE(prepared_content) > IS_NULL) {

@@ -183,7 +183,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp)
 		}
 
 		default:
-			PHALCON_CPY_WRT_CTOR(&tmp_val, tmp);
+			ZVAL_DUP(&tmp_val, tmp);
 			convert_to_string(&tmp_val);
 			smart_str_append(implstr, Z_STR(tmp_val));
 			break;
@@ -439,7 +439,7 @@ void phalcon_fast_explode(zval *result, zval *delimiter, zval *str){
 /**
  * Fast call to explode php function
  */
-void phalcon_fast_explode_str(zval *result, const char *delimiter, int delimiter_length, zval *str)
+void phalcon_fast_explode_str(zval *result, const char *delimiter, unsigned int delimiter_length, zval *str)
 {
 	zend_string *delim;
 
@@ -453,6 +453,22 @@ void phalcon_fast_explode_str(zval *result, const char *delimiter, int delimiter
 
 	array_init(result);
 	php_explode(delim, Z_STR_P(str), result, LONG_MAX);
+	zend_string_release(delim);
+}
+
+/**
+ * Fast call to explode php function
+ */
+void phalcon_fast_explode_str_str(zval *result, const char *delimiter, unsigned int delimiter_length, const char *str, unsigned int str_length)
+{
+	zend_string *delim, *s;
+
+	delim = zend_string_init(delimiter, delimiter_length, 0);
+	s = zend_string_init(str, str_length, 0);
+
+	array_init(result);
+	php_explode(delim, s, result, LONG_MAX);
+	zend_string_release(s);
 	zend_string_release(delim);
 }
 
@@ -508,6 +524,18 @@ int phalcon_memnstr_str(const zval *haystack, char *needle, unsigned int needle_
 
 	if ((uint)(Z_STRLEN_P(haystack)) >= needle_length) {
 		return php_memnstr(Z_STRVAL_P(haystack), needle, needle_length, Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack)) ? 1 : 0;
+	}
+
+	return 0;
+}
+
+/**
+ * Check if a string is contained into another
+ */
+int phalcon_memnstr_str_str(const char *haystack, unsigned int haystack_length, char *needle, unsigned int needle_length) {
+
+	if (haystack && haystack_length >= needle_length) {
+		return php_memnstr(haystack, needle, needle_length, haystack + strlen(haystack)) ? 1 : 0;
 	}
 
 	return 0;
@@ -742,7 +770,7 @@ int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *ne
 /**
  * Inmediate function resolution for strpos function
  */
-int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *needle, unsigned int needle_length) {
+int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length) {
 
 	const char *found = NULL;
 
@@ -769,7 +797,7 @@ int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, char *need
 /**
  * Inmediate function resolution for stripos function
  */
-int phalcon_fast_stripos_str(zval *return_value, zval *haystack, char *needle, unsigned int needle_length) {
+int phalcon_fast_stripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length) {
 
 	const char *found = NULL;
 	char *needle_dup, *haystack_dup;
@@ -1551,10 +1579,10 @@ void phalcon_lcfirst(zval *return_value, zval *s)
 	if (unlikely(Z_TYPE_P(s) != IS_STRING)) {
 		use_copy = zend_make_printable_zval(s, return_value);
 		if (!use_copy) {
-			PHALCON_CPY_WRT_CTOR(return_value, s);
+			ZVAL_DUP(return_value, s);
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(return_value, s);
+		ZVAL_DUP(return_value, s);
 	}
 
 	if (Z_STRLEN_P(s)) {

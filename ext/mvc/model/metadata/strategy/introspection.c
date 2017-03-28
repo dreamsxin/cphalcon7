@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 
-	/** 
+	/**
 	 * Check if the mapped table exists on the database
 	 */
 	PHALCON_CALL_METHOD(&read_connection, model, "getreadconnection");
@@ -98,10 +98,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			PHALCON_CPY_WRT(&complete_table, &table);
+			ZVAL_COPY_VALUE(&complete_table, &table);
 		}
 
-		/** 
+		/**
 		 * The table not exists
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Table \"", &complete_table, "\" doesn't exist on database when dumping meta-data for ", &class_name);
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		return;
 	}
 
-	/** 
+	/**
 	 * Try to describe the table
 	 */
 	PHALCON_CALL_METHOD(&columns, &read_connection, "describecolumns", &table, &schema);
@@ -117,10 +117,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			PHALCON_CPY_WRT(&complete_table, &table);
+			ZVAL_COPY_VALUE(&complete_table, &table);
 		}
 
-		/** 
+		/**
 		 * The table not exists
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Cannot obtain table columns for the mapped source \"", &complete_table, "\" used in model ", &class_name);
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		return;
 	}
 
-	/** 
+	/**
 	 * Initialize meta-data
 	 */
 	array_init(&attributes);
@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		PHALCON_CALL_METHOD(&field_name, column, "getname");
 		phalcon_array_append(&attributes, &field_name, PH_COPY);
 
-		/** 
+		/**
 		 * To mark fields as primary keys
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isprimary");
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 			phalcon_array_append(&non_primary_keys, &field_name, PH_COPY);
 		}
 
-		/** 
+		/**
 		 * To mark fields as numeric
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isnumeric");
@@ -171,47 +171,47 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 			phalcon_array_update_zval_bool(&numeric_typed, &field_name, 1, PH_COPY);
 		}
 
-		/** 
+		/**
 		 * To mark fields as not null
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isnotnull");
 		if (PHALCON_IS_TRUE(&feature)) {
 			phalcon_array_append(&not_null, &field_name, PH_COPY);
 		}
-	
-		/** 
+
+		/**
 		 * To mark fields as identity columns
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isautoincrement");
 		if (PHALCON_IS_TRUE(&feature)) {
-			PHALCON_CPY_WRT(&identity_field, &field_name);
+			ZVAL_COPY_VALUE(&identity_field, &field_name);
 		}
 
-		/** 
+		/**
 		 * To get the internal types
 		 */
 		PHALCON_CALL_METHOD(&type, column, "gettype");
 		phalcon_array_update_zval(&field_types, &field_name, &type, PH_COPY);
 
-		/** 
+		/**
 		 * To get the internal size
 		 */
 		PHALCON_CALL_METHOD(&size, column, "getsize");
 		phalcon_array_update_zval(&field_sizes, &field_name, &size, PH_COPY);
 
-		/** 
+		/**
 		 * To get the internal bytes
 		 */
 		PHALCON_CALL_METHOD(&bytes, column, "getbytes");
 		phalcon_array_update_zval(&field_bytes, &field_name, &bytes, PH_COPY);
 
-		/** 
+		/**
 		 * To get the internal scale
 		 */
 		PHALCON_CALL_METHOD(&scale, column, "getscale");
-		phalcon_array_update_zval(&field_scales, &field_name, &scale, PH_COPY);		
+		phalcon_array_update_zval(&field_scales, &field_name, &scale, PH_COPY);
 
-		/** 
+		/**
 		 * To mark how the fields must be escaped
 		 */
 		PHALCON_CALL_METHOD(&bind_type, column, "getbindtype");
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	/** 
+	/**
 	 * Create an array using the MODELS_* constants as indexes
 	 */
 	array_init_size(return_value, 14);
@@ -258,12 +258,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 
 	phalcon_fetch_params(0, 2, 0, &model, &dependency_injector);
 
-	/** 
+	/**
 	 * Check for a columnMap() method on the model
 	 */
 	if (phalcon_method_exists_ex(model, SL("columnmap")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&ordered_column_map, model, "columnmap");
-		if (Z_TYPE(ordered_column_map) != IS_ARRAY) { 
+		if (Z_TYPE(ordered_column_map) != IS_ARRAY) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "columnMap() not returned an array");
 			return;
 		}
@@ -291,9 +291,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		}
 		phalcon_array_update_zval(&reversed_column_map, column_name, &name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
-	
-	
-	/** 
+
+
+	/**
 	 * Store the column map
 	 */
 	array_init_size(return_value, 2);

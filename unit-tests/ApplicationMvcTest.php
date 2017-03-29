@@ -15,8 +15,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
+
+class CustomResponse extends Phalcon\Http\Response {
+	public function setContent($content) {
+		$e = $this->dispatcher->getLastException();
+		$v = $this->dispatcher->getReturnedValue();
+		parent::setContent($content.'Response');
+	}
+}
 
 class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 {
@@ -186,6 +195,35 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($application->handle()->getContent(), 'one-two-one');
 
+		$loader->unregister();
+	}
+
+	public function testApplicationCustomResponse()
+	{
+		// Creates the autoloader
+		$loader = new \Phalcon\Loader();
+
+		$loader->registerDirs(array(
+			'unit-tests/controllers/'
+		));
+
+		$loader->register();
+
+		$_GET['_url'] = '/continue2/index';
+
+		Phalcon\Di::reset();
+		$di = new Phalcon\Di\FactoryDefault();
+
+		$di->set('view', function() {
+			$view = new \Phalcon\Mvc\View();
+			$view->setViewsDir('unit-tests/views/');
+			return $view;
+		});
+		$di->set('response', 'CustomResponse');
+
+		$application = new Phalcon\Mvc\Application();
+		$application->setDi($di);
+		$this->assertEquals($application->handle()->getContent(), "<html>Continue</html>".PHP_EOL."Response");
 		$loader->unregister();
 	}
 

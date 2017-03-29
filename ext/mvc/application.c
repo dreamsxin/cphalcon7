@@ -396,6 +396,16 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view);
 
+				if (likely(PHALCON_IS_NOT_FALSE(&status))) {
+					if (unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
+						PHALCON_CALL_METHOD(&status, &controller, "beforerenderview", getThis());
+					}
+				} else {
+					if (unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
+						PHALCON_CALL_METHOD(NULL, &controller, "beforerenderview", getThis());
+					}
+				}
+
 				/* Check if the view process has been treated by the developer */
 				if (PHALCON_IS_NOT_FALSE(&status)) {
 					PHALCON_CALL_METHOD(&namespace_name, &dispatcher, "getnamespacename");
@@ -418,6 +428,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				ZVAL_STRING(&event_name, "application:afterRenderView");
 
 				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &view);
+
+				if (unlikely(phalcon_method_exists_ex(&controller, SL("afterrenderview")) == SUCCESS)) {
+					PHALCON_CALL_METHOD(NULL, &controller, "afterrenderview", getThis());
+				}
 			}
 		}
 	} else {

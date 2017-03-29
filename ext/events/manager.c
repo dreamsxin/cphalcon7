@@ -133,11 +133,6 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		ZVAL_COPY_VALUE(&priority, _priority);
 	}
 
-	if (unlikely(Z_TYPE_P(event_type) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
-		return;
-	}
-
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;

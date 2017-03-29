@@ -227,4 +227,35 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 		$loader->unregister();
 	}
 
+	public function testApplicationAttachEvent()
+	{
+		// Creates the autoloader
+		$loader = new \Phalcon\Loader();
+
+		$loader->registerDirs(array(
+			'unit-tests/controllers/'
+		));
+
+		$loader->register();
+
+		$_GET['_url'] = '/continue2/index';
+
+		Phalcon\Di::reset();
+		$di = new Phalcon\Di\FactoryDefault();
+
+		$di->set('view', function() {
+			$view = new \Phalcon\Mvc\View();
+			$view->setViewsDir('unit-tests/views/');
+			return $view;
+		});
+
+		$application = new Phalcon\Mvc\Application();
+		$application->setDi($di);
+		$application->attachEvent('afterSendResponse', function($response){
+			$response->setContent($response->getContent().'Response');
+		});
+		$this->assertEquals($application->handle()->getContent(), "<html>Continue</html>".PHP_EOL."Response");
+		$loader->unregister();
+	}
+
 }

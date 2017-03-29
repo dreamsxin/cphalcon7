@@ -27,6 +27,8 @@
 #include "events/managerinterface.h"
 #include "diinterface.h"
 
+#include <Zend/zend_closures.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/exception.h"
@@ -56,9 +58,15 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel);
 PHP_METHOD(Phalcon_Di_Injectable, hasService);
 PHP_METHOD(Phalcon_Di_Injectable, getResolveService);
+PHP_METHOD(Phalcon_Di_Injectable, attachEvent);
 PHP_METHOD(Phalcon_Di_Injectable, __get);
 PHP_METHOD(Phalcon_Di_Injectable, __sleep);
 PHP_METHOD(Phalcon_Di_Injectable, __debugInfo);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_attachevent, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, eventType, IS_STRING, 0)
+	ZEND_ARG_OBJ_INFO(0, callback, Closure, 0)
+ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, setDI, arginfo_phalcon_di_injectionawareinterface_setdi, ZEND_ACC_PUBLIC)
@@ -69,6 +77,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, attachEvent, arginfo_phalcon_di_injectable_attachevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, __debugInfo, NULL, ZEND_ACC_PUBLIC)
@@ -85,6 +94,7 @@ PHALCON_INIT_CLASS(Phalcon_Di_Injectable){
 
 	zend_declare_property_null(phalcon_di_injectable_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_injectable_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_di_injectable_ce, SL("_eventCallbacks"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_di_injectable_ce, 2, phalcon_di_injectionawareinterface_ce, phalcon_events_eventsawareinterface_ce);
 
@@ -182,7 +192,7 @@ PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
  */
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
@@ -211,6 +221,14 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(name), data);
 	}
 
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name)) {
+		zval arguments = {};
+		array_init_size(&arguments, 1);
+		phalcon_array_append(&arguments, data, PH_COPY);
+		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
+		zval_ptr_dtor(&arguments);
+	}
+
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
@@ -237,7 +255,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
  */
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 	PHALCON_ENSURE_IS_STRING(eventname);
@@ -267,6 +285,14 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+	}
+
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name)) {
+		zval arguments = {};
+		array_init_size(&arguments, 1);
+		phalcon_array_append(&arguments, data, PH_COPY);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
+		zval_ptr_dtor(&arguments);
 	}
 
 	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
@@ -342,6 +368,26 @@ PHP_METHOD(Phalcon_Di_Injectable, getResolveService){
 			PHALCON_RETURN_CALL_METHOD(&dependency_injector, "getshared", name, args, noerror);
 		}
 	}
+}
+
+/**
+ * Attach a listener to the events
+ *
+ * @param string $eventType
+ * @param Closure $callback
+ */
+PHP_METHOD(Phalcon_Di_Injectable, attachEvent){
+
+	zval *event_type, *callback, prefixed = {}, new_callback = {};
+
+	phalcon_fetch_params(0, 2, 0, &event_type, &callback);
+
+	phalcon_fast_strtolower(&prefixed, event_type);
+
+	PHALCON_CALL_CE_STATIC(&new_callback, zend_ce_closure, "bind", callback, getThis());
+	phalcon_update_property_array(getThis(), SL("_eventCallbacks"), &prefixed, &new_callback);
+
+	RETURN_THIS();
 }
 
 /**

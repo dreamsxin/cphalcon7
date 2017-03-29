@@ -388,49 +388,37 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 
 		if (PHALCON_IS_FALSE(&returned_response)) {
-			if (Z_TYPE(controller) == IS_OBJECT) {
-				/**
-				 * This allows to make a custom view render
-				 */
-				ZVAL_STRING(&event_name, "application:beforeRenderView");
+			/**
+			 * This allows to make a custom view render
+			 */
+			ZVAL_STRING(&event_name, "application:beforeRenderView");
 
-				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view);
+			PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view);
 
+			if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
 				if (likely(PHALCON_IS_NOT_FALSE(&status))) {
-					if (unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
-						PHALCON_CALL_METHOD(&status, &controller, "beforerenderview", getThis());
-					}
+					PHALCON_CALL_METHOD(&status, &controller, "beforerenderview", &view);
 				} else {
-					if (unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
-						PHALCON_CALL_METHOD(NULL, &controller, "beforerenderview", getThis());
-					}
+					PHALCON_CALL_METHOD(NULL, &controller, "beforerenderview", &view);
 				}
+			}
 
-				/* Check if the view process has been treated by the developer */
-				if (PHALCON_IS_NOT_FALSE(&status)) {
-					PHALCON_CALL_METHOD(&namespace_name, &dispatcher, "getnamespacename");
-					PHALCON_CALL_METHOD(&controller_name, &dispatcher, "getcontrollername");
-					PHALCON_CALL_METHOD(&action_name, &dispatcher, "getactionname");
-					PHALCON_CALL_METHOD(&params, &dispatcher, "getparams");
+			/* Check if the view process has been treated by the developer */
+			if (PHALCON_IS_NOT_FALSE(&status)) {
+				PHALCON_CALL_METHOD(&namespace_name, &dispatcher, "getnamespacename");
+				PHALCON_CALL_METHOD(&controller_name, &dispatcher, "getcontrollername");
+				PHALCON_CALL_METHOD(&action_name, &dispatcher, "getactionname");
+				PHALCON_CALL_METHOD(&params, &dispatcher, "getparams");
 
+				/* Automatic render based on the latest controller executed */
+				if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_mvc_view_modelinterface_ce, 1)) {
+					PHALCON_CALL_METHOD(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name, &possible_response);
+				} else {
+					if (Z_TYPE(possible_response) == IS_ARRAY) {
+						PHALCON_CALL_METHOD(NULL, &view, "setvars", &possible_response, &PHALCON_GLOBAL(z_true));
+					}
 					/* Automatic render based on the latest controller executed */
-					if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_mvc_view_modelinterface_ce, 1)) {
-						PHALCON_CALL_METHOD(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name, &possible_response);
-					} else {
-						if (Z_TYPE(possible_response) == IS_ARRAY) {
-							PHALCON_CALL_METHOD(NULL, &view, "setvars", &possible_response, &PHALCON_GLOBAL(z_true));
-						}
-						/* Automatic render based on the latest controller executed */
-						PHALCON_CALL_METHOD(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name);
-					}
-				}
-
-				ZVAL_STRING(&event_name, "application:afterRenderView");
-
-				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &view);
-
-				if (unlikely(phalcon_method_exists_ex(&controller, SL("afterrenderview")) == SUCCESS)) {
-					PHALCON_CALL_METHOD(NULL, &controller, "afterrenderview", getThis());
+					PHALCON_CALL_METHOD(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name);
 				}
 			}
 		}
@@ -439,6 +427,23 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+	}
+
+	if (f_implicit_view) {
+		PHALCON_CALL_METHOD(NULL, &view, "finish");
+
+		if (PHALCON_IS_FALSE(&returned_response)) {
+			ZVAL_STRING(&event_name, "application:afterRenderView");
+
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &view);
+
+			if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("afterrenderview")) == SUCCESS)) {
+				PHALCON_CALL_METHOD(NULL, &controller, "afterrenderview", &view);
+			}
+			/* The content returned by the view is passed to the response service */
+			PHALCON_CALL_METHOD(&content, &view, "getcontent");
+			PHALCON_CALL_METHOD(NULL, &response, "setcontent", &content);
+		}
 	}
 
 	/* Calling beforeSendResponse */
@@ -450,14 +455,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		RETURN_FALSE;
 	}
 
-	if (f_implicit_view) {
-		PHALCON_CALL_METHOD(NULL, &view, "finish");
-
-		if (PHALCON_IS_FALSE(&returned_response)) {
-			/* The content returned by the view is passed to the response service */
-			PHALCON_CALL_METHOD(&content, &view, "getcontent");
-			PHALCON_CALL_METHOD(NULL, &response, "setcontent", &content);
-		}
+	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforesendresponse")) == SUCCESS)) {
+		PHALCON_CALL_METHOD(NULL, &controller, "beforesendresponse", &response);
 	}
 
 	/* Headers & Cookies are automatically sent */
@@ -467,6 +466,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&event_name, "application:afterSendResponse");
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &response);
+
+	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("aftersendresponse")) == SUCCESS)) {
+		PHALCON_CALL_METHOD(NULL, &controller, "aftersendresponse", &response);
+	}
 
 	/* Return the response */
 	RETURN_CTOR(&response);

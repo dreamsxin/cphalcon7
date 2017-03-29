@@ -26,8 +26,8 @@
 			5.3.3.Fire event - application:afterStartModule
 		5.4.Fire event – application:beforeHandleRequest
 		5.5.Dispatch – Phalcon\Mvc\Dispatcher::dispatch → Phalcon\Dispatcher::dispatch
-			5.5.1Fire event - dispatch:beforeDispatchLoop
-			5.5.2Dispatch loop
+			5.5.1.Fire event - dispatch:beforeDispatchLoop
+			5.5.2.Dispatch loop
 				5.5.2.1.Fire event - dispatch:beforeDispatch
 				5.5.2.2.Create the complete controller class name
 				5.5.2.3.Load controller class
@@ -44,20 +44,23 @@
 				5.5.2.10.Retrun the controller
 			5.6.Fire event – application:afterHandleRequest
 			5.7.Rendering Views
-				5.7.1.Fire event - application:viewRender
-				5.7.2.Call method – Phalcon\Mvc\View::render
-					5.7.2.1.Load the template engines
-					5.7.2.2.Fire event  - view:beforeRender
-					5.7.2.3.Hierarchical Rendering
-						5.7.2.3.1Render action view
-						5.7.2.3.2Render before layout view
-						5.7.2.3.3Render controller layout view
-						5.7.2.3.4Render namespace layout view
-						5.7.2.3.5Render after layout view
-						5.7.2.3.6Render main view
-					5.7.2.4.Fire event - view:afterRender
-			5.8.Get the processed content - Phalcon\Mvc\View::getContent
-			5.9.Fire event - application:beforeSendResponse
+				5.7.1.Fire event - application:beforeRenderView
+				5.7.2.Call the controller method beforeRenderView
+				5.7.3.Call method – Phalcon\Mvc\View::render
+					5.7.3.1.Load the template engines
+					5.7.3.2.Fire event  - view:beforeRender
+					5.7.3.3.Hierarchical Rendering
+						5.7.3.3.1.Render action view
+						5.7.3.3.2.Render before layout view
+						5.7.3.3.3.Render controller layout view
+						5.7.3.3.4.Render namespace layout view
+						5.7.3.3.5.Render after layout view
+						5.7.3.3.6.Render main view
+					5.7.3.4.Fire event - view:afterRender
+				5.7.4.Fire event - application:afterRenderView
+				5.7.5.Call the controller method afterRenderView
+			5.8.Fire event - application:beforeSendResponse
+			5.9.Get the processed content - Phalcon\Mvc\View::getContent
 			5.10.Send headers - Phalcon\Http\Response::sendHeaders
 			5.11.Send cookies – Phalcon\Http\Response::sendCookies
 			5.12.Return the response

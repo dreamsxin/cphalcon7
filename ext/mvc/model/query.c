@@ -3069,7 +3069,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 			phalcon_array_update_zval(&sql_aliases_models_instances, &alias, &model, PH_COPY);
 			phalcon_array_update_zval(&models, &alias, &model_name, PH_COPY);
 		} else {
-			phalcon_array_append(&sql_tables, &source, PH_COPY);
+			phalcon_array_append(&sql_tables, &complete_source, PH_COPY);
 			phalcon_array_update_zval(&sql_aliases, &model_name, &source, PH_COPY);
 			phalcon_array_update_zval(&sql_aliases_models_instances, &model_name, &model, PH_COPY);
 			phalcon_array_update_zval(&models, &model_name, &source, PH_COPY);

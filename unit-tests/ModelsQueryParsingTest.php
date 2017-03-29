@@ -7926,7 +7926,10 @@ class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
 
 		$expected = array(
 			'tables' => array(
-				'robots',
+				array(
+					'robots',
+					NULL,
+				),
 			),
 			'models' => array(
 				'Robots',

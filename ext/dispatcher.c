@@ -83,6 +83,7 @@ PHP_METHOD(Phalcon_Dispatcher, setErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, fireEvent);
 PHP_METHOD(Phalcon_Dispatcher, getLastException);
+PHP_METHOD(Phalcon_Dispatcher, getLastHandler);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setmodulename, 0, 0, 1)
 	ZEND_ARG_INFO(0, moduleName)
@@ -135,6 +136,7 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, getErrorHandler, arginfo_phalcon_dispatcherinterface_geterrorhandler, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getLastException, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getLastHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1419,4 +1421,15 @@ PHP_METHOD(Phalcon_Dispatcher, getLastException){
 
 
 	RETURN_MEMBER(getThis(), "_lastException");
+}
+
+/**
+ * Returns the last handler
+ *
+ * @return Object
+ */
+PHP_METHOD(Phalcon_Dispatcher, getLastHandler){
+
+
+	RETURN_MEMBER(getThis(), "_lastHandler");
 }

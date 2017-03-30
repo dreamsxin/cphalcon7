@@ -899,7 +899,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 		Phalcon\Mvc\Router\Route::reset();
 
 		$router = new Phalcon\Mvc\Router(false);
-		
+
 		$router->add('/:controller/:action/:params', array(
 			"controller" => 1,
 			"action" => 2,
@@ -913,7 +913,7 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 		Phalcon\Mvc\Router\Route::reset();
 
 		$router = new Phalcon\Mvc\Router(false);
-		
+
 		$router->add('/:controller/:action/:params', array(
 			"controller" => 1,
 			"action" => 2,

@@ -32,6 +32,7 @@
 #include "di.h"
 #include "events/managerinterface.h"
 #include "http/responseinterface.h"
+#include "http/request.h"
 
 #include <Zend/zend_closures.h>
 
@@ -108,6 +109,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_request, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 1)
 	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 1)
 ZEND_END_ARG_INFO()
 
@@ -484,10 +486,14 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
  */
 PHP_METHOD(Phalcon_Mvc_Application, request){
 
-	zval *uri, *_dependency_injector = NULL, dependency_injector = {}, dependency_injector_new = {}, service = {}, definition = {};
-	zval app = {}, response = {};
+	zval *uri, *data = NULL, *_dependency_injector = NULL, dependency_injector = {}, dependency_injector_new = {}, service = {}, definition = {};
+	zval app = {}, response = {}, requset = {};
 
-	phalcon_fetch_params(0, 1, 1, &uri, &_dependency_injector);
+	phalcon_fetch_params(0, 1, 2, &uri, &data, &_dependency_injector);
+
+	if (!data) {
+		data = &PHALCON_GLOBAL(z_null);
+	}
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
@@ -498,6 +504,14 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	}
 
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_di_ce, "setdefault", &dependency_injector_new);
+
+	/**
+	 * Request
+	 */
+	ZVAL_STRING(&service, ISV(request));
+	object_init_ex(&requset, phalcon_http_request_ce);
+	PHALCON_CALL_METHOD(NULL, &requset, "__construct", data);
+	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &requset);
 
 	/**
 	 * Mvc Router

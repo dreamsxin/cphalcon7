@@ -64,6 +64,7 @@
  */
 zend_class_entry *phalcon_http_request_ce;
 
+PHP_METHOD(Phalcon_Http_Request, __construct);
 PHP_METHOD(Phalcon_Http_Request, _get);
 PHP_METHOD(Phalcon_Http_Request, get);
 PHP_METHOD(Phalcon_Http_Request, getPost);
@@ -126,6 +127,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_request__get, 0, 0, 5)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_request_method_entry[] = {
+	PHP_ME(Phalcon_Http_Request, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Http_Request, _get, arginfo_phalcon_http_request__get, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Http_Request, get, arginfo_phalcon_http_requestinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getPost, arginfo_phalcon_http_requestinterface_getpost, ZEND_ACC_PUBLIC)
@@ -191,10 +193,27 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request){
 	zend_declare_property_null(phalcon_http_request_ce, SL("_filter"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_request_ce, SL("_rawBody"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_request_ce, SL("_put"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_request_ce, SL("_data"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_http_request_ce, 1, phalcon_http_requestinterface_ce);
 
 	return SUCCESS;
+}
+
+/**
+ * Phalcon\Http\Request constructor
+ */
+PHP_METHOD(Phalcon_Http_Request, __construct){
+
+	zval *data = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &data);
+
+	if (!data || Z_TYPE_P(data) != IS_ARRAY) {
+		phalcon_update_property_empty_array(getThis(), SL("_data"));
+	} else {
+		phalcon_update_property_zval(getThis(), SL("_data"), data);
+	}
 }
 
 /**
@@ -277,7 +296,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 PHP_METHOD(Phalcon_Http_Request, get)
 {
 	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, *request;
-	zval put = {}, merged = {};
+	zval put = {}, merged = {}, data = {}, merged2 = {};
 
 	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
@@ -307,7 +326,11 @@ PHP_METHOD(Phalcon_Http_Request, get)
 
 	phalcon_fast_array_merge(&merged, request, &put);
 
-	PHALCON_RETURN_CALL_SELF("_get", &merged, name, filters, default_value, not_allow_empty, norecursive);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+
+	phalcon_fast_array_merge(&merged2, &merged, &data);
+
+	PHALCON_RETURN_CALL_SELF("_get", &merged2, name, filters, default_value, not_allow_empty, norecursive);
 }
 
 /**

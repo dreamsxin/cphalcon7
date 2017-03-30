@@ -48,6 +48,7 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	ZVAL_STRINGL(&z_index, index, index_length);
 
 	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
+	zval_ptr_dtor(&z_index);
 	return status;
 }
 
@@ -58,6 +59,7 @@ int phalcon_array_isset_fetch_str2(zval *fetched, const zval *arr, const char *i
 	ZVAL_STRINGL(&z_index, index, index_length);
 
 	status = phalcon_array_isset_fetch(fetched, arr, &z_index, readonly);
+	zval_ptr_dtor(&z_index);
 	return status;
 }
 

@@ -196,53 +196,53 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	}
 
 	if (!_expire) {
-		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY);
+		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&expire, _expire);
 	}
 
 	if (!_path) {
-		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&path, _path);
 	}
 
 	if (!_secure) {
-		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY);
+		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&secure, _secure);
 	}
 
 	if (!_domain) {
-		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY);
+		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&domain, _domain);
 	}
 
 	if (!_http_only) {
-		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY);
+		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
 	}
 
-	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
-	phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY);
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
-	/** 
-	 * Check if the cookie needs to be updated or 
+	/**
+	 * Check if the cookie needs to be updated or
 	 */
 	if (!phalcon_array_isset_fetch(&cookie, &cookies, name, 0)) {
 		object_init_ex(&cookie, phalcon_http_cookie_ce);
 
 		PHALCON_CALL_METHOD(NULL, &cookie, "__construct", name, value, &expire, &path, &secure, &domain, &http_only);
 
-		/** 
+		/**
 		 * Pass the DI to created cookies
 		 */
 		PHALCON_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
 
-		/** 
+		/**
 		 * Enable encryption in the cookie
 		 */
 		if (zend_is_true(&encryption)) {
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, &cookie);
 	} else {
-		/** 
+		/**
 		 * Override any settings in the cookie
 		 */
 		PHALCON_CALL_METHOD(NULL, &cookie, "setvalue", value);
@@ -262,10 +262,10 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		PHALCON_CALL_METHOD(NULL, &cookie, "sethttponly", &http_only);
 	}
 
-	/** 
+	/**
 	 * Register the cookies bag in the response
 	 */
-	phalcon_read_property(&registered, getThis(), SL("_registered"), PH_NOISY);
+	phalcon_read_property(&registered, getThis(), SL("_registered"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_FALSE(&registered)) {
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'response' service");
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
-		/** 
+		/**
 		 * Pass the cookies bag to the response so it can send the headers at the of the
 		 * request
 		 */
@@ -304,9 +304,9 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 		return;
 	}
 
-	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(return_value, &cookies, name, 0)) {
-		/** 
+		/**
 		 * Create the cookie if the it does not exist
 		 */
 		object_init_ex(return_value, phalcon_http_cookie_ce);
@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 		if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(NULL, return_value, "setdi", &dependency_injector);
 
-			phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY);
+			phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY|PH_READONLY);
 			if (zend_is_true(&encryption)) {
 				PHALCON_CALL_METHOD(NULL, return_value, "useencryption", &encryption);
 			}
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, has){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 
 	/* Check the internal bag */
 	if (phalcon_array_isset(&cookies, name)) {
@@ -363,9 +363,9 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 
-	/** 
+	/**
 	 * Check the internal bag
 	 */
 	if (phalcon_array_isset_fetch(&cookie, &cookies, name, 0)) {
@@ -400,7 +400,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, send){
 	zval cookies = {}, *cookie;
 
 	if (!SG(headers_sent)) {
-		phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY);
+		phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(cookies), cookie) {
 			PHALCON_CALL_METHOD(NULL, cookie, "send");

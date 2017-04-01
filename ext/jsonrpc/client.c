@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 
 	phalcon_fetch_params(0, 1, 1, &method, &data);
 
-	phalcon_read_property(&httpclient, getThis(), SL("_httpclient"), PH_NOISY);
+	phalcon_read_property(&httpclient, getThis(), SL("_httpclient"), PH_NOISY|PH_READONLY);
 	phalcon_return_property(&id, getThis(), SL("_id"));
 
 	i = Z_LVAL(id) + 1;

@@ -119,11 +119,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, __construct){
 	zval *options = NULL;
 
 	phalcon_fetch_params(0, 4, 1, &type, &referenced_model, &fields, &referenced_fields, &options);
-	
+
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_type"), type);
 	phalcon_update_property_zval(getThis(), SL("_referencedModel"), referenced_model);
 	phalcon_update_property_zval(getThis(), SL("_fields"), fields);
@@ -144,11 +144,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, setIntermediateRelation){
 	zval *intermediate_referenced_fields;
 
 	phalcon_fetch_params(0, 3, 0, &intermediate_fields, &intermediate_model, &intermediate_referenced_fields);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_intermediateFields"), intermediate_fields);
 	phalcon_update_property_zval(getThis(), SL("_intermediateModel"), intermediate_model);
 	phalcon_update_property_zval(getThis(), SL("_intermediateReferencedFields"), intermediate_referenced_fields);
-	
+
 }
 
 /**
@@ -215,13 +215,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isForeignKey){
 
 	zval options = {};
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
-	if (Z_TYPE(options) == IS_ARRAY) { 
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(options) == IS_ARRAY) {
 		if (phalcon_array_isset_str(&options, SL("foreignKey"))) {
 			RETURN_TRUE;
 		}
 	}
-	
+
 	RETURN_FALSE;
 }
 
@@ -234,14 +234,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, getForeignKey){
 
 	zval options = {}, foreign_key = {};
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_array_isset_fetch_str(&foreign_key, &options, SL("foreignKey"))) {
 		if (zend_is_true(&foreign_key)) {
 			RETURN_CTOR(&foreign_key);
 		}
 	}
-	
+
 	RETURN_FALSE;
 }
 
@@ -254,11 +254,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isThrough){
 
 	zval type = {};
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_LONG(&type, 3) || PHALCON_IS_LONG(&type, 4)) {
 		RETURN_TRUE;
 	}
-	
+
 	RETURN_FALSE;
 }
 
@@ -271,12 +271,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Relation, isReusable){
 
 	zval options = {}, reusable = {};
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_array_isset_fetch_str(&reusable, &options, SL("reusable"))) {
 		RETURN_CTOR(&reusable);
 	}
-	
+
 	RETURN_FALSE;
 }
 

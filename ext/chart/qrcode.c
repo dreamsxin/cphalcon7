@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	phalcon_update_property_zval(getThis(), SL("_text"), text);
 
 	if (!_version || Z_TYPE_P(_version) == IS_NULL) {
-		phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY);
+		phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY|PH_READONLY);
 	} else {
 		if (Z_LVAL_P(_version) < 1 || Z_LVAL_P(_version) > 40) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "version must be within the range of 1 to 40");
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	}
 
 	if (!_level || Z_TYPE_P(_level) == IS_NULL) {
-		phalcon_read_property(&level, getThis(), SL("_level"), PH_NOISY);
+		phalcon_read_property(&level, getThis(), SL("_level"), PH_NOISY|PH_READONLY);
 	} else {
 		if (Z_LVAL_P(_level) != QR_ECLEVEL_L && Z_LVAL_P(_level) != QR_ECLEVEL_M && Z_LVAL_P(_level) != QR_ECLEVEL_Q && Z_LVAL_P(_level) != QR_ECLEVEL_H) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error level. there are 4 values: LEVEL_L, LEVEL_M, LEVEL_Q, LEVEL_H");
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
 
 	if (!_mode || Z_TYPE_P(_mode) == IS_NULL) {
-		phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
+		phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY|PH_READONLY);
 	} else {
 		if (Z_LVAL_P(_mode) != QR_MODE_NUL && Z_LVAL_P(_mode) != QR_MODE_NUM && Z_LVAL_P(_mode) != QR_MODE_8 && Z_LVAL_P(_mode) != QR_MODE_KANJI) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_chart_exception_ce, "Error mode. there are 4 values: MODE_NUL, MODE_NUM, MODE_8, MODE_KANJI");
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 	}
 
 	if (!_casesensitive || Z_TYPE_P(_casesensitive) == IS_NULL) {
-		phalcon_read_property(&casesensitive, getThis(), SL("_casesensitive"), PH_NOISY);
+		phalcon_read_property(&casesensitive, getThis(), SL("_casesensitive"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&casesensitive, _casesensitive);
 	}
@@ -340,7 +340,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		m = Z_LVAL_P(margin);
 	}
 
-	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) <= IS_NULL) {
 		RETURN_FALSE;
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 
 	fn = Z_STRVAL_P(filename);
 
-	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;

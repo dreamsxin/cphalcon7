@@ -100,8 +100,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 	zval *options = NULL, servers = {}, client = {}, lifetime = {}, prefix = {}, frontend_data = {}, memcached = {}, option = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
-	
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
+
+	if (Z_TYPE_P(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 	PHALCON_CALL_METHOD(NULL, &memcached, "__construct", &frontend_data, &option);
 
 	phalcon_update_property_zval(getThis(), SL("_memcached"), &memcached);
-	
+
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }
 
@@ -166,8 +166,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(memcached) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(&memcached, "get", key, &lifetime);
@@ -188,11 +188,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(memcached) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &memcached, "save", key, data, &lifetime);	
+		PHALCON_CALL_METHOD(NULL, &memcached, "save", key, data, &lifetime);
 	}
 }
 
@@ -200,10 +200,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, reset){
 
 	zval memcached = {};
 
-	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY);
+	phalcon_read_property(&memcached, getThis(), SL("_memcached"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(memcached) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &memcached, "flush");	
+		PHALCON_CALL_METHOD(NULL, &memcached, "flush");
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_memcached_ce, getThis(), "reset");

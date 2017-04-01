@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	phalcon_fetch_params(0, 1, 0, &option);
 	PHALCON_ENSURE_IS_ARRAY(option);
 
-	phalcon_read_property(&values, getThis(), SL("_optionsValues"), PH_NOISY);
+	phalcon_read_property(&values, getThis(), SL("_optionsValues"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(values) != IS_ARRAY) {
 		PHALCON_CPY_WRT_CTOR(&tmp, option);
@@ -176,9 +176,9 @@ PHP_METHOD(Phalcon_Forms_Element_Select, render){
 		attributes = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&options, getThis(), SL("_optionsValues"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_optionsValues"), PH_NOISY|PH_READONLY);
 
-	/** 
+	/**
 	 * Merged passed attributes with previously defined ones
 	 */
 	PHALCON_CALL_METHOD(&widget_attributes, getThis(), "prepareattributes", attributes);

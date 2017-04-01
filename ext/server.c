@@ -231,7 +231,7 @@ void phalcon_server_process_write(struct phalcon_server_context *ctx, struct pha
 		if (EG(exception)) {
 			zval ex, msg;
 			ZVAL_OBJ(&ex, EG(exception));
-			phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY);
+			phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(msg) == IS_STRING) {
 				perror(Z_STRVAL(msg));
 			} else {
@@ -323,7 +323,7 @@ static void phalcon_server_process_read(struct phalcon_server_context *ctx, stru
 			if (EG(exception)) {
 				zval ex, msg;
 				ZVAL_OBJ(&ex, EG(exception));
-				phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY);
+				phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY|PH_READONLY);
 				if (Z_TYPE(msg) == IS_STRING) {
 					perror(Z_STRVAL(msg));
 				} else {
@@ -346,7 +346,7 @@ static void phalcon_server_process_read(struct phalcon_server_context *ctx, stru
 			if (EG(exception)) {
 				zval ex, msg;
 				ZVAL_OBJ(&ex, EG(exception));
-				phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY);
+				phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY|PH_READONLY);
 				if (Z_TYPE(msg) == IS_STRING) {
 					perror(Z_STRVAL(msg));
 				} else {
@@ -452,7 +452,7 @@ void phalcon_server_process_accept(struct phalcon_server_context *ctx, struct ph
 		if (EG(exception)) {
 			zval ex, msg;
 			ZVAL_OBJ(&ex, EG(exception));
-			phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY);
+			phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(msg) == IS_STRING) {
 				perror(Z_STRVAL(msg));
 			} else {

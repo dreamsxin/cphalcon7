@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, __construct)
 		phalcon_update_property_zval(getThis(), SL("_config"), _config);
 	}
 
-	phalcon_read_property(&config, getThis(), SL("_config"), PH_NOISY);
+	phalcon_read_property(&config, getThis(), SL("_config"), PH_NOISY|PH_READONLY);
 
 	db_intern = phalcon_storage_wiredtiger_object_from_obj(Z_OBJ_P(db));
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));

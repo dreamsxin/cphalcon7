@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Http_Request, get)
 
 	phalcon_fast_array_merge(&merged, request, &put);
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	phalcon_fast_array_merge(&merged2, &merged, &data);
 
@@ -430,7 +430,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 	if (!zend_is_true(&is_put)) {
 		RETURN_EMPTY_ARRAY();
 	} else {
-		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY);
+		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
 
@@ -621,7 +621,7 @@ PHP_METHOD(Phalcon_Http_Request, hasPut)
 	if (!zend_is_true(&is_put)) {
 		phalcon_read_global_str(&new_put, SL("_PUT"));
 	} else {
-		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY);
+		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(put) != IS_ARRAY) {
 			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
 
@@ -812,7 +812,7 @@ PHP_METHOD(Phalcon_Http_Request, getRawBody)
 	php_stream *stream;
 	long int maxlen;
 
-	phalcon_read_property(&raw, getThis(), SL("_rawBody"), PH_NOISY);
+	phalcon_read_property(&raw, getThis(), SL("_rawBody"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(raw) == IS_STRING) {
 		RETURN_CTOR(&raw);
 	}
@@ -1024,11 +1024,11 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 	if (zend_is_true(trust_forwarded_header)) {
 		if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("HTTP_X_FORWARDED_FOR"))) {
 			if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
-				phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY);
+				phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY|PH_READONLY);
 			}
 		}
 	} else if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
-		phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY);
+		phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY|PH_READONLY);
 	}
 
 	if (Z_TYPE(address) == IS_STRING) {
@@ -1038,7 +1038,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 			 */
 			phalcon_fast_explode_str(&addresses, SL(","), &address);
 
-			phalcon_array_fetch_long(&first, &addresses, 0, PH_NOISY);
+			phalcon_array_fetch_long(&first, &addresses, 0, PH_NOISY|PH_READONLY);
 			RETURN_CTOR(&first);
 		}
 
@@ -1498,10 +1498,10 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 					phalcon_array_append(return_value, &request_file, PH_COPY);
 				}
 			} else if (Z_TYPE(error) == IS_ARRAY) {
-				phalcon_array_fetch_str(&name, value, SL("name"), PH_NOISY);
-				phalcon_array_fetch_str(&type, value, SL("type"), PH_NOISY);
-				phalcon_array_fetch_str(&tmp_name, value, SL("tmp_name"), PH_NOISY);
-				phalcon_array_fetch_str(&size, value, SL("size"), PH_NOISY);
+				phalcon_array_fetch_str(&name, value, SL("name"), PH_NOISY|PH_READONLY);
+				phalcon_array_fetch_str(&type, value, SL("type"), PH_NOISY|PH_READONLY);
+				phalcon_array_fetch_str(&tmp_name, value, SL("tmp_name"), PH_NOISY|PH_READONLY);
+				phalcon_array_fetch_str(&size, value, SL("size"), PH_NOISY|PH_READONLY);
 
 				if (likely(Z_TYPE(index) == IS_STRING)) {
 					smart_str_appendl(&prefix, Z_STRVAL(index), Z_STRLEN(index));
@@ -1589,7 +1589,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 			ZVAL_COPY_VALUE(&quality, &quality_one);
 		}
 
-		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY|PH_READONLY);
 
 		array_init_size(&quality_part, 2);
 		phalcon_array_update_zval(&quality_part, name, &header_name, PH_COPY);
@@ -1618,12 +1618,12 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(quality_parts), accept) {
 		zval accept_quality = {}, best_quality = {};
 
-		phalcon_array_fetch_str(&accept_quality, accept, SL("quality"), PH_NOISY);
+		phalcon_array_fetch_str(&accept_quality, accept, SL("quality"), PH_NOISY|PH_READONLY);
 
 		is_smaller_function(&best_quality, &quality, &accept_quality);
 		if (PHALCON_IS_TRUE(&best_quality)) {
 			ZVAL_COPY_VALUE(&quality, &accept_quality);
-			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY);
+			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY|PH_READONLY);
 		}
 	} ZEND_HASH_FOREACH_END();
 

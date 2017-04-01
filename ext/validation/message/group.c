@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, count){
 
 	zval messages = {};
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 
 	phalcon_fast_count(return_value, &messages);
 }
@@ -359,7 +359,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, rewind){
 
 	zval messages = {};
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	zend_hash_internal_pointer_reset(Z_ARRVAL(messages));
 }
 
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, current){
 
 	zval messages = {}, *message;
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	if ((message = zend_hash_get_current_data(Z_ARRVAL(messages))) != NULL) {
 		RETURN_CTOR(message);
 	}
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, key){
 
 	zval messages = {};
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	zend_hash_get_current_key_zval(Z_ARRVAL(messages), return_value);
 }
 
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, next){
 
 	zval messages = {}, *message;
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	zend_hash_move_forward(Z_ARRVAL(messages));
 
 	if ((message = zend_hash_get_current_data(Z_ARRVAL(messages))) != NULL) {
@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, valid){
 
 	zval messages = {};
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 
 	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL(messages)) == SUCCESS);
 }

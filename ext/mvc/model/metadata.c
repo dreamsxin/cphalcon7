@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 
 	zval strategy = {}, s = {};
 
-	phalcon_read_property(&strategy, getThis(), SL("_strategy"), PH_NOISY);
+	phalcon_read_property(&strategy, getThis(), SL("_strategy"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(strategy) == IS_NULL) {
 		object_init_ex(&s, phalcon_mvc_model_metadata_strategy_introspection_ce);
 		phalcon_update_property_zval(getThis(), SL("_strategy"), &s);
@@ -357,13 +357,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
-	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
-		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_array_fetch(&data, &meta_data, &key, PH_NOISY);
+	phalcon_array_fetch(&data, &meta_data, &key, PH_NOISY|PH_READONLY);
 
 	RETURN_CTOR(&data);
 }
@@ -397,15 +397,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
-	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_array_isset(&meta_data, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
-		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_array_fetch(&meta_data_index, &meta_data, &key, PH_NOISY);
-	phalcon_array_fetch(&attributes, &meta_data_index, index, PH_NOISY);
+	phalcon_array_fetch(&meta_data_index, &meta_data, &key, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch(&attributes, &meta_data_index, index, PH_NOISY|PH_READONLY);
 
 	RETURN_CTOR(&attributes);
 }
@@ -450,13 +450,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
-	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
-		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	} else if (!zend_is_true(replace)) {
-		phalcon_array_fetch(&arr, &meta_data, &key, PH_NOISY);
-		phalcon_array_fetch(&value, &arr, index, PH_NOISY);
+		phalcon_array_fetch(&arr, &meta_data, &key, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch(&value, &arr, index, PH_NOISY|PH_READONLY);
 
 		PHALCON_SEPARATE_PARAM(data);
 
@@ -505,13 +505,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
-	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
+	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
-		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
+		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_array_fetch(&data, &column_map, &key, PH_NOISY);
+	phalcon_array_fetch(&data, &column_map, &key, PH_NOISY|PH_READONLY);
 
 	RETURN_CTOR(&data);
 }
@@ -544,15 +544,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
 
-	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
+	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
 		PHALCON_CALL_SELF(NULL, "_initialize", model, &key, &table, &schema);
 
-		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY);
+		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_array_fetch(&column_map_model, &column_map, &key, PH_NOISY);
-	phalcon_array_fetch(&attributes, &column_map_model, index, PH_NOISY);
+	phalcon_array_fetch(&column_map_model, &column_map, &key, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch(&attributes, &column_map_model, index, PH_NOISY|PH_READONLY);
 
 	RETURN_CTOR(&attributes);
 }
@@ -730,7 +730,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
 	}
 }
 
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatasizes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
 	}
 }
 
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataByte){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatabytes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
 	}
 }
 
@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatascales", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
 	}
 }
 
@@ -1189,7 +1189,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
-	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
+	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, attribute)) {
 		RETURN_TRUE;
 	}
@@ -1230,7 +1230,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute){
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
-	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
+	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, column)) {
 		RETURN_CTOR(column);
 	}
@@ -1279,7 +1279,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasRealAttribute){
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
-	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
+	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, attribute)) {
 		RETURN_TRUE;
 	}
@@ -1320,7 +1320,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getRealAttribute){
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
-	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY);
+	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, column)) {
 		RETURN_CTOR(column);
 	}
@@ -1340,7 +1340,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isEmpty){
 
 	zval meta_data = {};
 
-	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY);
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (phalcon_fast_count_ev(&meta_data)) {
 		RETURN_FALSE;
 	}

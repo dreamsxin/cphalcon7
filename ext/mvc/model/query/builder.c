@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindParams){
 
 	if (zend_is_true(merge)) {
 		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
-			phalcon_read_property(&current_bind_params, getThis(), SL("_bindParams"), PH_NOISY);
+			phalcon_read_property(&current_bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 				phalcon_add_function(&merged_params, bind_params, &current_bind_params);
 			} else {
@@ -446,7 +446,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindTypes){
 
 	if (zend_is_true(merge)) {
 		if (Z_TYPE_P(bind_types) == IS_ARRAY) {
-			phalcon_read_property(&current_bind_types, getThis(), SL("_bindTypes"), PH_NOISY);
+			phalcon_read_property(&current_bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 				phalcon_add_function(&merged_types, bind_types, &current_bind_types);
 			} else {
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, compile){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "compile");
-	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
+	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 }
 
 /**

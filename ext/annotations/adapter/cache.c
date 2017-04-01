@@ -128,8 +128,8 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, read)
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_RETURN_CALL_METHOD(&cache, "get", key, &lifetime);
 }
@@ -146,8 +146,8 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(NULL, &cache, "save", key, data, &lifetime);
 }

@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 	zval *file, *key = NULL, name = {}, temp_name = {}, size = {}, type = {}, error = {}, *constant, extension = {};
 
 	phalcon_fetch_params(0, 1, 1, &file, &key);
-	
+
 	if (Z_TYPE_P(file) != IS_ARRAY) {
 		if (phalcon_file_exists(file) == FAILURE) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "Phalcon\\Http\\Request\\File requires a valid uploaded file");
@@ -144,15 +144,15 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 				phalcon_update_property_zval(getThis(), SL("_extension"), &extension);
 			}
 		}
-		
+
 		if (phalcon_array_isset_fetch_str(&temp_name, file, SL("tmp_name"))) {
 			phalcon_update_property_zval(getThis(), SL("_tmp"), &temp_name);
 		}
-		
+
 		if (phalcon_array_isset_fetch_str(&size, file, SL("size"))) {
 			phalcon_update_property_zval(getThis(), SL("_size"), &size);
 		}
-		
+
 		if (phalcon_array_isset_fetch_str(&type, file, SL("type"))) {
 			phalcon_update_property_zval(getThis(), SL("_type"), &type);
 		}
@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 
 	zval mime = {}, *constant, finfo = {}, temp_file = {}, ret = {};
 
-	phalcon_read_property(&mime, getThis(), SL("_real_type"), PH_NOISY);
+	phalcon_read_property(&mime, getThis(), SL("_real_type"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(mime) == IS_STRING) {
 		RETURN_CTOR(&mime);
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Http_Request_File, getRealType){
 		RETURN_NULL();
 	}
 
-	phalcon_read_property(&temp_file, getThis(), SL("_tmp"), PH_NOISY);
+	phalcon_read_property(&temp_file, getThis(), SL("_tmp"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&ret, "finfo_file", &finfo, &temp_file);
 	PHALCON_CALL_FUNCTION(NULL, "finfo_close", &finfo);
@@ -305,8 +305,8 @@ PHP_METHOD(Phalcon_Http_Request_File, moveTo){
 	zval *destination, temp_file = {};
 
 	phalcon_fetch_params(0, 1, 0, &destination);
-	
-	phalcon_read_property(&temp_file, getThis(), SL("_tmp"), PH_NOISY);
+
+	phalcon_read_property(&temp_file, getThis(), SL("_tmp"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_FUNCTION("move_uploaded_file", &temp_file, destination);
 }
 

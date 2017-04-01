@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Di, __construct){
 		phalcon_update_property_zval(getThis(), SL("_name"), _name);
 	}
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 
 	phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), &name, getThis());
 }

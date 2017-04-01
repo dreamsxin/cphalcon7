@@ -954,14 +954,14 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
 
 	if (minutes > 0) {
 		ZVAL_LONG(&span, minutes);
-		phalcon_array_fetch_long(&label, &output, 5, PH_NOISY);
+		phalcon_array_fetch_long(&label, &output, 5, PH_NOISY|PH_READONLY);
 
 		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
 
 	if (seconds > 0) {
 		ZVAL_LONG(&span, seconds);
-		phalcon_array_fetch_long(&label, &output, 6, PH_NOISY);
+		phalcon_array_fetch_long(&label, &output, 6, PH_NOISY|PH_READONLY);
 
 		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
@@ -990,12 +990,12 @@ PHP_METHOD(Phalcon_Date, unix2dos){
 		PHALCON_CALL_FUNCTION(&day, "getdate", timestamp);
 	}
 
-	phalcon_array_fetch_str(&year, &day, SL("year"), PH_NOISY);
-	phalcon_array_fetch_str(&mon, &day, SL("mon"), PH_NOISY);
-	phalcon_array_fetch_str(&mday, &day, SL("mday"), PH_NOISY);
-	phalcon_array_fetch_str(&hours, &day, SL("hours"), PH_NOISY);
-	phalcon_array_fetch_str(&minutes, &day, SL("minutes"), PH_NOISY);
-	phalcon_array_fetch_str(&seconds, &day, SL("seconds"), PH_NOISY);
+	phalcon_array_fetch_str(&year, &day, SL("year"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&mon, &day, SL("mon"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&mday, &day, SL("mday"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&hours, &day, SL("hours"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&minutes, &day, SL("minutes"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&seconds, &day, SL("seconds"), PH_NOISY|PH_READONLY);
 
 	y = phalcon_get_intval(&year);
 	m = phalcon_get_intval(&mon);
@@ -1111,12 +1111,12 @@ PHP_METHOD(Phalcon_Date, intervalToSeconds){
 
 	phalcon_fetch_params(0, 1, 0, &interval);
 
-	phalcon_read_property(&s, interval, SL("s"), PH_NOISY);
-	phalcon_read_property(&i, interval, SL("i"), PH_NOISY);
-	phalcon_read_property(&h, interval, SL("h"), PH_NOISY);
-	phalcon_read_property(&d, interval, SL("d"), PH_NOISY);
-	phalcon_read_property(&m, interval, SL("m"), PH_NOISY);
-	phalcon_read_property(&y, interval, SL("y"), PH_NOISY);
+	phalcon_read_property(&s, interval, SL("s"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&i, interval, SL("i"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&h, interval, SL("h"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&d, interval, SL("d"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&m, interval, SL("m"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&y, interval, SL("y"), PH_NOISY|PH_READONLY);
 	seconds = Z_LVAL(s);
     if (Z_LVAL(i) > 0) {
         seconds += Z_LVAL(i) * PHALCON_DATE_MINUTE;

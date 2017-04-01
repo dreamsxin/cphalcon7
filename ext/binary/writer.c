@@ -245,8 +245,8 @@ PHP_METHOD(Phalcon_Binary_Writer, getContent){
 
 	zval output = {}, position = {};
 
-	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY);
-	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(NULL, "rewind", &output);
 	PHALCON_CALL_FUNCTION(return_value, "fread", &output, &position);
@@ -274,10 +274,10 @@ PHP_METHOD(Phalcon_Binary_Writer, write){
 
 	phalcon_fetch_params(0, 2, 0, &data, &length);
 
-	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY);
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 	phalcon_add_function(&result, &position, length);
 
-	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY);
+	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_FUNCTION(return_value, "fwrite", &output, data, length);
 	phalcon_update_property_zval(getThis(), SL("_position"), &result);
 }
@@ -355,7 +355,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 
 	ZVAL_LONG(&length, 2);
 
-	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY);
+	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
 		ZVAL_STRING(&format, "n");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
@@ -442,7 +442,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 
 	ZVAL_LONG(&length, 4);
 
-	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY);
+	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
 		ZVAL_STRING(&format, "N");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {

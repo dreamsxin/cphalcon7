@@ -89,7 +89,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, set){
 	phalcon_fetch_params(0, 2, 0, &name, &value);
 
 	phalcon_update_property_array(getThis(), SL("_headers"), name, value);
-	
+
 }
 
 /**
@@ -103,8 +103,8 @@ PHP_METHOD(Phalcon_Http_Response_Headers, get){
 	zval *name, headers = {};
 
 	phalcon_fetch_params(0, 1, 0, &name);
-	
-	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(return_value, &headers, name, 0)) {
 		RETURN_FALSE;
 	}
@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, setRaw){
 	zval *header;
 
 	phalcon_fetch_params(0, 1, 0, &header);
-	
+
 	phalcon_update_property_array(getThis(), SL("_headers"), header, &PHALCON_GLOBAL(z_null));
 }
 
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 
 	phalcon_fetch_params(0, 1, 0, &header_index);
 
-	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
 
 	phalcon_array_unset(&headers, header_index, 0);
 
@@ -155,13 +155,13 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send)
 	ulong idx;
 
 	if (!SG(headers_sent)) {
-		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY);
+		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
 
 		if (Z_TYPE(headers) != IS_ARRAY) {
 			/* No headers to send */
 			RETURN_TRUE;
 		}
-	
+
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(headers), idx, str_key, value) {
 			zval header = {}, http_header = {}, tmp = {};
 			if (str_key) {
@@ -188,10 +188,10 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send)
 				sapi_header_op(SAPI_HEADER_REPLACE, &ctr);
 			}
 		} ZEND_HASH_FOREACH_END();
-	
+
 		RETURN_TRUE;
 	}
-	
+
 	RETURN_FALSE;
 }
 
@@ -239,9 +239,9 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_CALL_METHOD(NULL, &headers, "set", &key, value);	
+			PHALCON_CALL_METHOD(NULL, &headers, "set", &key, value);
 		} ZEND_HASH_FOREACH_END();
 	}
-	
+
 	RETURN_CTOR(&headers);
 }

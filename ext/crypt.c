@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		return;
 	}
 
-	phalcon_read_property(&handler, getThis(), SL("_beforeEncrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_beforeEncrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		PHALCON_SEPARATE_PARAM(source);
@@ -284,14 +284,14 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		PHALCON_CPY_WRT_CTOR(&encrypt_options, options);
 	}
 
-	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
+	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
 	PHALCON_CALL_FUNCTION(&iv, "openssl_random_pseudo_bytes", &iv_size);
 	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &text, &method, &encrypt_key, &encrypt_options, &iv);
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
 
-	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		return;
 	}
 
-	phalcon_read_property(&handler, getThis(), SL("_beforeDecrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_beforeDecrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		PHALCON_SEPARATE_PARAM(source);
@@ -362,7 +362,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		ZVAL_COPY_VALUE(&encrypt_options, options);
 	}
 
-	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
+	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
 
 	if (Z_LVAL(iv_size) <= 0) {
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		convert_to_string(return_value);
 	}
 
-	phalcon_read_property(&handler, getThis(), SL("_afterDecrypt"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_afterDecrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);

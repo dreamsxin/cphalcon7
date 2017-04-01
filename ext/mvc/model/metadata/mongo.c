@@ -151,10 +151,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
-		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&mongo, "get", key, &lifetime);
 
 		return;
@@ -175,10 +175,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
-		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &mongo, "save", key, data, &lifetime);
 	}
 }
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, reset){
 
 	zval mongo;
 
-	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY);
+	phalcon_read_property(&mongo, getThis(), SL("_mongo"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(mongo) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, &mongo, "flush");

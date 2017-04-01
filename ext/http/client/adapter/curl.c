@@ -129,16 +129,16 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	PHALCON_CALL_SELF(&uri, "geturi");
 	PHALCON_CALL_METHOD(&url, &uri, "build");
 
-	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY);
-	phalcon_read_property(&useragent, getThis(), SL("_useragent"), PH_NOISY);
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
-	phalcon_read_property(&files, getThis(), SL("_files"), PH_NOISY);
-	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY);
-	phalcon_read_property(&curl, getThis(), SL("_curl"), PH_NOISY);
-	phalcon_read_property(&username, getThis(), SL("_username"), PH_NOISY);
-	phalcon_read_property(&password, getThis(), SL("_password"), PH_NOISY);
-	phalcon_read_property(&authtype, getThis(), SL("_authtype"), PH_NOISY);
+	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&useragent, getThis(), SL("_useragent"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&files, getThis(), SL("_files"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&curl, getThis(), SL("_curl"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&username, getThis(), SL("_username"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&password, getThis(), SL("_password"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&authtype, getThis(), SL("_authtype"), PH_NOISY|PH_READONLY);
 
 	if ((constant = zend_get_constant_str(SL("CURLOPT_URL"))) == NULL) {
 		RETURN_FALSE;
@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		PHALCON_CALL_FUNCTION(NULL, "curl_setopt", &curl, constant, &useragent);
 	}
 
-	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY|PH_READONLY);
 
 	if (PHALCON_IS_NOT_EMPTY(&username)) {
 		if (PHALCON_IS_STRING(&authtype, "any")) {

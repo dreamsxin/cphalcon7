@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 			phalcon_ob_clean();
 		}
 
-		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY);
+		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &view, "setcontent", &contents);
 	}
 

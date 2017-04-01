@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Socket, getSocketId){
 	zval socket = {};
 	php_socket *php_sock;
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	if ((php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "epoll: can't fetch socket");
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Socket, _throwSocketException){
 
 	zval socket = {}, exception_code = {}, exception_message = {}, exception = {};
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(socket) == IS_RESOURCE) {
 		PHALCON_CALL_FUNCTION(&exception_code, "socket_last_error", &socket);
 	} else {
@@ -189,12 +189,12 @@ PHP_METHOD(Phalcon_Socket, setBlocking){
 
 	phalcon_fetch_params(0, 1, 0, &flag);
 
-	phalcon_read_property(&blocking, getThis(), SL("_blocking"), PH_NOISY);
+	phalcon_read_property(&blocking, getThis(), SL("_blocking"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(&blocking) == zend_is_true(flag)) {
 		RETURN_TRUE;
 	}
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(flag)) {
 		PHALCON_CALL_FUNCTION(return_value, "socket_set_block", &socket);
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Socket, setOption){
 
 	phalcon_fetch_params(0, 3, 0, &level, &optname, &optval);
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(return_value, "socket_set_option", &socket, level, optname, optval);
 
@@ -244,7 +244,7 @@ PHP_METHOD(Phalcon_Socket, close){
 
 	zval socket = {};
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(NULL, "socket_close", &socket);
 	phalcon_update_property_bool(getThis(), SL("_close"), 1);
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Socket, __destruct){
 
 	zval socket = {};
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(NULL, getThis(), "close");
 	phalcon_update_property_null(getThis(), SL("_socket"));
 	phalcon_update_property_bool(getThis(), SL("_close"), 1);

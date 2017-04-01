@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Assets_Resource, __construct){
 	phalcon_update_property_zval(getThis(), SL("_path"), path);
 	phalcon_update_property_zval(getThis(), SL("_local"), local);
 	phalcon_update_property_zval(getThis(), SL("_filter"), filter);
-	if (Z_TYPE_P(attributes) == IS_ARRAY) { 
+	if (Z_TYPE_P(attributes) == IS_ARRAY) {
 		phalcon_update_property_zval(getThis(), SL("_attributes"), attributes);
 	}
 }
@@ -428,24 +428,24 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		base_path = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&source_path, getThis(), SL("_sourcePath"), PH_NOISY);
+	phalcon_read_property(&source_path, getThis(), SL("_sourcePath"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&source_path)) {
-		phalcon_read_property(&source_path, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&source_path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	}
 
-	/** 
+	/**
 	 * A base path for resources can be set in the assets manager
 	 */
 	PHALCON_CONCAT_VV(&complete_path, base_path, &source_path);
 
-	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY);
+	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY|PH_READONLY);
 
-	/** 
+	/**
 	 * Local resources are loaded from the local disk
 	 */
 	if (zend_is_true(&local)) {
 
-		/** 
+		/**
 		 * Check first if the file is readable
 		 */
 		if (phalcon_file_exists(&complete_path) == FAILURE) {
@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		}
 	}
 
-	/** 
+	/**
 	 * Use file_get_contents to respect the openbase_dir. Access urls must be enabled
 	 */
 	phalcon_file_get_contents(return_value, &complete_path);
@@ -475,9 +475,9 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
 
 	zval target_uri = {};
 
-	phalcon_read_property(&target_uri, getThis(), SL("_targetUri"), PH_NOISY);
+	phalcon_read_property(&target_uri, getThis(), SL("_targetUri"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&target_uri)) {
-		phalcon_read_property(&target_uri, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&target_uri, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	}
 
 	RETURN_CTOR(&target_uri);
@@ -499,19 +499,19 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 		base_path = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&source_path, getThis(), SL("_sourcePath"), PH_NOISY);
+	phalcon_read_property(&source_path, getThis(), SL("_sourcePath"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&source_path)) {
-		phalcon_read_property(&source_path, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&source_path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY);
+	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&local)) {
-		/** 
+		/**
 		 * A base path for resources can be set in the assets manager
 		 */
 		PHALCON_CONCAT_VV(&complete_path, base_path, &source_path);
 
-		/** 
+		/**
 		 * Get the real template path
 		 */
 		phalcon_file_realpath(return_value, &complete_path);
@@ -537,19 +537,19 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 		base_path = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&target_path, getThis(), SL("_targetPath"), PH_NOISY);
+	phalcon_read_property(&target_path, getThis(), SL("_targetPath"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&target_path)) {
-		phalcon_read_property(&target_path, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&target_path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY);
+	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&local)) {
-		/** 
+		/**
 		 * A base path for resources can be set in the assets manager
 		 */
 		PHALCON_CONCAT_VV(&complete_path, base_path, &target_path);
 
-		/** 
+		/**
 		 * Get the real template path, the target path can optionally don't exist
 		 */
 		if (phalcon_file_exists(&complete_path) == SUCCESS) {

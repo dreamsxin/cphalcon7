@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, __construct){
 	phalcon_array_update_long_string(&messages, 415, SL("Unsupported Media Type"), PH_COPY);
 	phalcon_array_update_long_string(&messages, 416, SL("Requested Range Not Satisfiable"), PH_COPY);
 	phalcon_array_update_long_string(&messages, 417, SL("Expectation Failed"), PH_COPY);
-	
+
 	phalcon_array_update_long_string(&messages, 500, SL("Internal Server Error"), PH_COPY);
 	phalcon_array_update_long_string(&messages, 501, SL("Not Implemented"), PH_COPY);
 	phalcon_array_update_long_string(&messages, 502, SL("Bad Gateway"), PH_COPY);
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, addMultiple){
 
 	phalcon_fetch_params(0, 1, 0, &values);
 
-	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY);
+	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY|PH_READONLY);
 
 	phalcon_array_merge_recursive_n(&fields, values);
 
@@ -262,14 +262,14 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	if (PHALCON_IS_EMPTY(content)) {
 		RETURN_FALSE;
 	}
-	
+
 	if (Z_TYPE_P(content) == IS_STRING) {
 		phalcon_fast_explode_str(&content_parts, SL("\r\n"), content);
 	} else if (Z_TYPE_P(content) == IS_ARRAY) {
 		PHALCON_CPY_WRT_CTOR(&content_parts, content);
 	} else {
 		RETURN_FALSE;
-	}	
+	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(content_parts), header) {
 		zval header_parts = {}, val1 = {}, val2 = {}, trimmed = {};
@@ -312,12 +312,12 @@ PHP_METHOD(Phalcon_Http_Client_Header, build)
 	}
 
 	messages = phalcon_read_static_property_ce(phalcon_http_client_header_ce, SL("_messages"));
-	phalcon_read_property(&status_code, getThis(), SL("_status_code"), PH_NOISY);
+	phalcon_read_property(&status_code, getThis(), SL("_status_code"), PH_NOISY|PH_READONLY);
 
 	array_init(&lines);
-	
+
 	if ((f & PHALCON_HTTP_CLIENT_HEADER_BUILD_STATUS) && phalcon_array_isset_fetch(&message, messages, &status_code, 0)) {
-		phalcon_read_property(&version, getThis(), SL("_version "), PH_NOISY);
+		phalcon_read_property(&version, getThis(), SL("_version "), PH_NOISY|PH_READONLY);
 
 		PHALCON_CONCAT_SVS(&line, "HTTP/", &version, " ");
 		PHALCON_SCONCAT_VSV(&line, &status_code, " ", &message);
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, build)
 
 	}
 
-	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY);
+	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY|PH_READONLY);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, value) {
 		zval filed = {}, tmp = {};
@@ -354,6 +354,6 @@ PHP_METHOD(Phalcon_Http_Client_Header, count){
 
 	zval fields = {};
 
-	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY);
+	phalcon_read_property(&fields, getThis(), SL("_fields"), PH_NOISY|PH_READONLY);
 	phalcon_fast_count(return_value, &fields);
 }

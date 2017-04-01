@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Dialect class can override the default dialect
 	 */
 	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"))) {
-		phalcon_read_property(&dialect_type, getThis(), SL("_dialectType"), PH_NOISY);
+		phalcon_read_property(&dialect_type, getThis(), SL("_dialectType"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", &dialect_type);
 	}
@@ -846,7 +846,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnList){
 
 	phalcon_fetch_params(0, 1, 0, &column_list);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_METHOD(&dialect, "getcolumnlist", column_list);
 }
 
@@ -867,7 +867,7 @@ PHP_METHOD(Phalcon_Db_Adapter, limit){
 
 	phalcon_fetch_params(0, 2, 0, &sql_query, &number);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_METHOD(&dialect, "limit", sql_query, number);
 }
 
@@ -892,7 +892,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 		schema_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "tableexists", table_name, schema_name);
 
@@ -900,7 +900,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
 	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
 
-	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY);
+	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY|PH_READONLY);
 	RETURN_CTOR(&first);
 }
 
@@ -925,7 +925,7 @@ PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 		schema_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "viewexists", view_name, schema_name);
 
@@ -933,7 +933,7 @@ PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 
 	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
 
-	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY);
+	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY|PH_READONLY);
 	RETURN_CTOR(&first);
 }
 
@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Db_Adapter, forUpdate){
 
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_METHOD(&dialect, "forupdate", sql_query);
 }
 
@@ -965,7 +965,7 @@ PHP_METHOD(Phalcon_Db_Adapter, sharedLock){
 
 	phalcon_fetch_params(0, 1, 0, &sql_query);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_METHOD(&dialect, "sharedlock", sql_query);
 }
 
@@ -999,7 +999,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 		return;
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "createtable", table_name, schema_name, definition);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1027,7 +1027,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropTable){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "droptable", table_name, schema_name, if_exists);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1062,7 +1062,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 		return;
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "createview", view_name, definition, schema_name);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1090,7 +1090,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropView){
 		if_exists = &PHALCON_GLOBAL(z_true);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropview", view_name, schema_name, if_exists);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1110,7 +1110,7 @@ PHP_METHOD(Phalcon_Db_Adapter, addColumn){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "addcolumn", table_name, schema_name, column);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1130,7 +1130,7 @@ PHP_METHOD(Phalcon_Db_Adapter, modifyColumn){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "modifycolumn", table_name, schema_name, column);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1150,7 +1150,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropColumn){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &column_name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropcolumn", table_name, schema_name, column_name);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1170,7 +1170,7 @@ PHP_METHOD(Phalcon_Db_Adapter, addIndex){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "addindex", table_name, schema_name, index);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1190,7 +1190,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropIndex){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index_name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropindex", table_name, schema_name, index_name);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1210,7 +1210,7 @@ PHP_METHOD(Phalcon_Db_Adapter, addPrimaryKey){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &index);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "addprimarykey", table_name, schema_name, index);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1229,7 +1229,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropPrimaryKey){
 
 	phalcon_fetch_params(0, 2, 0, &table_name, &schema_name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropprimarykey", table_name, schema_name);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1249,7 +1249,7 @@ PHP_METHOD(Phalcon_Db_Adapter, addForeignKey){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "addforeignkey", table_name, schema_name, reference);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1269,7 +1269,7 @@ PHP_METHOD(Phalcon_Db_Adapter, dropForeignKey){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &reference_name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropforeignkey", table_name, schema_name, reference_name);
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
@@ -1287,7 +1287,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getColumnDefinition){
 
 	phalcon_fetch_params(0, 1, 0, &column);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_METHOD(&dialect, "getcolumndefinition", column);
 }
 
@@ -1311,7 +1311,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 		schema_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Get the SQL to list the tables
@@ -1359,7 +1359,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 		schema_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Get the SQL to list the tables
@@ -1411,7 +1411,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * We're using FETCH_NUM to fetch the columns
@@ -1432,8 +1432,8 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), index) {
 		zval key_name = {}, column_name = {};
-		phalcon_array_fetch_long(&key_name, index, 2, PH_NOISY);
-		phalcon_array_fetch_long(&column_name, index, 4, PH_NOISY);
+		phalcon_array_fetch_long(&key_name, index, 2, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&column_name, index, 4, PH_NOISY|PH_READONLY);
 		phalcon_array_append_multi_2(&indexes, &key_name, &column_name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
@@ -1480,7 +1480,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * We're using FETCH_NUM to fetch the columns
@@ -1502,10 +1502,10 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), reference) {
 		zval constraint_name = {}, referenced_schema = {}, referenced_table = {}, reference_array = {}, column_name = {}, referenced_columns = {};
-		phalcon_array_fetch_long(&constraint_name, reference, 2, PH_NOISY);
+		phalcon_array_fetch_long(&constraint_name, reference, 2, PH_NOISY|PH_READONLY);
 		if (!phalcon_array_isset(&references, &constraint_name)) {
-			phalcon_array_fetch_long(&referenced_schema, reference, 3, PH_NOISY);
-			phalcon_array_fetch_long(&referenced_table, reference, 4, PH_NOISY);
+			phalcon_array_fetch_long(&referenced_schema, reference, 3, PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_long(&referenced_table, reference, 4, PH_NOISY|PH_READONLY);
 
 			array_init_size(&reference_array, 4);
 			phalcon_array_update_str(&reference_array, SL("referencedSchema"), &referenced_schema, PH_COPY);
@@ -1515,10 +1515,10 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 			phalcon_array_update_zval(&references, &constraint_name, &reference_array, PH_COPY);
 		}
 
-		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY);
+		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY|PH_READONLY);
 		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("columns"), &column_name, 0);
 
-		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY);
+		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY|PH_READONLY);
 		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("referencedColumns"), &referenced_columns, 0);
 	} ZEND_HASH_FOREACH_END();
 
@@ -1532,10 +1532,10 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 			ZVAL_LONG(&name, idx);
 		}
 
-		phalcon_array_fetch_str(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY);
-		phalcon_array_fetch_str(&referenced_table, array_reference, SL("referencedTable"), PH_NOISY);
-		phalcon_array_fetch_str(&columns, array_reference, SL("columns"), PH_NOISY);
-		phalcon_array_fetch_str(&referenced_columns, array_reference, SL("referencedColumns"), PH_NOISY);
+		phalcon_array_fetch_str(&referenced_schema, array_reference, SL("referencedSchema"), PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_str(&referenced_table, array_reference, SL("referencedTable"), PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_str(&columns, array_reference, SL("columns"), PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_str(&referenced_columns, array_reference, SL("referencedColumns"), PH_NOISY|PH_READONLY);
 
 		array_init_size(&definition, 4);
 		phalcon_array_update_str(&definition, SL("referencedSchema"), &referenced_schema, PH_COPY);
@@ -1571,7 +1571,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 		schema_name = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "tableoptions", table_name, schema_name);
 	if (zend_is_true(&sql)) {
@@ -1579,7 +1579,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
 		PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_assoc);
 
-		phalcon_array_fetch_long(&first, &describe, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first, &describe, 0, PH_NOISY|PH_READONLY);
 		RETURN_CTOR(&first);
 	}
 
@@ -1598,7 +1598,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&supports_sp, &dialect, "supportssavepoints");
 	if (!zend_is_true(&supports_sp)) {
@@ -1622,7 +1622,7 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&supports_sp, &dialect, "supportssavepoints");
 	if (!zend_is_true(&supports_sp)) {
@@ -1651,7 +1651,7 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&supports_sp, &dialect, "supportssavepoints");
 	if (!zend_is_true(&supports_sp)) {
@@ -1675,13 +1675,13 @@ PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 
 	phalcon_fetch_params(0, 1, 0, &nested_transactions_with_savepoints);
 
-	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY);
+	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY|PH_READONLY);
 	if (PHALCON_GT_LONG(&transaction_level, 0)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Nested transaction with savepoints behavior cannot be changed while a transaction is open");
 		return;
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&supports_sp, &dialect, "supportssavepoints");
 	if (!zend_is_true(&supports_sp)) {
@@ -1714,7 +1714,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getNestedTransactionSavepointName){
 
 	zval transaction_level = {};
 
-	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY);
+	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY|PH_READONLY);
 	PHALCON_CONCAT_SV(return_value, "PHALCON_SAVEPOINT_", &transaction_level);
 }
 

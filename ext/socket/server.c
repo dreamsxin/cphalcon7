@@ -216,13 +216,13 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 	}
 
 	if (!_type || Z_TYPE_P(_type) == IS_NULL) {
-		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&type, _type);
 	}
 
 	if (!_protocol || Z_TYPE_P(_protocol) == IS_NULL) {
-		phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY);
+		phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&protocol, _protocol);
 	}
@@ -318,14 +318,14 @@ PHP_METHOD(Phalcon_Socket_Server, listen){
 	phalcon_fetch_params(0, 0, 1, &_backlog);
 
 	if (!_backlog) {
-		phalcon_read_property(&backlog, getThis(), SL("_backlog"), PH_NOISY);
+		phalcon_read_property(&backlog, getThis(), SL("_backlog"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&backlog, _backlog);
 	}
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
-	phalcon_read_property(&address, getThis(), SL("_address"), PH_NOISY);
-	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&address, getThis(), SL("_address"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(return_value, "socket_bind", &socket, &address, &port);
 	if (!PHALCON_IS_TRUE(return_value)) {
@@ -347,7 +347,7 @@ PHP_METHOD(Phalcon_Socket_Server, accept){
 
 	zval socket = {}, client_socket = {}, socket_id = {};
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&client_socket, "socket_accept", &socket);
 
@@ -602,11 +602,11 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		usec = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
-	phalcon_read_property(&maxlen, getThis(), SL("_maxlen"), PH_NOISY);
-	phalcon_read_property(&event, getThis(), SL("_event"), PH_NOISY);
-	phalcon_read_property(&daemon, getThis(), SL("_daemon"), PH_NOISY);
-	phalcon_read_property(&max_children, getThis(), SL("_maxChildren"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&maxlen, getThis(), SL("_maxlen"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&event, getThis(), SL("_event"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&daemon, getThis(), SL("_daemon"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&max_children, getThis(), SL("_maxChildren"), PH_NOISY|PH_READONLY);
 
 	if ((listen_php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "epoll: can't fetch master socket");
@@ -660,7 +660,7 @@ worker:
 
 			phalcon_array_append(&r_array, &socket, PH_COPY);
 
-			phalcon_read_property(&clients, getThis(), SL("_clients"), PH_NOISY);
+			phalcon_read_property(&clients, getThis(), SL("_clients"), PH_NOISY|PH_READONLY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(clients), client) {
 				zval client_socket = {};

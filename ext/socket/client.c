@@ -146,13 +146,13 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 			PHALCON_CPY_WRT_CTOR(&domain, _domain);
 		}
 		if (!_type || Z_TYPE_P(_type) == IS_NULL) {
-			phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+			phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 		} else {
 			PHALCON_CPY_WRT_CTOR(&type, _type);
 		}
 
 		if (!_protocol || Z_TYPE_P(_protocol) == IS_NULL) {
-			phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY);
+			phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY|PH_READONLY);
 		} else {
 			PHALCON_CPY_WRT_CTOR(&protocol, _protocol);
 		}
@@ -176,15 +176,15 @@ PHP_METHOD(Phalcon_Socket_Client, connect){
 
 	zval address = {}, port = {}, socket = {};
 
-	phalcon_read_property(&address, getThis(), SL("_address"), PH_NOISY);
-	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY);
+	phalcon_read_property(&address, getThis(), SL("_address"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY|PH_READONLY);
 
 	if (!zend_is_true(&address)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "The socket cant't connect");
 		RETURN_FALSE;
 	}
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(return_value, "socket_connect", &socket, &address, &port);
 	if (!PHALCON_IS_TRUE(return_value)) {
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Socket_Client, read){
 
 	phalcon_fetch_params(0, 1, 1, &length, &type);
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	if (!type) {
 		PHALCON_CALL_FUNCTION(return_value, "socket_read", &socket, length);
@@ -239,7 +239,7 @@ PHP_METHOD(Phalcon_Socket_Client, write){
 		len = Z_LVAL_P(length);
 	}
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	ZVAL_LONG(&ret, 0);
 	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
@@ -274,7 +274,7 @@ PHP_METHOD(Phalcon_Socket_Client, recv){
 
 	phalcon_fetch_params(0, 2, 0, &length, &flag);
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&ret, "socket_recv", &socket, return_value, length, flag);
 
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 
 	phalcon_fetch_params(0, 3, 0, &buffer, &length, &flag);
 
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY);
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	ZVAL_LONG(&ret, 0);
 	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);

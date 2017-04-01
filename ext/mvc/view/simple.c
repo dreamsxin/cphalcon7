@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 		array_init(&engines);
 
 		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-		phalcon_read_property(&registered_engines, getThis(), SL("_registeredEngines"), PH_NOISY);
+		phalcon_read_property(&registered_engines, getThis(), SL("_registeredEngines"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(registered_engines) != IS_ARRAY) {
 			/**
 			 * We use Phalcon\Mvc\View\Engine\Php as default
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		absolute_path = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		phalcon_update_property_zval(getThis(), SL("_activeRenderPath"), view_path);
 	}
@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	if (zend_is_true(absolute_path)) {
 		phalcon_array_append(&views_dir_paths, view_path, PH_COPY);
 	} else {
-		phalcon_read_property(&views_dir, getThis(), SL("_viewsDir"), PH_NOISY);
+		phalcon_read_property(&views_dir, getThis(), SL("_viewsDir"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(views_dir) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir), path) {
 				PHALCON_CONCAT_VV(&views_dir_path, path, view_path);
@@ -536,19 +536,19 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 		 */
 		PHALCON_CALL_METHOD(&is_started, &cache, "isstarted");
 		if (PHALCON_IS_FALSE(&is_started)) {
-			phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY);
+			phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
 
 			/**
 			 * Check if the user has defined a different options to the default
 			 */
 			if (Z_TYPE(cache_options) == IS_ARRAY) {
 				if (phalcon_array_isset_str(&cache_options, SL("key"))) {
-					phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY);
+					phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY|PH_READONLY);
 				} else {
 					ZVAL_NULL(&key);
 				}
 				if (phalcon_array_isset_str(&cache_options, SL("lifetime"))) {
-					phalcon_array_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_NOISY);
+					phalcon_array_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_NOISY|PH_READONLY);
 				} else {
 					ZVAL_NULL(&lifetime);
 				}
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 
 	phalcon_ob_start();
 
-	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Merge parameters
@@ -656,7 +656,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 	/**
 	 * If the developer pass an array of variables we create a new virtual symbol table
 	 */
-	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE_P(params) == IS_ARRAY) {
 		/**
 		 * Merge or assign the new params as parameters
@@ -682,7 +682,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 
 	phalcon_ob_end_clean();
 
-	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY);
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Content is output to the parent view
@@ -732,7 +732,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 		return;
 	}
 
-	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY);
+	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(cache_options) != IS_ARRAY || !phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"))) {
 		ZVAL_STRING(&cache_service, "viewCache");
 	}
@@ -853,7 +853,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(view_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &view_params, params);
 		} else {
@@ -973,7 +973,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, stopSection){
 
 	phalcon_ob_get_clean(&content);
 
-	phalcon_read_property(&sections, getThis(), SL("_sections"), PH_NOISY);
+	phalcon_read_property(&sections, getThis(), SL("_sections"), PH_NOISY|PH_READONLY);
 
 	array = Z_ARRVAL(sections);
 
@@ -1053,7 +1053,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(return_value, &params, key, 0)) {
 		RETURN_NULL();
 	}

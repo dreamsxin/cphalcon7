@@ -155,8 +155,8 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 		ZVAL_COPY_VALUE(&syslog_type, type);
 		ZVAL_COPY_VALUE(&syslog_message, &applied_format);
 	} else {
-		phalcon_array_fetch_long(&syslog_type, &applied_format, 0, PH_NOISY);
-		phalcon_array_fetch_long(&syslog_message, &applied_format, 1, PH_NOISY);
+		phalcon_array_fetch_long(&syslog_type, &applied_format, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&syslog_message, &applied_format, 1, PH_NOISY|PH_READONLY);
 	}
 
 	PHALCON_CALL_FUNCTION(NULL, "syslog", &syslog_type, &syslog_message);
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, close){
 
 	zval opened = {};
 
-	phalcon_read_property(&opened, getThis(), SL("_opened"), PH_NOISY);
+	phalcon_read_property(&opened, getThis(), SL("_opened"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&opened)) {
 		PHALCON_CALL_FUNCTION(NULL, "closelog");
 	}

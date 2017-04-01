@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 
@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 
@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	zval metadata_dir = {}, pattern = {}, iterator = {};
 	zend_object_iterator *it;
 
-	phalcon_read_property(&metadata_dir, getThis(), SL("_metaDataDir"), PH_NOISY);
+	phalcon_read_property(&metadata_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VS(&pattern, &metadata_dir, "meta-*.php");
 

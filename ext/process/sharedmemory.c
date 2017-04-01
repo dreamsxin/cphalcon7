@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, isOpen){
 	zval shm = {};
 	phalcon_shared_memory *m;
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, getSize){
 	zval shm = {};
 	phalcon_shared_memory *m;
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;
@@ -170,8 +170,8 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, open){
 	zval name = {}, shm = {};
 	phalcon_shared_memory *m;
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Already create or open shared memory");
@@ -198,8 +198,8 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, create){
 
 	phalcon_fetch_params(0, 1, 0, &size);
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Already create or open shared memory");
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, lock){
 		blocking = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, unlock){
 		force = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;
@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, read){
 	char *mem;
 	size_t size, value_size;
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, write){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY);
+	phalcon_read_property(&shm, getThis(), SL("_shm"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(shm) != IS_RESOURCE) {
 		RETURN_FALSE;

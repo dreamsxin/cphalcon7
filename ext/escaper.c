@@ -276,8 +276,8 @@ PHP_METHOD(Phalcon_Escaper, escapeHtml){
 	phalcon_fetch_params(0, 1, 0, &text);
 
 	if (Z_TYPE_P(text) == IS_STRING) {
-		phalcon_read_property(&html_quote_type, getThis(), SL("_htmlQuoteType"), PH_NOISY);
-		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY);
+		phalcon_read_property(&html_quote_type, getThis(), SL("_htmlQuoteType"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY|PH_READONLY);
 
 		phalcon_htmlspecialchars(return_value, text, &html_quote_type, &encoding);
 		return;
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Escaper, escapeHtmlAttr){
 	if (Z_TYPE_P(attribute) == IS_STRING && zend_is_true(attribute)) {
 		ZVAL_LONG(&quoting, ENT_QUOTES);
 
-		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY);
+		phalcon_read_property(&encoding, getThis(), SL("_encoding"), PH_NOISY|PH_READONLY);
 
 		phalcon_htmlspecialchars(return_value, attribute, &quoting, &encoding);
 		return;

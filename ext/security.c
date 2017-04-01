@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Security, hash)
 	PHALCON_ENSURE_IS_STRING(password);
 
 	if (!work_factor || Z_TYPE_P(work_factor) == IS_NULL) {
-		phalcon_read_property(&_work_factor, getThis(), SL("_workFactor"), PH_NOISY);
+		phalcon_read_property(&_work_factor, getThis(), SL("_workFactor"), PH_NOISY|PH_READONLY);
 		work_factor = &_work_factor;
 	}
 

@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	zval callable_open = {}, callable_close = {}, callable_read = {}, callable_write = {}, callable_destroy = {}, callable_gc = {};
 //#endif
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "The options must be an array");
@@ -209,8 +209,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, read){
 
 	phalcon_fetch_params(0, 1, 0, &sid);
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(return_value, &cache, "get", sid, &lifetime);
 	if (Z_TYPE_P(return_value)!=IS_STRING) {
@@ -229,8 +229,8 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, write){
 
 	phalcon_fetch_params(0, 2, 0, &sid, &data);
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(return_value, &cache, "save", sid, data, &lifetime);
 }
@@ -253,7 +253,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy){
 		ZVAL_COPY_VALUE(&sid, _sid);
 	}
 
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY);
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_RETURN_CALL_METHOD(&cache, "delete", &sid);
 }

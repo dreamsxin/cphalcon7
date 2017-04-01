@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, insert){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, remove){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -220,7 +220,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, replace){
 
 	phalcon_fetch_params(0, 2, 0, &old_value, &new_value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, find){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, first){
 	phalcon_intrusive_rbtree_node_object *node_object;
 	struct phalcon_rbtree_node *n;
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -345,7 +345,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, last){
 	phalcon_intrusive_rbtree_node_object *node_object;
 	struct phalcon_rbtree_node *n;
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, prev){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, next){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY);
+	phalcon_read_property(&zid, getThis(), SL("_rbtree"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(zid) == IS_NULL) {
 		RETURN_FALSE;

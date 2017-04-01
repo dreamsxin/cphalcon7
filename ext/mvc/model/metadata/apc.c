@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", &prefix, key);
 
@@ -134,11 +134,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, write){
 
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&apc_key, "$PMM$", &prefix, key);
 
-	phalcon_read_property(&ttl, getThis(), SL("_ttl"), PH_NOISY);
+	phalcon_read_property(&ttl, getThis(), SL("_ttl"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_FUNCTION(NULL, "apc_store", &apc_key, data, &ttl);
 }
 
@@ -148,10 +148,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Apc, reset){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_read_property(&meta, getThis(), SL("_metaData"), PH_NOISY);
+	phalcon_read_property(&meta, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(meta) == IS_ARRAY) {
-		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(meta), idx, str_key) {
 			zval key = {}, real_key = {};

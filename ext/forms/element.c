@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 
-	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
+	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(filters) == IS_ARRAY) {
 		phalcon_update_property_array_append(getThis(), SL("_filters"), filter);
 	} else {
@@ -313,7 +313,7 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&current_validators, getThis(), SL("_validators"), PH_NOISY);
+		phalcon_read_property(&current_validators, getThis(), SL("_validators"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(current_validators) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_validators, &current_validators, validators);
 		} else {
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 		use_checked = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Create an array of parameters
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	/**
 	 * Merge passed parameters with default ones
 	 */
-	phalcon_read_property(&default_attributes, getThis(), SL("_attributes"), PH_NOISY);
+	phalcon_read_property(&default_attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(default_attributes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&merged_attributes, &default_attributes, &widget_attributes);
 	} else {
@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY);
+	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&value, &attributes, attribute, 0)) {
 		RETURN_CTOR(&value);
 	}
@@ -507,7 +507,7 @@ PHP_METHOD(Phalcon_Forms_Element, getAttributes){
 
 	zval attributes = {};
 
-	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY);
+	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(attributes) != IS_ARRAY) {
 		array_init(return_value);
 		return;
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&value, &options, option, 0)) {
 		RETURN_CTOR(&value);
 	}
@@ -705,12 +705,12 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 
 	zval name = {}, form = {}, has_default_value = {}, value = {};
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Get the related form
 	 */
-	phalcon_read_property(&form, getThis(), SL("_form"), PH_NOISY);
+	phalcon_read_property(&form, getThis(), SL("_form"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(form) == IS_OBJECT) {
 		/**
 		 * Check if the tag has a default value
@@ -747,7 +747,7 @@ PHP_METHOD(Phalcon_Forms_Element, getMessages){
 	/**
 	 * Get the related form
 	 */
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(messages) == IS_OBJECT) {
 		RETURN_CTOR(&messages);
 	}
@@ -770,7 +770,7 @@ PHP_METHOD(Phalcon_Forms_Element, hasMessages){
 	/**
 	 * Get the related form
 	 */
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(messages) == IS_OBJECT) {
 		if (phalcon_fast_count_ev(&messages)) {
 			RETURN_TRUE;
@@ -834,7 +834,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 PHP_METHOD(Phalcon_Forms_Element, clear)
 {
 	zval name = {};
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_tag_ce, "setdefault", &name, &PHALCON_GLOBAL(z_null));
 	RETURN_THIS();
 }
@@ -848,16 +848,16 @@ PHP_METHOD(Phalcon_Forms_Element, toArray)
 {
 	zval name = {}, type = {}, value = {}, label = {}, attributes = {}, validators = {}, filters = {}, options = {}, options_values = {}, messages = {};
 
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY);
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
-	phalcon_read_property(&value, getThis(), SL("_value"), PH_NOISY);
-	phalcon_read_property(&label, getThis(), SL("_label"), PH_NOISY);
-	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY);
-	phalcon_read_property(&validators, getThis(), SL("_validators"), PH_NOISY);
-	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
-	phalcon_read_property(&options_values, getThis(), SL("_optionsValues"), PH_NOISY);
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&value, getThis(), SL("_value"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&label, getThis(), SL("_label"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&validators, getThis(), SL("_validators"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&options_values, getThis(), SL("_optionsValues"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 
 	array_init(return_value);
 	if (PHALCON_IS_NOT_EMPTY(&name)) {
@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Forms_Element, render){
 
 	zval type = {};
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	phalcon_forms_element_render_helper(Z_STRVAL(type), 1, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 

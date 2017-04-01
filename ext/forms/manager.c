@@ -81,7 +81,7 @@ static zval* phalcon_forms_manager_read_dimension(zval *object, zval *offset, in
 		return &EG(uninitialized_zval);
 	}
 
-	phalcon_read_property(&forms, object, SL("_forms"), PH_NOISY);
+	phalcon_read_property(&forms, object, SL("_forms"), PH_NOISY|PH_READONLY);
 	if (UNEXPECTED(Z_TYPE(forms)) != IS_ARRAY) {
 		return &EG(uninitialized_zval);
 	}
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Forms_Manager, get){
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	phalcon_read_property(&forms, getThis(), SL("_forms"), PH_NOISY);
+	phalcon_read_property(&forms, getThis(), SL("_forms"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(&form, &forms, name, 0)) {
 		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "There is no form with name='%s'", Z_STRVAL_P(name));
 		return;
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Forms_Manager, has){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&forms, getThis(), SL("_forms"), PH_NOISY);
+	phalcon_read_property(&forms, getThis(), SL("_forms"), PH_NOISY|PH_READONLY);
 	RETURN_BOOL(phalcon_array_isset(&forms, name));
 }
 

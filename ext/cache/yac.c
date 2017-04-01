@@ -433,7 +433,7 @@ PHP_METHOD(Phalcon_Cache_Yac, set){
 		lifetime = &PHALCON_GLOBAL(z_zero);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		ret = phalcon_cache_yac_add_multi_impl(Z_STR(prefix), keys, Z_LVAL_P(lifetime), 0);
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Cache_Yac, get)
 
 	phalcon_fetch_params(0, 1, 0, &keys);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		ret = phalcon_cache_yac_get_multi_impl(Z_STR(prefix), keys, return_value);
@@ -504,7 +504,7 @@ PHP_METHOD(Phalcon_Cache_Yac, delete)
 		lifetime = &PHALCON_GLOBAL(z_zero);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(keys) == IS_ARRAY) {
 		phalcon_cache_yac_delete_multi_impl(Z_STRVAL(prefix), Z_STRLEN(prefix), keys, Z_LVAL_P(lifetime));
@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Cache_Yac, __set)
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	phalcon_cache_yac_add_impl(Z_STR(prefix), Z_STR_P(key), value, 0, 0);
 }
@@ -609,7 +609,7 @@ PHP_METHOD(Phalcon_Cache_Yac, __get)
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(key) == IS_STRING) {
 		ret = phalcon_cache_yac_get_impl(Z_STR(prefix), Z_STR_P(key), return_value);

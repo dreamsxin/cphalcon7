@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, read){
 	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
 
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&cache, "get", key, &lifetime);
 	} else {
 		RETURN_NULL();
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, write){
 	PHALCON_CALL_METHOD(&cache, getThis(), "_getcache");
 
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY);
+		phalcon_read_property(&lifetime, getThis(), SL("_lifetime"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &cache, "save", key, data, &lifetime);
 	}
 }

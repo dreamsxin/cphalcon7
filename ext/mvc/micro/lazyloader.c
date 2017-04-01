@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
 	phalcon_return_property(&handler, getThis(), SL("_handler"));
 	if (Z_TYPE(handler) != IS_OBJECT) {
-		phalcon_read_property(&definition, getThis(), SL("_definition"), PH_NOISY);
+		phalcon_read_property(&definition, getThis(), SL("_definition"), PH_NOISY|PH_READONLY);
 		ce0 = phalcon_fetch_class(&definition, ZEND_FETCH_CLASS_DEFAULT);
 
 		PHALCON_OBJECT_INIT(&handler, ce0);
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 	phalcon_array_append(&call_handler, &handler, PH_COPY);
 	phalcon_array_append(&call_handler, method, PH_COPY);
 
-	/** 
+	/**
 	 * Call the handler
 	 */
 	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &call_handler, arguments);

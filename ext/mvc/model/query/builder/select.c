@@ -194,7 +194,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
  *    // or 'limit' => array(20, 20),
  *);
  *$queryBuilder = new Phalcon\Mvc\Model\Query\Builder\Select($params);
- *</code> 
+ *</code>
  *
  * @param array $params
  * @param Phalcon\Di $dependencyInjector
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
-	/** 
+	/**
 	 * Update the dependency injector if any
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
-		/** 
+		/**
 		 * Process conditions
 		 */
 		if (phalcon_array_isset_fetch_str(&conditions, params, SL("conditions")) || phalcon_array_isset_fetch_long(&conditions, params, 0)) {
@@ -229,14 +229,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 			PHALCON_CALL_METHOD(NULL, getThis(), "setbindtypes", &bind_types);
 		}
 
-		/** 
+		/**
 		 * Assign 'FROM' clause
 		 */
 		if (phalcon_array_isset_fetch_str(&models, params, SL("models"))) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "from", &models);
 		}
 
-		/** 
+		/**
 		 * Assign COLUMNS clause
 		 */
 		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
@@ -250,28 +250,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 			phalcon_update_property_zval(getThis(), SL("_joins"), &joins);
 		}
 
-		/** 
+		/**
 		 * Assign GROUP clause
 		 */
 		if (phalcon_array_isset_fetch_str(&group_clause, params, SL("group"))) {
 			phalcon_update_property_zval(getThis(), SL("_group"), &group_clause);
 		}
 
-		/** 
+		/**
 		 * Assign HAVING clause
 		 */
 		if (phalcon_array_isset_fetch_str(&having_clause, params, SL("having"))) {
 			phalcon_update_property_zval(getThis(), SL("_having"), &having_clause);
 		}
 
-		/** 
+		/**
 		 * Assign ORDER clause
 		 */
 		if (phalcon_array_isset_fetch_str(&order_clause, params, SL("order"))) {
 			phalcon_update_property_zval(getThis(), SL("_order"), &order_clause);
 		}
 
-		/** 
+		/**
 		 * Assign LIMIT clause
 		 */
 		if (phalcon_array_isset_fetch_str(&limit_clause, params, SL("limit"))) {
@@ -286,21 +286,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 			}
 		}
 
-		/** 
+		/**
 		 * Assign OFFSET clause
 		 */
 		if (phalcon_array_isset_fetch_str(&offset_clause, params, SL("offset"))) {
 			phalcon_update_property_zval(getThis(), SL("_offset"), &offset_clause);
 		}
 
-		/** 
+		/**
 		 * Assign FOR UPDATE clause
 		 */
 		if (phalcon_array_isset_fetch_str(&for_update, params, SL("for_update"))) {
 			phalcon_update_property_zval(getThis(), SL("_forUpdate"), &for_update);
 		}
 
-		/** 
+		/**
 		 * Assign SHARED LOCK clause
 		 */
 		if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("shared_lock"))) {
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY);
+		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(models) != IS_ARRAY) {
 			array_init(&models);
 		}
@@ -630,8 +630,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY);
-	if (Z_TYPE(models) == IS_ARRAY) { 
+	phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(models) == IS_ARRAY) {
 		if (!phalcon_fast_count_ev(&models)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 			return;
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 
 	PHALCON_CALL_SELF(&conditions, "getConditions");
 
-	phalcon_read_property(&distinct, getThis(), SL("_distinct"), PH_NOISY);
+	phalcon_read_property(&distinct, getThis(), SL("_distinct"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_BOOL(&distinct)) {
 		if (Z_TYPE(distinct) == IS_TRUE) {
 			ZVAL_STRING(&phql, "SELECT DISTINCT ");
@@ -654,15 +654,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 		ZVAL_STRING(&phql, "SELECT ");
 	}
 
-	phalcon_read_property(&columns, getThis(), SL("_columns"), PH_NOISY);
+	phalcon_read_property(&columns, getThis(), SL("_columns"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(columns) != IS_NULL) {
-		/** 
+		/**
 		 * Generate PHQL for columns
 		 */
-		if (Z_TYPE(columns) == IS_ARRAY) { 
+		if (Z_TYPE(columns) == IS_ARRAY) {
 
 			array_init(&selected_columns);
-			
+
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
 				zval column_alias = {}, aliased_column = {};
 				if (str_key) {
@@ -685,7 +685,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 			phalcon_concat_self(&phql, &columns);
 		}
 	} else {
-		/** 
+		/**
 		 * Automatically generate an array of models
 		 */
 		if (Z_TYPE(models) == IS_ARRAY) {
@@ -714,10 +714,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 		}
 	}
 
-	/** 
+	/**
 	 * Join multiple models or use a single one if it is a string
 	 */
-	if (Z_TYPE(models) == IS_ARRAY) { 
+	if (Z_TYPE(models) == IS_ARRAY) {
 		array_init(&selected_models);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(models), idx, str_key, model) {
@@ -742,34 +742,34 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 		PHALCON_SCONCAT_SVS(&phql, " FROM [", &models, "]");
 	}
 
-	/** 
+	/**
 	 * Check if joins were passed to the builders
 	 */
-	phalcon_read_property(&joins, getThis(), SL("_joins"), PH_NOISY);
+	phalcon_read_property(&joins, getThis(), SL("_joins"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(joins) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(joins), join) {
 			zval join_model = {}, join_conditions = {}, join_alias = {}, join_type = {};
-			/** 
+			/**
 			 * The joined table is in the first place of the array
 			 */
-			phalcon_array_fetch_long(&join_model, join, 0, PH_NOISY);
+			phalcon_array_fetch_long(&join_model, join, 0, PH_NOISY|PH_READONLY);
 
-			/** 
+			/**
 			 * The join conditions are in the second place of the array
 			 */
-			phalcon_array_fetch_long(&join_conditions, join, 1, PH_NOISY);
+			phalcon_array_fetch_long(&join_conditions, join, 1, PH_NOISY|PH_READONLY);
 
-			/** 
+			/**
 			 * The join alias is in the second place of the array
 			 */
-			phalcon_array_fetch_long(&join_alias, join, 2, PH_NOISY);
+			phalcon_array_fetch_long(&join_alias, join, 2, PH_NOISY|PH_READONLY);
 
-			/** 
+			/**
 			 * Join type
 			 */
-			phalcon_array_fetch_long(&join_type, join, 3, PH_NOISY);
+			phalcon_array_fetch_long(&join_type, join, 3, PH_NOISY|PH_READONLY);
 
-			/** 
+			/**
 			 * Create the join according to the type
 			 */
 			if (zend_is_true(&join_type)) {
@@ -778,14 +778,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 				PHALCON_SCONCAT_SVS(&phql, " JOIN [", &join_model, "]");
 			}
 
-			/** 
+			/**
 			 * Alias comes first
 			 */
 			if (zend_is_true(&join_alias)) {
 				PHALCON_SCONCAT_SVS(&phql, " AS [", &join_alias, "]");
 			}
 
-			/** 
+			/**
 			 * Conditions then
 			 */
 			if (zend_is_true(&join_conditions)) {
@@ -794,37 +794,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	/** 
+	/**
 	 * Only append conditions if it's string
 	 */
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
 	}
 
-	/** 
+	/**
 	 * Process group parameters
 	 */
-	phalcon_read_property(&group, getThis(), SL("_group"), PH_NOISY);
+	phalcon_read_property(&group, getThis(), SL("_group"), PH_NOISY|PH_READONLY);
 	phalcon_orm_phql_build_group(&phql, &group);
 
 	/* Process HAVING clause */
-	phalcon_read_property(&having, getThis(), SL("_having"), PH_NOISY);
+	phalcon_read_property(&having, getThis(), SL("_having"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(having) != IS_NULL) {
 		if (PHALCON_IS_NOT_EMPTY(&having)) {
 			PHALCON_SCONCAT_SV(&phql, " HAVING ", &having);
 		}
 	}
 
-	/** 
+	/**
 	 * Process order clause
 	 */
-	phalcon_read_property(&order, getThis(), SL("_order"), PH_NOISY);
+	phalcon_read_property(&order, getThis(), SL("_order"), PH_NOISY|PH_READONLY);
 	phalcon_orm_phql_build_order(&phql, &order);
 
-	/** 
+	/**
 	 * Process limit parameters
 	 */
-	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY);
+	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
 		phalcon_return_property(&offset, getThis(), SL("_offset"));
 		if (PHALCON_IS_NOT_EMPTY(&offset)) {
@@ -834,10 +834,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 
 	phalcon_orm_phql_build_limit(&phql, &limit);
 
-	/** 
+	/**
 	 * Process FOR UPDATE clause
 	 */
-	phalcon_read_property(&for_update, getThis(), SL("_forUpdate"), PH_NOISY);
+	phalcon_read_property(&for_update, getThis(), SL("_forUpdate"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&for_update)) {
 		phalcon_concat_self_str(&phql, SL(" FOR UPDATE"));
 	}

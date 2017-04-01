@@ -78,11 +78,11 @@ PHP_METHOD(Phalcon_Logger_Item, __construct){
 	zval *message, *type, *time = NULL, *context = NULL;
 
 	phalcon_fetch_params(0, 2, 2, &message, &type, &time, &context);
-	
+
 	if (!time) {
 		time = &PHALCON_GLOBAL(z_zero);
 	}
-	
+
 	phalcon_update_property_zval(getThis(), SL("_message"), message);
 	phalcon_update_property_zval(getThis(), SL("_type"), type);
 	phalcon_update_property_zval(getThis(), SL("_time"), time);
@@ -128,8 +128,8 @@ PHP_METHOD(Phalcon_Logger_Item, getTime){
 PHP_METHOD(Phalcon_Logger_Item, getContext) {
 
 	zval context = {};
-	
-	phalcon_read_property(&context, getThis(), SL("_context"), PH_NOISY);
+
+	phalcon_read_property(&context, getThis(), SL("_context"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(context) == IS_ARRAY) {
 		RETURN_ZVAL(&context, 1, 0);

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
 	if (!_prefix || Z_TYPE_P(_prefix) != IS_NULL) {
-		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&prefix, _prefix);
 	}

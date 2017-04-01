@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	phalcon_fetch_params(0, 0, 1, &desc);
 
 	if (!desc || !zend_is_true(desc)) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&descriptor, desc);
 	}
@@ -161,14 +161,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
 	if (!_schema || !zend_is_true(_schema)) {
-		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&schema, _schema);
 	}
 
 	array_init(&columns);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "describecolumns", table, &schema);
 
@@ -189,22 +189,22 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
-		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY);
+		phalcon_array_fetch_long(&char_size, field, 2, PH_NOISY|PH_READONLY);
 		if (Z_TYPE(char_size) != IS_NULL) {
 			convert_to_long(&char_size);
 		}
 
-		phalcon_array_fetch_long(&numeric_size, field, 3, PH_NOISY);
+		phalcon_array_fetch_long(&numeric_size, field, 3, PH_NOISY|PH_READONLY);
 		if (phalcon_is_numeric(&numeric_size)) {
 			convert_to_long(&numeric_size);
 		}
 
-		phalcon_array_fetch_long(&numeric_scale, field, 4, PH_NOISY);
+		phalcon_array_fetch_long(&numeric_scale, field, 4, PH_NOISY|PH_READONLY);
 		if (phalcon_is_numeric(&numeric_scale)) {
 			convert_to_long(&numeric_scale);
 		}
 
-		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
+		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Check the column type to get the correct Phalcon type
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 			 * ARRAY
 			 */
 			if (phalcon_memnstr_str(&column_type, SL("ARRAY"))) {
-				phalcon_array_fetch_long(&element_type, field, 9, PH_NOISY);
+				phalcon_array_fetch_long(&element_type, field, 9, PH_NOISY|PH_READONLY);
 				if (phalcon_memnstr_str(&element_type, SL("char"))) {
 					phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_ARRAY, 0);
 				} else {
@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		/**
 		 * Check if the field is primary key
 		 */
-		phalcon_array_fetch_long(&attribute, field, 6, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 6, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "PRI")) {
 			phalcon_array_update_str_bool(&definition, SL("primary"), 1, 0);
 		}
@@ -460,7 +460,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		/**
 		 * Check if the column allows null values
 		 */
-		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "NO")) {
 			phalcon_array_update_str_bool(&definition, SL("notNull"), 1, 0);
 		}
@@ -468,14 +468,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		/**
 		 * Check if the column is auto increment
 		 */
-		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 7, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "auto_increment")) {
 			phalcon_array_update_str_bool(&definition, SL("autoIncrement"), 1, 0);
 		} else if (PHALCON_IS_NOT_EMPTY(&attribute)) {
 			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
 
-		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
+		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Create a Phalcon\Db\Column to abstract the column

@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setHeader){
 
 	phalcon_fetch_params(0, 1, 0, &headers);
 
-	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(NULL, &header, "parse", headers);
 
 	RETURN_THIS();
@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, getHeader){
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setBody){
-	
+
 	zval *body;
 
 	phalcon_fetch_params(0, 1, 0, &body);
@@ -163,13 +163,13 @@ PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){
-	
+
 	zval *status_code, header = {};
 
 	phalcon_fetch_params(0, 1, 0, &status_code);
 
-	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
-	
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY|PH_READONLY);
+
 	PHALCON_CALL_METHOD(NULL, &header, "setstatuscode", status_code);
 
 	RETURN_THIS();
@@ -178,8 +178,8 @@ PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){
 PHP_METHOD(Phalcon_Http_Client_Response, getStatusCode){
 
 	zval header = {};
-	
-	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY);
+
+	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY|PH_READONLY);
 
 	PHALCON_RETURN_CALL_METHOD(&header, "getstatuscode");
 }

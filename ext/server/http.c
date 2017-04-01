@@ -308,7 +308,7 @@ static void phalcon_server_http_process_read(struct phalcon_server_context *ctx,
 				if (EG(exception)) {
 					zval ex, msg;
 					ZVAL_OBJ(&ex, EG(exception));
-					phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY);
+					phalcon_read_property(&msg, &ex, SL("message"), PH_NOISY|PH_READONLY);
 					if (Z_TYPE(msg) == IS_STRING) {
 						PHALCON_SERVER_STRING_APPEND(client_ctx->response, Z_STR(msg));
 					}

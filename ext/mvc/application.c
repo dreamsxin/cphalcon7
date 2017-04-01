@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/**
 		 * Check if the module passed by the router is registered in the modules container
 		 */
-		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
+		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 			convert_to_string(&module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL(module_name));
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/**
 	 * Check whether use implicit views or not
 	 */
-	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY);
+	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY|PH_READONLY);
 
 	/*
 	 * The safe way is to use a flag because it *might* be possible to alter the value

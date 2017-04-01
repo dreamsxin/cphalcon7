@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Registry, count){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	phalcon_fast_count(return_value, &data);
 }
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Registry, current){
 
 	zval data = {}, *callback;
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	if ((callback = zend_hash_get_current_data(Z_ARRVAL(data))) != NULL) {
 		RETURN_ZVAL(callback, 1, 0);
 	}
@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Registry, key){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	zend_hash_get_current_key_zval(Z_ARRVAL(data), return_value);
 }
 
@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Registry, next){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	zend_hash_move_forward(Z_ARRVAL(data));
 }
 
@@ -313,7 +313,7 @@ PHP_METHOD(Phalcon_Registry, rewind){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	zend_hash_internal_pointer_reset(Z_ARRVAL(data));
 }
 
@@ -324,7 +324,7 @@ PHP_METHOD(Phalcon_Registry, valid){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	RETURN_BOOL(zend_hash_has_more_elements(Z_ARRVAL(data)));
 }
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Registry, serialize){
 
 	zval data = {};
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	smart_str buf = { 0 };
 	php_serialize_data_t var_hash;
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Registry, unserialize){
 	phalcon_fetch_params(0, 1, 0, &str);
 	PHALCON_ENSURE_IS_STRING(str);
 
-	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	if (zend_hash_num_elements(Z_ARRVAL(data))) {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Cannot call unserialize() on an already constructed object");

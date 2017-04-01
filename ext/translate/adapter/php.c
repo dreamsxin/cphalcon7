@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, query){
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY);
+	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(&translation, &translate, index, 0)) {
 		PHALCON_CPY_WRT_CTOR(&translation, index);
 	}
@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, exists){
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
-	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY);
+	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&translate, index)) {
 		RETURN_TRUE;
 	}

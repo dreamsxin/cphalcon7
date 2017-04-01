@@ -275,8 +275,8 @@ PHP_METHOD(Phalcon_Validation, validate){
 			return;
 		}
 
-		phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY);
-		phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY|PH_READONLY);
 		if (Z_TYPE(validator) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
 			return;
@@ -436,7 +436,7 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(messages) != IS_OBJECT) {
 	   object_init_ex(&messages, phalcon_validation_message_group_ce);
 	   PHALCON_CALL_METHOD(NULL, &messages, "__construct");
@@ -528,7 +528,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		}
 	} else {
 		if (Z_TYPE(data) == IS_ARRAY && phalcon_array_isset(&data, attribute)) {
-			phalcon_array_fetch(&value, &data, attribute, PH_NOISY);
+			phalcon_array_fetch(&value, &data, attribute, PH_NOISY|PH_READONLY);
 		} else if (Z_TYPE(data) == IS_OBJECT && phalcon_isset_property_zval(&data, attribute)) {
 			phalcon_return_property_zval(&value, &data, attribute);
 		}
@@ -603,7 +603,7 @@ PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&filename, getThis(), SL("_messageFilename"), PH_NOISY);
+	phalcon_read_property(&filename, getThis(), SL("_messageFilename"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&filename)) {
 		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"));
 		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type, default_value);

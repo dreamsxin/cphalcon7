@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		ZVAL_STRING(&mode, "ab");
 	}
 
-	/** 
+	/**
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	PHALCON_CALL_FUNCTION(&stream, "fopen", name, &mode);
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(stream) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
@@ -169,6 +169,6 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, close)
 {
 	zval stream = {};
 
-	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY);
+	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_FUNCTION("fclose", &stream);
 }

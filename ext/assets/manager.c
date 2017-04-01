@@ -94,12 +94,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_addresource, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_set, 0, 0, 2)
-	ZEND_ARG_INFO(0, id)
+	ZEND_ARG_TYPE_INFO(0, id, IS_STRING, 0)
 	ZEND_ARG_INFO(0, collection)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_get, 0, 0, 1)
-	ZEND_ARG_INFO(0, id)
+	ZEND_ARG_TYPE_INFO(0, id, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_collection, 0, 0, 1)
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 
 	phalcon_fetch_params(0, 2, 0, &type, &resource);
 
-	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(&collection, &collections, type, 0)) {
 		object_init_ex(&collection, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), type, &collection);
@@ -376,10 +376,6 @@ PHP_METHOD(Phalcon_Assets_Manager, set){
 
 	phalcon_fetch_params(0, 2, 0, &id, &collection);
 
-	if (unlikely(Z_TYPE_P(id) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Collection-Id must be a string");
-		return;
-	}
 	if (unlikely(Z_TYPE_P(collection) != IS_OBJECT)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Collection must be an object");
 		return;
@@ -406,12 +402,7 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
-	if (unlikely(Z_TYPE_P(id) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Collection-Id must be a string");
-		return;
-	}
-
-	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(return_value, &collections, id, 0)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
@@ -427,7 +418,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
 	zval collections = {}, collection = {};
 
-	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Check if the collection does not exist and create an implicit collection
@@ -449,7 +440,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
 	zval collections = {}, collection = {};
 
-	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Check if the collection does not exist and create an implicit collection
@@ -474,7 +465,7 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY);
+	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset_fetch(return_value, &collections, name, 0)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), name, return_value);

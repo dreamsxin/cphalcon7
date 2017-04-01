@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 
 	zval transaction = {}, queue = {}, *message, message_str = {}, type = {}, time = {}, context = {};
 
-	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY|PH_READONLY);
 	if (!zend_is_true(&transaction)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	phalcon_update_property_bool(getThis(), SL("_transaction"), 0);
 
 	/* Check if the queue has something to log */
-	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY);
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(queue) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), message) {
 			PHALCON_CALL_METHOD(&message_str, message, "getmessage");
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, rollback){
 
 	zval transaction = {}, queue = {};
 
-	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY|PH_READONLY);
 	if (!zend_is_true(&transaction)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "There is no active transaction");
 		return;
@@ -427,14 +427,14 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 		i_level = Z_LVAL_P(type);
 	}
 
-	phalcon_read_property(&log_level, getThis(), SL("_logLevel"), PH_NOISY);
+	phalcon_read_property(&log_level, getThis(), SL("_logLevel"), PH_NOISY|PH_READONLY);
 
 	/* Only log the message if this is allowed by the current log level */
 	if (phalcon_get_intval(&log_level) >= i_level) {
 		ZVAL_LONG(&timestamp, (long)time(NULL));
 		ZVAL_LONG(&level, i_level);
 
-		phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY);
+		phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_NOISY|PH_READONLY);
 		if (zend_is_true(&transaction)) {
 			object_init_ex(&queue_item, phalcon_logger_item_ce);
 			PHALCON_CALL_METHOD(NULL, &queue_item, "__construct", message, &level, &timestamp, context);

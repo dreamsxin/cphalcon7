@@ -188,7 +188,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 		lifetime = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY);
+	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(backends), backend) {
 			zval content = {};
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, start){
 		lifetime = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY);
+	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(backends), backend) {
 			PHALCON_CALL_METHOD(NULL, backend, "start", key_name, lifetime);
@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, save){
 		stop_buffer = &PHALCON_GLOBAL(z_true);
 	}
 
-	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY);
+	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(backends), backend) {
 			PHALCON_CALL_METHOD(NULL, backend, "save", key_name, content, lifetime, stop_buffer);
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, delete){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY);
+	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(backends), backend) {
 			PHALCON_CALL_METHOD(NULL, backend, "delete", key_name);
@@ -306,7 +306,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, exists){
 		lifetime = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY);
+	phalcon_read_property(&backends, getThis(), SL("_backends"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(backends) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(backends), backend) {
 			zval exists = {};

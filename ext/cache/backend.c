@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 	if (Z_TYPE_P(return_value) == IS_NULL) {
 		fresh = &PHALCON_GLOBAL(z_true);
 
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &frontend, "start");
 	} else {
 		fresh = &PHALCON_GLOBAL(z_false);
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Cache_Backend, stop){
 	phalcon_fetch_params(0, 0, 1, &stop_buffer);
 
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &frontend, "stop");
 	}
 
@@ -223,9 +223,9 @@ PHP_METHOD(Phalcon_Cache_Backend, getLifetime){
 
 	zval lifetime = {}, frontend = {};
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lastLifetime"), PH_NOISY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lastLifetime"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(lifetime) != IS_LONG) {
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(&lifetime, &frontend, "getlifetime");
 	}
 	RETURN_CTOR(&lifetime);

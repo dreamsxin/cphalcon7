@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Db_Index, getType){
 
 	zval type = {};
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(type) == IS_STRING) {
 		RETURN_CTOR(&type);
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Db_Index, __set_state){
 		return;
 	}
 
-	/** 
+	/**
 	 * Return a Phalcon\Db\Index as part of the returning state
 	 */
 	object_init_ex(return_value, phalcon_db_index_ce);

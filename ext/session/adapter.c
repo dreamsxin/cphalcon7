@@ -152,31 +152,31 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	}
 
 	if (!_expire) {
-		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY);
+		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&expire, _expire);
 	}
 
 	if (!_path) {
-		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&path, _path);
 	}
 
 	if (!_secure) {
-		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY);
+		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&secure, _secure);
 	}
 
 	if (!_domain) {
-		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY);
+		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&domain, _domain);
 	}
 
 	if (!_http_only) {
-		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY);
+		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
 	}
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
 
 	zval started = {};
 
-	phalcon_read_property(&started, getThis(), SL("_started"), PH_NOISY);
+	phalcon_read_property(&started, getThis(), SL("_started"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&started)) {
 		RETURN_ON_FAILURE(phalcon_session_write_close());
 		phalcon_update_property_bool(getThis(), SL("_started"), 0);
@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
 
 	phalcon_fetch_params(0, 2, 0, &index, &value);
 
-	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
@@ -354,7 +354,7 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
 	zval *index, unique_id = {}, key = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 	zval *index, unique_id = {}, key = {}, *_SESSION;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY);
+	phalcon_read_property(&unique_id, getThis(), SL("_uniqueId"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 

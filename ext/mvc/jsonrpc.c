@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 	if (PHALCON_IS_FALSE(merge)) {
 		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
 	} else {
-		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY);
+		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(registered_modules) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
 		} else {
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		return;
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_mvc_jsonrpc_exception_ce);
 
 	/* Call boot event, this allows the developer to perform initialization actions */
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/**
 			 * Check if the module passed by the router is registered in the modules container
 			 */
-			phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
+			phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 			if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
 				convert_to_string(&module_name);
 				zend_throw_exception_ex(phalcon_mvc_jsonrpc_exception_ce, 0, "Module %s is not registered in the jsonrpc container", Z_STRVAL(module_name));

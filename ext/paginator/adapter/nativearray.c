@@ -94,11 +94,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 	zval *config, limit = {}, page = {}, data = {};
 
 	phalcon_fetch_params(0, 1, 0, &config);
-	
+
 	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
 		phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
 	}
-	
+
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
 		phalcon_update_property_zval(getThis(), SL("_page"), &page);
 	}
@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
 	RETURN_THIS();
 }
@@ -142,14 +142,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	long int i_total_pages, i_next;
 	ldiv_t tp;
 
-	phalcon_read_property(&items, getThis(), SL("_data"), PH_NOISY);
+	phalcon_read_property(&items, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	if (UNEXPECTED(Z_TYPE(items) != IS_ARRAY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Invalid data for paginator");
 		return;
 	}
 
-	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_NOISY);
-	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_NOISY);
+	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_NOISY|PH_READONLY);
 	i_limit       = phalcon_get_intval(&limit);
 	i_number_page = phalcon_get_intval(&number_page);
 

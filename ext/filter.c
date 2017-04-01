@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	phalcon_fetch_params(0, 2, 1, &value, &filter, &options);
 
-	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY);
+	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&filter_object, &filters, filter, 0) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
 		/**
 		 * If the filter is a closure we call it in the PHP userland

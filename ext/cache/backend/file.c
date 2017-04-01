@@ -152,8 +152,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
@@ -237,8 +237,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
 
@@ -287,8 +287,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 	array_init(return_value);
 
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * We use a directory iterator to traverse the cache dir directory
@@ -380,7 +380,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
 
@@ -425,8 +425,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -434,7 +434,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 	assert(Z_TYPE(cache_file) == IS_STRING);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		/**
 		 * Check if the file has expired
 		 */
@@ -503,8 +503,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -512,7 +512,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	assert(Z_TYPE(cache_file) == IS_STRING);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		/**
 		 * Check if the file has expired
 		 */
@@ -572,8 +572,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 	zval prefix = {}, cache_dir = {}, iterator = {};
 	zend_object_iterator *it;
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
-	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	object_init_ex(&iterator, spl_ce_DirectoryIterator);
 	assert(phalcon_has_constructor(&iterator));

@@ -107,7 +107,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 	phalcon_fetch_params(0, 0, 1, &desc);
 
 	if (!desc || !zend_is_true(desc)) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY);
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY|PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&descriptor, desc);
 	}
@@ -116,7 +116,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "dbname must be specified");
 		return;
 	} else {
-		phalcon_array_fetch_str(&dbname, &descriptor, SL("dbname"), PH_NOISY);
+		phalcon_array_fetch_str(&dbname, &descriptor, SL("dbname"), PH_NOISY|PH_READONLY);
 		phalcon_array_update_str(&descriptor, SL("dsn"), &dbname, PH_COPY);
 	}
 
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 
 	array_init(&columns);
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	ZVAL_STRING(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		array_init_size(&definition, 1);
 		add_assoc_long_ex(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_STR);
 
-		phalcon_array_fetch_long(&column_type, field, 2, PH_NOISY);
+		phalcon_array_fetch_long(&column_type, field, 2, PH_NOISY|PH_READONLY);
 
 		if (phalcon_memnstr_str(&column_type, SL("("))) {
 			ZVAL_NULL(&matches);
@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 2, 0);
 
-				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 
 				/**
 				 * Check if the column is auto increment
@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 3, 0);
 
-				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 
 				/**
 				 * Check if the column is auto increment
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 8, 0);
 
-				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 
 				/**
 				 * Check if the column is auto increment
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				phalcon_array_update_str_long(&definition, SL("bytes"), 4, 0);
 
-				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+				phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 
 				/**
 				 * Check if the column is auto increment
@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		/**
 		 * Check if the field is primary key
 		 */
-		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 		if (zend_is_true(&attribute)) {
 			phalcon_array_update_str_bool(&definition, SL("primary"), 1, 0);
 		}
@@ -407,17 +407,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		/**
 		 * Check if the column allows null values
 		 */
-		phalcon_array_fetch_long(&attribute, field, 3, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 3, PH_NOISY|PH_READONLY);
 		if (zend_is_true(&attribute)) {
 			phalcon_array_update_str_bool(&definition, SL("notNull"), 1, 0);
 		}
 
-		phalcon_array_fetch_long(&column_name, field, 1, PH_NOISY);
+		phalcon_array_fetch_long(&column_name, field, 1, PH_NOISY|PH_READONLY);
 
 		/**
 		 * If the column set the default values, get it
 		 */
-		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY|PH_READONLY);
 		if (!PHALCON_IS_EMPTY(&attribute)) {
 			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}
@@ -451,12 +451,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
 	if (!_schema || !zend_is_true(_schema)) {
-		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&schema, _schema);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * We're using FETCH_NUM to fetch the columns
@@ -474,14 +474,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), index) {
 		zval key_name = {}, sql_index_describe = {}, describe_index = {}, *index_column;
 
-		phalcon_array_fetch_long(&key_name, index, 1, PH_NOISY);
+		phalcon_array_fetch_long(&key_name, index, 1, PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_METHOD(&sql_index_describe, &dialect, "describeindex", &key_name);
 		PHALCON_CALL_METHOD(&describe_index, getThis(), "fetchall", &sql_index_describe, &fetch_num);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe_index), index_column) {
 			zval column_name = {};
-			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY);
+			phalcon_array_fetch_long(&column_name, index_column, 2, PH_NOISY|PH_READONLY);
 			phalcon_array_append_multi_2(&indexes, &key_name, &column_name, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
@@ -524,7 +524,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		schema = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Get the SQL to describe the references
@@ -555,9 +555,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		}
 
 		PHALCON_CONCAT_SV(&constraint_name, "foreign_key_", &number);
-		phalcon_array_fetch_long(&referenced_table, reference_describe, 2, PH_NOISY);
-		phalcon_array_fetch_long(&from, reference_describe, 3, PH_NOISY);
-		phalcon_array_fetch_long(&to, reference_describe, 4, PH_NOISY);
+		phalcon_array_fetch_long(&referenced_table, reference_describe, 2, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&from, reference_describe, 3, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&to, reference_describe, 4, PH_NOISY|PH_READONLY);
 
 		array_init_size(&columns, 1);
 		phalcon_array_append(&columns, &from, PH_COPY);

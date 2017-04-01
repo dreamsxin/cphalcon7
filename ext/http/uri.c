@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Http_Uri, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_array_isset_fetch(return_value, &parts, key, 0)) {
 		 RETURN_NULL();
@@ -233,7 +233,7 @@ PHP_METHOD(Phalcon_Http_Uri, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	RETURN_BOOL(phalcon_array_isset(&parts, key));
 }
@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath)
 {
 	zval parts = {}, value = {};
 
-	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_array_isset_fetch_str(&value, &parts, SL("path"))) {
 		 RETURN_NULL();
@@ -275,7 +275,7 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 {
 	zval parts = {}, uri = {}, scheme = {}, host = {}, user = {}, pass = {}, port = {}, path = {}, query = {}, fragment = {}, tmp = {};
 
-	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_array_isset_fetch_str(&scheme, &parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(&scheme)) {
 		if (phalcon_array_isset_fetch_str(&host, &parts, SL("host")) && PHALCON_IS_NOT_EMPTY(&host)) {

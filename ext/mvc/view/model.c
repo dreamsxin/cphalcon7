@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(view_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &view_params, params);
 		} else {
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVar){
 	phalcon_fetch_params(0, 2, 1, &key, &value, &isappend);
 
 	if (isappend && zend_is_true(isappend)) {
-		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
 		if (Z_TYPE(view_params) != IS_ARRAY || !phalcon_array_isset_fetch(&var, &view_params, key, 0)) {
 			ZVAL_COPY_VALUE(&var_append, value);
@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getVar){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(view_params) != IS_ARRAY || !phalcon_array_isset_fetch(&var, &view_params, key, 0)) {
 		ZVAL_COPY_VALUE(&var, default_value);
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, getChild){
 	if (capture_to) {
 		array_init(return_value);
 
-		phalcon_read_property(&childs, getThis(), SL("_childs"), PH_NOISY);
+		phalcon_read_property(&childs, getThis(), SL("_childs"), PH_NOISY|PH_READONLY);
 
 		if (Z_TYPE(childs) != IS_ARRAY) {
 			RETURN_EMPTY_ARRAY();
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, hasChild){
 
 	phalcon_fetch_params(0, 0, 1, &capture_to);
 
-	phalcon_read_property(&childs, getThis(), SL("_childs"), PH_NOISY);
+	phalcon_read_property(&childs, getThis(), SL("_childs"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(childs) != IS_ARRAY) {
 		RETURN_FALSE;
@@ -487,7 +487,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, isAppend){
 
 	zval append = {};
 
-	phalcon_read_property(&append, getThis(), SL("_append"), PH_NOISY);
+	phalcon_read_property(&append, getThis(), SL("_append"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(&append)) {
 		RETURN_TRUE;
@@ -720,7 +720,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __get){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&value, &params, key, 0)) {
 		RETURN_CTOR(&value);
 	}
@@ -740,7 +740,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, __isset){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY);
+	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&params, key)) {
 		RETURN_TRUE;
 	}

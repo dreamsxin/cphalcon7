@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Config, get){
 
 	phalcon_fetch_params(0, 1, 1, &index, &default_value);
 
-	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY) == FAILURE) {
+	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY|PH_READONLY) == FAILURE) {
 		if (default_value) {
 			RETURN_CTOR(default_value);
 		} else {

@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get)
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get)
 	if (phalcon_is_numeric(&cached_content)) {
 		RETURN_CTOR(&cached_content);
 	} else {
-		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
 	}
 }
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
 		phalcon_return_property(&key, getThis(), SL("_lastKey"));
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	}
 	PHALCON_CONCAT_SVV(&last_key, "_PHCA", &prefix, key_name);
 
-	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, increment){
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, decrement){
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, delete){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 

@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
 	phalcon_fetch_params(0, 1, 0, &formatter);
 
-	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY);
+	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(loggers) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(loggers), logger) {
 			PHALCON_CALL_METHOD(NULL, logger, "setformatter", formatter);
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, log){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY);
+	phalcon_read_property(&loggers, getThis(), SL("_loggers"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(loggers) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(loggers), logger) {
 			PHALCON_CALL_METHOD(NULL, logger, "log", message, &type, context);

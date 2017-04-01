@@ -394,9 +394,9 @@ PHP_METHOD(Phalcon_Websocket_Client, connect)
 		PHALCON_CALL_METHOD(NULL, getThis(), "on", &event, tick);
 	}
 
-	phalcon_read_property(&host, getThis(), SL("_host"), PH_NOISY);
-	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY);
-	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+	phalcon_read_property(&host, getThis(), SL("_host"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
 	intern->context = lws_create_context(&intern->info);

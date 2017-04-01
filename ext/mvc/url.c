@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Mvc_Url, setBaseUri){
 
 	phalcon_update_property_zval(getThis(), SL("_baseUri"), base_uri);
 
-	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY);
+	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(static_base_uri) == IS_NULL) {
 		phalcon_update_property_zval(getThis(), SL("_staticBaseUri"), base_uri);
 	}
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 
 	zval base_uri = {}, slash = {}, *_SERVER, php_self = {}, uri = {};
 
-	phalcon_read_property(&base_uri, getThis(), SL("_baseUri"), PH_NOISY);
+	phalcon_read_property(&base_uri, getThis(), SL("_baseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(base_uri) == IS_NULL) {
 		ZVAL_STRING(&slash, "/");
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStaticBaseUri){
 
 	zval static_base_uri = {};
 
-	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY);
+	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(static_base_uri) != IS_NULL) {
 		RETURN_CTOR(&static_base_uri);
 	}
@@ -394,10 +394,10 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		}
 	}
 
-	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY);
+	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(static_base_uri) != IS_NULL) {
 		PHALCON_CONCAT_VV(return_value, &static_base_uri, uri);
-	} else {	
+	} else {
 		PHALCON_CALL_METHOD(&base_uri, getThis(), "getbaseuri");
 		PHALCON_CONCAT_VV(return_value, &base_uri, uri);
 	}
@@ -431,6 +431,6 @@ PHP_METHOD(Phalcon_Mvc_Url, path){
 		path = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&base_path, getThis(), SL("_basePath"), PH_NOISY);
+	phalcon_read_property(&base_path, getThis(), SL("_basePath"), PH_NOISY|PH_READONLY);
 	PHALCON_CONCAT_VV(return_value, &base_path, path);
 }

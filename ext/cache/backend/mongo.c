@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 		phalcon_update_property_zval(getThis(), SL("_uri"), &uri);
 		phalcon_array_unset_str(options, SL("uri"), PH_SEPARATE);
 	} else {
-		phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY);
+		phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY|PH_READONLY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&db_name, options, SL("db")) && PHALCON_IS_NOT_EMPTY(&db_name)) {
@@ -247,8 +247,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, get){
 
 	query = bson_new();
 
-	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -327,7 +327,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, delete){
 
 	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, queryKeys){
 	query = bson_new();
 
 	if (!_prefix || Z_TYPE_P(_prefix) != IS_NULL) {
-		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+		phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&prefix, _prefix);
 	}
@@ -517,7 +517,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, exists){
 
 	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	query = BCON_NEW (
@@ -579,7 +579,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, increment){
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -650,7 +650,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, decrement){
 		v = -labs(Z_LVAL_P(value));
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -707,7 +707,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, flush){
 	bson_t query = BSON_INITIALIZER;
 	bson_error_t error;
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 

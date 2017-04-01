@@ -76,7 +76,7 @@ int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class
 	zval *params[1];
 
 	if (is_phalcon_class(ce)) {
-		phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY);
+		phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY|PH_READONLY);
 
 		if (phalcon_array_isset_fetch_str(&value, &options, option, strlen(option))) {
 			ZVAL_ZVAL(retval, &value, 1, 0);
@@ -104,12 +104,12 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 	zval *options = NULL;
 
 	phalcon_fetch_params(0, 0, 1, &options);
-	
+
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
 	}
-	
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
+
+	if (Z_TYPE_P(options) != IS_ARRAY) {
 		if (Z_TYPE_P(options) != IS_NULL) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Options must be an array");
 			return;
@@ -130,8 +130,8 @@ PHP_METHOD(Phalcon_Validation_Validator, isSetOption){
 	zval *key, options = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
-	
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 	RETURN_BOOL(phalcon_array_isset(&options, key));
 }
 
@@ -162,9 +162,9 @@ PHP_METHOD(Phalcon_Validation_Validator, setOption){
 	zval *key, *value;
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
-	
+
 	phalcon_update_property_array(getThis(), SL("_options"), key, value);
-	
+
 }
 
 /**

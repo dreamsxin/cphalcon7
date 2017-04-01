@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Process_Proc, getDescriptors){
 
 	zval mode = {}, stdin = {}, stdout = {}, stderr = {};
 
-	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY);
+	phalcon_read_property(&mode, getThis(), SL("_mode"), PH_NOISY|PH_READONLY);
 
 	switch (Z_TYPE(mode)) {
 		case PHALCON_PROCESS_MODE_TTY:
@@ -396,7 +396,7 @@ PHP_METHOD(Phalcon_Process_Proc, start){
 
 	zval status = {}, descriptors = {}, command = {}, pipes = {}, cwd = {}, env = {}, options = {}, starttime ={}, process = {};
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Process is already running");
 		return;
@@ -404,11 +404,11 @@ PHP_METHOD(Phalcon_Process_Proc, start){
 
 	PHALCON_CALL_METHOD(&descriptors, getThis(), "getdescriptors");
 
-	phalcon_read_property(&command, getThis(), SL("_command"), PH_NOISY);
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
-	phalcon_read_property(&cwd, getThis(), SL("_cwd"), PH_NOISY);
-	phalcon_read_property(&env, getThis(), SL("_env"), PH_NOISY);
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&command, getThis(), SL("_command"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&cwd, getThis(), SL("_cwd"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&env, getThis(), SL("_env"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	phalcon_time(&starttime);
 
@@ -443,7 +443,7 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 
 	phalcon_fetch_params(0, 0, 2, &timeout, &_signal);
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		RETURN_FALSE;
 	}
@@ -460,8 +460,8 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 		ZVAL_COPY_VALUE(&signal, _signal);
 	}
 
-	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
-	phalcon_read_property(&ppid, getThis(), SL("_pid"), PH_NOISY);
+	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&ppid, getThis(), SL("_pid"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(&ppid)) {
 		PHALCON_CONCAT_SV(&command, "ps -o pid --no-heading --ppid ", &ppid);
@@ -514,7 +514,7 @@ PHP_METHOD(Phalcon_Process_Proc, close){
 
 	zval pipes = {}, *s;
 
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(pipes), s) {
 			PHALCON_CALL_FUNCTION(NULL, "pclose", s);
@@ -544,13 +544,13 @@ PHP_METHOD(Phalcon_Process_Proc, isRunning){
 
 	zval status = {};
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		RETURN_FALSE;
 	}
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "update");
-	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY);
+	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY|PH_READONLY);
 }
 
 /**
@@ -568,19 +568,19 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 		blocking = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		RETURN_FALSE;
 	}
-	phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY);
-	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY);
+	phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(process) != IS_NULL) {
 		PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
 		if (Z_TYPE(information) == IS_ARRAY) {
-			phalcon_array_fetch_str(&pid, &information, SL("pid"), PH_NOISY);
+			phalcon_array_fetch_str(&pid, &information, SL("pid"), PH_NOISY|PH_READONLY);
 			phalcon_update_property_zval(getThis(), SL("_pid"), &pid);
 
-			phalcon_array_fetch_str(&running, &information, SL("running"), PH_NOISY);
+			phalcon_array_fetch_str(&running, &information, SL("running"), PH_NOISY|PH_READONLY);
 			phalcon_update_property_zval(getThis(), SL("_running"), &running);
 
 			if (!zend_is_true(&running)) {
@@ -589,7 +589,7 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 						phalcon_update_property_zval(getThis(), SL("_exitCode"), &exitcode);
 					}
 				}
-				phalcon_array_fetch_str(&signaled, &information, SL("signaled"), PH_NOISY);
+				phalcon_array_fetch_str(&signaled, &information, SL("signaled"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&signaled)) {
 					if (phalcon_array_isset_fetch_str(&termsig, &information, SL("termsig")) && Z_LVAL(termsig) > 0) {
 						phalcon_update_property_long(getThis(), SL("_exitCode"), 128 + Z_LVAL(termsig));
@@ -600,7 +600,7 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 
 				phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_TERMINATED);
 			} else {
-				phalcon_array_fetch_str(&stopped, &information, SL("stopped"), PH_NOISY);
+				phalcon_array_fetch_str(&stopped, &information, SL("stopped"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&stopped)) {
 					if (phalcon_array_isset_fetch_str(&stopsig, &information, SL("stopsig"))) {
 						phalcon_update_property_long(getThis(), SL("_stopCode"), Z_LVAL(stopsig));
@@ -740,17 +740,17 @@ PHP_METHOD(Phalcon_Process_Proc, checkTimeout){
 
 	zval status = {}, timeout = {}, start_time = {}, microtime = {};
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		RETURN_FALSE;
 	}
 
-	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY);
+	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(timeout) == IS_NULL) {
 		RETURN_TRUE;
 	}
 
-	phalcon_read_property(&start_time, getThis(), SL("_startTime"), PH_NOISY);
+	phalcon_read_property(&start_time, getThis(), SL("_startTime"), PH_NOISY|PH_READONLY);
 	phalcon_microtime(&microtime, &PHALCON_GLOBAL(z_true));
 	if (PHALCON_LE_LONG(&timeout, Z_DVAL(microtime) - Z_DVAL(start_time))) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "stop", &PHALCON_GLOBAL(z_zero));
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Process_Proc, wait){
 
 	zval status = {}, isrunning = {};
 
-	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY);
+	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
 		RETURN_FALSE;
 	}
@@ -809,7 +809,7 @@ PHP_METHOD(Phalcon_Process_Proc, read){
 		timeout = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch(&pipe, &pipes, type, 0)) {
 		RETURN_FALSE;
 	}
@@ -829,7 +829,7 @@ PHP_METHOD(Phalcon_Process_Proc, write){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch_long(&stdin, &pipes, 0)) {
 		RETURN_FALSE;
 	}
@@ -930,7 +930,7 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		timeout = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_fast_count_ev(&pipes)) {
 		RETURN_FALSE;
 	}
@@ -1064,12 +1064,12 @@ PHP_METHOD(Phalcon_Process_Proc, setBlocking){
 
 	phalcon_fetch_params(0, 1, 0, &flag);
 
-	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY);
+	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) != IS_ARRAY && !phalcon_fast_count_ev(&pipes)) {
 		RETURN_FALSE;
 	}
 
-	phalcon_read_property(&blocked, getThis(), SL("_blocking"), PH_NOISY);
+	phalcon_read_property(&blocked, getThis(), SL("_blocking"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(&blocked) == zend_is_true(flag)) {
 		RETURN_TRUE;

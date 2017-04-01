@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		ZVAL_STRING(&mode, "ab");
 	}
 
-	/** 
+	/**
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	PHALCON_CALL_FUNCTION(&handler, "fopen", name, &mode);
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &time, &context);
 
-	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
+	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(file_handler) != IS_RESOURCE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Cannot send message to the log because it is invalid");
 		return;
@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, close){
 
 	zval file_handler = {};
 
-	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY);
+	phalcon_read_property(&file_handler, getThis(), SL("_fileHandler"), PH_NOISY|PH_READONLY);
 	PHALCON_RETURN_CALL_FUNCTION("fclose", &file_handler);
 }
 
@@ -199,13 +199,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 
 	zval path = {}, options = {}, mode = {}, file_handler = {};
 
-	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY);
+	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(path) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 		return;
 	}
 
-	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"))) {
 		if (Z_TYPE(mode) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");

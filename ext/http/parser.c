@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 
 	phalcon_fetch_params(0, 1, 0, &body);
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	body_len = Z_STRLEN_P(body);
 

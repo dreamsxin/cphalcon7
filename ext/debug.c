@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Debug, getMajorVersion){
 
 	phalcon_fast_explode_str(&parts, SL(" "), &version);
 
-	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY);
+	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY|PH_READONLY);
 }
 
 /**
@@ -613,7 +613,7 @@ PHP_METHOD(Phalcon_Debug, getCssSources){
 
 	zval uri = {};
 
-	phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY);
+	phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVS(return_value, "<link href=\"", &uri, "bootstrap/css/bootstrap.min.css\" type=\"text/css\" rel=\"stylesheet\" />");
 	PHALCON_SCONCAT_SVS(return_value, "<link href=\"", &uri, "bower_components/jquery-ui/themes/ui-lightness/theme.css\" type=\"text/css\" rel=\"stylesheet\" />");
@@ -629,7 +629,7 @@ PHP_METHOD(Phalcon_Debug, getJsSources){
 
 	zval uri = {};
 
-	phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY);
+	phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_SVS(return_value, "<script type=\"text/javascript\" src=\"", &uri, "bower_components/jquery/dist/jquery.min.js\"></script>");
 	PHALCON_SCONCAT_SVS(return_value, "<script type=\"text/javascript\" src=\"", &uri, "bootstrap/js/bootstrap.min.js\"></script>");
@@ -715,7 +715,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		/**
 		 * Object access operator: static/instance
 		 */
-		phalcon_array_fetch_str(&type, trace, SL("type"), PH_NOISY);
+		phalcon_array_fetch_str(&type, trace, SL("type"), PH_NOISY|PH_READONLY);
 		phalcon_concat_self(&html, &type);
 	}
 
@@ -788,7 +788,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 	 * When 'file' is present, it usually means the function is provided by the user
 	 */
 	if (phalcon_array_isset_fetch_str(&file, trace, SL("file"))) {
-		phalcon_array_fetch_str(&line, trace, SL("line"), PH_NOISY);
+		phalcon_array_fetch_str(&line, trace, SL("line"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_METHOD(&formatted_file, getThis(), "getfilelink", &file, &line, link_format);
 
@@ -874,7 +874,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/**
 				 * Current line content in the piece of file
 				 */
-				phalcon_array_fetch(&current_line, &lines, &line_position, PH_NOISY);
+				phalcon_array_fetch(&current_line, &lines, &line_position, PH_NOISY|PH_READONLY);
 
 				/**
 				 * File fragments are cleaned, removing tabs and comments
@@ -1015,7 +1015,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	 * Check if the developer wants to show the backtrace or not
 	 */
 	if (zend_is_true(&show_back_trace)) {
-		phalcon_read_property(&data_vars, getThis(), SL("_data"), PH_NOISY);
+		phalcon_read_property(&data_vars, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 		/**
 		 * Create the tabs in the page
@@ -1252,7 +1252,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 					ZVAL_LONG(&tmp, idx);
 				}
 
-				phalcon_array_fetch_long(&variable, data_var, 0, PH_NOISY);
+				phalcon_array_fetch_long(&variable, data_var, 0, PH_NOISY|PH_READONLY);
 
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", &variable);
 				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");

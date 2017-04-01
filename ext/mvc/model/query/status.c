@@ -93,13 +93,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 	zval *success, *model = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &success, &model);
-	
+
 	phalcon_update_property_zval(getThis(), SL("_success"), success);
 
 	if (model) {
 		phalcon_update_property_zval(getThis(), SL("_model"), model);
 	}
-	
+
 }
 
 /**
@@ -122,12 +122,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, getMessages){
 
 	zval model = {};
 
-	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY);
+	phalcon_read_property(&model, getThis(), SL("_model"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(model) == IS_OBJECT) {
 		PHALCON_RETURN_CALL_METHOD(&model, "getmessages");
 		return;
 	}
-	
+
 	array_init(return_value);
 }
 
@@ -141,4 +141,3 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, success){
 
 	RETURN_MEMBER(getThis(), "_success");
 }
-

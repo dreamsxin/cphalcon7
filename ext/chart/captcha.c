@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	ZVAL_LONG(&color_type, PHALCON_RANDOM_COLOR_RGB);
 
 	if (!_word || Z_TYPE_P(_word) == IS_NULL) {
-		phalcon_read_property(&word, getThis(), SL("_word"), PH_NOISY);
+		phalcon_read_property(&word, getThis(), SL("_word"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&word, _word);
 	}
@@ -255,13 +255,13 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 
 	if (!_width || Z_TYPE_P(_width) == IS_NULL) {
-		phalcon_read_property(&width, getThis(), SL("_width"), PH_NOISY);
+		phalcon_read_property(&width, getThis(), SL("_width"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&width, _width);
 	}
 
 	if (!_height || Z_TYPE_P(_height) == IS_NULL) {
-		phalcon_read_property(&height, getThis(), SL("_height"), PH_NOISY);
+		phalcon_read_property(&height, getThis(), SL("_height"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&height, _height);
 	}
@@ -282,11 +282,11 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (phalcon_has_constructor(&draw)) {
 		PHALCON_CALL_METHOD(NULL, &draw, "__construct");
 	}
-	phalcon_read_property(&font, getThis(), SL("_font"), PH_NOISY);
+	phalcon_read_property(&font, getThis(), SL("_font"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&font)) {
 		PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font);
 	}
-	phalcon_read_property(&font_size, getThis(), SL("_fontSize"), PH_NOISY);
+	phalcon_read_property(&font_size, getThis(), SL("_fontSize"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font_size);
 
 	object_init_ex(&fgpixel, imagickpixel_ce);
@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHOD(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
 	}
 
-	phalcon_read_property(&pad_type, getThis(), SL("_padType"), PH_NOISY);
+	phalcon_read_property(&pad_type, getThis(), SL("_padType"), PH_NOISY|PH_READONLY);
 	switch (Z_LVAL(pad_type)) {
 		case PHALCON_CHART_CAPTCHA_PAD_LEFT:
 			phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_WEST"));
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
 	PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, offset_x, offset_y, &PHALCON_GLOBAL(z_zero), &word);
 
-	phalcon_read_property(&pad_size, getThis(), SL("_padSize"), PH_NOISY);
+	phalcon_read_property(&pad_size, getThis(), SL("_padSize"), PH_NOISY|PH_READONLY);
 	if (Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_BOTH || Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_LEFT) {
 		PHALCON_CALL_METHOD(&color, &random, "color", &color_type);
 		PHALCON_CALL_METHOD(&word, &random, "alnum", &pad_size);
@@ -403,7 +403,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, save){
 
 	phalcon_fetch_params(0, 1, 0, &filename);
 
-	phalcon_read_property(&imagick, getThis(), SL("_imagick"), PH_NOISY);
+	phalcon_read_property(&imagick, getThis(), SL("_imagick"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(imagick) != IS_OBJECT) {
 		RETURN_FALSE;
 	}

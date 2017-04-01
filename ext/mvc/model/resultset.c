@@ -194,15 +194,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 
 	zval type = {}, result = {}, active_row = {}, rows = {}, r = {};
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&type)) {
 
 		/**
 		 * Here, the resultset act as a result that is fetched one by one
 		 */
-		phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+		phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_NOT_FALSE(&result)) {
-			phalcon_read_property(&active_row, getThis(), SL("_activeRow"), PH_NOISY);
+			phalcon_read_property(&active_row, getThis(), SL("_activeRow"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(active_row) != IS_NULL) {
 				PHALCON_CALL_METHOD(NULL, &result, "dataseek", &PHALCON_GLOBAL(z_zero));
 			}
@@ -211,9 +211,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 		/**
 		 * Here, the resultset act as an array
 		 */
-		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY);
+		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(rows) == IS_NULL) {
-			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&r, &result, "fetchall");
 				if (likely(Z_TYPE(r) == IS_ARRAY)) {
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 
 	phalcon_fetch_params(0, 1, 0, &position);
 
-	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
+	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * We only seek the records if the current position is diferent than the passed one
@@ -252,12 +252,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 
 	if (PHALCON_IS_TRUE(&is_different)) {
 
-		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 		if (zend_is_true(&type)) {
 			/**
 			 * Here, the resultset is fetched one by one because is large
 			 */
-			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			PHALCON_CALL_METHOD(NULL, &result, "dataseek", position);
 		} else {
 			/**
@@ -269,7 +269,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 			 * We need to fetch the records because rows is null
 			 */
 			if (Z_TYPE(rows) == IS_NULL) {
-				phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+				phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 				if (PHALCON_IS_NOT_FALSE(&result)) {
 					PHALCON_CALL_METHOD(&rows, &result, "fetchall");
 					phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
@@ -316,12 +316,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 	if (Z_TYPE(count) == IS_NULL) {
 		ZVAL_LONG(&count, 0);
 
-		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY);
+		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 		if (zend_is_true(&type)) {
 			/**
 			 * Here, the resultset act as a result that is fetched one by one
 			 */
-			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (PHALCON_IS_NOT_FALSE(&result)) {
 				PHALCON_CALL_METHOD(&number_rows, &result, "numrows");
 
@@ -333,7 +333,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			 */
 			phalcon_return_property(&rows, getThis(), SL("_rows"));
 			if (Z_TYPE(rows) == IS_NULL) {
-				phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY);
+				phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 				if (Z_TYPE(result) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(&rows, &result, "fetchall");
 					phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
@@ -382,7 +382,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetGet){
 		/**
 		 * Check if the last record returned is the current requested
 		 */
-		phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
+		phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_EQUAL(&pointer, index)) {
 			PHALCON_RETURN_CALL_METHOD(getThis(), "current");
 			return;
@@ -460,7 +460,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getFirst){
 	/**
 	 * Check if the last record returned is the current requested
 	 */
-	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY);
+	phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_LONG(&pointer, 0)) {
 		PHALCON_RETURN_CALL_METHOD(getThis(), "current");
 		return;

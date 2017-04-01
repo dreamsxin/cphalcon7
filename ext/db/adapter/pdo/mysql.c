@@ -98,8 +98,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
 	phalcon_fetch_params(0, 1, 0, &identifier);
 
 	if (Z_TYPE_P(identifier) == IS_ARRAY) {
-		phalcon_array_fetch_long(&domain, identifier, 0, PH_NOISY);
-		phalcon_array_fetch_long(&name, identifier, 1, PH_NOISY);
+		phalcon_array_fetch_long(&domain, identifier, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&name, identifier, 1, PH_NOISY|PH_READONLY);
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CONCAT_SVSVS(return_value, "`", &domain, "`.`", &name, "`");
 			return;
@@ -135,12 +135,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
 	if (!_schema || !zend_is_true(_schema)) {
-		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY);
+		phalcon_read_property(&schema, getThis(), SL("_schema"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&schema, _schema);
 	}
 
-	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY);
+	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Get the SQL to describe a table
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		/**
 		 * By checking every column type we convert it to a Phalcon\Db\Column
 		 */
-		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY);
+		phalcon_array_fetch_long(&column_type, field, 1, PH_NOISY|PH_READONLY);
 
 		/**
 		 * If the column type has a parentheses we try to get the column size from it
@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		/**
 		 * Check if the field is primary key
 		 */
-		phalcon_array_fetch_long(&attribute, field, 3, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 3, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "PRI")) {
 			phalcon_array_update_str(&definition, SL("primary"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		/**
 		 * Check if the column allows null values
 		 */
-		phalcon_array_fetch_long(&attribute, field, 2, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 2, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "NO")) {
 			phalcon_array_update_str(&definition, SL("notNull"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
@@ -453,17 +453,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		/**
 		 * Check if the column is auto increment
 		 */
-		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 5, PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_STRING(&attribute, "auto_increment")) {
 			phalcon_array_update_str(&definition, SL("autoIncrement"), &PHALCON_GLOBAL(z_true), PH_COPY);
 		}
 
-		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY);
+		phalcon_array_fetch_long(&column_name, field, 0, PH_NOISY|PH_READONLY);
 
 		/**
 		 * If the column set the default values, get it
 		 */
-		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY);
+		phalcon_array_fetch_long(&attribute, field, 4, PH_NOISY|PH_READONLY);
 		if (Z_TYPE(attribute) == IS_STRING) {
 			phalcon_array_update_str(&definition, SL("default"), &attribute, PH_COPY);
 		}

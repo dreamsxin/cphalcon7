@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 
 	zval is_exact = {};
 
-	phalcon_read_property(&is_exact, getThis(), SL("_isExactHandler"), PH_NOISY);
+	phalcon_read_property(&is_exact, getThis(), SL("_isExactHandler"), PH_NOISY|PH_READONLY);
 
 	if (!zend_is_true(&is_exact)) {
 		RETURN_MEMBER(getThis(), "_handlerName");
@@ -201,20 +201,20 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		PHALCON_SEPARATE_PARAM(code);
 	}
 
-	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY);
+	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(error_handlers) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, code, 0)) {
 			PHALCON_CALL_SELF(NULL, "forward", &error_handler);
-			phalcon_read_property(&previous_namespace_name, getThis(), SL("_previousNamespaceName"), PH_NOISY);
-			phalcon_read_property(&previous_controller_name, getThis(), SL("_previousHandlerName"), PH_NOISY);
-			phalcon_read_property(&previous_action_name, getThis(), SL("_previousActionName"), PH_NOISY);
-			phalcon_read_property(&previous_params, getThis(), SL("_previousParams"), PH_NOISY);
+			phalcon_read_property(&previous_namespace_name, getThis(), SL("_previousNamespaceName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&previous_controller_name, getThis(), SL("_previousHandlerName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&previous_action_name, getThis(), SL("_previousActionName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&previous_params, getThis(), SL("_previousParams"), PH_NOISY|PH_READONLY);
 
-			phalcon_read_property(&namespace_name, getThis(), SL("_namespaceName"), PH_NOISY);
-			phalcon_read_property(&controller_name, getThis(), SL("_handlerName"), PH_NOISY);
-			phalcon_read_property(&action_name, getThis(), SL("_actionName"), PH_NOISY);
-			phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY);
+			phalcon_read_property(&namespace_name, getThis(), SL("_namespaceName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&controller_name, getThis(), SL("_handlerName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&action_name, getThis(), SL("_actionName"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY|PH_READONLY);
 
 			if (
 				!PHALCON_IS_EQUAL(&previous_namespace_name, &namespace_name) ||
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 			) {
 				RETURN_FALSE;
 			}
-			
+
 		}
 	}
 
@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
 	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, code);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY);
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 
@@ -347,4 +347,3 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getPreviousActionName){
 
 	RETURN_MEMBER(getThis(), "_previousActionName");
 }
-

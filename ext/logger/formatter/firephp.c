@@ -167,8 +167,8 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, format) {
 
 	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);
 
-	phalcon_read_property(&show_backtrace, getThis(), SL("_showBacktrace"), PH_NOISY);
-	phalcon_read_property(&enable_labels, getThis(), SL("_enableLabels"), PH_NOISY);
+	phalcon_read_property(&show_backtrace, getThis(), SL("_showBacktrace"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&enable_labels, getThis(), SL("_enableLabels"), PH_NOISY|PH_READONLY);
 
 	i_show_backtrace = zend_is_true(&show_backtrace);
 	i_enable_labels  = zend_is_true(&enable_labels);

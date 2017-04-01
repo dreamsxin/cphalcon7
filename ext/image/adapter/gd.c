@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
 
 	phalcon_fetch_params(0, 4, 0, &width, &height, &offset_x, &offset_y);
 
-	phalcon_read_property(&image, getThis(), SL("_image"), 0);
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
 
 	array_init_size(&rect, 4);
 	phalcon_array_update_str(&rect, SL("x"), offset_x, 0);

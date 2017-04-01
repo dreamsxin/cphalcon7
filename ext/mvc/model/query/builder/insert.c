@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct){
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
-	/** 
+	/**
 	 * Update the dependency injector if any
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 
 			PHALCON_CONCAT_SVSV(&key, "phi_", &hidden_param, "_", &column);
 			PHALCON_CONCAT_SVS(&insert_value, " :", &key, ":");
-			
+
 			phalcon_array_append(&insert_values, &insert_value, PH_COPY);
 			phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();

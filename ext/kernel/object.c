@@ -966,11 +966,12 @@ int phalcon_update_property_long(zval *object, const char *property_name, uint32
  */
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length)
 {
-	zval value = {};
+	zval tmp = {};
 	int status = 0;
 
-	ZVAL_STRINGL(&value, str, str_length);
-	status = phalcon_update_property_zval(object, property_name, property_length, &value);
+	ZVAL_STRINGL(&tmp, str, str_length);
+	Z_SET_REFCOUNT(tmp, 0);
+	status = phalcon_update_property_zval(object, property_name, property_length, &tmp);
 	return status;
 }
 
@@ -1166,6 +1167,7 @@ int phalcon_update_property_array_str(zval *object, const char *property, uint32
 	int status = 0;
 
 	ZVAL_STRINGL(&tmp, index, index_length);
+	Z_SET_REFCOUNT(tmp, 0);
 	status = phalcon_update_property_array(object, property, property_length, &tmp, value);
 	return status;
 }
@@ -1630,7 +1632,7 @@ int phalcon_property_incr(zval *object, const char *property_name, uint32_t prop
 
 	zval value = {};
 
-	phalcon_read_property(&value, object, property_name, property_length, 0);
+	phalcon_read_property(&value, object, property_name, property_length, PH_READONLY);
 	phalcon_increment(&value);
 	phalcon_update_property_zval(object, property_name, property_length, &value);
 
@@ -1644,7 +1646,7 @@ int phalcon_property_decr(zval *object, const char *property_name, uint32_t prop
 
 	zval value = {};
 
-	phalcon_read_property(&value, object, property_name, property_length, 0);
+	phalcon_read_property(&value, object, property_name, property_length, PH_READONLY);
 	phalcon_decrement(&value);
 	phalcon_update_property_zval(object, property_name, property_length, &value);
 

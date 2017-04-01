@@ -700,7 +700,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	PHALCON_CALL_METHOD(&matched_route, &router, "getmatchedroute");
 	if (Z_TYPE(matched_route) == IS_OBJECT) {
 
-		phalcon_read_property(&handlers, getThis(), SL("_handlers"), PH_NOISY);
+		phalcon_read_property(&handlers, getThis(), SL("_handlers"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_METHOD(&route_id, &matched_route, "getrouteid");
 		if (!phalcon_array_isset_fetch(&handler, &handlers, &route_id, 0)) {
@@ -748,7 +748,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						/**
 						 * Reload the status
 						 */
-						phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY);
+						phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY|PH_READONLY);
 
 						/**
 						 * break the execution if the middleware was stopped
@@ -777,7 +777,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 				/**
 				 * Reload the 'stopped' status
 				 */
-				phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY);
+				phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&stopped)) {
 					RETURN_CTOR(&status);
 				}
@@ -803,7 +803,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		ZVAL_STRING(&event_name, "micro:afterExecuteRoute");
 		PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
 
-		phalcon_read_property(&after_handlers, getThis(), SL("_afterHandlers"), PH_NOISY);
+		phalcon_read_property(&after_handlers, getThis(), SL("_afterHandlers"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(after_handlers) == IS_ARRAY) {
 			phalcon_update_property_bool(getThis(), SL("_stopped"), 0);
 
@@ -824,7 +824,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 						/**
 						 * Reload the status
 						 */
-						phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY);
+						phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY|PH_READONLY);
 
 						/**
 						 * break the execution if the middleware was stopped
@@ -860,7 +860,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/**
 		 * Check if a notfoundhandler is defined and it's callable
 		 */
-		phalcon_read_property(&not_found_handler, getThis(), SL("_notFoundHandler"), PH_NOISY);
+		phalcon_read_property(&not_found_handler, getThis(), SL("_notFoundHandler"), PH_NOISY|PH_READONLY);
 		if (!phalcon_is_callable(&not_found_handler)) {
 			ZVAL_STRING(&error_message, "The Not-Found handler is not callable or is not defined");
 
@@ -887,7 +887,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	ZVAL_STRING(&event_name, "micro:afterHandleRoute");
 	PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
 
-	phalcon_read_property(&finish_handlers, getThis(), SL("_finishHandlers"), PH_NOISY);
+	phalcon_read_property(&finish_handlers, getThis(), SL("_finishHandlers"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(finish_handlers) == IS_ARRAY) {
 		phalcon_update_property_zval(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
 		/**
@@ -909,7 +909,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 					/**
 					 * Reload the status
 					 */
-					phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY);
+					phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY|PH_READONLY);
 
 					/**
 					 * break the execution if the middleware was stopped
@@ -940,7 +940,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 			/**
 			 * Reload the status
 			 */
-			phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY);
+			phalcon_read_property(&stopped, getThis(), SL("_stopped"), PH_NOISY|PH_READONLY);
 
 			/**
 			 * break the execution if the middleware was stopped
@@ -1155,7 +1155,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, _throwException){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_read_property(&handler, getThis(), SL("_errorHandler"), PH_NOISY);
+	phalcon_read_property(&handler, getThis(), SL("_errorHandler"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_is_callable(&handler)) {
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_micro_exception_ce, message);

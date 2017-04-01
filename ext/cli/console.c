@@ -172,8 +172,8 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			}
 		}
 
-		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY);
-		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, 0)) {
+		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
+		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, PH_READONLY)) {
 			PHALCON_CONCAT_SVS(&exception_msg, "Module '", &module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, &exception_msg);
 			return;

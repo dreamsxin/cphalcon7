@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 		http_methods = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(prefix) != IS_STRING) {
 		convert_to_string_ex(&prefix);
@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Group, _addRoute){
 		}
 	}
 
-	phalcon_read_property(&default_paths, getThis(), SL("_paths"), PH_NOISY);
+	phalcon_read_property(&default_paths, getThis(), SL("_paths"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Check if the paths need to be merged with current paths

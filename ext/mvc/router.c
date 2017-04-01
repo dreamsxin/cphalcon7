@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 	/**
 	 * The developer can change the URI source
 	 */
-	phalcon_read_property(&uri_source, getThis(), SL("_uriSource"), PH_NOISY);
+	phalcon_read_property(&uri_source, getThis(), SL("_uriSource"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * By default we use $_GET['url'] to obtain the rewrite information
@@ -336,7 +336,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		if (phalcon_array_isset_fetch_str(&url, _SERVER, SL("REQUEST_URI"))) {
 			phalcon_fast_explode_str(&url_parts, SL("?"), &url);
 
-			phalcon_array_fetch_long(&real_uri, &url_parts, 0, PH_NOISY);
+			phalcon_array_fetch_long(&real_uri, &url_parts, 0, PH_NOISY|PH_READONLY);
 			if (PHALCON_IS_NOT_EMPTY(&real_uri)) {
 				RETURN_CTOR(&real_uri);
 			}
@@ -548,11 +548,11 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
 	zval namespace_name = {}, module_name = {}, controller_name = {}, action_name = {}, params = {};
 
-	phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY);
-	phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_NOISY);
-	phalcon_read_property(&controller_name, getThis(), SL("_defaultController"), PH_NOISY);
-	phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_NOISY);
-	phalcon_read_property(&params, getThis(), SL("_defaultParams"), PH_NOISY);
+	phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&controller_name, getThis(), SL("_defaultController"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&params, getThis(), SL("_defaultParams"), PH_NOISY|PH_READONLY);
 
 	array_init_size(return_value, 5);
 
@@ -598,7 +598,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	/**
 	 * Remove extra slashes in the route
 	 */
-	phalcon_read_property(&removeextraslashes, getThis(), SL("_removeExtraSlashes"), PH_NOISY);
+	phalcon_read_property(&removeextraslashes, getThis(), SL("_removeExtraSlashes"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&removeextraslashes)) {
 		phalcon_remove_extra_slashes(&handled_uri, &real_uri);
 	} else {
@@ -637,7 +637,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	/**
 	 * Routes are traversed in reversed order
 	 */
-	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
+	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY|PH_READONLY);
 
 	ZEND_HASH_REVERSE_FOREACH_VAL(Z_ARRVAL(routes), route) {
 		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, prefix = {}, regex_host_name = {}, matched = {};
@@ -1228,7 +1228,7 @@ PHP_METHOD(Phalcon_Mvc_Router, mount){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
+	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(routes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&new_routes, &routes, &group_routes);
 		phalcon_update_property_zval(getThis(), SL("_routes"), &new_routes);
@@ -1463,7 +1463,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteById){
 
 	phalcon_fetch_params(0, 1, 0, &id);
 
-	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
+	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(routes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(routes), route) {
 			PHALCON_CALL_METHOD(&route_id, route, "getrouteid");
@@ -1493,12 +1493,12 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
 		convert_to_string(name);
 	}
 
-	phalcon_read_property(&routes_name_lookup, getThis(), SL("_routesNameLookup"), PH_NOISY);
+	phalcon_read_property(&routes_name_lookup, getThis(), SL("_routesNameLookup"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(name) && (route = zend_hash_find(Z_ARRVAL(routes_name_lookup), Z_STR_P(name))) != NULL) {
 		RETURN_CTOR(route);
 	}
 
-	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY);
+	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(routes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(routes), route) {
 			zval route_name = {};

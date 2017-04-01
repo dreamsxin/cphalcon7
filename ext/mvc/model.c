@@ -1481,7 +1481,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				 * Every field must be part of the column map
 				 */
 				if (phalcon_array_isset(column_map, &key)) {
-					phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY);
+					phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY|PH_READONLY);
 					phalcon_update_property_zval_zval(&object, &attribute, &convert_value);
 				} else {
 					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
@@ -1999,7 +1999,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-	phalcon_read_property(&snapshot, getThis(), SL("_snapshot"), PH_NOISY);
+	phalcon_read_property(&snapshot, getThis(), SL("_snapshot"), PH_NOISY|PH_READONLY);
 
 	array_init(&where_pk);
 	array_init(&unique_params);
@@ -2028,7 +2028,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			 * If the primary key attribute is set append it to the conditions
 			 */
 			if (phalcon_isset_property_zval(getThis(), &attribute_field)) {
-				phalcon_read_property_zval(&value, getThis(), &attribute_field, PH_NOISY);
+				phalcon_read_property_zval(&value, getThis(), &attribute_field, PH_NOISY|PH_READONLY);
 			}
 		}
 
@@ -2043,7 +2043,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			phalcon_array_update_zval(&unique_params, &key, &value, PH_COPY);
 
 			if (phalcon_array_isset(&bind_data_types, field)) {
-				phalcon_array_fetch(&type, &bind_data_types, field, PH_NOISY);
+				phalcon_array_fetch(&type, &bind_data_types, field, PH_NOISY|PH_READONLY);
 				phalcon_array_update_zval(&unique_types, &key, &type, PH_COPY);
 			}
 		}
@@ -2498,7 +2498,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _cancelOperation){
 
 	zval operation_made = {}, event_name = {};
 
-	phalcon_read_property(&operation_made, getThis(), SL("_operationMade"), PH_NOISY);
+	phalcon_read_property(&operation_made, getThis(), SL("_operationMade"), PH_NOISY|PH_READONLY);
 
 	if (PHALCON_IS_LONG(&operation_made, 3)) {
 		ZVAL_STRING(&event_name, "notDeleted");
@@ -2752,7 +2752,7 @@ PHP_METHOD(Phalcon_Mvc_Model, validationHasFailed){
 
 	zval error_messages = {};
 
-	phalcon_read_property(&error_messages, getThis(), SL("_errorMessages"), PH_NOISY);
+	phalcon_read_property(&error_messages, getThis(), SL("_errorMessages"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(error_messages) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL(error_messages))) {
 		RETURN_TRUE;
 	}
@@ -2790,7 +2790,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getMessages){
 		RETURN_MEMBER(getThis(), "_errorMessages");
 	}
 
-	phalcon_read_property(&messages, getThis(), SL("_errorMessages"), PH_NOISY);
+	phalcon_read_property(&messages, getThis(), SL("_errorMessages"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		array_init(return_value);
 
@@ -2887,9 +2887,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 								ZVAL_LONG(&position, idx);
 							}
 
-							phalcon_read_property_zval(&value, getThis(), field, PH_NOISY);
+							phalcon_read_property_zval(&value, getThis(), field, PH_NOISY|PH_READONLY);
 
-							phalcon_array_fetch(&referenced_field, &referenced_fields, &position, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, &referenced_fields, &position, PH_NOISY|PH_READONLY);
 
 							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &position);
 							phalcon_array_append(&conditions, &condition, PH_COPY);
@@ -2901,7 +2901,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysRestrict){
 						/**
 						 * Create a simple condition
 						 */
-						phalcon_read_property_zval(&value, getThis(), &fields, PH_NOISY);
+						phalcon_read_property_zval(&value, getThis(), &fields, PH_NOISY|PH_READONLY);
 
 						PHALCON_CONCAT_SVS(&condition, "[", &referenced_fields, "] = ?0");
 						phalcon_array_append(&conditions, &condition, PH_COPY);
@@ -3022,7 +3022,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 				 * Try to find a different action in the foreign key's options
 				 */
 				if (Z_TYPE(foreign_key) == IS_ARRAY && phalcon_array_isset_str(&foreign_key, SL("action"))) {
-					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
+					phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY|PH_READONLY);
 				}
 
 				/**
@@ -3054,9 +3054,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 								ZVAL_LONG(&tmp, idx);
 							}
 
-							phalcon_read_property_zval(&value, getThis(), field, PH_NOISY);
+							phalcon_read_property_zval(&value, getThis(), field, PH_NOISY|PH_READONLY);
 
-							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY|PH_READONLY);
 
 							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &tmp);
 							phalcon_array_append(&conditions, &condition, PH_COPY);
@@ -3064,7 +3064,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseRestrict){
 						} ZEND_HASH_FOREACH_END();
 
 					} else {
-						phalcon_read_property_zval(&value, getThis(), &fields, PH_NOISY);
+						phalcon_read_property_zval(&value, getThis(), &fields, PH_NOISY|PH_READONLY);
 
 						PHALCON_CONCAT_SVS(&condition, "[", &referenced_fields, "] = ?0");
 						phalcon_array_append(&conditions, &condition, PH_COPY);
@@ -3171,7 +3171,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 				 */
 				if (Z_TYPE(foreign_key) == IS_ARRAY) {
 					if (phalcon_array_isset_str(&foreign_key, SL("action"))) {
-						phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY);
+						phalcon_array_fetch_str(&action, &foreign_key, SL("action"), PH_NOISY|PH_READONLY);
 					}
 				}
 
@@ -3206,7 +3206,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 								phalcon_return_property_zval(&value, getThis(), field);
 							}
 
-							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY);
+							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY|PH_READONLY);
 
 							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &tmp);
 							phalcon_array_append(&conditions, &condition, PH_COPY);
@@ -3388,7 +3388,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 				ZVAL_NULL(&value);
 			}
 
-			phalcon_array_fetch(&field_type, &data_types, field, PH_NOISY);
+			phalcon_array_fetch(&field_type, &data_types, field, PH_NOISY|PH_READONLY);
 
 			/**
 			 * Field is null when: 1) is not set, 2) is numeric but its value is not numeric,
@@ -3624,7 +3624,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		/**
 		 * Always return true if the operation is skipped
 		 */
-		phalcon_read_property(&skipped, getThis(), SL("_skipped"), PH_NOISY);
+		phalcon_read_property(&skipped, getThis(), SL("_skipped"), PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_TRUE(&skipped)) {
 			RETURN_TRUE;
 		}
@@ -3980,7 +3980,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
 					phalcon_array_update_zval(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
-					phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY);
+					phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY|PH_READONLY);
 					phalcon_array_append(&bind_types, &bind_type, PH_COPY);
 				} else {
 					/**
@@ -4005,7 +4005,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
 						phalcon_array_update_zval(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
-						phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY);
+						phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY|PH_READONLY);
 						phalcon_array_append(&bind_types, &bind_type, PH_COPY);
 					}
 				}
@@ -4884,7 +4884,7 @@ PHP_METHOD(Phalcon_Mvc_Model, readAttribute){
 
 	phalcon_fetch_params(0, 1, 0, &attribute);
 
-	phalcon_read_property_zval(return_value, getThis(), attribute, PH_NOISY);
+	phalcon_read_property_zval(return_value, getThis(), attribute, PH_NOISY|PH_READONLY);
 }
 
 /**
@@ -5295,7 +5295,7 @@ PHP_METHOD(Phalcon_Mvc_Model, setSnapshotData){
 					return;
 				}
 
-				phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY);
+				phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY|PH_READONLY);
 				phalcon_array_update_zval(&snapshot, &attribute, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -5316,7 +5316,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasSnapshotData){
 
 	zval snapshot = {};
 
-	phalcon_read_property(&snapshot, getThis(), SL("_snapshot"), PH_NOISY);
+	phalcon_read_property(&snapshot, getThis(), SL("_snapshot"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(snapshot) == IS_ARRAY) {
 		RETURN_TRUE;
 	}
@@ -5367,7 +5367,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 		}
 	}
 
-	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY);
+	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Dirty state must be DIRTY_PERSISTENT to make the checking
@@ -5431,7 +5431,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 
 		phalcon_return_property_zval(&attribute_value, getThis(), field_name);
 
-		phalcon_array_fetch(&original_value, &snapshot, field_name, PH_NOISY);
+		phalcon_array_fetch(&original_value, &snapshot, field_name, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Check if the field has changed
@@ -5471,7 +5471,7 @@ PHP_METHOD(Phalcon_Mvc_Model, hasChanged){
 
 		phalcon_return_property_zval(&attribute_value, getThis(), &name);
 
-		phalcon_array_fetch(&original_value, &snapshot, &name, PH_NOISY);
+		phalcon_array_fetch(&original_value, &snapshot, &name, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Check if the field has changed
@@ -5556,7 +5556,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
 			continue;
 		}
 
-		phalcon_array_fetch(&original_value, &snapshot, &tmp, PH_NOISY);
+		phalcon_array_fetch(&original_value, &snapshot, &tmp, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Check if the field has changed
@@ -5816,7 +5816,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 		return;
 	}
 
-	phalcon_array_fetch_long(&value, arguments, 0, PH_NOISY);
+	phalcon_array_fetch_long(&value, arguments, 0, PH_NOISY|PH_READONLY);
 	ce0 = phalcon_fetch_class(&model_name, ZEND_FETCH_CLASS_DEFAULT);
 
 	PHALCON_OBJECT_INIT(&model, ce0);
@@ -6475,13 +6475,13 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 
 		if (!phalcon_array_isset_fetch_long(&bind_params, parameters, 1)) {
 			if (phalcon_array_isset_str(parameters, SL("bind"))) {
-				phalcon_array_fetch_str(&bind_params, parameters, SL("bind"), PH_NOISY);
+				phalcon_array_fetch_str(&bind_params, parameters, SL("bind"), PH_NOISY|PH_READONLY);
 			}
 		}
 
 		if (!phalcon_array_isset_fetch_long(&bind_types, parameters, 2)) {
 			if (phalcon_array_isset_str(parameters, SL("bindTypes"))) {
-				phalcon_array_fetch_str(&bind_types, parameters, SL("bindTypes"), PH_NOISY);
+				phalcon_array_fetch_str(&bind_types, parameters, SL("bindTypes"), PH_NOISY|PH_READONLY);
 			}
 		}
 	}
@@ -6627,7 +6627,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isRecord){
 
 	zval dirty_state = {};
 
-	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY);
+	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_get_intval(&dirty_state) == PHALCON_MODEL_DIRTY_STATE_PERSISTEN) {
 		RETURN_TRUE;
@@ -6645,7 +6645,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isNewRecord){
 
 	zval dirty_state = {};
 
-	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY);
+	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_get_intval(&dirty_state) == PHALCON_MODEL_DIRTY_STATE_TRANSIENT) {
 		RETURN_TRUE;
@@ -6663,7 +6663,7 @@ PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord){
 
 	zval dirty_state = {};
 
-	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY);
+	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_get_intval(&dirty_state) == PHALCON_MODEL_DIRTY_STATE_DETACHED) {
 		RETURN_TRUE;

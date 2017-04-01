@@ -201,7 +201,7 @@ PHP_METHOD(Phalcon_Socket, setBlocking){
 	} else {
 		PHALCON_CALL_FUNCTION(return_value, "socket_set_nonblock", &socket);
 	}
-	phalcon_update_property_zval(getThis(), SL("_blocking"), flag);
+	phalcon_update_property(getThis(), SL("_blocking"), flag);
 }
 
 /**

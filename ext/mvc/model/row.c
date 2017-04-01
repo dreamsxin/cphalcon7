@@ -71,7 +71,7 @@ static const zend_function_entry phalcon_mvc_model_row_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Row, offsetSet, arginfo_phalcon_mvc_model_row_offsetset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Row, offsetUnset, arginfo_phalcon_mvc_model_row_offsetunset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Row, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Row, count, NULL, ZEND_ACC_PUBLIC)	
+	PHP_ME(Phalcon_Mvc_Model_Row, count, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -127,11 +127,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetExists){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Row, offsetGet){
 
-	zval *index, value;
+	zval *index, value = {};
 
 	phalcon_fetch_params(0, 1, 0, &index);
 
-	if (phalcon_property_isset_fetch_zval(&value, getThis(), index)) {
+	if (phalcon_property_isset_fetch_zval(&value, getThis(), index, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 
@@ -194,10 +194,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 PHP_METHOD(Phalcon_Mvc_Model_Row, count)
 {
 	HashTable *properties;
-	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());	
+	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
 	if (properties) {
 		RETURN_LONG(zend_hash_num_elements(properties));
 	}
 	RETURN_LONG(0);
 }
-

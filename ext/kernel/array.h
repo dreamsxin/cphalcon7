@@ -39,7 +39,7 @@
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  * @throw E_WARNING if @a offset is not a scalar
  */
-int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int readonly);
+int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int flags);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr
@@ -213,7 +213,7 @@ static inline int phalcon_array_append_string(zval *arr, const char *value, uint
  * @arg @c PH_SEPARATE: separate @a arr if its reference count is greater than 1; @c *arr will contain the separated version
  * @arg @c PH_COPY: increment the reference count on @c **value
  */
-int phalcon_array_update_zval(zval *arr, const zval *index, zval *value, int flags);
+int phalcon_array_update(zval *arr, const zval *index, zval *value, int flags);
 int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int flags);
 
 /**
@@ -226,7 +226,7 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
  * @retval @c FAILURE Failure, @a arr is not an array or @a index is of not supported type
  * @retval @c SUCCESS Success
  * @throw @c E_WARNING if @a arr is not an array
- * @see phalcon_array_update_zval()
+ * @see phalcon_array_update()
  *
  * Equivalent to <tt>$arr[$index] = $value</tt> in PHP, where @c $value is a boolean.
  */
@@ -234,7 +234,7 @@ static inline int phalcon_array_update_zval_bool(zval *arr, zval *index, int val
 {
 	zval zvalue;
 	ZVAL_BOOL(&zvalue, value);
-	return phalcon_array_update_zval(arr, index, &zvalue, flags);
+	return phalcon_array_update(arr, index, &zvalue, flags);
 }
 
 /**
@@ -247,7 +247,7 @@ static inline int phalcon_array_update_zval_bool(zval *arr, zval *index, int val
  * @retval @c FAILURE Failure, @a arr is not an array or @a index is of not supported type
  * @retval @c SUCCESS Success
  * @throw @c E_WARNING if @a arr is not an array
- * @see phalcon_array_update_zval()
+ * @see phalcon_array_update()
  *
  * Equivalent to <tt>$arr[$index] = $value</tt> in PHP, where @c $value is an integer.
  */
@@ -255,7 +255,7 @@ static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long va
 {
 	zval zvalue;
 	ZVAL_LONG(&zvalue, value);
-	return phalcon_array_update_zval(arr, index, &zvalue, flags);
+	return phalcon_array_update(arr, index, &zvalue, flags);
 }
 
 /**
@@ -269,7 +269,7 @@ static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long va
  * @retval @c FAILURE Failure, @a arr is not an array or @a index is of not supported type
  * @retval @c SUCCESS Success
  * @throw @c E_WARNING if @a arr is not an array
- * @see phalcon_array_update_zval()
+ * @see phalcon_array_update()
  *
  * Equivalent to <tt>$arr[$index] = $value</tt> in PHP, where @c $value is a string.
  */
@@ -277,7 +277,7 @@ static inline int phalcon_array_update_zval_str(zval *arr, zval *index, char *va
 {
 	zval zvalue;
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	return phalcon_array_update_zval(arr, index, &zvalue, flags);
+	return phalcon_array_update(arr, index, &zvalue, flags);
 }
 
 /**

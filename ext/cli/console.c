@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		PHALCON_CPY_WRT_CTOR(&arguments, _arguments);
 	}
 
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 
 	ZVAL_STRING(&service, ISV(router));
 
@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
+			phalcon_update_property(getThis(), SL("_moduleObject"), &module_object);
 
 			ZVAL_STRING(&event_name, "console:afterStartModule");
 

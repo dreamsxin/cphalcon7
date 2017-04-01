@@ -76,7 +76,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __construct){
 	phalcon_fetch_params(0, 1, 0, &definition);
 	PHALCON_ENSURE_IS_STRING(definition);
 
-	phalcon_update_property_zval(getThis(), SL("_definition"), definition);
+	phalcon_update_property(getThis(), SL("_definition"), definition);
 }
 
 /**
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 		if (phalcon_has_constructor(&handler)) {
 			PHALCON_CALL_METHOD(NULL, &handler, "__construct");
 		}
-		phalcon_update_property_zval(getThis(), SL("_handler"), &handler);
+		phalcon_update_property(getThis(), SL("_handler"), &handler);
 	}
 
 	array_init_size(&call_handler, 2);

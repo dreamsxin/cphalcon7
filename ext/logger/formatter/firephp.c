@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, setShowBacktrace) {
 	phalcon_fetch_params(0, 1, 0, &show);
 
 	PHALCON_ENSURE_IS_BOOL(show);
-	phalcon_update_property_zval(getThis(), SL("_showBacktrace"), show);
+	phalcon_update_property(getThis(), SL("_showBacktrace"), show);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, enableLabels) {
 	phalcon_fetch_params(0, 1, 0, &enable);
 
 	PHALCON_ENSURE_IS_BOOL(enable);
-	phalcon_update_property_zval(getThis(), SL("_enableLabels"), enable);
+	phalcon_update_property(getThis(), SL("_enableLabels"), enable);
 }
 
 PHP_METHOD(Phalcon_Logger_Formatter_Firephp, labelsEnabled) {

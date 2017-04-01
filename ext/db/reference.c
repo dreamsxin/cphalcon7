@@ -111,35 +111,35 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
 	
-	phalcon_update_property_zval(getThis(), SL("_referenceName"), reference_name);
+	phalcon_update_property(getThis(), SL("_referenceName"), reference_name);
 
 	if (phalcon_array_isset_fetch_str(&referenced_table, definition, SL("referencedTable"))) {
-		phalcon_update_property_zval(getThis(), SL("_referencedTable"), &referenced_table);
+		phalcon_update_property(getThis(), SL("_referencedTable"), &referenced_table);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
 	
 	if (phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
-		phalcon_update_property_zval(getThis(), SL("_columns"), &columns);
+		phalcon_update_property(getThis(), SL("_columns"), &columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_fetch_str(&referenced_columns, definition, SL("referencedColumns"))) {
-		phalcon_update_property_zval(getThis(), SL("_referencedColumns"), &referenced_columns);
+		phalcon_update_property(getThis(), SL("_referencedColumns"), &referenced_columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
 	
 	if (phalcon_array_isset_fetch_str(&schema, definition, SL("schema"))) {
-		phalcon_update_property_zval(getThis(), SL("_schemaName"), &schema);
+		phalcon_update_property(getThis(), SL("_schemaName"), &schema);
 	}
 	
 	if (phalcon_array_isset_fetch_str(&referenced_schema, definition, SL("referencedSchema"))) {
-		phalcon_update_property_zval(getThis(), SL("_referencedSchema"), &referenced_schema);
+		phalcon_update_property(getThis(), SL("_referencedSchema"), &referenced_schema);
 	}
 	
 	number_columns = phalcon_fast_count_int(&columns);
@@ -151,11 +151,11 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	}
 	
 	if (phalcon_array_isset_fetch_str(&on_delete, definition, SL("onDelete"))) {
-		phalcon_update_property_zval(getThis(), SL("_onDelete"), &on_delete);
+		phalcon_update_property(getThis(), SL("_onDelete"), &on_delete);
 	}
 	
 	if (phalcon_array_isset_fetch_str(&on_update, definition, SL("onUpdate"))) {
-		phalcon_update_property_zval(getThis(), SL("_onUpdate"), &on_update);
+		phalcon_update_property(getThis(), SL("_onUpdate"), &on_update);
 	}
 }
 

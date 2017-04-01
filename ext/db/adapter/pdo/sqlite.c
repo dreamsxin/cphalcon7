@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeIndexes){
 		object_init_ex(&index, phalcon_db_index_ce);
 		PHALCON_CALL_METHOD(NULL, &index, "__construct", &name, index_columns);
 
-		phalcon_array_update_zval(&index_objects, &name, &index, PH_COPY);
+		phalcon_array_update(&index_objects, &name, &index, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(&index_objects);
@@ -576,7 +576,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeReferences){
 		 */
 		object_init_ex(&reference, phalcon_db_reference_ce);
 		PHALCON_CALL_METHOD(NULL, &reference, "__construct", &constraint_name, &reference_array);
-		phalcon_array_update_zval(&reference_objects, &constraint_name, &reference, PH_COPY);
+		phalcon_array_update(&reference_objects, &constraint_name, &reference, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	RETURN_CTOR(&reference_objects);

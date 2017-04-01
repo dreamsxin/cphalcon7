@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_CPY_WRT_CTOR(&params, parameters);
 	}
 
-	phalcon_return_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"));
+	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
 		phalcon_array_merge_recursive_n2(&params, &default_params);
 	}

@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 
 	phalcon_fetch_params(0, 1, 4, &text, &_version, &level, &_mode, &_casesensitive);
 
-	phalcon_update_property_zval(getThis(), SL("_text"), text);
+	phalcon_update_property(getThis(), SL("_text"), text);
 
 	if (!_version || Z_TYPE_P(_version) == IS_NULL) {
 		phalcon_read_property(&version, getThis(), SL("_version"), PH_NOISY|PH_READONLY);
@@ -268,7 +268,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		RETURN_FALSE;
 	} else {
 		ZVAL_RES(&zid, zend_register_resource(qr, phalcon_qrcode_handle));
-		phalcon_update_property_zval(getThis(), SL("_qr"), &zid);
+		phalcon_update_property(getThis(), SL("_qr"), &zid);
 		RETURN_TRUE;
 	}
 #endif

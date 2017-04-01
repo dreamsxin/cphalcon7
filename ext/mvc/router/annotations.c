@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addResource){
 	phalcon_array_append(&scope, prefix, PH_COPY);
 	phalcon_array_append(&scope, handler, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), &scope);
-	phalcon_update_property_zval(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
+	phalcon_update_property(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 
 	RETURN_THIS();
 }
@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, addModuleResource){
 	phalcon_array_append(&scope, module, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_handlers"), &scope);
 
-	phalcon_update_property_zval(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
+	phalcon_update_property(getThis(), SL("_processed"), &PHALCON_GLOBAL(z_false));
 
 	RETURN_THIS();
 }
@@ -356,7 +356,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processControllerAnnotation){
 	 */
 	if (PHALCON_IS_STRING(&name, "RoutePrefix")) {
 		PHALCON_CALL_METHOD(&value, annotation, "getargument", &PHALCON_GLOBAL(z_zero));
-		phalcon_update_property_zval(getThis(), SL("_routePrefix"), &value);
+		phalcon_update_property(getThis(), SL("_routePrefix"), &value);
 	}
 }
 
@@ -530,7 +530,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, setControllerSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &controller_suffix);
 
-	phalcon_update_property_zval(getThis(), SL("_controllerSuffix"), controller_suffix);
+	phalcon_update_property(getThis(), SL("_controllerSuffix"), controller_suffix);
 
 }
 
@@ -545,7 +545,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, setActionSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &action_suffix);
 
-	phalcon_update_property_zval(getThis(), SL("_actionSuffix"), action_suffix);
+	phalcon_update_property(getThis(), SL("_actionSuffix"), action_suffix);
 
 }
 

@@ -80,14 +80,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	phalcon_update_property_zval(getThis(), SL("_config"), config);
+	phalcon_update_property(getThis(), SL("_config"), config);
 
 	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
-		phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
+		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
-		phalcon_update_property_zval(getThis(), SL("_page"), &page);
+		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 }
 
@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
 
 	phalcon_fetch_params(0, 1, 0, &page);
 
-	phalcon_update_property_zval(getThis(), SL("_page"), page);
+	phalcon_update_property(getThis(), SL("_page"), page);
 	RETURN_THIS();
 }
 
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		}
 	}
 
-	phalcon_update_property_zval(&page, SL("items"), &page_items);
+	phalcon_update_property(&page, SL("items"), &page_items);
 
 	phalcon_add_function(&maximum_pages, &start, &show);
 	if (PHALCON_LT(&maximum_pages, &rowcount)) {
@@ -199,16 +199,16 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		ZVAL_COPY_VALUE(&next, &total_pages);
 	}
 
-	phalcon_update_property_zval(&page, SL("next"), &next);
+	phalcon_update_property(&page, SL("next"), &next);
 	if (PHALCON_GT(&page_number, &PHALCON_GLOBAL(z_one))) {
 		phalcon_sub_function(&before, &page_number, &PHALCON_GLOBAL(z_one));
 	} else {
 		ZVAL_COPY_VALUE(&before, &PHALCON_GLOBAL(z_one));
 	}
 
-	phalcon_update_property_zval(&page, SL("first"), &PHALCON_GLOBAL(z_one));
-	phalcon_update_property_zval(&page, SL("before"), &before);
-	phalcon_update_property_zval(&page, SL("current"), &page_number);
+	phalcon_update_property(&page, SL("first"), &PHALCON_GLOBAL(z_one));
+	phalcon_update_property(&page, SL("before"), &before);
+	phalcon_update_property(&page, SL("current"), &page_number);
 
 	mod_function(&remainder, &rowcount, &show);
 
@@ -221,9 +221,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 		ZVAL_COPY_VALUE(&pages_total, &possible_pages);
 	}
 
-	phalcon_update_property_zval(&page, SL("last"), &pages_total);
-	phalcon_update_property_zval(&page, SL("total_pages"), &pages_total);
-	phalcon_update_property_zval(&page, SL("total_items"), &rowcount);
+	phalcon_update_property(&page, SL("last"), &pages_total);
+	phalcon_update_property(&page, SL("total_pages"), &pages_total);
+	phalcon_update_property(&page, SL("total_items"), &rowcount);
 
 	RETURN_CTOR(&page);
 }

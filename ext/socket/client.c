@@ -118,14 +118,14 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 	phalcon_fetch_params(0, 1, 4, &address, &port, &_domain, &_type, &_protocol);
 
 	if (Z_TYPE_P(address) == IS_RESOURCE) {
-		phalcon_update_property_zval(getThis(), SL("_socket"), address);
+		phalcon_update_property(getThis(), SL("_socket"), address);
 	} else {
 		if (!port) {
 			port = &PHALCON_GLOBAL(z_zero);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_address"), address);
-		phalcon_update_property_zval(getThis(), SL("_port"), port);
+		phalcon_update_property(getThis(), SL("_address"), address);
+		phalcon_update_property(getThis(), SL("_port"), port);
 
 		if (!_domain || Z_TYPE_P(_domain) == IS_NULL) {
 			ZVAL_LONG(&filter_type, 275); // FILTER_VALIDATE_IP
@@ -163,7 +163,7 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 			return;
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_socket"), &socket);
+		phalcon_update_property(getThis(), SL("_socket"), &socket);
 	}
 }
 

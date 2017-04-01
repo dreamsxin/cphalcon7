@@ -191,35 +191,35 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 * To get the internal types
 		 */
 		PHALCON_CALL_METHOD(&type, column, "gettype");
-		phalcon_array_update_zval(&field_types, &field_name, &type, PH_COPY);
+		phalcon_array_update(&field_types, &field_name, &type, PH_COPY);
 
 		/**
 		 * To get the internal size
 		 */
 		PHALCON_CALL_METHOD(&size, column, "getsize");
-		phalcon_array_update_zval(&field_sizes, &field_name, &size, PH_COPY);
+		phalcon_array_update(&field_sizes, &field_name, &size, PH_COPY);
 
 		/**
 		 * To get the internal bytes
 		 */
 		PHALCON_CALL_METHOD(&bytes, column, "getbytes");
-		phalcon_array_update_zval(&field_bytes, &field_name, &bytes, PH_COPY);
+		phalcon_array_update(&field_bytes, &field_name, &bytes, PH_COPY);
 
 		/**
 		 * To get the internal scale
 		 */
 		PHALCON_CALL_METHOD(&scale, column, "getscale");
-		phalcon_array_update_zval(&field_scales, &field_name, &scale, PH_COPY);
+		phalcon_array_update(&field_scales, &field_name, &scale, PH_COPY);
 
 		/**
 		 * To mark how the fields must be escaped
 		 */
 		PHALCON_CALL_METHOD(&bind_type, column, "getbindtype");
-		phalcon_array_update_zval(&field_bind_types, &field_name, &bind_type, PH_COPY);
+		phalcon_array_update(&field_bind_types, &field_name, &bind_type, PH_COPY);
 
 		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			phalcon_array_update_zval(&field_default_values, &field_name, &default_value, PH_COPY);
+			phalcon_array_update(&field_default_values, &field_name, &default_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	if (Z_TYPE(columns) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column_name) {
 			if (!phalcon_array_isset(&ordered_column_map, column_name)) {
-				phalcon_array_update_zval(&ordered_column_map, column_name, column_name, PH_COPY);
+				phalcon_array_update(&ordered_column_map, column_name, column_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -289,7 +289,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 		} else {
 			ZVAL_LONG(&name, idx);
 		}
-		phalcon_array_update_zval(&reversed_column_map, column_name, &name, PH_COPY);
+		phalcon_array_update(&reversed_column_map, column_name, &name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 

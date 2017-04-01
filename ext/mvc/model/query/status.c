@@ -94,10 +94,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Status, __construct){
 
 	phalcon_fetch_params(0, 1, 1, &success, &model);
 
-	phalcon_update_property_zval(getThis(), SL("_success"), success);
+	phalcon_update_property(getThis(), SL("_success"), success);
 
 	if (model) {
-		phalcon_update_property_zval(getThis(), SL("_model"), model);
+		phalcon_update_property(getThis(), SL("_model"), model);
 	}
 
 }

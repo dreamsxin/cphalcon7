@@ -123,7 +123,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 	}
 
 	if (phalcon_array_isset_fetch_str(&schema, &descriptor, SL("schema"))) {
-		phalcon_update_property_zval(getThis(), SL("_schema"), &schema);
+		phalcon_update_property(getThis(), SL("_schema"), &schema);
 		phalcon_array_unset_str(&descriptor, SL("schema"), PH_SEPARATE);
 	}
 

@@ -262,8 +262,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		 */
 		PHALCON_CALL_METHOD(&model_column_map, getThis(), "read", &prefix_key);
 		if (Z_TYPE(model_column_map) != IS_NULL) {
-			phalcon_array_update_zval(&column_map, key, &model_column_map, PH_COPY);
-			phalcon_update_property_zval(getThis(), SL("_columnMap"), &column_map);
+			phalcon_array_update(&column_map, key, &model_column_map, PH_COPY);
+			phalcon_update_property(getThis(), SL("_columnMap"), &column_map);
 			RETURN_NULL();
 		}
 
@@ -307,7 +307,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The meta-data extraction strategy is not valid");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_strategy"), strategy);
+	phalcon_update_property(getThis(), SL("_strategy"), strategy);
 
 }
 
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 	phalcon_read_property(&strategy, getThis(), SL("_strategy"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(strategy) == IS_NULL) {
 		object_init_ex(&s, phalcon_mvc_model_metadata_strategy_introspection_ce);
-		phalcon_update_property_zval(getThis(), SL("_strategy"), &s);
+		phalcon_update_property(getThis(), SL("_strategy"), &s);
 		RETURN_CTOR(&s);
 	}
 
@@ -469,13 +469,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 			}
 
 			if (!phalcon_array_isset(data, &tmp)) {
-				phalcon_array_update_zval(data, &tmp, v, PH_COPY);
+				phalcon_array_update(data, &tmp, v, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 
 	phalcon_array_update_multi_2(&meta_data, &key, index, data, PH_COPY);
-	phalcon_update_property_zval(getThis(), SL("_metaData"), &meta_data);
+	phalcon_update_property(getThis(), SL("_metaData"), &meta_data);
 }
 
 /**
@@ -730,7 +730,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
 }
 
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatasizes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
 }
 
@@ -828,7 +828,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataByte){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatabytes", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
 }
 
@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatascales", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
 	}
 }
 

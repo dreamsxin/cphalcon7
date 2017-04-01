@@ -277,13 +277,15 @@ PHP_METHOD(Phalcon_Arr, is_array){
  */
 PHP_METHOD(Phalcon_Arr, path){
 
-	zval *array, *path, *default_value = NULL, *delimiter = NULL, is_array = {}, keys = {}, key = {}, *arr = NULL;
+	zval *array, *path, *default_value = NULL, *_delimiter = NULL, delimiter = {}, is_array = {}, keys = {}, key = {}, *arr = NULL;
 
-	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &delimiter);
+	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &_delimiter);
 	PHALCON_SEPARATE_PARAM(array);
 
-	if (!delimiter) {
-		delimiter = phalcon_read_static_property(SL("phalcon\\arr"), SL("delimiter"));
+	if (!_delimiter || Z_TYPE_P(_delimiter) == IS_NULL) {
+		phalcon_read_static_property_ce(&delimiter, phalcon_arr_ce, SL("delimiter"), PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&delimiter, _delimiter);
 	}
 
 	PHALCON_CALL_SELF(&is_array, "is_array", array);
@@ -300,7 +302,7 @@ PHP_METHOD(Phalcon_Arr, path){
 			return;
 		}
 
-		phalcon_fast_explode(&keys, delimiter, path);
+		phalcon_fast_explode(&keys, &delimiter, path);
 	}
 
 	do {
@@ -376,21 +378,23 @@ end:
  */
 PHP_METHOD(Phalcon_Arr, set_path){
 
-	zval *array, *path, *value, *delimiter = NULL, *flag = NULL, keys = {}, cpy_array = {}, key = {};
+	zval *array, *path, *value, *_delimiter = NULL, *flag = NULL, delimiter = {}, keys = {}, cpy_array = {}, key = {};
 	int found = 1;
 
-	phalcon_fetch_params(0, 3, 2, &array, &path, &value, &delimiter, &flag);
+	phalcon_fetch_params(0, 3, 2, &array, &path, &value, &_delimiter, &flag);
 	ZVAL_DEREF(array);
 
 	if (Z_TYPE_P(path) == IS_ARRAY) {
 		PHALCON_SEPARATE_PARAM(path);
 		ZVAL_COPY_VALUE(&keys, path);
 	} else {
-		if (!delimiter || Z_TYPE_P(delimiter) == IS_NULL) {
-			delimiter = phalcon_read_static_property_ce(phalcon_arr_ce, SL("delimiter"));
+		if (!_delimiter || Z_TYPE_P(_delimiter) == IS_NULL) {
+			phalcon_read_static_property_ce(&delimiter, phalcon_arr_ce, SL("delimiter"), PH_READONLY);
+		} else {
+			ZVAL_COPY_VALUE(&delimiter, _delimiter);
 		}
 
-		phalcon_fast_explode(&keys, delimiter, path);
+		phalcon_fast_explode(&keys, &delimiter, path);
 	}
 
 	if (!flag) {
@@ -431,7 +435,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 				ZVAL_COPY_VALUE(&cpy_array, &v);
 			} else {
 				array_init(&v);
-				phalcon_array_update_zval(&cpy_array, &key, &v, PH_COPY);
+				phalcon_array_update(&cpy_array, &key, &v, PH_COPY);
 				zval_ptr_dtor(&v);
 			}
 		}
@@ -452,9 +456,9 @@ PHP_METHOD(Phalcon_Arr, set_path){
 				array_init(&v);
 			}
 			phalcon_array_append(&v, value, PH_COPY);
-			phalcon_array_update_zval(&cpy_array, &key, &v, PH_COPY);
+			phalcon_array_update(&cpy_array, &key, &v, PH_COPY);
 		} else {
-			phalcon_array_update_zval(&cpy_array, &key, value, PH_COPY);
+			phalcon_array_update(&cpy_array, &key, value, PH_COPY);
 		}
 	}
 }
@@ -545,7 +549,7 @@ PHP_METHOD(Phalcon_Arr, get){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
 				zval value0 = {};
 				if (phalcon_array_isset_fetch(&value0, array, key, 0)) {
-					phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
+					phalcon_array_update(return_value, key, &value0, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 			if (phalcon_fast_count_ev(return_value)) {
@@ -560,14 +564,14 @@ PHP_METHOD(Phalcon_Arr, get){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
 				zval value0 = {};
-				if (phalcon_property_isset_fetch_zval(&value0, array, key)) {
-					phalcon_array_update_zval(return_value, key, &value0, PH_COPY);
+				if (phalcon_property_isset_fetch_zval(&value0, array, key, PH_READONLY)) {
+					phalcon_array_update(return_value, key, &value0, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 			if (phalcon_fast_count_ev(return_value)) {
 				return;
 			}
-		} else if (phalcon_property_isset_fetch_zval(&value, array, keys)) {
+		} else if (phalcon_property_isset_fetch_zval(&value, array, keys, PH_READONLY)) {
 			RETURN_CTOR(&value);
 		}
 	}
@@ -687,7 +691,7 @@ PHP_METHOD(Phalcon_Arr, unshift){
 
 	PHALCON_CALL_FUNCTION(&tmp, "array_reverse", array, &PHALCON_GLOBAL(z_true));
 
-	phalcon_array_update_zval(&tmp, key, val, PH_COPY);
+	phalcon_array_update(&tmp, key, val, PH_COPY);
 
 	PHALCON_RETURN_CALL_FUNCTION("array_reverse", &tmp, &PHALCON_GLOBAL(z_true));
 }
@@ -725,7 +729,7 @@ PHP_METHOD(Phalcon_Arr, map){
 		}
 		if (Z_TYPE_P(val) == IS_ARRAY) {
 			PHALCON_CALL_SELF(&value, "map", callbacks, val);
-			phalcon_array_update_zval(array, &key, &value, PH_COPY);
+			phalcon_array_update(array, &key, &value, PH_COPY);
 		} else if (!keys || Z_TYPE_P(keys) != IS_ARRAY || phalcon_fast_in_array(&key, keys)) {
 			if (Z_TYPE_P(callbacks) == IS_ARRAY) {
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(callbacks), callback) {
@@ -735,7 +739,7 @@ PHP_METHOD(Phalcon_Arr, map){
 
 					PHALCON_CALL_USER_FUNC_ARRAY(&value, callback, &params);
 
-					phalcon_array_update_zval(array, &key, &value, PH_COPY);
+					phalcon_array_update(array, &key, &value, PH_COPY);
 					zval_ptr_dtor(&params);
 				} ZEND_HASH_FOREACH_END();
 			} else {
@@ -745,7 +749,7 @@ PHP_METHOD(Phalcon_Arr, map){
 
 				PHALCON_CALL_USER_FUNC_ARRAY(&value, callbacks, &params);
 
-				phalcon_array_update_zval(array, &key, &value, PH_COPY);
+				phalcon_array_update(array, &key, &value, PH_COPY);
 				zval_ptr_dtor(&params);
 			}
 		}
@@ -797,12 +801,12 @@ PHP_METHOD(Phalcon_Arr, merge){
 				if (Z_TYPE(value1) == IS_ARRAY) {
 					PHALCON_CALL_SELF(&arr, "merge", &value1, value);
 
-					phalcon_array_update_zval(return_value, &tmp, &arr, PH_COPY);
+					phalcon_array_update(return_value, &tmp, &arr, PH_COPY);
 				} else {
-					phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, value, PH_COPY);
 				}
 			} else {
-				phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+				phalcon_array_update(return_value, &tmp, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {
@@ -1099,19 +1103,21 @@ PHP_METHOD(Phalcon_Arr, filter){
  */
 PHP_METHOD(Phalcon_Arr, sum){
 
-	zval *array, *path, *default_value = NULL, *delimiter = NULL, values = {};
+	zval *array, *path, *default_value = NULL, *_delimiter = NULL, delimiter = {}, values = {};
 
-	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &delimiter);
+	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &_delimiter);
 
 	if (!default_value) {
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!delimiter) {
-		delimiter = phalcon_read_static_property(SL("phalcon\\arr"), SL("delimiter"));
+	if (!_delimiter || Z_TYPE_P(_delimiter) == IS_NULL) {
+		phalcon_read_static_property_ce(&delimiter, phalcon_arr_ce, SL("delimiter"), PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&delimiter, _delimiter);
 	}
 
-	PHALCON_CALL_SELF(&values, "path", array, path, default_value, delimiter);
+	PHALCON_CALL_SELF(&values, "path", array, path, default_value, &delimiter);
 
 	if (Z_TYPE(values) == IS_ARRAY) {
 		PHALCON_RETURN_CALL_FUNCTION("array_sum", &values);
@@ -1159,9 +1165,9 @@ PHP_METHOD(Phalcon_Arr, toArray){
 
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
-					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, &array_value, PH_COPY);
 				} else {
-					phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
@@ -1177,9 +1183,9 @@ PHP_METHOD(Phalcon_Arr, toArray){
 				}
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
-					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, &array_value, PH_COPY);
 				} else {
-					phalcon_array_update_zval(return_value, &tmp, value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, value, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

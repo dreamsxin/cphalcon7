@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		if (!_escape_char) {
-			 phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
+			 phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_READONLY);
 		} else {
 			ZVAL_COPY_VALUE(&escape_char, _escape_char);
 		}
@@ -1064,7 +1064,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
+		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_READONLY);
 	}
 
 	/**
@@ -1198,7 +1198,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	}
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
-		phalcon_return_property(&escape_char, getThis(), SL("_escapeChar"));
+		phalcon_read_property(&escape_char, getThis(), SL("_escapeChar"), PH_READONLY);
 	}
 
 	/**

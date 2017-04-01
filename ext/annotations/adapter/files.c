@@ -97,10 +97,10 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, __construct){
 	zval *options = NULL, annotations_dir = {};
 
 	phalcon_fetch_params(0, 0, 1, &options);
-	
+
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&annotations_dir, options, SL("annotationsDir"))) {
-			phalcon_update_property_zval(getThis(), SL("_annotationsDir"), &annotations_dir);
+			phalcon_update_property(getThis(), SL("_annotationsDir"), &annotations_dir);
 		}
 	}
 }
@@ -118,15 +118,15 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, read){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_return_property(&annotations_dir, getThis(), SL("_annotationsDir"));
-	
-	/** 
+	phalcon_read_property(&annotations_dir, getThis(), SL("_annotationsDir"), PH_READONLY);
+
+	/**
 	 * Paths must be normalized before be used as keys
 	 */
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
-	
+
 	PHALCON_CONCAT_VVS(&path, &annotations_dir, &virtual_key, ".php");
-	
+
 	if (phalcon_file_exists(&path) == SUCCESS) {
 		RETURN_ON_FAILURE(phalcon_require_ret(return_value, Z_STRVAL(path)));
 		return;
@@ -147,15 +147,15 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Files, write){
 	phalcon_fetch_params(0, 2, 0, &key, &data);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_return_property(&annotations_dir, getThis(), SL("_annotationsDir"));
-	
-	/** 
+	phalcon_read_property(&annotations_dir, getThis(), SL("_annotationsDir"), PH_READONLY);
+
+	/**
 	 * Paths must be normalized before be used as keys
 	 */
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
 
 	PHALCON_CONCAT_VVS(&path, &annotations_dir, &virtual_key, ".php");
-	
+
 	smart_str_appends(&exp, "<?php return ");
 	php_var_export_ex(data, 0, &exp);
 	smart_str_appendc(&exp, ';');

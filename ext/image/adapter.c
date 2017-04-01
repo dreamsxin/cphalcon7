@@ -237,8 +237,8 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 		tmp_height = phalcon_get_intval(&height);
 	}
 
-	phalcon_return_property(&image_width, getThis(), SL("_width"));
-	phalcon_return_property(&image_height, getThis(), SL("_height"));
+	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
+	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
 
 	tmp_image_width  = phalcon_get_intval(&image_width);
 	tmp_image_height = phalcon_get_intval(&image_height);
@@ -385,8 +385,8 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	PHALCON_ENSURE_IS_LONG(w);
 	PHALCON_ENSURE_IS_LONG(h);
 
-	phalcon_return_property(&image_width, getThis(), SL("_width"));
-	phalcon_return_property(&image_height, getThis(), SL("_height"));
+	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
+	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
 
 	if (ofs_x && Z_TYPE_P(ofs_x) > IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_P(ofs_x) != IS_LONG) {
 		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 
 	phalcon_fetch_params(0, 0, 3, &h, &op, &fade_in);
 
-	phalcon_return_property(&image_height, getThis(), SL("_height"));
+	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
 	tmp_image_height = phalcon_get_intval(&image_height);
 
 	if (!h || Z_TYPE_P(h) != IS_LONG || Z_LVAL_P(h) > tmp_image_height) {
@@ -608,10 +608,10 @@ PHP_METHOD(Phalcon_Image_Adapter, watermark){
 	phalcon_fetch_params(0, 1, 3, &watermark, &ofs_x, &ofs_y, &op);
 	PHALCON_VERIFY_INTERFACE_EX(watermark, phalcon_image_adapterinterface_ce, phalcon_image_exception_ce);
 
-	phalcon_return_property(&image_width, getThis(), SL("_width"));
-	phalcon_return_property(&image_height, getThis(), SL("_height"));
-	phalcon_return_property(&watermark_width, watermark, SL("_width"));
-	phalcon_return_property(&watermark_height, watermark, SL("_height"));
+	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
+	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
+	phalcon_read_property(&watermark_width, watermark, SL("_width"), PH_READONLY);
+	phalcon_read_property(&watermark_height, watermark, SL("_height"), PH_READONLY);
 
 	tmp_image_width      = phalcon_get_intval(&image_width);
 	tmp_image_height     = phalcon_get_intval(&image_height);
@@ -933,7 +933,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	phalcon_fetch_params(0, 0, 3, &fname, &q, &interlacing);
 
 	if (!fname) {
-		phalcon_return_property(&file, getThis(), SL("_realpath"));
+		phalcon_read_property(&file, getThis(), SL("_realpath"), PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&file, fname);
 	}
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 	phalcon_fetch_params(0, 0, 3, &ext, &_quality, &interlacing);
 
 	if (!ext) {
-		phalcon_return_property(&format, getThis(), SL("_format"));
+		phalcon_read_property(&format, getThis(), SL("_format"), PH_READONLY);
 
 		if (PHALCON_IS_EMPTY(&format)) {
 			ZVAL_STRING(&format, "png");

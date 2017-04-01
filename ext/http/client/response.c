@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 	object_init_ex(&header, phalcon_http_client_header_ce);
 	PHALCON_CALL_METHOD(NULL, &header, "__construct");
 
-	phalcon_update_property_zval(getThis(), SL("_header"), &header);
+	phalcon_update_property(getThis(), SL("_header"), &header);
 
 	if (headers) {
 		PHALCON_CALL_SELF(NULL, "setheader", headers);
@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, setBody){
 
 	phalcon_fetch_params(0, 1, 0, &body);
 
-	phalcon_update_property_zval(getThis(), SL("_body"), body);
+	phalcon_update_property(getThis(), SL("_body"), body);
 
 	RETURN_THIS();
 }

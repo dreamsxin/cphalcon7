@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, setOptions){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	phalcon_update_property_zval(getThis(), SL("_optionsValues"), options);
+	phalcon_update_property(getThis(), SL("_optionsValues"), options);
 	RETURN_THIS();
 }
 
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	}
 
 	Z_TRY_ADDREF(tmp);
-	phalcon_update_property_zval(getThis(), SL("_optionsValues"), &tmp);
+	phalcon_update_property(getThis(), SL("_optionsValues"), &tmp);
 	RETURN_THIS();
 }
 

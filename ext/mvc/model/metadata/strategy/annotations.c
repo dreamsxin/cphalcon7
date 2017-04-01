@@ -219,23 +219,23 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 		PHALCON_CALL_METHOD(&feature, &column_annotation, "getargument", &column_size_name);
 		if (!PHALCON_IS_EMPTY(&feature)) {
-			phalcon_array_update_zval(&field_sizes, &real_property, &feature, PH_COPY);
-			phalcon_array_update_zval(&field_bytes, &real_property, &feature, PH_COPY);
+			phalcon_array_update(&field_sizes, &real_property, &feature, PH_COPY);
+			phalcon_array_update(&field_bytes, &real_property, &feature, PH_COPY);
 		}
 
 		PHALCON_CALL_METHOD(&feature, &column_annotation, "getargument", &column_bytes_name);
 		if (!PHALCON_IS_EMPTY(&feature)) {
-			phalcon_array_update_zval(&field_bytes, &real_property, &feature, PH_COPY);
+			phalcon_array_update(&field_bytes, &real_property, &feature, PH_COPY);
 		}
 
 		PHALCON_CALL_METHOD(&feature, &column_annotation, "getargument", &column_scale_name);
 		if (!PHALCON_IS_EMPTY(&feature)) {
-			phalcon_array_update_zval(&field_scales, &real_property, &feature, PH_COPY);
+			phalcon_array_update(&field_scales, &real_property, &feature, PH_COPY);
 		}
 
 		PHALCON_CALL_METHOD(&feature, &column_annotation, "getargument", &column_default_name);
 		if (!PHALCON_IS_EMPTY(&feature)) {
-			phalcon_array_update_zval(&field_default_values, &real_property, &feature, PH_COPY);
+			phalcon_array_update(&field_default_values, &real_property, &feature, PH_COPY);
 		}
 
 		/** 
@@ -377,13 +377,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		PHALCON_CALL_METHOD(&real_property, &column_annotation, "getargument", &column_map_name);
 		if (PHALCON_IS_NOT_EMPTY(&real_property)) {
 			if (!phalcon_array_isset(&ordered_column_map, &real_property)) {
-				phalcon_array_update_zval(&ordered_column_map, &real_property, &property, PH_COPY);
+				phalcon_array_update(&ordered_column_map, &real_property, &property, PH_COPY);
 			}
 		} else {
 			if (!phalcon_array_isset(&ordered_column_map, &property)) {
-				phalcon_array_update_zval(&ordered_column_map, &property, &property, PH_COPY);
+				phalcon_array_update(&ordered_column_map, &property, &property, PH_COPY);
 			}
-			phalcon_array_update_zval(&ordered_column_map, &property, &property, PH_COPY);
+			phalcon_array_update(&ordered_column_map, &property, &property, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		} else {
 			ZVAL_LONG(&name, idx);
 		}
-		phalcon_array_update_zval(&reversed_column_map, column_name, &name, PH_COPY);
+		phalcon_array_update(&reversed_column_map, column_name, &name, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init_size(return_value, 2);

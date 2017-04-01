@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Logger_Multiple, setFormatter){
 
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_formatter"), formatter);
+	phalcon_update_property(getThis(), SL("_formatter"), formatter);
 }
 
 /**

@@ -76,7 +76,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Failed, __construct){
 		code = &PHALCON_GLOBAL(z_zero);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_record"), record);
+	phalcon_update_property(getThis(), SL("_record"), record);
 
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_transaction_failed_ce, getThis(), "__construct", message, code);
 }

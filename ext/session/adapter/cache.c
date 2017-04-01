@@ -132,13 +132,13 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	}
 	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
+	phalcon_update_property(getThis(), SL("_cache"), &cache);
 
 	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
-		phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
+		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
+	phalcon_update_property(getThis(), SL("_cache"), &cache);
 
 	/* open callback */
 	array_init_size(&callable_open, 2);

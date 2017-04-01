@@ -143,31 +143,31 @@ PHP_METHOD(Phalcon_Chart_Captcha, __construct){
 		return;
 	}
 	if (word && Z_TYPE_P(word) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_word"), word);
+		phalcon_update_property(getThis(), SL("_word"), word);
 	}
 
 	if (font && Z_TYPE_P(font) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_font"), font);
+		phalcon_update_property(getThis(), SL("_font"), font);
 	}
 
 	if (font_size && Z_TYPE_P(font_size) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_fontSize"), font_size);
+		phalcon_update_property(getThis(), SL("_fontSize"), font_size);
 	}
 
 	if (width && Z_TYPE_P(width) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_width"), width);
+		phalcon_update_property(getThis(), SL("_width"), width);
 	}
 
 	if (height && Z_TYPE_P(height) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_height"), height);
+		phalcon_update_property(getThis(), SL("_height"), height);
 	}
 
 	if (pad_size && Z_TYPE_P(pad_size) != IS_NULL && Z_LVAL_P(pad_size) > 0) {
-		phalcon_update_property_zval(getThis(), SL("_padSize"), pad_size);
+		phalcon_update_property(getThis(), SL("_padSize"), pad_size);
 	}
 
 	if (pad_type && Z_TYPE_P(pad_type) != IS_NULL && Z_LVAL_P(pad_type) > 0 && Z_LVAL_P(pad_type) <= 2) {
-		phalcon_update_property_zval(getThis(), SL("_padType"), pad_type);
+		phalcon_update_property(getThis(), SL("_padType"), pad_type);
 	}
 }
 
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 
 	phalcon_fetch_params(0, 1, 0, &font);
 
-	phalcon_update_property_zval(getThis(), SL("_font"), font);
+	phalcon_update_property(getThis(), SL("_font"), font);
 	RETURN_THIS();
 }
 
@@ -199,7 +199,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
 
 	phalcon_fetch_params(0, 1, 0, &font_size);
 
-	phalcon_update_property_zval(getThis(), SL("_fontSize"), font_size);
+	phalcon_update_property(getThis(), SL("_fontSize"), font_size);
 	RETURN_THIS();
 }
 
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	PHALCON_CALL_METHOD(NULL, &imagick, "setImageFormat", &format);
 	PHALCON_CALL_METHOD(NULL, &imagick, "stripImage");
 
-	phalcon_update_property_zval(getThis(), SL("_imagick"), &imagick);
+	phalcon_update_property(getThis(), SL("_imagick"), &imagick);
 	if (filename && zend_is_true(filename)) {
 		PHALCON_CALL_METHOD(NULL, &imagick, "writeImage", filename);
 	}

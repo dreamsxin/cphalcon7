@@ -156,14 +156,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 
 	if (phalcon_array_isset_fetch_str(&uri, options, SL("uri"))) {
-		phalcon_update_property_zval(getThis(), SL("_uri"), &uri);
+		phalcon_update_property(getThis(), SL("_uri"), &uri);
 		phalcon_array_unset_str(options, SL("uri"), PH_SEPARATE);
 	} else {
 		phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY|PH_READONLY);
 	}
 
 	if (phalcon_array_isset_fetch_str(&db_name, options, SL("db")) && PHALCON_IS_NOT_EMPTY(&db_name)) {
-		phalcon_update_property_zval(getThis(), SL("_db"), &db_name);
+		phalcon_update_property(getThis(), SL("_db"), &db_name);
 		phalcon_array_unset_str(options, SL("db"), PH_SEPARATE);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'db' is required");
@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 	}
 
 	if (phalcon_array_isset_fetch_str(&collection_name, options, SL("collection")) && PHALCON_IS_NOT_EMPTY(&collection_name)) {
-		phalcon_update_property_zval(getThis(), SL("_collection"), &collection_name);
+		phalcon_update_property(getThis(), SL("_collection"), &collection_name);
 		phalcon_array_unset_str(options, SL("collection"), PH_SEPARATE);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'collection' is required");
@@ -313,10 +313,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, save){
 
 	mongo_object = phalcon_cache_backend_mongo_object_from_obj(Z_OBJ_P(getThis()));
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&key, getThis(), SL("_lastKey"), PH_READONLY);
 		key_name = &key;
 	}
 

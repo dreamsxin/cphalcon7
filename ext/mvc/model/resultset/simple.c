@@ -111,11 +111,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 		source_model = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_model"), model);
-	phalcon_update_property_zval(getThis(), SL("_result"), result);
-	phalcon_update_property_zval(getThis(), SL("_cache"), cache);
-	phalcon_update_property_zval(getThis(), SL("_columnMap"), column_map);
-	phalcon_update_property_zval(getThis(), SL("_sourceModel"), source_model);
+	phalcon_update_property(getThis(), SL("_model"), model);
+	phalcon_update_property(getThis(), SL("_result"), result);
+	phalcon_update_property(getThis(), SL("_cache"), cache);
+	phalcon_update_property(getThis(), SL("_columnMap"), column_map);
+	phalcon_update_property(getThis(), SL("_sourceModel"), source_model);
 
 	if (Z_TYPE_P(result) != IS_OBJECT) {
 		RETURN_NULL();
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 	/**
 	 * Update the row-count
 	 */
-	phalcon_update_property_zval(getThis(), SL("_count"), &row_count);
+	phalcon_update_property(getThis(), SL("_count"), &row_count);
 
 	phalcon_update_property_empty_array(getThis(), SL("_models"));
 	phalcon_update_property_empty_array(getThis(), SL("_others"));
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&rows, &result, "fetchall");
-				phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
+				phalcon_update_property(getThis(), SL("_rows"), &rows);
 			}
 		}
 
@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			break;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_activeRow"), &active_row);
+	phalcon_update_property(getThis(), SL("_activeRow"), &active_row);
 
 	RETURN_TRUE;
 }
@@ -360,17 +360,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 	}
 
 	phalcon_array_fetch_str(&model, &resultset, SL("model"), PH_NOISY|PH_READONLY);
-	phalcon_update_property_zval(getThis(), SL("_model"), &model);
+	phalcon_update_property(getThis(), SL("_model"), &model);
 
 	phalcon_array_fetch_str(&rows, &resultset, SL("rows"), PH_NOISY|PH_READONLY);
-	phalcon_update_property_zval(getThis(), SL("_rows"), &rows);
+	phalcon_update_property(getThis(), SL("_rows"), &rows);
 
 	phalcon_array_fetch_str(&cache, &resultset, SL("cache"), PH_NOISY|PH_READONLY);
-	phalcon_update_property_zval(getThis(), SL("_cache"), &cache);
+	phalcon_update_property(getThis(), SL("_cache"), &cache);
 
 	phalcon_array_fetch_str(&column_map, &resultset, SL("columnMap"), PH_NOISY|PH_READONLY);
-	phalcon_update_property_zval(getThis(), SL("_columnMap"), &column_map);
+	phalcon_update_property(getThis(), SL("_columnMap"), &column_map);
 
 	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY|PH_READONLY);
-	phalcon_update_property_zval(getThis(), SL("_hydrateMode"), &hydrate_mode);
+	phalcon_update_property(getThis(), SL("_hydrateMode"), &hydrate_mode);
 }

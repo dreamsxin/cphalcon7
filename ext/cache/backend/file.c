@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_cacheDir"), &cache_dir);
+	phalcon_update_property(getThis(), SL("_cacheDir"), &cache_dir);
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_file_ce, getThis(), "__construct", frontend, options);
 
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
-		phalcon_return_property(&frontend, getThis(), SL("_frontend"));
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 
 		/**
 		 * Check if the file has expired
@@ -223,10 +223,10 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&key, getThis(), SL("_lastKey"), PH_READONLY);
 		key_name = &key;
 	}
 
@@ -377,7 +377,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
@@ -385,7 +385,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
-		phalcon_return_property(&frontend, getThis(), SL("_frontend"));
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 
 		/**
 		 * Check if the file has expired

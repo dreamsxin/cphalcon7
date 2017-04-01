@@ -196,7 +196,7 @@ PHP_METHOD(Phalcon_Registry, __call){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_data"), name)) {
-		phalcon_read_property_array(&callback, getThis(), SL("_data"), name);
+		phalcon_read_property_array(&callback, getThis(), SL("_data"), name, PH_READONLY);
 		PHALCON_CALL_ZVAL_FUNCTION(return_value, &callback, arguments);
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Call to undefined method Phalcon\\Registry::%s", Z_STRVAL_P(name));
@@ -224,9 +224,7 @@ PHP_METHOD(Phalcon_Registry, offsetGet){
 
 	phalcon_fetch_params(0, 1, 0, &property);
 
-	if (!phalcon_read_property_array(return_value, getThis(), SL("_data"), property)) {
-		RETURN_NULL();
-	}
+	phalcon_read_property_array(return_value, getThis(), SL("_data"), property, PH_COPY);
 }
 
 /**

@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, table){
 
 	phalcon_fetch_params(0, 1, 0, &table);
 
-	phalcon_update_property_zval(getThis(), SL("_table"), table);
+	phalcon_update_property(getThis(), SL("_table"), table);
 	RETURN_THIS();
 }
 
@@ -189,10 +189,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, _compile){
 	}
 
 	PHALCON_CALL_SELF(&bind_params, "getbindparams");
-	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
+	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
-	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
+	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
 
-	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);
+	phalcon_update_property(getThis(), SL("_phql"), &phql);
 }

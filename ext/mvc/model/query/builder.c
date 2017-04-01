@@ -399,10 +399,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindParams){
 				ZVAL_COPY_VALUE(&merged_params, bind_params);
 			}
 
-			phalcon_update_property_zval(getThis(), SL("_bindParams"), &merged_params);
+			phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
 		}
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_bindParams"), bind_params);
+		phalcon_update_property(getThis(), SL("_bindParams"), bind_params);
 	}
 }
 
@@ -453,10 +453,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindTypes){
 				ZVAL_COPY_VALUE(&merged_types, bind_types);
 			}
 
-			phalcon_update_property_zval(getThis(), SL("_bindTypes"), &merged_types);
+			phalcon_update_property(getThis(), SL("_bindTypes"), &merged_types);
 		}
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_bindTypes"), bind_types);
+		phalcon_update_property(getThis(), SL("_bindTypes"), bind_types);
 	}
 }
 
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, compile){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "compile");
-	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
 }
 
 /**

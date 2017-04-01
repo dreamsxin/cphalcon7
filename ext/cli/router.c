@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Cli_Router, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &module_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultModule"), module_name);
+	phalcon_update_property(getThis(), SL("_defaultModule"), module_name);
 
 }
 
@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Cli_Router, setDefaultNamespace){
 
 	phalcon_fetch_params(0, 1, 0, &namespace_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultNamespace"), namespace_name);
+	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace_name);
 
 }
 
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Cli_Router, setDefaultTask){
 
 	phalcon_fetch_params(0, 1, 0, &task_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultTask"), task_name);
+	phalcon_update_property(getThis(), SL("_defaultTask"), task_name);
 
 }
 
@@ -191,7 +191,7 @@ PHP_METHOD(Phalcon_Cli_Router, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultAction"), action_name);
+	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
 
 }
 
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	} else {
 		ZVAL_NULL(&module_name);
 	}
-	phalcon_update_property_zval(getThis(), SL("_module"), &module_name);
+	phalcon_update_property(getThis(), SL("_module"), &module_name);
 
 	/**
 	 * Check for a namespace
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	} else {
 		ZVAL_NULL(&namespace_name);
 	}
-	phalcon_update_property_zval(getThis(), SL("_namespace"), &namespace_name);
+	phalcon_update_property(getThis(), SL("_namespace"), &namespace_name);
 
 	/**
 	 * Check for a task
@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	} else {
 		ZVAL_NULL(&task_name);
 	}
-	phalcon_update_property_zval(getThis(), SL("_task"), &task_name);
+	phalcon_update_property(getThis(), SL("_task"), &task_name);
 
 	/**
 	 * Check for an action
@@ -260,9 +260,9 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	} else {
 		ZVAL_NULL(&action_name);
 	}
-	phalcon_update_property_zval(getThis(), SL("_action"), &action_name);
+	phalcon_update_property(getThis(), SL("_action"), &action_name);
 
-	phalcon_update_property_zval(getThis(), SL("_params"), &options);
+	phalcon_update_property(getThis(), SL("_params"), &options);
 }
 
 /**

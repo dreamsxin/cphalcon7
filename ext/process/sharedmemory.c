@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_zval(getThis(), SL("_name"), name);
+	phalcon_update_property(getThis(), SL("_name"), name);
 }
 
 /**
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, open){
 	}
 
 	ZVAL_RES(&shm, zend_register_resource(m, phalcon_sharedmemory_handle));
-	phalcon_update_property_zval(getThis(), SL("_shm"), &shm);
+	phalcon_update_property(getThis(), SL("_shm"), &shm);
 	RETURN_TRUE;
 }
 
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Process_Sharedmemory, create){
 	}
 
 	ZVAL_RES(&shm, zend_register_resource(m, phalcon_sharedmemory_handle));
-	phalcon_update_property_zval(getThis(), SL("_shm"), &shm);
+	phalcon_update_property(getThis(), SL("_shm"), &shm);
 	RETURN_TRUE;
 }
 

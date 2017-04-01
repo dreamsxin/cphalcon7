@@ -211,36 +211,36 @@ PHP_METHOD(Phalcon_Process_Proc, __construct){
 	phalcon_fetch_params(0, 1, 4, &command, &cwd, &env, &timeout, &options);
 
 	if (Z_TYPE_P(command) == IS_LONG) {
-		phalcon_update_property_zval(getThis(), SL("_pid"), command);
+		phalcon_update_property(getThis(), SL("_pid"), command);
 		PHALCON_CALL_METHOD(&real_command, getThis(), "getcommandforpid", command);
 		if (zend_is_true(&real_command)) {
-			phalcon_update_property_zval(getThis(), SL("_command"), &real_command);
+			phalcon_update_property(getThis(), SL("_command"), &real_command);
 			phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STARTED);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Can't find process pid");
 			return;
 		}
 	} else if (Z_TYPE_P(command) == IS_STRING) {
-		phalcon_update_property_zval(getThis(), SL("_command"), command);
+		phalcon_update_property(getThis(), SL("_command"), command);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Command error");
 		return;
 	}
 
 	if (cwd) {
-		phalcon_update_property_zval(getThis(), SL("_cwd"), cwd);
+		phalcon_update_property(getThis(), SL("_cwd"), cwd);
 	}
 
 	if (env) {
-		phalcon_update_property_zval(getThis(), SL("_env"), env);
+		phalcon_update_property(getThis(), SL("_env"), env);
 	}
 
 	if (timeout) {
-		phalcon_update_property_zval(getThis(), SL("_timeout"), timeout);
+		phalcon_update_property(getThis(), SL("_timeout"), timeout);
 	}
 
 	if (options) {
-		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property(getThis(), SL("_options"), options);
 	}
 }
 
@@ -260,13 +260,13 @@ PHP_METHOD(Phalcon_Process_Proc, setMode){
 
 	switch (Z_TYPE_P(mode)) {
 		case PHALCON_PROCESS_MODE_NONE:
-			phalcon_update_property_zval(getThis(), SL("_mode"), mode);
+			phalcon_update_property(getThis(), SL("_mode"), mode);
 			break;
 		case PHALCON_PROCESS_MODE_TTY:
-			phalcon_update_property_zval(getThis(), SL("_mode"), mode);
+			phalcon_update_property(getThis(), SL("_mode"), mode);
 			break;
 		case PHALCON_PROCESS_MODE_PTY:
-			phalcon_update_property_zval(getThis(), SL("_mode"), mode);
+			phalcon_update_property(getThis(), SL("_mode"), mode);
 			break;
 		default:
 			PHALCON_THROW_EXCEPTION_STR(phalcon_process_exception_ce, "Process mode error");
@@ -418,9 +418,9 @@ PHP_METHOD(Phalcon_Process_Proc, start){
     if (Z_TYPE(process) != IS_RESOURCE) {
 		RETURN_FALSE;
     }
-	phalcon_update_property_zval(getThis(), SL("_process"), &process);
-	phalcon_update_property_zval(getThis(), SL("_pipes"), &pipes);
-	phalcon_update_property_zval(getThis(), SL("_startTime"), &starttime);
+	phalcon_update_property(getThis(), SL("_process"), &process);
+	phalcon_update_property(getThis(), SL("_pipes"), &pipes);
+	phalcon_update_property(getThis(), SL("_startTime"), &starttime);
 	phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STARTED);
 	PHALCON_CALL_METHOD(NULL, getThis(), "update");
 
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Process_Proc, isRunning){
 	}
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "update");
-	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY);
 }
 
 /**
@@ -578,22 +578,22 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 		PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
 		if (Z_TYPE(information) == IS_ARRAY) {
 			phalcon_array_fetch_str(&pid, &information, SL("pid"), PH_NOISY|PH_READONLY);
-			phalcon_update_property_zval(getThis(), SL("_pid"), &pid);
+			phalcon_update_property(getThis(), SL("_pid"), &pid);
 
 			phalcon_array_fetch_str(&running, &information, SL("running"), PH_NOISY|PH_READONLY);
-			phalcon_update_property_zval(getThis(), SL("_running"), &running);
+			phalcon_update_property(getThis(), SL("_running"), &running);
 
 			if (!zend_is_true(&running)) {
 				if (phalcon_array_isset_fetch_str(&exitcode, &information, SL("exitcode"))) {
 					if (Z_LVAL(exitcode) != -1) {
-						phalcon_update_property_zval(getThis(), SL("_exitCode"), &exitcode);
+						phalcon_update_property(getThis(), SL("_exitCode"), &exitcode);
 					}
 				}
 				phalcon_array_fetch_str(&signaled, &information, SL("signaled"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&signaled)) {
 					if (phalcon_array_isset_fetch_str(&termsig, &information, SL("termsig")) && Z_LVAL(termsig) > 0) {
 						phalcon_update_property_long(getThis(), SL("_exitCode"), 128 + Z_LVAL(termsig));
-						phalcon_update_property_zval(getThis(), SL("_exitCode"), &termsig);
+						phalcon_update_property(getThis(), SL("_exitCode"), &termsig);
 					}
 					phalcon_update_property_bool(getThis(), SL("_signaled"), 1);
 				}
@@ -1079,5 +1079,5 @@ PHP_METHOD(Phalcon_Process_Proc, setBlocking){
 		PHALCON_CALL_FUNCTION(NULL, "stream_set_blocking", s, flag);
 	} ZEND_HASH_FOREACH_END();
 
-	phalcon_update_property_zval(getThis(), SL("_blocking"), flag);
+	phalcon_update_property(getThis(), SL("_blocking"), flag);
 }

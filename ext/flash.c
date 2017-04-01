@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Flash, __construct){
 		ZVAL_COPY_VALUE(&css_classes, _css_classes);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_cssClasses"), &css_classes);
+	phalcon_update_property(getThis(), SL("_cssClasses"), &css_classes);
 }
 
 /**
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Flash, setImplicitFlush){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_flush);
 
-	phalcon_update_property_zval(getThis(), SL("_implicitFlush"), implicit_flush);
+	phalcon_update_property(getThis(), SL("_implicitFlush"), implicit_flush);
 	RETURN_THIS();
 }
 
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Flash, setAutomaticHtml){
 
 	phalcon_fetch_params(0, 1, 0, &automatic_html);
 
-	phalcon_update_property_zval(getThis(), SL("_automaticHtml"), automatic_html);
+	phalcon_update_property(getThis(), SL("_automaticHtml"), automatic_html);
 	RETURN_THIS();
 }
 
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Flash, setCssClasses){
 	phalcon_fetch_params(0, 1, 0, &css_classes);
 
 	if (Z_TYPE_P(css_classes) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_cssClasses"), css_classes);
+		phalcon_update_property(getThis(), SL("_cssClasses"), css_classes);
 		RETURN_THIS();
 	}
 	PHALCON_THROW_EXCEPTION_STR(phalcon_flash_exception_ce, "CSS classes must be an Array");

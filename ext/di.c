@@ -109,24 +109,24 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___call, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_setshared, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, definition)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_attempt, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, definition)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_setraw, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, definition)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_getraw, 0, 0, 1)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_method_entry[] = {
@@ -195,17 +195,17 @@ PHALCON_INIT_CLASS(Phalcon_Di){
  */
 PHP_METHOD(Phalcon_Di, __construct){
 
-	zval *_name = NULL, *default_di, name = {};
+	zval *_name = NULL, default_di = {}, name = {};
 
 	phalcon_fetch_params(0, 0, 1, &_name);
 
-	default_di = phalcon_read_static_property_ce(phalcon_di_ce, SL("_default"));
-	if (Z_TYPE_P(default_di) == IS_NULL) {
+	phalcon_read_static_property_ce(&default_di, phalcon_di_ce, SL("_default"), PH_READONLY);
+	if (Z_TYPE(default_di) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
 
 	if (_name) {
-		phalcon_update_property_zval(getThis(), SL("_name"), _name);
+		phalcon_update_property(getThis(), SL("_name"), _name);
 	}
 
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Di, setEventsManager){
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
 }
 
 /**
@@ -262,7 +262,6 @@ PHP_METHOD(Phalcon_Di, set) {
 	zval *name, *definition, *shared = NULL;
 
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!shared) {
 		shared = &PHALCON_GLOBAL(z_false);
@@ -283,7 +282,6 @@ PHP_METHOD(Phalcon_Di, setShared){
 	zval *name, *definition;
 
 	phalcon_fetch_params(0, 2, 0, &name, &definition);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	PHALCON_CALL_METHOD(return_value, getThis(), "setraw", name, definition, &PHALCON_GLOBAL(z_true));
 }
@@ -320,7 +318,7 @@ PHP_METHOD(Phalcon_Di, attempt){
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
 	PHALCON_ENSURE_IS_STRING(name);
 
-	if (!phalcon_property_array_isset_fetch(return_value, getThis(), SL("_services"), name)) {
+	if (!phalcon_property_array_isset_fetch(return_value, getThis(), SL("_services"), name, PH_COPY)) {
 		if (!shared) {
 			shared = &PHALCON_GLOBAL(z_false);
 		}
@@ -371,7 +369,7 @@ PHP_METHOD(Phalcon_Di, getRaw){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		phalcon_read_property_array(&service, getThis(), SL("_services"), name);
+		phalcon_read_property_array(&service, getThis(), SL("_services"), name, PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&service, "getdefinition");
 		return;
 	}
@@ -411,7 +409,7 @@ PHP_METHOD(Phalcon_Di, getService){
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
-		phalcon_read_property_array(return_value, getThis(), SL("_services"), name);
+		phalcon_read_property_array(return_value, getThis(), SL("_services"), name, PH_COPY);
 		return;
 	}
 
@@ -442,7 +440,7 @@ PHP_METHOD(Phalcon_Di, get){
 		noerror = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
@@ -453,7 +451,7 @@ PHP_METHOD(Phalcon_Di, get){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
 	}
 
-	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name)) {
+	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name, PH_READONLY)) {
 		PHALCON_CALL_METHOD(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
@@ -510,7 +508,7 @@ PHP_METHOD(Phalcon_Di, getShared){
 		noerror = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_property_array_isset_fetch(return_value, getThis(), SL("_sharedInstances"), name)) {
+	if (phalcon_property_array_isset_fetch(return_value, getThis(), SL("_sharedInstances"), name, PH_COPY)) {
 		if (Z_TYPE_P(return_value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(return_value), phalcon_di_injectionawareinterface_ce, 1)) {
 			PHALCON_CALL_METHOD(NULL, return_value, "setdi", getThis());
 		}
@@ -682,9 +680,9 @@ PHP_METHOD(Phalcon_Di, getDefault){
 	phalcon_fetch_params(0, 0, 1, &name);
 
 	if (name && PHALCON_IS_NOT_EMPTY(name)) {
-		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name);
+		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name, PH_COPY);
 	} else {
-		phalcon_return_static_property_ce(return_value, phalcon_di_ce, SL("_default"));
+		phalcon_read_static_property_ce(return_value, phalcon_di_ce, SL("_default"), PH_COPY);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			object_init_ex(return_value, phalcon_di_factorydefault_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct");

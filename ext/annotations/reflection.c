@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __construct){
 	phalcon_fetch_params(0, 0, 1, &reflection_data);
 
 	if (reflection_data && Z_TYPE_P(reflection_data) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_reflectionData"), reflection_data);
+		phalcon_update_property(getThis(), SL("_reflectionData"), reflection_data);
 	}
 }
 
@@ -116,18 +116,18 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 
 	zval annotations = {}, reflection_data = {}, reflection_class = {};
 
-	phalcon_return_property(&annotations, getThis(), SL("_classAnnotations"));
+	phalcon_read_property(&annotations, getThis(), SL("_classAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
-		phalcon_return_property(&reflection_data, getThis(), SL("_reflectionData"));
+		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
 		if (phalcon_array_isset_fetch_str(&reflection_class, &reflection_data, SL("class"))) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &reflection_class);
 
-			phalcon_update_property_zval(getThis(), SL("_classAnnotations"), return_value);
+			phalcon_update_property(getThis(), SL("_classAnnotations"), return_value);
 			return;
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_classAnnotations"), &PHALCON_GLOBAL(z_false));
 		RETURN_FALSE;
 	}
 
@@ -145,9 +145,9 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_return_property(&annotations, getThis(), SL("_methodAnnotations"));
+	phalcon_read_property(&annotations, getThis(), SL("_methodAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
-		phalcon_return_property(&reflection_data, getThis(), SL("_reflectionData"));
+		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
 		if (phalcon_array_isset_fetch_str(&reflection_methods, &reflection_data, SL("methods"))) {
 			if (phalcon_fast_count_ev(&reflection_methods)) {
 				array_init(return_value);
@@ -163,10 +163,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 					object_init_ex(&collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, &collection, "__construct", reflection_method);
 
-					phalcon_array_update_zval(return_value, &method_name, &collection, PH_COPY);
+					phalcon_array_update(return_value, &method_name, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
-				phalcon_update_property_zval(getThis(), SL("_methodAnnotations"), return_value);
+				phalcon_update_property(getThis(), SL("_methodAnnotations"), return_value);
 				return;
 			}
 		}
@@ -189,9 +189,9 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_return_property(&annotations, getThis(), SL("_propertyAnnotations"));
+	phalcon_read_property(&annotations, getThis(), SL("_propertyAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
-		phalcon_return_property(&reflection_data, getThis(), SL("_reflectionData"));
+		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
 		if (phalcon_array_isset_fetch_str(&reflection_properties, &reflection_data, SL("properties"))) {
 			if (phalcon_fast_count_ev(&reflection_properties)) {
 				array_init(return_value);
@@ -207,10 +207,10 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 					object_init_ex(&collection, phalcon_annotations_collection_ce);
 					PHALCON_CALL_METHOD(NULL, &collection, "__construct", reflection_property);
 
-					phalcon_array_update_zval(return_value, &property, &collection, PH_COPY);
+					phalcon_array_update(return_value, &property, &collection, PH_COPY);
 				} ZEND_HASH_FOREACH_END();
 
-				phalcon_update_property_zval(getThis(), SL("_propertyAnnotations"), return_value);
+				phalcon_update_property(getThis(), SL("_propertyAnnotations"), return_value);
 				return;
 			}
 		}

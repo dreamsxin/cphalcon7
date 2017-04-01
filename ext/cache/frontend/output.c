@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, __construct){
 	phalcon_fetch_params(0, 0, 1, &frontend_options);
 
 	if (frontend_options) {
-		phalcon_update_property_zval(getThis(), SL("_frontendOptions"), frontend_options);
+		phalcon_update_property(getThis(), SL("_frontendOptions"), frontend_options);
 	}
 }
 

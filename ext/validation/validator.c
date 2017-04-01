@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Validation_Validator, __construct){
 			return;
 		}
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property(getThis(), SL("_options"), options);
 	}
 }
 

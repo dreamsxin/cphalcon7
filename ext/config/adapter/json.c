@@ -91,7 +91,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Json, read){
 	if (zend_is_true(absolute_path)) {
 		ZVAL_COPY_VALUE(&config_dir_path, file_path);
 	} else {
-		phalcon_return_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"));
+		phalcon_read_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"), PH_READONLY);
 		PHALCON_CONCAT_VV(&config_dir_path, &base_path, file_path);
 	}
 

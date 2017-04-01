@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Intrusive_Avltree, __construct){
 	phalcon_avltree_init(avltree);
 
 	ZVAL_RES(&zid, zend_register_resource(avltree, phalcon_avltree_handle));
-	phalcon_update_property_zval(getThis(), SL("_avltree"), &zid);
+	phalcon_update_property(getThis(), SL("_avltree"), &zid);
 }
 
 /**

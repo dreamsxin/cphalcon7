@@ -232,10 +232,10 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"))) {
-			phalcon_update_property_zval(getThis(), SL("_uniqueId"), &unique_id);
+			phalcon_update_property(getThis(), SL("_uniqueId"), &unique_id);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property(getThis(), SL("_options"), options);
 	}
 }
 

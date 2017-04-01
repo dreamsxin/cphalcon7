@@ -98,7 +98,7 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 	PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_cache_frontendinterface_ce, phalcon_cache_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_frontend"), frontend);
+	phalcon_update_property(getThis(), SL("_frontend"), frontend);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		/**
@@ -109,10 +109,10 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The prefix is currupted, can't contain `#`");
 				return;
 			}
-			phalcon_update_property_zval(getThis(), SL("_prefix"), &prefix);
+			phalcon_update_property(getThis(), SL("_prefix"), &prefix);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property(getThis(), SL("_options"), options);
 	}
 }
 
@@ -129,10 +129,10 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 
 	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
-	phalcon_update_property_zval(getThis(), SL("_lastKey"), key_name);
+	phalcon_update_property(getThis(), SL("_lastKey"), key_name);
 
 	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
-		phalcon_update_property_zval(getThis(), SL("_lastLifetime"), lifetime);
+		phalcon_update_property(getThis(), SL("_lastLifetime"), lifetime);
 		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name, lifetime);
 	} else {
 		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name);
@@ -147,8 +147,8 @@ PHP_METHOD(Phalcon_Cache_Backend, start){
 		fresh = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_fresh"), fresh);
-	phalcon_update_property_zval(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
+	phalcon_update_property(getThis(), SL("_fresh"), fresh);
+	phalcon_update_property(getThis(), SL("_started"), &PHALCON_GLOBAL(z_true));
 }
 
 /**

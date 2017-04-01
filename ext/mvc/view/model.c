@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTemplate){
 
 	phalcon_fetch_params(0, 1, 0, &template);
 
-	phalcon_update_property_zval(getThis(), SL("_template"), template);
+	phalcon_update_property(getThis(), SL("_template"), template);
 
 	RETURN_THIS();
 }
@@ -214,9 +214,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setVars){
 			ZVAL_COPY_VALUE(&merged_params, params);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_viewParams"), &merged_params);
+		phalcon_update_property(getThis(), SL("_viewParams"), &merged_params);
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_viewParams"), params);
+		phalcon_update_property(getThis(), SL("_viewParams"), params);
 	}
 
 	RETURN_THIS();
@@ -419,7 +419,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setCaptureTo){
 
 	phalcon_fetch_params(0, 1, 0, &capture);
 
-	phalcon_update_property_zval(getThis(), SL("_captureTo"), capture);
+	phalcon_update_property(getThis(), SL("_captureTo"), capture);
 
 	RETURN_THIS();
 }
@@ -446,7 +446,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setTerminal){
 
 	phalcon_fetch_params(0, 1, 0, &terminate);
 
-	phalcon_update_property_zval(getThis(), SL("_terminate"), terminate);
+	phalcon_update_property(getThis(), SL("_terminate"), terminate);
 
 	RETURN_THIS();
 }
@@ -473,7 +473,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setAppend){
 
 	phalcon_fetch_params(0, 1, 0, &append);
 
-	phalcon_update_property_zval(getThis(), SL("_append"), append);
+	phalcon_update_property(getThis(), SL("_append"), append);
 
 	RETURN_THIS();
 }
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, setView){
 
 	phalcon_fetch_params(0, 1, 0, &view);
 
-	phalcon_update_property_zval(getThis(), SL("_view"), view);
+	phalcon_update_property(getThis(), SL("_view"), view);
 
 	RETURN_THIS();
 }
@@ -552,12 +552,12 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			if (zend_is_true(&isappend)) {
 				if (Z_TYPE(child_contents) == IS_ARRAY && phalcon_array_isset_fetch(&child_content, &child_contents, &capture, 0)) {
 					PHALCON_CONCAT_VV(&content_append, &child_content, &content);
-					phalcon_array_update_zval(&child_contents, &capture, &content_append, PH_COPY);
+					phalcon_array_update(&child_contents, &capture, &content_append, PH_COPY);
 				} else {
-					phalcon_array_update_zval(&child_contents, &capture, &content, PH_COPY);
+					phalcon_array_update(&child_contents, &capture, &content, PH_COPY);
 				}
 			} else {
-				phalcon_array_update_zval(&child_contents, &capture, &content, PH_COPY);
+				phalcon_array_update(&child_contents, &capture, &content, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

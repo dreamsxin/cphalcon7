@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Server_Http, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	phalcon_update_property_zval(getThis(), SL("_config"), config);
+	phalcon_update_property(getThis(), SL("_config"), config);
 
 	intern = phalcon_server_http_object_from_obj(Z_OBJ_P(getThis()));
 
@@ -369,7 +369,7 @@ PHP_METHOD(Phalcon_Server_Http, start){
 
 	phalcon_fetch_params(0, 1, 0, &application);
 
-	phalcon_update_property_zval(getThis(), SL("_application"), application);
+	phalcon_update_property(getThis(), SL("_application"), application);
 
 	intern = phalcon_server_http_object_from_obj(Z_OBJ_P(getThis()));
 	PHALCON_SERVER_COPY_TO_STACK(&intern->application, application);

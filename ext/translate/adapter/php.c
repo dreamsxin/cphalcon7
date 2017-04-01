@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_translate"), &translate);
+	phalcon_update_property(getThis(), SL("_translate"), &translate);
 }
 
 /**

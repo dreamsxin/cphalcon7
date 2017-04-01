@@ -237,10 +237,10 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, __construct)
 		php_mkdir(Z_STRVAL_P(home), mode);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_home"), home);
+	phalcon_update_property(getThis(), SL("_home"), home);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
-		phalcon_update_property_zval(getThis(), SL("_config"), _config);
+		phalcon_update_property(getThis(), SL("_config"), _config);
 	}
 
 	phalcon_read_property(&config, getThis(), SL("_config"), PH_NOISY|PH_READONLY);

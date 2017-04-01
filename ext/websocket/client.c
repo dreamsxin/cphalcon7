@@ -321,12 +321,12 @@ PHP_METHOD(Phalcon_Websocket_Client, __construct)
 
 	phalcon_fetch_params(0, 1, 2, &host, &port, &path);
 
-	phalcon_update_property_zval(getThis(), SL("_host"), host);
+	phalcon_update_property(getThis(), SL("_host"), host);
 	if (port) {
-		phalcon_update_property_zval(getThis(), SL("_port"), port);
+		phalcon_update_property(getThis(), SL("_port"), port);
 	}
 	if (path) {
-		phalcon_update_property_zval(getThis(), SL("_path"), path);
+		phalcon_update_property(getThis(), SL("_path"), path);
 	}
 }
 

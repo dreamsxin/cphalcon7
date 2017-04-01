@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Forms_Manager, __construct)
 	zval z = {};
 
 	array_init(&z);
-	phalcon_update_property_zval(getThis(), SL("_forms"), &z);
+	phalcon_update_property(getThis(), SL("_forms"), &z);
 
 	Z_OBJ_HT_P(getThis()) = &phalcon_forms_manager_object_handlers;
 }

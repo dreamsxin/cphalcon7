@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 	phalcon_fetch_params(0, 1, 1, &data, &endian);
 
 	if (Z_TYPE_P(data) == IS_STRING) {
-		phalcon_update_property_zval(getThis(), SL("_data"), data);
+		phalcon_update_property(getThis(), SL("_data"), data);
 
 		ZVAL_STRING(&filename, "php://memory");
 		ZVAL_STRING(&mode, "br+");
@@ -160,21 +160,21 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
-			phalcon_update_property_zval(getThis(), SL("_eofPosition"), &size);
+			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		}
-		phalcon_update_property_zval(getThis(), SL("_input"), &handler);
+		phalcon_update_property(getThis(), SL("_input"), &handler);
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
-		phalcon_update_property_zval(getThis(), SL("_input"), data);
+		phalcon_update_property(getThis(), SL("_input"), data);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
-			phalcon_update_property_zval(getThis(), SL("_eofPosition"), &size);
+			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		}
 
 		PHALCON_CALL_FUNCTION(NULL, "rewind", data);
 		PHALCON_CALL_FUNCTION(&content, "fread", data, &size);
 		PHALCON_CALL_FUNCTION(NULL, "rewind", data);
-		phalcon_update_property_zval(getThis(), SL("_data"), &content);
+		phalcon_update_property(getThis(), SL("_data"), &content);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
 		return;
@@ -184,7 +184,7 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 		if (Z_TYPE_P(endian) != IS_LONG || Z_LVAL_P(endian) < 0 || Z_LVAL_P(endian) > 2) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
 		}
-		phalcon_update_property_zval(getThis(), SL("_endian"), endian);
+		phalcon_update_property(getThis(), SL("_endian"), endian);
 	}
 }
 
@@ -247,7 +247,7 @@ PHP_METHOD(Phalcon_Binary_Reader, setPosition){
 		if (ret >= 0) {
 			phalcon_read_property(&current_position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 			ZVAL_LONG(&pos, Z_LVAL(current_position) + Z_LVAL_P(position));
-			phalcon_update_property_zval(getThis(), SL("_position"), &pos);
+			phalcon_update_property(getThis(), SL("_position"), &pos);
 			RETURN_TRUE;
 		}
 	} else if (seek_type == SEEK_END) {
@@ -255,13 +255,13 @@ PHP_METHOD(Phalcon_Binary_Reader, setPosition){
 		if (ret >= 0) {
 			phalcon_read_property(&eof_position, getThis(), SL("_eofPosition"), PH_NOISY|PH_READONLY);
 			ZVAL_LONG(&pos, Z_LVAL(eof_position) - Z_LVAL_P(position));
-			phalcon_update_property_zval(getThis(), SL("_position"), &pos);
+			phalcon_update_property(getThis(), SL("_position"), &pos);
 			RETURN_TRUE;
 		}
 	} else {
 		ret = php_stream_seek(stream, Z_LVAL_P(position), SEEK_SET);
 		if (ret >= 0) {
-			phalcon_update_property_zval(getThis(), SL("_position"), position);
+			phalcon_update_property(getThis(), SL("_position"), position);
 			RETURN_TRUE;
 		}
 	}
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Binary_Reader, read){
 
 	phalcon_read_property(&input, getThis(), SL("_input"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_FUNCTION(return_value, "fread", &input, length);
-	phalcon_update_property_zval(getThis(), SL("_position"), &result);
+	phalcon_update_property(getThis(), SL("_position"), &result);
 }
 
 /**

@@ -112,7 +112,7 @@ PHP_METHOD(Phalcon_Escaper, setEncoding){
 	zval *encoding;
 
 	phalcon_fetch_params(0, 1, 0, &encoding);
-	phalcon_update_property_zval(getThis(), SL("_encoding"), encoding);
+	phalcon_update_property(getThis(), SL("_encoding"), encoding);
 }
 
 /**
@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Escaper, setHtmlQuoteType){
 	zval *quote_type;
 
 	phalcon_fetch_params(0, 1, 0, &quote_type);
-	phalcon_update_property_zval(getThis(), SL("_htmlQuoteType"), quote_type);
+	phalcon_update_property(getThis(), SL("_htmlQuoteType"), quote_type);
 }
 
 /**

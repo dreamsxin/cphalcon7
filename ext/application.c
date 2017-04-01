@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Application, registerModules){
 	}
 
 	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
+		phalcon_update_property(getThis(), SL("_modules"), modules);
 	} else {
 		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(registered_modules) == IS_ARRAY) {
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Application, registerModules){
 			ZVAL_COPY_VALUE(&merged_modules, modules);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);
+		phalcon_update_property(getThis(), SL("_modules"), &merged_modules);
 	}
 
 	RETURN_THIS();
@@ -138,7 +138,7 @@ PHP_METHOD(Phalcon_Application, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultModule"), default_module);
+	phalcon_update_property(getThis(), SL("_defaultModule"), default_module);
 	RETURN_THIS();
 }
 

@@ -402,7 +402,7 @@ PHP_METHOD(Phalcon_Cache_Yac, __construct){
 			return;
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
+		phalcon_update_property(getThis(), SL("_prefix"), prefix);
 	}
 }
 

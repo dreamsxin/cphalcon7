@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
+	phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 
 	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
 		ZVAL_EMPTY_STRING(&prefix);
@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
 	PHALCON_CALL_METHOD(NULL, &mongo, "__construct", &frontend_data, &backend_options);
 
-	phalcon_update_property_zval(getThis(), SL("_mongo"), &mongo);
+	phalcon_update_property(getThis(), SL("_mongo"), &mongo);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }
 

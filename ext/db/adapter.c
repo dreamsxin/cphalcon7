@@ -204,7 +204,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Adapter){
  */
 PHP_METHOD(Phalcon_Db_Adapter, __construct){
 
-	zval *descriptor, *connection_consecutive, next_consecutive = {}, dialect_type = {}, dialect_class = {}, dialect_object = {};
+	zval *descriptor, connection_consecutive = {}, next_consecutive = {}, dialect_type = {}, dialect_class = {}, dialect_object = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 0, &descriptor);
@@ -213,12 +213,12 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	 * Every new connection created obtain a consecutive number from the static
 	 * property self::$_connectionConsecutive
 	 */
-	connection_consecutive = phalcon_read_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"));
+	phalcon_read_static_property_ce(&connection_consecutive, phalcon_db_adapter_ce, SL("_connectionConsecutive"), PH_READONLY);
 
-	phalcon_add_function(&next_consecutive, connection_consecutive, &PHALCON_GLOBAL(z_one));
+	phalcon_add_function(&next_consecutive, &connection_consecutive, &PHALCON_GLOBAL(z_one));
 
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), &next_consecutive);
-	phalcon_update_property_zval(getThis(), SL("_connectionId"), connection_consecutive);
+	phalcon_update_property(getThis(), SL("_connectionId"), &connection_consecutive);
 	/**
 	 * Dialect class can override the default dialect
 	 */
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_class);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_descriptor"), descriptor);
+	phalcon_update_property(getThis(), SL("_descriptor"), descriptor);
 }
 
 /**
@@ -256,7 +256,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setProfiler){
 
 	phalcon_fetch_params(0, 1, 0, &profiler);
 
-	phalcon_update_property_zval(getThis(), SL("_profiler"), profiler);
+	phalcon_update_property(getThis(), SL("_profiler"), profiler);
 
 }
 
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setDialect){
 	phalcon_fetch_params(0, 1, 0, &dialect);
 
 	PHALCON_VERIFY_INTERFACE_EX(dialect, phalcon_db_dialectinterface_ce, phalcon_db_exception_ce);
-	phalcon_update_property_zval(getThis(), SL("_dialect"), dialect);
+	phalcon_update_property(getThis(), SL("_dialect"), dialect);
 }
 
 /**
@@ -1453,7 +1453,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 		object_init_ex(&index, phalcon_db_index_ce);
 		PHALCON_CALL_METHOD(NULL, &index, "__construct", &name, index_columns);
 
-		phalcon_array_update_zval(return_value, &name, &index, PH_COPY);
+		phalcon_array_update(return_value, &name, &index, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 }
 
@@ -1512,7 +1512,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 			phalcon_array_update_str(&reference_array, SL("referencedTable"), &referenced_table, PH_COPY);
 			phalcon_array_update_str(&reference_array, SL("columns"), &empty_arr, PH_COPY);
 			phalcon_array_update_str(&reference_array, SL("referencedColumns"), &empty_arr, PH_COPY);
-			phalcon_array_update_zval(&references, &constraint_name, &reference_array, PH_COPY);
+			phalcon_array_update(&references, &constraint_name, &reference_array, PH_COPY);
 		}
 
 		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY|PH_READONLY);
@@ -1546,7 +1546,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 		object_init_ex(&reference, phalcon_db_reference_ce);
 		PHALCON_CALL_METHOD(NULL, &reference, "__construct", &name, &definition);
 
-		phalcon_array_update_zval(return_value, &name, &reference, PH_COPY);
+		phalcon_array_update(return_value, &name, &reference, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 }
 
@@ -1689,7 +1689,7 @@ PHP_METHOD(Phalcon_Db_Adapter, setNestedTransactionsWithSavepoints){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints);
+	phalcon_update_property(getThis(), SL("_transactionsWithSavepoints"), nested_transactions_with_savepoints);
 
 	RETURN_THIS();
 }

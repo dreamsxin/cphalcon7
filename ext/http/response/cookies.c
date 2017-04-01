@@ -116,23 +116,23 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, __construct){
 	phalcon_fetch_params(0, 0, 5, &expire, &path, &secure, &domain, &http_only);
 
 	if (expire && Z_TYPE_P(expire) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_expire"), expire);
+		phalcon_update_property(getThis(), SL("_expire"), expire);
 	}
 
 	if (path && Z_TYPE_P(path) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_path"), path);
+		phalcon_update_property(getThis(), SL("_path"), path);
 	}
 
 	if (secure && Z_TYPE_P(secure) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_secure"), secure);
+		phalcon_update_property(getThis(), SL("_secure"), secure);
 	}
 
 	if (domain && Z_TYPE_P(domain) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_domain"), domain);
+		phalcon_update_property(getThis(), SL("_domain"), domain);
 	}
 
 	if (http_only && Z_TYPE_P(http_only) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_httpOnly"), http_only);
+		phalcon_update_property(getThis(), SL("_httpOnly"), http_only);
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_cookies"));
@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, useEncryption){
 
 	phalcon_fetch_params(0, 1, 0, &use_encryption);
 
-	phalcon_update_property_zval(getThis(), SL("_useEncryption"), use_encryption);
+	phalcon_update_property(getThis(), SL("_useEncryption"), use_encryption);
 	RETURN_THIS();
 }
 

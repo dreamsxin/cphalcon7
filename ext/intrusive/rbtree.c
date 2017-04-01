@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, __construct){
 	phalcon_rbtree_init(rbtree);
 
 	ZVAL_RES(&zid, zend_register_resource(rbtree, phalcon_rbtree_handle));
-	phalcon_update_property_zval(getThis(), SL("_rbtree"), &zid);
+	phalcon_update_property(getThis(), SL("_rbtree"), &zid);
 }
 
 /**

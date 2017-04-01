@@ -96,11 +96,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 	phalcon_fetch_params(0, 1, 0, &config);
 
 	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
-		phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
+		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
-		phalcon_update_property_zval(getThis(), SL("_page"), &page);
+		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"))) {
@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_data"), &data);
+	phalcon_update_property(getThis(), SL("_data"), &data);
 }
 
 /**
@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
-	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
+	phalcon_update_property(getThis(), SL("_page"), current_page);
 	RETURN_THIS();
 }
 
@@ -175,7 +175,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 	PHALCON_CALL_FUNCTION(&slice, "array_slice", &items, &start, &lim);
 
 	object_init(return_value);
-	phalcon_update_property_zval(return_value, SL("items"),       &slice);
+	phalcon_update_property(return_value, SL("items"),       &slice);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);

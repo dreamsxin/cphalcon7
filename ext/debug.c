@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Debug, setUri){
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
-	phalcon_update_property_zval(getThis(), SL("_uri"), uri);
+	phalcon_update_property(getThis(), SL("_uri"), uri);
 	RETURN_THIS();
 }
 
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Debug, setShowBackTrace){
 
 	phalcon_fetch_params(0, 1, 0, &show_back_trace);
 
-	phalcon_update_property_zval(getThis(), SL("_showBackTrace"), show_back_trace);
+	phalcon_update_property(getThis(), SL("_showBackTrace"), show_back_trace);
 	RETURN_THIS();
 }
 
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Debug, setShowFiles){
 
 	phalcon_fetch_params(0, 1, 0, &show_files);
 
-	phalcon_update_property_zval(getThis(), SL("_showFiles"), show_files);
+	phalcon_update_property(getThis(), SL("_showFiles"), show_files);
 	RETURN_THIS();
 }
 
@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Debug, setShowFileFragment){
 
 	phalcon_fetch_params(0, 1, 0, &show_file_fragment);
 
-	phalcon_update_property_zval(getThis(), SL("_showFileFragment"), show_file_fragment);
+	phalcon_update_property(getThis(), SL("_showFileFragment"), show_file_fragment);
 	RETURN_THIS();
 }
 
@@ -386,20 +386,20 @@ PHP_METHOD(Phalcon_Debug, clearVars){
  */
 PHP_METHOD(Phalcon_Debug, _escapeString){
 
-	zval *value, *charset, replaced_value = {};
+	zval *value, charset = {}, replaced_value = {};
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
 	if (Z_TYPE_P(value) == IS_STRING) {
 		zval line_break = {}, escaped_line_break = {};
 
-		charset = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_charset"));
+		phalcon_read_static_property_ce(&charset, phalcon_debug_ce, SL("_charset"), PH_READONLY);
 
 		ZVAL_STRING(&line_break, "\n");
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		PHALCON_STR_REPLACE(&replaced_value, &line_break, &escaped_line_break, value);
-		phalcon_htmlentities(return_value, &replaced_value, NULL, charset);
+		phalcon_htmlentities(return_value, &replaced_value, NULL, &charset);
 		return;
 	}
 
@@ -588,7 +588,7 @@ PHP_METHOD(Phalcon_Debug, getMajorVersion){
 
 	phalcon_fast_explode_str(&parts, SL(" "), &version);
 
-	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY);
 }
 
 /**
@@ -797,7 +797,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		 */
 		PHALCON_SCONCAT_SVSVS(&html, "<br/><div class=\"error-file\">", &formatted_file, " (", &line, ")</div>");
 
-		phalcon_return_property(&show_files, getThis(), SL("_showFiles"));
+		phalcon_read_property(&show_files, getThis(), SL("_showFiles"), PH_READONLY);
 
 		/**
 		 * The developer can change if the files must be opened or not
@@ -809,7 +809,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 			PHALCON_CALL_FUNCTION(&lines, "file", &file);
 			phalcon_fast_count(&number_lines, &lines);
 
-			phalcon_return_property(&show_file_fragment, getThis(), SL("_showFileFragment"));
+			phalcon_read_property(&show_file_fragment, getThis(), SL("_showFileFragment"), PH_READONLY);
 
 			/**
 			 * File fragments just show a piece of the file where the exception is located
@@ -819,7 +819,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/**
 				 * Take lines back to the current exception's line
 				 */
-				phalcon_return_property(&before_context, getThis(), SL("_beforeContext"));
+				phalcon_read_property(&before_context, getThis(), SL("_beforeContext"), PH_READONLY);
 
 				phalcon_sub_function(&before_line, &line, &before_context);
 
@@ -835,7 +835,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				/**
 				 * Take lines after the current exception's line
 				 */
-				phalcon_return_property(&after_context, getThis(), SL("_afterContext"));
+				phalcon_read_property(&after_context, getThis(), SL("_afterContext"), PH_READONLY);
 
 				phalcon_add_function(&after_line, &line, &after_context);
 
@@ -857,7 +857,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 			ZVAL_STRING(&comment_pattern, "#\\*\\/$#");
 
-			phalcon_return_static_property_ce(&charset, phalcon_debug_ce, SL("_charset"));
+			phalcon_read_static_property_ce(&charset, phalcon_debug_ce, SL("_charset"), PH_READONLY);
 
 			ZVAL_STRING(&tab, "\t");
 			ZVAL_STRING(&comment, "* /");
@@ -928,9 +928,9 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
  */
 PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
-	zval *exception, *is_active, message = {}, class_name = {}, css_sources = {}, escaped_message = {}, html = {}, version = {}, file = {}, line = {}, show_back_trace = {};
+	zval *exception, is_active = {}, message = {}, class_name = {}, css_sources = {}, escaped_message = {}, html = {}, version = {}, file = {}, line = {}, show_back_trace = {};
 	zval data_vars = {}, trace = {}, *trace_item, *_REQUEST, *value = NULL, *_SERVER, *_SESSION, *_COOKIE, files = {}, di = {}, service_name = {}, router = {}, routes = {}, *route;
-	zval loader = {}, loader_value = {}, dumped_loader_value = {}, memory = {}, *data_var, *logs, *log, js_sources = {}, formatted_file = {}, z_link_format = {};
+	zval loader = {}, loader_value = {}, dumped_loader_value = {}, memory = {}, *data_var, logs = {}, *log, js_sources = {}, formatted_file = {}, z_link_format = {};
 	zend_bool ini_exists = 1;
 	zend_class_entry *ce;
 	zend_string *str_key;
@@ -947,12 +947,12 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_ob_end_clean();
 	}
 
-	is_active = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_isActive"));
+	phalcon_read_static_property_ce(&is_active, phalcon_debug_ce, SL("_isActive"), PH_READONLY);
 
 	/**
 	 * Avoid that multiple exceptions being showed
 	 */
-	if (zend_is_true(is_active)) {
+	if (zend_is_true(&is_active)) {
 		PHALCON_CALL_METHOD(&message, exception, "getmessage");
 		zend_print_zval(&message, 0);
 	}
@@ -1009,7 +1009,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	PHALCON_SCONCAT_SVSVS(&html, "<span>", &formatted_file, " (", &line, ")</span>");
 	phalcon_concat_self_str(&html, SL("</div>"));
 
-	phalcon_return_property(&show_back_trace, getThis(), SL("_showBackTrace"));
+	phalcon_read_property(&show_back_trace, getThis(), SL("_showBackTrace"), PH_READONLY);
 
 	/**
 	 * Check if the developer wants to show the backtrace or not
@@ -1208,7 +1208,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-8\" role=\"tabpanel\" class=\"tab-pane\"><table class=\"table table-striped\">"));
 		phalcon_concat_self_str(&html, SL("<tr><th>#</th><th>Value</th></tr>"));
 
-		phalcon_return_static_property_ce(&loader, phalcon_loader_ce, SL("_default"));
+		phalcon_read_static_property_ce(&loader, phalcon_loader_ce, SL("_default"), PH_READONLY);
 		if (Z_TYPE(loader) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&loader_value, &loader, "getdirs");
 			PHALCON_CALL_METHOD(&dumped_loader_value, getThis(), "_getvardump", &loader_value);
@@ -1265,9 +1265,9 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<div id=\"error-tabs-11\" role=\"tabpanel\" class=\"tab-pane\"><table class=\"table table-striped\">"));
 		phalcon_concat_self_str(&html, SL("<tr><th>Message</th></tr>"));
 
-		logs = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_logs"));
-		if (logs && Z_TYPE_P(logs) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(logs), log) {
+		phalcon_read_static_property_ce(&logs, phalcon_debug_ce, SL("_logs"), PH_READONLY);
+		if (Z_TYPE(logs) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(logs), log) {
 				zval dumped_argument = {};
 
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", log);
@@ -1399,7 +1399,7 @@ PHP_METHOD(Phalcon_Debug, setLinesBeforeContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_zval(getThis(), SL("_beforeContext"), lines);
+	phalcon_update_property(getThis(), SL("_beforeContext"), lines);
 	RETURN_THIS();
 }
 
@@ -1427,7 +1427,7 @@ PHP_METHOD(Phalcon_Debug, setLinesAfterContext) {
 	phalcon_fetch_params(0, 1, 0, &lines);
 	PHALCON_ENSURE_IS_LONG(lines);
 
-	phalcon_update_property_zval(getThis(), SL("_afterContext"), lines);
+	phalcon_update_property(getThis(), SL("_afterContext"), lines);
 	RETURN_THIS();
 }
 
@@ -1470,7 +1470,7 @@ PHP_METHOD(Phalcon_Debug, disable){
  */
 PHP_METHOD(Phalcon_Debug, log){
 
-	zval *message, *_type = NULL, *context = NULL, type = {},  *listen, log_type = {}, log = {}, *logger;
+	zval *message, *_type = NULL, *context = NULL, type = {},  listen = {}, log_type = {}, log = {}, logger = {};
 
 	phalcon_fetch_params(0, 1, 2, &message, &_type, &context);
 
@@ -1484,8 +1484,8 @@ PHP_METHOD(Phalcon_Debug, log){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	listen = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_listen"));
-	if (listen && zend_is_true(listen)) {
+	phalcon_read_static_property_ce(&listen, phalcon_debug_ce, SL("_listen"), PH_READONLY);
+	if (zend_is_true(&listen)) {
 		if (Z_TYPE_P(message) == IS_STRING) {
 			PHALCON_CALL_CE_STATIC(&log_type, phalcon_logger_ce, "gettypestring", &type);
 			PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
@@ -1495,11 +1495,11 @@ PHP_METHOD(Phalcon_Debug, log){
 		}
 	}
 
-	logger = phalcon_read_static_property_ce(phalcon_debug_ce, SL("_logger"));
-	if (logger && Z_TYPE_P(logger) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
-		PHALCON_CALL_METHOD(NULL, logger, "log", &type, message, context);
-	} else if (!listen || !zend_is_true(listen)) {
+	phalcon_read_static_property_ce(&logger, phalcon_debug_ce, SL("_logger"), PH_READONLY);
+	if (Z_TYPE(logger) != IS_NULL) {
+		PHALCON_VERIFY_INTERFACE_EX(&logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
+		PHALCON_CALL_METHOD(NULL, &logger, "log", &type, message, context);
+	} else if (!zend_is_true(&listen)) {
 		phalcon_debug_print_r(message);
 	}
 }

@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	}
 
 	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
-		phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
+		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	} else {
 		ZVAL_LONG(&lifetime, 8600);
 	}
@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 	PHALCON_CALL_METHOD(NULL, &redis, "__construct", &frontend_data, &backend_option);
 
-	phalcon_update_property_zval(getThis(), SL("_redis"), &redis);
+	phalcon_update_property(getThis(), SL("_redis"), &redis);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }
 

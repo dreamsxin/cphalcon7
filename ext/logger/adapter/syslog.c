@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_syslog_ce);
-		phalcon_update_property_zval(getThis(), SL("_formatter"), &formatter);
+		phalcon_update_property(getThis(), SL("_formatter"), &formatter);
 	}
 
 	RETURN_CTOR(&formatter);

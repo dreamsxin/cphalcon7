@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_view);
 
-	phalcon_update_property_zval(getThis(), SL("_implicitView"), implicit_view);
+	phalcon_update_property(getThis(), SL("_implicitView"), implicit_view);
 	RETURN_THIS();
 }
 

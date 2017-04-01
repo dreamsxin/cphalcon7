@@ -452,7 +452,7 @@ PHP_METHOD(Phalcon_Date, days){
 
 	phalcon_fetch_params(0, 1, 1, &month, &year);
 
-	phalcon_return_static_property_ce(&months, phalcon_date_ce, SL("_months"));
+	phalcon_read_static_property_ce(&months, phalcon_date_ce, SL("_months"), PH_READONLY);
 
 	m = phalcon_get_intval(month);
 
@@ -1066,13 +1066,13 @@ PHP_METHOD(Phalcon_Date, formatted_time){
 	}
 
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
-		 phalcon_return_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"));
+		 phalcon_read_static_property_ce(&timestamp_format, phalcon_date_ce, SL("timestamp_format"), PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&timestamp_format, format);
 	}
 
 	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
-		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
+		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"), PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&timezone, zone);
 	}
@@ -1150,7 +1150,7 @@ PHP_METHOD(Phalcon_Date, createDateTimeZone){
 	ce0 = phalcon_fetch_str_class(SL("DateTimeZone"), ZEND_FETCH_CLASS_AUTO);
 
 	if (!zone || Z_TYPE_P(zone) == IS_NULL) {
-		phalcon_return_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"));
+		phalcon_read_static_property_ce(&timezone, phalcon_date_ce, SL("timezone"), PH_READONLY);
 	} else {
 		PHALCON_SEPARATE_PARAM(zone);
 		ZVAL_COPY_VALUE(&timezone, zone);

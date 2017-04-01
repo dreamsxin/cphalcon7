@@ -96,7 +96,7 @@ PHP_METHOD(Phalcon_Intrusive_Avltree_Node, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_update_property_zval(getThis(), SL("_value"), value);
+	phalcon_update_property(getThis(), SL("_value"), value);
 }
 
 /**
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_Intrusive_Avltree_Node, setValue){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_update_property_zval(getThis(), SL("_value"), value);
+	phalcon_update_property(getThis(), SL("_value"), value);
 	RETURN_THIS();
 }
 

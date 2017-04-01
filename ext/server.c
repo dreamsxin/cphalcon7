@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Server, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	phalcon_update_property_zval(getThis(), SL("_config"), config);
+	phalcon_update_property(getThis(), SL("_config"), config);
 
 	intern = phalcon_server_object_from_obj(Z_OBJ_P(getThis()));
 

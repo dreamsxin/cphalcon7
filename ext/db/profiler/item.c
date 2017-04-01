@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLStatement){
 
 	phalcon_fetch_params(0, 1, 0, &sql_statement);
 
-	phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
+	phalcon_update_property(getThis(), SL("_sqlStatement"), sql_statement);
 
 }
 
@@ -131,7 +131,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLVariables){
 
 	phalcon_fetch_params(0, 1, 0, &sql_variables);
 
-	phalcon_update_property_zval(getThis(), SL("_sqlVariables"), sql_variables);
+	phalcon_update_property(getThis(), SL("_sqlVariables"), sql_variables);
 
 }
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setSQLBindTypes){
 
 	phalcon_fetch_params(0, 1, 0, &sql_bindtypes);
 
-	phalcon_update_property_zval(getThis(), SL("_sqlBindTypes"), sql_bindtypes);
+	phalcon_update_property(getThis(), SL("_sqlBindTypes"), sql_bindtypes);
 
 }
 
@@ -183,7 +183,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setInitialTime){
 
 	phalcon_fetch_params(0, 1, 0, &initial_time);
 
-	phalcon_update_property_zval(getThis(), SL("_initialTime"), initial_time);
+	phalcon_update_property(getThis(), SL("_initialTime"), initial_time);
 
 }
 
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Db_Profiler_Item, setFinalTime){
 
 	phalcon_fetch_params(0, 1, 0, &final_time);
 
-	phalcon_update_property_zval(getThis(), SL("_finalTime"), final_time);
+	phalcon_update_property(getThis(), SL("_finalTime"), final_time);
 
 }
 

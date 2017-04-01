@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, _connect){
 	ulong idx;
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 	ce0 = phalcon_fetch_str_class(SL("Memcached"), ZEND_FETCH_CLASS_AUTO);
 
 	object_init_ex(&memcache, ce0);
@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, _connect){
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_memcache"), &memcache);
+	phalcon_update_property(getThis(), SL("_memcache"), &memcache);
 }
 
 /**
@@ -223,14 +223,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, get)
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -261,10 +261,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&key, getThis(), SL("_lastKey"), PH_READONLY);
 		key_name = &key;
 	}
 
@@ -275,15 +275,15 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_return_property(&frontend, getThis(), SL("_frontend"));
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 
 	/**
 	 * Check if a connection is created or make a new one
 	 */
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 		return;
 	}
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, save){
 	}
 
 	if (!phalcon_array_isset(&keys, &prefixed_key)) {
-		phalcon_array_update_zval(&keys, &prefixed_key, &ttl, PH_COPY);
+		phalcon_array_update(&keys, &prefixed_key, &ttl, PH_COPY);
 		PHALCON_CALL_METHOD(NULL, &memcache, "set", &special_key, &keys);
 	}
 
@@ -365,13 +365,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, increment)
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -400,13 +400,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, decrement)
 		value = &PHALCON_GLOBAL(z_one);
 	}
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
@@ -430,17 +430,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, delete){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -471,7 +471,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, queryKeys){
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
 		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
 		return;
@@ -479,10 +479,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, queryKeys){
 
 	array_init(return_value);
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
 	/* Get the key from memcached */
@@ -515,13 +515,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, exists){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
 	PHALCON_CALL_METHOD(&value, &memcache, "get", &prefixed_key);
@@ -539,13 +539,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, flush){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+	phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	if (Z_TYPE(memcache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_connect");
-		phalcon_return_property(&memcache, getThis(), SL("_memcache"));
+		phalcon_read_property(&memcache, getThis(), SL("_memcache"), PH_READONLY);
 	}
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
@@ -581,7 +581,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, getTrackingKey)
 {
 	zval options = {}, stats_key = {};
 
-	phalcon_return_property(&options, getThis(), SL("_options"));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 	if (!phalcon_array_isset_fetch_str(&stats_key, &options, SL("statsKey"))) {
 		RETURN_NULL();

@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_translate"), &data);
+	phalcon_update_property(getThis(), SL("_translate"), &data);
 }
 
 /**

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Config, get){
 
 	phalcon_fetch_params(0, 1, 1, &index, &default_value);
 
-	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY|PH_READONLY) == FAILURE) {
+	if (phalcon_read_property_zval(return_value, getThis(), index, PH_NOISY) == FAILURE) {
 		if (default_value) {
 			RETURN_CTOR(default_value);
 		} else {
@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Config, offsetGet){
 
 	phalcon_fetch_params(0, 1, 0, &index);
 	PHALCON_ENSURE_IS_STRING(index);
-	phalcon_return_property_zval(return_value, getThis(), index);
+	phalcon_read_property_zval(return_value, getThis(), index, PH_COPY);
 }
 
 /**
@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Config, merge){
 				ZVAL_LONG(&tmp, idx);
 			}
 
-			if (phalcon_property_isset_fetch_zval(&active_value, getThis(), &tmp)) {
+			if (phalcon_property_isset_fetch_zval(&active_value, getThis(), &tmp, PH_READONLY)) {
 				if ((Z_TYPE_P(value)  == IS_OBJECT || Z_TYPE_P(value) == IS_ARRAY) && Z_TYPE(active_value) == IS_OBJECT) {
 					if (phalcon_method_exists_ex(&active_value, SL("merge")) == SUCCESS) { /* Path AAA in the test */
 						zval *params[] = { value };
@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 			}
 			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
 				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
-					phalcon_array_update_zval(return_value, &tmp, &array_value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, &array_value, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();

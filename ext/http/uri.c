@@ -153,12 +153,12 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 			phalcon_array_update_str(&parts, SL("query"), &params, PH_COPY);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_parts"), &parts);
+		phalcon_update_property(getThis(), SL("_parts"), &parts);
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_parts"), uri);
+		phalcon_update_property(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
 		phalcon_return_property(&parts, uri, SL("_parts"));
-		phalcon_update_property_zval(getThis(), SL("_parts"), &parts);
+		phalcon_update_property(getThis(), SL("_parts"), &parts);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	}
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Http_Uri, extend)
 
 	phalcon_array_merge_recursive_n(&parts, &parts2);
 
-	phalcon_update_property_zval(getThis(), SL("_parts"), &parts);
+	phalcon_update_property(getThis(), SL("_parts"), &parts);
 
 	RETURN_THIS();
 }

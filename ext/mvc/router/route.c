@@ -223,18 +223,18 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, __construct){
 	/**
 	 * Update the HTTP method constraints
 	 */
-	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
+	phalcon_update_property(getThis(), SL("_methods"), http_methods);
 
 	/**
 	 * Get the unique Id from the static member _uniqueId
 	 */
-	phalcon_return_static_property_ce(&unique_id, phalcon_mvc_router_route_ce, SL("_uniqueId"));
+	phalcon_read_static_property_ce(&unique_id, phalcon_mvc_router_route_ce, SL("_uniqueId"), PH_READONLY);
 
 	if (Z_TYPE(unique_id) == IS_NULL) {
 		ZVAL_LONG(&unique_id, 0);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_id"), &unique_id);
+	phalcon_update_property(getThis(), SL("_id"), &unique_id);
 
 	/* increment_function() will increment the value of the static property as well */
 	increment_function(&unique_id);
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, via){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
+	phalcon_update_property(getThis(), SL("_methods"), http_methods);
 	RETURN_THIS();
 }
 
@@ -585,17 +585,17 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	/**
 	 * Update the original pattern
 	 */
-	phalcon_update_property_zval(getThis(), SL("_pattern"), pattern);
+	phalcon_update_property(getThis(), SL("_pattern"), pattern);
 
 	/**
 	 * Update the compiled pattern
 	 */
-	phalcon_update_property_zval(getThis(), SL("_compiledPattern"), &compiled_pattern);
+	phalcon_update_property(getThis(), SL("_compiledPattern"), &compiled_pattern);
 
 	/**
 	 * Update the route's paths
 	 */
-	phalcon_update_property_zval(getThis(), SL("_paths"), &route_paths);
+	phalcon_update_property(getThis(), SL("_paths"), &route_paths);
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		ZVAL_STRING(&debug_message, "Update Route paths: ");
 		PHALCON_DEBUG_LOG(&debug_message);
@@ -632,7 +632,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setName){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
-	phalcon_update_property_zval(getThis(), SL("_name"), name);
+	phalcon_update_property(getThis(), SL("_name"), name);
 	RETURN_THIS();
 }
 
@@ -650,7 +650,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, beforeMatch){
 
 	phalcon_fetch_params(0, 1, 0, &callback);
 
-	phalcon_update_property_zval(getThis(), SL("_beforeMatch"), callback);
+	phalcon_update_property(getThis(), SL("_beforeMatch"), callback);
 	RETURN_THIS();
 }
 
@@ -731,7 +731,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 		} else {
 			ZVAL_LONG(&path, idx);
 		}
-		phalcon_array_update_zval(return_value, position, &path, PH_COPY);
+		phalcon_array_update(return_value, position, &path, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 }
 
@@ -752,7 +752,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHttpMethods){
 
 	phalcon_fetch_params(0, 1, 0, &http_methods);
 
-	phalcon_update_property_zval(getThis(), SL("_methods"), http_methods);
+	phalcon_update_property(getThis(), SL("_methods"), http_methods);
 	RETURN_THIS();
 }
 
@@ -779,7 +779,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setPrefix){
 
 	phalcon_fetch_params(0, 1, 0, &prefix);
 
-	phalcon_update_property_zval(getThis(), SL("_prefix"), prefix);
+	phalcon_update_property(getThis(), SL("_prefix"), prefix);
 	RETURN_THIS();
 }
 
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setHostname){
 
 	phalcon_fetch_params(0, 1, 0, &hostname);
 
-	phalcon_update_property_zval(getThis(), SL("_hostname"), hostname);
+	phalcon_update_property(getThis(), SL("_hostname"), hostname);
 	RETURN_THIS();
 }
 
@@ -838,7 +838,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setGroup) {
 	phalcon_fetch_params(0, 1, 0, &group);
 	PHALCON_VERIFY_CLASS_EX(group, phalcon_mvc_router_group_ce, phalcon_mvc_router_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_group"), group);
+	phalcon_update_property(getThis(), SL("_group"), group);
 	RETURN_THIS();
 }
 
@@ -907,7 +907,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Namespace name must be an string");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_defaultNamespace"), &namespace_name);
+		phalcon_update_property(getThis(), SL("_defaultNamespace"), &namespace_name);
 		zval_ptr_dtor(&namespace_name);
 	}
 
@@ -917,7 +917,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Module name must be an string");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_defaultModule"), &module_name);
+		phalcon_update_property(getThis(), SL("_defaultModule"), &module_name);
 		zval_ptr_dtor(&module_name);
 	}
 
@@ -927,7 +927,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Controller name must be an string");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_defaultController"), &controller_name);
+		phalcon_update_property(getThis(), SL("_defaultController"), &controller_name);
 		zval_ptr_dtor(&controller_name);
 	}
 
@@ -937,7 +937,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Action name must be an string");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_defaultAction"), &action_name);
+		phalcon_update_property(getThis(), SL("_defaultAction"), &action_name);
 		zval_ptr_dtor(&action_name);
 	}
 
@@ -947,7 +947,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Params must be an array");
 			return;
 		}
-		phalcon_update_property_zval(getThis(), SL("_defaultParams"), &params);
+		phalcon_update_property(getThis(), SL("_defaultParams"), &params);
 		zval_ptr_dtor(&params);
 	}
 
@@ -1040,7 +1040,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setUrlGenerator){
 	phalcon_fetch_params(0, 1, 0, &generator);
 
 	PHALCON_CALL_CE_STATIC(&callback, zend_ce_closure, "bind", generator, getThis());
-	phalcon_update_property_zval(getThis(), SL("_urlGenerator"), &callback);
+	phalcon_update_property(getThis(), SL("_urlGenerator"), &callback);
 
 	RETURN_THIS();
 }

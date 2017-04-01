@@ -77,13 +77,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 	if (method) {
 		phalcon_fast_strtoupper(&upper_method, method);
-		phalcon_update_property_zval(getThis(), SL("_method"), &upper_method);
+		phalcon_update_property(getThis(), SL("_method"), &upper_method);
 	}
 
 	object_init_ex(&header, phalcon_http_client_header_ce);
 	PHALCON_CALL_METHOD(NULL, &header, "__construct");
 
-	phalcon_update_property_zval(getThis(), SL("_header"), &header);
+	phalcon_update_property(getThis(), SL("_header"), &header);
 
 	PHALCON_CALL_FUNCTION(&curl, "curl_init");
 
@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, __construct){
 
 	PHALCON_CALL_FUNCTION(NULL, "curl_setopt_array", &curl, &options);
 
-	phalcon_update_property_zval(getThis(), SL("_curl"), &curl);
+	phalcon_update_property(getThis(), SL("_curl"), &curl);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){

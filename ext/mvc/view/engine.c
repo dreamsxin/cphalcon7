@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __construct){
 		PHALCON_CALL_METHOD(NULL, getThis(), "setdi", dependency_injector);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_view"), view);
+	phalcon_update_property(getThis(), SL("_view"), view);
 }
 
 /**

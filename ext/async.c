@@ -123,8 +123,8 @@ PHP_METHOD(Phalcon_Async, call){
 		RETURN_CTOR(&pid);
 	}
 
-	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
-	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"), PH_READONLY);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"), PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
@@ -161,8 +161,8 @@ PHP_METHOD(Phalcon_Async, recv){
 		ZVAL_LONG(&flag, 0);
 	}
 
-	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
-	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"), PH_READONLY);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"), PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
@@ -201,9 +201,9 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_LONG(&flag, 0);
 	}
 
-	phalcon_return_static_property_ce(&num, phalcon_async_ce, SL("_num"));
-	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
-	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
+	phalcon_read_static_property_ce(&num, phalcon_async_ce, SL("_num"), PH_READONLY);
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"), PH_READONLY);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"), PH_READONLY);
 
 	i = phalcon_get_intval(&num);
 
@@ -229,9 +229,9 @@ PHP_METHOD(Phalcon_Async, recvAll){
 		ZVAL_UNREF(&type);
 
 		if (zend_is_true(&result)) {
-			phalcon_array_update_zval(return_value, &type, &message, PH_COPY);
+			phalcon_array_update(return_value, &type, &message, PH_COPY);
 		} else {
-			phalcon_array_update_zval(return_value, &type, &PHALCON_GLOBAL(z_null), PH_COPY);
+			phalcon_array_update(return_value, &type, &PHALCON_GLOBAL(z_null), PH_COPY);
 		}
 
 	}
@@ -250,8 +250,8 @@ PHP_METHOD(Phalcon_Async, count){
 
 	zval filename = {}, proj = {}, key = {}, seg = {}, result = {}, num = {};
 
-	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
-	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"), PH_READONLY);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"), PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
@@ -277,8 +277,8 @@ PHP_METHOD(Phalcon_Async, clear){
 
 	zval filename = {}, proj = {}, key = {}, seg = {};
 
-	phalcon_return_static_property_ce(&filename, phalcon_async_ce, SL("_filename"));
-	phalcon_return_static_property_ce(&proj, phalcon_async_ce, SL("_proj"));
+	phalcon_read_static_property_ce(&filename, phalcon_async_ce, SL("_filename"), PH_READONLY);
+	phalcon_read_static_property_ce(&proj, phalcon_async_ce, SL("_proj"), PH_READONLY);
 
 	PHALCON_CALL_FUNCTION(&key, "ftok", &filename, &proj);
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);

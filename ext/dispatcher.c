@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Dispatcher, setEventsManager){
 
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 
-	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
 
 }
 
@@ -230,7 +230,7 @@ PHP_METHOD(Phalcon_Dispatcher, setActionSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &action_suffix);
 
-	phalcon_update_property_zval(getThis(), SL("_actionSuffix"), action_suffix);
+	phalcon_update_property(getThis(), SL("_actionSuffix"), action_suffix);
 
 }
 
@@ -245,7 +245,7 @@ PHP_METHOD(Phalcon_Dispatcher, setModuleName){
 
 	phalcon_fetch_params(0, 1, 0, &module_name);
 
-	phalcon_update_property_zval(getThis(), SL("_moduleName"), module_name);
+	phalcon_update_property(getThis(), SL("_moduleName"), module_name);
 
 }
 
@@ -271,7 +271,7 @@ PHP_METHOD(Phalcon_Dispatcher, setNamespaceName){
 
 	phalcon_fetch_params(0, 1, 0, &namespace_name);
 
-	phalcon_update_property_zval(getThis(), SL("_namespaceName"), namespace_name);
+	phalcon_update_property(getThis(), SL("_namespaceName"), namespace_name);
 
 }
 
@@ -297,7 +297,7 @@ PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace){
 
 	phalcon_fetch_params(0, 1, 0, &namespace);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultNamespace"), namespace);
+	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace);
 
 }
 
@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Dispatcher, setDefaultAction){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultAction"), action_name);
+	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
 
 }
 
@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Dispatcher, setActionName){
 
 	phalcon_fetch_params(0, 1, 0, &action_name);
 
-	phalcon_update_property_zval(getThis(), SL("_actionName"), action_name);
+	phalcon_update_property(getThis(), SL("_actionName"), action_name);
 
 }
 
@@ -365,9 +365,9 @@ PHP_METHOD(Phalcon_Dispatcher, setLogicBinding){
 	phalcon_fetch_params(0, 1, 0, &value);
 
 	if (PHALCON_IS_TRUE(value)) {
-		phalcon_update_property_zval(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_true));
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_logicBinding"), &PHALCON_GLOBAL(z_false));
 	}
 }
 
@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Dispatcher, setParams){
 
 	phalcon_fetch_params(0, 1, 0, &params);
 
-	phalcon_update_property_zval(getThis(), SL("_params"), params);
+	phalcon_update_property(getThis(), SL("_params"), params);
 }
 
 /**
@@ -535,9 +535,9 @@ PHP_METHOD(Phalcon_Dispatcher, setFinished){
 	phalcon_fetch_params(0, 1, 0, &finished);
 
 	if (PHALCON_IS_TRUE(finished)) {
-		phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_true) TSRMLS_CC);
+		phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_true) TSRMLS_CC);
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false) TSRMLS_CC);
+		phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false) TSRMLS_CC);
 	}
 }
 
@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Dispatcher, setReturnedValue){
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	phalcon_update_property_zval(getThis(), SL("_returnedValue"), value);
+	phalcon_update_property(getThis(), SL("_returnedValue"), value);
 
 }
 
@@ -603,7 +603,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	/**
 	 * Do at least one dispatch
 	 */
-	phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
+	phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
 
 	do {
 		zval finished = {}, namespace_name = {}, handler_name = {}, action_name = {}, camelize = {}, camelized_class = {}, camelized_namespace = {};
@@ -617,7 +617,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Loop until finished is false
 		 */
-		phalcon_return_property(&finished, getThis(), SL("_finished"));
+		phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 		if (zend_is_true(&finished)) {
 			break;
 		}
@@ -634,33 +634,33 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			break;
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_true));
 
 		/**
 		 * If the current namespace is null we used the set in this_ptr::_defaultNamespace
 		 */
-		phalcon_return_property(&namespace_name, getThis(), SL("_namespaceName"));
+		phalcon_read_property(&namespace_name, getThis(), SL("_namespaceName"), PH_READONLY);
 		if (!zend_is_true(&namespace_name)) {
-			phalcon_return_property(&namespace_name, getThis(), SL("_defaultNamespace"));
-			phalcon_update_property_zval(getThis(), SL("_namespaceName"), &namespace_name);
+			phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_READONLY);
+			phalcon_update_property(getThis(), SL("_namespaceName"), &namespace_name);
 		}
 
 		/**
 		 * If the handler is null we use the set in this_ptr::_defaultHandler
 		 */
-		phalcon_return_property(&handler_name, getThis(), SL("_handlerName"));
+		phalcon_read_property(&handler_name, getThis(), SL("_handlerName"), PH_READONLY);
 		if (!zend_is_true(&handler_name)) {
-			phalcon_return_property(&handler_name, getThis(), SL("_defaultHandler"));
-			phalcon_update_property_zval(getThis(), SL("_handlerName"), &handler_name);
+			phalcon_read_property(&handler_name, getThis(), SL("_defaultHandler"), PH_READONLY);
+			phalcon_update_property(getThis(), SL("_handlerName"), &handler_name);
 		}
 
 		/**
 		 * If the action is null we use the set in this_ptr::_defaultAction
 		 */
-		phalcon_return_property(&action_name, getThis(), SL("_actionName"));
+		phalcon_read_property(&action_name, getThis(), SL("_actionName"), PH_READONLY);
 		if (!zend_is_true(&action_name)) {
-			phalcon_return_property(&action_name, getThis(), SL("_defaultAction"));
-			phalcon_update_property_zval(getThis(), SL("_actionName"), &action_name);
+			phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_READONLY);
+			phalcon_update_property(getThis(), SL("_actionName"), &action_name);
 		}
 
 		/**
@@ -676,7 +676,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			phalcon_return_property(&finished, getThis(), SL("_finished"));
+			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
 			}
@@ -686,7 +686,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * We don't camelize the classes if they are in namespaces
 		 */
 		if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
-			phalcon_return_property(&camelize, getThis(), SL("_camelizeController"));
+			phalcon_read_property(&camelize, getThis(), SL("_camelizeController"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
 				PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
 			} else {
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * Create the complete controller class name prepending the namespace
 		 */
 		if (zend_is_true(&namespace_name)) {
-			phalcon_return_property(&camelize, getThis(), SL("_camelizeNamespace"));
+			phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
 				PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
 			} else {
@@ -742,7 +742,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				/**
 				 * Check if the user made a forward in the listener
 				 */
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -761,7 +761,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 			PHALCON_CALL_METHOD(&status, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
 			if (PHALCON_IS_FALSE(&status)) {
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -778,7 +778,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Update the active handler making it available for events
 		 */
-		phalcon_update_property_zval(getThis(), SL("_activeHandler"), &handler);
+		phalcon_update_property(getThis(), SL("_activeHandler"), &handler);
 
 		/**
 		 * Check if the method exists in the handler
@@ -796,7 +796,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					continue;
 				}
 
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -810,7 +810,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			PHALCON_CALL_METHOD(&status, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
 			if (PHALCON_IS_FALSE(&status)) {
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -831,7 +831,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			phalcon_return_property(&finished, getThis(), SL("_finished"));
+			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
 			}
@@ -849,7 +849,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Check if the user made a forward in the listener
 			 */
-			phalcon_return_property(&finished, getThis(), SL("_finished"));
+			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
 			}
@@ -876,7 +876,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				/**
 				 * Check if the user made a forward in the listener
 				 */
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -886,7 +886,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Check if the params is an array
 		 */
-		phalcon_return_property(&action_params, getThis(), SL("_params"));
+		phalcon_read_property(&action_params, getThis(), SL("_params"), PH_READONLY);
 		if (Z_TYPE(action_params) != IS_ARRAY) {
 			ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_INVALID_PARAMS);
 			ZVAL_STRING(&exception_message, "Action parameters must be an Array");
@@ -896,7 +896,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			PHALCON_CALL_METHOD(&status, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
 			if (PHALCON_IS_FALSE(&status)) {
-				phalcon_return_property(&finished, getThis(), SL("_finished"));
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
 					continue;
 				}
@@ -907,7 +907,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/**
 		 * Check if logic binding
 		 */
-		phalcon_return_property(&logic_binding, getThis(), SL("_logicBinding"));
+		phalcon_read_property(&logic_binding, getThis(), SL("_logicBinding"), PH_READONLY);
 		if (zend_is_true(&logic_binding)) {
 			count_action_params = phalcon_fast_count_int(&action_params);
 			PHALCON_CPY_WRT_CTOR(&tmp_params, &action_params);
@@ -933,7 +933,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 						logic_ce = phalcon_fetch_class(&logic_classname, ZEND_FETCH_CLASS_AUTO);
 						if (instanceof_function_ex(logic_ce, phalcon_mvc_user_logic_ce, 0)) {
 							PHALCON_CALL_CE_STATIC(&logic, logic_ce, "call", &action_name, &action_params);
-							phalcon_array_update_zval(&params, &key, &logic, PH_COPY);
+							phalcon_array_update(&params, &key, &logic, PH_COPY);
 
 							if (phalcon_method_exists_ex(&logic, SL("start")) == SUCCESS) {
 								PHALCON_CALL_METHOD(NULL, &logic, "start");
@@ -943,14 +943,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				} else {
 					PHALCON_CALL_METHOD(&var_name, reflection_parameter, "getname");
 					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, 0)) {
-						phalcon_array_update_zval(&params, &var_name, &var_value, PH_COPY);
+						phalcon_array_update(&params, &var_name, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &var_name, 0);
 					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, 0)) {
-						phalcon_array_update_zval(&params, &key, &var_value, PH_COPY);
+						phalcon_array_update(&params, &key, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &key, 0);
 					} else if (count_action_params) {
 						phalcon_array_get_current(&var_value, &action_params);
-						phalcon_array_update_zval(&params, &key, &var_value, PH_COPY);
+						phalcon_array_update(&params, &key, &var_value, PH_COPY);
 
 						phalcon_array_get_key(&var_name, &action_params);
 						phalcon_array_unset(&tmp_params, &var_name, 0);
@@ -983,7 +983,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (EG(exception)) {
 			ZVAL_OBJ(&e, EG(exception));
 			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
-			phalcon_update_property_zval(getThis(), SL("_lastException"), &exception);
+			phalcon_update_property(getThis(), SL("_lastException"), &exception);
 
 			/* Clear the exception  */
 			zend_clear_exception();
@@ -993,7 +993,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 			if (likely(!instanceof_function_ex(Z_OBJCE(exception), phalcon_continueexception_ce, 0))) {
 				if (PHALCON_IS_FALSE(&status)) {
-					phalcon_return_property(&finished, getThis(), SL("_finished"));
+					phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 					if (PHALCON_IS_FALSE(&finished)) {
 						continue;
 					}
@@ -1005,10 +1005,10 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			}
 		} else {
 			/* Update the latest value produced by the latest handler */
-			phalcon_update_property_zval(getThis(), SL("_returnedValue"), &value);
+			phalcon_update_property(getThis(), SL("_returnedValue"), &value);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_lastHandler"), &handler);
+		phalcon_update_property(getThis(), SL("_lastHandler"), &handler);
 
 		if (zend_is_true(&logic_binding)) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(params), param) {
@@ -1030,7 +1030,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				continue;
 			}
 
-			phalcon_return_property(&finished, getThis(), SL("_finished"));
+			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
 			}
@@ -1051,7 +1051,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				continue;
 			}
 
-			phalcon_return_property(&finished, getThis(), SL("_finished"));
+			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
 			}
@@ -1147,50 +1147,50 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 		return;
 	}
 
-	phalcon_return_property(&previous_namespace_name, getThis(), SL("_namespaceName"));
-	phalcon_update_property_zval(getThis(), SL("_previousNamespaceName"), &previous_namespace_name);
+	phalcon_read_property(&previous_namespace_name, getThis(), SL("_namespaceName"), PH_READONLY);
+	phalcon_update_property(getThis(), SL("_previousNamespaceName"), &previous_namespace_name);
 
-	phalcon_return_property(&previous_controller_name, getThis(), SL("_handlerName"));
-	phalcon_update_property_zval(getThis(), SL("_previousHandlerName"), &previous_controller_name);
+	phalcon_read_property(&previous_controller_name, getThis(), SL("_handlerName"), PH_READONLY);
+	phalcon_update_property(getThis(), SL("_previousHandlerName"), &previous_controller_name);
 
-	phalcon_return_property(&previous_action_name, getThis(), SL("_actionName"));
-	phalcon_update_property_zval(getThis(), SL("_previousActionName"), &previous_action_name);
+	phalcon_read_property(&previous_action_name, getThis(), SL("_actionName"), PH_READONLY);
+	phalcon_update_property(getThis(), SL("_previousActionName"), &previous_action_name);
 
-	phalcon_return_property(&previous_params, getThis(), SL("_params"));
-	phalcon_update_property_zval(getThis(), SL("_previousParams"), &previous_params);
+	phalcon_read_property(&previous_params, getThis(), SL("_params"), PH_READONLY);
+	phalcon_update_property(getThis(), SL("_previousParams"), &previous_params);
 
 	/**
 	 * Check if we need to forward to another namespace
 	 */
 	if (phalcon_array_isset_fetch_str(&namespace_name, &forward_parts, SL("namespace"))) {
-		phalcon_update_property_zval(getThis(), SL("_namespaceName"), &namespace_name);
+		phalcon_update_property(getThis(), SL("_namespaceName"), &namespace_name);
 	}
 
 	/**
 	 * Check if we need to forward to another controller
 	 */
 	if (phalcon_array_isset_fetch_str(&controller_name, &forward_parts, SL("controller"))) {
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), &controller_name);
+		phalcon_update_property(getThis(), SL("_handlerName"), &controller_name);
 	} else if (phalcon_array_isset_fetch_str(&task_name, &forward_parts, SL("task"))) {
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), &task_name);
+		phalcon_update_property(getThis(), SL("_handlerName"), &task_name);
 	}
 
 	/**
 	 * Check if we need to forward to another action
 	 */
 	if (phalcon_array_isset_fetch_str(&action_name, &forward_parts, SL("action"))) {
-		phalcon_update_property_zval(getThis(), SL("_actionName"), &action_name);
+		phalcon_update_property(getThis(), SL("_actionName"), &action_name);
 	}
 
 	/**
 	 * Check if we need to forward changing the current parameters
 	 */
 	if (phalcon_array_isset_fetch_str(&params, &forward_parts, SL("params"))) {
-		phalcon_update_property_zval(getThis(), SL("_params"), &params);
+		phalcon_update_property(getThis(), SL("_params"), &params);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
-	phalcon_update_property_zval(getThis(), SL("_forwarded"), &PHALCON_GLOBAL(z_true));
+	phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
+	phalcon_update_property(getThis(), SL("_forwarded"), &PHALCON_GLOBAL(z_true));
 }
 
 /**
@@ -1224,7 +1224,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	phalcon_read_property(&namespace_name, getThis(), SL("_namespaceName"), PH_NOISY|PH_READONLY);
 	if (!zend_is_true(&namespace_name)) {
 		phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY|PH_READONLY);
-		phalcon_update_property_zval(getThis(), SL("_namespaceName"), &namespace_name);
+		phalcon_update_property(getThis(), SL("_namespaceName"), &namespace_name);
 	}
 
 	/**
@@ -1233,7 +1233,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	phalcon_read_property(&handler_name, getThis(), SL("_handlerName"), PH_NOISY|PH_READONLY);
 	if (!zend_is_true(&handler_name)) {
 		phalcon_read_property(&handler_name, getThis(), SL("_defaultHandler"), PH_NOISY|PH_READONLY);
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), &handler_name);
+		phalcon_update_property(getThis(), SL("_handlerName"), &handler_name);
 	}
 
 	/**
@@ -1266,7 +1266,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 		PHALCON_CONCAT_VV(return_value, &camelized_class, &handler_suffix);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
+	phalcon_update_property(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
 }
 
 /**
@@ -1285,9 +1285,9 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeNamespace){
 	phalcon_fetch_params(0, 1, 0, &camelize);
 
 	if (PHALCON_IS_TRUE(camelize)) {
-		phalcon_update_property_zval(getThis(), SL("_camelizeNamespace"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property(getThis(), SL("_camelizeNamespace"), &PHALCON_GLOBAL(z_true));
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_camelizeNamespace"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_camelizeNamespace"), &PHALCON_GLOBAL(z_false));
 	}
 }
 
@@ -1307,9 +1307,9 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeController){
 	phalcon_fetch_params(0, 1, 0, &camelize);
 
 	if (PHALCON_IS_TRUE(camelize)) {
-		phalcon_update_property_zval(getThis(), SL("_camelizeController"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property(getThis(), SL("_camelizeController"), &PHALCON_GLOBAL(z_true));
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_camelizeController"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_camelizeController"), &PHALCON_GLOBAL(z_false));
 	}
 }
 

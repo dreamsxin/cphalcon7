@@ -138,7 +138,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 
 	if (!phalcon_array_isset_fetch(&t1, arr, section, 0)) {
 		array_init(&t1);
-		phalcon_array_update_zval(arr, section, &t1, 0);
+		phalcon_array_update(arr, section, &t1, 0);
 	} else if (Z_TYPE(t1) != IS_ARRAY) {
 		convert_to_array_ex(&t1);
 	}
@@ -152,7 +152,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 		}
 		if (!phalcon_array_isset_fetch(&t2, &tmp, &index, 0)) {
 			array_init(&t2);
-			phalcon_array_update_zval(&tmp, &index, &t2, 0);
+			phalcon_array_update(&tmp, &index, &t2, 0);
 		} else if (Z_TYPE(t2) != IS_ARRAY) {
 			convert_to_array_ex(&t2);
 		}
@@ -161,7 +161,7 @@ static void phalcon_config_adapter_ini_update_zval_directive(zval *arr, zval *se
 	}
 
 	phalcon_array_fetch_long(&index, directive, n - 1, PH_NOISY);
-	phalcon_array_update_zval(&tmp, &index, value, 0);
+	phalcon_array_update(&tmp, &index, value, 0);
 }
 
 /**
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 	if (zend_is_true(absolute_path)) {
 		ZVAL_COPY_VALUE(&config_dir_path, file_path);
 	} else {
-		phalcon_return_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"));
+		phalcon_read_static_property_ce(&base_path, phalcon_config_adapter_ce, SL("_basePath"), PH_READONLY);
 
 		PHALCON_CONCAT_VV(&config_dir_path, &base_path, file_path);
 	}
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 		}
 
 		if (unlikely(Z_TYPE_P(directives) != IS_ARRAY) || zend_hash_num_elements(Z_ARRVAL_P(directives)) == 0) {
-			phalcon_array_update_zval(&config, &section, directives, PH_COPY);
+			phalcon_array_update(&config, &section, directives, PH_COPY);
 		} else {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(directives), idx, str_key, value) {
 				zval key = {}, directive_parts = {};

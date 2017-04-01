@@ -127,7 +127,7 @@ static inline int phalcon_return_property_zval(zval *return_value, zval *object,
 }
 
 /** Updating properties */
-int phalcon_update_property_zval(zval *obj, const char *property_name, uint32_t property_length, zval *value);
+int phalcon_update_property(zval *obj, const char *property_name, uint32_t property_length, zval *value);
 int phalcon_update_property_long(zval *obj, const char *property_name, uint32_t property_length, long value);
 int phalcon_update_property_str(zval *object, const char *property_name, uint32_t property_length, const char *str, uint32_t str_length);
 int phalcon_update_property_bool(zval *obj, const char *property_name, uint32_t property_length, int value);
@@ -153,7 +153,7 @@ int phalcon_property_decr(zval *object, const char *property_name, uint32_t prop
 
 /** Unset Array properties */
 int phalcon_isset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
-int phalcon_read_property_array(zval *return_value, zval *object, const char *property_name, size_t property_length, const zval *index);
+int phalcon_read_property_array(zval *return_value, zval *object, const char *property_name, size_t property_length, const zval *index, int flags);
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index);
 
 static inline int phalcon_isset_property_zval_array(zval *object, const zval *property, const zval *index)
@@ -171,14 +171,14 @@ static inline int phalcon_isset_property_zval_array(zval *object, const zval *pr
 static inline int phalcon_return_property_array(zval *return_value, zval *object, const char *property_name, uint32_t property_length, const zval *index)
 {
 	ZVAL_NULL(return_value);
-	phalcon_read_property_array(return_value, object, property_name, property_length, index);
+	phalcon_read_property_array(return_value, object, property_name, property_length, index, 0);
 	return FAILURE;
 }
 
 /** Static properties */
-zval* phalcon_read_static_property(const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length);
-zval* phalcon_read_static_property_ce(zend_class_entry *ce, const char *property, uint32_t len);
-int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property_name, uint32_t property_length, const zval *index);
+int phalcon_read_static_property(zval *return_value, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length, int flags);
+int phalcon_read_static_property_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t len, int flags);
+int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property_name, uint32_t property_length, const zval *index, int flags);
 int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index, zval *value);
 int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const char *property, uint32_t property_length, zval *value, const char *types, int types_length, int types_count, ...);
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
@@ -187,37 +187,6 @@ int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const ch
 int phalcon_update_static_property_array_append_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len);
-
-
-/**
- * Return a static property
- */
-static inline int phalcon_return_static_property(zval *return_value, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length)
-{
-	zval *tmp = phalcon_read_static_property(class_name, class_length, property_name, property_length);
-	if (tmp) {
-		ZVAL_COPY(return_value, tmp);
-		return SUCCESS;
-	}
-
-	ZVAL_NULL(return_value);
-	return FAILURE;
-}
-
-/**
- * Return a static property
- */
-static inline int phalcon_return_static_property_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t len)
-{
-	zval *tmp = phalcon_read_static_property_ce(ce, property, len);
-	if (tmp) {
-		ZVAL_COPY(return_value, tmp);
-		return SUCCESS;
-	}
-
-	ZVAL_NULL(return_value);
-	return FAILURE;
-}
 
 /**
  * Update a static property
@@ -255,17 +224,17 @@ static inline int phalcon_check_property_access_zval(zval *object, const zval *p
 	return 0;
 }
 
-int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length);
-int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, const zval *index);
+int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, int flags);
+int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, const zval *index, int flags);
 
-static inline int phalcon_property_isset_fetch_zval(zval *fetched, zval *object, zval *property)
+static inline int phalcon_property_isset_fetch_zval(zval *fetched, zval *object, zval *property, int flags)
 {
-	return phalcon_property_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property));
+	return phalcon_property_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property), flags);
 }
 
-static inline int phalcon_property_array_isset_fetch_zval(zval *fetched, zval *object, zval *property, const zval *index)
+static inline int phalcon_property_array_isset_fetch_zval(zval *fetched, zval *object, zval *property, const zval *index, int flags)
 {
-	return phalcon_property_array_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property), index);
+	return phalcon_property_array_isset_fetch(fetched, object, Z_STRVAL_P(property), Z_STRLEN_P(property), index, flags);
 }
 
 #define PHALCON_PROPERTY_IS_PUBLIC(object, property) \

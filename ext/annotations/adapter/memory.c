@@ -79,7 +79,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Memory, read){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_return_property(&data, getThis(), SL("_data"));
+	phalcon_read_property(&data, getThis(), SL("_data"), PH_READONLY);
 
 	phalcon_fast_strtolower(&lowercased_key, key);
 	if (!phalcon_array_isset_fetch(return_value, &data, &lowercased_key, 0)) {

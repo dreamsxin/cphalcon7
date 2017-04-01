@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	phalcon_fetch_params(0, 0, 2, &validators, &options);
 
 	if (validators && Z_TYPE_P(validators) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_validators"), validators);
+		phalcon_update_property(getThis(), SL("_validators"), validators);
 	}
 
 	/* Check for an 'initialize' method */
@@ -201,10 +201,10 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		zval filename = {}, allow_empty = {};
 		if (phalcon_array_isset_fetch_str(&filename, options, SL("messageFilename"))) {
-			phalcon_update_property_zval(getThis(), SL("_messageFilename"), &filename);
+			phalcon_update_property(getThis(), SL("_messageFilename"), &filename);
 		}
 		if (phalcon_array_isset_fetch_str(&allow_empty, options, SL("allowEmpty"))) {
-			phalcon_update_property_zval(getThis(), SL("_allowEmpty"), &allow_empty);
+			phalcon_update_property(getThis(), SL("_allowEmpty"), &allow_empty);
 		}
 	}
 }
@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	object_init_ex(&messages, phalcon_validation_message_group_ce);
 	PHALCON_CALL_METHOD(NULL, &messages, "__construct");
 
-	phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
+	phalcon_update_property(getThis(), SL("_messages"), &messages);
 
 	/**
 	 * Validation classes can implement the 'beforeValidation' callback
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	}
 
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
-		phalcon_update_property_zval(getThis(), SL("_data"), data);
+		phalcon_update_property(getThis(), SL("_data"), data);
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Validation, setEntity){
 
 	phalcon_fetch_params(0, 1, 0, &entity);
 
-	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
+	phalcon_update_property(getThis(), SL("_entity"), entity);
 	RETURN_THIS();
 }
 
@@ -441,7 +441,7 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 	   object_init_ex(&messages, phalcon_validation_message_group_ce);
 	   PHALCON_CALL_METHOD(NULL, &messages, "__construct");
 
-	   phalcon_update_property_zval(getThis(), SL("_messages"), &messages);
+	   phalcon_update_property(getThis(), SL("_messages"), &messages);
 	}
 
 	PHALCON_CALL_METHOD(NULL, &messages, "appendmessage", message);
@@ -467,8 +467,8 @@ PHP_METHOD(Phalcon_Validation, bind){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The data to validate must be an array or object");
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_entity"), entity);
-	phalcon_update_property_zval(getThis(), SL("_data"), data);
+	phalcon_update_property(getThis(), SL("_entity"), entity);
+	phalcon_update_property(getThis(), SL("_data"), data);
 
 	RETURN_THIS();
 }
@@ -580,22 +580,22 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 {
-	zval *messages, *file, default_messages = {};
+	zval *messages, file = {}, default_messages = {};
 
 	phalcon_fetch_params(0, 1, 0, &messages);
 
-	file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_file"));
+	phalcon_read_static_property_ce(&file, phalcon_validation_ce, SL("_file"), PH_READONLY);
 
-	phalcon_read_static_property_array_ce(&default_messages, phalcon_kernel_ce, SL("_defaultMessages"), file);
+	phalcon_read_static_property_array_ce(&default_messages, phalcon_kernel_ce, SL("_defaultMessages"), &file, PH_READONLY);
 
 	phalcon_array_merge_recursive_n(&default_messages, messages);
 
-	phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_defaultMessages"), file, &default_messages);
+	phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_defaultMessages"), &file, &default_messages);
 }
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 {
-	zval *type, *default_value = NULL, filename = {}, *file;
+	zval *type, *default_value = NULL, filename = {}, file = {};
 
 	phalcon_fetch_params(0, 1, 1, &type, &default_value);
 
@@ -605,8 +605,8 @@ PHP_METHOD(Phalcon_Validation, getDefaultMessage)
 
 	phalcon_read_property(&filename, getThis(), SL("_messageFilename"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&filename)) {
-		file = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"));
-		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", file, type, default_value);
+		phalcon_read_static_property_ce(&file, phalcon_validation_ce, SL("_defaultMessageFilename"), PH_READONLY);
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &file, type, default_value);
 	} else {
 		PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type, default_value);
 	}
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
 		zend_throw_exception_ex(phalcon_validation_exception_ce, 0, "Labels must be an array");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_labels"), labels);
+	phalcon_update_property(getThis(), SL("_labels"), labels);
 }
 
 /**
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 	}
 
 	if (Z_TYPE_P(field_param) == IS_ARRAY) {
-		zval label_values = {}, *field, *delimiter;
+		zval label_values = {}, *field, delimiter = {};
 		array_init(&label_values);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(field_param), field) {
@@ -678,8 +678,8 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 				phalcon_array_append(&label_values, field, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
-		delimiter = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_delimiter"));
-		phalcon_fast_join_str(&value, Z_STRVAL_P(delimiter), Z_STRLEN_P(delimiter), &label_values);
+		phalcon_read_static_property_ce(&delimiter, phalcon_validation_ce, SL("_delimiter"), PH_READONLY);
+		phalcon_fast_join_str(&value, Z_STRVAL(delimiter), Z_STRLEN(delimiter), &label_values);
 	} else {
 		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(&value, &labels, field_param, 0) || Z_TYPE(value) != IS_STRING) {
 			if (exists) {
@@ -731,11 +731,11 @@ PHP_METHOD(Phalcon_Validation, setMessageFilename)
  */
 PHP_METHOD(Phalcon_Validation, getMessage)
 {
-	zval *type, *filename;
+	zval *type, filename = {};
 
 	phalcon_fetch_params(0, 1, 0, &type);
 
-	filename = phalcon_read_static_property_ce(phalcon_validation_ce, SL("_defaultMessageFilename"));
+	phalcon_read_static_property_ce(&filename, phalcon_validation_ce, SL("_defaultMessageFilename"), PH_READONLY);
 
-	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", filename, type);
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_kernel_ce, "message", &filename, type);
 }

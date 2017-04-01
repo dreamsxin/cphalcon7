@@ -150,7 +150,7 @@ PHP_METHOD(Phalcon_Cache_Multiple, __construct){
 	phalcon_fetch_params(0, 0, 1, &backends);
 
 	if (backends) {
-		phalcon_update_property_zval(getThis(), SL("_backends"), backends);
+		phalcon_update_property(getThis(), SL("_backends"), backends);
 	}
 }
 

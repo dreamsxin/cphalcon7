@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 		PHALCON_CALL_METHOD(NULL, getThis(), "beforestartprofile", &active_profile);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_activeProfile"), &active_profile);
+	phalcon_update_property(getThis(), SL("_activeProfile"), &active_profile);
 
 	RETURN_THIS();
 }
@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Db_Profiler, stopProfile){
 
 	phalcon_add_function(&new_total_seconds, &total_seconds, &difference);
 
-	phalcon_update_property_zval(getThis(), SL("_totalSeconds"), &new_total_seconds);
+	phalcon_update_property(getThis(), SL("_totalSeconds"), &new_total_seconds);
 	phalcon_update_property_array_append(getThis(), SL("_allProfiles"), &active_profile);
 
 	if (phalcon_method_exists_ex(getThis(), SL("afterendprofile")) == SUCCESS) {

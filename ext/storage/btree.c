@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Storage_Btree, __construct)
 
 	phalcon_fetch_params(0, 1, 0, &db);
 
-	phalcon_update_property_zval(getThis(), SL("_db"), db);
+	phalcon_update_property(getThis(), SL("_db"), db);
 
 	intern = phalcon_storage_btree_object_from_obj(Z_OBJ_P(getThis()));
 

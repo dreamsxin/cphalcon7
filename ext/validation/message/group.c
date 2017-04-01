@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __construct){
 
 	phalcon_fetch_params(0, 0, 1, &messages);
 	if (messages && Z_TYPE_P(messages) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_messages"), messages);
+		phalcon_update_property(getThis(), SL("_messages"), messages);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_messages"));
 	}

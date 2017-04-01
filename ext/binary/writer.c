@@ -191,15 +191,15 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
-			phalcon_update_property_zval(getThis(), SL("_position"), &size);
+			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
-		phalcon_update_property_zval(getThis(), SL("_output"), &handler);
+		phalcon_update_property(getThis(), SL("_output"), &handler);
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
-		phalcon_update_property_zval(getThis(), SL("_output"), data);
+		phalcon_update_property(getThis(), SL("_output"), data);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
-			phalcon_update_property_zval(getThis(), SL("_position"), &size);
+			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
@@ -210,7 +210,7 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 		if (Z_TYPE_P(endian) != IS_LONG || Z_LVAL_P(endian) < 0 || Z_LVAL_P(endian) > 2) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
 		}
-		phalcon_update_property_zval(getThis(), SL("_endian"), endian);
+		phalcon_update_property(getThis(), SL("_endian"), endian);
 	}
 }
 
@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Binary_Writer, write){
 
 	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_FUNCTION(return_value, "fwrite", &output, data, length);
-	phalcon_update_property_zval(getThis(), SL("_position"), &result);
+	phalcon_update_property(getThis(), SL("_position"), &result);
 }
 
 /**

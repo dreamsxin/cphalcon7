@@ -115,10 +115,10 @@ PHP_METHOD(Phalcon_Di_Injectable, setDI){
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT && PHALCON_IS_NOT_EMPTY(dependency_injector)) {
 		PHALCON_CALL_METHOD(&di, getThis(), "getdi", dependency_injector);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &di);
+		phalcon_update_property(getThis(), SL("_dependencyInjector"), &di);
 	} else {
 		PHALCON_VERIFY_INTERFACE_OR_NULL_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce);
-		phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), dependency_injector);
+		phalcon_update_property(getThis(), SL("_dependencyInjector"), dependency_injector);
 	}
 
 	RETURN_THIS();
@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Di_Injectable, getDI)
 		not_use_default = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_READONLY);
 	if (Z_TYPE(dependency_injector) != IS_OBJECT && !zend_is_true(not_use_default)) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
 	}
@@ -168,7 +168,7 @@ PHP_METHOD(Phalcon_Di_Injectable, setEventsManager)
 	phalcon_fetch_params(0, 1, 0, &events_manager);
 	PHALCON_VERIFY_INTERFACE_OR_NULL_EX(events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_eventsManager"), events_manager);
+	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
 
 	RETURN_THIS();
 }
@@ -221,7 +221,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(name), data);
 	}
 
-	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name)) {
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
 		zval arguments = {};
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, data, PH_COPY);
@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		zval_ptr_dtor(&arguments);
 	}
 
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		}
 	}
 
-	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name)) {
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
 		zval arguments = {};
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, data, PH_COPY);
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		zval_ptr_dtor(&arguments);
 	}
 
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
 
@@ -442,14 +442,14 @@ PHP_METHOD(Phalcon_Di_Injectable, __sleep){
 
 	zval dependency_injector = {}, dependency_name = {};
 
-	phalcon_return_property(&dependency_injector, getThis(), SL("_dependencyInjector"));
+	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_READONLY);
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&dependency_name, &dependency_injector, "getname");
 	} else {
 		ZVAL_COPY_VALUE(&dependency_name, &dependency_injector);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_dependencyInjector"), &dependency_name);
+	phalcon_update_property(getThis(), SL("_dependencyInjector"), &dependency_name);
 
 	phalcon_get_object_members(return_value, getThis(), 0);
 }

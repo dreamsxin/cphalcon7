@@ -132,18 +132,18 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, __construct){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid PDOStatement supplied to Phalcon\\Db\\Result\\Pdo");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_connection"), connection);
-	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), result);
+	phalcon_update_property(getThis(), SL("_connection"), connection);
+	phalcon_update_property(getThis(), SL("_pdoStatement"), result);
 	if (Z_TYPE_P(sql_statement) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_sqlStatement"), sql_statement);
+		phalcon_update_property(getThis(), SL("_sqlStatement"), sql_statement);
 	}
 
 	if (Z_TYPE_P(bind_params) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_bindParams"), bind_params);
+		phalcon_update_property(getThis(), SL("_bindParams"), bind_params);
 	}
 
 	if (Z_TYPE_P(bind_types) != IS_NULL) {
-		phalcon_update_property_zval(getThis(), SL("_bindTypes"), bind_types);
+		phalcon_update_property(getThis(), SL("_bindTypes"), bind_types);
 	}
 }
 
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 	zval row_count = {}, connection = {}, type = {}, pdo_statement = {}, sql_statement = {}, bind_params = {}, bind_types = {};
 	zval matches = {}, pattern = {}, match = {}, else_clauses = {}, sql = {}, result = {}, row = {};
 
-	phalcon_return_property(&row_count, getThis(), SL("_rowCount"));
+	phalcon_read_property(&row_count, getThis(), SL("_rowCount"), PH_READONLY);
 
 	if (PHALCON_IS_FALSE(&row_count)) {
 		phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY|PH_READONLY);
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		/**
 		 * Update the value to avoid further calculations
 		 */
-		phalcon_update_property_zval(getThis(), SL("_rowCount"), &row_count);
+		phalcon_update_property(getThis(), SL("_rowCount"), &row_count);
 	}
 
 	RETURN_CTOR(&row_count);
@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 		PHALCON_CALL_METHOD(&statement, &pdo, "query", &sql_statement);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_pdoStatement"), &statement);
+	phalcon_update_property(getThis(), SL("_pdoStatement"), &statement);
 
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records

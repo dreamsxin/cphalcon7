@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, start){
 	if (!phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
 		ZVAL_LONG(&lifetime, 8600);
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_lifetime"), &lifetime);
+		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	}
 
 	if (phalcon_array_isset_fetch_str(&prefix, &options, SL("prefix"))) {
@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, start){
 
 	PHALCON_CALL_METHOD(NULL, &memcached, "__construct", &frontend_data, &backend_option);
 
-	phalcon_update_property_zval(getThis(), SL("_memcached"), &memcached);
+	phalcon_update_property(getThis(), SL("_memcached"), &memcached);
 
 //#ifdef PHALCON_USE_PHP_SESSION
 //	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));

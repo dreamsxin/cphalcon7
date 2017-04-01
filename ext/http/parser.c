@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
 			case HTTP_REQUEST:
 			case HTTP_RESPONSE:
 			case HTTP_BOTH:
-				phalcon_update_property_zval(getThis(), SL("_type"), type);
+				phalcon_update_property(getThis(), SL("_type"), type);
 				break;
 			default:
 				break;

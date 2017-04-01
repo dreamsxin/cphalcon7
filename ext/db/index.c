@@ -92,9 +92,9 @@ PHP_METHOD(Phalcon_Db_Index, __construct){
 		type = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_indexName"), index_name);
-	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
-	phalcon_update_property_zval(getThis(), SL("_type"), type);
+	phalcon_update_property(getThis(), SL("_indexName"), index_name);
+	phalcon_update_property(getThis(), SL("_columns"), columns);
+	phalcon_update_property(getThis(), SL("_type"), type);
 }
 
 /**

@@ -156,7 +156,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 		return;
 	}
 	if (PHALCON_IS_FALSE(merge)) {
-		phalcon_update_property_zval(getThis(), SL("_modules"), modules);
+		phalcon_update_property(getThis(), SL("_modules"), modules);
 	} else {
 		phalcon_read_property(&registered_modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(registered_modules) == IS_ARRAY) {
@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, registerModules){
 			ZVAL_COPY_VALUE(&merged_modules, modules);
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_modules"), &merged_modules);
+		phalcon_update_property(getThis(), SL("_modules"), &merged_modules);
 	}
 
 	RETURN_THIS();
@@ -194,7 +194,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, setDefaultModule){
 
 	phalcon_fetch_params(0, 1, 0, &default_module);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultModule"), default_module);
+	phalcon_update_property(getThis(), SL("_defaultModule"), default_module);
 	RETURN_THIS();
 }
 
@@ -379,7 +379,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			}
 
 			/* Calling afterStartModule event */
-			phalcon_update_property_zval(getThis(), SL("_moduleObject"), &module_object);
+			phalcon_update_property(getThis(), SL("_moduleObject"), &module_object);
 			if (FAILURE == phalcon_mvc_jsonrpc_fire_event(&events_manager, "jsonrpc:afterStartModule", getThis(), &module_name)) {
 				RETURN_FALSE;
 			}

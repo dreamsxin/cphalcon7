@@ -240,35 +240,35 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 		 * Assign COLUMNS clause
 		 */
 		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
-			phalcon_update_property_zval(getThis(), SL("_columns"), &columns);
+			phalcon_update_property(getThis(), SL("_columns"), &columns);
 		}
 
 		/**
 		 * Assign JOIN clause
 		 */
 		if (phalcon_array_isset_fetch_str(&joins, params, SL("joins"))) {
-			phalcon_update_property_zval(getThis(), SL("_joins"), &joins);
+			phalcon_update_property(getThis(), SL("_joins"), &joins);
 		}
 
 		/**
 		 * Assign GROUP clause
 		 */
 		if (phalcon_array_isset_fetch_str(&group_clause, params, SL("group"))) {
-			phalcon_update_property_zval(getThis(), SL("_group"), &group_clause);
+			phalcon_update_property(getThis(), SL("_group"), &group_clause);
 		}
 
 		/**
 		 * Assign HAVING clause
 		 */
 		if (phalcon_array_isset_fetch_str(&having_clause, params, SL("having"))) {
-			phalcon_update_property_zval(getThis(), SL("_having"), &having_clause);
+			phalcon_update_property(getThis(), SL("_having"), &having_clause);
 		}
 
 		/**
 		 * Assign ORDER clause
 		 */
 		if (phalcon_array_isset_fetch_str(&order_clause, params, SL("order"))) {
-			phalcon_update_property_zval(getThis(), SL("_order"), &order_clause);
+			phalcon_update_property(getThis(), SL("_order"), &order_clause);
 		}
 
 		/**
@@ -279,10 +279,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 				&& phalcon_array_isset_fetch_long(&limit, &limit_clause, 0)
 				&& phalcon_array_isset_fetch_long(&offset, &limit_clause, 1)
 			) {
-				phalcon_update_property_zval(getThis(), SL("_limit"), &limit);
-				phalcon_update_property_zval(getThis(), SL("_offset"), &offset);
+				phalcon_update_property(getThis(), SL("_limit"), &limit);
+				phalcon_update_property(getThis(), SL("_offset"), &offset);
 			} else {
-				phalcon_update_property_zval(getThis(), SL("_limit"), &limit_clause);
+				phalcon_update_property(getThis(), SL("_limit"), &limit_clause);
 			}
 		}
 
@@ -290,21 +290,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 		 * Assign OFFSET clause
 		 */
 		if (phalcon_array_isset_fetch_str(&offset_clause, params, SL("offset"))) {
-			phalcon_update_property_zval(getThis(), SL("_offset"), &offset_clause);
+			phalcon_update_property(getThis(), SL("_offset"), &offset_clause);
 		}
 
 		/**
 		 * Assign FOR UPDATE clause
 		 */
 		if (phalcon_array_isset_fetch_str(&for_update, params, SL("for_update"))) {
-			phalcon_update_property_zval(getThis(), SL("_forUpdate"), &for_update);
+			phalcon_update_property(getThis(), SL("_forUpdate"), &for_update);
 		}
 
 		/**
 		 * Assign SHARED LOCK clause
 		 */
 		if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("shared_lock"))) {
-			phalcon_update_property_zval(getThis(), SL("_sharedLock"), &shared_lock);
+			phalcon_update_property(getThis(), SL("_sharedLock"), &shared_lock);
 		}
 	}
 }
@@ -321,7 +321,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, distinct){
 
 	phalcon_fetch_params(0, 1, 0, &distinct);
 
-	phalcon_update_property_zval(getThis(), SL("_distinct"), distinct);
+	phalcon_update_property(getThis(), SL("_distinct"), distinct);
 	RETURN_THIS();
 }
 
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, columns){
 
 	phalcon_fetch_params(0, 1, 0, &columns);
 
-	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
+	phalcon_update_property(getThis(), SL("_columns"), columns);
 	RETURN_THIS();
 }
 
@@ -405,13 +405,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 		phalcon_array_merge_recursive_n(&models, model);
 	} else if (Z_TYPE_P(model) != IS_NULL) {
 		if (Z_TYPE_P(alias) == IS_STRING) {
-			phalcon_array_update_zval(&models, alias, model, PH_COPY);
+			phalcon_array_update(&models, alias, model, PH_COPY);
 		} else {
 			phalcon_array_append(&models, model, PH_COPY);
 		}
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_models"), &models);
+	phalcon_update_property(getThis(), SL("_models"), &models);
 
 	RETURN_THIS();
 }
@@ -470,7 +470,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, orderBy){
 
 	phalcon_fetch_params(0, 1, 0, &order_by);
 
-	phalcon_update_property_zval(getThis(), SL("_order"), order_by);
+	phalcon_update_property(getThis(), SL("_order"), order_by);
 	RETURN_THIS();
 }
 
@@ -501,7 +501,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, having){
 
 	phalcon_fetch_params(0, 1, 0, &having);
 
-	phalcon_update_property_zval(getThis(), SL("_having"), having);
+	phalcon_update_property(getThis(), SL("_having"), having);
 	RETURN_THIS();
 }
 
@@ -534,10 +534,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, limit){
 
 	phalcon_fetch_params(0, 1, 1, &limit, &offset);
 
-	phalcon_update_property_zval(getThis(), SL("_limit"), limit);
+	phalcon_update_property(getThis(), SL("_limit"), limit);
 
 	if (offset) {
-		phalcon_update_property_zval(getThis(), SL("_offset"), offset);
+		phalcon_update_property(getThis(), SL("_offset"), offset);
 	}
 
 	RETURN_THIS();
@@ -571,7 +571,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, offset){
 
 	phalcon_fetch_params(0, 1, 0, &offset);
 
-	phalcon_update_property_zval(getThis(), SL("_offset"), offset);
+	phalcon_update_property(getThis(), SL("_offset"), offset);
 	RETURN_THIS();
 }
 
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy){
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	phalcon_update_property_zval(getThis(), SL("_group"), group);
+	phalcon_update_property(getThis(), SL("_group"), group);
 	RETURN_THIS();
 }
 
@@ -843,10 +843,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	}
 
 	PHALCON_CALL_SELF(&bind_params, "getbindparams");
-	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
+	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
-	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
+	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
 
-	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);
+	phalcon_update_property(getThis(), SL("_phql"), &phql);
 }

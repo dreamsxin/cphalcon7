@@ -114,7 +114,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerSuffix){
 
 	phalcon_fetch_params(0, 1, 0, &controller_suffix);
 
-	phalcon_update_property_zval(getThis(), SL("_handlerSuffix"), controller_suffix);
+	phalcon_update_property(getThis(), SL("_handlerSuffix"), controller_suffix);
 
 }
 
@@ -129,7 +129,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController){
 
 	phalcon_fetch_params(0, 1, 0, &controller_name);
 
-	phalcon_update_property_zval(getThis(), SL("_defaultHandler"), controller_name);
+	phalcon_update_property(getThis(), SL("_defaultHandler"), controller_name);
 
 }
 
@@ -146,11 +146,11 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 
 	if (is_exact && zend_is_true(is_exact)) {
 		PHALCON_CONCAT_SV(&name, "\\", controller_name);
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), &name);
-		phalcon_update_property_zval(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
+		phalcon_update_property(getThis(), SL("_handlerName"), &name);
+		phalcon_update_property(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_handlerName"), controller_name);
-		phalcon_update_property_zval(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_handlerName"), controller_name);
+		phalcon_update_property(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_false));
 	}
 }
 

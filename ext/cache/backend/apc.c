@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 
 	if (!key_name || Z_TYPE_P(key_name) == IS_NULL) {
-		phalcon_return_property(&key, getThis(), SL("_lastKey"));
+		phalcon_read_property(&key, getThis(), SL("_lastKey"), PH_READONLY);
 		key_name = &key;
 	}
 
@@ -363,7 +363,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, exists){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_return_property(&prefix, getThis(), SL("_prefix"));
+	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
 	PHALCON_CALL_FUNCTION(&cache_exists, "apc_exists", &prefixed_key);

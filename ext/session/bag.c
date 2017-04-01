@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Session_Bag, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &name);
 	PHALCON_ENSURE_IS_STRING(name);
-	phalcon_update_property_zval(getThis(), SL("_name"), name);
+	phalcon_update_property(getThis(), SL("_name"), name);
 }
 
 /**
@@ -177,7 +177,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 		PHALCON_CALL_METHOD(&session, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
-		phalcon_update_property_zval(getThis(), SL("_session"), &session);
+		phalcon_update_property(getThis(), SL("_session"), &session);
 	}
 
 	phalcon_return_property(&name, getThis(), SL("_name"));
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 	if (Z_TYPE(data) != IS_ARRAY) {
 		phalcon_update_property_empty_array(getThis(), SL("_data"));
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_data"), &data);
+		phalcon_update_property(getThis(), SL("_data"), &data);
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_initialized"), 1);

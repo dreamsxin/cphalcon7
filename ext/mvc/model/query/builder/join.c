@@ -263,6 +263,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, rightJoin){
 	phalcon_array_append(&join, conditions, PH_COPY);
 	phalcon_array_append(&join, alias, PH_COPY);
 	phalcon_array_append(&join, &type, PH_COPY);
-	phalcon_update_property_zval(getThis(), SL("_joins"), &join);
+	phalcon_update_property(getThis(), SL("_joins"), &join);
 	RETURN_THIS();
 }

@@ -126,7 +126,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(&builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_builder"), &builder);
+	phalcon_update_property(getThis(), SL("_builder"), &builder);
 
 	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
@@ -139,10 +139,10 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_limitRows"), &limit);
+	phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
-		phalcon_update_property_zval(getThis(), SL("_page"), &page);
+		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 }
 
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setCurrentPage){
 	phalcon_fetch_params(0, 1, 0, &current_page);
 	PHALCON_ENSURE_IS_LONG(current_page);
 
-	phalcon_update_property_zval(getThis(), SL("_page"), current_page);
+	phalcon_update_property(getThis(), SL("_page"), current_page);
 	RETURN_THIS();
 }
 
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setLimit){
 	phalcon_fetch_params(0, 1, 0, &current_limit);
 	PHALCON_ENSURE_IS_LONG(current_limit);
 
-	phalcon_update_property_zval(getThis(), SL("_limitRows"), current_limit);
+	phalcon_update_property(getThis(), SL("_limitRows"), current_limit);
 	RETURN_THIS();
 }
 
@@ -214,7 +214,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, setQueryBuilder){
 	phalcon_fetch_params(0, 1, 0, &query_builder);
 	PHALCON_VERIFY_INTERFACE_EX(query_builder, phalcon_mvc_model_query_builderinterface_ce, phalcon_paginator_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_builder"), query_builder);
+	phalcon_update_property(getThis(), SL("_builder"), query_builder);
 
 	RETURN_THIS();
 }
@@ -373,9 +373,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				phalcon_array_update_zval(&processed, &string_wildcard, value, PH_COPY);
+				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed, &wildcard, value, PH_COPY);
+				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -399,9 +399,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 			if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				phalcon_array_update_zval(&processed_types, &string_wildcard, value, PH_COPY);
+				phalcon_array_update(&processed_types, &string_wildcard, value, PH_COPY);
 			} else {
-				phalcon_array_update_zval(&processed_types, &wildcard, value, PH_COPY);
+				phalcon_array_update(&processed_types, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -420,7 +420,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
 	object_init(&paginate);
-	phalcon_update_property_zval(&paginate, SL("items"),       &items);
+	phalcon_update_property(&paginate, SL("items"),       &items);
 	phalcon_update_property_long(&paginate, SL("before"),      i_before);
 	phalcon_update_property_long(&paginate, SL("first"),       1);
 	phalcon_update_property_long(&paginate, SL("next"),        i_next);

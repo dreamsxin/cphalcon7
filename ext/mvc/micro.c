@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, notFound){
 
 	phalcon_fetch_params(0, 1, 0, &handler);
 
-	phalcon_update_property_zval(getThis(), SL("_notFoundHandler"), handler);
+	phalcon_update_property(getThis(), SL("_notFoundHandler"), handler);
 	RETURN_THIS();
 }
 
@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 		/**
 		 * Update the internal router
 		 */
-		phalcon_update_property_zval(getThis(), SL("_router"), &router);
+		phalcon_update_property(getThis(), SL("_router"), &router);
 	}
 
 	RETURN_CTOR(&router);
@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/**
 		 * Updating active handler
 		 */
-		phalcon_update_property_zval(getThis(), SL("_activeHandler"), &handler);
+		phalcon_update_property(getThis(), SL("_activeHandler"), &handler);
 
 		/**
 		 * Calling beforeExecuteRoute event
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
 		phalcon_return_property(&before_handlers, getThis(), SL("_beforeHandlers"));
 		if (Z_TYPE(before_handlers) == IS_ARRAY) {
-			phalcon_update_property_zval(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
+			phalcon_update_property(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
 
 			/**
 			 * Calls the before handlers
@@ -795,7 +795,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/**
 		 * Update the returned value
 		 */
-		phalcon_update_property_zval(getThis(), SL("_returnedValue"), return_value);
+		phalcon_update_property(getThis(), SL("_returnedValue"), return_value);
 
 		/**
 		 * Calling afterExecuteRoute event
@@ -876,7 +876,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		/**
 		 * Update the returned value
 		 */
-		phalcon_update_property_zval(getThis(), SL("_returnedValue"), return_value);
+		phalcon_update_property(getThis(), SL("_returnedValue"), return_value);
 
 		return;
 	}
@@ -889,7 +889,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 
 	phalcon_read_property(&finish_handlers, getThis(), SL("_finishHandlers"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(finish_handlers) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
+		phalcon_update_property(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
 		/**
 		 * Calls the finish handlers
 		 */
@@ -977,7 +977,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 PHP_METHOD(Phalcon_Mvc_Micro, stop){
 
 
-	phalcon_update_property_zval(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_true));
+	phalcon_update_property(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_true));
 
 }
 
@@ -992,7 +992,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, setActiveHandler){
 
 	phalcon_fetch_params(0, 1, 0, &active_handler);
 
-	phalcon_update_property_zval(getThis(), SL("_activeHandler"), active_handler);
+	phalcon_update_property(getThis(), SL("_activeHandler"), active_handler);
 
 }
 

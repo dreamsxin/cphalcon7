@@ -89,11 +89,11 @@ PHP_METHOD(Phalcon_Mvc_User_Logic, __construct){
 	phalcon_fetch_params(0, 0, 2, &action, &params);
 
 	if (action) {
-		phalcon_update_property_zval(getThis(), SL("_actionName"), action);
+		phalcon_update_property(getThis(), SL("_actionName"), action);
 	}
 
 	if (params) {
-		phalcon_update_property_zval(getThis(), SL("_actionParams"), params);
+		phalcon_update_property(getThis(), SL("_actionParams"), params);
 	}
 }
 
@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Mvc_User_Logic, setContent){
 
 	phalcon_fetch_params(0, 1, 0, &content);
 
-	phalcon_update_property_zval(getThis(), SL("_content"), content);
+	phalcon_update_property(getThis(), SL("_content"), content);
 }
 
 /**

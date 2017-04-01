@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 				&& Z_TYPE(condition_string) == IS_STRING
 				&& Z_TYPE(tmp_bind_params) == IS_ARRAY
 			) {
-				phalcon_array_update_zval(&merged_conditions, &condition_string, &condition_string, PH_COPY);
+				phalcon_array_update(&merged_conditions, &condition_string, &condition_string, PH_COPY);
 				phalcon_array_merge_recursive_n(&merged_bind_params, &tmp_bind_params);
 
 				if (phalcon_array_isset_fetch_long(&tmp_bind_types, single_condition_array, 2) && Z_TYPE(tmp_bind_types) == IS_ARRAY) {
@@ -215,12 +215,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 			} else if (Z_TYPE(single_condition_key) == IS_STRING) {
 				PHALCON_CONCAT_VSVS(&condition_string, &single_condition_key, " = :", &single_condition_key, ":");
 
-				phalcon_array_update_zval(&merged_conditions, &single_condition_key, &condition_string, PH_COPY);
+				phalcon_array_update(&merged_conditions, &single_condition_key, &condition_string, PH_COPY);
 
 				if (Z_TYPE_P(single_condition_array) == IS_ARRAY) {
 					phalcon_array_merge_recursive_n(&merged_bind_params, single_condition_array);
 				} else {
-					phalcon_array_update_zval(&merged_bind_params, &single_condition_key, single_condition_array, PH_COPY);
+					phalcon_array_update(&merged_bind_params, &single_condition_key, single_condition_array, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -262,9 +262,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 			}
 		}
 
-		phalcon_update_property_zval(getThis(), SL("_conditions"), &new_conditions);
+		phalcon_update_property(getThis(), SL("_conditions"), &new_conditions);
 	} else {
-		phalcon_update_property_zval(getThis(), SL("_conditions"), &joind_condition);
+		phalcon_update_property(getThis(), SL("_conditions"), &joind_condition);
 	}
 }
 
@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 				}
 
 				PHALCON_CONCAT_SVSVSV(return_value, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-				phalcon_update_property_zval(getThis(), SL("_conditions"), return_value);
+				phalcon_update_property(getThis(), SL("_conditions"), return_value);
 				return;
 			}
 		}
@@ -511,8 +511,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	PHALCON_CONCAT_VSVSVS(&conditions, expr, " BETWEEN :", &minimum_key, ": AND :", &maximum_key, ":");
 
 	array_init_size(&bind_params, 2);
-	phalcon_array_update_zval(&bind_params, &minimum_key, minimum, PH_COPY);
-	phalcon_array_update_zval(&bind_params, &maximum_key, maximum, PH_COPY);
+	phalcon_array_update(&bind_params, &minimum_key, minimum, PH_COPY);
+	phalcon_array_update(&bind_params, &maximum_key, maximum, PH_COPY);
 
 	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
@@ -524,7 +524,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	}
 
 	phalcon_increment(&next_hidden_param);
-	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
+	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
 	RETURN_THIS();
 }
 
@@ -570,8 +570,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	PHALCON_CONCAT_VSVSVS(&conditions, expr, " NOT BETWEEN :", &minimum_key, ": AND :", &maximum_key, ":");
 
 	array_init_size(&bind_params, 2);
-	phalcon_array_update_zval(&bind_params, &minimum_key, minimum, PH_COPY);
-	phalcon_array_update_zval(&bind_params, &maximum_key, maximum, PH_COPY);
+	phalcon_array_update(&bind_params, &minimum_key, minimum, PH_COPY);
+	phalcon_array_update(&bind_params, &maximum_key, maximum, PH_COPY);
 
 	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	}
 
 	phalcon_increment(&next_hidden_param);
-	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
+	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
 	RETURN_THIS();
 }
 
@@ -628,7 +628,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 
 		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
 		phalcon_array_append(&bind_keys, &query_key, PH_COPY);
-		phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
+		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 		phalcon_increment(&hidden_param);
 	} ZEND_HASH_FOREACH_END();
 
@@ -647,7 +647,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
-	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &hidden_param);
+	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THIS();
 }
@@ -693,7 +693,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 
 		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
 		phalcon_array_append(&bind_keys, &query_key, PH_COPY);
-		phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
+		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 		phalcon_increment(&hidden_param);
 	} ZEND_HASH_FOREACH_END();
 
@@ -712,7 +712,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
-	phalcon_update_property_zval(getThis(), SL("_hiddenParamNumber"), &hidden_param);
+	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THIS();
 }
@@ -747,10 +747,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, compile){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getPhql){
 
-	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
 	if (PHALCON_IS_EMPTY(return_value)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "compile");
-		phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
 	}
 }
 

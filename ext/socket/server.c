@@ -232,10 +232,10 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 		return;
 	}
-	phalcon_update_property_zval(getThis(), SL("_socket"), &socket);
+	phalcon_update_property(getThis(), SL("_socket"), &socket);
 
-	phalcon_update_property_zval(getThis(), SL("_address"), address);
-	phalcon_update_property_zval(getThis(), SL("_port"), port);
+	phalcon_update_property(getThis(), SL("_address"), address);
+	phalcon_update_property(getThis(), SL("_port"), port);
 
 	phalcon_update_property_empty_array(getThis(), SL("_clients"));
 }
@@ -249,7 +249,7 @@ PHP_METHOD(Phalcon_Socket_Server, setDaemon){
 
 	phalcon_fetch_params(0, 1, 0, &daemon);
 
-	phalcon_update_property_zval(getThis(), SL("_daemon"), daemon);
+	phalcon_update_property(getThis(), SL("_daemon"), daemon);
 
 	RETURN_THIS();
 }
@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Socket_Server, setMaxChildren){
 
 	phalcon_fetch_params(0, 1, 0, &max_children);
 
-	phalcon_update_property_zval(getThis(), SL("_maxChildren"), max_children);
+	phalcon_update_property(getThis(), SL("_maxChildren"), max_children);
 
 	RETURN_THIS();
 }
@@ -281,11 +281,11 @@ PHP_METHOD(Phalcon_Socket_Server, setEvent){
 
 	switch(Z_LVAL_P(event)) {
 		case 0:
-			phalcon_update_property_zval(getThis(), SL("_event"), event);
+			phalcon_update_property(getThis(), SL("_event"), event);
 			break;
 #if HAVE_EPOLL
 		case 1:
-			phalcon_update_property_zval(getThis(), SL("_event"), event);
+			phalcon_update_property(getThis(), SL("_event"), event);
 			break;
 #endif
 		default:
@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Socket_Server, getClient){
 
 	phalcon_fetch_params(0, 1, 0, &socket_id);
 
-	phalcon_read_property_array(return_value, getThis(), SL("_clients"), socket_id);
+	phalcon_read_property_array(return_value, getThis(), SL("_clients"), socket_id, 0);
 }
 
 /**
@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Socket_Server, disconnect){
 
 	phalcon_fetch_params(0, 1, 0, &socket_id);
 
-	phalcon_read_property_array(&client, getThis(), SL("_clients"), socket_id);
+	phalcon_read_property_array(&client, getThis(), SL("_clients"), socket_id, PH_READONLY);
 	if (Z_TYPE(client) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, &client, "close");
 	}

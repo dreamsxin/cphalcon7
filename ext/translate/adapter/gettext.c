@@ -112,9 +112,9 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_locale"), &locale);
-	phalcon_update_property_zval(getThis(), SL("_defaultDomain"), &default_domain);
-	phalcon_update_property_zval(getThis(), SL("_directory"), &directory);
+	phalcon_update_property(getThis(), SL("_locale"), &locale);
+	phalcon_update_property(getThis(), SL("_defaultDomain"), &default_domain);
+	phalcon_update_property(getThis(), SL("_directory"), &directory);
 
 	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
 	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);

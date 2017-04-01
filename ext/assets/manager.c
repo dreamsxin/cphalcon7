@@ -169,7 +169,7 @@ PHP_METHOD(Phalcon_Assets_Manager, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property_zval(getThis(), SL("_options"), options);
+		phalcon_update_property(getThis(), SL("_options"), options);
 	}
 }
 
@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Assets_Manager, setOptions){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	phalcon_update_property_zval(getThis(), SL("_options"), options);
+	phalcon_update_property(getThis(), SL("_options"), options);
 
 	RETURN_THIS();
 }
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput){
 
 	phalcon_fetch_params(0, 1, 0, &implicit_output);
 
-	phalcon_update_property_zval(getThis(), SL("_implicitOutput"), implicit_output);
+	phalcon_update_property(getThis(), SL("_implicitOutput"), implicit_output);
 	RETURN_THIS();
 }
 
@@ -497,7 +497,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		args = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_return_property(&use_implicit_output, getThis(), SL("_implicitOutput"));
+	phalcon_read_property(&use_implicit_output, getThis(), SL("_implicitOutput"), PH_READONLY);
 
 	/**
 	 * Get the resources as an array
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	 * Prepare options if the collection must be filtered
 	 */
 	if (Z_TYPE(filters) == IS_ARRAY) {
-		phalcon_return_property(&options, getThis(), SL("_options"));
+		phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 		/**
 		 * Check for global options in the assets manager

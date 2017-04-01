@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Crypt, setMethod){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_method"), method);
+	phalcon_update_property(getThis(), SL("_method"), method);
 	RETURN_THIS();
 }
 
@@ -176,7 +176,7 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	phalcon_fetch_params(0, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
-	phalcon_update_property_zval(getThis(), SL("_key"), key);
+	phalcon_update_property(getThis(), SL("_key"), key);
 	RETURN_THIS();
 }
 
@@ -205,7 +205,7 @@ PHP_METHOD(Phalcon_Crypt, setOptions) {
 	phalcon_fetch_params(0, 1, 0, &options);
 	PHALCON_ENSURE_IS_LONG(options);
 
-	phalcon_update_property_zval(getThis(), SL("_options"), options);
+	phalcon_update_property(getThis(), SL("_options"), options);
 	RETURN_THIS();
 }
 
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		phalcon_return_property(&encrypt_key, getThis(), SL("_key"));
+		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&encrypt_key, key);
 		if (Z_TYPE(encrypt_key) != IS_STRING) {
@@ -279,7 +279,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (!options || Z_TYPE_P(options) == IS_NULL) {
-		phalcon_return_property(&encrypt_options, getThis(), SL("_options"));
+		phalcon_read_property(&encrypt_options, getThis(), SL("_options"), PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&encrypt_options, options);
 	}
@@ -348,7 +348,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
-		phalcon_return_property(&encrypt_key, getThis(), SL("_key"));
+		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
 	} else {
 		PHALCON_CPY_WRT_CTOR(&encrypt_key, key);
 		if (Z_TYPE(encrypt_key) != IS_STRING) {
@@ -357,7 +357,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	if (!options || Z_TYPE_P(options) == IS_NULL) {
-		phalcon_return_property(&encrypt_options, getThis(), SL("_options"));
+		phalcon_read_property(&encrypt_options, getThis(), SL("_options"), PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&encrypt_options, options);
 	}
@@ -479,7 +479,7 @@ PHP_METHOD(Phalcon_Crypt, beforeEncrypt){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_beforeEncrypt"), handler);
+	phalcon_update_property(getThis(), SL("_beforeEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -499,7 +499,7 @@ PHP_METHOD(Phalcon_Crypt, afterEncrypt){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_afterEncrypt"), handler);
+	phalcon_update_property(getThis(), SL("_afterEncrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -519,7 +519,7 @@ PHP_METHOD(Phalcon_Crypt, beforeDecrypt){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_beforeDecrypt"), handler);
+	phalcon_update_property(getThis(), SL("_beforeDecrypt"), handler);
 	RETURN_THIS();
 }
 
@@ -539,6 +539,6 @@ PHP_METHOD(Phalcon_Crypt, afterDecrypt){
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_afterDecrypt"), handler);
+	phalcon_update_property(getThis(), SL("_afterDecrypt"), handler);
 	RETURN_THIS();
 }

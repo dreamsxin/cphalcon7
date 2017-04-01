@@ -86,7 +86,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, __construct){
 
 	PHALCON_VERIFY_INTERFACE_EX(httpclient, phalcon_http_client_adapterinterface_ce, phalcon_jsonrpc_client_exception_ce);
 
-	phalcon_update_property_zval(getThis(), SL("_httpclient"), httpclient);
+	phalcon_update_property(getThis(), SL("_httpclient"), httpclient);
 }
 
 /**
@@ -110,7 +110,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 	i = Z_LVAL(id) + 1;
 	ZVAL_LONG(&id, i);
 
-	phalcon_update_property_zval(getThis(), SL("_id"), &id);
+	phalcon_update_property(getThis(), SL("_id"), &id);
 
 	array_init(&jsonrpc_message);
 

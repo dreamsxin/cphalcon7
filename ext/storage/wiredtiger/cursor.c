@@ -172,10 +172,10 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, __construct)
 
 	phalcon_fetch_params(0, 2, 1, &db, &uri, &_config);
 
-	phalcon_update_property_zval(getThis(), SL("_uri"), uri);
+	phalcon_update_property(getThis(), SL("_uri"), uri);
 
 	if (_config && Z_TYPE_P(_config) == IS_STRING) {
-		phalcon_update_property_zval(getThis(), SL("_config"), _config);
+		phalcon_update_property(getThis(), SL("_config"), _config);
 	}
 
 	phalcon_read_property(&config, getThis(), SL("_config"), PH_NOISY|PH_READONLY);
@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, reconfigure)
 		return;
 	}
 
-	phalcon_update_property_zval(getThis(), SL("_config"), config);
+	phalcon_update_property(getThis(), SL("_config"), config);
 	RETURN_TRUE;
 }
 
@@ -401,7 +401,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, gets)
 		}
 		PHALCON_CALL_METHOD_FLAG(flag, &ret, getThis(), "get", val);
 		if (flag != FAILURE) {
-			phalcon_array_update_zval(return_value, &key, &ret, PH_COPY);
+			phalcon_array_update(return_value, &key, &ret, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 }

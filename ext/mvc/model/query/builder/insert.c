@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, table){
 
 	phalcon_fetch_params(0, 1, 0, &table);
 
-	phalcon_update_property_zval(getThis(), SL("_table"), table);
+	phalcon_update_property(getThis(), SL("_table"), table);
 	RETURN_THIS();
 }
 
@@ -186,7 +186,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, columns){
 
 	phalcon_fetch_params(0, 1, 0, &columns);
 
-	phalcon_update_property_zval(getThis(), SL("_columns"), columns);
+	phalcon_update_property(getThis(), SL("_columns"), columns);
 	RETURN_THIS();
 }
 
@@ -213,7 +213,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, values){
 
 	phalcon_fetch_params(0, 1, 0, &values);
 
-	phalcon_update_property_zval(getThis(), SL("_values"), values);
+	phalcon_update_property(getThis(), SL("_values"), values);
 	RETURN_THIS();
 }
 
@@ -288,7 +288,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 			PHALCON_CONCAT_SVS(&insert_value, " :", &key, ":");
 
 			phalcon_array_append(&insert_values, &insert_value, PH_COPY);
-			phalcon_array_update_zval(&bind_params, &key, value, PH_COPY);
+			phalcon_array_update(&bind_params, &key, value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 		phalcon_increment(&hidden_param);
 		phalcon_fast_join_str(&joined_values, SL(", "), &insert_values);
@@ -299,10 +299,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 
 	PHALCON_SCONCAT_SVS(&phql, "(", &joined_rows, ")");
 
-	phalcon_update_property_zval(getThis(), SL("_mergeBindParams"), &bind_params);
+	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
-	phalcon_update_property_zval(getThis(), SL("_mergeBindTypes"), &bind_types);
+	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
 
-	phalcon_update_property_zval(getThis(), SL("_phql"), &phql);
+	phalcon_update_property(getThis(), SL("_phql"), &phql);
 }

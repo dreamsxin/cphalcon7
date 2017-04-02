@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Arr, path){
 			break;
 		}
 
-		if (phalcon_array_isset_fetch(&values, array, &key, 0)) {
+		if (phalcon_array_isset_fetch(&values, array, &key, PH_READONLY)) {
 			if (phalcon_fast_count_ev(&keys) > 0) {
 				PHALCON_CALL_SELF(&is_array, "is_array", &values);
 				if (zend_is_true(&is_array)) {
@@ -1074,7 +1074,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
-	ZVAL_STRING(&service, ISV(filter));
+	ZVAL_STR(&service, IS(filter));
 
 	PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);

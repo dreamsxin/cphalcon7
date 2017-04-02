@@ -261,12 +261,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		|| phalcon_compare_strict_string(&method_name, SL("getPut"))
 		|| phalcon_compare_strict_string(&method_name, SL("getQuery"))
 		|| phalcon_compare_strict_string(&method_name, SL("getServer"))) {
-		ZVAL_STRING(&service_name, ISV(request));
+		ZVAL_STR(&service_name, IS(request));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getSession"))) {
 		ZVAL_STRING(&method_name, "get");
-		ZVAL_STRING(&service_name, ISV(session));
+		ZVAL_STR(&service_name, IS(session));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getParam"))) {
-		ZVAL_STRING(&service_name, ISV(dispatcher));
+		ZVAL_STR(&service_name, IS(dispatcher));
 	}
 
 	PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &service_name);

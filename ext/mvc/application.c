@@ -199,10 +199,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		return;
 	}
 
-	ZVAL_STRING(&service, ISV(app));
+	ZVAL_STR(&service, IS(app));
 	PHALCON_CALL_METHOD(NULL, &dependency_injector, "setshared", &service, getThis());
 
-	ZVAL_STRING(&service, ISV(router));
+	ZVAL_STR(&service, IS(router));
 	PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
@@ -326,7 +326,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
 	PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
 
-	ZVAL_STRING(&service, ISV(dispatcher));
+	ZVAL_STR(&service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
@@ -375,7 +375,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_CPY_WRT_CTOR(&response, &possible_response);
 			ZVAL_TRUE(&returned_response);
 		} else {
-			ZVAL_STRING(&service, ISV(response));
+			ZVAL_STR(&service, IS(response));
 
 			PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			}
 		}
 	} else {
-		ZVAL_STRING(&service, ISV(response));
+		ZVAL_STR(&service, IS(response));
 
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	/**
 	 * Request
 	 */
-	ZVAL_STRING(&service, ISV(request));
+	ZVAL_STR(&service, IS(request));
 	object_init_ex(&requset, phalcon_http_request_ce);
 	PHALCON_CALL_METHOD(NULL, &requset, "__construct", data);
 	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &requset);
@@ -516,21 +516,21 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	/**
 	 * Mvc Router
 	 */
-	ZVAL_STRING(&service, ISV(router));
+	ZVAL_STR(&service, IS(router));
 	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
 	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * Mvc Dispatcher
 	 */
-	ZVAL_STRING(&service, ISV(dispatcher));
+	ZVAL_STR(&service, IS(dispatcher));
 	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
 	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * Mvc View
 	 */
-	ZVAL_STRING(&service, ISV(view));
+	ZVAL_STR(&service, IS(view));
 	PHALCON_CALL_METHOD(&definition, &dependency_injector_new, "getraw", &service);
 	PHALCON_CALL_METHOD(NULL, &dependency_injector_new, "set", &service, &definition, &PHALCON_GLOBAL(z_true));
 

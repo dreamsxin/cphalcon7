@@ -2303,7 +2303,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 	/**
 	 * Create a query
 	 */
-	ZVAL_STRING(&service_name, ISV(modelsQuery));
+	ZVAL_STR(&service_name, IS(modelsQuery));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {

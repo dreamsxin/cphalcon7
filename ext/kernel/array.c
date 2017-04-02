@@ -371,6 +371,11 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 	ulong uidx = 0;
 	char *sidx = NULL;
 
+	if (!phalcon_array_isset(arr, index)) {
+		ZVAL_NULL(return_value);
+		return FAILURE;
+	}
+
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {
@@ -414,6 +419,14 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 		}
 
 		if (result != FAILURE && found == 1) {
+			/*
+			if (EXPECTED(Z_TYPE_P(zv) == IS_REFERENCE)) {
+				zv = Z_REFVAL_P(zv);
+			}
+			if (Z_TYPE_P(zv) == IS_INDIRECT) {
+				zv = Z_INDIRECT_P(zv);
+			}
+			*/
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
 				SEPARATE_ZVAL_IF_NOT_REF(zv);
 				ZVAL_COPY_VALUE(return_value, zv);

@@ -469,7 +469,7 @@ PHP_METHOD(Phalcon_Tag, getUrlService){
 
 		PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
-		ZVAL_STRING(&service, ISV(url));
+		ZVAL_STR(&service, IS(url));
 
 		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 
 		PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
-		ZVAL_STRING(&service, ISV(escaper));
+		ZVAL_STR(&service, IS(escaper));
 
 		PHALCON_CALL_METHOD(&escaper, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&escaper, phalcon_escaperinterface_ce);

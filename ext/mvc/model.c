@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsMetaData){
 
 	zval service_name = {};
 
-	ZVAL_STRING(&service_name, ISV(modelsMetadata));
+	ZVAL_STR(&service_name, IS(modelsMetadata));
 
 	PHALCON_CALL_METHOD(return_value, getThis(), "getresolveservice", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
@@ -649,7 +649,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getModelsManager){
 
 	zval service_name = {};
 
-	ZVAL_STRING(&service_name, ISV(modelsManager));
+	ZVAL_STR(&service_name, IS(modelsManager));
 	PHALCON_CALL_METHOD(return_value, getThis(), "getresolveservice", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
@@ -1721,7 +1721,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		return;
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsManager));
+	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
@@ -1808,7 +1808,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	phalcon_get_called_class(&model_name);
 
-	ZVAL_STRING(&service_name, ISV(modelsManager));
+	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -1918,7 +1918,7 @@ PHP_METHOD(Phalcon_Mvc_Model, query){
 
 	phalcon_get_called_class(&model_name);
 
-	ZVAL_STRING(&service_name, ISV(modelsCriteria));
+	ZVAL_STR(&service_name, IS(modelsCriteria));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
@@ -2185,7 +2185,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 		return;
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsManager));
+	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
 
@@ -6452,7 +6452,7 @@ PHP_METHOD(Phalcon_Mvc_Model, remove){
 	}
 
 	phalcon_get_called_class(&model_name);
-	ZVAL_STRING(&service_name, ISV(modelsManager));
+	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
@@ -6594,7 +6594,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 					return;
 				}
 
-				ZVAL_STRING(&service, ISV(filter));
+				ZVAL_STR(&service, IS(filter));
 
 				PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 				PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);

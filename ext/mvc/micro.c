@@ -535,7 +535,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 
 	phalcon_return_property(&router, getThis(), SL("_router"));
 	if (Z_TYPE(router) != IS_OBJECT) {
-		ZVAL_STRING(&service_name, ISV(router));
+		ZVAL_STR(&service_name, IS(router));
 
 		PHALCON_CALL_METHOD(&router, getThis(), "getsharedservice", &service_name);
 		PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);

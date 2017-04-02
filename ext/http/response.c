@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
 	if (Z_TYPE(header) <= IS_NULL) {
-		ZVAL_STRING(&service_name, ISV(url));
+		ZVAL_STR(&service_name, IS(url));
 
 		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service_name);
 		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		PHALCON_CALL_METHOD(&header, &url, "get", location);
 	}
 
-	ZVAL_STRING(&service_name, ISV(view));
+	ZVAL_STR(&service_name, IS(view));
 
 	PHALCON_CALL_METHOD(&view, &dependency_injector, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE(view) == IS_OBJECT && instanceof_function(Z_OBJCE(view), phalcon_mvc_viewinterface_ce)) {

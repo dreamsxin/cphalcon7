@@ -1182,7 +1182,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		phalcon_concat_self_str(&html, SL("<tr><th>Pattern</th><th>Paths</th><th>Methods</th></tr>"));
 
 		if (Z_TYPE(di) == IS_OBJECT) {
-			ZVAL_STRING(&service_name, ISV(router));
+			ZVAL_STR(&service_name, IS(router));
 			PHALCON_CALL_METHOD(&router, &di, "getshared", &service_name);
 			if (Z_TYPE(router) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&routes, &router, "getroutes");

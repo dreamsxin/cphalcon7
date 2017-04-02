@@ -317,7 +317,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 			PHALCON_CPY_WRT_CTOR(&model, &models);
 		}
 
-		ZVAL_STRING(&service_name, ISV(modelsMetadata));
+		ZVAL_STR(&service_name, IS(modelsMetadata));
 
 		PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 		if (zend_is_true(&has)) {
@@ -773,7 +773,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
-	ZVAL_STRING(&service_name, ISV(modelsQuery));
+	ZVAL_STR(&service_name, IS(modelsQuery));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 

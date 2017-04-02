@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 
-	ZVAL_STRING(&service, ISV(router));
+	ZVAL_STR(&service, IS(router));
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
 
-	ZVAL_STRING(&service, ISV(dispatcher));
+	ZVAL_STR(&service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);

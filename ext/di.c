@@ -100,7 +100,7 @@ PHP_METHOD(Phalcon_Di, reset);
 PHP_METHOD(Phalcon_Di, __clone);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___construct, 0, 0, 0)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di___call, 0, 0, 1)
@@ -204,11 +204,12 @@ PHP_METHOD(Phalcon_Di, __construct){
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
 
-	if (_name) {
+	if (_name && Z_TYPE_P(_name) != IS_NULL) {
 		phalcon_update_property(getThis(), SL("_name"), _name);
+		ZVAL_COPY_VALUE(&name, _name);
+	} else {
+		phalcon_read_property(&name, getThis(), SL("_name"), PH_READONLY);
 	}
-
-	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 
 	phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), &name, getThis());
 }

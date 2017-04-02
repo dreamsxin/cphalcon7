@@ -250,7 +250,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 				return;
 			}
 
-			ZVAL_STRING(&service, ISV(filter));
+			ZVAL_STR(&service, IS(filter));
 
 			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
@@ -564,7 +564,7 @@ PHP_METHOD(Phalcon_Http_Request, getParam){
 		return;
 	}
 
-	ZVAL_STRING(&service, ISV(dispatcher));
+	ZVAL_STR(&service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 
@@ -1195,7 +1195,7 @@ PHP_METHOD(Phalcon_Http_Request, isPost){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "POST"));
 	}
 
-	ZVAL_STRING(&post, ISV(POST));
+	ZVAL_STR(&post, IS(POST));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &post);
@@ -1214,7 +1214,7 @@ PHP_METHOD(Phalcon_Http_Request, isGet){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "GET"));
 	}
 
-	ZVAL_STRING(&get, ISV(GET));
+	ZVAL_STR(&get, IS(GET));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &get);
@@ -1233,7 +1233,7 @@ PHP_METHOD(Phalcon_Http_Request, isPut){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "PUT"));
 	}
 
-	ZVAL_STRING(&put, ISV(PUT));
+	ZVAL_STR(&put, IS(PUT));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &put);
@@ -1252,7 +1252,7 @@ PHP_METHOD(Phalcon_Http_Request, isPatch){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "PATCH"));
 	}
 
-	ZVAL_STRING(&patch, ISV(PATCH));
+	ZVAL_STR(&patch, IS(PATCH));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &patch);
@@ -1271,7 +1271,7 @@ PHP_METHOD(Phalcon_Http_Request, isHead){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "HEAD"));
 	}
 
-	ZVAL_STRING(&head, ISV(HEAD));
+	ZVAL_STR(&head, IS(HEAD));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &head);
@@ -1290,7 +1290,7 @@ PHP_METHOD(Phalcon_Http_Request, isDelete){
 		RETURN_BOOL(!strcmp(phalcon_http_request_getmethod_helper(), "DELETE"));
 	}
 
-	ZVAL_STRING(&delete, ISV(DELETE));
+	ZVAL_STR(&delete, IS(DELETE));
 
 	PHALCON_CALL_METHOD(&method, getThis(), "getmethod");
 	is_equal_function(return_value, &method, &delete);

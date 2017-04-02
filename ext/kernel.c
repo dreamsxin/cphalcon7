@@ -287,7 +287,7 @@ PHP_METHOD(Phalcon_Kernel, message){
 	if (!_ext || Z_TYPE_P(_ext) == IS_NULL) {
 		ZVAL_STRING(&ext, "php");
 	} else {
-		ZVAL_COPY_VALUE(&ext, _ext);
+		ZVAL_COPY(&ext, _ext);
 	}
 
 	if (!absolute_path) {
@@ -302,6 +302,7 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 		PHALCON_CONCAT_VVVSV(&file_path, &base_path, &messages_dir, file, ".", &ext);
 	}
+	zval_ptr_dtor(&ext);
 
 	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_READONLY);
 	if (Z_TYPE(messages) != IS_ARRAY) {
@@ -370,29 +371,30 @@ PHP_METHOD(Phalcon_Kernel, message){
 			array_init(&file_messages2);
 		}
 		phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_messages"), &file_path, &file_messages2);
+		zval_ptr_dtor(&file_messages2);
 	}
 	zval_ptr_dtor(&file_path);
 
 	if (Z_TYPE_P(path) != IS_NULL) {
+		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+
+		ZVAL_STR(&service, IS(translate));
+
+		PHALCON_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+
 		if  (Z_TYPE(file_messages) == IS_ARRAY) {
 			PHALCON_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages, path, default_value);
 		} else {
 			ZVAL_COPY_VALUE(&value, default_value);
 		}
+		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
+			PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
+			PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
+		} else {
+			RETURN_CTOR(&value);
+		}
 	} else {
 		RETURN_CTOR(&file_messages);
-	}
-
-	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-
-	ZVAL_STRING(&service, ISV(translate));
-
-	PHALCON_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
-	if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
-		PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
-		PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
-	} else {
-		RETURN_CTOR(&value);
 	}
 }
 

@@ -192,8 +192,11 @@ static inline int phalcon_array_append_long(zval *arr, long value, int flags)
 static inline int phalcon_array_append_string(zval *arr, const char *value, uint value_length, int separate)
 {
 	zval zvalue;
+	int ret;
+
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	return phalcon_array_append(arr, &zvalue, separate);
+	ret = phalcon_array_append(arr, &zvalue, separate);
+	return ret;
 }
 
 /**
@@ -276,8 +279,10 @@ static inline int phalcon_array_update_zval_long(zval *arr, zval *index, long va
 static inline int phalcon_array_update_zval_str(zval *arr, zval *index, char *value, uint value_length, int flags)
 {
 	zval zvalue;
+	int ret;
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	return phalcon_array_update(arr, index, &zvalue, flags);
+	ret = phalcon_array_update(arr, index, &zvalue, flags);
+	return ret;
 }
 
 /**
@@ -390,9 +395,11 @@ static inline int phalcon_array_update_str_double(zval *arr, const char *index, 
 static inline int phalcon_array_update_str_str(zval *arr, const char *index, uint index_length, char *value, uint value_length, int flags)
 {
 	zval zvalue;
+	int ret;
 
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	return phalcon_array_update_str(arr, index, index_length, &zvalue, flags);
+	ret = phalcon_array_update_str(arr, index, index_length, &zvalue, flags);
+	return ret;
 }
 
 static inline int phalcon_array_update_str_string(zval *arr, const char *index, uint index_length, zend_string *value, int flags)
@@ -406,9 +413,11 @@ static inline int phalcon_array_update_str_string(zval *arr, const char *index, 
 static inline int phalcon_array_update_string_str(zval *arr, zend_string *index, char *value, uint value_length, int flags)
 {
 	zval zvalue;
+	int ret;
 
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	return phalcon_array_update_string(arr, index, &zvalue, flags);
+	ret = phalcon_array_update_string(arr, index, &zvalue, flags);
+	return ret;
 }
 
 static inline int phalcon_array_update_string_string(zval *arr, zend_string *index, zend_string *value, int flags)
@@ -645,7 +654,7 @@ void phalcon_fast_array_merge(zval *return_value, zval *array1, zval *array2);
  * that Phalcon's version preserves numeric keys
  */
 void phalcon_array_merge_recursive_n(zval *a1, zval *a2);
-void phalcon_array_merge_recursive_n2(zval *a1, zval *a2);
+void phalcon_array_merge_recursive_n2(zval *a1, zval *a2, int flags);
 
 /**
  * @brief <tt>$return_value = array_keys($arr)</tt>

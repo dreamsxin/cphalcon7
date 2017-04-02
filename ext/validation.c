@@ -580,17 +580,13 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
 {
-	zval *messages, file = {}, default_messages = {};
+	zval *messages, file = {};
 
 	phalcon_fetch_params(0, 1, 0, &messages);
 
 	phalcon_read_static_property_ce(&file, phalcon_validation_ce, SL("_file"), PH_READONLY);
 
-	phalcon_read_static_property_array_ce(&default_messages, phalcon_kernel_ce, SL("_defaultMessages"), &file, PH_READONLY);
-
-	phalcon_array_merge_recursive_n(&default_messages, messages);
-
-	phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_defaultMessages"), &file, &default_messages);
+	phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_defaultMessages"), &file, messages);
 }
 
 PHP_METHOD(Phalcon_Validation, getDefaultMessage)

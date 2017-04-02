@@ -910,7 +910,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		phalcon_read_property(&logic_binding, getThis(), SL("_logicBinding"), PH_READONLY);
 		if (zend_is_true(&logic_binding)) {
 			count_action_params = phalcon_fast_count_int(&action_params);
-			PHALCON_CPY_WRT_CTOR(&tmp_params, &action_params);
+			ZVAL_DUP(&tmp_params, &action_params);
 			array_init(&params);
 			reflection_method_ce = phalcon_fetch_str_class(SL("ReflectionMethod"), ZEND_FETCH_CLASS_AUTO);
 			object_init_ex(&reflection_method, reflection_method_ce);
@@ -945,7 +945,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, 0)) {
 						phalcon_array_update(&params, &var_name, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &var_name, 0);
-					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, 0)) {
+					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, PH_READONLY)) {
 						phalcon_array_update(&params, &key, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &key, 0);
 					} else if (count_action_params) {

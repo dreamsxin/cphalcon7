@@ -251,11 +251,11 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 
 	switch (Z_TYPE_P(index)) {
 		case IS_NULL:
-			status = zend_hash_update(ht, zend_string_init("", 1, 0), value) ? SUCCESS : FAILURE;
+			status = zend_symtable_update(ht, ZSTR_EMPTY_ALLOC(), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_DOUBLE:
-			status = zend_hash_index_update(ht, (ulong)Z_DVAL_P(index), value) ? SUCCESS : FAILURE;
+			status = zend_hash_index_update(ht, zend_dval_to_lval(Z_DVAL_P(index)), value) ? SUCCESS : FAILURE;
 			break;
 
 		case IS_TRUE:
@@ -267,12 +267,16 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 			break;
 
 		case IS_LONG:
-		case IS_RESOURCE:
 			status = zend_hash_index_update(ht, Z_LVAL_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
+		case IS_RESOURCE:
+			zend_error(E_NOTICE, "Resource ID#%d used as offset, casting to integer (%d)", Z_RES_HANDLE_P(index), Z_RES_HANDLE_P(index));
+			status = zend_hash_index_update(ht, Z_RES_HANDLE_P(index), value) ? SUCCESS : FAILURE;
+			break;
+
 		case IS_STRING:
-			status = zend_hash_update(ht, Z_STR_P(index), value) ? SUCCESS : FAILURE;
+			status = zend_symtable_update(ht, Z_STR_P(index), value) ? SUCCESS : FAILURE;
 			break;
 
 		default:
@@ -282,12 +286,12 @@ int phalcon_array_update_hash(HashTable *ht, const zval *index, zval *value, int
 	}
 
 	return status;
+	// return array_set_zval_key(ht, (zval *)index, value);
 }
 
 int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zval *value, int flags)
 {
-	zval new_value = {};
-	zend_string *key;
+	zval new_value = {}, key = {};
 	int status;
 
 	if (Z_TYPE_P(arr) != IS_ARRAY) {
@@ -307,9 +311,9 @@ int phalcon_array_update_str(zval *arr, const char *index, uint index_length, zv
 		SEPARATE_ZVAL_IF_NOT_REF(arr);
 	}
 
-	key = zend_string_init(index, index_length, 0);
-	status = zend_hash_update(Z_ARRVAL_P(arr), key, value) ? SUCCESS : FAILURE;
-	zend_string_release(key);
+	ZVAL_STRINGL(&key, index, index_length);
+	status = phalcon_array_update_hash(Z_ARRVAL_P(arr), &key, value, flags);
+	zval_ptr_dtor(&key);
 	return status;
 }
 
@@ -972,7 +976,7 @@ void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 	} ZEND_HASH_FOREACH_END();
 }
 
-void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
+void phalcon_array_merge_recursive_n2(zval *a1, zval *a2, int flags)
 {
 	zval *value;
 	zend_string *str_key;
@@ -989,10 +993,10 @@ void phalcon_array_merge_recursive_n2(zval *a1, zval *a2)
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset_fetch(&tmp, a1, &key, 0)) {
-			phalcon_array_update(a1, &key, value, PH_COPY);
+		if (!phalcon_array_isset_fetch(&tmp, a1, &key, PH_READONLY)) {
+			phalcon_array_update(a1, &key, value, flags);
 		} else if (Z_TYPE_P(value) == IS_ARRAY) {
-			phalcon_array_merge_recursive_n2(&tmp, value);
+			phalcon_array_merge_recursive_n2(&tmp, value, flags);
 		}
 	} ZEND_HASH_FOREACH_END();
 }

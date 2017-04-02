@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Arr, path){
 		PHALCON_SEPARATE_PARAM(path);
 		ZVAL_COPY_VALUE(&keys, path);
 	} else {
-		if (phalcon_array_isset_fetch(return_value, array, path, 0)) {
+		if (phalcon_array_isset_fetch(return_value, array, path, PH_COPY)) {
 			return;
 		}
 

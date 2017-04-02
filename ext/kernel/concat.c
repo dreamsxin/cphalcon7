@@ -34,6 +34,7 @@ void phalcon_concat_sv(zval *result, const char *op1, uint32_t op1_len, zval *op
 	} else {
 		concat_function(result, &zop1, op2);
 	}
+	zval_ptr_dtor(&zop1);
 }
 
 void phalcon_concat_svs(zval *result, const char *op1, uint32_t op1_len, zval *op2, const char *op3, uint32_t op3_len, int self_var){

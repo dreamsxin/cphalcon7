@@ -145,7 +145,6 @@ int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *pr
 	}
 
 	phalcon_array_update(&tmp, index,  value, PH_COPY);
-
 	if (separated) {
 		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
 	}
@@ -199,14 +198,45 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	va_end(ap);
 
 	if (separated) {
-		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		return phalcon_update_static_property_ce(ce, property, property_length, &tmp);
 	}
 	return SUCCESS;
 }
 
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length, zval *value)
 {
-	return zend_update_static_property(ce, property_name, property_length, value);
+	zval garbage;
+	zval *property;
+	zend_class_entry *old_scope;
+	zend_string *key = zend_string_init(property_name, property_length, 0);
+
+#if PHP_VERSION_ID >= 70100
+	old_scope = EG(fake_scope);
+	EG(fake_scope) = ce;
+#else
+	old_scope = EG(scope);
+	EG(scope) = ce;
+#endif
+	property = zend_std_get_static_property(ce, key, 0);
+#if PHP_VERSION_ID >= 70100
+	EG(fake_scope) = old_scope;
+#else
+	EG(scope) = old_scope;
+#endif
+	zend_string_free(key);
+
+	if (!property) {
+		return FAILURE;
+	} else {
+		ZVAL_COPY_VALUE(&garbage, property);
+		if (Z_ISREF_P(value)) {
+			SEPARATE_ZVAL(value);
+		}
+		ZVAL_COPY(property, value);
+		zval_ptr_dtor(&garbage);
+		return SUCCESS;
+	}
+	//return zend_update_static_property(ce, property_name, property_length, value);
 }
 
 int phalcon_update_static_property_bool_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length, int value)

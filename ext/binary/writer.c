@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 		PHALCON_CALL_FUNCTION(NULL, "fwrite", &handler, data);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
-		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
+		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
 		phalcon_update_property(getThis(), SL("_output"), &handler);
@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 		phalcon_update_property(getThis(), SL("_output"), data);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
-		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
+		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
 	} else {

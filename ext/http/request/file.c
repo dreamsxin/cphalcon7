@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 
 		PHALCON_CALL_PARENT(NULL, phalcon_http_request_file_ce, getThis(), "__construct", file);
 	} else {
-		if (phalcon_array_isset_fetch_str(&name, file, SL("name"))) {
+		if (phalcon_array_isset_fetch_str(&name, file, SL("name"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_name"), &name);
 
 			if ((constant = zend_get_constant_str(SL("PATHINFO_EXTENSION"))) != NULL) {
@@ -145,19 +145,19 @@ PHP_METHOD(Phalcon_Http_Request_File, __construct){
 			}
 		}
 
-		if (phalcon_array_isset_fetch_str(&temp_name, file, SL("tmp_name"))) {
+		if (phalcon_array_isset_fetch_str(&temp_name, file, SL("tmp_name"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_tmp"), &temp_name);
 		}
 
-		if (phalcon_array_isset_fetch_str(&size, file, SL("size"))) {
+		if (phalcon_array_isset_fetch_str(&size, file, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_size"), &size);
 		}
 
-		if (phalcon_array_isset_fetch_str(&type, file, SL("type"))) {
+		if (phalcon_array_isset_fetch_str(&type, file, SL("type"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_type"), &type);
 		}
 
-		if (phalcon_array_isset_fetch_str(&error, file, SL("error"))) {
+		if (phalcon_array_isset_fetch_str(&error, file, SL("error"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_error"), &error);
 		}
 

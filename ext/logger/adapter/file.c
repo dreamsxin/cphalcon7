@@ -102,7 +102,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"))) {
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
 			return;
@@ -206,7 +206,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	}
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"))) {
+	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"), PH_READONLY)) {
 		if (Z_TYPE(mode) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
 			return;

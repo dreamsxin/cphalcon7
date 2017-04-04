@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&service, &options, SL("service"))) {
+	if (!phalcon_array_isset_fetch_str(&service, &options, SL("service"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "No service given in options");
 		return;
 	}
@@ -134,7 +134,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 
 	phalcon_update_property(getThis(), SL("_cache"), &cache);
 
-	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
+	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	}
 

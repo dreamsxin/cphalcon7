@@ -95,15 +95,15 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
-	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"))) {
+	if (!phalcon_array_isset_fetch_str(&data, config, SL("data"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'data' is required");
 		return;
 	} else if (Z_TYPE(data) != IS_ARRAY) {

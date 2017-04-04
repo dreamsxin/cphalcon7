@@ -207,7 +207,7 @@ static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *V)
 
 	ZVAL_DUP(ret, Q);
 
-	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values))) {
+	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values), PH_READONLY)) {
 		array_init(&values);
 	}
 	add_next_index_zval(&values, V);
@@ -364,7 +364,7 @@ static void phql_ret_func_call(zval *ret, phql_parser_token *name, zval *argumen
 	if (arguments && Z_TYPE_P(arguments) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(arguments), arguments);
 	}
-	
+
 	if (distinct && Z_TYPE_P(distinct) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(distinct), distinct);
 	}
@@ -401,7 +401,7 @@ static void phql_ret_func_call(zval *ret, phql_parser_token *name, zval *argumen
 **                       the minor type might be the name of the identifier.
 **                       Each non-terminal can have a different minor type.
 **                       Terminal symbols all have the same minor type, though.
-**                       This macros defines the minor type for terminal 
+**                       This macros defines the minor type for terminal
 **                       symbols.
 **    YYMINORTYPE        is the data type used for all minor types.
 **                       This is typically a union of many types, one of
@@ -473,7 +473,7 @@ typedef union {
 /* Next are the tables used to determine what action to take based on the
 ** current state and lookahead token.  These tables are used to implement
 ** functions that take a state number and lookahead value and return an
-** action integer.  
+** action integer.
 **
 ** Suppose the action integer is N.  Then the action is determined as
 ** follows
@@ -502,7 +502,7 @@ typedef union {
 ** If the index value yy_shift_ofst[S]+X is out of range or if the value
 ** yy_lookahead[yy_shift_ofst[S]+X] is not equal to X or if yy_shift_ofst[S]
 ** is equal to YY_SHIFT_USE_DFLT, it means that the action is not in the table
-** and that yy_default[S] should be used instead.  
+** and that yy_default[S] should be used instead.
 **
 ** The formula above is for computing the action when the lookahead is
 ** a terminal symbol.  If the lookahead is a non-terminal (as occurs after
@@ -760,9 +760,9 @@ static const YYACTIONTYPE yy_default[] = {
 };
 /********** End of lemon-generated parsing tables *****************************/
 
-/* The next table maps tokens (terminal symbols) into fallback tokens.  
+/* The next table maps tokens (terminal symbols) into fallback tokens.
 ** If a construct like the following:
-** 
+**
 **      %fallback ID X Y Z.
 **
 ** appears in the grammar, then ID becomes a fallback token for X, Y,
@@ -831,10 +831,10 @@ static char *yyTracePrompt = 0;
 #endif /* NDEBUG */
 
 #ifndef NDEBUG
-/* 
+/*
 ** Turn parser tracing on by giving a stream to which to write the trace
 ** and a prompt to preface each trace message.  Tracing is turned off
-** by making either argument NULL 
+** by making either argument NULL
 **
 ** Inputs:
 ** <ul>
@@ -859,40 +859,40 @@ void phql_Trace(FILE *TraceFILE, char *zTracePrompt){
 #ifndef NDEBUG
 /* For tracing shifts, the names of all terminals and nonterminals
 ** are required.  The following table supplies these names */
-static const char *const yyTokenName[] = { 
-  "$",             "AGAINST",       "BETWEEN",       "EQUALS",      
+static const char *const yyTokenName[] = {
+  "$",             "AGAINST",       "BETWEEN",       "EQUALS",
   "NOTEQUALS",     "LESS",          "GREATER",       "GREATEREQUAL",
-  "LESSEQUAL",     "TS_MATCHES",    "TS_OR",         "TS_AND",      
-  "TS_NEGATE",     "TS_CONTAINS_ANOTHER",  "TS_CONTAINS_IN",  "AND",         
-  "OR",            "LIKE",          "ILIKE",         "BITWISE_AND", 
-  "BITWISE_OR",    "BITWISE_XOR",   "DIVIDE",        "TIMES",       
-  "MOD",           "PLUS",          "MINUS",         "IS",          
-  "IN",            "NOT",           "BITWISE_NOT",   "COMMA",       
-  "SELECT",        "FROM",          "DISTINCT",      "ALL",         
-  "IDENTIFIER",    "DOT",           "AS",            "INNER",       
-  "JOIN",          "CROSS",         "LEFT",          "OUTER",       
+  "LESSEQUAL",     "TS_MATCHES",    "TS_OR",         "TS_AND",
+  "TS_NEGATE",     "TS_CONTAINS_ANOTHER",  "TS_CONTAINS_IN",  "AND",
+  "OR",            "LIKE",          "ILIKE",         "BITWISE_AND",
+  "BITWISE_OR",    "BITWISE_XOR",   "DIVIDE",        "TIMES",
+  "MOD",           "PLUS",          "MINUS",         "IS",
+  "IN",            "NOT",           "BITWISE_NOT",   "COMMA",
+  "SELECT",        "FROM",          "DISTINCT",      "ALL",
+  "IDENTIFIER",    "DOT",           "AS",            "INNER",
+  "JOIN",          "CROSS",         "LEFT",          "OUTER",
   "RIGHT",         "FULL",          "ON",            "PARENTHESES_OPEN",
-  "PARENTHESES_CLOSE",  "INSERT",        "INTO",          "VALUES",      
-  "UPDATE",        "SET",           "DELETE",        "WHERE",       
-  "ORDER",         "BY",            "ASC",           "DESC",        
-  "GROUP",         "HAVING",        "FOR",           "LIMIT",       
+  "PARENTHESES_CLOSE",  "INSERT",        "INTO",          "VALUES",
+  "UPDATE",        "SET",           "DELETE",        "WHERE",
+  "ORDER",         "BY",            "ASC",           "DESC",
+  "GROUP",         "HAVING",        "FOR",           "LIMIT",
   "OFFSET",        "INTEGER",       "HINTEGER",      "NPLACEHOLDER",
-  "SPLACEHOLDER",  "EXISTS",        "CAST",          "CONVERT",     
-  "USING",         "CASE",          "END",           "WHEN",        
-  "THEN",          "ELSE",          "NULL",          "STRING",      
+  "SPLACEHOLDER",  "EXISTS",        "CAST",          "CONVERT",
+  "USING",         "CASE",          "END",           "WHEN",
+  "THEN",          "ELSE",          "NULL",          "STRING",
   "DOUBLE",        "TRUE",          "FALSE",         "BPLACEHOLDER",
   "COLON",         "error",         "program",       "query_language",
   "select_statement",  "insert_statement",  "update_statement",  "delete_statement",
   "select_clause",  "where_clause",  "group_clause",  "having_clause",
   "order_clause",  "select_limit_clause",  "for_update_clause",  "distinct_all",
-  "column_list",   "associated_name_list",  "join_list_or_null",  "column_item", 
-  "expr",          "associated_name",  "join_list",     "join_item",   
+  "column_list",   "associated_name_list",  "join_list_or_null",  "column_item",
+  "expr",          "associated_name",  "join_list",     "join_item",
   "join_clause",   "join_type",     "aliased_or_qualified_name",  "join_associated_name",
-  "join_conditions",  "values_list",   "field_list",    "value_item",  
+  "join_conditions",  "values_list",   "field_list",    "value_item",
   "field_item",    "update_clause",  "limit_clause",  "update_item_list",
   "update_item",   "qualified_name",  "new_value",     "delete_clause",
-  "order_list",    "order_item",    "group_list",    "group_item",  
-  "integer_or_placeholder",  "argument_list",  "when_clauses",  "when_clause", 
+  "order_list",    "order_item",    "group_list",    "group_item",
+  "integer_or_placeholder",  "argument_list",  "when_clauses",  "when_clause",
   "function_call",  "distinct_or_null",  "argument_list_or_null",  "argument_item",
 };
 #endif /* NDEBUG */
@@ -1097,7 +1097,7 @@ static void yyGrowStack(yyParser *p){
 # define YYMALLOCARGTYPE size_t
 #endif
 
-/* 
+/*
 ** This function allocates a new parser.
 ** The only argument is a pointer to a function which works like
 ** malloc.
@@ -1129,7 +1129,7 @@ void *phql_Alloc(void *(*mallocProc)(YYMALLOCARGTYPE)){
 /* The following function deletes the "minor type" or semantic value
 ** associated with a symbol.  The symbol can be either a terminal
 ** or nonterminal. "yymajor" is the symbol code, and "yypminor" is
-** a pointer to the value to be deleted.  The code used to do the 
+** a pointer to the value to be deleted.  The code used to do the
 ** deletions is derived from the %destructor and/or %token_destructor
 ** directives of the input grammar.
 */
@@ -1143,7 +1143,7 @@ static void yy_destructor(
     /* Here is inserted the actions which take place when a
     ** terminal or non-terminal is destroyed.  This can happen
     ** when the symbol is popped from the stack during a
-    ** reduce or during error processing or when a parser is 
+    ** reduce or during error processing or when a parser is
     ** being destroyed before it is finished parsing.
     **
     ** Note: during a reduce, the only symbols destroyed are those
@@ -1339,7 +1339,7 @@ static void yy_pop_parser_stack(yyParser *pParser){
   yy_destructor(pParser, yytos->major, &yytos->minor);
 }
 
-/* 
+/*
 ** Deallocate and destroy a parser.  Destructors are called for
 ** all stack elements before shutting the parser down.
 **
@@ -1382,7 +1382,7 @@ static unsigned int yy_find_shift_action(
 ){
   int i;
   int stateno = pParser->yystack[pParser->yyidx].stateno;
- 
+
   if( stateno>=YY_MIN_REDUCE ) return stateno;
   assert( stateno <= YY_SHIFT_COUNT );
   do{
@@ -1410,7 +1410,7 @@ static unsigned int yy_find_shift_action(
 #ifdef YYWILDCARD
         {
           int j = i - iLookAhead + YYWILDCARD;
-          if( 
+          if(
 #if YY_SHIFT_MIN+YYWILDCARD<0
             j>=0 &&
 #endif
@@ -1524,7 +1524,7 @@ static void yy_shift(
     yypParser->yyidxMax = yypParser->yyidx;
   }
 #endif
-#if YYSTACKDEPTH>0 
+#if YYSTACKDEPTH>0
   if( yypParser->yyidx>=YYSTACKDEPTH ){
     yyStackOverflow(yypParser);
     return;
@@ -1747,7 +1747,7 @@ static void yy_reduce(
       yypParser->yyidxMax = yypParser->yyidx;
     }
 #endif
-#if YYSTACKDEPTH>0 
+#if YYSTACKDEPTH>0
     if( yypParser->yyidx>=YYSTACKDEPTH-1 ){
       yyStackOverflow(yypParser);
       return;
@@ -3052,7 +3052,7 @@ void phql_(
 #ifdef YYERRORSYMBOL
       /* A syntax error has occurred.
       ** The response to an error depends upon whether or not the
-      ** grammar defines an error token "ERROR".  
+      ** grammar defines an error token "ERROR".
       **
       ** This is what we do if the grammar does define ERROR:
       **
@@ -3113,7 +3113,7 @@ void phql_(
       yy_syntax_error(yypParser,yymajor, yyminor);
       yy_destructor(yypParser,(YYCODETYPE)yymajor,&yyminorunion);
       yymajor = YYNOCODE;
-      
+
 #else  /* YYERRORSYMBOL is not defined */
       /* This is what we do if the grammar does not define ERROR:
       **
@@ -3141,7 +3141,7 @@ void phql_(
     int i;
     fprintf(yyTraceFILE,"%sReturn. Stack=",yyTracePrompt);
     for(i=1; i<=yypParser->yyidx; i++)
-      fprintf(yyTraceFILE,"%c%s", i==1 ? '[' : ' ', 
+      fprintf(yyTraceFILE,"%c%s", i==1 ? '[' : ' ',
               yyTokenName[yypParser->yystack[i].major]);
     fprintf(yyTraceFILE,"]\n");
   }

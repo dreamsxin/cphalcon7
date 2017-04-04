@@ -450,6 +450,7 @@ PHP_METHOD(Phalcon_Di, get){
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
+		zval_ptr_dtor(&event_name);
 	}
 
 	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name, PH_READONLY)) {
@@ -483,6 +484,7 @@ PHP_METHOD(Phalcon_Di, get){
 		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
+		zval_ptr_dtor(&event_name);
 	}
 }
 
@@ -642,7 +644,7 @@ PHP_METHOD(Phalcon_Di, __call){
 	 * If the magic method starts with "set" we try to set a service using that name
 	 */
 	if (phalcon_start_with_str(method, SL("set"))) {
-		if (phalcon_array_isset_fetch_long(&definition, arguments, 0)) {
+		if (phalcon_array_isset_fetch_long(&definition, arguments, 0, PH_READONLY)) {
 			PHALCON_CALL_SELF(NULL, "set", &name, &definition);
 			return;
 		}

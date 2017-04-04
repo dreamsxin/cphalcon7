@@ -775,7 +775,7 @@ PHP_METHOD(Phalcon_Http_Request, isSoapRequested)
 		RETURN_TRUE;
 	}
 
-	if (phalcon_array_isset_fetch_str(&content_type, server, SL("CONTENT_TYPE"))) {
+	if (phalcon_array_isset_fetch_str(&content_type, server, SL("CONTENT_TYPE"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&content_type, SL("application/soap+xml"))) {
 			RETURN_TRUE;
 		}
@@ -885,7 +885,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerAddress){
 	zval *server, server_addr = {};
 
 	server = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch_str(&server_addr, server, SL("SERVER_ADDR"))) {
+	if (phalcon_array_isset_fetch_str(&server_addr, server, SL("SERVER_ADDR"), PH_READONLY)) {
 		RETURN_CTOR(&server_addr);
 	}
 
@@ -902,7 +902,7 @@ PHP_METHOD(Phalcon_Http_Request, getServerName){
 	zval *server, server_name = {};
 
 	server = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch_str(&server_name, server, SL("SERVER_NAME"))) {
+	if (phalcon_array_isset_fetch_str(&server_name, server, SL("SERVER_NAME"), PH_READONLY)) {
 		RETURN_CTOR(&server_name);
 	}
 
@@ -924,7 +924,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 		phalcon_array_append_string(&longopts, SL("host::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
-		if (phalcon_array_isset_fetch_str(&host, &options, SL("host"))) {
+		if (phalcon_array_isset_fetch_str(&host, &options, SL("host"), PH_READONLY)) {
 			RETURN_CTOR(&host);
 		}
 	}
@@ -1022,12 +1022,12 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 	 * Proxies use this IP
 	 */
 	if (zend_is_true(trust_forwarded_header)) {
-		if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("HTTP_X_FORWARDED_FOR"))) {
-			if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
+		if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("HTTP_X_FORWARDED_FOR"), PH_READONLY)) {
+			if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_READONLY)) {
 				phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY|PH_READONLY);
 			}
 		}
-	} else if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"))) {
+	} else if (!phalcon_array_isset_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_READONLY)) {
 		phalcon_array_fetch_str(&address, _SERVER, SL("REMOTE_ADDR"), PH_NOISY|PH_READONLY);
 	}
 
@@ -1084,7 +1084,7 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
 		phalcon_array_append_string(&longopts, SL("method::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
-		if (phalcon_array_isset_fetch_str(&method, &options, SL("method"))) {
+		if (phalcon_array_isset_fetch_str(&method, &options, SL("method"), PH_READONLY)) {
 			RETURN_CTOR(&method);
 		}
 	}
@@ -1147,7 +1147,7 @@ PHP_METHOD(Phalcon_Http_Request, getUserAgent){
 	zval *server, user_agent = {};
 
 	server = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch_str(&user_agent, server, SL("HTTP_USER_AGENT"))) {
+	if (phalcon_array_isset_fetch_str(&user_agent, server, SL("HTTP_USER_AGENT"), PH_READONLY)) {
 		RETURN_CTOR(&user_agent);
 	}
 
@@ -1355,7 +1355,7 @@ PHP_METHOD(Phalcon_Http_Request, hasFiles){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(_FILES), file) {
 		zval error = {};
-		if (phalcon_array_isset_fetch_str(&error, file, SL("error"))) {
+		if (phalcon_array_isset_fetch_str(&error, file, SL("error"), PH_READONLY)) {
 			if (Z_TYPE(error) < IS_ARRAY) {
 				if (!zend_is_true(&error) || !only_successful) {
 					++nfiles;
@@ -1488,7 +1488,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 			continue;
 		}
 
-		if (phalcon_array_isset_fetch_str(&error, value, SL("error"))) {
+		if (phalcon_array_isset_fetch_str(&error, value, SL("error"), PH_READONLY)) {
 			if (Z_TYPE(error) != IS_ARRAY) {
 				if (!zend_is_true(&error) || !only_successful) {
 					object_init_ex(&request_file, phalcon_http_request_file_ce);
@@ -1551,7 +1551,7 @@ PHP_METHOD(Phalcon_Http_Request, getHTTPReferer){
 	zval *_SERVER, http_referer = {};
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (phalcon_array_isset_fetch_str(&http_referer, _SERVER, SL("HTTP_REFERER"))) {
+	if (phalcon_array_isset_fetch_str(&http_referer, _SERVER, SL("HTTP_REFERER"), PH_READONLY)) {
 		RETURN_CTOR(&http_referer);
 	}
 
@@ -1583,7 +1583,7 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(parts), part) {
 		zval header_parts = {}, quality_part = {}, quality = {}, header_name = {};
 		phalcon_fast_explode_str(&header_parts, SL(";"), part);
-		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1)) {
+		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1, PH_READONLY)) {
 			phalcon_substr(&quality, &quality_part, 2, 0);
 		} else {
 			ZVAL_COPY_VALUE(&quality, &quality_one);
@@ -1799,7 +1799,8 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(matches), match) {
 				zval tmp1 = {}, tmp2 = {};
-				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_fetch_long(&tmp1, match, 1) && phalcon_array_isset_fetch_long(&tmp2, match, 3)) {
+				if (Z_TYPE_P(match) == IS_ARRAY && phalcon_array_isset_fetch_long(&tmp1, match, 1, PH_READONLY)
+					&& phalcon_array_isset_fetch_long(&tmp2, match, 3, PH_READONLY)) {
 					phalcon_array_update(return_value, &tmp1, &tmp2, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();

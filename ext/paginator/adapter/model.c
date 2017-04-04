@@ -82,11 +82,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 
 	phalcon_update_property(getThis(), SL("_config"), config);
 
-	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
-	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 }

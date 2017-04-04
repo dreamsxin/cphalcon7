@@ -97,17 +97,17 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
+	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&default_domain, options, SL("defaultDomain"))) {
+	if (!phalcon_array_isset_fetch_str(&default_domain, options, SL("defaultDomain"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"defaultDomain\" is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
+	if (!phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"directory\" is required");
 		return;
 	}

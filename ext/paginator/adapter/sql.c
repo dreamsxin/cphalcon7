@@ -123,17 +123,17 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
-	if (!phalcon_array_isset_fetch_str(&sql, config, SL("sql"))) {
+	if (!phalcon_array_isset_fetch_str(&sql, config, SL("sql"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'sql' is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&total_sql, config, SL("total_sql"))) {
+	if (!phalcon_array_isset_fetch_str(&total_sql, config, SL("total_sql"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'total_sql' is required");
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&bind, config, SL("bind"))) {
+	if (phalcon_array_isset_fetch_str(&bind, config, SL("bind"), PH_READONLY)) {
 		if (Z_TYPE(bind) != IS_ARRAY) {
 			phalcon_update_property_empty_array(getThis(), SL("_bind"));
 		} else {
@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	}
 
 
-	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"))) {
+	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"), PH_READONLY)) {
 		ZVAL_STRING(&dbname, "db");
 	}
 
@@ -160,7 +160,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	phalcon_update_property(getThis(), SL("_sql"), &sql);
 	phalcon_update_property(getThis(), SL("_total_sql"), &total_sql);
 
-	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+	if (!phalcon_array_isset_fetch_str(&limit, config, SL("limit"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "Parameter 'limit' is required");
 		return;
 	}
@@ -173,11 +173,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
 	phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 
-	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 
-	if (phalcon_array_isset_fetch_str(&fetch_mode, config, SL("fetchMode"))) {
+	if (phalcon_array_isset_fetch_str(&fetch_mode, config, SL("fetchMode"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_fetchMode"), &fetch_mode);
 	}
 }

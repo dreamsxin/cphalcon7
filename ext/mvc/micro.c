@@ -469,10 +469,10 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount){
 			}
 
 			if (
-				    !phalcon_array_isset_fetch_long(&methods, handler, 0)
-				 || !phalcon_array_isset_fetch_long(&pattern, handler, 1)
-				 || !phalcon_array_isset_fetch_long(&sub_handler, handler, 2)
-				 || !phalcon_array_isset_fetch_long(&name, handler, 3)
+				    !phalcon_array_isset_fetch_long(&methods, handler, 0, PH_READONLY)
+				 || !phalcon_array_isset_fetch_long(&pattern, handler, 1, PH_READONLY)
+				 || !phalcon_array_isset_fetch_long(&sub_handler, handler, 2, PH_READONLY)
+				 || !phalcon_array_isset_fetch_long(&name, handler, 3, PH_READONLY)
 			) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "One of the registered handlers is invalid");
 				return;
@@ -677,6 +677,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 */
 	ZVAL_STRING(&event_name, "micro:beforeHandleRoute");
 	PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
+	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
@@ -720,6 +721,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 */
 		ZVAL_STRING(&event_name, "micro:beforeExecuteRoute");
 		PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		} else {
@@ -802,6 +804,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 */
 		ZVAL_STRING(&event_name, "micro:afterExecuteRoute");
 		PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
+		zval_ptr_dtor(&event_name);
 
 		phalcon_read_property(&after_handlers, getThis(), SL("_afterHandlers"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(after_handlers) == IS_ARRAY) {
@@ -851,8 +854,8 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		 * Calling beforeNotFound event
 		 */
 		ZVAL_STRING(&event_name, "micro:beforeNotFound");
-
 		PHALCON_CALL_SELF(&status, "fireeventcancel", &event_name);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -886,6 +889,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	 */
 	ZVAL_STRING(&event_name, "micro:afterHandleRoute");
 	PHALCON_CALL_SELF(NULL, "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	phalcon_read_property(&finish_handlers, getThis(), SL("_finishHandlers"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(finish_handlers) == IS_ARRAY) {

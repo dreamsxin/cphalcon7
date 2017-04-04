@@ -81,7 +81,7 @@ PHP_METHOD(Phalcon_Mvc_Model_ValidationFailed, __construct){
 		/**
 		 * Get the first message in the array
 		 */
-		phalcon_array_fetch_long(&message, validation_messages, 0, PH_NOISY);
+		phalcon_array_fetch_long(&message, validation_messages, 0, PH_NOISY|PH_READONLY);
 
 		/**
 		 * Get the message to use it in the exception

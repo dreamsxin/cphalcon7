@@ -200,10 +200,10 @@ PHP_METHOD(Phalcon_Validation, __construct){
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		zval filename = {}, allow_empty = {};
-		if (phalcon_array_isset_fetch_str(&filename, options, SL("messageFilename"))) {
+		if (phalcon_array_isset_fetch_str(&filename, options, SL("messageFilename"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_messageFilename"), &filename);
 		}
-		if (phalcon_array_isset_fetch_str(&allow_empty, options, SL("allowEmpty"))) {
+		if (phalcon_array_isset_fetch_str(&allow_empty, options, SL("allowEmpty"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_allowEmpty"), &allow_empty);
 		}
 	}

@@ -396,8 +396,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	 */
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "view:beforeRender");
-
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_NULL();
 		}
@@ -457,6 +457,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "view:beforeRenderView");
 					PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
+					zval_ptr_dtor(&event_name);
 					if (PHALCON_IS_FALSE(&status)) {
 						continue;
 					}
@@ -471,6 +472,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "view:afterRenderView");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+					zval_ptr_dtor(&event_name);
 				}
 
 				break;
@@ -500,6 +502,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "view:afterRender");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+		zval_ptr_dtor(&event_name);
 	}
 }
 
@@ -733,7 +736,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 	}
 
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
-	if (Z_TYPE(cache_options) != IS_ARRAY || !phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"))) {
+	if (Z_TYPE(cache_options) != IS_ARRAY ||
+		!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_READONLY)) {
 		ZVAL_STRING(&cache_service, "viewCache");
 	}
 

@@ -107,20 +107,20 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, connect){
 	phalcon_fetch_params(0, 0, 1, &desc);
 
 	if (!desc || !zend_is_true(desc)) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_CTOR);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&descriptor, desc);
+		ZVAL_DUP(&descriptor, desc);
 	}
 
-	if (!phalcon_array_isset_str(&descriptor, SL("dbname"))) {
+	if (!phalcon_array_isset_fetch_str(&dbname, &descriptor, SL("dbname"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "dbname must be specified");
 		return;
 	} else {
-		phalcon_array_fetch_str(&dbname, &descriptor, SL("dbname"), PH_NOISY|PH_READONLY);
 		phalcon_array_update_str(&descriptor, SL("dsn"), &dbname, PH_COPY);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_db_adapter_pdo_sqlite_ce, getThis(), "connect", &descriptor);
+	zval_ptr_dtor(&descriptor);
 }
 
 /**
@@ -173,12 +173,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
 			ZVAL_UNREF(&matches);
 			if (zend_is_true(&pos)) {
-				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1)) {
+				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1, PH_READONLY)) {
 					convert_to_long(&match_one);
 					phalcon_array_update_str(&definition, SL("size"), &match_one, PH_COPY);
 					phalcon_array_update_str(&definition, SL("bytes"), &match_one, PH_COPY);
 				}
-				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2)) {
+				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_READONLY)) {
 					convert_to_long(&match_two);
 					phalcon_array_update_str(&definition, SL("scale"), &match_two, PH_COPY);
 				}

@@ -91,12 +91,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
+	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation locale was not provided");
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
+	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
 		phalcon_add_trailing_slash(&directory);
 		PHALCON_CONCAT_VVS(&file, &directory, &locale, ".php");
 	} else {

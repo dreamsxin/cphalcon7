@@ -262,8 +262,8 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
-
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &exception);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -290,8 +290,8 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
 	phalcon_fetch_params(0, 1, 0, &exception);
 
 	ZVAL_STRING(&event_name, "dispatch:beforeException");
-
 	PHALCON_RETURN_CALL_METHOD(getThis(), "fireevent", &event_name, exception);
+	zval_ptr_dtor(&event_name);
 }
 
 /**

@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	}
 
 	if (!zend_is_true(uri)) {
-		/** 
+		/**
 		 * If 'uri' isn't passed as parameter it reads $_GET['_url']
 		 */
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
@@ -242,27 +242,27 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 				zval prefix = {}, handler = {}, controller_name = {}, namespace_name = {}, module_name = {}, suffixed = {};
 				zval handler_annotations = {}, class_annotations = {}, annotations = {}, *annotation, method_annotations = {}, *collection;
 				if (Z_TYPE_P(scope) == IS_ARRAY) {
-					/** 
+					/**
 					 * A prefix (if any) must be in position 0
 					 */
-					phalcon_array_fetch_long(&prefix, scope, 0, PH_NOISY);
+					phalcon_array_fetch_long(&prefix, scope, 0, PH_NOISY|PH_READONLY);
 					if (Z_TYPE(prefix) == IS_STRING) {
 						if (!phalcon_start_with(&real_uri, &prefix, NULL)) {
 							continue;
 						}
 					}
 
-					/** 
+					/**
 					 * The controller must be in position 1
 					 */
-					phalcon_array_fetch_long(&handler, scope, 1, PH_NOISY);
+					phalcon_array_fetch_long(&handler, scope, 1, PH_NOISY|PH_READONLY);
 					if (phalcon_memnstr_str(&handler, SL("\\"))) {
-						/** 
+						/**
 						 * Extract the real class name from the namespaced class
 						 */
 						phalcon_get_class_ns(&controller_name, &handler, 0);
 
-						/** 
+						/**
 						 * Extract the namespace from the namespaced class
 						 */
 						phalcon_get_ns_class(&namespace_name, &handler, 0);
@@ -272,26 +272,26 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 
 					phalcon_update_property_null(getThis(), SL("_routePrefix"));
 
-					/** 
+					/**
 					 * Check if the scope has a module associated
 					 */
 					if (phalcon_array_isset_long(scope, 2)) {
-						phalcon_array_fetch_long(&module_name, scope, 2, PH_NOISY);
+						phalcon_array_fetch_long(&module_name, scope, 2, PH_NOISY|PH_READONLY);
 					}
 
 					PHALCON_CONCAT_VV(&suffixed, &handler, &controller_suffix);
 
-					/** 
+					/**
 					 * Get the annotations from the class
 					 */
 					PHALCON_CALL_METHOD(&handler_annotations, &annotations_service, "get", &suffixed);
 
-					/** 
+					/**
 					 * Process class annotations
 					 */
 					PHALCON_CALL_METHOD(&class_annotations, &handler_annotations, "getclassannotations");
 					if (Z_TYPE(class_annotations) == IS_OBJECT) {
-						/** 
+						/**
 						 * Process class annotations
 						 */
 						PHALCON_CALL_METHOD(&annotations, &class_annotations, "getannotations");
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						}
 					}
 
-					/** 
+					/**
 					 * Process method annotations
 					 */
 					PHALCON_CALL_METHOD(&method_annotations, &handler_annotations, "getmethodsannotations");
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 		phalcon_update_property_bool(getThis(), SL("_processed"), 1);
 	}
 
-	/** 
+	/**
 	 * Call the parent handle method()
 	 */
 	PHALCON_CALL_PARENT(NULL, phalcon_mvc_router_annotations_ce, getThis(), "handle", &real_uri);
@@ -351,7 +351,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processControllerAnnotation){
 
 	PHALCON_CALL_METHOD(&name, annotation, "getname");
 
-	/** 
+	/**
 	 * @RoutePrefix add a prefix for all the routes defined in the model
 	 */
 	if (PHALCON_IS_STRING(&name, "RoutePrefix")) {
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 		ZVAL_STR(&parameter, IS(paths));
 
-		/** 
+		/**
 		 * Check for existing paths in the annotation
 		 */
 		PHALCON_CALL_METHOD(&paths, annotation, "getargument", &parameter);
@@ -423,14 +423,14 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 			array_init(&paths);
 		}
 
-		/** 
+		/**
 		 * Update the module if any
 		 */
 		if (Z_TYPE_P(module) == IS_STRING) {
 			phalcon_array_update_string(&paths, IS(module), module, PH_COPY);
 		}
 
-		/** 
+		/**
 		 * Update the namespace if any
 		 */
 		if (Z_TYPE_P(namespace) == IS_STRING) {
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 
 		PHALCON_CALL_METHOD(&value, annotation, "getargument", &position);
 
-		/** 
+		/**
 		 * Create the route using the prefix
 		 */
 		if (Z_TYPE(value) != IS_NULL) {
@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 			PHALCON_CONCAT_VV(&uri, &route_prefix, &action_name);
 		}
 
-		/** 
+		/**
 		 * Add the route to the router
 		 */
 		PHALCON_CALL_METHOD(&route, getThis(), "add", &uri, &paths);

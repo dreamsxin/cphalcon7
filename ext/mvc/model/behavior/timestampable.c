@@ -86,17 +86,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_Timestampable, notify){
 		/**
 		 * The field name is required in this behavior
 		 */
-		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"))) {
+		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"), PH_READONLY)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}
 
-		if (phalcon_array_isset_fetch_str(&format, &options, SL("format"))) {
+		if (phalcon_array_isset_fetch_str(&format, &options, SL("format"), PH_READONLY)) {
 			/**
 			 * Format is a format for date()
 			 */
 			phalcon_date(&timestamp, &format, NULL);
-		} else if (phalcon_array_isset_fetch_str(&generator, &options, SL("generator"))) {
+		} else if (phalcon_array_isset_fetch_str(&generator, &options, SL("generator"), PH_READONLY)) {
 			/**
 			 * A generator is a closure that produce the correct timestamp value
 			 */

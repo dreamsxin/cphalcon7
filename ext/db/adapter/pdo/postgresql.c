@@ -122,12 +122,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, connect){
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&schema, &descriptor, SL("schema"))) {
+	if (phalcon_array_isset_fetch_str(&schema, &descriptor, SL("schema"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_schema"), &schema);
 		phalcon_array_unset_str(&descriptor, SL("schema"), PH_SEPARATE);
 	}
 
-	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"))) {
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_READONLY)) {
 		if (Z_TYPE(password) == IS_STRING && Z_STRLEN(password) == 0) {
 			phalcon_array_update_str(&descriptor, SL("password"), &PHALCON_GLOBAL(z_null), PH_COPY);
 		}

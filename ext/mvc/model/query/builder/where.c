@@ -201,15 +201,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 				ZVAL_LONG(&single_condition_key, idx);
 			}
 			if (Z_TYPE_P(single_condition_array) == IS_ARRAY
-				&& phalcon_array_isset_fetch_long(&condition_string, single_condition_array, 0)
-				&& phalcon_array_isset_fetch_long(&tmp_bind_params, single_condition_array, 1)
+				&& phalcon_array_isset_fetch_long(&condition_string, single_condition_array, 0, PH_READONLY)
+				&& phalcon_array_isset_fetch_long(&tmp_bind_params, single_condition_array, 1, PH_READONLY)
 				&& Z_TYPE(condition_string) == IS_STRING
 				&& Z_TYPE(tmp_bind_params) == IS_ARRAY
 			) {
 				phalcon_array_update(&merged_conditions, &condition_string, &condition_string, PH_COPY);
 				phalcon_array_merge_recursive_n(&merged_bind_params, &tmp_bind_params);
 
-				if (phalcon_array_isset_fetch_long(&tmp_bind_types, single_condition_array, 2) && Z_TYPE(tmp_bind_types) == IS_ARRAY) {
+				if (phalcon_array_isset_fetch_long(&tmp_bind_types, single_condition_array, 2, PH_READONLY)
+					&& Z_TYPE(tmp_bind_types) == IS_ARRAY) {
 					phalcon_array_merge_recursive_n(&merged_bind_types, &tmp_bind_types);
 				}
 			} else if (Z_TYPE(single_condition_key) == IS_STRING) {
@@ -340,7 +341,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */

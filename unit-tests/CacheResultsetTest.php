@@ -150,4 +150,30 @@ class CacheResultsetTest extends PHPUnit_Framework_TestCase
 
 	}
 
+	public function testSqliteCacheResultsetNormal()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configSqlite)) {
+			$this->markTestSkipped('Test skipped');
+			return;
+		}
+
+		$cache = $this->_getCache();
+
+		$this->_di->set('db', function() use ($configSqlite) {
+			return new Phalcon\Db\Adapter\Pdo\Sqlite($configSqlite);
+		}, true);
+
+		$cache->save('test-resultset', Robots::find(array('order' => 'id')));
+
+		$this->assertTrue(file_exists('unit-tests/cache/test-resultset'));
+
+		$robots = $cache->get('test-resultset');
+
+		$this->assertEquals(get_class($robots), 'Phalcon\Mvc\Model\Resultset\Simple');
+		$this->assertEquals(count($robots), 3);
+		$this->assertEquals($robots->count(), 3);
+
+	}
+
 }

@@ -222,13 +222,13 @@ PHP_METHOD(Phalcon_Text, increment){
 		PHALCON_CONCAT_VV(return_value, &first_part, &number);
 	} else {
 		phalcon_fast_explode(&parts, &sep, str);
-		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1, PH_READONLY)) {
 			phalcon_increment(&number);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
+			ZVAL_COPY_VALUE(&number, &PHALCON_GLOBAL(z_one));
 		}
 
-		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY|PH_READONLY);
 		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
 	}
 }
@@ -265,13 +265,13 @@ PHP_METHOD(Phalcon_Text, decrement){
 		PHALCON_CONCAT_VV(return_value, &first_part, &number);
 	} else {
 		phalcon_fast_explode(&parts, &sep, str);
-		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1, PH_READONLY)) {
 			phalcon_decrement(&number);
 		} else {
 			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
 		}
 
-		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY|PH_READONLY);
 		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
 	}
 }
@@ -373,7 +373,7 @@ PHP_METHOD(Phalcon_Text, lower){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	/** 
+	/**
 	 * 'lower' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
@@ -397,7 +397,7 @@ PHP_METHOD(Phalcon_Text, upper){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	/** 
+	/**
 	 * 'upper' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
@@ -444,7 +444,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 		PHALCON_CPY_WRT_CTOR(&format, _format);
 		convert_to_string(&format);
 	}
-		
+
 	if (PHALCON_IS_EMPTY(&format)) {
 		ZVAL_STRING(&format, "%01.2f %s");
 	}

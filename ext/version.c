@@ -91,11 +91,11 @@ PHP_METHOD(Phalcon_Version, get){
 
 	PHALCON_CALL_SELF(&version, "_getversion");
 
-	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
-	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
-	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY);
-	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY);
-	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY);
+	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VSVSVS(&result, &major, ".", &medium, ".", &minor, " ");
 
@@ -136,11 +136,11 @@ PHP_METHOD(Phalcon_Version, getId){
 	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, format = {}, real_medium = {}, real_minor = {};
 
 	PHALCON_CALL_SELF(&version, "_getversion");
-	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY);
-	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY);
-	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY);
-	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY);
-	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY);
+	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&minor, &version, 2, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&special, &version, 3, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY|PH_READONLY);
 
 	ZVAL_STRING(&format, "%02s");
 

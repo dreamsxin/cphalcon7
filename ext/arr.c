@@ -914,11 +914,11 @@ PHP_METHOD(Phalcon_Arr, callback){
 	ZVAL_UNREF(&matches);
 
 	if (zend_is_true(&ret)) {
-		if (!phalcon_array_isset_fetch_long(&command, &matches, 1)) {
+		if (!phalcon_array_isset_fetch_long(&command, &matches, 1, PH_READONLY)) {
 			ZVAL_EMPTY_STRING(&command);
 		}
 
-		if (phalcon_array_isset_fetch_long(&match, &matches, 2)) {
+		if (phalcon_array_isset_fetch_long(&match, &matches, 2, PH_READONLY)) {
 			if ((pce = pcre_get_compiled_regex_cache(SSL("#(?<!\\\\\\\\),#"))) == NULL) {
 				RETURN_FALSE;
 			}

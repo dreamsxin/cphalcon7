@@ -277,7 +277,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 							/**
 							 * Get the base instance
 							 */
-							if (!phalcon_array_isset_fetch_str(&instance, column, SL("instance"))) {
+							if (!phalcon_array_isset_fetch_str(&instance, column, SL("instance"), PH_READONLY)) {
 								php_error_docref(NULL, E_NOTICE, "Undefined index: instance");
 								ZVAL_NULL(&instance);
 							}
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 * The complete object is assigned to an attribute with the name of the alias or
 					 * the model name
 					 */
-					if (!phalcon_array_isset_fetch_str(&alias, column, SL("balias"))) {
+					if (!phalcon_array_isset_fetch_str(&alias, column, SL("balias"), PH_READONLY)) {
 						ZVAL_NULL(&alias);
 					}
 				} else {
@@ -314,11 +314,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					/**
 					 * Scalar columns are simply assigned to the result object
 					 */
-					if (phalcon_array_isset_fetch_str(&sql_alias, column, SL("sqlAlias"))) {
+					if (phalcon_array_isset_fetch_str(&sql_alias, column, SL("sqlAlias"), PH_READONLY)) {
 						if (!phalcon_array_isset_fetch(&value, &row, &sql_alias, 0)) {
 							ZVAL_NULL(&value);
 						}
-					} else if (!phalcon_array_isset_fetch(&value, &row, &alias, 0)) {
+					} else if (!phalcon_array_isset_fetch(&value, &row, &alias, PH_READONLY)) {
 						ZVAL_NULL(&value);
 					}
 

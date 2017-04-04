@@ -145,9 +145,9 @@ class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
 		$this->_testSelectRenamedExecute($di);
 		$this->_testInsertExecute($di);
 		$this->_testInsertRenamedExecute($di);
-		$this->_testUpdateExecute($di);
-		$this->_testUpdateRenamedExecute($di);
-		$this->_testDeleteExecute($di);
+		$this->_testUpdateExecute2($di);
+		$this->_testUpdateRenamedExecute2($di);
+		$this->_testDeleteExecute2($di);
 		$this->_testDeleteRenamedExecute($di);
 
 	}
@@ -761,7 +761,6 @@ class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
 
 	public function _testUpdateExecute($di)
 	{
-
 		$manager = $di->getShared('modelsManager');
 
 		$di->getShared('db')->execute("UPDATE personas SET ciudad_id = NULL WHERE direccion = 'COL'");
@@ -795,7 +794,6 @@ class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
 
 	public function _testUpdateExecute2($di)
 	{
-
 		$manager = $di->getShared('modelsManager');
 
 		$di->getShared('db')->execute("UPDATE personas SET ciudad_id = NULL WHERE direccion = 'COL'");

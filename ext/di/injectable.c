@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&name, &lower);
 	}
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&name, &lower);
 	}

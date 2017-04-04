@@ -1565,7 +1565,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
@@ -1652,7 +1652,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 			/**
 			 * Create the join according to the type
 			 */
-			if (phalcon_array_isset_fetch_long(&join_type, join, 3) && zend_is_true(&join_type)) {
+			if (phalcon_array_isset_fetch_long(&join_type, join, 3, PH_READONLY) && zend_is_true(&join_type)) {
 				PHALCON_SCONCAT_SVSVS(&phql, " ", &join_type, " JOIN [", &join_model, "]");
 			} else {
 				PHALCON_SCONCAT_SVS(&phql, " JOIN [", &join_model, "]");
@@ -1661,14 +1661,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 			/**
 			 * Alias comes first
 			 */
-			if (phalcon_array_isset_fetch_long(&join_alias, join, 2) && zend_is_true(&join_alias)) {
+			if (phalcon_array_isset_fetch_long(&join_alias, join, 2, PH_READONLY) && zend_is_true(&join_alias)) {
 				PHALCON_SCONCAT_SVS(&phql, " AS [", &join_alias, "]");
 			}
 
 			/**
 			 * Conditions then
 			 */
-			if (phalcon_array_isset_fetch_long(&join_conditions, join, 1) && zend_is_true(&join_conditions)) {
+			if (phalcon_array_isset_fetch_long(&join_conditions, join, 1, PH_READONLY) && zend_is_true(&join_conditions)) {
 				PHALCON_SCONCAT_SV(&phql, " ON ", &join_conditions);
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -1861,24 +1861,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_READONLY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&attribute_field, &first_primary_key);
+					ZVAL_COPY_VALUE(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-				PHALCON_CPY_WRT_CTOR(&conditions, &primary_key_condition);
+				ZVAL_COPY_VALUE(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}
@@ -2001,14 +2001,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_READONLY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;

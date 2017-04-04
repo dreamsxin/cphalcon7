@@ -111,13 +111,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+	if (!phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"), PH_READONLY)) {
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
 	phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 

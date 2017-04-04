@@ -133,15 +133,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&table, params, SL("table"))) {
+		if (phalcon_array_isset_fetch_str(&table, params, SL("table"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "settable", &table);
 		}
 
-		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"))) {
+		if (phalcon_array_isset_fetch_str(&columns, params, SL("columns"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setcolumns", &columns);
 		}
 
-		if (phalcon_array_isset_fetch_str(&values, params, SL("values"))) {
+		if (phalcon_array_isset_fetch_str(&values, params, SL("values"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setvalues", &values);
 		}
 	}

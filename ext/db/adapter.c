@@ -216,13 +216,13 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	phalcon_read_static_property_ce(&connection_consecutive, phalcon_db_adapter_ce, SL("_connectionConsecutive"), PH_READONLY);
 
 	phalcon_add_function(&next_consecutive, &connection_consecutive, &PHALCON_GLOBAL(z_one));
-
 	phalcon_update_static_property_ce(phalcon_db_adapter_ce, SL("_connectionConsecutive"), &next_consecutive);
+
 	phalcon_update_property(getThis(), SL("_connectionId"), &connection_consecutive);
 	/**
-	 * Dialect class can override the default dialect
+	 * Dialect class can override the default dialectwo
 	 */
-	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"))) {
+	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"), PH_COPY)) {
 		phalcon_read_property(&dialect_type, getThis(), SL("_dialectType"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", &dialect_type);
@@ -237,10 +237,12 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 		if (phalcon_has_constructor(&dialect_object)) {
 			PHALCON_CALL_METHOD(NULL, &dialect_object, "__construct");
 		}
-		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_object);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdialect", &dialect_object);
+		zval_ptr_dtor(&dialect_object);
 	} else if (Z_TYPE(dialect_class) == IS_OBJECT) {
-		PHALCON_CALL_SELF(NULL, "setdialect", &dialect_class);
+		PHALCON_CALL_METHOD(NULL, getThis(),  "setdialect", &dialect_class);
 	}
+	zval_ptr_dtor(&dialect_class);
 
 	phalcon_update_property(getThis(), SL("_descriptor"), descriptor);
 }
@@ -351,17 +353,18 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 		if (Z_TYPE(fetch_mode) != IS_NULL) {
 			if (Z_TYPE_P(fetch_argument) != IS_NULL) {
 				if (Z_TYPE_P(ctor_args) != IS_NULL) {
-					PHALCON_RETURN_CALL_METHOD(&result, "fetch", &fetch_mode, fetch_argument, ctor_args);
+					PHALCON_CALL_METHOD(return_value, &result, "fetch", &fetch_mode, fetch_argument, ctor_args);
 				} else {
-					PHALCON_RETURN_CALL_METHOD(&result, "fetch", &fetch_mode, fetch_argument);
+					PHALCON_CALL_METHOD(return_value, &result, "fetch", &fetch_mode, fetch_argument);
 				}
 			} else {
 				PHALCON_CALL_METHOD(NULL, &result, "setfetchmode", &fetch_mode);
-				PHALCON_RETURN_CALL_METHOD(&result, "fetch");
+				PHALCON_CALL_METHOD(return_value, &result, "fetch");
 			}
 		} else {
-			PHALCON_RETURN_CALL_METHOD(&result, "fetch");
+			PHALCON_CALL_METHOD(return_value, &result, "fetch");
 		}
+		zval_ptr_dtor(&result);
 		return;
 	}
 
@@ -429,16 +432,17 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 		if (Z_TYPE(fetch_mode) != IS_NULL) {
 			if (Z_TYPE_P(fetch_argument) != IS_NULL) {
 				if (Z_TYPE_P(ctor_args) != IS_NULL) {
-					PHALCON_RETURN_CALL_METHOD(&result, "fetchall", &fetch_mode, fetch_argument, ctor_args);
+					PHALCON_CALL_METHOD(return_value, &result, "fetchall", &fetch_mode, fetch_argument, ctor_args);
 				} else {
-					PHALCON_RETURN_CALL_METHOD(&result, "fetchall", &fetch_mode, fetch_argument);
+					PHALCON_CALL_METHOD(return_value, &result, "fetchall", &fetch_mode, fetch_argument);
 				}
 			} else {
-				PHALCON_RETURN_CALL_METHOD(&result, "fetchall", &fetch_mode);
+				PHALCON_CALL_METHOD(return_value, &result, "fetchall", &fetch_mode);
 			}
 		} else {
-			PHALCON_RETURN_CALL_METHOD(&result, "fetchall");
+			PHALCON_CALL_METHOD(return_value, &result, "fetchall");
 		}
+		zval_ptr_dtor(&result);
 	}
 }
 
@@ -500,7 +504,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	if (Z_TYPE_P(data_types) == IS_ARRAY) {
 		array_init(&bind_data_types);
 	} else {
-		ZVAL_COPY_VALUE(&bind_data_types, data_types);
+		ZVAL_COPY(&bind_data_types, data_types);
 	}
 
 	/**
@@ -517,14 +521,15 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 		if (Z_TYPE_P(value) == IS_OBJECT) {
 			phalcon_strval(&str_value, value);
 			phalcon_array_append(&placeholders, &str_value, PH_COPY);
+			zval_ptr_dtor(&str_value);
 		} else {
 			if (Z_TYPE_P(value) == IS_NULL) {
-				phalcon_array_append_string(&placeholders, SL("null"), PH_COPY);
+				phalcon_array_append_string(&placeholders, SL("null"), PH_READONLY);
 			} else {
-				phalcon_array_append_string(&placeholders, SL("?"), PH_COPY);
+				phalcon_array_append_string(&placeholders, SL("?"), PH_READONLY);
 				phalcon_array_append(&insert_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, 0)) {
+					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, PH_READONLY)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Incomplete number of bind types");
 						return;
 					}
@@ -538,7 +543,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		ZVAL_COPY_VALUE(&escaped_table, table);
+		ZVAL_COPY(&escaped_table, table);
 	}
 
 	/**
@@ -553,23 +558,32 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 				zval escaped_field = {};
 				PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", field);
 				phalcon_array_append(&escaped_fields, &escaped_field, PH_COPY);
+				zval_ptr_dtor(&escaped_field);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			ZVAL_COPY_VALUE(&escaped_fields, fields);
+			ZVAL_COPY(&escaped_fields, fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
+		zval_ptr_dtor(&escaped_fields);
 
 		PHALCON_CONCAT_SVSVSVS(&insert_sql, "INSERT INTO ", &escaped_table, " (", &joined_fields, ") VALUES (", &joined_values, ")");
+		zval_ptr_dtor(&joined_fields);
 	} else {
 		PHALCON_CONCAT_SVSVS(&insert_sql, "INSERT INTO ", &escaped_table, " VALUES (", &joined_values, ")");
 	}
+	zval_ptr_dtor(&escaped_table);
+	zval_ptr_dtor(&joined_values);
+	zval_ptr_dtor(&placeholders);
 
 	/**
 	 * Perform the execution via execute
 	 */
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &insert_sql, &insert_values, &bind_data_types);
+	zval_ptr_dtor(&insert_values);
+	zval_ptr_dtor(&bind_data_types);
+	zval_ptr_dtor(&insert_sql);
 }
 
 /**
@@ -674,8 +688,9 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	if (Z_TYPE_P(data_types) == IS_ARRAY) {
 		array_init(&bind_data_types);
 	} else {
-		ZVAL_COPY_VALUE(&bind_data_types, data_types);
+		ZVAL_COPY(&bind_data_types, data_types);
 	}
+
 
 	/**
 	 * Objects are casted using __toString, null values are converted to string 'null',
@@ -688,7 +703,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		} else {
 			ZVAL_LONG(&position, idx);
 		}
-		if (!phalcon_array_isset_fetch(&field, fields, &position, 0)) {
+		if (!phalcon_array_isset_fetch(&field, fields, &position, PH_READONLY)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The number of values in the update is not the same as fields");
 			return;
 		}
@@ -696,7 +711,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", &field);
 		} else {
-			ZVAL_COPY_VALUE(&escaped_field, &field);
+			ZVAL_COPY(&escaped_field, &field);
 		}
 
 		if (Z_TYPE_P(value) == IS_OBJECT) {
@@ -709,7 +724,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 				PHALCON_CONCAT_VS(&set_clause_part, &escaped_field, " = ?");
 				phalcon_array_append(&update_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, 0)) {
+					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, PH_READONLY)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Incomplete number of bind types");
 						return;
 					}
@@ -719,15 +734,18 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			}
 			phalcon_array_append(&placeholders, &set_clause_part, PH_COPY);
 		}
+		zval_ptr_dtor(&set_clause_part);
+		zval_ptr_dtor(&escaped_field);
 	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		ZVAL_COPY_VALUE(&escaped_table, table);
+		ZVAL_COPY(&escaped_table, table);
 	}
 
 	phalcon_fast_join_str(&set_clause, SL(", "), &placeholders);
+	zval_ptr_dtor(&placeholders);
 	if (Z_TYPE_P(where_condition) != IS_NULL) {
 		PHALCON_CONCAT_SVSVS(&update_sql, "UPDATE ", &escaped_table, " SET ", &set_clause, " WHERE ");
 
@@ -749,14 +767,14 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			 * If an index 'conditions' is present it contains string where conditions that are
 			 * appended to the UPDATE sql
 			 */
-			if (phalcon_array_isset_fetch_str(&conditions, where_condition, SL("conditions"))) {
+			if (phalcon_array_isset_fetch_str(&conditions, where_condition, SL("conditions"), PH_READONLY)) {
 				phalcon_concat_self(&update_sql, &conditions);
 			}
 
 			/**
 			 * Bound parameters are arbitrary values that are passed by separate
 			 */
-			if (phalcon_array_isset_fetch_str(&where_bind, where_condition, SL("bind"))) {
+			if (phalcon_array_isset_fetch_str(&where_bind, where_condition, SL("bind"), PH_READONLY)) {
 				phalcon_merge_append(&update_values, &where_bind);
 			}
 
@@ -764,18 +782,23 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 			 * Bind types is how the bound parameters must be casted before be sent to the
 			 * database system
 			 */
-			if (phalcon_array_isset_fetch_str(&where_types, where_condition, SL("bindTypes"))) {
+			if (phalcon_array_isset_fetch_str(&where_types, where_condition, SL("bindTypes"), PH_READONLY)) {
 				phalcon_merge_append(&bind_data_types, &where_types);
 			}
 		}
 	} else {
 		PHALCON_CONCAT_SVSV(&update_sql, "UPDATE ", &escaped_table, " SET ", &set_clause);
 	}
+	zval_ptr_dtor(&escaped_table);
+	zval_ptr_dtor(&set_clause);
 
 	/**
 	 * Perform the update via execute
 	 */
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &update_sql, &update_values, &bind_data_types);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &update_sql, &update_values, &bind_data_types);
+	zval_ptr_dtor(&bind_data_types);
+	zval_ptr_dtor(&update_values);
+	zval_ptr_dtor(&update_sql);
 }
 
 /**
@@ -819,7 +842,7 @@ PHP_METHOD(Phalcon_Db_Adapter, delete){
 	if (PHALCON_GLOBAL(db).escape_identifiers) {
 		PHALCON_CALL_METHOD(&escaped_table, getThis(), "escapeidentifier", table);
 	} else {
-		ZVAL_COPY_VALUE(&escaped_table, table);
+		ZVAL_COPY(&escaped_table, table);
 	}
 
 	if (PHALCON_IS_NOT_EMPTY(where_condition)) {
@@ -827,11 +850,13 @@ PHP_METHOD(Phalcon_Db_Adapter, delete){
 	} else {
 		PHALCON_CONCAT_SV(&sql, "DELETE FROM ", &escaped_table);
 	}
+	zval_ptr_dtor(&escaped_table);
 
 	/**
 	 * Perform the update via execute
 	 */
 	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql, placeholders, data_types);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -917,7 +942,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
  */
 PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 
-	zval *view_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, num = {}, first = {};
+	zval *view_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, num = {};
 
 	phalcon_fetch_params(0, 1, 1, &view_name, &schema_name);
 
@@ -932,9 +957,10 @@ PHP_METHOD(Phalcon_Db_Adapter, viewExists){
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
-	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY|PH_READONLY);
-	RETURN_CTOR(&first);
+	phalcon_array_fetch_long(return_value, &num, 0, PH_NOISY|PH_COPY);
+	zval_ptr_dtor(&num);
 }
 
 /**
@@ -989,7 +1015,7 @@ PHP_METHOD(Phalcon_Db_Adapter, createTable){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
+	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The table must contain at least one column");
 		return;
 	}
@@ -1065,7 +1091,8 @@ PHP_METHOD(Phalcon_Db_Adapter, createView){
 	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "createview", view_name, definition, schema_name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &sql);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -1093,7 +1120,8 @@ PHP_METHOD(Phalcon_Db_Adapter, dropView){
 	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "dropview", view_name, schema_name, if_exists);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &sql);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -1332,7 +1360,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
 			zval table_name = {};
-			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
+			if (phalcon_array_isset_fetch_long(&table_name, table, 0, PH_READONLY)) {
 				phalcon_array_append(return_value, &table_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -1375,17 +1403,19 @@ PHP_METHOD(Phalcon_Db_Adapter, listViews){
 	 * Execute the SQL returning the tables
 	 */
 	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
 	if (Z_TYPE(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tables), table) {
 			zval table_name = {};
-			if (phalcon_array_isset_fetch_long(&table_name, table, 0)) {
+			if (phalcon_array_isset_fetch_long(&table_name, table, 0, PH_READONLY)) {
 				phalcon_array_append(return_value, &table_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&tables);
 }
 
 /**
@@ -1607,7 +1637,8 @@ PHP_METHOD(Phalcon_Db_Adapter, createSavepoint){
 	}
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "createsavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &sql);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -1636,7 +1667,8 @@ PHP_METHOD(Phalcon_Db_Adapter, releaseSavepoint){
 	}
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "releasesavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &sql);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -1660,7 +1692,8 @@ PHP_METHOD(Phalcon_Db_Adapter, rollbackSavepoint){
 	}
 
 	PHALCON_CALL_METHOD(&sql, &dialect, "rollbacksavepoint", name);
-	PHALCON_RETURN_CALL_METHOD(getThis(), "execute", &sql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "execute", &sql);
+	zval_ptr_dtor(&sql);
 }
 
 /**
@@ -1739,8 +1772,7 @@ PHP_METHOD(Phalcon_Db_Adapter, getDefaultIdValue){
 	ZVAL_STRING(&default_value, "null");
 	object_init_ex(return_value, phalcon_db_rawvalue_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &default_value);
-
-	return;
+	zval_ptr_dtor(&default_value);
 }
 
 /**

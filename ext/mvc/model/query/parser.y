@@ -235,7 +235,7 @@ static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *V)
 
 	ZVAL_DUP(ret, Q);
 
-	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values))) {
+	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values), PH_READONLY)) {
 		array_init(&values);
 	}
 	add_next_index_zval(&values, V);
@@ -392,7 +392,7 @@ static void phql_ret_func_call(zval *ret, phql_parser_token *name, zval *argumen
 	if (arguments && Z_TYPE_P(arguments) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(arguments), arguments);
 	}
-	
+
 	if (distinct && Z_TYPE_P(distinct) != IS_UNDEF) {
 		add_assoc_zval(ret, ISV(distinct), distinct);
 	}

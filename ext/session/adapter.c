@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"))) {
+		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_uniqueId"), &unique_id);
 		}
 

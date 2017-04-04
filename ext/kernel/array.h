@@ -51,7 +51,7 @@ int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index,
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index);
+int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index, int flags);
 
 /**
  * @brief Fetches @a index if it exists from the array @a arr
@@ -64,8 +64,7 @@ int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index);
  * @retval 1 Exists
  * @note $arr[$index] is returned as is: no copying occurs, reference count is not updated
  */
-int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length);
-int ZEND_FASTCALL phalcon_array_isset_fetch_str2(zval *fetched, const zval *arr, const char *index, uint index_length, int readonly);
+int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length, int flags);
 int ZEND_FASTCALL phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index);
 
 

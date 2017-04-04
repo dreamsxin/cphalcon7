@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&meta_data_dir, options, SL("metaDataDir"))) {
+		if (phalcon_array_isset_fetch_str(&meta_data_dir, options, SL("metaDataDir"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_metaDataDir"), &meta_data_dir);
 		}
 	}

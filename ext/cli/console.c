@@ -167,6 +167,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			ZVAL_STRING(&event_name, "console:beforeStartModule");
 
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
+			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_FALSE;
 			}
@@ -184,7 +185,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			return;
 		}
 
-		if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
+		if (phalcon_array_isset_fetch_str(&path, &module, SL("path"), PH_READONLY)) {
 			convert_to_string_ex(&path);
 
 			if (phalcon_file_exists(&path) == SUCCESS) {
@@ -195,7 +196,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			}
 		}
 
-		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
+		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_READONLY)) {
 			ZVAL_STRING(&class_name, "Module");
 		}
 
@@ -208,6 +209,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			ZVAL_STRING(&event_name, "console:afterStartModule");
 
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
+			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				RETURN_FALSE;
 			}
@@ -230,8 +232,8 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &params);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "console:beforeHandleTask");
-
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &dispatcher);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -242,6 +244,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "console:afterHandleTask");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &status);
+		zval_ptr_dtor(&event_name);
 	}
 
 	RETURN_CTOR(&status);

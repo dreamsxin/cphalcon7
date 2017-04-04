@@ -692,8 +692,8 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	}
 
 	phalcon_fast_explode_str(&event_parts, SL(":"), event_type);
-	phalcon_array_fetch_long(&type, &event_parts, 0, PH_NOISY);
-	phalcon_array_fetch_long(&event_name, &event_parts, 1, PH_NOISY);
+	phalcon_array_fetch_long(&type, &event_parts, 0, PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_long(&event_name, &event_parts, 1, PH_NOISY|PH_READONLY);
 
 	/**
 	 * Should responses be traced?

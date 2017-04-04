@@ -417,18 +417,18 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	if (PHALCON_IS_STRING(filter, "xss") || PHALCON_IS_STRING(filter, "xssclean")) {
 		if (Z_TYPE_P(options) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags")) || Z_TYPE(allow_tags) != IS_ARRAY) {
-				phalcon_return_property(&allow_tags, getThis(), SL("_allowTags"));
+			if (!phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags"), PH_READONLY) || Z_TYPE(allow_tags) != IS_ARRAY) {
+				phalcon_read_property(&allow_tags, getThis(), SL("_allowTags"), PH_READONLY);
 			} else {
 				phalcon_array_append_string(&allow_tags, SL("body"), 0);
 				phalcon_array_append_string(&allow_tags, SL("html"), 0);
 			}
-			if (!phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowAttributes")) || Z_TYPE(allow_attributes) != IS_ARRAY) {
-				phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
+			if (!phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowAttributes"), PH_READONLY) || Z_TYPE(allow_attributes) != IS_ARRAY) {
+				phalcon_read_property(&allow_attributes, getThis(), SL("_allowAttributes"), PH_READONLY);
 			}
 		} else {
-			phalcon_return_property(&allow_tags, getThis(), SL("_allowTags"));
-			phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
+			phalcon_read_property(&allow_tags, getThis(), SL("_allowTags"), PH_READONLY);
+			phalcon_read_property(&allow_attributes, getThis(), SL("_allowAttributes"), PH_READONLY);
 		}
 
 		phalcon_xss_clean(&filtered, value, &allow_tags, &allow_attributes);
@@ -443,6 +443,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	if (PHALCON_IS_STRING(filter, "datetime")) {
 		ZVAL_STRING(&format, "Y-m-d H:i:s");
 		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value, &format);
+		zval_ptr_dtor(&format);
 		goto ph_end_0;
 	}
 
@@ -450,7 +451,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
 	return;
 
-	ph_end_0:
+ph_end_0:
 
 	RETURN_CTOR(&filtered);
 }

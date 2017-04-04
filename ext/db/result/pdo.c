@@ -321,8 +321,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			 * If the sql_statement starts with SELECT COUNT(*) we don't make the count
 			 */
 			if (!phalcon_start_with_str(&sql_statement, SL("SELECT COUNT(*) "))) {
-				 phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
-				 phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
+				phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
+				phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
 
 				ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
 
@@ -330,16 +330,22 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, &sql_statement, &matches));
 				ZVAL_UNREF(&matches);
+				zval_ptr_dtor(&pattern);
 
 				if (zend_is_true(&match)) {
 					phalcon_array_fetch_long(&else_clauses, &matches, 1, PH_NOISY|PH_READONLY);
 
 					PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", &else_clauses, ")");
+					zval_ptr_dtor(&matches);
 
 					PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &bind_params, &bind_types);
-					PHALCON_CALL_METHOD(&row, &result, "fetch");
+					zval_ptr_dtor(&sql);
 
-					phalcon_array_fetch_str(&row_count, &row, SL("numrows"), PH_NOISY|PH_READONLY);
+					PHALCON_CALL_METHOD(&row, &result, "fetch");
+					zval_ptr_dtor(&result);
+
+					phalcon_array_fetch_str(&row_count, &row, SL("numrows"), PH_NOISY|PH_COPY);
+					zval_ptr_dtor(&row);
 				}
 			} else {
 				ZVAL_LONG(&row_count, 1);
@@ -350,6 +356,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		 * Update the value to avoid further calculations
 		 */
 		phalcon_update_property(getThis(), SL("_rowCount"), &row_count);
+		zval_ptr_dtor(&row_count);
 	}
 
 	RETURN_CTOR(&row_count);
@@ -379,8 +386,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
 	PHALCON_CALL_METHOD(&pdo, &connection, "getinternalhandler");
 
-	 phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
-	 phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * PDO doesn't support scrollable cursors, so we need to re-execute the statement again
@@ -391,14 +398,17 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", &sql_statement);
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&temp_statement, &connection, "executeprepared", &statement, &bind_params, &bind_types);
+			zval_ptr_dtor(&statement);
 			ZVAL_COPY_VALUE(&statement, &temp_statement);
 		}
 
 	} else {
 		PHALCON_CALL_METHOD(&statement, &pdo, "query", &sql_statement);
 	}
+	zval_ptr_dtor(&pdo);
 
 	phalcon_update_property(getThis(), SL("_pdoStatement"), &statement);
+	zval_ptr_dtor(&statement);
 
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records

@@ -528,15 +528,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &definition);
 
-	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
+	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
-	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"))) {
-		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"))) {
+	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"), PH_READONLY)) {
+		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"), PH_READONLY)) {
 			ZVAL_FALSE(&temporary);
 		}
 	} else {
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
 	/**
 	 * Create related indexes
 	 */
-	if (phalcon_array_isset_fetch_str(&indexes, definition, SL("indexes"))) {
+	if (phalcon_array_isset_fetch_str(&indexes, definition, SL("indexes"), PH_READONLY)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&indexes), index) {
 			zval index_name = {}, columns = {}, column_list = {}, index_type = {}, index_sql = {};
 
@@ -627,7 +627,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createTable){
 	/**
 	 * Create related references
 	 */
-	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"))) {
+	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"), PH_READONLY)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&references), reference) {
 			zval name = {}, columns = {}, column_list = {}, referenced_table = {}, referenced_columns = {}, referenced_column_list = {}, constaint_sql = {}, reference_sql = {}, on_delete = {}, on_update = {};
 
@@ -699,20 +699,20 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Sqlite, createView){
 
-	zval *view_name, *definition, *schema_name, view_sql = {}, view = {}, sql = {};
+	zval *view_name, *definition, *schema_name, view_sql = {}, view = {};
 
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
-	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"))) {
+	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
-	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
+	PHALCON_CONCAT_SVSV(return_value, "CREATE VIEW ", &view, " AS ", &view_sql);
 
-	RETURN_CTOR(&sql);
+	zval_ptr_dtor(&view);
 }
 
 /**
@@ -740,6 +740,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, dropView){
 	} else {
 		PHALCON_CONCAT_SVS(return_value, "DROP VIEW ", &view, "");
 	}
+	zval_ptr_dtor(&view);
 }
 
 /**

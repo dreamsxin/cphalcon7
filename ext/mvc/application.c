@@ -189,6 +189,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/* Call boot event, this allows the developer to perform initialization actions */
 	ZVAL_STRING(&event_name, "application:boot");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
@@ -223,6 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	if (zend_is_true(&module_name)) {
 		ZVAL_STRING(&event_name, "application:beforeStartModule");
 		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &module_name);
+		zval_ptr_dtor(&event_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -249,12 +251,12 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		/* An array module definition contains a path to a module definition class */
 		if (Z_TYPE(module) == IS_ARRAY) {
 			/* Class name used to load the module definition */
-			if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
+			if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_READONLY)) {
 				ZVAL_STRING(&class_name, "Module");
 			}
 
 			/* If the developer has specified a path, try to include the file */
-			if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
+			if (phalcon_array_isset_fetch_str(&path, &module, SL("path"), PH_READONLY)) {
 				convert_to_string_ex(&path);
 				if (Z_TYPE(class_name) != IS_STRING || phalcon_class_exists(&class_name, 0) == NULL) {
 					if (phalcon_file_exists(&path) == SUCCESS) {
@@ -291,8 +293,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		/* Calling afterStartModule event */
 		ZVAL_STRING(&event_name, "application:afterStartModule");
-
 		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &module_name);
+		zval_ptr_dtor(&event_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
@@ -347,8 +349,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeHandleRequest */
 	ZVAL_STRING(&event_name, "application:beforeHandleRequest");
-
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &dispatcher);
+	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -359,8 +361,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling afterHandleRequest */
 	ZVAL_STRING(&event_name, "application:afterHandleRequest");
-
 	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &controller);
+	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -394,8 +396,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			 * This allows to make a custom view render
 			 */
 			ZVAL_STRING(&event_name, "application:beforeRenderView");
-
 			PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view);
+			zval_ptr_dtor(&event_name);
 
 			if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
 				if (likely(PHALCON_IS_NOT_FALSE(&status))) {
@@ -436,8 +438,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		if (PHALCON_IS_FALSE(&returned_response)) {
 			ZVAL_STRING(&event_name, "application:afterRenderView");
-
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &view);
+			zval_ptr_dtor(&event_name);
 
 			if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("afterrenderview")) == SUCCESS)) {
 				PHALCON_CALL_METHOD(NULL, &controller, "afterrenderview", &view);
@@ -450,8 +452,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeSendResponse */
 	ZVAL_STRING(&event_name, "application:beforeSendResponse");
-
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &response);
+	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -466,8 +468,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(NULL, &response, "sendcookies");
 
 	ZVAL_STRING(&event_name, "application:afterSendResponse");
-
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &response);
+	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("aftersendresponse")) == SUCCESS)) {
 		PHALCON_CALL_METHOD(NULL, &controller, "aftersendresponse", &response);

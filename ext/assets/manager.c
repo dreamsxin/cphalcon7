@@ -423,7 +423,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
 	/**
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("css"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("css"), PH_READONLY)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}
@@ -445,7 +445,7 @@ PHP_METHOD(Phalcon_Assets_Manager, getJs){
 	/**
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("js"))) {
+	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("js"), PH_READONLY)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		return;
 	}

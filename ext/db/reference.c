@@ -110,51 +110,51 @@ PHP_METHOD(Phalcon_Db_Reference, __construct){
 	long int number_columns, number_referenced_columns;
 
 	phalcon_fetch_params(0, 2, 0, &reference_name, &definition);
-	
+
 	phalcon_update_property(getThis(), SL("_referenceName"), reference_name);
 
-	if (phalcon_array_isset_fetch_str(&referenced_table, definition, SL("referencedTable"))) {
+	if (phalcon_array_isset_fetch_str(&referenced_table, definition, SL("referencedTable"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_referencedTable"), &referenced_table);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced table is required");
 		return;
 	}
-	
-	if (phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
+
+	if (phalcon_array_isset_fetch_str(&columns, definition, SL("columns"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_columns"), &columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Foreign key columns are required");
 		return;
 	}
-	
-	if (phalcon_array_isset_fetch_str(&referenced_columns, definition, SL("referencedColumns"))) {
+
+	if (phalcon_array_isset_fetch_str(&referenced_columns, definition, SL("referencedColumns"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_referencedColumns"), &referenced_columns);
 	} else {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Referenced columns of the foreign key are required");
 		return;
 	}
-	
-	if (phalcon_array_isset_fetch_str(&schema, definition, SL("schema"))) {
+
+	if (phalcon_array_isset_fetch_str(&schema, definition, SL("schema"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_schemaName"), &schema);
 	}
-	
-	if (phalcon_array_isset_fetch_str(&referenced_schema, definition, SL("referencedSchema"))) {
+
+	if (phalcon_array_isset_fetch_str(&referenced_schema, definition, SL("referencedSchema"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_referencedSchema"), &referenced_schema);
 	}
-	
+
 	number_columns = phalcon_fast_count_int(&columns);
 	number_referenced_columns = phalcon_fast_count_int(&referenced_columns);
-	
+
 	if (number_columns != number_referenced_columns) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Number of columns is not equal to the number of referenced columns");
 		return;
 	}
-	
-	if (phalcon_array_isset_fetch_str(&on_delete, definition, SL("onDelete"))) {
+
+	if (phalcon_array_isset_fetch_str(&on_delete, definition, SL("onDelete"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_onDelete"), &on_delete);
 	}
-	
-	if (phalcon_array_isset_fetch_str(&on_update, definition, SL("onUpdate"))) {
+
+	if (phalcon_array_isset_fetch_str(&on_update, definition, SL("onUpdate"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_onUpdate"), &on_update);
 	}
 }
@@ -258,25 +258,25 @@ PHP_METHOD(Phalcon_Db_Reference, __set_state){
 	zval *data, constraint_name = {}, referenced_schema = {}, referenced_table = {}, columns = {}, referenced_columns = {}, definition = {};
 
 	phalcon_fetch_params(0, 1, 0, &data);
-	
-	if (!phalcon_array_isset_fetch_str(&constraint_name, data, SL("_referenceName"))) {
+
+	if (!phalcon_array_isset_fetch_str(&constraint_name, data, SL("_referenceName"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "_referenceName parameter is required");
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&referenced_schema, data, SL("_referencedSchema"))) {
+	if (!phalcon_array_isset_fetch_str(&referenced_schema, data, SL("_referencedSchema"), PH_READONLY)) {
 		ZVAL_NULL(&referenced_schema);
 	}
-	
-	if (!phalcon_array_isset_fetch_str(&referenced_table, data, SL("_referencedTable"))) {
+
+	if (!phalcon_array_isset_fetch_str(&referenced_table, data, SL("_referencedTable"), PH_READONLY)) {
 		ZVAL_NULL(&referenced_table);
 	}
-	
-	if (!phalcon_array_isset_fetch_str(&columns, data, SL("_columns"))) {
+
+	if (!phalcon_array_isset_fetch_str(&columns, data, SL("_columns"), PH_READONLY)) {
 		ZVAL_NULL(&columns);
 	}
-	
-	if (!phalcon_array_isset_fetch_str(&referenced_columns, data, SL("_referencedColumns"))) {
+
+	if (!phalcon_array_isset_fetch_str(&referenced_columns, data, SL("_referencedColumns"), PH_READONLY)) {
 		ZVAL_NULL(&referenced_columns);
 	}
 

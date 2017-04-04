@@ -165,12 +165,12 @@ PHP_METHOD(Phalcon_Mvc_Url, getBaseUri){
 	if (Z_TYPE(base_uri) == IS_NULL) {
 		ZVAL_STRING(&slash, "/");
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
-		if (phalcon_array_isset_fetch_str(&php_self, _SERVER, SL("PHP_SELF"))) {
+		if (phalcon_array_isset_fetch_str(&php_self, _SERVER, SL("PHP_SELF"), PH_READONLY)) {
 			phalcon_get_uri(&uri, &php_self);
 		}
 
 		if (!zend_is_true(&uri)) {
-			PHALCON_CPY_WRT_CTOR(&base_uri, &slash);
+			ZVAL_COPY_VALUE(&base_uri, &slash);
 		} else {
 			PHALCON_CONCAT_VVV(&base_uri, &slash, &uri, &slash);
 		}
@@ -287,12 +287,12 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			ZVAL_ZVAL(return_value, uri, 1, 0);
 		}
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
-		if (!phalcon_array_isset_fetch_str(&route_name, uri, SL("for"))) {
+		if (!phalcon_array_isset_fetch_str(&route_name, uri, SL("for"), PH_READONLY)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_url_exception_ce, "It's necessary to define the route name with the parameter \"for\"");
 			return;
 		}
 
-		phalcon_return_property(&router, getThis(), SL("_router"));
+		phalcon_read_property(&router, getThis(), SL("_router"), PH_READONLY);
 
 		/**
 		 * Check if the router has not previously set
@@ -339,13 +339,14 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 			phalcon_array_append(&arguments, &paths, PH_COPY);
 			phalcon_array_append(&arguments, uri, PH_COPY);
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &generator, &arguments);
+			zval_ptr_dtor(&arguments);
 		} else {
 			/**
 			 * Replace the patterns by its variables
 			 */
 			phalcon_replace_paths(&processed_uri, &pattern, &paths, uri);
 
-			if (phalcon_array_isset_fetch_str(&hostname, uri, SL("hostname")) && zend_is_true(&hostname)) {
+			if (phalcon_array_isset_fetch_str(&hostname, uri, SL("hostname"), PH_READONLY) && zend_is_true(&hostname)) {
 				PHALCON_CALL_METHOD(&hostname, &route, "gethostname");
 				PHALCON_CONCAT_VVV(return_value, &hostname, &base_uri, &processed_uri);
 			} else {

@@ -49,6 +49,10 @@ PHP_METHOD(Phalcon_Kernel, setMessagesDir);
 PHP_METHOD(Phalcon_Kernel, message);
 PHP_METHOD(Phalcon_Kernel, setMessages);
 PHP_METHOD(Phalcon_Kernel, getMessages);
+PHP_METHOD(Phalcon_Kernel, setAliasDir);
+PHP_METHOD(Phalcon_Kernel, alias);
+PHP_METHOD(Phalcon_Kernel, setAlias);
+PHP_METHOD(Phalcon_Kernel, getAlias);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrKey)
@@ -67,10 +71,26 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_message, 0, 0, 1)
 	ZEND_ARG_INFO(0, key_path)
 	ZEND_ARG_INFO(0, default_value)
 	ZEND_ARG_TYPE_INFO(0, ext, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, absolute_path, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setmessages, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, messages, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setaliasdir, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_alias, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ext, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, absolute_path, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setalias, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, alias, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_kernel_method_entry[] = {
@@ -81,7 +101,11 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, setMessagesDir, arginfo_phalcon_kernel_setmessagesdir, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, message, arginfo_phalcon_kernel_message, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Kernel, getMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getMessages, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, setAliasDir, arginfo_phalcon_kernel_setaliasdir, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, alias, arginfo_phalcon_kernel_alias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, setAlias, arginfo_phalcon_kernel_setalias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getAlias, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -93,9 +117,11 @@ PHALCON_INIT_CLASS(Phalcon_Kernel){
 	PHALCON_REGISTER_CLASS(Phalcon, Kernel, kernel, phalcon_kernel_method_entry, 0);
 
 	zend_declare_property_null(phalcon_kernel_ce, SL("_defaultMessages"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
-	zend_declare_property_null(phalcon_kernel_ce, SL("_messages"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_kernel_ce, SL("_basePath"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_kernel_ce, SL("_messages"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_kernel_ce, SL("_messagesDir"), "messages/", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_kernel_ce, SL("_alias"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_kernel_ce, SL("_aliasDir"), "alias/", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_declare_class_constant_string(phalcon_kernel_ce, SL("EXT"), "php");
 
@@ -246,7 +272,7 @@ PHP_METHOD(Phalcon_Kernel, setBasePath){
 }
 
 /**
- * Sets base path
+ * Sets messages dir
  *
  * @param string $messagesDir
  */
@@ -424,4 +450,107 @@ PHP_METHOD(Phalcon_Kernel, getMessages){
 
 
 	phalcon_read_static_property_ce(return_value, phalcon_kernel_ce, SL("_messages"), PH_COPY);
+}
+
+/**
+ * Sets alias dir
+ *
+ * @param string $aliasDir
+ */
+PHP_METHOD(Phalcon_Kernel, setAliasDir){
+
+	zval *alias_dir;
+
+	phalcon_fetch_params(0, 1, 0, &alias_dir);
+
+	phalcon_add_trailing_slash(alias_dir);
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_aliasDir"), alias_dir);
+}
+
+/**
+ * Resolver alias from a file.
+ *
+ * @param string $file file name
+ * @param string $str
+ * @return string|array
+ */
+PHP_METHOD(Phalcon_Kernel, alias){
+
+	zval *file, *str, *_ext = NULL, *absolute_path = NULL, ext = {}, alias = {}, base_path = {}, alias_dir = {}, file_path = {};
+	zval file_alias = {};
+
+	phalcon_fetch_params(0, 2, 2, &file, &str, &_ext, &absolute_path);
+
+	if (!_ext || Z_TYPE_P(_ext) == IS_NULL) {
+		ZVAL_STRING(&ext, "php");
+	} else {
+		ZVAL_COPY(&ext, _ext);
+	}
+
+	if (!absolute_path) {
+		absolute_path = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (unlikely(zend_is_true(absolute_path))) {
+		PHALCON_CONCAT_VSV(&file_path, file, ".", &ext);
+	} else {
+		phalcon_read_static_property_ce(&base_path, phalcon_kernel_ce, SL("_basePath"), PH_READONLY);
+		phalcon_read_static_property_ce(&alias_dir, phalcon_kernel_ce, SL("_aliasDir"), PH_READONLY);
+
+		PHALCON_CONCAT_VVVSV(&file_path, &base_path, &alias_dir, file, ".", &ext);
+	}
+	zval_ptr_dtor(&ext);
+
+	phalcon_read_static_property_ce(&alias, phalcon_kernel_ce, SL("_alias"), PH_READONLY);
+	if (Z_TYPE(alias) != IS_ARRAY) {
+		convert_to_array(&alias);
+		phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_alias"), &alias);
+		zval_ptr_dtor(&alias);
+	}
+
+	if (!phalcon_array_isset_fetch(&file_alias, &alias, &file_path, PH_READONLY)) {
+		if (phalcon_require_ret(&file_alias, Z_STRVAL(file_path)) != FAILURE) {
+			if (Z_TYPE(file_alias) != IS_ARRAY) {
+				zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));
+				return;
+			}
+		} else {
+			array_init(&file_alias);
+		}
+		phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_alias"), &file_path, &file_alias);
+		zval_ptr_dtor(&file_alias);
+	}
+	zval_ptr_dtor(&file_path);
+
+	if  (Z_TYPE(file_alias) == IS_ARRAY) {
+		PHALCON_CALL_FUNCTION(return_value, "strtr", str, &file_alias);
+	} else {
+		RETURN_CTOR(str);
+	}
+}
+
+/**
+ * Sets the alias
+ *
+ * @param array alias
+ */
+PHP_METHOD(Phalcon_Kernel, setAlias){
+
+	zval *alias;
+
+	phalcon_fetch_params(0, 1, 0, &alias);
+
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_alias"), alias);
+}
+
+
+/**
+ * Get the alias
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Kernel, getAlias){
+
+
+	phalcon_read_static_property_ce(return_value, phalcon_kernel_ce, SL("_alias"), PH_COPY);
 }

@@ -584,14 +584,14 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 			phalcon_update_property(getThis(), SL("_running"), &running);
 
 			if (!zend_is_true(&running)) {
-				if (phalcon_array_isset_fetch_str(&exitcode, &information, SL("exitcode"))) {
+				if (phalcon_array_isset_fetch_str(&exitcode, &information, SL("exitcode"), PH_READONLY)) {
 					if (Z_LVAL(exitcode) != -1) {
 						phalcon_update_property(getThis(), SL("_exitCode"), &exitcode);
 					}
 				}
 				phalcon_array_fetch_str(&signaled, &information, SL("signaled"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&signaled)) {
-					if (phalcon_array_isset_fetch_str(&termsig, &information, SL("termsig")) && Z_LVAL(termsig) > 0) {
+					if (phalcon_array_isset_fetch_str(&termsig, &information, SL("termsig"), PH_READONLY) && Z_LVAL(termsig) > 0) {
 						phalcon_update_property_long(getThis(), SL("_exitCode"), 128 + Z_LVAL(termsig));
 						phalcon_update_property(getThis(), SL("_exitCode"), &termsig);
 					}
@@ -602,7 +602,7 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 			} else {
 				phalcon_array_fetch_str(&stopped, &information, SL("stopped"), PH_NOISY|PH_READONLY);
 				if (zend_is_true(&stopped)) {
-					if (phalcon_array_isset_fetch_str(&stopsig, &information, SL("stopsig"))) {
+					if (phalcon_array_isset_fetch_str(&stopsig, &information, SL("stopsig"), PH_READONLY)) {
 						phalcon_update_property_long(getThis(), SL("_stopCode"), Z_LVAL(stopsig));
 					}
 					phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STOP);
@@ -654,16 +654,16 @@ PHP_METHOD(Phalcon_Process_Proc, getCommandForPid){
 	}
 	PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
 	if (Z_TYPE(information) == IS_ARRAY) {
-		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running")) || !zend_is_true(&running)) {
+		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running"), PH_READONLY) || !zend_is_true(&running)) {
 			RETURN_FALSE;
 		}
-		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2)) {
+		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2, PH_READONLY)) {
 			PHALCON_CALL_FUNCTION(&ret, "fgets", &pipe);
 			if (!PHALCON_IS_FALSE(&ret)) {
 				RETURN_FALSE;
 			}
 		}
-		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1)) {
+		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1, PH_READONLY)) {
 			RETURN_FALSE;
 		}
 		PHALCON_CALL_FUNCTION(NULL, "fgets", &pipe);
@@ -711,16 +711,16 @@ PHP_METHOD(Phalcon_Process_Proc, getStatForPid){
 	}
 	PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
 	if (Z_TYPE(information) == IS_ARRAY) {
-		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running")) || !zend_is_true(&running)) {
+		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running"), PH_READONLY) || !zend_is_true(&running)) {
 			RETURN_FALSE;
 		}
-		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2)) {
+		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2, PH_READONLY)) {
 			PHALCON_CALL_FUNCTION(&ret, "fgets", &pipe);
 			if (!PHALCON_IS_FALSE(&ret)) {
 				RETURN_FALSE;
 			}
 		}
-		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1)) {
+		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1, PH_READONLY)) {
 			RETURN_FALSE;
 		}
 		PHALCON_CALL_FUNCTION(NULL, "fgets", &pipe);
@@ -830,7 +830,7 @@ PHP_METHOD(Phalcon_Process_Proc, write){
 	phalcon_fetch_params(0, 1, 0, &data);
 
 	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
-	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch_long(&stdin, &pipes, 0)) {
+	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_array_isset_fetch_long(&stdin, &pipes, 0, PH_READONLY)) {
 		RETURN_FALSE;
 	}
 
@@ -948,15 +948,15 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		array_init(&w_array);
 		array_init(&e_array);
 
-		if (phalcon_array_isset_fetch_long(&stdout, &pipes, PHALCON_PROCESS_STDOUT)) {
+		if (phalcon_array_isset_fetch_long(&stdout, &pipes, PHALCON_PROCESS_STDOUT, PH_READONLY)) {
 			phalcon_array_append(&r_array, &stdout, PH_COPY);
 		}
 
-		if (phalcon_array_isset_fetch_long(&stdin, &pipes, PHALCON_PROCESS_STDIN)) {
+		if (phalcon_array_isset_fetch_long(&stdin, &pipes, PHALCON_PROCESS_STDIN, PH_READONLY)) {
 			phalcon_array_append(&w_array, &stdin, PH_COPY);
 		}
 
-		if (phalcon_array_isset_fetch_long(&stderr, &pipes, PHALCON_PROCESS_STDERR)) {
+		if (phalcon_array_isset_fetch_long(&stderr, &pipes, PHALCON_PROCESS_STDERR, PH_READONLY)) {
 			phalcon_array_append(&e_array, &stderr, PH_COPY);
 		}
 
@@ -1046,7 +1046,7 @@ PHP_METHOD(Phalcon_Process_Proc, hasSystemCallBeenInterrupted){
 	zval last_error = {}, message = {};
 
 	PHALCON_CALL_FUNCTION(&last_error, "error_get_last");
-	if (Z_TYPE(last_error) == IS_ARRAY && phalcon_array_isset_fetch_str(&message, &last_error, SL("message"))) {
+	if (Z_TYPE(last_error) == IS_ARRAY && phalcon_array_isset_fetch_str(&message, &last_error, SL("message"), PH_READONLY)) {
 		phalcon_fast_stripos_str(return_value, &message, SL("interrupted system call"));
 	} else {
 		RETURN_FALSE;

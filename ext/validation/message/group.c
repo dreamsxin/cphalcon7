@@ -437,7 +437,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &group);
 
-	if (phalcon_array_isset_fetch_str(&messages, group, SL("_messages"))) {
+	if (phalcon_array_isset_fetch_str(&messages, group, SL("_messages"), PH_READONLY)) {
 		object_init_ex(return_value, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", &messages);
 	} else {

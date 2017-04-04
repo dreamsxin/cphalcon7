@@ -467,8 +467,8 @@ PHP_METHOD(Phalcon_Date, days){
 	}
 
 	if (Z_TYPE(months) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_long(&year_months, &months, y)) {
-			if (phalcon_array_isset_fetch_long(return_value, &year_months, m)) {
+		if (phalcon_array_isset_fetch_long(&year_months, &months, y, PH_READONLY)) {
+			if (phalcon_array_isset_fetch_long(return_value, &year_months, m, PH_COPY)) {
 				return;
 			}
 		}
@@ -947,7 +947,7 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
 	minutes = (offset % PHALCON_DATE_HOUR) / PHALCON_DATE_MINUTE;
 	seconds = offset % PHALCON_DATE_MINUTE;
 
-	if (hours > 0 && phalcon_array_isset_fetch_long(&label, &output, 4)) {
+	if (hours > 0 && phalcon_array_isset_fetch_long(&label, &output, 4, PH_READONLY)) {
 		ZVAL_LONG(&span, hours);
 		PHALCON_SCONCAT_VV(return_value, &span, &label);
 	}
@@ -1207,10 +1207,11 @@ PHP_METHOD(Phalcon_Date, filter){
 	PHALCON_CALL_CE_STATIC(&errors, ce0, "getlasterrors");
 
 	if (Z_TYPE(errors) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count")) && PHALCON_GT_LONG(&warning_count, 0)) {
+		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count"), PH_READONLY)
+			&& PHALCON_GT_LONG(&warning_count, 0)) {
 			RETURN_FALSE;
 		}
-		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count")) && PHALCON_GT_LONG(&error_count, 0)) {
+		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count"), PH_READONLY) && PHALCON_GT_LONG(&error_count, 0)) {
 			RETURN_FALSE;
 		}
 	}
@@ -1247,10 +1248,11 @@ PHP_METHOD(Phalcon_Date, valid){
 	PHALCON_CALL_CE_STATIC(&errors, ce0, "getlasterrors");
 
 	if (Z_TYPE(errors) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count")) && PHALCON_GT_LONG(&warning_count, 0)) {
+		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count"), PH_READONLY)
+			&& PHALCON_GT_LONG(&warning_count, 0)) {
 			RETURN_FALSE;
 		}
-		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count")) && PHALCON_GT_LONG(&error_count, 0)) {
+		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count"), PH_READONLY) && PHALCON_GT_LONG(&error_count, 0)) {
 			RETURN_FALSE;
 		}
 	}

@@ -68,37 +68,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 	zval *type, *model, options = {}, value = {}, field = {}, actual_value = {}, update_model = {}, status = {}, messages = {}, *message, event_name = {};
 
 	phalcon_fetch_params(0, 2, 0, &type, &model);
-	
+
 	if (PHALCON_IS_STRING(type, "beforeDelete")) {
 		PHALCON_CALL_METHOD(&options, getThis(), "getoptions");
 
-		/** 
+		/**
 		 * 'value' is the value to be updated instead of delete the record
 		 */
-		if (!phalcon_array_isset_fetch_str(&value, &options, SL("value"))) {
+		if (!phalcon_array_isset_fetch_str(&value, &options, SL("value"), PH_READONLY)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'value' is required");
 			return;
 		}
 
-		/** 
+		/**
 		 * 'field' is the attribute to be updated instead of delete the record
 		 */
-		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"))) {
+		if (!phalcon_array_isset_fetch_str(&field, &options, SL("field"), PH_READONLY)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The option 'field' is required");
 			return;
 		}
 
-		/** 
+		/**
 		 * Skip the current operation
 		 */
 		PHALCON_CALL_METHOD(NULL, model, "skipoperation", &PHALCON_GLOBAL(z_true));
 		PHALCON_CALL_METHOD(&actual_value, model, "readattribute", &field);
-	
-		/** 
+
+		/**
 		 * If the record is already flagged as 'deleted' we don't delete it again
 		 */
 		if (!PHALCON_IS_EQUAL(&actual_value, &value)) {
-			/** 
+			/**
 			 * Clone the current model to make a clean new operation
 			 */
 			if (phalcon_clone(&update_model, model) == FAILURE) {
@@ -106,13 +106,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 			}
 
 			PHALCON_CALL_METHOD(NULL, &update_model, "writeattribute", &field, &value);
-	
-			/** 
+
+			/**
 			 * Update the cloned model
 			 */
 			PHALCON_CALL_METHOD(&status, &update_model, "save");
 			if (!zend_is_true(&status)) {
-				/** 
+				/**
 				 * Transfer the messages from the cloned model to the original model
 				 */
 				PHALCON_CALL_METHOD(&messages, &update_model, "getmessages");
@@ -120,22 +120,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Behavior_SoftDelete, notify){
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
 					PHALCON_CALL_METHOD(NULL, model, "appendmessage", message);
 				} ZEND_HASH_FOREACH_END();
-	
+
 				RETURN_FALSE;
 			}
-	
-			/** 
+
+			/**
 			 * Update the original model too
 			 */
 			PHALCON_CALL_METHOD(NULL, model, "writeattribute", &field, &value);
 
-			ZVAL_STRING(&event_name, "afterDelete");
-
 			/**
 			 * Fire the beforeDelete event
 			 */
+ 			ZVAL_STRING(&event_name, "afterDelete");
 			PHALCON_CALL_METHOD(NULL, model, "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 		}
 	}
 }
-

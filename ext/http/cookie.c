@@ -433,22 +433,22 @@ PHP_METHOD(Phalcon_Http_Cookie, restore)
 
 			PHALCON_CALL_METHOD(&definition, &session, "get", &key);
 			if (Z_TYPE(definition) == IS_ARRAY) {
-				if (phalcon_array_isset_fetch_str(&expire, &definition, SL("expire"))) {
+				if (phalcon_array_isset_fetch_str(&expire, &definition, SL("expire"), PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_expire"), &expire);
 				}
-				if (phalcon_array_isset_fetch_str(&domain, &definition, SL("domain"))) {
+				if (phalcon_array_isset_fetch_str(&domain, &definition, SL("domain"), PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_domain"), &domain);
 				}
 
-				if (phalcon_array_isset_fetch_str(&path, &definition, SL("path"))) {
+				if (phalcon_array_isset_fetch_str(&path, &definition, SL("path"), PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_path"), &path);
 				}
 
-				if (phalcon_array_isset_fetch_str(&secure, &definition, SL("secure"))) {
+				if (phalcon_array_isset_fetch_str(&secure, &definition, SL("secure"), PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_secure"), &secure);
 				}
 
-				if (phalcon_array_isset_fetch_str(&http_only, &definition, SL("httpOnly"))) {
+				if (phalcon_array_isset_fetch_str(&http_only, &definition, SL("httpOnly"), PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_httpOnly"), &http_only);
 				}
 			}

@@ -78,7 +78,7 @@ int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class
 	if (is_phalcon_class(ce)) {
 		phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY|PH_READONLY);
 
-		if (phalcon_array_isset_fetch_str(&value, &options, option, strlen(option))) {
+		if (phalcon_array_isset_fetch_str(&value, &options, option, strlen(option), PH_READONLY)) {
 			ZVAL_ZVAL(retval, &value, 1, 0);
 		}
 		else {

@@ -26,33 +26,22 @@
 #include "kernel/fcall.h"
 #include "kernel/hash.h"
 
-int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int readonly)
+int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int flags)
 {
-	return phalcon_array_fetch(fetched, arr, index, readonly) == SUCCESS ? 1 : 0;
+	return phalcon_array_fetch(fetched, arr, index, flags) == SUCCESS ? 1 : 0;
 }
 
-int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index)
+int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index, int flags)
 {
 	zval z_index = {};
 	int status;
 	ZVAL_LONG(&z_index, index);
 
-	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
+	status = phalcon_array_isset_fetch(fetched, arr, &z_index, flags);
 	return status;
 }
 
-int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length)
-{
-	zval z_index = {};
-	int status;
-	ZVAL_STRINGL(&z_index, index, index_length);
-
-	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
-	zval_ptr_dtor(&z_index);
-	return status;
-}
-
-int phalcon_array_isset_fetch_str2(zval *fetched, const zval *arr, const char *index, uint index_length, int flags)
+int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length, int flags)
 {
 	zval z_index = {};
 	int status;
@@ -430,6 +419,8 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
 				SEPARATE_ZVAL_IF_NOT_REF(zv);
 				ZVAL_COPY_VALUE(return_value, zv);
+			} else if ((flags & PH_CTOR) == PH_CTOR) {
+				ZVAL_DUP(return_value, zv);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {
@@ -1127,7 +1118,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 				l = va_arg(ap, int);
 				old_s[i] = s;
 				old_l[i] = l;
-				if (phalcon_array_isset_fetch_str(&fetched, &pzv, s, l)) {
+				if (phalcon_array_isset_fetch_str(&fetched, &pzv, s, l, PH_READONLY)) {
 					if (Z_TYPE(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = !Z_REFCOUNTED(pzv) || (Z_REFCOUNT(pzv) > 1 && !Z_ISREF(pzv));
@@ -1163,7 +1154,7 @@ void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, in
 			case 'l':
 				ll = va_arg(ap, long);
 				old_ll[i] = ll;
-				if (phalcon_array_isset_fetch_long(&fetched, &pzv, ll)) {
+				if (phalcon_array_isset_fetch_long(&fetched, &pzv, ll, PH_READONLY)) {
 					if (Z_TYPE(fetched) == IS_ARRAY) {
 						if (i == (types_length - 1)) {
 							re_update = !Z_REFCOUNTED(pzv) || (Z_REFCOUNT(pzv) > 1 && !Z_ISREF(pzv));

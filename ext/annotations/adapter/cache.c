@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, __construct){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	if (!phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
+	if (!phalcon_array_isset_fetch_str(&service, options, SL("service"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "No service given in options");
 		return;
 	}
@@ -109,7 +109,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter_Cache, __construct){
 
 	phalcon_update_property(getThis(), SL("_cache"), &cache);
 
-	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	}
 

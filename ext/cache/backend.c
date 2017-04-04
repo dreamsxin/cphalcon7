@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
 		/**
 		 * A common option is the prefix
 		 */
-		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
 			if (phalcon_fast_strpos_str(NULL, &prefix, SL("#"))) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The prefix is currupted, can't contain `#`");
 				return;

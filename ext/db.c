@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Db, setup){
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
-	if (Z_TYPE_P(options) != IS_ARRAY) { 
+	if (Z_TYPE_P(options) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Options must be an array");
 		return;
 	}
@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Db, setup){
 	/**
 	 * Enables/Disables globally the escaping of SQL identifiers
 	 */
-	if (phalcon_array_isset_fetch_str(&escape_identifiers, options, SL("escapeSqlIdentifiers"))) {
+	if (phalcon_array_isset_fetch_str(&escape_identifiers, options, SL("escapeSqlIdentifiers"), PH_READONLY)) {
 		PHALCON_GLOBAL(db).escape_identifiers = zend_is_true(&escape_identifiers);
 	}
 }

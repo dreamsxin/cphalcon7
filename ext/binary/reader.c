@@ -159,7 +159,7 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 		PHALCON_CALL_FUNCTION(NULL, "rewind", &handler);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
-		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
+		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		}
 		phalcon_update_property(getThis(), SL("_input"), &handler);
@@ -167,7 +167,7 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 		phalcon_update_property(getThis(), SL("_input"), data);
 
 		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
-		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"))) {
+		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		}
 
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readChar){
 
 	ZVAL_STRING(&format, "c");
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -368,7 +368,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedChar){
 
 	ZVAL_STRING(&format, "C");
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -388,7 +388,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt16){
 	ZVAL_STRING(&format, "s");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -415,7 +415,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt16){
 	}
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt){
 	ZVAL_STRING(&format, "i");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt){
 	ZVAL_STRING(&format, "I");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -475,7 +475,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt32){
 	ZVAL_STRING(&format, "l");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt32){
 	}
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -522,7 +522,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readFloat){
 	ZVAL_STRING(&format, "f");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -542,7 +542,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readDouble){
 	ZVAL_STRING(&format, "d");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 		RETURN_NULL();
 	}
 }
@@ -571,7 +571,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
 
 		phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
-		if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+		if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 			RETURN_NULL();
 		} else {
 			ZVAL_LONG(&len, Z_STRLEN_P(return_value));
@@ -607,7 +607,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 			PHALCON_CONCAT_SV(&format, "H", length);
 		}
 		PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
-		if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+		if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 			RETURN_NULL();
 		}
 	} else {
@@ -626,7 +626,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 
 		phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
-		if (!phalcon_array_isset_fetch_long(return_value, &result, 1)) {
+		if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
 			RETURN_NULL();
 		} else {
 			ZVAL_LONG(&len, Z_STRLEN_P(return_value)/2);

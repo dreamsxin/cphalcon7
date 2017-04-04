@@ -277,9 +277,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:module"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:module"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
@@ -294,9 +293,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:controller"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:controller"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
@@ -311,9 +309,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:namespace"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:namespace"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
@@ -328,9 +325,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:action"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:action"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
@@ -345,9 +341,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:params"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:params"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				zval_ptr_dtor(&id_pattern);
 				ZVAL_STRING(&id_pattern, "(/.*)*");
@@ -364,9 +359,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 			ZVAL_COPY_VALUE(&pattern_copy, &compiled_pattern);
 
-			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:int"))) {
+			if (Z_TYPE_P(regex) == IS_ARRAY && phalcon_array_isset_fetch_str(&params_pattern, regex, SL("/:int"), PH_READONLY)) {
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &params_pattern, &pattern_copy);
-				zval_ptr_dtor(&params_pattern);
 			} else {
 				zval_ptr_dtor(&id_pattern);
 				ZVAL_STRING(&id_pattern, "/([0-9]+)");
@@ -476,7 +470,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 					break;
 
 				case 1:
-					phalcon_array_fetch_long(&controller_name, &parts, 0, PH_NOISY);
+					phalcon_array_fetch_long(&controller_name, &parts, 0, PH_NOISY|PH_READONLY);
 					break;
 
 			}
@@ -547,12 +541,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 
 			PHALCON_SEPARATE_PARAM(paths);
 			ZVAL_COPY_VALUE(&route_paths, paths);
-			if (phalcon_array_isset_fetch_str(&controller_name, &route_paths, SL("controller"))) {
+			if (phalcon_array_isset_fetch_str(&controller_name, &route_paths, SL("controller"), PH_READONLY)) {
 				if (Z_TYPE(controller_name) == IS_STRING && !phalcon_is_numeric_ex(&controller_name)) {
 					phalcon_uncamelize(&lower_name, &controller_name);
 					phalcon_array_update_str(&route_paths, SL("controller"), &lower_name, PH_COPY);
 				}
-				zval_ptr_dtor(&controller_name);
 			}
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "The route contains invalid paths");
@@ -902,53 +895,48 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, setDefaults){
 	phalcon_fetch_params(0, 1, 0, &defaults);
 
 	/* Set the default namespace */
-	if (phalcon_array_isset_fetch_str(&namespace_name, defaults, SL("namespace"))) {
+	if (phalcon_array_isset_fetch_str(&namespace_name, defaults, SL("namespace"), PH_READONLY)) {
 		if (Z_TYPE(namespace_name) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Namespace name must be an string");
 			return;
 		}
 		phalcon_update_property(getThis(), SL("_defaultNamespace"), &namespace_name);
-		zval_ptr_dtor(&namespace_name);
 	}
 
 	/* Set the default module */
-	if (phalcon_array_isset_fetch_str(&module_name, defaults, SL("module"))) {
+	if (phalcon_array_isset_fetch_str(&module_name, defaults, SL("module"), PH_READONLY)) {
 		if (Z_TYPE(module_name) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Module name must be an string");
 			return;
 		}
 		phalcon_update_property(getThis(), SL("_defaultModule"), &module_name);
-		zval_ptr_dtor(&module_name);
 	}
 
 	/* Set the default controller */
-	if (phalcon_array_isset_fetch_str(&controller_name, defaults, SL("controller"))) {
+	if (phalcon_array_isset_fetch_str(&controller_name, defaults, SL("controller"), PH_READONLY)) {
 		if (Z_TYPE(controller_name) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Controller name must be an string");
 			return;
 		}
 		phalcon_update_property(getThis(), SL("_defaultController"), &controller_name);
-		zval_ptr_dtor(&controller_name);
 	}
 
 	/* Set the default action */
-	if (phalcon_array_isset_fetch_str(&action_name, defaults, SL("action"))) {
+	if (phalcon_array_isset_fetch_str(&action_name, defaults, SL("action"), PH_READONLY)) {
 		if (Z_TYPE(action_name) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Action name must be an string");
 			return;
 		}
 		phalcon_update_property(getThis(), SL("_defaultAction"), &action_name);
-		zval_ptr_dtor(&action_name);
 	}
 
 	/* Set default parameters */
-	if (phalcon_array_isset_fetch_str(&params, defaults, SL("params"))) {
+	if (phalcon_array_isset_fetch_str(&params, defaults, SL("params"), PH_READONLY)) {
 		if (Z_TYPE(params) != IS_ARRAY) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_router_exception_ce, "Params must be an array");
 			return;
 		}
 		phalcon_update_property(getThis(), SL("_defaultParams"), &params);
-		zval_ptr_dtor(&params);
 	}
 
 	RETURN_THIS();

@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 	if (!phalcon_get_constant(&gd_version, SL("GD_VERSION"))) {
 		PHALCON_CALL_FUNCTION(&gd_info, "gd_info");
 
-		if (phalcon_array_isset_fetch_str(&gd_version, &gd_info, SL("GD Version"))) {
+		if (phalcon_array_isset_fetch_str(&gd_version, &gd_info, SL("GD Version"), PH_READONLY)) {
 			ZVAL_STRING(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
 			ZVAL_NULL(&matches);
 			ZVAL_MAKE_REF(&matches);
@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 			ZVAL_UNREF(&matches);
 
 			if (zend_is_true(&ret)) {
-				if (!phalcon_array_isset_fetch_long(&version, &matches, 0)) {
+				if (!phalcon_array_isset_fetch_long(&version, &matches, 0, PH_READONLY)) {
 					ZVAL_EMPTY_STRING(&version);
 				}
 			} else {
@@ -207,22 +207,22 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 
 		PHALCON_CALL_FUNCTION(&imageinfo, "getimagesize", &realpath);
 
-		if (phalcon_array_isset_fetch_long(&img_width, &imageinfo, 0)) {
+		if (phalcon_array_isset_fetch_long(&img_width, &imageinfo, 0, PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_width"), &img_width);
 		}
 
-		if (phalcon_array_isset_fetch_long(&img_height, &imageinfo, 1)) {
+		if (phalcon_array_isset_fetch_long(&img_height, &imageinfo, 1, PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_height"), &img_height);
 		}
 
-		if (phalcon_array_isset_fetch_long(&type, &imageinfo, 2)) {
+		if (phalcon_array_isset_fetch_long(&type, &imageinfo, 2, PH_READONLY)) {
 			convert_to_long(&type);
 			phalcon_update_property(getThis(), SL("_type"), &type);
 		} else {
 			ZVAL_LONG(&type, -1);
 		}
 
-		if (phalcon_array_isset_fetch_str(&mime, &imageinfo, SL("mime"))) {
+		if (phalcon_array_isset_fetch_str(&mime, &imageinfo, SL("mime"), PH_READONLY)) {
 			convert_to_string(&mime);
 			phalcon_update_property(getThis(), SL("_mime"), &mime);
 		}
@@ -704,10 +704,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _text) {
 		PHALCON_CALL_FUNCTION(&space, "imagettfbbox", size, &tmp, fontfile, text);
 
 		if (
-			!phalcon_array_isset_fetch_long(&s0, &space, 0) ||
-			!phalcon_array_isset_fetch_long(&s1, &space, 1) ||
-			!phalcon_array_isset_fetch_long(&s4, &space, 4) ||
-			!phalcon_array_isset_fetch_long(&s5, &space, 5)
+			!phalcon_array_isset_fetch_long(&s0, &space, 0, PH_READONLY) ||
+			!phalcon_array_isset_fetch_long(&s1, &space, 1, PH_READONLY) ||
+			!phalcon_array_isset_fetch_long(&s4, &space, 4, PH_READONLY) ||
+			!phalcon_array_isset_fetch_long(&s5, &space, 5, PH_READONLY)
 		) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Call to imagettfbbox() failed");
 			return;
@@ -859,7 +859,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 			PHALCON_CALL_FUNCTION(&index, "imagecolorat", &mask_image, &zx, &zy);
 			PHALCON_CALL_FUNCTION(&alpha, "imagecolorsforindex", &mask_image, &index);
 
-			if (phalcon_array_isset_fetch_str(&red, &alpha, SL("red"))) {
+			if (phalcon_array_isset_fetch_str(&red, &alpha, SL("red"), PH_READONLY)) {
 				i = (int)(127 - (phalcon_get_intval(&red) / 2));
 				ZVAL_LONG(&alpha, i);
 			}
@@ -867,9 +867,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _mask){
 			PHALCON_CALL_FUNCTION(&index2, "imagecolorat", &image, &zx, &zy);
 			PHALCON_CALL_FUNCTION(&color, "imagecolorsforindex", &image, &index2);
 
-			phalcon_array_isset_fetch_str(&r, &color, SL("red"));
-			phalcon_array_isset_fetch_str(&g, &color, SL("green"));
-			phalcon_array_isset_fetch_str(&b, &color, SL("blue"));
+			phalcon_array_isset_fetch_str(&r, &color, SL("red"), PH_READONLY);
+			phalcon_array_isset_fetch_str(&g, &color, SL("green"), PH_READONLY);
+			phalcon_array_isset_fetch_str(&b, &color, SL("blue"), PH_READONLY);
 
 			PHALCON_CALL_FUNCTION(&color, "imagecolorallocatealpha", &newimage, &r, &g, &b, &alpha);
 			PHALCON_CALL_FUNCTION(NULL, "imagesetpixel", &newimage, &zx, &zy, &color);
@@ -1210,9 +1210,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, line){
 
 	if (Z_TYPE(image) == IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&rgb, getThis(), "getcolorrbg", color);
-		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY);
-		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY);
-		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY);
+		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_FUNCTION(&imagecolor, "imagecolorallocate", &image, &r, &g, &b);
 		PHALCON_CALL_FUNCTION(NULL, "imageline", &image, sy, sx, ey, ex, &imagecolor);
@@ -1250,9 +1250,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
 
 	if (Z_TYPE(image) == IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&rgb, getThis(), "getcolorrbg", color);
-		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY);
-		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY);
-		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY);
+		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&b, &rgb, 2, PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_FUNCTION(&imagecolor, "imagecolorallocate", &image, &r, &g, &b);
 
@@ -1264,10 +1264,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
 					PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Coordinates point error");
 					return;
 				}
-				if (!phalcon_array_isset_fetch_long(&x, point, 0)) {
+				if (!phalcon_array_isset_fetch_long(&x, point, 0, PH_READONLY)) {
 					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY);
 				}
-				if (!phalcon_array_isset_fetch_long(&y, point, 0)) {
+				if (!phalcon_array_isset_fetch_long(&y, point, 0, PH_READONLY)) {
 					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
 				}
 				phalcon_array_append(&points, &x, PH_COPY);

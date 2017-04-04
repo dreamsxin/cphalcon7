@@ -155,14 +155,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 
-	if (phalcon_array_isset_fetch_str(&uri, options, SL("uri"))) {
+	if (phalcon_array_isset_fetch_str(&uri, options, SL("uri"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_uri"), &uri);
 		phalcon_array_unset_str(options, SL("uri"), PH_SEPARATE);
 	} else {
 		phalcon_read_property(&uri, getThis(), SL("_uri"), PH_NOISY|PH_READONLY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&db_name, options, SL("db")) && PHALCON_IS_NOT_EMPTY(&db_name)) {
+	if (phalcon_array_isset_fetch_str(&db_name, options, SL("db"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&db_name)) {
 		phalcon_update_property(getThis(), SL("_db"), &db_name);
 		phalcon_array_unset_str(options, SL("db"), PH_SEPARATE);
 	} else {
@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Mongo, __construct){
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&collection_name, options, SL("collection")) && PHALCON_IS_NOT_EMPTY(&collection_name)) {
+	if (phalcon_array_isset_fetch_str(&collection_name, options, SL("collection"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&collection_name)) {
 		phalcon_update_property(getThis(), SL("_collection"), &collection_name);
 		phalcon_array_unset_str(options, SL("collection"), PH_SEPARATE);
 	} else {

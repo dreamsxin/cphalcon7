@@ -1421,10 +1421,10 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
 					PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Coordinates point error");
 					return;
 				}
-				if (!phalcon_array_isset_fetch_long(&x, point, 0)) {
+				if (!phalcon_array_isset_fetch_long(&x, point, 0, PH_READONLY)) {
 					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY);
 				}
-				if (!phalcon_array_isset_fetch_long(&y, point, 0)) {
+				if (!phalcon_array_isset_fetch_long(&y, point, 0, PH_READONLY)) {
 					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
 				}
 			} else {
@@ -1665,7 +1665,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, levels)
 
 	PHALCON_CALL_METHOD(&range, &im, "getquantumrange");
 
-	if (Z_TYPE(range) == IS_ARRAY && phalcon_array_isset_fetch_str(&quantum_range_long, &range, SL("quantumRangeLong"))) {
+	if (Z_TYPE(range) == IS_ARRAY &&
+		phalcon_array_isset_fetch_str(&quantum_range_long, &range, SL("quantumRangeLong"), PH_READONLY)) {
 		tmp_input_min = round(phalcon_get_intval(&input_min) * phalcon_get_intval(&quantum_range_long) / 255);
 		tmp_input_max = round(phalcon_get_intval(&input_max) * phalcon_get_intval(&quantum_range_long) / 255);
 		tmp_output_min = round(phalcon_get_intval(&output_min) * phalcon_get_intval(&quantum_range_long) / 255);

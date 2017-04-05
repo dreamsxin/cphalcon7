@@ -232,11 +232,11 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 	PHALCON_CALL_METHOD(&annotations_service, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACE(&annotations_service, phalcon_annotations_adapterinterface_ce);
 
-	phalcon_return_property(&processed, getThis(), SL("_processed"));
+	phalcon_read_property(&processed, getThis(), SL("_processed"), PH_READONLY);
 	if (!zend_is_true(&processed)) {
-		phalcon_return_property(&handlers, getThis(), SL("_handlers"));
+		phalcon_read_property(&handlers, getThis(), SL("_handlers"), PH_READONLY);
 		if (Z_TYPE(handlers) == IS_ARRAY) {
-			phalcon_return_property(&controller_suffix, getThis(), SL("_controllerSuffix"));
+			phalcon_read_property(&controller_suffix, getThis(), SL("_controllerSuffix"), PH_READONLY);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(handlers), scope) {
 				zval prefix = {}, handler = {}, controller_name = {}, namespace_name = {}, module_name = {}, suffixed = {};
@@ -386,26 +386,26 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 		is_route = 1;
 	} else if (PHALCON_IS_STRING(&name, "Get")) {
 		is_route = 1;
-		ZVAL_STRING(&methods, ISV(GET));
+		ZVAL_STR(&methods, IS(GET));
 	} else if (PHALCON_IS_STRING(&name, "Post")) {
 		is_route = 1;
-		ZVAL_STRING(&methods, ISV(POST));
+		ZVAL_STR(&methods, IS(POST));
 	} else if (PHALCON_IS_STRING(&name, "Put")) {
 		is_route = 1;
-		ZVAL_STRING(&methods, ISV(PUT));
+		ZVAL_STR(&methods, IS(PUT));
 	} else if (PHALCON_IS_STRING(&name, "Delete")) {
 		is_route = 1;
-		ZVAL_STRING(&methods, ISV(DELETE));
+		ZVAL_STR(&methods, IS(DELETE));
 	} else if (PHALCON_IS_STRING(&name, "Options")) {
 		is_route = 1;
-		ZVAL_STRING(&methods, ISV(OPTIONS));
+		ZVAL_STR(&methods, IS(OPTIONS));
 	} else {
 		is_route = 0;
 	}
 
 	if (is_route) {
-		phalcon_return_property(&action_suffix, getThis(), SL("_actionSuffix"));
-		phalcon_return_property(&route_prefix, getThis(), SL("_routePrefix"));
+		phalcon_read_property(&action_suffix, getThis(), SL("_actionSuffix"), PH_READONLY);
+		phalcon_read_property(&route_prefix, getThis(), SL("_routePrefix"), PH_READONLY);
 
 		ZVAL_EMPTY_STRING(&empty_str);
 
@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 			} ZEND_HASH_FOREACH_END();
 		}
 
-		ZVAL_STRING(&parameter, ISV(name));
+		ZVAL_STR(&parameter, IS(name));
 
 		PHALCON_CALL_METHOD(&route_name, annotation, "getargument", &parameter);
 		if (Z_TYPE(route_name) == IS_STRING) {

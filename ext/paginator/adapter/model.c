@@ -117,13 +117,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	zval page_items = {}, maximum_pages = {}, next = {}, additional_page = {}, before = {}, remainder = {}, pages_total = {};
 	long int i, i_show;
 
-	phalcon_return_property(&show, getThis(), SL("_limitRows"));
-	phalcon_return_property(&config, getThis(), SL("_config"));
-	phalcon_return_property(&page_number, getThis(), SL("_page"));
+	phalcon_read_property(&show, getThis(), SL("_limitRows"), PH_READONLY);
+	phalcon_read_property(&config, getThis(), SL("_config"), PH_READONLY);
+	phalcon_read_property(&page_number, getThis(), SL("_page"), PH_READONLY);
 
 	i_show = phalcon_get_intval(&show);
 
-	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY);
+	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(page_number) == IS_NULL || PHALCON_LT(&show, &PHALCON_GLOBAL(z_zero))) {
 		ZVAL_COPY_VALUE(&page_number, &PHALCON_GLOBAL(z_one));

@@ -111,7 +111,7 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
 	PHALCON_CALL_SELF(&valid, "valid", &value, &minimum, &maximum);
 
 	if (PHALCON_IS_FALSE(&valid)) {
-		phalcon_return_property(&type, getThis(), SL("_type"));
+		phalcon_read_property(&type, getThis(), SL("_type"), PH_READONLY);
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {

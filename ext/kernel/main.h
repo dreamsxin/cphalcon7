@@ -105,7 +105,7 @@ void phalcon_gettype(zval *return_value, zval *arg);
  * Returns a zval in an object member
  */
 #define RETURN_MEMBER(object, member_name) \
-	phalcon_return_property(return_value, object, SL(member_name)); \
+	phalcon_read_property(return_value, object, SL(member_name), PH_COPY); \
 	return;
 
 #define RETURN_ON_FAILURE(what) \

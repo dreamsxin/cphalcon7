@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
 {
 	zval formatter = {};
 
-	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
+	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_READONLY);
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHOD(NULL, &formatter, "__construct");

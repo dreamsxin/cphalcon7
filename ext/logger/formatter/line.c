@@ -170,13 +170,13 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
-	phalcon_return_property(&format, getThis(), SL("_format"));
+	phalcon_read_property(&format, getThis(), SL("_format"), PH_READONLY);
 
 	/**
 	 * Check if the format has the %date% placeholder
 	 */
 	if (phalcon_memnstr_str(&format, SL("%date%"))) {
-		phalcon_return_property(&date_format, getThis(), SL("_dateFormat"));
+		phalcon_read_property(&date_format, getThis(), SL("_dateFormat"), PH_READONLY);
 
 		phalcon_date(&date, &date_format, timestamp);
 

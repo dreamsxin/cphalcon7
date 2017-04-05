@@ -358,7 +358,7 @@ PHP_METHOD(Phalcon_Assets_Collection, current){
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY|PH_READONLY);
 
-	if (!phalcon_array_isset_fetch(return_value, &resources, &position, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &resources, &position, PH_COPY)) {
 		RETURN_NULL();
 	}
 }

@@ -456,8 +456,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 */
 	if (phalcon_array_isset(&sql_column_aliases, &column_name)) {
 		array_init_size(return_value, 2);
-		ZVAL_STRING(&s_qualified, ISV(qualified));
-		add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
+		ZVAL_STR(&s_qualified, IS(qualified));
+		phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
 		phalcon_array_update_string(return_value, IS(name), &column_name, PH_COPY);
 		return;
 	}
@@ -596,9 +596,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	/**
 	 * Create an array with the qualified info
 	 */
-	ZVAL_STRING(&s_qualified, ISV(qualified));
+	ZVAL_STR(&s_qualified, IS(qualified));
 	array_init_size(return_value, 4);
-	add_assoc_zval_ex(return_value, ISL(type), &s_qualified);
+	phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
 	phalcon_array_update_string(return_value, IS(domain), &source, PH_COPY);
 	phalcon_array_update_string(return_value, IS(name), &real_column_name, PH_COPY);
 	phalcon_array_update_string(return_value, IS(balias), &column_name, PH_COPY);
@@ -1496,7 +1496,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoinType){
 
 	phalcon_fetch_params(0, 1, 0, &join);
 
-	if (!phalcon_array_isset_fetch_string(&type, join, IS(type))) {
+	if (!phalcon_array_isset_fetch_string(&type, join, IS(type), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 5");
 		return;
 	}
@@ -3368,7 +3368,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	/**
 	 * Models instances is an array if the SELECT was prepared with parse
 	 */
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (Z_TYPE(models_instances) != IS_ARRAY) {
 		array_init(&models_instances);
 	}
@@ -3579,7 +3579,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
 				array_init(&bind_keys);
@@ -3600,7 +3600,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_select);
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
@@ -3660,7 +3660,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	/**
 	 * Choose a resultset type
 	 */
-	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 	if (!is_complex) {
 		/**
 		 * Select the base object
@@ -3761,7 +3761,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	phalcon_array_fetch_str(&model_name, &intermediate, SL("model"), PH_NOISY|PH_READONLY);
 
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
 		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
 	}
@@ -3792,7 +3792,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
 
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
 				array_init(&bind_keys);
@@ -3813,7 +3813,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_insert);
 				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
@@ -3933,7 +3933,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	/**
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
 		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
@@ -3965,7 +3965,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 				ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
 
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
 				array_init(&bind_keys);
@@ -3986,7 +3986,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &update_sql);
 				ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
@@ -4072,7 +4072,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	/**
 	 * Load the model from the modelsManager or from the _modelsInstances property
 	 */
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
 		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
@@ -4103,7 +4103,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 				ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
 
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
 				array_init(&bind_keys);
@@ -4124,7 +4124,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &delete_sql);
 				ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
-				phalcon_array_unset(&bind_types, &wildcard, PH_COPY);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
@@ -4240,7 +4240,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			 * 'modelsCache' is the default name for the models cache service
 			 */
 			if (!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_READONLY)) {
-				ZVAL_STRING(&cache_service, ISV(modelsCache));
+				ZVAL_STR(&cache_service, IS(modelsCache));
 			}
 
 			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
@@ -4743,7 +4743,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
 	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 
-	phalcon_return_property(&models_instances, getThis(), SL("_modelsInstances"));
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (Z_TYPE(models_instances) != IS_ARRAY) {
 		array_init(&models_instances);
 	}

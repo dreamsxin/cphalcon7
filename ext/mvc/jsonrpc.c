@@ -262,7 +262,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	/* Deserializer Json */
 
-	ZVAL_STRING(&service, ISV(request));
+	ZVAL_STR(&service, IS(request));
 
 	PHALCON_CALL_METHOD(&request, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&request, phalcon_http_requestinterface_ce);
@@ -270,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	PHALCON_CALL_METHOD(&json, &request, "getrawbody");
 	PHALCON_CALL_FUNCTION(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
 
-	ZVAL_STRING(&service, ISV(response));
+	ZVAL_STR(&service, IS(response));
 
 	PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
@@ -295,13 +295,13 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			array_init(&jsonrpc_params);
 		}
 
-		ZVAL_STRING(&service, ISV(url));
+		ZVAL_STR(&service, IS(url));
 		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHOD(&uri, &url, "get", &jsonrpc_method);
 
-		ZVAL_STRING(&service, ISV(router));
+		ZVAL_STR(&service, IS(router));
 		PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
@@ -313,7 +313,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 		/* If the router doesn't return a valid module we use the default module */
 		if (!zend_is_true(&module_name)) {
-			phalcon_return_property(&module_name, getThis(), SL("_defaultModule"));
+			phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_READONLY);
 		}
 
 		/**
@@ -395,7 +395,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHOD(&params, &router, "getparams");
 		PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
 
-		ZVAL_STRING(&service, ISV(dispatcher));
+		ZVAL_STR(&service, IS(dispatcher));
 
 		PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);

@@ -533,7 +533,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
 
 	zval router = {}, service_name = {};
 
-	phalcon_return_property(&router, getThis(), SL("_router"));
+	phalcon_read_property(&router, getThis(), SL("_router"), PH_READONLY);
 	if (Z_TYPE(router) != IS_OBJECT) {
 		ZVAL_STR(&service_name, IS(router));
 
@@ -704,7 +704,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		phalcon_read_property(&handlers, getThis(), SL("_handlers"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_METHOD(&route_id, &matched_route, "getrouteid");
-		if (!phalcon_array_isset_fetch(&handler, &handlers, &route_id, 0)) {
+		if (!phalcon_array_isset_fetch(&handler, &handlers, &route_id, PH_READONLY)) {
 			ZVAL_STRING(&error_message, "Matched route doesn't have an associate handler");
 
 			PHALCON_RETURN_CALL_SELF("_throwexception", &error_message);
@@ -725,10 +725,10 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		} else {
-			phalcon_return_property(&handler, getThis(), SL("_activeHandler"));
+			phalcon_read_property(&handler, getThis(), SL("_activeHandler"), PH_READONLY);
 		}
 
-		phalcon_return_property(&before_handlers, getThis(), SL("_beforeHandlers"));
+		phalcon_read_property(&before_handlers, getThis(), SL("_beforeHandlers"), PH_READONLY);
 		if (Z_TYPE(before_handlers) == IS_ARRAY) {
 			phalcon_update_property(getThis(), SL("_stopped"), &PHALCON_GLOBAL(z_false));
 

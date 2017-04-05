@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 	phalcon_fetch_params(0, 6, 0, &data, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
 	if (Z_TYPE_P(name) != IS_NULL) {
-		if (!phalcon_array_isset_fetch(&value, data, name, 0)) {
+		if (!phalcon_array_isset_fetch(&value, data, name, PH_READONLY)) {
 			RETURN_CTOR(default_value);
 		}
 	} else {
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 	}
 
 	if (Z_TYPE_P(filters) != IS_NULL) {
-		phalcon_return_property(&filter, getThis(), SL("_filter"));
+		phalcon_read_property(&filter, getThis(), SL("_filter"), PH_READONLY);
 		if (Z_TYPE(filter) != IS_OBJECT) {
 			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Http_Request, getServer){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, PH_READONLY)) {
 		RETURN_NULL();
 	}
 }
@@ -710,9 +710,9 @@ PHP_METHOD(Phalcon_Http_Request, getHeader)
 	phalcon_fetch_params(0, 1, 0, &header);
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (!phalcon_array_isset_fetch(return_value, _SERVER, header, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, _SERVER, header, PH_COPY)) {
 		PHALCON_CONCAT_SV(&key, "HTTP_", header);
-		if (phalcon_array_isset_fetch(return_value, _SERVER, &key, 0)) {
+		if (phalcon_array_isset_fetch(return_value, _SERVER, &key, PH_COPY)) {
 			return;
 		}
 	}

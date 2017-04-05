@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, __construct){
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(expr_arguments), argument) {
 			zval expr = {}, resolved_argument = {}, name = {};
 
-			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY);
+			phalcon_array_fetch_str(&expr, argument, SL("expr"), PH_NOISY|PH_READONLY);
 
 			PHALCON_CALL_METHOD(&resolved_argument, getThis(), "getexpression", &expr);
 			if (phalcon_array_isset_fetch_str(&name, argument, SL("name"), PH_READONLY)) {
@@ -154,14 +154,14 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 
 	phalcon_fetch_params(0, 1, 0, &expr);
 
-	phalcon_array_fetch_str(&type, expr, SL("type"), PH_NOISY);
+	phalcon_array_fetch_str(&type, expr, SL("type"), PH_NOISY|PH_READONLY);
 
 	switch (phalcon_get_intval(&type)) {
 		case PHANNOT_T_INTEGER:
 		case PHANNOT_T_DOUBLE:
 		case PHANNOT_T_STRING:
 		case PHANNOT_T_IDENTIFIER:
-			phalcon_array_fetch_str(&items, expr, SL("value"), PH_NOISY);
+			phalcon_array_fetch_str(&items, expr, SL("value"), PH_NOISY|PH_READONLY);
 			RETURN_CTOR(&items);
 			/* no break because of implicit return */
 
@@ -178,14 +178,14 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getExpression){
 			/* no break because of implicit return */
 
 		case PHANNOT_T_ARRAY:
-			phalcon_array_fetch_str(&items, expr, SL("items"), PH_NOISY);
+			phalcon_array_fetch_str(&items, expr, SL("items"), PH_NOISY|PH_READONLY);
 
 			array_init(return_value);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(items), item) {
 				zval name = {}, item_expr = {}, resolved_item = {};
 
-				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY);
+				phalcon_array_fetch_str(&item_expr, item, SL("expr"), PH_NOISY|PH_READONLY);
 
 				PHALCON_CALL_METHOD(&resolved_item, getThis(), "getexpression", &item_expr);
 				if (phalcon_array_isset_fetch_str(&name, item, SL("name"), PH_READONLY)) {
@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 	phalcon_fetch_params(0, 1, 0, &position);
 
 	phalcon_read_property(&arguments, getThis(), SL("_arguments"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &arguments, position, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &arguments, position, PH_READONLY)) {
 		RETURN_NULL();
 	}
 }

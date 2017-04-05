@@ -1060,7 +1060,8 @@ int phalcon_update_property(zval *object, const char *property_name, uint32_t pr
 	ZVAL_STRINGL(&property, property_name, property_length);
 
 	/* write_property will add 1 to refcount, so no Z_TRY_ADDREF_P(value); is necessary */
-	Z_OBJ_HT_P(object)->write_property(object, &property, value, 0);
+	// Z_OBJ_HT_P(object)->write_property(object, &property, value, NULL);
+	Z_OBJ_HANDLER_P(object, write_property)(object, &property, value, NULL);
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;
@@ -1077,8 +1078,11 @@ int phalcon_update_property(zval *object, const char *property_name, uint32_t pr
 int phalcon_update_property_long(zval *object, const char *property_name, uint32_t property_length, long value)
 {
 	zval v = {};
+	int ret;
 	ZVAL_LONG(&v, value);
-	return phalcon_update_property(object, property_name, property_length, &v);
+	ret = phalcon_update_property(object, property_name, property_length, &v);
+	zval_ptr_dtor(&v);
+	return ret;
 }
 
 /**
@@ -1090,8 +1094,8 @@ int phalcon_update_property_str(zval *object, const char *property_name, uint32_
 	int status = 0;
 
 	ZVAL_STRINGL(&tmp, str, str_length);
-	Z_SET_REFCOUNT(tmp, 0);
 	status = phalcon_update_property(object, property_name, property_length, &tmp);
+	zval_ptr_dtor(&tmp);
 	return status;
 }
 
@@ -1100,47 +1104,38 @@ int phalcon_update_property_str(zval *object, const char *property_name, uint32_
  */
 int phalcon_update_property_bool(zval *object, const char *property_name, uint32_t property_length, int value) {
 	zval v = {};
+	int ret;
 	ZVAL_BOOL(&v, value);
-	return phalcon_update_property(object, property_name, property_length, &v);
+	ret = phalcon_update_property(object, property_name, property_length, &v);
+	zval_ptr_dtor(&v);
+	return ret;
 }
 
 /**
  * Checks whether obj is an object and updates property with null value
  */
 int phalcon_update_property_null(zval *object, const char *property_name, uint32_t property_length) {
-	zval value = {};
-	ZVAL_NULL(&value);
-	return phalcon_update_property(object, property_name, property_length, &value);
+	zval v = {};
+	int ret;
+	ZVAL_NULL(&v);
+	ret = phalcon_update_property(object, property_name, property_length, &v);
+	zval_ptr_dtor(&v);
+	return ret;
 }
 
 int phalcon_update_property_string_zval(zval *object, zend_string *property, zval *value){
-	zend_class_entry *ce;
 
-	if (!object) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (1)");
-		return FAILURE;
-	}
-
-	if (Z_TYPE_P(object) != IS_OBJECT) {
-		php_error_docref(NULL, E_WARNING, "Attempt to assign property of non-object (2)");
-		return FAILURE;
-	}
-
-	ce = Z_OBJCE_P(object);
-	if (ce->parent) {
-		ce = phalcon_lookup_str_class_ce(ce, property);
-	}
-
-	zend_update_property_ex(ce, object, property, value);
-
-	return SUCCESS;
+	return phalcon_update_property(object, ZSTR_VAL(property), ZSTR_LEN(property), value);
 }
 
 int phalcon_update_property_zval_null(zval *object, const zval *property)
 {
 	zval v = {};
+	int ret;
 	ZVAL_NULL(&v);
-	return phalcon_update_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), &v);
+	ret = phalcon_update_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), &v);
+	zval_ptr_dtor(&v);
+	return ret;
 }
 
 /**
@@ -1149,8 +1144,11 @@ int phalcon_update_property_zval_null(zval *object, const zval *property)
 int phalcon_update_property_zval_long(zval *object, const zval *property, int value)
 {
 	zval v = {};
+	int ret;
 	ZVAL_LONG(&v, value);
-	return phalcon_update_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), &v);
+	ret = phalcon_update_property(object, Z_STRVAL_P(property), Z_STRLEN_P(property), &v);
+	zval_ptr_dtor(&v);
+	return ret;
 }
 
 /**
@@ -1478,12 +1476,12 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
  */
 int phalcon_update_property_empty_array(zval *object, const char *property_name, uint32_t property_length) {
 
-	zval empty_array = {};
+	zval v = {};
 	int status;
 
-	array_init(&empty_array);
-
-	status = phalcon_update_property(object, property_name, property_length, &empty_array);
+	array_init(&v);
+	status = phalcon_update_property(object, property_name, property_length, &v);
+	zval_ptr_dtor(&v);
 	return status;
 }
 

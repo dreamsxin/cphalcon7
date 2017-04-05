@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		PHALCON_ENSURE_IS_LONG(length);
 	}
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "connect");
 		if (Z_TYPE(connection) != IS_RESOURCE) {
@@ -660,7 +660,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "connect");
 		if (Z_TYPE(connection) != IS_RESOURCE) {
@@ -688,7 +688,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 	zval connection = {};
 	php_stream *stream;
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}

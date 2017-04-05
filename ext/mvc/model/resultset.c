@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 			/**
 			 * Here, the resultset is a small array
 			 */
-			phalcon_return_property(&rows, getThis(), SL("_rows"));
+			phalcon_read_property(&rows, getThis(), SL("_rows"), PH_READONLY);
 
 			/**
 			 * We need to fetch the records because rows is null
@@ -308,7 +308,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 
 	zval count = {}, type = {}, result = {}, number_rows = {}, rows = {};
 
-	phalcon_return_property(&count, getThis(), SL("_count"));
+	phalcon_read_property(&count, getThis(), SL("_count"), PH_READONLY);
 
 	/**
 	 * We only calculate the row number is it wasn't calculated before
@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			/**
 			 * Here, the resultset act as an array
 			 */
-			phalcon_return_property(&rows, getThis(), SL("_rows"));
+			phalcon_read_property(&rows, getThis(), SL("_rows"), PH_READONLY);
 			if (Z_TYPE(rows) == IS_NULL) {
 				phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 				if (Z_TYPE(result) == IS_OBJECT) {

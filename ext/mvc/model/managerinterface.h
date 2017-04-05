@@ -31,11 +31,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_initialize, 0,
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_isinitialized, 0, 0, 1)
-	ZEND_ARG_INFO(0, modelName)
+	ZEND_ARG_TYPE_INFO(0, modelName, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_load, 0, 0, 2)
-	ZEND_ARG_INFO(0, modelName)
+	ZEND_ARG_TYPE_INFO(0, modelName, IS_STRING, 0)
 	ZEND_ARG_INFO(0, newInstance)
 ZEND_END_ARG_INFO()
 

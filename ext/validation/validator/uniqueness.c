@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 			 * Rename the column if there is a column map
 			 */
 			if (Z_TYPE(column_map) == IS_ARRAY) {
-				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field, 0)) {
+				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, primary_field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", primary_field, "\" isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_validation_exception_ce, &exception_message);
 					return;

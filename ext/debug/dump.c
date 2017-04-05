@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Debug_Dump, getStyle){
 
 	phalcon_read_property(&styles, getThis(), SL("_styles"), PH_NOISY|PH_READONLY);
 
-	if (!phalcon_array_isset_fetch(return_value, &styles, type, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &styles, type, PH_COPY)) {
 		ZVAL_STRING(return_value, "color:gray");
 	}
 }

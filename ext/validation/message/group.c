@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetGet){
 	zval *index;
 
 	phalcon_fetch_params(0, 1, 0, &index);
-	phalcon_return_property_array(return_value, getThis(), SL("_messages"), index);
+	phalcon_read_property_array(return_value, getThis(), SL("_messages"), index, PH_COPY);
 }
 
 /**
@@ -315,7 +315,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 
 	array_init(&filtered);
 
-	phalcon_return_property(&messages, getThis(), SL("_messages"));
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_READONLY);
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		/**
 		 * A group of messages is iterated and appended one-by-one to the current list

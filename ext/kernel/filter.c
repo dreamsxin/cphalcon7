@@ -404,7 +404,7 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 	ZVAL_STRING(&regexp, "/e.*x.*p.*r.*e.*s.*s.*i.*o.*n/i");
 
-	phalcon_return_property(&tmp, &elements, SL("length"));
+	phalcon_read_property(&tmp, &elements, SL("length"), PH_READONLY);
 
 	element_length = Z_LVAL_P(&tmp);
 
@@ -416,16 +416,16 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 		PHALCON_CALL_METHOD(&element, &elements, "item", &t);
 
-		phalcon_return_property(&element_name, &element, SL("nodeName"));
+		phalcon_read_property(&element_name, &element, SL("nodeName"), PH_READONLY);
 
 		if (Z_TYPE_P(allow_tags) == IS_ARRAY && !phalcon_fast_in_array(&element_name, allow_tags)) {
-			phalcon_return_property(&parent, &element, SL("parentNode"));
+			phalcon_read_property(&parent, &element, SL("parentNode"), PH_READONLY);
 			PHALCON_CALL_METHOD(NULL, &parent, "removechild", &element);
 			continue;
 		}
 
-		phalcon_return_property(&element_attrs, &element, SL("attributes"));
-		phalcon_return_property(&tmp, &element_attrs, SL("length"));
+		phalcon_read_property(&element_attrs, &element, SL("attributes"), PH_READONLY);
+		phalcon_read_property(&tmp, &element_attrs, SL("length"), PH_READONLY);
 
 		element_attrs_length = Z_LVAL_P(&tmp);
 
@@ -435,17 +435,17 @@ void phalcon_xss_clean(zval *return_value, zval *str, zval *allow_tags, zval *al
 
 			PHALCON_CALL_METHOD(&element_attr, &element_attrs, "item", &t2);
 
-			phalcon_return_property(&element_attr_name, &element_attr, SL("nodeName"));
+			phalcon_read_property(&element_attr_name, &element_attr, SL("nodeName"), PH_READONLY);
 			if (Z_TYPE_P(allow_attributes) == IS_ARRAY && !phalcon_fast_in_array(&element_attr_name, allow_attributes)) {
 				PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", &element_attr);
 			} else if (phalcon_memnstr_str(&element_attr_name, SL("href")) || phalcon_memnstr_str(&element_attr_name, SL("href"))) {
-				phalcon_return_property(&element_attr_value, &element_attr, SL("nodeValue"));
+				phalcon_read_property(&element_attr_value, &element_attr, SL("nodeValue"), PH_READONLY);
 
 				if (phalcon_memnstr_str(&element_attr_value, SL("javascript:"))) {
 					PHALCON_CALL_METHOD(NULL, &element, "removeattributenode", &element_attr);
 				}
 			} else if (phalcon_memnstr_str(&element_attr_name, SL("style"))) {
-				phalcon_return_property(&element_attr_value, &element_attr, SL("nodeValue"));
+				phalcon_read_property(&element_attr_value, &element_attr, SL("nodeValue"), PH_READONLY);
 
 				RETURN_ON_FAILURE(phalcon_preg_match(&matched, &regexp, &element_attr_value, NULL));
 

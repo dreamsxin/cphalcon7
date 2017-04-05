@@ -178,7 +178,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 		/**
 		 * The full rows are dumped in this_ptr->rows
 		 */
-		phalcon_return_property(&rows, getThis(), SL("_rows"));
+		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_READONLY);
 		if (Z_TYPE(rows) == IS_ARRAY) {
 			phalcon_array_get_current(&row, &rows);
 			if (Z_TYPE(row) == IS_OBJECT) {

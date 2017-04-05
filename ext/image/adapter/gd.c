@@ -1265,10 +1265,10 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
 					return;
 				}
 				if (!phalcon_array_isset_fetch_long(&x, point, 0, PH_READONLY)) {
-					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY);
+					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY|PH_READONLY);
 				}
 				if (!phalcon_array_isset_fetch_long(&y, point, 0, PH_READONLY)) {
-					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY);
+					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY|PH_READONLY);
 				}
 				phalcon_array_append(&points, &x, PH_COPY);
 				phalcon_array_append(&points, &y, PH_COPY);

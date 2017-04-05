@@ -52,13 +52,13 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	return status;
 }
 
-int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index)
+int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index, int flags)
 {
 	zval z_index = {};
 	int status;
 	ZVAL_STR(&z_index, index);
 
-	status = phalcon_array_isset_fetch(fetched, arr, &z_index, 0);
+	status = phalcon_array_isset_fetch(fetched, arr, &z_index, flags);
 	return status;
 }
 
@@ -972,7 +972,7 @@ void phalcon_array_merge_recursive_n(zval *a1, zval *a2)
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset_fetch(&tmp, a1, &key, 0) || Z_TYPE_P(value) != IS_ARRAY) {
+		if (!phalcon_array_isset_fetch(&tmp, a1, &key, PH_READONLY) || Z_TYPE_P(value) != IS_ARRAY) {
 			phalcon_array_update(a1, &key, value, PH_COPY);
 		} else {
 			phalcon_array_merge_recursive_n(&tmp, value);

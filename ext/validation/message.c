@@ -268,10 +268,10 @@ PHP_METHOD(Phalcon_Validation_Message, __set_state){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_array_fetch_str(&message_text, message, SL("_message"), PH_NOISY);
-	phalcon_array_fetch_str(&field, message, SL("_field"), PH_NOISY);
-	phalcon_array_fetch_str(&type, message, SL("_type"), PH_NOISY);
-	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY);
+	phalcon_array_fetch_str(&message_text, message, SL("_message"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&field, message, SL("_field"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&type, message, SL("_type"), PH_NOISY|PH_READONLY);
+	phalcon_array_fetch_str(&code, message, SL("_code"), PH_NOISY|PH_READONLY);
 
 	object_init_ex(return_value, phalcon_validation_message_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &message_text, &field, &type, &code);

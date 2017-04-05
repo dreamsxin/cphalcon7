@@ -713,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, getReversedPaths){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_read_property(&paths, getThis(), SL("_paths"), PH_NOISY);
+	phalcon_read_property(&paths, getThis(), SL("_paths"), PH_NOISY|PH_READONLY);
 
 	array_init(return_value);
 

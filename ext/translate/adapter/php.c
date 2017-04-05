@@ -137,8 +137,8 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, query){
 	}
 
 	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&translation, &translate, index, 0)) {
-		PHALCON_CPY_WRT_CTOR(&translation, index);
+	if (!phalcon_array_isset_fetch(&translation, &translate, index, PH_READONLY)) {
+		ZVAL_COPY_VALUE(&translation, index);
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {

@@ -827,7 +827,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
-		phalcon_return_property(&offset, getThis(), SL("_offset"));
+		phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
 		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}

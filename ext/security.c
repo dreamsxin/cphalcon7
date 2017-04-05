@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Security, getSaltBytes)
 	if (number_bytes) {
 		i_bytes = phalcon_get_intval(number_bytes);
 	} else {
-		phalcon_return_property(&n, getThis(), SL("_numberBytes"));
+		phalcon_read_property(&n, getThis(), SL("_numberBytes"), PH_READONLY);
 		i_bytes = phalcon_get_intval(&n);
 	}
 
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Security, hash)
 
 	i_factor = phalcon_get_intval(work_factor);
 
-	phalcon_return_property(&default_hash, getThis(), SL("_defaultHash"));
+	phalcon_read_property(&default_hash, getThis(), SL("_defaultHash"), PH_READONLY);
 	i_hash = (Z_TYPE(default_hash) == IS_LONG) ? Z_LVAL(default_hash) : phalcon_get_intval(&default_hash);
 
 	switch (i_hash) {

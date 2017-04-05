@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, get){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &headers, name, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &headers, name, PH_COPY)) {
 		RETURN_FALSE;
 	}
 }

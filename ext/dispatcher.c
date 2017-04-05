@@ -467,7 +467,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
 	phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&param_value, &params, param, 0)) {
+	if (phalcon_array_isset_fetch(&param_value, &params, param, PH_READONLY)) {
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
 			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -477,7 +477,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 				return;
 			}
 
-			ZVAL_STRING(&service, ISV(filter));
+			ZVAL_STR(&service, IS(filter));
 
 			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
@@ -955,10 +955,10 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					}
 				} else {
 					PHALCON_CALL_METHOD(&var_name, reflection_parameter, "getname");
-					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, 0)) {
+					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, PH_COPY)) {
 						phalcon_array_update(&params, &var_name, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &var_name, 0);
-					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, PH_READONLY)) {
+					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, PH_COPY)) {
 						phalcon_array_update(&params, &key, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &key, 0);
 					} else if (count_action_params) {
@@ -1371,7 +1371,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(error_handlers) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, exception_code, 0)) {
+		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, exception_code, PH_READONLY)) {
 			RETURN_CTOR(&error_handler);
 		}
 	}
@@ -1501,7 +1501,7 @@ PHP_METHOD(Phalcon_Dispatcher, getPreviousParam){
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
 	phalcon_read_property(&params, getThis(), SL("_previousParams"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&param_value, &params, param, 0)) {
+	if (phalcon_array_isset_fetch(&param_value, &params, param, PH_READONLY)) {
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
 			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -1511,7 +1511,7 @@ PHP_METHOD(Phalcon_Dispatcher, getPreviousParam){
 				return;
 			}
 
-			ZVAL_STRING(&service, ISV(filter));
+			ZVAL_STR(&service, IS(filter));
 
 			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);

@@ -152,7 +152,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		array_init(&events);
 	}
 
-	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type, 0)) {
+	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type, PH_READONLY)) {
 		phalcon_read_property(&enable_priorities, getThis(), SL("_enablePriorities"), PH_READONLY);
 		if (zend_is_true(&enable_priorities)) {
 			/**
@@ -280,7 +280,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 		RETURN_FALSE;
 	}
 
-	if (!phalcon_array_isset_fetch(&queue, &events, type, 0)) {
+	if (!phalcon_array_isset_fetch(&queue, &events, type, PH_READONLY)) {
 		RETURN_FALSE;
 	}
 
@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
 
 			if (phalcon_is_equal_object(&handler_embeded, handler)) {
-				phalcon_array_unset(&priority_queue, &key, PH_COPY);
+				phalcon_array_unset(&priority_queue, &key, 0);
 			}
 
 		} ZEND_HASH_FOREACH_END();
@@ -349,7 +349,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
 
 	phalcon_read_property(&events, getThis(), SL("_events"), PH_READONLY);
 	if (Z_TYPE_P(type) != IS_NULL && phalcon_array_isset(&events, type)) {
-		phalcon_array_unset(&events, type, PH_COPY);
+		phalcon_array_unset(&events, type, 0);
 	}
 
 	phalcon_update_property(getThis(), SL("_events"), &events);
@@ -707,7 +707,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	 * Check if there are listeners for the all event type
 	 */
 	ZVAL_STRING(&any_type, "*");
-	if (phalcon_array_isset_fetch(&fire_events, &events, &any_type, 0)) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, &any_type, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/**
 			 * Create the event if it wasn't created before
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/**
 	 * Check if events are grouped by type
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, &type, 0)) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, &type, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/**
 			 * Create the event context
@@ -746,7 +746,7 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/**
 	 * Check if there are listeners for the event type itself
 	 */
-	if (phalcon_array_isset_fetch(&fire_events, &events, event_type, 0)) {
+	if (phalcon_array_isset_fetch(&fire_events, &events, event_type, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/**
 			 * Create the event if it wasn't created before
@@ -814,7 +814,7 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 
 	array_init(return_value);
 
-	phalcon_array_fetch(&queue, &events, type, PH_NOISY);
+	phalcon_array_fetch(&queue, &events, type, PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(full)) {
 		RETURN_CTOR(&queue);

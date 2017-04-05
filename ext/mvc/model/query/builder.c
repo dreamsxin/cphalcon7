@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 
 	switch (phalcon_get_intval(type)) {
 		case PHQL_T_SELECT:
-			ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForSelect));
+			ZVAL_STR(&service_name, IS(modelsQueryBuilderForSelect));
 			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
 				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name);
@@ -182,7 +182,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 			break;
 
 		case PHQL_T_INSERT:
-			ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForInsert));
+			ZVAL_STR(&service_name, IS(modelsQueryBuilderForInsert));
 			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
 				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
@@ -193,7 +193,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 			break;
 
 		case PHQL_T_UPDATE:
-			ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForUpdate));
+			ZVAL_STR(&service_name, IS(modelsQueryBuilderForUpdate));
 			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
 				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 			break;
 
 		case PHQL_T_DELETE:
-			ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForDelete));
+			ZVAL_STR(&service_name, IS(modelsQueryBuilderForDelete));
 			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
 				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, createSelectBuilder){
 		ZVAL_COPY_VALUE(&di, _di);
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForSelect));
+	ZVAL_STR(&service_name, IS(modelsQueryBuilderForSelect));
 	PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_mvc_model_query_builder_select_ce);
@@ -283,7 +283,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, createInsertBuilder){
 		ZVAL_COPY_VALUE(&di, _di);
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForInsert));
+	ZVAL_STR(&service_name, IS(modelsQueryBuilderForInsert));
 	PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_mvc_model_query_builder_insert_ce);
@@ -318,7 +318,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, createUpdateBuilder){
 		ZVAL_COPY_VALUE(&di, _di);
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForUpdate));
+	ZVAL_STR(&service_name, IS(modelsQueryBuilderForUpdate));
 	PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_mvc_model_query_builder_update_ce);
@@ -353,7 +353,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, createDeleteBuilder){
 		ZVAL_COPY_VALUE(&di, _di);
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsQueryBuilderForDelete));
+	ZVAL_STR(&service_name, IS(modelsQueryBuilderForDelete));
 	PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
@@ -524,11 +524,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
-	ZVAL_STRING(&service_name, ISV(modelsQuery));
+	ZVAL_STR(&service_name, IS(modelsQuery));
 
 	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 
-	if (zend_is_true(&has)) {;
+	if (zend_is_true(&has)) {
 		array_init(&args);
 		phalcon_array_append(&args, &phql, PH_COPY);
 		phalcon_array_append(&args, &dependency_injector, PH_COPY);

@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Flash_Session, message){
  */
 PHP_METHOD(Phalcon_Flash_Session, getMessages){
 
-	zval *type = NULL, *remove = NULL, messages = {}, return_messages = {}, do_remove = {};
+	zval *type = NULL, *remove = NULL, messages = {}, do_remove = {};
 
 	phalcon_fetch_params(0, 0, 2, &type, &remove);
 
@@ -183,13 +183,13 @@ PHP_METHOD(Phalcon_Flash_Session, getMessages){
 	PHALCON_CALL_METHOD(&messages, getThis(), "_getsessionmessages", &do_remove);
 	if (Z_TYPE(messages) == IS_ARRAY) {
 		if (likely(Z_TYPE_P(type) != IS_NULL)) {
-			if (phalcon_array_isset_fetch(&return_messages, &messages, type, 0)) {
+			if (phalcon_array_isset_fetch(return_value, &messages, type, PH_COPY)) {
 				if (zend_is_true(remove)) {
 					phalcon_array_unset(&messages, type, 0);
 					PHALCON_CALL_METHOD(NULL, getThis(), "_setsessionmessages", &messages);
 				}
 
-				RETURN_CTOR(&return_messages);
+				return;
 			}
 		} else {
 			RETURN_CTOR(&messages);

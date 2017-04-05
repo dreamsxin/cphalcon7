@@ -69,11 +69,11 @@ PHP_METHOD(Phalcon_Di_FactoryDefault_Cli, __construct){
 
 	shared = &PHALCON_GLOBAL(z_true);
 
-	ZVAL_STRING(&name, ISV(router));
+	ZVAL_STR(&name, IS(router));
 	ZVAL_STRING(&definition, "Phalcon\\Cli\\Router");
 	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 
-	ZVAL_STRING(&name, ISV(dispatcher));
+	ZVAL_STR(&name, IS(dispatcher));
 	ZVAL_STRING(&definition, "Phalcon\\Cli\\Dispatcher");
 	PHALCON_CALL_SELF(NULL, "set", &name, &definition, shared);
 }

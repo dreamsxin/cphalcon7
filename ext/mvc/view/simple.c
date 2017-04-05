@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_return_property(&engines, getThis(), SL("_engines"));
+	phalcon_read_property(&engines, getThis(), SL("_engines"), PH_READONLY);
 
 	/**
 	 * If the engines aren't initialized 'engines' is false
@@ -616,7 +616,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 
 	phalcon_ob_end_clean();
 
-	phalcon_return_property(&content, getThis(), SL("_content"));
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_READONLY);
 
 	RETURN_CTOR(&content);
 }
@@ -763,7 +763,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, getCache){
 
 	zval cache = {};
 
-	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 
 	if (zend_is_true(&cache)) {
 		if (Z_TYPE(cache) != IS_OBJECT) {
@@ -1058,7 +1058,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, __get){
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &params, key, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &params, key, PH_COPY)) {
 		RETURN_NULL();
 	}
 }

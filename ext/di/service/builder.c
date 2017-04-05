@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 		return;
 	}
 
-	phalcon_array_fetch_str(&class_name, definition, SL("className"), PH_NOISY);
+	phalcon_array_fetch_str(&class_name, definition, SL("className"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE_P(parameters) == IS_ARRAY) {
 		/**
 		 * Build the instance overriding the definition constructor parameters
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 				return;
 			}
 
-			phalcon_array_fetch_str(&method_name, method, SL("method"), PH_NOISY);
+			phalcon_array_fetch_str(&method_name, method, SL("method"), PH_NOISY|PH_READONLY);
 
 			/**
 			 * Create the method call
@@ -395,8 +395,8 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 				return;
 			}
 
-			phalcon_array_fetch_str(&property_name, property, SL("name"), PH_NOISY);
-			phalcon_array_fetch_str(&property_value, property, SL("value"), PH_NOISY);
+			phalcon_array_fetch_str(&property_name, property, SL("name"), PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_str(&property_value, property, SL("value"), PH_NOISY|PH_READONLY);
 
 			/**
 			 * Resolve the parameter

@@ -161,7 +161,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 
-	zval is_exact = {};
+	zval is_exact = {}, handler_name = {};
 
 	phalcon_read_property(&is_exact, getThis(), SL("_isExactHandler"), PH_NOISY|PH_READONLY);
 
@@ -169,11 +169,11 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
 		RETURN_MEMBER(getThis(), "_handlerName");
 	}
 
-	phalcon_return_property(return_value, getThis(), SL("_handlerName"));
-	if (likely(Z_TYPE_P(return_value) == IS_STRING) && Z_STRLEN_P(return_value) > 1) {
-		if (Z_STRVAL_P(return_value)[0] == '\\') {
-			char *c = Z_STRVAL_P(return_value);
-			int len = Z_STRLEN_P(return_value);
+	phalcon_read_property(&handler_name, getThis(), SL("_handlerName"), PH_READONLY);
+	if (likely(Z_TYPE(handler_name) == IS_STRING) && Z_STRLEN(handler_name) > 1) {
+		if (Z_STRVAL(handler_name)[0] == '\\') {
+			char *c = Z_STRVAL(handler_name);
+			int len = Z_STRLEN(handler_name);
 			memmove(c, c+1, len); /* This will include the trailing zero */
 			RETVAL_STRINGL(c, len - 1);
 		}
@@ -204,7 +204,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(error_handlers) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, code, 0)) {
+		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, code, PH_READONLY)) {
 			PHALCON_CALL_SELF(NULL, "forward", &error_handler);
 			phalcon_read_property(&previous_namespace_name, getThis(), SL("_previousNamespaceName"), PH_NOISY|PH_READONLY);
 			phalcon_read_property(&previous_controller_name, getThis(), SL("_previousHandlerName"), PH_NOISY|PH_READONLY);
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 		return;
 	}
 
-	ZVAL_STRING(&service, ISV(response));
+	ZVAL_STR(&service, IS(response));
 
 	PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);

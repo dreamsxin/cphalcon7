@@ -470,7 +470,7 @@ PHP_METHOD(Phalcon_Forms_Element, getAttribute){
 	}
 
 	phalcon_read_property(&attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &attributes, attribute, 0)) {
+	if (phalcon_array_isset_fetch(&value, &attributes, attribute, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 
@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Forms_Element, getUserOption){
 	}
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &options, option, 0)) {
+	if (phalcon_array_isset_fetch(&value, &options, option, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 
@@ -630,7 +630,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	phalcon_fetch_params(0, 0, 1, &attributes);
 
-	phalcon_return_property(&label, getThis(), SL("_label"));
+	phalcon_read_property(&label, getThis(), SL("_label"), PH_READONLY);
 
 	/**
 	 * Check if there is an 'id' attribute defined
@@ -728,7 +728,7 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 	 * Assign the default value if there is no form available
 	 */
 	if (Z_TYPE(value) <= IS_NULL) {
-		 phalcon_return_property(&value, getThis(), SL("_value"));
+		 phalcon_read_property(&value, getThis(), SL("_value"), PH_READONLY);
 	}
 
 	RETURN_CTOR(&value);
@@ -813,7 +813,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_return_property(&messages, getThis(), SL("_messages"));
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_READONLY);
 	if (Z_TYPE(messages) != IS_OBJECT) {
 		object_init_ex(&messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, &messages, "__construct");

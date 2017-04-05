@@ -198,21 +198,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check for a username or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"), PH_COPY)) {
 		phalcon_array_unset_str(&descriptor, SL("username"), 0);
 	}
 
 	/**
 	 * Check for a password or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_COPY)) {
 		phalcon_array_unset_str(&descriptor, SL("password"), 0);
 	}
 
 	/**
 	 * Check if the developer has defined custom options or create one from scratch
 	 */
-	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"), PH_COPY)) {
 		phalcon_array_unset_str(&descriptor, SL("options"), 0);
 	} else {
 		array_init(&options);
@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check if the connection must be persistent
 	 */
-	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_COPY)) {
 		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
 		if (zend_is_true(&persistent)) {
 			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, PH_COPY);

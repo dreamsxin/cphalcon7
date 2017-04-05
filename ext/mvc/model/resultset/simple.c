@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			ZVAL_FALSE(&row);
 		}
 	} else {
-		phalcon_return_property(&rows, getThis(), SL("_rows"));
+		phalcon_read_property(&rows, getThis(), SL("_rows"), PH_READONLY);
 		if (Z_TYPE(rows) != IS_ARRAY) {
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		case 0:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsModels"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, 0)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
 				/**
 				 * this_ptr->model is the base entity
 				 */
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		default:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsOthers"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, 0)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
 				/**
 				 * Other kinds of hydrations
 				 */

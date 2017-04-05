@@ -165,7 +165,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	zval session = {}, dependency_injector = {}, service = {}, name = {}, data = {};
 
-	phalcon_return_property(&session, getThis(), SL("_session"));
+	phalcon_read_property(&session, getThis(), SL("_session"), PH_READONLY);
 	if (Z_TYPE(session) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -180,7 +180,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 		phalcon_update_property(getThis(), SL("_session"), &session);
 	}
 
-	phalcon_return_property(&name, getThis(), SL("_name"));
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_READONLY);
 
 	PHALCON_CALL_METHOD(&data, &session, "__get", &name);
 

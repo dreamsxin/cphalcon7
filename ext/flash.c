@@ -263,12 +263,12 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 
 	phalcon_fetch_params(0, 2, 0, &type, &message);
 
-	phalcon_return_property(&automatic_html, getThis(), SL("_automaticHtml"));
+	phalcon_read_property(&automatic_html, getThis(), SL("_automaticHtml"), PH_READONLY);
 	flag_automatic_html = zend_is_true(&automatic_html);
 	if (flag_automatic_html) {
-		phalcon_return_property(&classes, getThis(), SL("_cssClasses"));
+		phalcon_read_property(&classes, getThis(), SL("_cssClasses"), PH_READONLY);
 
-		if (phalcon_array_isset_fetch(&type_classes, &classes, type, 0)) {
+		if (phalcon_array_isset_fetch(&type_classes, &classes, type, PH_READONLY)) {
 			if (Z_TYPE(type_classes) == IS_ARRAY) {
 				phalcon_fast_join_str(&joined_classes, SL(" "), &type_classes);
 
@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		}
 	}
 
-	phalcon_return_property(&implicit_flush, getThis(), SL("_implicitFlush"));
+	phalcon_read_property(&implicit_flush, getThis(), SL("_implicitFlush"), PH_READONLY);
 	flag_implicit_flush = zend_is_true(&implicit_flush);
 	if (Z_TYPE_P(message) == IS_ARRAY) {
 		/**

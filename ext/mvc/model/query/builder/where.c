@@ -285,7 +285,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 	zval model_instance = {}, primary_keys = {}, first_primary_key = {}, column_map = {}, attribute_field = {}, exception_message = {};
 	zend_class_entry *ce0;
 
-	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
+	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
 
 	if (phalcon_is_numeric(&conditions)) {
 		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));

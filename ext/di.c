@@ -431,7 +431,6 @@ PHP_METHOD(Phalcon_Di, get){
 	zend_class_entry *ce;
 
 	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -501,7 +500,6 @@ PHP_METHOD(Phalcon_Di, getShared){
 	zval *name, *parameters = NULL, *noerror = NULL;
 
 	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -536,7 +534,6 @@ PHP_METHOD(Phalcon_Di, has){
 	zval *name;
 
 	phalcon_fetch_params(0, 1, 0, &name);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	if (phalcon_isset_property_array(getThis(), SL("_services"), name)) {
 		RETURN_TRUE;

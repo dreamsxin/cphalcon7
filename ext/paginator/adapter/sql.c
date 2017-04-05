@@ -151,7 +151,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	if (Z_TYPE(dbname) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", &dbname);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&db, &dbname);
+		ZVAL_COPY_VALUE(&db, &dbname);
 	}
 
 	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
@@ -282,13 +282,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	long int i_total_pages, i_next;
 	ldiv_t tp;
 
-	phalcon_return_property(&db, getThis(), SL("_db"));
-	phalcon_return_property(&sql, getThis(), SL("_sql"));
-	phalcon_return_property(&total_sql, getThis(), SL("_total_sql"));
-	phalcon_return_property(&bind, getThis(), SL("_bind"));
-	phalcon_return_property(&limit, getThis(), SL("_limitRows"));
-	phalcon_return_property(&number_page, getThis(), SL("_page"));
-	phalcon_return_property(&fetch_mode, getThis(), SL("_fetchMode"));
+	phalcon_read_property(&db, getThis(), SL("_db"), PH_READONLY);
+	phalcon_read_property(&sql, getThis(), SL("_sql"), PH_READONLY);
+	phalcon_read_property(&total_sql, getThis(), SL("_total_sql"), PH_READONLY);
+	phalcon_read_property(&bind, getThis(), SL("_bind"), PH_SEPARATE);
+	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_READONLY);
+	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_READONLY);
+	phalcon_read_property(&fetch_mode, getThis(), SL("_fetchMode"), PH_READONLY);
 
 	i_limit       = phalcon_get_intval(&limit);
 	i_number_page = phalcon_get_intval(&number_page);
@@ -307,9 +307,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	PHALCON_CALL_METHOD(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
 
-	phalcon_return_property(&rowcount, &row, SL("rowcount"));
+	phalcon_read_property(&rowcount, &row, SL("rowcount"), PH_READONLY);
 
-	PHALCON_SEPARATE(&bind);
 	/* Set the limit clause avoiding negative offsets */
 	if (i_number < i_limit) {
 		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);

@@ -47,8 +47,8 @@ static inline int phalcon_intrusive_avltree_node_compare(phalcon_avltree_node * 
 	aobject = phalcon_intrusive_avltree_node_object_from_node(a);
 	bobject = phalcon_intrusive_avltree_node_object_from_node(b);
 
-	phalcon_read_object_property(&av, &aobject->std, SL("_value"), PH_NOISY);
-	phalcon_read_object_property(&bv, &bobject->std, SL("_value"), PH_NOISY);
+	phalcon_read_object_property(&av, &aobject->std, SL("_value"), PH_NOISY|PH_READONLY);
+	phalcon_read_object_property(&bv, &bobject->std, SL("_value"), PH_NOISY|PH_READONLY);
 	return phalcon_compare(&av, &bv);
 }
 

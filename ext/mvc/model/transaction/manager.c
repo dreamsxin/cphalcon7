@@ -251,7 +251,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, get){
 
 	phalcon_read_property(&initialized, getThis(), SL("_initialized"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&initialized)) {
-		phalcon_return_property(&rollback_pendent, getThis(), SL("_rollbackPendent"));
+		phalcon_read_property(&rollback_pendent, getThis(), SL("_rollbackPendent"), PH_READONLY);
 		if (zend_is_true(&rollback_pendent)) {
 			array_init_size(&rollback_pendent, 2);
 			phalcon_array_append(&rollback_pendent, getThis(), PH_COPY);

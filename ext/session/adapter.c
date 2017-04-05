@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getOptions){
  */
 PHP_METHOD(Phalcon_Session_Adapter, get){
 
-	zval *index, *default_value = NULL, *remove = NULL, unique_id = {}, key = {}, *_SESSION, value = {};
+	zval *index, *default_value = NULL, *remove = NULL, unique_id = {}, key = {}, *_SESSION;
 
 	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
 
@@ -272,14 +272,14 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
-	if (phalcon_array_isset_fetch(&value, _SESSION, &key, 0)) {
+	if (phalcon_array_isset_fetch(return_value, _SESSION, &key, PH_COPY)) {
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, &key, 0);
 			if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY) {
 				zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
 			}
 		}
-		RETURN_CTOR(&value);
+		return;
 	}
 
 	RETURN_CTOR(default_value);

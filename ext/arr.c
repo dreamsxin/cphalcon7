@@ -431,7 +431,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 				convert_to_long(&key);
 			}
 
-			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, 0)) {
+			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, PH_READONLY)) {
 				ZVAL_COPY_VALUE(&cpy_array, &v);
 			} else {
 				array_init(&v);
@@ -448,7 +448,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 		if (zend_is_true(flag)) {
 			zval v = {};
-			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, 0)) {
+			if (phalcon_array_isset_fetch(&v, &cpy_array, &key, PH_READONLY)) {
 				if (Z_TYPE(v) != IS_ARRAY) {
 					convert_to_array(&v);
 				}
@@ -548,14 +548,14 @@ PHP_METHOD(Phalcon_Arr, get){
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
 				zval value0 = {};
-				if (phalcon_array_isset_fetch(&value0, array, key, 0)) {
+				if (phalcon_array_isset_fetch(&value0, array, key, PH_READONLY)) {
 					phalcon_array_update(return_value, key, &value0, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
 			if (phalcon_fast_count_ev(return_value)) {
 				return;
 			}
-		} else if (phalcon_array_isset_fetch(&value, array, keys, 0)) {
+		} else if (phalcon_array_isset_fetch(&value, array, keys, PH_READONLY)) {
 			RETURN_CTOR(&value);
 		}
 	} else if (Z_TYPE_P(array) == IS_OBJECT) {
@@ -666,7 +666,7 @@ PHP_METHOD(Phalcon_Arr, pluck){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), row) {
 		zval value = {};
-		if (phalcon_array_isset_fetch(&value, row, key, 0)) {
+		if (phalcon_array_isset_fetch(&value, row, key, PH_READONLY)) {
 			phalcon_array_append(return_value, &value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
@@ -797,7 +797,7 @@ PHP_METHOD(Phalcon_Arr, merge){
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
-			if (Z_TYPE_P(value) == IS_ARRAY && phalcon_array_isset_fetch(&value1, array1, &tmp, 0)) {
+			if (Z_TYPE_P(value) == IS_ARRAY && phalcon_array_isset_fetch(&value1, array1, &tmp, PH_READONLY)) {
 				if (Z_TYPE(value1) == IS_ARRAY) {
 					PHALCON_CALL_SELF(&arr, "merge", &value1, value);
 

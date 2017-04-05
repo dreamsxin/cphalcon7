@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
 	zval cache = {}, tmp = {};
 
-	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 
 	if (Z_TYPE(cache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&tmp, getThis(), "getresolveservice", &cache);

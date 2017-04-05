@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 	phalcon_fetch_params(0, 2, 0, &type, &resource);
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&collection, &collections, type, 0)) {
+	if (!phalcon_array_isset_fetch(&collection, &collections, type, PH_READONLY)) {
 		object_init_ex(&collection, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), type, &collection);
 	}
@@ -403,7 +403,7 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
 	phalcon_fetch_params(0, 1, 0, &id);
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &collections, id, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &collections, id, PH_COPY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "The collection does not exist in the manager");
 		return;
 	}
@@ -466,7 +466,7 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &collections, name, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &collections, name, PH_COPY)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), name, return_value);
 	}
@@ -530,14 +530,14 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * The source base path is a global location where all resources are located
 			 */
 			if (phalcon_array_isset_str(&options, SL("sourceBasePath"))) {
-				phalcon_array_fetch_str(&source_base_path, &options, SL("sourceBasePath"), PH_NOISY);
+				phalcon_array_fetch_str(&source_base_path, &options, SL("sourceBasePath"), PH_NOISY|PH_READONLY);
 			}
 
 			/**
 			 * The target base path is a global location where all resources are written
 			 */
 			if (phalcon_array_isset_str(&options, SL("targetBasePath"))) {
-				phalcon_array_fetch_str(&target_base_path, &options, SL("targetBasePath"), PH_NOISY);
+				phalcon_array_fetch_str(&target_base_path, &options, SL("targetBasePath"), PH_NOISY|PH_READONLY);
 			}
 		}
 

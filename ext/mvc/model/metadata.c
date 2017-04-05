@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	phalcon_get_class(&class_name, model, 0);
 
-	phalcon_return_property(&meta_data, getThis(), SL("_metaData"));
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_READONLY);
 	if (Z_TYPE(meta_data) != IS_ARRAY) {
 		array_init(&meta_data);
 	}
@@ -247,11 +247,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		/**
 		 * Check for a column map, store in _columnMap in order and reversed order
 		 */
-		phalcon_return_property(&column_map, getThis(), SL("_columnMap"));
+		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_READONLY);
 
 		if (Z_TYPE(column_map) != IS_ARRAY) {
 			array_init(&column_map);
-		} else if (phalcon_array_isset_fetch(&model_column_map, &column_map, key, 0) && Z_TYPE(model_column_map) != IS_NULL) {
+		} else if (phalcon_array_isset_fetch(&model_column_map, &column_map, key, PH_READONLY) && Z_TYPE(model_column_map) != IS_NULL) {
 			return;
 		}
 

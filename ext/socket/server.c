@@ -383,7 +383,7 @@ PHP_METHOD(Phalcon_Socket_Server, getClient){
 
 	phalcon_fetch_params(0, 1, 0, &socket_id);
 
-	phalcon_read_property_array(return_value, getThis(), SL("_clients"), socket_id, 0);
+	phalcon_read_property_array(return_value, getThis(), SL("_clients"), socket_id, PH_COPY);
 }
 
 /**

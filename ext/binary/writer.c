@@ -93,6 +93,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedint16, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
+	ZEND_ARG_TYPE_INFO(0, endian, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeint, 0, 0, 1)
@@ -109,6 +110,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedint32, 0, 0, 1)
 	ZEND_ARG_INFO(0, num)
+	ZEND_ARG_TYPE_INFO(0, endian, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writefloat, 0, 0, 1)
@@ -349,13 +351,18 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 
-	zval *num, length = {}, endian = {}, format = {}, result = {};
+	zval *_endian = NULL, *num, length = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(0, 1, 1, &num, &_endian);
+
+	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
+		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&endian, _endian);
+	}
 
 	ZVAL_LONG(&length, 2);
 
-	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
 		ZVAL_STRING(&format, "n");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
@@ -436,13 +443,18 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 
-	zval *num, length = {}, endian = {}, format = {}, result = {};
+	zval *_endian = NULL, *num, length = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(0, 1, 1, &num, &_endian);
+
+	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
+		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&endian, _endian);
+	}
 
 	ZVAL_LONG(&length, 4);
 
-	phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
 		ZVAL_STRING(&format, "N");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {

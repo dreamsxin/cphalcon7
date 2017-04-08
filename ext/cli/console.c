@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	if (!_arguments) {
 		array_init(&arguments);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&arguments, _arguments);
+		ZVAL_COPY_VALUE(&arguments, _arguments);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);

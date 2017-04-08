@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 	}
 
 	if (_local) {
-		PHALCON_CPY_WRT_CTOR(&local, _local);
+		ZVAL_COPY_VALUE(&local, _local);
 	} else {
 		ZVAL_TRUE(&local);
 	}

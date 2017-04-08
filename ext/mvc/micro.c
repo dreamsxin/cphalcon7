@@ -78,7 +78,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, mount);
 PHP_METHOD(Phalcon_Mvc_Micro, notFound);
 PHP_METHOD(Phalcon_Mvc_Micro, getRouter);
 PHP_METHOD(Phalcon_Mvc_Micro, setService);
-PHP_METHOD(Phalcon_Mvc_Micro, hasService);
+PHP_METHOD(Phalcon_Mvc_Micro, offsetExists);
 PHP_METHOD(Phalcon_Mvc_Micro, getService);
 PHP_METHOD(Phalcon_Mvc_Micro, getSharedService);
 PHP_METHOD(Phalcon_Mvc_Micro, handle);
@@ -152,7 +152,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_setservice, 0, 0, 2)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_hasservice, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_offsetexists, 0, 0, 1)
 	ZEND_ARG_INFO(0, serviceName)
 ZEND_END_ARG_INFO()
 
@@ -211,7 +211,6 @@ static const zend_function_entry phalcon_mvc_micro_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Micro, notFound, arginfo_phalcon_mvc_micro_notfound, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getRouter, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, setService, arginfo_phalcon_mvc_micro_setservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Micro, hasService, arginfo_phalcon_mvc_micro_hasservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getService, arginfo_phalcon_mvc_micro_getservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getSharedService, arginfo_phalcon_mvc_micro_getsharedservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, handle, arginfo_phalcon_mvc_micro_handle, ZEND_ACC_PUBLIC)
@@ -219,7 +218,7 @@ static const zend_function_entry phalcon_mvc_micro_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Micro, setActiveHandler, arginfo_phalcon_mvc_micro_setactivehandler, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getActiveHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getReturnedValue, NULL, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_Mvc_Micro, offsetExists, hasService, arginfo_phalcon_mvc_micro_hasservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Micro, offsetExists, arginfo_phalcon_mvc_micro_offsetexists, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Mvc_Micro, offsetSet, setService, arginfo_phalcon_mvc_micro_setservice, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Mvc_Micro, offsetGet, getService, arginfo_phalcon_mvc_micro_getservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, offsetUnset, arginfo_phalcon_mvc_micro_offsetunset, ZEND_ACC_PUBLIC)
@@ -591,19 +590,13 @@ PHP_METHOD(Phalcon_Mvc_Micro, setService){
  * @param string $serviceName
  * @return boolean
  */
-PHP_METHOD(Phalcon_Mvc_Micro, hasService){
+PHP_METHOD(Phalcon_Mvc_Micro, offsetExists){
 
-	zval *service_name, dependency_injector = {};
+	zval *service_name;
 
 	phalcon_fetch_params(0, 1, 0, &service_name);
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_micro_exception_ce, "A dependency injection container is required to access related dispatching services");
-		return;
-	}
-
-	PHALCON_RETURN_CALL_METHOD(&dependency_injector, "has", service_name);
+	PHALCON_RETURN_CALL_PARENT(phalcon_mvc_micro_ce, getThis(), "hasservice", service_name);
 }
 
 /**
@@ -1021,15 +1014,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, getReturnedValue){
 
 	RETURN_MEMBER(getThis(), "_returnedValue");
 }
-
-/**
- * Check if a service is registered in the internal services container using the array syntax.
- * Alias for Phalcon\Mvc\Micro::hasService()
- *
- * @param string $alias
- * @return boolean
- */
-PHALCON_DOC_METHOD(Phalcon_Mvc_Micro, offsetExists);
 
 /**
  * Allows to register a shared service in the internal services container using the array syntax.

@@ -374,7 +374,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		/* Check if the returned object is already a response */
 		if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_http_responseinterface_ce, 1)) {
-			PHALCON_CPY_WRT_CTOR(&response, &possible_response);
+			ZVAL_COPY_VALUE(&response, &possible_response);
 			ZVAL_TRUE(&returned_response);
 		} else {
 			ZVAL_STR(&service, IS(response));
@@ -502,7 +502,7 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 	if (!_dependency_injector || Z_TYPE_P(_dependency_injector) == IS_NULL) {
 		ZVAL_OBJ(&dependency_injector_new, zend_objects_clone_obj(&dependency_injector));
 	} else {
-		PHALCON_CPY_WRT_CTOR(&dependency_injector_new, _dependency_injector);
+		ZVAL_COPY_VALUE(&dependency_injector_new, _dependency_injector);
 	}
 
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_di_ce, "setdefault", &dependency_injector_new);

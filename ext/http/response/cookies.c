@@ -198,31 +198,31 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	if (!_expire) {
 		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&expire, _expire);
+		ZVAL_COPY_VALUE(&expire, _expire);
 	}
 
 	if (!_path) {
 		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&path, _path);
+		ZVAL_COPY_VALUE(&path, _path);
 	}
 
 	if (!_secure) {
 		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&secure, _secure);
+		ZVAL_COPY_VALUE(&secure, _secure);
 	}
 
 	if (!_domain) {
 		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&domain, _domain);
+		ZVAL_COPY_VALUE(&domain, _domain);
 	}
 
 	if (!_http_only) {
 		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
+		ZVAL_COPY_VALUE(&http_only, _http_only);
 	}
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);

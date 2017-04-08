@@ -595,7 +595,7 @@ PHP_METHOD(Phalcon_Websocket_Server, on)
 	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
 			PHALCON_CALL_CE_STATIC(&callback, zend_ce_closure, "bind", func, getThis());
 	} else {
-		PHALCON_CPY_WRT_CTOR(&callback, func);
+		ZVAL_COPY_VALUE(&callback, func);
 	}
 
 	event = Z_LVAL_P(ev);

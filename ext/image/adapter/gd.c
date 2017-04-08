@@ -381,11 +381,11 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _rotate) {
 
-	zval *_degrees, degrees = {}, image = {}, tmp_image = {}, color = {}, alpha = {}, transparent = {}, ignore_transparent = {}, saveflag = {}, w = {}, h = {};
+	zval *degrees, image = {}, tmp_image = {}, color = {}, alpha = {}, transparent = {}, ignore_transparent = {}, saveflag = {}, w = {}, h = {};
 	int tmp_degrees;
 
-	phalcon_fetch_params(0, 1, 0, &_degrees);
-	PHALCON_CPY_WRT_CTOR(&degrees, _degrees);
+	phalcon_fetch_params(0, 1, 0, &degrees);
+	PHALCON_SEPARATE_PARAM(degrees);
 
 	ZVAL_LONG(&color, 0);
 	ZVAL_LONG(&alpha, 127);
@@ -394,12 +394,12 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _rotate) {
 
 	PHALCON_CALL_FUNCTION(&transparent, "imagecolorallocatealpha", &image, &color, &color, &color, &alpha);
 
-	tmp_degrees = phalcon_get_intval(&degrees);
+	tmp_degrees = phalcon_get_intval(degrees);
 
-	ZVAL_LONG(&degrees, 360 - tmp_degrees);
+	ZVAL_LONG(degrees, 360 - tmp_degrees);
 	ZVAL_LONG(&ignore_transparent, 1);
 
-	PHALCON_CALL_FUNCTION(&tmp_image, "imagerotate", &image, &degrees, &transparent, &ignore_transparent);
+	PHALCON_CALL_FUNCTION(&tmp_image, "imagerotate", &image, degrees, &transparent, &ignore_transparent);
 
 	ZVAL_TRUE(&saveflag);
 
@@ -520,13 +520,12 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _sharpen) {
  */
 PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 
-	zval *_height, *opacity, *fade_in, height = {}, tmp = {}, reflection  = {}, line = {}, image = {}, image_width = {}, image_height = {}, dst = {}, filtertype = {};
+	zval *height, *opacity, *fade_in, tmp = {}, reflection  = {}, line = {}, image = {}, image_width = {}, image_height = {}, dst = {}, filtertype = {};
 	int h0, h1, tmp_opacity, int_opacity, offset;
 	double stepping;
 
-	phalcon_fetch_params(0, 3, 0, &_height, &opacity, &fade_in);
-
-	PHALCON_CPY_WRT_CTOR(&height, _height);
+	phalcon_fetch_params(0, 3, 0, &height, &opacity, &fade_in);
+	PHALCON_SEPARATE_PARAM(height);
 
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
 	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
@@ -536,7 +535,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 		return;
 	}
 
-	h0 = phalcon_get_intval(&height);
+	h0 = phalcon_get_intval(height);
 	h1 = phalcon_get_intval(&image_height);
 
 	if (unlikely(h0 == 0)) {
@@ -557,9 +556,9 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _reflection) {
 		stepping = 127 / h0;
 	}
 
-	ZVAL_DOUBLE(&height, h0 + h1);
+	ZVAL_DOUBLE(height, h0 + h1);
 
-	PHALCON_CALL_METHOD(&reflection, getThis(), "_create", &image_width, &height);
+	PHALCON_CALL_METHOD(&reflection, getThis(), "_create", &image_width, height);
 
 	ZVAL_LONG(&dst, 0);
 

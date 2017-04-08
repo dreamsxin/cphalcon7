@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 		RETURN_FALSE;
 	}
 
-	PHALCON_CPY_WRT_CTOR(return_value, &ctx->data);
+	ZVAL_COPY(return_value, &ctx->data);
 
 	if (ctx->is_response == 0) {
 		add_assoc_string(return_value, "REQUEST_METHOD", (char*)http_method_str(ctx->parser.method));

@@ -516,7 +516,7 @@ PHP_METHOD(Phalcon_Http_Request, getServer){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(return_value, _SERVER, name, PH_COPY)) {
 		RETURN_NULL();
 	}
 }

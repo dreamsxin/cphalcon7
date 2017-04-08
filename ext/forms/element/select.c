@@ -101,7 +101,7 @@ PHP_METHOD(Phalcon_Forms_Element_Select, __construct){
 	if (!_type || PHALCON_IS_EMPTY(_type)) {
 		ZVAL_STRING(&type, "select");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_forms_element_select_ce, getThis(), "__construct", name, attributes, options, options_values, &type);
@@ -150,12 +150,11 @@ PHP_METHOD(Phalcon_Forms_Element_Select, addOption){
 	phalcon_read_property(&values, getThis(), SL("_optionsValues"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(values) != IS_ARRAY) {
-		PHALCON_CPY_WRT_CTOR(&tmp, option);
+		ZVAL_COPY_VALUE(&tmp, option);
 	} else {
 		add_function(&tmp, option, &values);
 	}
 
-	Z_TRY_ADDREF(tmp);
 	phalcon_update_property(getThis(), SL("_optionsValues"), &tmp);
 	RETURN_THIS();
 }

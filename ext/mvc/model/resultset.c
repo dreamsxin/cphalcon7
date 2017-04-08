@@ -840,9 +840,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, jsonSerialize) {
 
-	zval records = {};
-
-	array_init(&records);
+	array_init(return_value);
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "rewind");
 
@@ -865,12 +863,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, jsonSerialize) {
 		if (status) {
 			PHALCON_CALL_METHOD(&jsondata, &current, "jsonserialize");
 
-			phalcon_array_append(&records, &jsondata, PH_SEPARATE);
+			phalcon_array_append(return_value, &jsondata, PH_COPY);
 		} else {
-			phalcon_array_append(&records, &current, PH_SEPARATE);
+			phalcon_array_append(return_value, &current, PH_COPY);
 		}
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
-
-	RETURN_CTOR(&records);
 }

@@ -136,7 +136,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 	if (!_options || Z_TYPE_P(_options) == IS_NULL) {
 		array_init_size(&options, 4);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&options, _options);
+		ZVAL_DUP(&options, _options);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {
@@ -559,7 +559,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (!phalcon_array_isset_fetch_str(return_value, &options, SL("statsKey"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(return_value, &options, SL("statsKey"), PH_COPY)) {
 		RETURN_NULL();
 	}
 }

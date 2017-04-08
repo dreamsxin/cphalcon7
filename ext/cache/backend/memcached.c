@@ -139,7 +139,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 	if (!opts || Z_TYPE_P(opts) == IS_NULL) {
 		array_init(&options);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&options, opts);
+		ZVAL_DUP(&options, opts);
 	}
 
 	if (!phalcon_array_isset_str(&options, SL("servers"))) {

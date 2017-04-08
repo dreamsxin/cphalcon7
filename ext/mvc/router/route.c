@@ -254,7 +254,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 
 	phalcon_fetch_params(0, 1, 1, &pattern, &regex);
 
-	PHALCON_CPY_WRT_CTOR(&compiled_pattern, pattern);
+	ZVAL_DUP(&compiled_pattern, pattern);
 
 	if (!regex) {
 		regex = &PHALCON_GLOBAL(z_null);

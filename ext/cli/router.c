@@ -219,7 +219,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 			array_init(&options);
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&options, arguments);
+		ZVAL_DUP(&options, arguments);
 	}
 
 	/**

@@ -214,20 +214,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 
 	phalcon_fetch_params(0, 0, 1, &uri);
 
-	if (!uri) {
-		uri = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (!zend_is_true(uri)) {
-		/**
-		 * If 'uri' isn't passed as parameter it reads $_GET['_url']
-		 */
+	if (!uri || Z_TYPE_P(uri) == IS_NULL) {
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&real_uri, uri);
+		ZVAL_COPY_VALUE(&real_uri, uri);
 	}
 
-	ZVAL_STRING(&service, "annotations");
+	ZVAL_STR(&service, IS(annotations));
 
 	PHALCON_CALL_METHOD(&annotations_service, getThis(), "getresolveservice", &service);
 	PHALCON_VERIFY_INTERFACE(&annotations_service, phalcon_annotations_adapterinterface_ce);
@@ -267,7 +260,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 						 */
 						phalcon_get_ns_class(&namespace_name, &handler, 0);
 					} else {
-						PHALCON_CPY_WRT_CTOR(&controller_name, &handler);
+						ZVAL_COPY_VALUE(&controller_name, &handler);
 					}
 
 					phalcon_update_property_null(getThis(), SL("_routePrefix"));
@@ -453,9 +446,9 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, processActionAnnotation){
 				PHALCON_CONCAT_VV(&uri, &route_prefix, &value);
 			} else {
 				if (Z_TYPE(route_prefix) != IS_NULL) {
-					PHALCON_CPY_WRT_CTOR(&uri, &route_prefix);
+					ZVAL_COPY_VALUE(&uri, &route_prefix);
 				} else {
-					PHALCON_CPY_WRT_CTOR(&uri, &value);
+					ZVAL_COPY_VALUE(&uri, &value);
 				}
 			}
 		} else {

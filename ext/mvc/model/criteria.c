@@ -281,7 +281,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bind) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bindTypes) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_types);
@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -554,7 +554,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -607,7 +607,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 	if (!PHALCON_IS_EMPTY(&current_conditions)) {
 		PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") AND (", conditions, ")");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&new_conditions, conditions);
+		ZVAL_COPY_VALUE(&new_conditions, conditions);
 	}
 
 	phalcon_update_property(getThis(), SL("_conditions"), &new_conditions);
@@ -620,7 +620,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -634,7 +634,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -675,7 +675,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 	if (!PHALCON_IS_EMPTY(&current_conditions)) {
 		PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") OR (", conditions, ")");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&new_conditions, conditions);
+		ZVAL_COPY_VALUE(&new_conditions, conditions);
 	}
 
 	phalcon_update_property(getThis(), SL("_conditions"), &new_conditions);
@@ -688,7 +688,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -1274,7 +1274,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 			}
 
 			if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&real_field, &column_map, &field, PH_READONLY)) {
-				PHALCON_CPY_WRT_CTOR(&real_field, &field);
+				ZVAL_COPY_VALUE(&real_field, &field);
 			}
 
 			if (phalcon_array_isset_fetch(&type, &data_types, &real_field, PH_READONLY)) {
@@ -1578,11 +1578,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&attribute_field, &first_primary_key);
+					ZVAL_COPY_VALUE(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-				PHALCON_CPY_WRT_CTOR(&conditions, &primary_key_condition);
+				ZVAL_COPY_VALUE(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}

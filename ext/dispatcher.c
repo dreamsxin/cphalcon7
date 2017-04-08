@@ -698,14 +698,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
 			phalcon_read_property(&camelize, getThis(), SL("_camelizeController"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+				ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 			} else {
 				phalcon_camelize(&camelized_class, &handler_name);
 			}
 		} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 			ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+			ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 		}
 
 		/**
@@ -714,7 +714,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (zend_is_true(&namespace_name)) {
 			phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
+				ZVAL_COPY_VALUE(&camelized_namespace, &namespace_name);
 			} else {
 				phalcon_camelize(&camelized_namespace, &namespace_name);
 			}
@@ -979,7 +979,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				phalcon_array_append(&params, param, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CPY_WRT_CTOR(&params, &action_params);
+			ZVAL_COPY_VALUE(&params, &action_params);
 		}
 
 		/**
@@ -1143,7 +1143,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 					phalcon_array_update_str(&forward_parts, SL("namespace"), &real_namespace_name, PH_COPY);
 				}
 			} else {
-				PHALCON_CPY_WRT_CTOR(&real_controller_name, &controller_part);
+				ZVAL_COPY_VALUE(&real_controller_name, &controller_part);
 			}
 
 			phalcon_uncamelize(&controller_part, &real_controller_name);
@@ -1154,7 +1154,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 			}
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&forward_parts, forward);
+		ZVAL_COPY_VALUE(&forward_parts, forward);
 	}
 
 	if (Z_TYPE(forward_parts) != IS_ARRAY) {
@@ -1261,7 +1261,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 		ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+		ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 	}
 
 	/**
@@ -1270,7 +1270,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	if (zend_is_true(&namespace_name)) {
 		phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_NOISY|PH_READONLY);
 		if (!zend_is_true(&camelize)) {
-			PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
+			ZVAL_COPY_VALUE(&camelized_namespace, &namespace_name);
 		} else {
 			phalcon_camelize(&camelized_namespace, &namespace_name);
 		}
@@ -1515,7 +1515,7 @@ PHP_METHOD(Phalcon_Dispatcher, getPreviousParam){
 
 			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
-			PHALCON_RETURN_CALL_METHOD(&filter, "sanitize", &param_value, filters);
+			PHALCON_CALL_METHOD(return_value, &filter, "sanitize", &param_value, filters);
 			return;
 		} else {
 			RETURN_CTOR(&param_value);

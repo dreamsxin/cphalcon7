@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	 * Apply an array of filters
 	 */
 	if (Z_TYPE_P(filters) == IS_ARRAY) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		ZVAL_DUP(&new_value, value);
 		if (Z_TYPE_P(value) != IS_NULL) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
 				zval array_value = {};
@@ -232,15 +232,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 						}
 					} ZEND_HASH_FOREACH_END();
 
-					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
+					ZVAL_DUP(&new_value, &array_value);
 				} else {
 					PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", &new_value, filter, options);
-					PHALCON_CPY_WRT_CTOR(&new_value, &filter_value);
+					ZVAL_DUP(&new_value, &filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
-
 		}
-
 		RETURN_CTOR(&new_value);
 	}
 
@@ -324,7 +322,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "int!") || (PHALCON_IS_STRING(filter, "int?") && phalcon_is_numeric(value))) {
-		PHALCON_CPY_WRT_CTOR(&filtered, value);
+		ZVAL_DUP(&filtered, value);
 		convert_to_long_base(&filtered, 10);
 		goto ph_end_0;
 	}

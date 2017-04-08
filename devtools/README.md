@@ -52,11 +52,9 @@ Help:
 Available commands:
   commands         (alias of: list, enumerate)
   controller       (alias of: create-controller)
-  module           (alias of: create-module)
   model            (alias of: create-model)
   all-models       (alias of: create-all-models)
   project          (alias of: create-project)
-  scaffold         (alias of: create-scaffold)
   migration        (alias of: create-migration)
 ```
 

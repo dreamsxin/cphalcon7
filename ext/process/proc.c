@@ -853,7 +853,7 @@ PHP_METHOD(Phalcon_Process_Proc, write){
 
 	len = Z_STRLEN_P(data);
 	ZVAL_LONG(&ret, 0);
-	PHALCON_CPY_WRT_CTOR(&writebuf, data);
+	ZVAL_DUP(&writebuf, data);
 	while(1) {
 		zval writelen = {};
 		ZVAL_LONG(&writelen, len);

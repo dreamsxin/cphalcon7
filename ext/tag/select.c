@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		phalcon_array_append(&params, parameters, PH_COPY);
 		phalcon_array_append(&params, data, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&params, parameters);
+		ZVAL_DUP(&params, parameters);
 	}
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);

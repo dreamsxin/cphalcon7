@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
-				PHALCON_CPY_WRT_CTOR(&sql_tmp, &sql);
+				ZVAL_COPY_VALUE(&sql_tmp, &sql);
 				PHALCON_STR_REPLACE(&sql, &string_wildcard, value, &sql_tmp);
 
 				phalcon_array_unset(&bind_types, &wildcard, 0);

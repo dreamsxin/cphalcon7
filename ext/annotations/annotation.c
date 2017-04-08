@@ -258,7 +258,7 @@ PHP_METHOD(Phalcon_Annotations_Annotation, getArgument){
 	phalcon_fetch_params(0, 1, 0, &position);
 
 	phalcon_read_property(&arguments, getThis(), SL("_arguments"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &arguments, position, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(return_value, &arguments, position, PH_COPY)) {
 		RETURN_NULL();
 	}
 }

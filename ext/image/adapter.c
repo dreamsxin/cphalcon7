@@ -221,20 +221,14 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 
 	phalcon_fetch_params(0, 0, 3, &_width, &_height, &_master);
 
-	if (_width) {
-		PHALCON_CPY_WRT_CTOR(&width, _width);
-		if (Z_TYPE(width) != IS_LONG && Z_TYPE(width) > IS_NULL) {
-			convert_to_long(&width);
-		}
-		tmp_width = phalcon_get_intval(&width);
+	if (_width && Z_TYPE_P(_width) != IS_NULL) {
+		ZVAL_COPY_VALUE(&width, _width);
+		tmp_width = Z_LVAL(width);
 	}
 
-	if (_height) {
-		PHALCON_CPY_WRT_CTOR(&height, _height);
-		if (Z_TYPE(height) != IS_LONG && Z_TYPE(height) > IS_NULL) {
-			convert_to_long(&height);
-		}
-		tmp_height = phalcon_get_intval(&height);
+	if (_height && Z_TYPE_P(_height) != IS_NULL) {
+		ZVAL_COPY_VALUE(&height, _height);
+		tmp_height = Z_LVAL(height);
 	}
 
 	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
@@ -382,8 +376,6 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	long tmp_max_width, tmp_max_height, tmp_width, tmp_height, tmp_image_width, tmp_image_height, tmp_offset_x, tmp_offset_y;
 
 	phalcon_fetch_params(0, 2, 2, &w, &h, &ofs_x, &ofs_y);
-	PHALCON_ENSURE_IS_LONG(w);
-	PHALCON_ENSURE_IS_LONG(h);
 
 	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
 	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
@@ -504,7 +496,6 @@ PHP_METHOD(Phalcon_Image_Adapter, flip){
 	zval *direction, dir = {};
 
 	phalcon_fetch_params(0, 1, 0, &direction);
-	PHALCON_ENSURE_IS_LONG(direction);
 
 	ZVAL_LONG(&dir, (Z_LVAL_P(direction) != 11) ? 12 : 11);
 
@@ -524,7 +515,6 @@ PHP_METHOD(Phalcon_Image_Adapter, sharpen){
 	zval *amount;
 
 	phalcon_fetch_params(0, 1, 0, &amount);
-	SEPARATE_ZVAL_IF_NOT_REF(amount);
 
 	if (Z_TYPE_P(amount) != IS_LONG) {
 		convert_to_long(amount);
@@ -564,20 +554,18 @@ PHP_METHOD(Phalcon_Image_Adapter, reflection){
 	if (!h || Z_TYPE_P(h) != IS_LONG || Z_LVAL_P(h) > tmp_image_height) {
 		ZVAL_LONG(&height, tmp_image_height);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&height, h);
+		ZVAL_COPY_VALUE(&height, h);
 	}
 
-	if (!op) {
+	if (!op || Z_TYPE_P(op) == IS_NULL) {
 		ZVAL_LONG(&opacity, 100);
 	} else {
-		PHALCON_ENSURE_IS_LONG(op);
-
 		if (Z_LVAL_P(op) > 100) {
 			ZVAL_LONG(&opacity, 100);
 		} else if (Z_LVAL_P(op) < 0) {
 			ZVAL_LONG(&opacity, 0);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&opacity, op);
+			ZVAL_COPY_VALUE(&opacity, op);
 		}
 	}
 
@@ -687,22 +675,21 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 
 	phalcon_fetch_params(0, 1, 6, &text, &ofs_x, &ofs_y, &op, &fontcolor, &fontsize, &fontfile);
 
-	if (!ofs_x) {
+	if (!ofs_x || Z_TYPE_P(ofs_x) == IS_NULL) {
 		ZVAL_NULL(&offset_x);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&offset_x, ofs_x);
+		ZVAL_COPY_VALUE(&offset_x, ofs_x);
 	}
 
-	if (!ofs_y) {
+	if (!ofs_y || Z_TYPE_P(ofs_y) == IS_NULL) {
 		ZVAL_NULL(&offset_x);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&offset_y, ofs_y);
+		ZVAL_COPY_VALUE(&offset_y, ofs_y);
 	}
 
 	if (!op || Z_TYPE_P(op) == IS_NULL) {
 		ZVAL_LONG(&opacity, 100);
 	} else {
-		PHALCON_ENSURE_IS_LONG(op);
 		if (Z_LVAL_P(op) < 1) {
 			ZVAL_LONG(&opacity, 1);
 		} else if (Z_LVAL_P(op) > 100) {
@@ -798,10 +785,10 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 
 	phalcon_fetch_params(0, 1, 1, &bcolor, &_opacity);
 
-	if (!_opacity) {
+	if (!_opacity || Z_TYPE_P(_opacity) == IS_NULL) {
 		ZVAL_LONG(&opacity, 100);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&opacity, _opacity);
+		ZVAL_COPY_VALUE(&opacity, _opacity);
 	}
 
 	if (Z_TYPE_P(bcolor) == IS_NULL) {
@@ -870,9 +857,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 
 	phalcon_fetch_params(0, 0, 1, &_radius);
 
-	if (!_radius) {
-		ZVAL_LONG(&radius, 1);
-	} else if (Z_TYPE_P(_radius) != IS_LONG) {
+	if (!_radius || Z_TYPE_P(_radius) != IS_LONG) {
 		ZVAL_LONG(&radius, 1);
 	} else {
 		r = phalcon_get_intval(_radius);
@@ -881,7 +866,7 @@ PHP_METHOD(Phalcon_Image_Adapter, blur){
 		} else if (r > 100) {
 			ZVAL_LONG(&radius, 100);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&radius, _radius);
+			ZVAL_COPY_VALUE(&radius, _radius);
 		}
 	}
 
@@ -935,11 +920,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	if (!fname) {
 		phalcon_read_property(&file, getThis(), SL("_realpath"), PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&file, fname);
-	}
-
-	if (Z_TYPE(file) != IS_STRING) {
-		convert_to_string_ex(&file);
+		ZVAL_COPY_VALUE(&file, fname);
 	}
 
 	if (!q || Z_TYPE_P(q) != IS_LONG) {
@@ -1004,23 +985,20 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 
 	phalcon_fetch_params(0, 0, 3, &ext, &_quality, &interlacing);
 
-	if (!ext) {
+	if (!ext || Z_TYPE_P(ext) == IS_NULL) {
 		phalcon_read_property(&format, getThis(), SL("_format"), PH_READONLY);
 
 		if (PHALCON_IS_EMPTY(&format)) {
 			ZVAL_STRING(&format, "png");
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&format, ext);
+		ZVAL_COPY_VALUE(&format, ext);
 	}
 
-	if (!_quality) {
+	if (!_quality || Z_TYPE_P(_quality) == IS_NULL) {
 		ZVAL_LONG(&quality, 100);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&quality, _quality);
-        if (Z_TYPE(quality) != IS_LONG) {
-            convert_to_long(&quality);
-        }
+		ZVAL_COPY_VALUE(&quality, _quality);
     }
 
 	if (!interlacing) {

@@ -143,18 +143,18 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 				}
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(&domain, _domain);
+			ZVAL_COPY_VALUE(&domain, _domain);
 		}
 		if (!_type || Z_TYPE_P(_type) == IS_NULL) {
 			phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&type, _type);
+			ZVAL_COPY_VALUE(&type, _type);
 		}
 
 		if (!_protocol || Z_TYPE_P(_protocol) == IS_NULL) {
 			phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY|PH_READONLY);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&protocol, _protocol);
+			ZVAL_COPY_VALUE(&protocol, _protocol);
 		}
 
 		PHALCON_CALL_FUNCTION(&socket, "socket_create", &domain, &type, &protocol);
@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Socket_Client, write){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	ZVAL_LONG(&ret, 0);
-	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
+	ZVAL_DUP(&writebuf, buffer);
 	while(1) {
 		ZVAL_LONG(&writelen, len);
 		PHALCON_CALL_FUNCTION(&ret, "socket_write", &socket, &writebuf, &writelen);
@@ -301,7 +301,7 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
 	ZVAL_LONG(&ret, 0);
-	PHALCON_CPY_WRT_CTOR(&writebuf, buffer);
+	ZVAL_DUP(&writebuf, buffer);
 
 	while(1) {
 		ZVAL_LONG(&writelen, len);

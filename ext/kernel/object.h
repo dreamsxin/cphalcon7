@@ -91,6 +91,11 @@ static inline int phalcon_isset_property_zval(zval *object, const zval *property
 /** Reading properties */
 int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags);
 
+static inline int phalcon_return_property(zval *result, zval *object, const char *property_name, uint32_t property_length)
+{
+	return phalcon_read_property(result, object, property_name, property_length, PH_COPY);
+}
+
 static inline int phalcon_read_object_property(zval *result, zend_object *object, const char *property_name, uint32_t property_length, int flags)
 {
 	zval obj = {};
@@ -111,6 +116,16 @@ static inline int phalcon_read_property_zval(zval *result, zval *object, zval *p
 	}
 
 	return phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), flags);
+}
+
+static inline int phalcon_return_property_zval(zval *result, zval *object, zval *property)
+{
+	if (unlikely(Z_TYPE_P(property) != IS_STRING)) {
+		ZVAL_NULL(result);
+		return FAILURE;
+	}
+
+	return phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), PH_COPY);
 }
 
 /** Updating properties */

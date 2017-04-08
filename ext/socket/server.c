@@ -212,19 +212,19 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 			}
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&domain, _domain);
+		ZVAL_COPY_VALUE(&domain, _domain);
 	}
 
 	if (!_type || Z_TYPE_P(_type) == IS_NULL) {
 		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&type, _type);
+		ZVAL_COPY_VALUE(&type, _type);
 	}
 
 	if (!_protocol || Z_TYPE_P(_protocol) == IS_NULL) {
 		phalcon_read_property(&protocol, getThis(), SL("_protocol"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&protocol, _protocol);
+		ZVAL_COPY_VALUE(&protocol, _protocol);
 	}
 
 	PHALCON_CALL_FUNCTION(&socket, "socket_create", &domain, &type, &protocol);
@@ -320,7 +320,7 @@ PHP_METHOD(Phalcon_Socket_Server, listen){
 	if (!_backlog) {
 		phalcon_read_property(&backlog, getThis(), SL("_backlog"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&backlog, _backlog);
+		ZVAL_COPY_VALUE(&backlog, _backlog);
 	}
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
@@ -550,7 +550,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_onconnection) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onconnection), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onconnection, zend_ce_closure, "bind", _onconnection, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&onconnection, _onconnection);
+			ZVAL_COPY_VALUE(&onconnection, _onconnection);
 		}
 	}
 
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_onrecv) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&onrecv, _onrecv);
+			ZVAL_COPY_VALUE(&onrecv, _onrecv);
 		}
 	}
 
@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_onsend) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&onsend, _onsend);
+			ZVAL_COPY_VALUE(&onsend, _onsend);
 		}
 	}
 
@@ -574,7 +574,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_onclose) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onclose), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onclose, zend_ce_closure, "bind", _onclose, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&onclose, _onclose);
+			ZVAL_COPY_VALUE(&onclose, _onclose);
 		}
 	}
 
@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_onerror) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&onerror, _onerror);
+			ZVAL_COPY_VALUE(&onerror, _onerror);
 		}
 	}
 
@@ -590,7 +590,7 @@ PHP_METHOD(Phalcon_Socket_Server, run){
 		if (Z_TYPE_P(_ontimeout) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
 				PHALCON_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
 		} else {
-			PHALCON_CPY_WRT_CTOR(&ontimeout, _ontimeout);
+			ZVAL_COPY_VALUE(&ontimeout, _ontimeout);
 		}
 	}
 

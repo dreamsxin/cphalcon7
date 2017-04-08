@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 	if (Z_TYPE_P(options) != IS_ARRAY) {
 		array_init_size(&parameters, 2);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&parameters, options);
+		ZVAL_DUP(&parameters, options);
 	}
 
 	if (!phalcon_array_isset_str(&parameters, SL("host"))) {

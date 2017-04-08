@@ -73,13 +73,19 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 		PHALCON_INIT_VAR(z); \
 	} while (0)
 
-#define PHALCON_CPY_WRT(d, v)       ZVAL_COPY(d, v);
-#define PHALCON_CPY_WRT_CTOR(d, v)  ZVAL_DUP(d, v);
+#define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v);
+#define PHALCON_SEPARATE_COPY_PARAM(d, v) \
+	do { \
+		SEPARATE_ZVAL_IF_NOT_REF(v); \
+		ZVAL_COPY_VALUE(d, v); \
+	} while (0)
 
 #define PHALCON_SEPARATE(z) \
-	if (Z_TYPE_P(z) > IS_NULL) { \
-		SEPARATE_ZVAL(z); \
-	}
+	do { \
+		if (Z_TYPE_P(z) > IS_NULL) { \
+			SEPARATE_ZVAL(z); \
+		} \
+	} while (0)
 
 #define PHALCON_SEPARATE_PARAM(z) SEPARATE_ZVAL_IF_NOT_REF(z)
 

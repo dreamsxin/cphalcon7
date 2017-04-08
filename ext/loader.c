@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces){
 		if (Z_TYPE(current_namespaces) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_namespaces, &current_namespaces, namespaces);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_namespaces, namespaces);
+			ZVAL_COPY_VALUE(&merged_namespaces, namespaces);
 		}
 
 		phalcon_update_property(getThis(), SL("_namespaces"), &merged_namespaces);
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 		if (Z_TYPE(current_prefixes) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_prefixes, &current_prefixes, prefixes);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_prefixes, prefixes);
+			ZVAL_COPY_VALUE(&merged_prefixes, prefixes);
 		}
 
 		phalcon_update_property(getThis(), SL("_prefixes"), &merged_prefixes);
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Loader, registerDirs){
 		if (Z_TYPE(current_directories) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_directories, &current_directories, directories);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_directories, directories);
+			ZVAL_COPY_VALUE(&merged_directories, directories);
 		}
 
 		phalcon_update_property(getThis(), SL("_directories"), &merged_directories);
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Loader, registerClasses){
 		if (Z_TYPE(current_classes) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_classes, &current_classes, classes);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_classes, classes);
+			ZVAL_COPY_VALUE(&merged_classes, classes);
 		}
 
 		phalcon_update_property(getThis(), SL("_classes"), &merged_classes);
@@ -458,13 +458,13 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		array_init(&directories);
 		phalcon_array_append(&directories, directory, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&directories, directory);
+		ZVAL_COPY_VALUE(&directories, directory);
 	}
 
 	if (ds == NULL) {
 		ZVAL_STRING(&ds_slash, slash);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&ds_slash, ds);
+		ZVAL_COPY_VALUE(&ds_slash, ds);
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {

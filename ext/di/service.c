@@ -64,7 +64,7 @@ PHP_METHOD(Phalcon_Di_Service, isResolved);
 PHP_METHOD(Phalcon_Di_Service, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_service___construct, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, definition)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
@@ -115,7 +115,6 @@ PHP_METHOD(Phalcon_Di_Service, __construct){
 	zval *name, *definition, *shared = NULL;
 
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	phalcon_update_property(getThis(), SL("_name"), name);
 	phalcon_update_property(getThis(), SL("_definition"), definition);

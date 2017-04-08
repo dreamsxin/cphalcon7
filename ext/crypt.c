@@ -267,10 +267,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
 		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&encrypt_key, key);
-		if (Z_TYPE(encrypt_key) != IS_STRING) {
-			convert_to_string(&encrypt_key);
-		}
+		ZVAL_COPY_VALUE(&encrypt_key, key);
 	}
 
 	if (PHALCON_IS_EMPTY(&encrypt_key)) {
@@ -281,7 +278,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (!options || Z_TYPE_P(options) == IS_NULL) {
 		phalcon_read_property(&encrypt_options, getThis(), SL("_options"), PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&encrypt_options, options);
+		ZVAL_COPY_VALUE(&encrypt_options, options);
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
@@ -298,6 +295,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		zval_ptr_dtor(&arguments);
 
 		RETURN_CTOR(&value);
 	}
@@ -336,6 +334,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		phalcon_array_append(&arguments, source, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		zval_ptr_dtor(&arguments);
 
 		source = &value;
 	}
@@ -344,16 +343,13 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&text, source);
+		ZVAL_COPY_VALUE(&text, source);
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
 		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&encrypt_key, key);
-		if (Z_TYPE(encrypt_key) != IS_STRING) {
-			convert_to_string(&encrypt_key);
-		}
+		ZVAL_COPY_VALUE(&encrypt_key, key);
 	}
 
 	if (!options || Z_TYPE_P(options) == IS_NULL) {
@@ -385,6 +381,7 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		zval_ptr_dtor(&arguments);
 
 		RETURN_CTOR(&value);
 	}
@@ -431,7 +428,6 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 	zval *text, *key = NULL, *safe = NULL, decrypt_text = {}, decrypt_value = {};
 
 	phalcon_fetch_params(0, 1, 2, &text, &key, &safe);
-	PHALCON_ENSURE_IS_STRING(text);
 
 	if (!key) {
 		key = &PHALCON_GLOBAL(z_null);

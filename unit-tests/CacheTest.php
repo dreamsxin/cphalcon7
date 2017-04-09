@@ -1619,4 +1619,73 @@ class CacheTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($cache->delete($key));
 		$this->assertEquals($cache->get($key), NULL);
 	}
+
+	public function testWiredTiger()
+	{
+		if (!class_exists('Phalcon\Cache\Backend\Wiredtiger')) {
+			$this->markTestSkipped('Class `Phalcon\Cache\Backend\Wiredtiger` is not exists');
+			return false;
+		}
+
+		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 20));
+		$cache = new Phalcon\Cache\Backend\Wiredtiger($frontCache, array(
+			'home' => __DIR__.'/cache/wiredtiger',
+			'table' => 'cache',
+		));
+
+		$cache->delete('increment');
+		$cache->save('increment', 1);
+		$this->assertEquals(2, $cache->increment('increment'));
+		$this->assertEquals(4, $cache->increment('increment', 2));
+		$this->assertEquals(14, $cache->increment('increment', 10));
+
+		$cache->delete('decrement');
+		$cache->save('decrement', 100);
+		$this->assertEquals(99, $cache->decrement('decrement'));
+		$this->assertEquals(97, $cache->decrement('decrement', 2));
+		$this->assertEquals(87, $cache->decrement('decrement', 10));
+
+		$data = array(1, 2, 3, 4, 5);
+
+		$cache->save('test-data', $data);
+
+		$cachedContent = $cache->get('test-data');
+		$this->assertEquals($cachedContent, $data);
+
+		$cache->save('test-data', "sure, nothing interesting");
+
+		$cachedContent = $cache->get('test-data');
+		$this->assertEquals($cachedContent, "sure, nothing interesting");
+
+		$this->assertTrue($cache->delete('test-data'));
+
+		$cache->save('a', 1);
+		$cache->save('long-key', 'long-val');
+		$cache->save('bcd', 3);
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('a', 'bcd', 'decrement', 'increment', 'long-key'));
+		$this->assertEquals($cache->queryKeys('long'), array('long-key'));
+
+		$this->assertTrue($cache->delete('a'));
+		$this->assertTrue($cache->delete('long-key'));
+		$this->assertTrue($cache->delete('bcd'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('decrement', 'increment'));
+
+		$this->assertTrue($cache->flush());
+
+		$cache->save('data', "1");
+		$cache->save('data2', "2");
+
+		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
+
+		$this->assertTrue($cache->flush());
+
+		$this->assertEquals($cache->queryKeys(), array());
+
+		$this->assertFalse($cache->exists('data'));
+		$this->assertFalse($cache->exists('data2'));
+	}
 }

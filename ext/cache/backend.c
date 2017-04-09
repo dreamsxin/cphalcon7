@@ -50,7 +50,7 @@ PHP_METHOD(Phalcon_Cache_Backend, getLifetime);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_backend_method_entry[] = {

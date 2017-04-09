@@ -58,6 +58,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, prev);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, rewind);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, last);
 PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, valid);
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, close);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_wiredtiger_cursor___construct, 0, 0, 2)
 	ZEND_ARG_OBJ_INFO(0, db, Phalcon\\Storage\\Wiredtiger, 0)
@@ -105,6 +106,7 @@ static const zend_function_entry phalcon_storage_wiredtiger_cursor_method_entry[
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, rewind, arginfo_iterator_rewind, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, last, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, valid, arginfo_iterator_valid, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, close, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -453,6 +455,15 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, delete)
 	phalcon_storage_wiredtiger_pack_item_free(&pk);
 }
 
+static void phalcon_storage_wiredtiger_cursor_reset(phalcon_storage_wiredtiger_cursor_object *intern) {
+	intern->started_iterating = 0;
+
+	intern->current.key.data = NULL;
+	intern->current.key.size = 0;
+	intern->current.value.data = NULL;
+	intern->current.value.size = 0;
+}
+
 static int phalcon_storage_wiredtiger_cursor_load_current(phalcon_storage_wiredtiger_cursor_object *intern)
 {
 	int ret;
@@ -469,6 +480,8 @@ static int phalcon_storage_wiredtiger_cursor_load_current(phalcon_storage_wiredt
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get value");
 		return FAILURE;
 	}
+
+	intern->started_iterating = 1;
 
 	return SUCCESS;
 }
@@ -489,10 +502,9 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, current)
         if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
             RETURN_FALSE;
         }
-		intern->started_iterating = 1;
-    }
 
-	phalcon_storage_wiredtiger_cursor_load_current(intern);
+		phalcon_storage_wiredtiger_cursor_load_current(intern);
+    }
 
 	if (!intern->current.value.data) {
 		RETURN_FALSE;
@@ -523,10 +535,9 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, key)
         if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
             RETURN_FALSE;
         }
-		intern->started_iterating = 1;
-    }
 
-	phalcon_storage_wiredtiger_cursor_load_current(intern);
+		phalcon_storage_wiredtiger_cursor_load_current(intern);
+    }
 
 	if (!intern->current.key.data) {
 		RETURN_FALSE;
@@ -535,7 +546,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, key)
 	} else {
 		ret = phalcon_storage_wiredtiger_unpack_key(intern, return_value, &intern->current.key);
 		if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't get key");
+			PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Can't unpack key");
 			RETURN_FALSE;
 		}
 	}
@@ -551,12 +562,13 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, next)
 	phalcon_storage_wiredtiger_cursor_object *intern;
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_storage_wiredtiger_cursor_reset(intern);
 
 	if (intern->cursor->next(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETURN_FALSE;
 	}
 
-	intern->started_iterating = 1;
+	phalcon_storage_wiredtiger_cursor_load_current(intern);
 
 	RETURN_TRUE;
 }
@@ -571,12 +583,13 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, prev)
 	phalcon_storage_wiredtiger_cursor_object *intern;
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_storage_wiredtiger_cursor_reset(intern);
 
 	if (intern->cursor->prev(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK) {
 		RETURN_FALSE;
 	}
 
-	intern->started_iterating = 1;
+	phalcon_storage_wiredtiger_cursor_load_current(intern);
 
 	RETURN_TRUE;
 }
@@ -592,6 +605,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, rewind)
 	int ret;
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_storage_wiredtiger_cursor_reset(intern);
 
 	ret = intern->cursor->reset(intern->cursor);
 	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
@@ -603,6 +617,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, rewind)
 		RETURN_FALSE;
 	}
 
+	phalcon_storage_wiredtiger_cursor_load_current(intern);
 	RETURN_TRUE;
 }
 
@@ -617,6 +632,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, last)
 	int ret;
 
 	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_storage_wiredtiger_cursor_reset(intern);
 
 	ret = intern->cursor->reset(intern->cursor);
 	if (ret != PHALCON_STORAGE_WIREDTIGER_OK) {
@@ -625,6 +641,8 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, last)
 	}
 
 	while (intern->cursor->prev(intern->cursor) != PHALCON_STORAGE_WIREDTIGER_OK);
+
+	phalcon_storage_wiredtiger_cursor_load_current(intern);
 
 	RETURN_TRUE;
 }
@@ -646,4 +664,19 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, valid)
 	}
 
 	RETURN_FALSE;
+}
+
+/**
+ * Close the cursor
+ *
+ */
+PHP_METHOD(Phalcon_Storage_Wiredtiger_Cursor, close)
+{
+	phalcon_storage_wiredtiger_cursor_object *intern;
+
+	intern = phalcon_storage_wiredtiger_cursor_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (intern->cursor) {
+		intern->cursor->close(intern->cursor);
+	}
 }

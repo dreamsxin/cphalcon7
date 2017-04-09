@@ -1074,7 +1074,7 @@ server/exception.c"
 				[
 					PHP_ADD_LIBRARY_WITH_PATH(wiredtiger, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_WIREDTIGER, 1, [Have wiredtiger support])
-					phalcon_sources="$phalcon_sources storage/wiredtiger.c storage/wiredtiger/pack.c storage/wiredtiger/cursor.c "
+					phalcon_sources="$phalcon_sources storage/wiredtiger.c storage/wiredtiger/pack.c storage/wiredtiger/cursor.c cache/backend/wiredtiger.c "
 				],[
 					AC_MSG_ERROR([Wrong wiredtiger version or library not found])
 				],[

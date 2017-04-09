@@ -284,6 +284,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Backend_Memcached);
 	PHALCON_INIT(Phalcon_Cache_Backend_Redis);
 	PHALCON_INIT(Phalcon_Cache_Backend_Yac);
+#if PHALCON_USE_WIREDTIGER
+	PHALCON_INIT(Phalcon_Cache_Backend_Wiredtiger);
+#endif
 	PHALCON_INIT(Phalcon_Cache_Frontend_Json);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Output);
 	PHALCON_INIT(Phalcon_Cache_Frontend_None);

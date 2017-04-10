@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Arr, path){
 			if (phalcon_fast_count_ev(&keys) > 0) {
 				PHALCON_CALL_SELF(&is_array, "is_array", &values);
 				if (zend_is_true(&is_array)) {
-					ZVAL_COPY_VALUE(array, &values);
+					ZVAL_COPY(array, &values);
 				} else {
 					// Unable to dig deeper
 					break;
@@ -385,8 +385,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 	ZVAL_DEREF(array);
 
 	if (Z_TYPE_P(path) == IS_ARRAY) {
-		PHALCON_SEPARATE_PARAM(path);
-		ZVAL_COPY_VALUE(&keys, path);
+		ZVAL_DUP(&keys, path);
 	} else {
 		if (!_delimiter || Z_TYPE_P(_delimiter) == IS_NULL) {
 			phalcon_read_static_property_ce(&delimiter, phalcon_arr_ce, SL("delimiter"), PH_READONLY);

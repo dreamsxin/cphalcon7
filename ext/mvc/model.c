@@ -1476,8 +1476,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				/**
 				 * Every field must be part of the column map
 				 */
-				if (phalcon_array_isset(column_map, &key)) {
-					phalcon_array_fetch(&attribute, column_map, &key, PH_NOISY|PH_READONLY);
+				if (phalcon_array_isset_fetch(&attribute, column_map, &key, PH_NOISY|PH_READONLY)) {
 					phalcon_update_property_zval_zval(return_value, &attribute, &convert_value);
 				} else {
 					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");

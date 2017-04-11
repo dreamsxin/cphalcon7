@@ -243,6 +243,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 			 */
 			PHALCON_CALL_METHOD(NULL, getThis(), "write", &prefix_key, &model_metadata);
 		}
+		zval_ptr_dtor(&model_metadata);
 
 		/**
 		 * Check for a column map, store in _columnMap in order and reversed order
@@ -288,7 +289,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		 * Write the data to the adapter
 		 */
 		PHALCON_CALL_METHOD(NULL, getThis(), "write", &prefix_key, &model_column_map);
-
+		zval_ptr_dtor(&model_column_map);
 	}
 }
 
@@ -342,7 +343,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 
-	zval *model, table = {}, schema = {}, class_name = {}, key = {}, meta_data = {}, data = {};
+	zval *model, table = {}, schema = {}, class_name = {}, key = {}, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 	PHALCON_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
@@ -363,9 +364,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	}
 
-	phalcon_array_fetch(&data, &meta_data, &key, PH_NOISY|PH_READONLY);
-
-	RETURN_CTOR(&data);
+	if (!phalcon_array_isset_fetch(return_value, &meta_data, &key, PH_COPY)) {
+		RETURN_NULL();
+	}
 }
 
 /**

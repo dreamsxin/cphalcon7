@@ -222,6 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 			phalcon_array_update(&field_default_values, &field_name, &default_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&columns);
 
 	/**
 	 * Create an array using the MODELS_* constants as indexes

@@ -722,6 +722,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 					} else {
 						PHALCON_CONCAT_VSV(&column_domain_sql, &column_domain, ".", &column_sql);
 					}
+					zval_ptr_dtor(&column_sql);
 				} else {
 					ZVAL_COPY_VALUE(&column_domain_sql, &column_sql);
 				}
@@ -739,6 +740,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 					} else {
 						PHALCON_CONCAT_VSV(&column_alias_sql, &column_domain_sql, " AS ", &column_alias);
 					}
+					zval_ptr_dtor(&column_domain_sql);
 				} else {
 					ZVAL_COPY_VALUE(&column_alias_sql, &column_domain_sql);
 				}
@@ -750,6 +752,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&columns_sql, SL(", "), &selected_columns);
+		zval_ptr_dtor(&selected_columns);
 	} else {
 		ZVAL_COPY_VALUE(&columns_sql, &columns);
 	}
@@ -767,6 +770,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&tables_sql, SL(", "), &selected_tables);
+		zval_ptr_dtor(&selected_tables);
 	} else {
 		ZVAL_COPY_VALUE(&tables_sql, &tables);
 	}
@@ -788,6 +792,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	}
 
 	PHALCON_SCONCAT_VSV(&sql, &columns_sql, " FROM ", &tables_sql);
+	zval_ptr_dtor(&tables_sql);
+	zval_ptr_dtor(&columns_sql);
 
 	/**
 	 * Check for joins
@@ -819,6 +825,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 					phalcon_fast_join_str(&join_conditions, SL(" AND "), &join_expressions);
 					PHALCON_SCONCAT_SVS(&sql_join, " ON ", &join_conditions, " ");
+					zval_ptr_dtor(&join_expressions);
+					zval_ptr_dtor(&join_conditions);
 				}
 			}
 			phalcon_concat_self(&sql, &sql_join);
@@ -850,6 +858,9 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 		PHALCON_CONCAT_SV(&group_clause, " GROUP BY ", &group_sql);
 		phalcon_concat_self(&sql, &group_clause);
+		zval_ptr_dtor(&group_items);
+		zval_ptr_dtor(&group_sql);
+		zval_ptr_dtor(&group_clause);
 	}
 
 	/* Check for a HAVING clause */
@@ -882,6 +893,8 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 		phalcon_fast_join_str(&order_sql, SL(", "), &order_items);
 		PHALCON_SCONCAT_SV(&sql, " ORDER BY ", &order_sql);
+		zval_ptr_dtor(&order_items);
+		zval_ptr_dtor(&order_sql);
 	}
 
 	/**

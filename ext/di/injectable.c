@@ -57,6 +57,8 @@ PHP_METHOD(Phalcon_Di_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel);
 PHP_METHOD(Phalcon_Di_Injectable, hasService);
+PHP_METHOD(Phalcon_Di_Injectable, setService);
+PHP_METHOD(Phalcon_Di_Injectable, getService);
 PHP_METHOD(Phalcon_Di_Injectable, getResolveService);
 PHP_METHOD(Phalcon_Di_Injectable, attachEvent);
 PHP_METHOD(Phalcon_Di_Injectable, __get);
@@ -76,6 +78,8 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, setService, arginfo_phalcon_di_injectable_setservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, getService, arginfo_phalcon_di_injectable_getservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, attachEvent, arginfo_phalcon_di_injectable_attachevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
@@ -327,6 +331,44 @@ PHP_METHOD(Phalcon_Di_Injectable, hasService){
 	} else {
 		RETURN_FALSE;
 	}
+}
+
+/**
+ * Sets a service from the DI
+ *
+ * @param string $serviceName
+ * @param mixed $definition
+ * @param boolean $shared
+ * @return Phalcon\Di\ServiceInterface
+ */
+PHP_METHOD(Phalcon_Di_Injectable, setService){
+
+	zval *service_name, *definition, *shared = NULL, dependency_injector = {};
+
+	phalcon_fetch_params(0, 2, 1, &service_name, &definition, &shared);
+
+	if (!shared) {
+		shared = &PHALCON_GLOBAL(z_false);
+	}
+
+	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+	PHALCON_RETURN_CALL_METHOD(&dependency_injector, "set", service_name, definition, shared);
+}
+
+/**
+ * Obtains a service from the DI
+ *
+ * @param string $serviceName
+ * @return object
+ */
+PHP_METHOD(Phalcon_Di_Injectable, getService){
+
+	zval *service_name, dependency_injector = {};
+
+	phalcon_fetch_params(0, 1, 0, &service_name);
+
+	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+	PHALCON_RETURN_CALL_METHOD(&dependency_injector, "get", service_name);
 }
 
 /**

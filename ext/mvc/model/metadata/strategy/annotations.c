@@ -33,6 +33,8 @@
 #include "kernel/operators.h"
 #include "kernel/array.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Mvc\Model\MetaData\Strategy\Annotations
  *
@@ -90,7 +92,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 		return;
 	}
 
-	ZVAL_STRING(&service, "annotations");
+	ZVAL_STR(&service, IS(annotations));
 
 	phalcon_get_class(&class_name, model, 0);
 
@@ -309,7 +311,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		return;
 	}
 
-	ZVAL_STRING(&service, "annotations");
+	ZVAL_STR(&service, IS(annotations));
 
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", &service);
 

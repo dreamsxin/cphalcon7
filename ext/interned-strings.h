@@ -121,9 +121,11 @@ extern zend_string *phalcon_interned_sessionBag;
 extern zend_string *phalcon_interned_eventsManager;
 extern zend_string *phalcon_interned_transactionManager;
 extern zend_string *phalcon_interned_assets;
+extern zend_string *phalcon_interned_db;
 extern zend_string *phalcon_interned_view;
 extern zend_string *phalcon_interned_except;
 extern zend_string *phalcon_interned_app;
+extern zend_string *phalcon_interned_application;
 extern zend_string *phalcon_interned_validation;
 extern zend_string *phalcon_interned_translate;
 

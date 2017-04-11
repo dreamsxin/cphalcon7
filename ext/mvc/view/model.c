@@ -43,6 +43,8 @@
 
 #include "internal/arginfo.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Mvc\View\Model
  *
@@ -569,7 +571,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
-		ZVAL_STRING(&service, "view");
+		ZVAL_STR(&service, IS(view));
 
 		PHALCON_CALL_METHOD(&view, &dependency_injector, "getshared", &service);
 	}

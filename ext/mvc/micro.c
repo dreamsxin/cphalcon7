@@ -284,7 +284,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, setDI){
 	/**
 	 * We automatically set ourselves as application service
 	 */
-	ZVAL_STRING(&service, "application");
+	ZVAL_STR(&service, IS(application));
 
 	PHALCON_CALL_METHOD(&exists, dependency_injector, "has", &service);
 	if (!zend_is_true(&exists)) {

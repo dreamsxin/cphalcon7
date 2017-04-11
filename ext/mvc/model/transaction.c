@@ -30,6 +30,8 @@
 #include "kernel/object.h"
 #include "kernel/array.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Mvc\Model\Transaction
  *
@@ -142,7 +144,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 
 	if (!s || Z_TYPE_P(s) != IS_STRING) {
-		ZVAL_STRING(&service, "db");
+		ZVAL_STR(&service, IS(db));
 	} else {
 		ZVAL_COPY_VALUE(&service, s);
 	}

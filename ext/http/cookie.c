@@ -263,7 +263,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 		if (phalcon_array_isset_fetch(&value, _COOKIE, &name, PH_READONLY)) {
 			phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY|PH_READONLY);
 			if (zend_is_true(&encryption) && PHALCON_IS_NOT_EMPTY(&value)) {
-				ZVAL_STRING(&service, "crypt");
+				ZVAL_STR(&service, IS(crypt));
 
 				PHALCON_CALL_METHOD(&crypt, &dependency_injector, "getshared", &service);
 				PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 			return;
 		}
 
-		ZVAL_STRING(&service, "crypt");
+		ZVAL_STR(&service, IS(crypt));
 
 		PHALCON_CALL_METHOD(&crypt, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&crypt, phalcon_cryptinterface_ce);

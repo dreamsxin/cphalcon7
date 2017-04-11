@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	f_implicit_view = PHALCON_IS_TRUE(&implicit_view);
 
 	if (f_implicit_view) {
-		ZVAL_STRING(&service, "view");
+		ZVAL_STR(&service, IS(view));
 
 		PHALCON_CALL_METHOD(&view, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);

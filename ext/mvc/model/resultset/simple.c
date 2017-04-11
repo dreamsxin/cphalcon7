@@ -255,7 +255,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 	}
 
 	phalcon_update_property(getThis(), SL("_activeRow"), &active_row);
-
 	RETURN_TRUE;
 }
 

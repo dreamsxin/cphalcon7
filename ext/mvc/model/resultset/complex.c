@@ -264,6 +264,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
 						phalcon_array_fetch(&column_value, &row, &column_alias, PH_NOISY|PH_READONLY);
 						phalcon_array_update(&row_model, attribute, &column_value, PH_COPY);
+						zval_ptr_dtor(&column_alias);
 					} ZEND_HASH_FOREACH_END();
 
 					/**
@@ -315,7 +316,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 * Scalar columns are simply assigned to the result object
 					 */
 					if (phalcon_array_isset_fetch_str(&sql_alias, column, SL("sqlAlias"), PH_READONLY)) {
-						if (!phalcon_array_isset_fetch(&value, &row, &sql_alias, 0)) {
+						if (!phalcon_array_isset_fetch(&value, &row, &sql_alias, PH_READONLY)) {
 							ZVAL_NULL(&value);
 						}
 					} else if (!phalcon_array_isset_fetch(&value, &row, &alias, PH_READONLY)) {
@@ -327,7 +328,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					 */
 					if (!phalcon_array_isset_str(column, SL("balias"))) {
 						PHALCON_STR_REPLACE(&n_alias, &underscore, &empty_str, &alias);
-						PHALCON_CPY_WRT_CTOR(&alias, &n_alias);
+						ZVAL_COPY_VALUE(&alias, &n_alias);
 					}
 				}
 
@@ -409,7 +410,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 
-	zval records = {}, cache = {}, column_types = {}, hydrate_mode = {}, data = {}, serialized = {};
+	zval records = {}, cache = {}, column_types = {}, hydrate_mode = {}, data = {};
 
 	/**
 	 * Obtain the records as an array
@@ -426,16 +427,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 	phalcon_array_update_str(&data, SL("columnTypes"), &column_types, PH_COPY);
 	phalcon_array_update_str(&data, SL("hydrateMode"), &hydrate_mode, PH_COPY);
 
-	phalcon_serialize(&serialized, &data);
-
-	/**
-	 * Avoid return bad serialized data
-	 */
-	if (Z_TYPE(serialized) != IS_STRING) {
-		RETURN_NULL();
-	}
-
-	RETURN_CTOR(&serialized);
+	phalcon_serialize(return_value, &data);
 }
 
 /**

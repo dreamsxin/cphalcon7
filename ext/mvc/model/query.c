@@ -3145,7 +3145,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 		phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&phql, _phql);
+		ZVAL_COPY_VALUE(&phql, _phql);
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -3163,17 +3163,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	/**
 	 * A valid AST must have a type
 	 */
-	if (Z_TYPE(ast) == IS_ARRAY && phalcon_array_isset_fetch_str(&type, &ast, ISL(type), PH_READONLY)) {
-		phalcon_update_property(getThis(), SL("_ast"), &ast);
-
-		/**
-		 * Produce an independent database system representation
-		 */
-		phalcon_update_property(getThis(), SL("_type"), &type);
-	} else {
+	if (Z_TYPE(ast) != IS_ARRAY || !phalcon_array_isset_fetch_string(&type, &ast, IS(type), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Corrupted AST");
 		return;
 	}
+
+	phalcon_update_property(getThis(), SL("_ast"), &ast);
+	phalcon_update_property(getThis(), SL("_type"), &type);
 
 	if (PHALCON_GLOBAL(orm).enable_ast_cache) {
 		/**
@@ -3189,7 +3185,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 				if (Z_TYPE(ir_phql) == IS_ARRAY) {
 					if (phalcon_array_isset_fetch_str(&model_names, &ir_phql, SL("models"), PH_READONLY) && phalcon_array_isset_fetch_str(&tables, &ir_phql, SL("tables"), PH_READONLY)) {
 						// Obtain the real source including the schema again
-						PHALCON_CALL_SELF(&manager, "getmodelsmanager");
+						PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
 
 						ZVAL_LONG(&key_schema, 1);
 						ZVAL_LONG(&key_source, 0);
@@ -3239,15 +3235,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 			}
 		}
 	}
-
-	phalcon_update_property(getThis(), SL("_ast"), &ast);
-
-	/**
-	 * Produce an independent database system representation
-	 */
-	phalcon_array_fetch_string(&type, &ast, IS(type), PH_NOISY|PH_READONLY);
-
-	phalcon_update_property(getThis(), SL("_type"), &type);
 
 	switch (phalcon_get_intval(&type)) {
 
@@ -3359,7 +3346,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	ulong idx;
 	int have_scalars = 0, have_objects = 0, is_complex = 0, is_simple_std = 0;
 	size_t number_objects = 0;
-
 
 	ZVAL_STRING(&event_name, "query:beforeExecuteSelect");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
@@ -3555,6 +3541,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	 */
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&sql_select, &dialect, "select", &intermediate);
+	zval_ptr_dtor(&intermediate);
 
 	/**
 	 * Replace the placeholders
@@ -3579,6 +3566,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 
+				zval_ptr_dtor(&sql_tmp);
+				zval_ptr_dtor(&string_wildcard);
+
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
@@ -3595,12 +3585,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
 					phalcon_array_update(&processed, &k, v, PH_COPY);
 					phalcon_increment(&hidden_param);
+
+					zval_ptr_dtor(&query_key);
+					zval_ptr_dtor(&k);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_select);
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 				phalcon_array_unset(&bind_types, &wildcard, 0);
+				zval_ptr_dtor(&sql_tmp);
+				zval_ptr_dtor(&string_wildcard);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
@@ -3672,9 +3667,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			object_init_ex(&result_object, phalcon_mvc_model_row_ce);
 		} else {
 			if (Z_TYPE(instance) == IS_OBJECT) {
-				PHALCON_CPY_WRT_CTOR(&result_object, &instance);
+				ZVAL_COPY_VALUE(&result_object, &instance);
 			} else {
-				PHALCON_CPY_WRT_CTOR(&result_object, &model);
+				ZVAL_COPY_VALUE(&result_object, &model);
 			}
 
 			PHALCON_CALL_METHOD(NULL, &result_object, "reset");

@@ -77,9 +77,9 @@ PHP_METHOD(Phalcon_Mvc_Micro, options);
 PHP_METHOD(Phalcon_Mvc_Micro, mount);
 PHP_METHOD(Phalcon_Mvc_Micro, notFound);
 PHP_METHOD(Phalcon_Mvc_Micro, getRouter);
-PHP_METHOD(Phalcon_Mvc_Micro, setService);
+PHP_METHOD(Phalcon_Mvc_Micro, offsetSet);
 PHP_METHOD(Phalcon_Mvc_Micro, offsetExists);
-PHP_METHOD(Phalcon_Mvc_Micro, getService);
+PHP_METHOD(Phalcon_Mvc_Micro, offsetGet);
 PHP_METHOD(Phalcon_Mvc_Micro, getSharedService);
 PHP_METHOD(Phalcon_Mvc_Micro, handle);
 PHP_METHOD(Phalcon_Mvc_Micro, stop);
@@ -146,7 +146,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_notfound, 0, 0, 1)
 	ZEND_ARG_INFO(0, handler)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_setservice, 0, 0, 2)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_offsetset, 0, 0, 2)
 	ZEND_ARG_INFO(0, serviceName)
 	ZEND_ARG_INFO(0, definition)
 	ZEND_ARG_INFO(0, shared)
@@ -156,7 +156,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_offsetexists, 0, 0, 1)
 	ZEND_ARG_INFO(0, serviceName)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_getservice, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_micro_offsetget, 0, 0, 1)
 	ZEND_ARG_INFO(0, serviceName)
 ZEND_END_ARG_INFO()
 
@@ -210,8 +210,8 @@ static const zend_function_entry phalcon_mvc_micro_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Micro, mount, arginfo_phalcon_mvc_micro_mount, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, notFound, arginfo_phalcon_mvc_micro_notfound, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getRouter, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Micro, setService, arginfo_phalcon_mvc_micro_setservice, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Micro, getService, arginfo_phalcon_mvc_micro_getservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Micro, offsetSet, arginfo_phalcon_mvc_micro_offsetset, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Micro, offsetGet, arginfo_phalcon_mvc_micro_offsetget, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getSharedService, arginfo_phalcon_mvc_micro_getsharedservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, handle, arginfo_phalcon_mvc_micro_handle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, stop, NULL, ZEND_ACC_PUBLIC)
@@ -219,8 +219,6 @@ static const zend_function_entry phalcon_mvc_micro_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Micro, getActiveHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, getReturnedValue, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, offsetExists, arginfo_phalcon_mvc_micro_offsetexists, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_Mvc_Micro, offsetSet, setService, arginfo_phalcon_mvc_micro_setservice, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_Mvc_Micro, offsetGet, getService, arginfo_phalcon_mvc_micro_getservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, offsetUnset, arginfo_phalcon_mvc_micro_offsetunset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, before, arginfo_phalcon_mvc_micro_before, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Micro, after, arginfo_phalcon_mvc_micro_after, ZEND_ACC_PUBLIC)
@@ -566,7 +564,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, getRouter){
  * @param boolean $shared
  * @return Phalcon\Di\ServiceInterface
  */
-PHP_METHOD(Phalcon_Mvc_Micro, setService){
+PHP_METHOD(Phalcon_Mvc_Micro, offsetSet){
 
 	zval *service_name, *definition, *shared = NULL, dependency_injector = {};
 
@@ -605,7 +603,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, offsetExists){
  * @param string $serviceName
  * @return object
  */
-PHP_METHOD(Phalcon_Mvc_Micro, getService){
+PHP_METHOD(Phalcon_Mvc_Micro, offsetGet){
 
 	zval *service_name, dependency_injector = {};
 
@@ -1014,32 +1012,6 @@ PHP_METHOD(Phalcon_Mvc_Micro, getReturnedValue){
 
 	RETURN_MEMBER(getThis(), "_returnedValue");
 }
-
-/**
- * Allows to register a shared service in the internal services container using the array syntax.
- * Alias for Phalcon\Mvc\Micro::setService()
- *
- *<code>
- *	$app['request'] = new Phalcon\Http\Request();
- *</code>
- *
- * @param string $alias
- * @param mixed $definition
- */
-PHALCON_DOC_METHOD(Phalcon_Mvc_Micro, offsetSet);
-
-/**
- * Allows to obtain a shared service in the internal services container using the array syntax.
- * Alias for Phalcon\Mvc\Micro::getService()
- *
- *<code>
- *	var_dump($app['request']);
- *</code>
- *
- * @param string $alias
- * @return mixed
- */
-PHALCON_DOC_METHOD(Phalcon_Mvc_Micro, offsetGet);
 
 /**
  * Removes a service from the internal services container using the array syntax

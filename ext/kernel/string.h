@@ -63,11 +63,25 @@ void phalcon_fast_explode_str_str(zval *result, const char *delimiter, unsigned 
 int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
 int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 int phalcon_fast_stripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
+int phalcon_fast_strrpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
+int phalcon_fast_strripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 zend_string* phalcon_trim(zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
 void phalcon_fast_strtoupper(zval *return_value, zval *str);
 void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where);
 void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, zval *subject);
+
+static inline void phalcon_fast_str_replace_str(zval *return_value, const char *search, const char *replace, zval *subject)
+{
+	zval s = {}, r = {};
+
+	ZVAL_STRING(&s, search);
+	ZVAL_STRING(&r, replace);
+
+	phalcon_fast_str_replace(return_value, &s, &r, subject);
+	zval_ptr_dtor(&s);
+	zval_ptr_dtor(&r);
+}
 
 /** Camelize/Uncamelize */
 void phalcon_camelize(zval *return_value, const zval *str);

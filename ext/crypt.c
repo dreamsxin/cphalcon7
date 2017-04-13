@@ -96,6 +96,8 @@ static const zend_function_entry phalcon_crypt_method_entry[] = {
 	PHP_ME(Phalcon_Crypt, getKey, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, setOptions, arginfo_phalcon_cryptinterface_setoptions, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, getOptions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Crypt, setPadding, arginfo_phalcon_cryptinterface_setpadding, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Crypt, getPadding, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, encrypt, arginfo_phalcon_cryptinterface_encrypt, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, decrypt, arginfo_phalcon_cryptinterface_decrypt, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Crypt, encryptBase64, arginfo_phalcon_cryptinterface_encryptbase64, ZEND_ACC_PUBLIC)
@@ -119,10 +121,19 @@ PHALCON_INIT_CLASS(Phalcon_Crypt){
 	zend_declare_property_null(phalcon_crypt_ce, SL("_key"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_crypt_ce, SL("_method"), "aes-256-cbc", ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_crypt_ce, SL("_options"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_crypt_ce, SL("_padding"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeEncrypt"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_afterEncrypt"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_beforeDecrypt"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_crypt_ce, SL("_afterDecrypt"), ZEND_ACC_PROTECTED);
+
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_DEFAULT"),        PHALCON_CRYPT_PADDING_DEFAULT);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ANSI_X_923"),     PHALCON_CRYPT_PADDING_ANSI_X_923);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_PKCS7"),          PHALCON_CRYPT_PADDING_PKCS7);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_10126"),      PHALCON_CRYPT_PADDING_ISO_10126);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ISO_IEC_7816_4"), PHALCON_CRYPT_PADDING_ISO_IEC_7816_4);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_ZERO"),           PHALCON_CRYPT_PADDING_ZERO);
+	zend_declare_class_constant_long(phalcon_crypt_ce, SL("PADDING_SPACE"),          PHALCON_CRYPT_PADDING_SPACE);
 
 	zend_class_implements(phalcon_crypt_ce, 1, phalcon_cryptinterface_ce);
 
@@ -203,7 +214,6 @@ PHP_METHOD(Phalcon_Crypt, setOptions) {
 	zval *options;
 
 	phalcon_fetch_params(0, 1, 0, &options);
-	PHALCON_ENSURE_IS_LONG(options);
 
 	phalcon_update_property(getThis(), SL("_options"), options);
 	RETURN_THIS();
@@ -221,6 +231,105 @@ PHP_METHOD(Phalcon_Crypt, getOptions) {
 }
 
 /**
+ * Sets the padding
+ *
+ * @param int $padding
+ * @return Phalcon\CryptInterface
+ */
+PHP_METHOD(Phalcon_Crypt, setPadding) {
+
+	zval *padding;
+
+	phalcon_fetch_params(0, 1, 0, &padding);
+
+	phalcon_update_property(getThis(), SL("_padding"), padding);
+	RETURN_THIS();
+}
+
+/**
+ * Returns the padding
+ *
+ * @return int
+ */
+PHP_METHOD(Phalcon_Crypt, getPadding) {
+
+	RETURN_MEMBER(getThis(), "_padding");
+}
+
+/**
+ * @brief Adds padding @a padding_type to @a text
+ * @param return_value Result, possibly padded
+ * @param text Message to be padded
+ * @param mode Encryption mode; padding is applied only in CBC or ECB mode
+ * @param block_size Cipher block size
+ * @param padding_type Padding scheme
+ * @see http://www.di-mgt.com.au/cryptopad.html
+ */
+static void phalcon_crypt_pad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type)
+{
+	uint padding_size, i;
+	char padding[256];
+	char *str_mode;
+
+	assert(Z_TYPE_P(text) == IS_STRING);
+	assert(Z_TYPE_P(mode) == IS_STRING);
+
+	padding_size = 0;
+	str_mode = Z_STRVAL_P(mode);
+
+	if (!strcmp(str_mode, "ecb") || !strcmp(str_mode, "cbc")) {
+
+		padding_size = block_size - (Z_STRLEN_P(text) % block_size);
+		if (padding_size >= 256) {
+			RETURN_FALSE;
+		}
+
+		switch (padding_type) {
+			case PHALCON_CRYPT_PADDING_ANSI_X_923:
+				memset(padding, 0, padding_size - 1);
+				padding[padding_size-1] = (unsigned char)padding_size;
+				break;
+
+			case PHALCON_CRYPT_PADDING_PKCS7:
+				memset(padding, padding_size, padding_size);
+				break;
+
+			case PHALCON_CRYPT_PADDING_ISO_10126:
+				for (i = 0; i < padding_size - 1; ++i) {
+					padding[i] = (unsigned char)rand();
+				}
+
+				padding[padding_size - 1] = (unsigned char)padding_size;
+				break;
+
+			case PHALCON_CRYPT_PADDING_ISO_IEC_7816_4:
+				padding[0] = 0x80;
+				memset(padding + 1, 0, padding_size - 1);
+				break;
+
+			case PHALCON_CRYPT_PADDING_ZERO:
+				memset(padding, 0, padding_size);
+				break;
+
+			case PHALCON_CRYPT_PADDING_SPACE:
+				memset(padding, 0x20, padding_size);
+				break;
+
+			default:
+				padding_size = 0;
+				break;
+		}
+	}
+
+	if (!padding_size) {
+		ZVAL_ZVAL(return_value, text, 1, 0);
+	} else {
+		assert(padding_size <= block_size);
+		phalcon_concat_vs(return_value, text, padding, padding_size, 0);
+	}
+}
+
+/**
  * Encrypts a text
  *
  *<code>
@@ -235,11 +344,11 @@ PHP_METHOD(Phalcon_Crypt, getOptions) {
 PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	zval *source, *key = NULL, *options = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, encrypt_options = {};
-	zval method = {}, iv_size = {}, iv = {}, encrypt = {};
+	zval method = {}, pos = {}, mode = {}, cipher = {}, iv_size = {}, iv = {}, block_size = {}, padding = {}, padded = {}, encrypt = {};
 
 	phalcon_fetch_params(0, 1, 2, &source, &key, &options);
 
-	if (phalcon_function_exists_ex(SL("openssl_decrypt")) == FAILURE) {
+	if (phalcon_function_exists_ex(SL("openssl_encrypt")) == FAILURE) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "openssl extension is required");
 		return;
 	}
@@ -282,10 +391,41 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
+/*
+	PHALCON_CALL_FUNCTION(&methods, "openssl_get_cipher_methods", &PHALCON_GLOBAL(z_true));
+
+	if (!phalcon_fast_in_array(&method, &methods)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Cipher algorithm is unknown");
+		return;
+	}
+*/
+
+	phalcon_read_property(&padding, getThis(), SL("_padding"), PH_NOISY|PH_READONLY);
+	if (PHALCON_GT_LONG(&padding, 0) && phalcon_fast_strrpos_str(&pos, &method, SL("-"))) {
+		zval tmp = {};
+		phalcon_substr(&mode, &method, Z_LVAL(pos) + 1, 0);
+		phalcon_substr(&tmp, &method, 0, Z_LVAL(pos));
+		phalcon_fast_str_replace_str(&cipher, "-", "", &tmp);
+		zval_ptr_dtor(&tmp);
+		phalcon_strtolower_inplace(&cipher);
+	}
 
 	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
+
 	PHALCON_CALL_FUNCTION(&iv, "openssl_random_pseudo_bytes", &iv_size);
-	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &text, &method, &encrypt_key, &encrypt_options, &iv);
+
+	if (PHALCON_GT_LONG(&padding, 0)) {
+		if (PHALCON_LE_LONG(&iv_size, 0) && zend_is_true(&cipher)) {
+			PHALCON_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
+		} else {
+			ZVAL_COPY_VALUE(&block_size, &iv_size);
+		}
+		phalcon_crypt_pad_text(&padded, &text, &mode, Z_LVAL(block_size), Z_LVAL(padding));
+	} else {
+		ZVAL_COPY_VALUE(&padded, &text);
+	}
+
+	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &padded, &method, &encrypt_key, &encrypt_options, &iv);
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY|PH_READONLY);
@@ -298,6 +438,116 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		zval_ptr_dtor(&arguments);
 
 		RETURN_CTOR(&value);
+	}
+}
+
+/**
+ * @brief Removes padding @a padding_type from @a text
+ * @param return_value Result, possibly unpadded
+ * @param text Message to be unpadded
+ * @param mode Encryption mode; unpadding is applied only in CBC or ECB mode
+ * @param block_size Cipher block size
+ * @param padding_type Padding scheme
+ * @note If the function detects that the text was not padded, it will return it unmodified
+ */
+static void phalcon_crypt_unpad_text(zval *return_value, zval *text, zval *mode, uint block_size, int padding_type)
+{
+	uint padding_size;
+	char padding[256];
+	int i;
+	char *str_mode;
+	char *str_text;
+	uint text_len;
+
+	assert(Z_TYPE_P(text) == IS_STRING);
+	assert(Z_TYPE_P(mode) == IS_STRING);
+
+	padding_size = 0;
+	str_mode = Z_STRVAL_P(mode);
+	str_text = Z_STRVAL_P(text);
+	text_len = Z_STRLEN_P(text);
+
+	if (text_len && (text_len % block_size == 0) && (!strcmp(str_mode, "ecb") || !strcmp(str_mode, "cbc"))) {
+		switch (padding_type) {
+			case PHALCON_CRYPT_PADDING_ANSI_X_923:
+				if ((unsigned char)(str_text[text_len - 1]) <= block_size) {
+					padding_size = str_text[text_len - 1];
+
+					memset(padding, 0, padding_size - 1);
+					padding[padding_size-1] = (unsigned char)padding_size;
+
+					if (memcmp(padding, str_text + text_len - padding_size, padding_size)) {
+						padding_size = 0;
+					}
+				}
+
+				break;
+
+			case PHALCON_CRYPT_PADDING_PKCS7:
+				if ((unsigned char)(str_text[text_len-1]) <= block_size) {
+					padding_size = str_text[text_len-1];
+
+					memset(padding, padding_size, padding_size);
+
+					if (memcmp(padding, str_text + text_len - padding_size, padding_size)) {
+						padding_size = 0;
+					}
+				}
+
+				break;
+
+			case PHALCON_CRYPT_PADDING_ISO_10126:
+				padding_size = str_text[text_len-1];
+				break;
+
+			case PHALCON_CRYPT_PADDING_ISO_IEC_7816_4:
+				i = text_len - 1;
+				while (i > 0 && str_text[i] == 0x00 && padding_size < block_size) {
+					++padding_size;
+					--i;
+				}
+
+				padding_size = ((unsigned char)str_text[i] == 0x80) ? (padding_size + 1) : 0;
+				break;
+
+			case PHALCON_CRYPT_PADDING_ZERO:
+				i = text_len - 1;
+				while (i >= 0 && str_text[i] == 0x00 && padding_size <= block_size) {
+					++padding_size;
+					--i;
+				}
+
+				break;
+
+			case PHALCON_CRYPT_PADDING_SPACE:
+				i = text_len - 1;
+				while (i >= 0 && str_text[i] == 0x20 && padding_size <= block_size) {
+					++padding_size;
+					--i;
+				}
+
+				break;
+
+			default:
+				break;
+		}
+
+		if (padding_size && padding_size <= block_size) {
+			assert(padding_size <= text_len);
+			if (padding_size < text_len) {
+				phalcon_substr(return_value, text, 0, text_len - padding_size);
+			}
+			else {
+				ZVAL_EMPTY_STRING(return_value);
+			}
+		}
+		else {
+			padding_size = 0;
+		}
+	}
+
+	if (!padding_size) {
+		ZVAL_ZVAL(return_value, text, 1, 0);
 	}
 }
 
@@ -316,7 +566,8 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	zval *source, *key = NULL, *options = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, encrypt_options = {};
-	zval method = {}, iv_size = {}, iv = {}, text_to_decipher = {};
+	zval method = {}, pos = {}, mode = {}, cipher = {}, iv_size = {}, iv = {}, block_size = {}, decrypted = {};
+	zval padding = {}, unpadded = {}, text_to_decipher = {};
 
 	phalcon_fetch_params(0, 1, 2, &source, &key, &options);
 
@@ -359,6 +610,24 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
+/*
+	PHALCON_CALL_FUNCTION(&methods, "openssl_get_cipher_methods", &PHALCON_GLOBAL(z_true));
+
+	if (!phalcon_fast_in_array(&method, &methods)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Cipher algorithm is unknown");
+		return;
+	}
+*/
+	phalcon_read_property(&padding, getThis(), SL("_padding"), PH_NOISY|PH_READONLY);
+	if (PHALCON_GT_LONG(&padding, 0) && phalcon_fast_strrpos_str(&pos, &method, SL("-"))) {
+		zval tmp = {};
+		phalcon_substr(&mode, &method, Z_LVAL(pos) + 1, 0);
+		phalcon_substr(&tmp, &method, 0, Z_LVAL(pos));
+		phalcon_fast_str_replace_str(&cipher, "-", "", &tmp);
+		zval_ptr_dtor(&tmp);
+		phalcon_strtolower_inplace(&cipher);
+	}
+
 	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
 
 	if (Z_LVAL(iv_size) <= 0) {
@@ -369,21 +638,32 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		phalcon_substr(&text_to_decipher, &text, Z_LVAL(iv_size), 0);
 	}
 
-	PHALCON_CALL_FUNCTION(return_value, "openssl_decrypt", &text_to_decipher, &method, &encrypt_key, &encrypt_options, &iv);
-	if (unlikely(Z_TYPE_P(return_value) != IS_STRING)) {
-		convert_to_string(return_value);
+	PHALCON_CALL_FUNCTION(&decrypted, "openssl_decrypt", &text_to_decipher, &method, &encrypt_key, &encrypt_options, &iv);
+	if (unlikely(Z_TYPE(decrypted) != IS_STRING)) {
+		convert_to_string(&decrypted);
+	}
+
+	if (PHALCON_GT_LONG(&padding, 0)) {
+		if (PHALCON_LE_LONG(&iv_size, 0) && zend_is_true(&cipher)) {
+			PHALCON_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
+		} else {
+			ZVAL_COPY_VALUE(&block_size, &iv_size);
+		}
+		phalcon_crypt_unpad_text(&unpadded, &decrypted, &mode, Z_LVAL(block_size), Z_LVAL(padding));
+	} else {
+		ZVAL_COPY_VALUE(&unpadded, &decrypted);
 	}
 
 	phalcon_read_property(&handler, getThis(), SL("_afterDecrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, return_value, PH_COPY);
+		phalcon_array_append(&arguments, &decrypted, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		PHALCON_CALL_USER_FUNC_ARRAY(return_value, &handler, &arguments);
 		zval_ptr_dtor(&arguments);
-
-		RETURN_CTOR(&value);
+	} else {
+		RETURN_CTOR(&unpadded);
 	}
 }
 

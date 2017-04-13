@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, write){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy){
 
-	zval *_sid, sid, cache = {};
+	zval *_sid = NULL, sid = {}, cache = {};
 
 	phalcon_fetch_params(0, 0, 1, &_sid);
 

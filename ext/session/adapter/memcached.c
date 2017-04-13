@@ -273,7 +273,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, write){
  */
 PHP_METHOD(Phalcon_Session_Adapter_Memcached, destroy){
 
-	zval *_sid, sid, memcached = {};
+	zval *_sid = NULL, sid = {}, memcached = {};
 
 	phalcon_fetch_params(0, 0, 1, &_sid);
 

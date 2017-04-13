@@ -120,7 +120,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, start){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&servers, &options, SL("servers"))) {
+	if (!phalcon_array_isset_fetch_str(&servers, &options, SL("servers"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "No servers given in options");
 		return;
 	}
@@ -129,17 +129,17 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, start){
 
 	phalcon_array_update_str(&backend_option, SL("servers"), &servers, PH_COPY);
 
-	if (phalcon_array_isset_fetch_str(&client, &options, SL("client"))) {
+	if (phalcon_array_isset_fetch_str(&client, &options, SL("client"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("client"), &client, PH_COPY);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"))) {
+	if (!phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"), PH_READONLY)) {
 		ZVAL_LONG(&lifetime, 8600);
 	} else {
 		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	}
 
-	if (phalcon_array_isset_fetch_str(&prefix, &options, SL("prefix"))) {
+	if (phalcon_array_isset_fetch_str(&prefix, &options, SL("prefix"), PH_READONLY)) {
         phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, PH_COPY);
 	}
 

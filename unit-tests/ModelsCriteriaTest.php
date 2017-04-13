@@ -421,12 +421,12 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$personas = Personas::query()->where("estado='X'")->execute();
 		$this->assertTrue(count($personas) == 0);
 
-		$ret = Personas::query()->update(array("estado" => "X"))->where("estado='I'")->execute(TRUE);
+		$ret = Personas::query()->update(array("estado" => "X"))->where("estado='I'")->execute();
 
 		$personas = Personas::query()->where("estado='X'")->execute();
 		$this->assertTrue(count($personas) > 0);
 
-		$ret = Personas::query()->update(array("estado" => "I"))->where("estado='X'")->execute(TRUE);
+		$ret = Personas::query()->update(array("estado" => "I"))->where("estado='X'")->execute();
 
 		$personas = Personas::query()->where("estado='X'")->execute();
 		$this->assertTrue(count($personas) == 0);

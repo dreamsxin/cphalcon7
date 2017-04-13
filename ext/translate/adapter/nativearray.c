@@ -84,7 +84,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&data, options, SL("content"))) {
+	if (!phalcon_array_isset_fetch_str(&data, options, SL("content"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation content was not provided");
 		return;
 	}
@@ -118,8 +118,8 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	}
 
 	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&translation, &translate, index, 0)) {
-		PHALCON_CPY_WRT_CTOR(&translation, index);
+	if (!phalcon_array_isset_fetch(&translation, &translate, index, PH_READONLY)) {
+		ZVAL_COPY_VALUE(&translation, index);
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {

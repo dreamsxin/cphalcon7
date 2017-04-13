@@ -15,11 +15,11 @@ if (!file_exists(__DIR__ . '/config.db.local.php')) {
 		'dbname' => 'phalcon_test',
 		'schema' => 'public'
 	);
-	/*
+/*
 	$configSqlite = array(
 		'dbname' => '/tmp/phalcon_test.sqlite',
 	);
-	*/
+*/
 } else {
 	require __DIR__ . '/config.db.local.php';
 }

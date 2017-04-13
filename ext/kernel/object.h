@@ -91,6 +91,11 @@ static inline int phalcon_isset_property_zval(zval *object, const zval *property
 /** Reading properties */
 int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags);
 
+static inline int phalcon_return_property(zval *result, zval *object, const char *property_name, uint32_t property_length)
+{
+	return phalcon_read_property(result, object, property_name, property_length, PH_COPY);
+}
+
 static inline int phalcon_read_object_property(zval *result, zend_object *object, const char *property_name, uint32_t property_length, int flags)
 {
 	zval obj = {};
@@ -113,17 +118,14 @@ static inline int phalcon_read_property_zval(zval *result, zval *object, zval *p
 	return phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), flags);
 }
 
-/**
- * Returns an object's member
- */
-static inline int phalcon_return_property(zval *return_value, zval *object, const char *property_name, uint32_t property_length)
+static inline int phalcon_return_property_zval(zval *result, zval *object, zval *property)
 {
-	return phalcon_read_property(return_value, object, property_name, property_length, 0);
-}
+	if (unlikely(Z_TYPE_P(property) != IS_STRING)) {
+		ZVAL_NULL(result);
+		return FAILURE;
+	}
 
-static inline int phalcon_return_property_zval(zval *return_value, zval *object, zval *property)
-{
-	return phalcon_read_property_zval(return_value, object, property, PH_NOISY);
+	return phalcon_read_property(result, object, Z_STRVAL_P(property), Z_STRLEN_P(property), PH_COPY);
 }
 
 /** Updating properties */
@@ -163,16 +165,6 @@ static inline int phalcon_isset_property_zval_array(zval *object, const zval *pr
 	}
 
 	return 0;
-}
-
-/**
- * Returns an object's Array properties
- */
-static inline int phalcon_return_property_array(zval *return_value, zval *object, const char *property_name, uint32_t property_length, const zval *index)
-{
-	ZVAL_NULL(return_value);
-	phalcon_read_property_array(return_value, object, property_name, property_length, index, 0);
-	return FAILURE;
 }
 
 /** Static properties */

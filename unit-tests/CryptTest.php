@@ -22,7 +22,7 @@ class CryptTest extends PHPUnit_Framework_TestCase
 {
 
 	/**
-	 * @requires extension mcrypt
+	 * @requires extension openssl
 	 */
 	public function testEncryption()
 	{
@@ -52,7 +52,7 @@ class CryptTest extends PHPUnit_Framework_TestCase
 	}
 
 	/**
-	 * @requires extension mcrypt
+	 * @requires extension openssl
 	 */
 	public function testEncryptBase64()
 	{
@@ -68,5 +68,41 @@ class CryptTest extends PHPUnit_Framework_TestCase
 		$encrypted = $crypt->encryptBase64($text, $key, TRUE);
 		$actual = $crypt->decryptBase64($encrypted, $key, TRUE);
 		$this->assertEquals($actual, $text);
+	}
+
+	/**
+	 * @requires extension openssl
+	 * @medium
+	 */
+	public function testPadding()
+	{
+		$texts = array('');
+		$key   = '0123456789ABCDEF0123456789ABCDEF';
+		$methods = array('aes-256-ecb', 'aes-256-cbc', 'aes-256-cfb');
+		$pads  = array(
+			Phalcon\Crypt::PADDING_ANSI_X_923, Phalcon\Crypt::PADDING_PKCS7,
+			Phalcon\Crypt::PADDING_ISO_10126, Phalcon\Crypt::PADDING_ISO_IEC_7816_4,
+			Phalcon\Crypt::PADDING_ZERO, Phalcon\Crypt::PADDING_SPACE
+		);
+
+		for ($i=1; $i<128; ++$i) {
+			$texts[] = str_repeat('A', $i);
+		}
+
+		$crypt = new Phalcon\Crypt();
+		$crypt->setKey(substr($key, 0, 16));
+
+		foreach ($pads as $padding) {
+			$crypt->setPadding($padding);
+			foreach ($methods as $method) {
+				$crypt->setMethod($method);
+				foreach ($texts as $text) {
+					$encrypted = $crypt->encrypt($text);
+					$actual    = $crypt->decrypt($encrypted);
+
+					$this->assertEquals($actual, $text);
+				}
+			}
+		}
 	}
 }

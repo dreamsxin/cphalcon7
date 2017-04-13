@@ -153,7 +153,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, valid){
 	ZVAL_UNREF(&matches);
 
 	if (zend_is_true(&match_pattern)) {
-		phalcon_array_fetch_long(&match_zero, &matches, 0, PH_NOISY);
+		phalcon_array_fetch_long(&match_zero, &matches, 0, PH_NOISY|PH_READONLY);
 
 		is_not_equal_function(&valid, &match_zero, value);
 

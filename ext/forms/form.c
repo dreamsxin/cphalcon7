@@ -342,7 +342,7 @@ PHP_METHOD(Phalcon_Forms_Form, getAction){
 
 	ZVAL_STRING(&option, "action");
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+	if (phalcon_array_isset_fetch(return_value, &options, &option, PH_COPY)) {
 		return;
 	}
 
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Forms_Form, getMethod){
 
 	ZVAL_STRING(&option, "method");
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+	if (phalcon_array_isset_fetch(return_value, &options, &option, PH_COPY)) {
 		return;
 	}
 
@@ -414,7 +414,7 @@ PHP_METHOD(Phalcon_Forms_Form, getEnctype){
 
 	ZVAL_STRING(&option, "enctype");
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(return_value, &options, &option, 0)) {
+	if (phalcon_array_isset_fetch(return_value, &options, &option, PH_COPY)) {
 		return;
 	}
 
@@ -456,7 +456,7 @@ PHP_METHOD(Phalcon_Forms_Form, getOption){
 	}
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &options, option, 0)) {
+	if (phalcon_array_isset_fetch(&value, &options, option, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 
@@ -566,7 +566,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		return;
 	}
 
-	ZVAL_STRING(&service_name, ISV(filter));
+	ZVAL_STR(&service_name, IS(filter));
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
@@ -584,7 +584,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (!phalcon_array_isset_fetch(&element, &elements, &key, 0)) {
+		if (!phalcon_array_isset_fetch(&element, &elements, &key, PH_READONLY)) {
 			continue;
 		}
 
@@ -799,7 +799,7 @@ PHP_METHOD(Phalcon_Forms_Form, getMessagesFor){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&element_messages, &messages, name, 0)) {
+	if (phalcon_array_isset_fetch(&element_messages, &messages, name, PH_READONLY)) {
 		RETURN_CTOR(&element_messages);
 	}
 
@@ -933,7 +933,7 @@ PHP_METHOD(Phalcon_Forms_Form, render){
 		PHALCON_ENSURE_IS_STRING(name);
 
 		phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY|PH_READONLY);
-		if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
+		if (!phalcon_array_isset_fetch(&element, &elements, name, PH_READONLY)) {
 			zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
 			return;
 		}
@@ -994,7 +994,7 @@ PHP_METHOD(Phalcon_Forms_Form, get){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
+	if (!phalcon_array_isset_fetch(&element, &elements, name, PH_READONLY)) {
 		PHALCON_ENSURE_IS_STRING(name);
 		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
 		return;
@@ -1020,7 +1020,7 @@ PHP_METHOD(Phalcon_Forms_Form, label){
 	}
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
+	if (!phalcon_array_isset_fetch(&element, &elements, name, PH_READONLY)) {
 		PHALCON_ENSURE_IS_STRING(name);
 		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
 		return;
@@ -1042,7 +1042,7 @@ PHP_METHOD(Phalcon_Forms_Form, getLabel){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&element, &elements, name, 0)) {
+	if (!phalcon_array_isset_fetch(&element, &elements, name, PH_READONLY)) {
 		PHALCON_ENSURE_IS_STRING(name);
 		zend_throw_exception_ex(phalcon_forms_exception_ce, 0, "Element with ID=%s is not a part of the form", Z_STRVAL_P(name));
 		return;
@@ -1108,7 +1108,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 			/**
 			 * Check if the data is in the data array
 			 */
-			if (phalcon_array_isset_fetch(&value, &data, name, 0)) {
+			if (phalcon_array_isset_fetch(&value, &data, name, PH_READONLY)) {
 				RETURN_CTOR(&value);
 			}
 		}
@@ -1150,7 +1150,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 	if (PHALCON_IS_EMPTY(name)) {
 		RETURN_CTOR(&filter_data);
 	} else if (Z_TYPE(filter_data) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&value, &filter_data, name, 0)) {
+		if (phalcon_array_isset_fetch(&value, &filter_data, name, PH_READONLY)) {
 			RETURN_CTOR(&value);
 		}
 	}
@@ -1275,7 +1275,7 @@ PHP_METHOD(Phalcon_Forms_Form, current){
 	phalcon_read_property(&elements, getThis(), SL("_elementsIndexed"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(elements) == IS_ARRAY) {
 		phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
-		if (phalcon_array_isset_fetch(return_value, &elements, &position, 0)) {
+		if (phalcon_array_isset_fetch(return_value, &elements, &position, PH_COPY)) {
 			return;
 		}
 	}
@@ -1339,12 +1339,12 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessage){
 
 	phalcon_fetch_params(0, 2, 0, &filed, &message);
 
-	phalcon_return_property(&current_messages, getThis(), SL("_messages"));
+	phalcon_read_property(&current_messages, getThis(), SL("_messages"), PH_READONLY);
 	if (Z_TYPE(current_messages) != IS_ARRAY) {
 		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, 0)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, PH_READONLY)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, &element_messages, "__construct");
 	}
@@ -1374,12 +1374,12 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	phalcon_fetch_params(0, 2, 0, &filed, &messages);
 
-	phalcon_return_property(&current_messages, getThis(), SL("_messages"));
+	phalcon_read_property(&current_messages, getThis(), SL("_messages"), PH_READONLY);
 	if (Z_TYPE(current_messages) != IS_ARRAY) {
 		array_init(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, 0)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, PH_READONLY)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, &element_messages, "__construct");
 	}

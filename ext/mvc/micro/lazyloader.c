@@ -93,7 +93,7 @@ PHP_METHOD(Phalcon_Mvc_Micro_LazyLoader, __call){
 
 	phalcon_fetch_params(0, 2, 0, &method, &arguments);
 
-	phalcon_return_property(&handler, getThis(), SL("_handler"));
+	phalcon_read_property(&handler, getThis(), SL("_handler"), PH_READONLY);
 	if (Z_TYPE(handler) != IS_OBJECT) {
 		phalcon_read_property(&definition, getThis(), SL("_definition"), PH_NOISY|PH_READONLY);
 		ce0 = phalcon_fetch_class(&definition, ZEND_FETCH_CLASS_DEFAULT);

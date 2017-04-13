@@ -241,17 +241,16 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	zval *method, *args = NULL, method_name = {}, arguments = {}, methods = {}, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
 	phalcon_fetch_params(0, 1, 1, &method, &args);
+	ZVAL_DUP(&method_name, method);
 
-	PHALCON_CPY_WRT_CTOR(&method_name, method);
-
-	if (!args) {
+	if (!args || Z_TYPE_P(args) == IS_NULL) {
 		array_init(&arguments);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&arguments, args);
+		ZVAL_COPY_VALUE(&arguments, args);
 	}
 
 	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&func, &methods, &method_name, 0)) {
+	if (phalcon_array_isset_fetch(&func, &methods, &method_name, PH_READONLY)) {
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
 			return;
 	}

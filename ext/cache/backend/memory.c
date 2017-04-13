@@ -103,7 +103,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, get){
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_READONLY);
-	if (phalcon_array_isset_fetch(&cached_content, &data, &prefixed_key, 0)) {
+	if (phalcon_array_isset_fetch(&cached_content, &data, &prefixed_key, PH_READONLY)) {
 		if (Z_TYPE(cached_content) != IS_NULL) {
 			if (phalcon_is_numeric(&cached_content)) {
 				RETURN_CTOR(&cached_content);

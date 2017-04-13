@@ -97,11 +97,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&service, options, SL("service"))) {
+		if (phalcon_array_isset_fetch_str(&service, options, SL("service"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_cache"), &service);
 		}
 
-		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+		if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 		}
 	}
@@ -113,7 +113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Cache, _getCache){
 
 	zval cache = {}, tmp = {};
 
-	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 
 	if (Z_TYPE(cache) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&tmp, getThis(), "getresolveservice", &cache);

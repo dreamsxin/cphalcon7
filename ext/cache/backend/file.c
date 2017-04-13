@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
 
 	phalcon_fetch_params(0, 2, 0, &frontend, &options);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&cache_dir, options, SL("cacheDir")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&cache_dir, options, SL("cacheDir"), PH_READONLY))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory must be specified with the option cacheDir");
 		return;
 	}

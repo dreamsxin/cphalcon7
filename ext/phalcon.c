@@ -136,6 +136,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Response_Exception);
 	PHALCON_INIT(Phalcon_Http_Client_Exception);
 	PHALCON_INIT(Phalcon_Image_Exception);
+
+	PHALCON_INIT(Phalcon_Router_Exception);
 	PHALCON_INIT(Phalcon_Application_Exception);
 	PHALCON_INIT(Phalcon_Cli_Console_Exception);
 	PHALCON_INIT(Phalcon_Cli_Dispatcher_Exception);
@@ -209,6 +211,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_AdapterInterface);
 	PHALCON_INIT(Phalcon_Logger_AdapterInterface);
 	PHALCON_INIT(Phalcon_Logger_FormatterInterface);
+
+	PHALCON_INIT(Phalcon_RouterInterface);
 	PHALCON_INIT(Phalcon_Mvc_ControllerInterface);
 	PHALCON_INIT(Phalcon_Mvc_DispatcherInterface);
 	PHALCON_INIT(Phalcon_Mvc_Micro_CollectionInterface);
@@ -284,6 +288,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Backend_Memcached);
 	PHALCON_INIT(Phalcon_Cache_Backend_Redis);
 	PHALCON_INIT(Phalcon_Cache_Backend_Yac);
+#if PHALCON_USE_WIREDTIGER
+	PHALCON_INIT(Phalcon_Cache_Backend_Wiredtiger);
+#endif
 	PHALCON_INIT(Phalcon_Cache_Frontend_Json);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Output);
 	PHALCON_INIT(Phalcon_Cache_Frontend_None);
@@ -416,7 +423,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_JsonRpc_Client_Response);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
+
 	PHALCON_INIT(Phalcon_Application);
+	PHALCON_INIT(Phalcon_Router);
 	PHALCON_INIT(Phalcon_Cli_Task);
 	PHALCON_INIT(Phalcon_Cli_Router);
 	PHALCON_INIT(Phalcon_Cli_Console);

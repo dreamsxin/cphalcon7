@@ -116,28 +116,28 @@ PHP_METHOD(Phalcon_Server_Http, __construct){
 
 	intern = phalcon_server_http_object_from_obj(Z_OBJ_P(getThis()));
 
-	if (phalcon_array_isset_fetch_str(&verbose, config, SL("verbose"))) {
+	if (phalcon_array_isset_fetch_str(&verbose, config, SL("verbose"), PH_READONLY)) {
 		intern->ctx.enable_verbose = zend_is_true(&verbose);
 	}
 
-	if (phalcon_array_isset_fetch_str(&worker, config, SL("worker")) && Z_TYPE(worker) == IS_LONG) {
+	if (phalcon_array_isset_fetch_str(&worker, config, SL("worker"), PH_READONLY) && Z_TYPE(worker) == IS_LONG) {
 		num_workers = Z_LVAL(worker);
 	}
 
 	intern->ctx.num_workers = num_workers > phalcon_server_get_cpu_num() ? phalcon_server_get_cpu_num() : num_workers;
 
-	if (phalcon_array_isset_fetch_str(&log_path, config, SL("log")) && Z_TYPE(log_path) == IS_STRING) {
+	if (phalcon_array_isset_fetch_str(&log_path, config, SL("log"), PH_READONLY) && Z_TYPE(log_path) == IS_STRING) {
 		intern->ctx.log_path = zend_string_copy(Z_STR(log_path));
 	}
 
-	if (phalcon_array_isset_fetch_str(&host, config, SL("host")) && Z_TYPE(host) == IS_STRING) {
+	if (phalcon_array_isset_fetch_str(&host, config, SL("host"), PH_READONLY) && Z_TYPE(host) == IS_STRING) {
 		strncpy(intern->ctx.la[0].param_ip, Z_STRVAL(host), 32);
 	} else {
 		strncpy(intern->ctx.la[0].param_ip, "0.0.0.0", 32);
 	}
 	inet_aton(intern->ctx.la[0].param_ip, &intern->ctx.la[0].listenip);
 
-	if (phalcon_array_isset_fetch_str(&port, config, SL("port")) && Z_TYPE(port) == IS_LONG) {
+	if (phalcon_array_isset_fetch_str(&port, config, SL("port"), PH_READONLY) && Z_TYPE(port) == IS_LONG) {
 		intern->ctx.la[0].param_port =Z_LVAL(port);
 	} else {
 		intern->ctx.la[0].param_port = 8383;

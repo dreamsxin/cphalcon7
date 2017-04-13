@@ -90,7 +90,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (Z_TYPE(allow_empty) == IS_NULL) {
 		if (_allow_empty && zend_is_true(_allow_empty)) {
-			PHALCON_CPY_WRT_CTOR(&allow_empty, _allow_empty);
+			ZVAL_COPY_VALUE(&allow_empty, _allow_empty);
 		}
 	}
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
@@ -104,7 +104,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Url, validate){
 		if (!zend_is_true(&label)) {
 			PHALCON_CALL_METHOD(&label, validaton, "getlabel", attribute);
 			if (!zend_is_true(&label)) {
-				PHALCON_CPY_WRT_CTOR(&label, attribute);
+				ZVAL_COPY_VALUE(&label, attribute);
 			}
 		}
 

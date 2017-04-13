@@ -95,7 +95,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"))) {
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
 			return;
@@ -124,7 +124,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
 {
 	zval formatter = {};
 
-	phalcon_return_property(&formatter, getThis(), SL("_formatter"));
+	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_READONLY);
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHOD(NULL, &formatter, "__construct");

@@ -68,11 +68,11 @@ PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, log = {}, json = {};
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
-	
+
 	if (Z_TYPE_P(context) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(&interpolated, getThis(), "interpolate", message, context);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&interpolated, message);
+		ZVAL_COPY_VALUE(&interpolated, message);
 	}
 
 	PHALCON_CALL_METHOD(&type_str, getThis(), "gettypestring", type);

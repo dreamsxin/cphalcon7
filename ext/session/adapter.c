@@ -154,31 +154,31 @@ PHP_METHOD(Phalcon_Session_Adapter, __construct){
 	if (!_expire) {
 		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&expire, _expire);
+		ZVAL_COPY_VALUE(&expire, _expire);
 	}
 
 	if (!_path) {
 		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&path, _path);
+		ZVAL_COPY_VALUE(&path, _path);
 	}
 
 	if (!_secure) {
 		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&secure, _secure);
+		ZVAL_COPY_VALUE(&secure, _secure);
 	}
 
 	if (!_domain) {
 		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&domain, _domain);
+		ZVAL_COPY_VALUE(&domain, _domain);
 	}
 
 	if (!_http_only) {
 		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
+		ZVAL_COPY_VALUE(&http_only, _http_only);
 	}
 
 	if (_expire || _path || _secure || _domain || _http_only) {
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Session_Adapter, setOptions){
 	phalcon_fetch_params(0, 1, 0, &options);
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"))) {
+		if (phalcon_array_isset_fetch_str(&unique_id, options, SL("uniqueId"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_uniqueId"), &unique_id);
 		}
 
@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Session_Adapter, getOptions){
  */
 PHP_METHOD(Phalcon_Session_Adapter, get){
 
-	zval *index, *default_value = NULL, *remove = NULL, unique_id = {}, key = {}, *_SESSION, value = {};
+	zval *index, *default_value = NULL, *remove = NULL, unique_id = {}, key = {}, *_SESSION;
 
 	phalcon_fetch_params(0, 1, 2, &index, &default_value, &remove);
 
@@ -272,14 +272,14 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	_SESSION = phalcon_get_global_str(SL("_SESSION"));
-	if (phalcon_array_isset_fetch(&value, _SESSION, &key, 0)) {
+	if (phalcon_array_isset_fetch(return_value, _SESSION, &key, PH_COPY)) {
 		if (remove && zend_is_true(remove)) {
 			phalcon_array_unset(_SESSION, &key, 0);
 			if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY) {
 				zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
 			}
 		}
-		RETURN_CTOR(&value);
+		return;
 	}
 
 	RETURN_CTOR(default_value);

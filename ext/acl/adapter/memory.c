@@ -511,11 +511,11 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, _allowOrDeny){
 					phalcon_fast_explode_str(&arr, SL("!"), &key);
 
 					if (phalcon_fast_count_int(&arr) >= 3) {
-						phalcon_array_fetch_long(&arr_role_name, &arr, 0, PH_NOISY);
-						phalcon_array_fetch_long(&arr_resource_name, &arr, 1, PH_NOISY);
+						phalcon_array_fetch_long(&arr_role_name, &arr, 0, PH_NOISY|PH_READONLY);
+						phalcon_array_fetch_long(&arr_resource_name, &arr, 1, PH_NOISY|PH_READONLY);
 
 						if (PHALCON_IS_IDENTICAL(&arr_role_name, role_name) && PHALCON_IS_IDENTICAL(&arr_resource_name, resource_name)) {
-							phalcon_array_fetch_long(&arr_access, &arr, 2, PH_NOISY);
+							phalcon_array_fetch_long(&arr_access, &arr, 2, PH_NOISY|PH_READONLY);
 
 							PHALCON_CONCAT_VSVSV(&access_key, &arr_role_name, "!", &arr_resource_name, "!", &arr_access);
 
@@ -685,7 +685,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 	assert(Z_TYPE_P(access) == IS_STRING);
 	assert(Z_TYPE_P(access_list) == IS_ARRAY);
 
-	if (!phalcon_array_isset_fetch(&inherited_roles, role_inherits, role, 0) || Z_TYPE(inherited_roles) != IS_ARRAY) {
+	if (!phalcon_array_isset_fetch(&inherited_roles, role_inherits, role, PH_READONLY) || Z_TYPE(inherited_roles) != IS_ARRAY) {
 		return PHALCON_ACL_DUNNO;
 	}
 
@@ -694,7 +694,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
 		int found;
 
 		phalcon_concat_vsvsv(&access_key, parent_role, SL("!"), resource, SL("!"), access, 0);
-		found = phalcon_array_isset_fetch(&have_access, access_list, &access_key, 0);
+		found = phalcon_array_isset_fetch(&have_access, access_list, &access_key, PH_READONLY);
 
 		if (found) {
 			result = zend_is_true(&have_access) ? PHALCON_ACL_ALLOW : PHALCON_ACL_DENY;
@@ -772,6 +772,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
 
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_CTOR(&status);
 		}
@@ -794,7 +795,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	/**
 	 * Check if there is a direct combination for role-resource-access
 	 */
-	if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
+	if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, PH_READONLY)) {
 		allow_access = zend_is_true(&have_access) ? PHALCON_ACL_ALLOW : PHALCON_ACL_DENY;
 	} else {
 		allow_access = PHALCON_ACL_DUNNO;
@@ -817,7 +818,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		/**
 		 * In the direct role
 		 */
-		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
+		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, PH_READONLY)) {
 			allow_access = zend_is_true(&have_access) ? PHALCON_ACL_ALLOW : PHALCON_ACL_DENY;
 		} else {
 			allow_access = phalcon_role_adapter_memory_check_inheritance(role, resource, &star, &access_list, &role_inherits);
@@ -833,7 +834,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 		/**
 		 * Try in the direct role
 		 */
-		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, 0)) {
+		if (phalcon_array_isset_fetch(&have_access, &access_list, &access_key, PH_READONLY)) {
 			allow_access = zend_is_true(&have_access) ? PHALCON_ACL_ALLOW : PHALCON_ACL_DENY;
 		} else {
 			allow_access = phalcon_role_adapter_memory_check_inheritance(role, &star, &star, &access_list, &role_inherits);
@@ -850,7 +851,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 			phalcon_array_append(&arguments, resource, PH_COPY);
 			phalcon_array_append(&arguments, access, PH_COPY);
 			phalcon_array_append(&arguments, data, PH_COPY);
-			phalcon_array_append_long(&arguments, allow_access, 0);
+			phalcon_array_append_long(&arguments, allow_access, PH_COPY);
 			PHALCON_CALL_USER_FUNC_ARRAY(&ret, &func, &arguments);
 			if (!zend_is_true(&ret)) {
 				ZVAL_BOOL(return_value, PHALCON_ACL_DENY == allow_access);
@@ -863,6 +864,7 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), return_value);
+		zval_ptr_dtor(&event_name);
 	}
 }
 

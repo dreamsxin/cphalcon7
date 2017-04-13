@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		phalcon_array_append(&params, parameters, PH_COPY);
 		phalcon_array_append(&params, data, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&params, parameters);
+		ZVAL_DUP(&params, parameters);
 	}
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
@@ -95,11 +95,11 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		phalcon_array_merge_recursive_n2(&params, &default_params, PH_READONLY);
 	}
 
-	if (!phalcon_array_isset_fetch_long(&id, &params, 0)) {
-		phalcon_array_fetch_str(&id, &params, SL("id"), PH_NOISY);
+	if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
+		phalcon_array_fetch_str(&id, &params, SL("id"), PH_NOISY|PH_READONLY);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&name, &params, SL("name"))) {
+	if (!phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_READONLY)) {
 		phalcon_array_update_str(&params, SL("name"), &id, PH_COPY);
 	} else {
 		if (!zend_is_true(&name)) {
@@ -116,19 +116,19 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		}
 	}
 
-	if (!phalcon_array_isset_fetch_str(&value, &params, SL("value"))) {
+	if (!phalcon_array_isset_fetch_str(&value, &params, SL("value"), PH_COPY)) {
 		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 	} else {
 		phalcon_array_unset_str(&params, SL("value"), 0);
 	}
 
-	if (phalcon_array_isset_fetch_str(&use_empty, &params, SL("useEmpty"))) {
-		if (!phalcon_array_isset_fetch_str(&empty_value, &params, SL("emptyValue"))) {
+	if (phalcon_array_isset_fetch_str(&use_empty, &params, SL("useEmpty"), PH_COPY)) {
+		if (!phalcon_array_isset_fetch_str(&empty_value, &params, SL("emptyValue"), PH_COPY)) {
 			ZVAL_EMPTY_STRING(&empty_value);
 		} else {
 			phalcon_array_unset_str(&params, SL("emptyValue"), 0);
 		}
-		if (!phalcon_array_isset_fetch_str(&empty_text, &params, SL("emptyText"))) {
+		if (!phalcon_array_isset_fetch_str(&empty_text, &params, SL("emptyText"), PH_COPY)) {
 			ZVAL_STRING(&empty_text, "Choose...");
 		} else {
 			phalcon_array_unset_str(&params, SL("emptyText"), 0);
@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		phalcon_array_unset_str(&params, SL("useEmpty"), 0);
 	}
 
-	if (phalcon_array_isset_fetch_str(&using, &params, SL("using"))) {
+	if (phalcon_array_isset_fetch_str(&using, &params, SL("using"), PH_COPY)) {
 		phalcon_array_unset_str(&params, SL("using"), 0);
 	}
 
@@ -156,8 +156,8 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &empty_value, "\">", &empty_text, &close_option);
 	}
 
-	if (!phalcon_array_isset_fetch_long(&options, &params, 1)) {
-		PHALCON_CPY_WRT_CTOR(&options, data);
+	if (!phalcon_array_isset_fetch_long(&options, &params, 1, PH_READONLY)) {
+		ZVAL_COPY_VALUE(&options, data);
 	}
 
 	if (Z_TYPE(options) == IS_OBJECT) {
@@ -230,11 +230,11 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		 */
 		PHALCON_CALL_METHOD(&option, resultset, "current");
 		if (Z_TYPE_P(using) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch_long(&using_zero, using, 0)) {
+			if (!phalcon_array_isset_fetch_long(&using_zero, using, 0, PH_READONLY)) {
 				ZVAL_STRING(&using_zero, "id");
 			}
-			if (!phalcon_array_isset_fetch_long(&using_one, using, 1)) {
-				PHALCON_CPY_WRT_CTOR(&using_one, &using_zero);
+			if (!phalcon_array_isset_fetch_long(&using_one, using, 1, PH_READONLY)) {
+				ZVAL_COPY_VALUE(&using_one, &using_zero);
 			}
 			if (Z_TYPE(option) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(&option, SL("readattribute")) == SUCCESS) {
@@ -251,24 +251,24 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 					/**
 					 * Read the variable directly from the model/object
 					 */
-					phalcon_return_property_zval(&option_value, &option, &using_zero);
+					phalcon_read_property_zval(&option_value, &option, &using_zero, PH_READONLY);
 
 					/**
 					 * Read the text directly from the model/object
 					 */
-					phalcon_return_property_zval(&option_text, &option, &using_one);
+					phalcon_read_property_zval(&option_text, &option, &using_one, PH_READONLY);
 				}
 			} else {
 				if (Z_TYPE(option) == IS_ARRAY) {
 					/**
 					 * Read the variable directly from the model/object
 					 */
-					phalcon_array_fetch(&option_value, &option, &using_zero, PH_NOISY);
+					phalcon_array_fetch(&option_value, &option, &using_zero, PH_NOISY|PH_READONLY);
 
 					/**
 					 * Read the text directly from the model/object
 					 */
-					phalcon_array_fetch(&option_text, &option, &using_one, PH_NOISY);
+					phalcon_array_fetch(&option_text, &option, &using_one, PH_NOISY|PH_READONLY);
 				} else {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Resultset returned an invalid value");
 					return;

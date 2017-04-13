@@ -27,19 +27,19 @@ extern zend_class_entry *phalcon_mvc_routerinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_Mvc_RouterInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_routerinterface_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_INFO(0, moduleName)
+	ZEND_ARG_TYPE_INFO(0, moduleName, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_routerinterface_setdefaultcontroller, 0, 0, 1)
-	ZEND_ARG_INFO(0, controllerName)
+	ZEND_ARG_TYPE_INFO(0, controllerName, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_routerinterface_setdefaultaction, 0, 0, 1)
-	ZEND_ARG_INFO(0, actionName)
+	ZEND_ARG_TYPE_INFO(0, actionName, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_routerinterface_setdefaults, 0, 0, 1)
-	ZEND_ARG_INFO(0, defaults)
+	ZEND_ARG_TYPE_INFO(0, defaults, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_routerinterface_handle, 0, 0, 0)

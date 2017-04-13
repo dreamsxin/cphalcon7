@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	 * Apply an array of filters
 	 */
 	if (Z_TYPE_P(filters) == IS_ARRAY) {
-		PHALCON_CPY_WRT_CTOR(&new_value, value);
+		ZVAL_DUP(&new_value, value);
 		if (Z_TYPE_P(value) != IS_NULL) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(filters), filter) {
 				zval array_value = {};
@@ -232,15 +232,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 						}
 					} ZEND_HASH_FOREACH_END();
 
-					PHALCON_CPY_WRT_CTOR(&new_value, &array_value);
+					ZVAL_DUP(&new_value, &array_value);
 				} else {
 					PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", &new_value, filter, options);
-					PHALCON_CPY_WRT_CTOR(&new_value, &filter_value);
+					ZVAL_DUP(&new_value, &filter_value);
 				}
 			} ZEND_HASH_FOREACH_END();
-
 		}
-
 		RETURN_CTOR(&new_value);
 	}
 
@@ -281,7 +279,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	phalcon_fetch_params(0, 2, 1, &value, &filter, &options);
 
 	phalcon_read_property(&filters, getThis(), SL("_filters"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&filter_object, &filters, filter, 0) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
+	if (phalcon_array_isset_fetch(&filter_object, &filters, filter, PH_READONLY) && (Z_TYPE(filter_object) == IS_OBJECT || phalcon_is_callable(&filter_object))) {
 		/**
 		 * If the filter is a closure we call it in the PHP userland
 		 */
@@ -324,7 +322,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "int!") || (PHALCON_IS_STRING(filter, "int?") && phalcon_is_numeric(value))) {
-		PHALCON_CPY_WRT_CTOR(&filtered, value);
+		ZVAL_DUP(&filtered, value);
 		convert_to_long_base(&filtered, 10);
 		goto ph_end_0;
 	}
@@ -417,18 +415,18 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 
 	if (PHALCON_IS_STRING(filter, "xss") || PHALCON_IS_STRING(filter, "xssclean")) {
 		if (Z_TYPE_P(options) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags")) || Z_TYPE(allow_tags) != IS_ARRAY) {
-				phalcon_return_property(&allow_tags, getThis(), SL("_allowTags"));
+			if (!phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags"), PH_READONLY) || Z_TYPE(allow_tags) != IS_ARRAY) {
+				phalcon_read_property(&allow_tags, getThis(), SL("_allowTags"), PH_READONLY);
 			} else {
 				phalcon_array_append_string(&allow_tags, SL("body"), 0);
 				phalcon_array_append_string(&allow_tags, SL("html"), 0);
 			}
-			if (!phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowAttributes")) || Z_TYPE(allow_attributes) != IS_ARRAY) {
-				phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
+			if (!phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowAttributes"), PH_READONLY) || Z_TYPE(allow_attributes) != IS_ARRAY) {
+				phalcon_read_property(&allow_attributes, getThis(), SL("_allowAttributes"), PH_READONLY);
 			}
 		} else {
-			phalcon_return_property(&allow_tags, getThis(), SL("_allowTags"));
-			phalcon_return_property(&allow_attributes, getThis(), SL("_allowAttributes"));
+			phalcon_read_property(&allow_tags, getThis(), SL("_allowTags"), PH_READONLY);
+			phalcon_read_property(&allow_attributes, getThis(), SL("_allowAttributes"), PH_READONLY);
 		}
 
 		phalcon_xss_clean(&filtered, value, &allow_tags, &allow_attributes);
@@ -443,6 +441,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	if (PHALCON_IS_STRING(filter, "datetime")) {
 		ZVAL_STRING(&format, "Y-m-d H:i:s");
 		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value, &format);
+		zval_ptr_dtor(&format);
 		goto ph_end_0;
 	}
 
@@ -450,7 +449,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
 	return;
 
-	ph_end_0:
+ph_end_0:
 
 	RETURN_CTOR(&filtered);
 }

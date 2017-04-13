@@ -108,29 +108,29 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 
 	phalcon_array_update_str_str(&backend_option, SL("statsKey"), SL("$PMM$"), PH_COPY);
 
-	if (phalcon_array_isset_fetch_str(&host, options, SL("host"))) {
+	if (phalcon_array_isset_fetch_str(&host, options, SL("host"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("host"), &host, PH_COPY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&port, options, SL("port"))) {
+	if (phalcon_array_isset_fetch_str(&port, options, SL("port"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("port"), &port, PH_COPY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&auth, options, SL("auth"))) {
+	if (phalcon_array_isset_fetch_str(&auth, options, SL("auth"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("auth"), &auth, PH_COPY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"))) {
+	if (phalcon_array_isset_fetch_str(&persistent, options, SL("persistent"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("persistent"), &persistent, PH_COPY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"))) {
+	if (phalcon_array_isset_fetch_str(&lifetime, options, SL("lifetime"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 	} else {
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 

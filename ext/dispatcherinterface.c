@@ -24,8 +24,20 @@ zend_class_entry *phalcon_dispatcherinterface_ce;
 
 static const zend_function_entry phalcon_dispatcherinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setActionSuffix, arginfo_phalcon_dispatcherinterface_setactionsuffix)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setDefaultModule, arginfo_phalcon_dispatcherinterface_setdefaultmodule)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getDefaultModule, NULL)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setDefaultNamespace, arginfo_phalcon_dispatcherinterface_setdefaultnamespace)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getDefaultNamespace, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setDefaultHandler, arginfo_phalcon_dispatcherinterface_setdefaulthandler)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getDefaultHandler, NULL)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setDefaultAction, arginfo_phalcon_dispatcherinterface_setdefaultaction)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getDefaultAction, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setModuleName, arginfo_phalcon_dispatcherinterface_setmodulename)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getModuleName, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setNamespaceName, arginfo_phalcon_dispatcherinterface_setnamespacename)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getNamespaceName, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setHandlerName, arginfo_phalcon_dispatcherinterface_sethandlername)
+	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getHandlerName, NULL)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setActionName, arginfo_phalcon_dispatcherinterface_setactionname)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, getActionName, NULL)
 	PHP_ABSTRACT_ME(Phalcon_DispatcherInterface, setParams, arginfo_phalcon_dispatcherinterface_setparams)
@@ -61,6 +73,20 @@ PHALCON_INIT_CLASS(Phalcon_DispatcherInterface){
 PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setActionSuffix);
 
 /**
+ * Sets the default module
+ *
+ * @param string $module
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setDefaultModule);
+
+/**
+ * Gets the default module
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getDefaultModule);
+
+/**
  * Sets the default namespace
  *
  * @param string $namespace
@@ -68,11 +94,81 @@ PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setActionSuffix);
 PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setDefaultNamespace);
 
 /**
+ * Gets the default namespace
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getDefaultNamespace);
+
+/**
+ * Sets the default handler name
+ *
+ * @param string $handlerName
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setDefaultHandler);
+
+/**
+ * Gets the default handler name
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getDefaultHandler);
+
+/**
  * Sets the default action name
  *
  * @param string $actionName
  */
 PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setDefaultAction);
+
+/**
+ * Gets the default action name
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getDefaultAction);
+
+/**
+ * Sets the module name to be dispatched
+ *
+ * @param string $moduleName
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setModuleName);
+
+/**
+ * Gets last dispatched module name
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getModuleName);
+
+/**
+ * Sets the namespace to be dispatched
+ *
+ * @param string $namespaceName
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setNamespaceName);
+
+/**
+ * Gets last dispatched namespace
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getNamespaceName);
+
+/**
+ * Sets the handler name to be dispatched
+ *
+ * @param string $handlerName
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, setHandlerName);
+
+/**
+ * Gets last dispatched handler name
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_DispatcherInterface, getHandlerName);
 
 /**
  * Sets the action name to be dispatched

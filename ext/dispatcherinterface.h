@@ -30,12 +30,32 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setactionsuffix, 0, 0
 	ZEND_ARG_TYPE_INFO(0, actionSuffix, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultmodule, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultnamespace, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, namespace, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaulthandler, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, handlerName, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultaction, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, actionName, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setmodulename, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setnamespacename, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, namespace, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_sethandlername, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, handlerName, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setactionname, 0, 0, 1)

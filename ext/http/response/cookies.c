@@ -198,31 +198,31 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	if (!_expire) {
 		phalcon_read_property(&expire, getThis(), SL("_expire"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&expire, _expire);
+		ZVAL_COPY_VALUE(&expire, _expire);
 	}
 
 	if (!_path) {
 		phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&path, _path);
+		ZVAL_COPY_VALUE(&path, _path);
 	}
 
 	if (!_secure) {
 		phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&secure, _secure);
+		ZVAL_COPY_VALUE(&secure, _secure);
 	}
 
 	if (!_domain) {
 		phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&domain, _domain);
+		ZVAL_COPY_VALUE(&domain, _domain);
 	}
 
 	if (!_http_only) {
 		phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&http_only, _http_only);
+		ZVAL_COPY_VALUE(&http_only, _http_only);
 	}
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	/**
 	 * Check if the cookie needs to be updated or
 	 */
-	if (!phalcon_array_isset_fetch(&cookie, &cookies, name, 0)) {
+	if (!phalcon_array_isset_fetch(&cookie, &cookies, name, PH_READONLY)) {
 		object_init_ex(&cookie, phalcon_http_cookie_ce);
 
 		PHALCON_CALL_METHOD(NULL, &cookie, "__construct", name, value, &expire, &path, &secure, &domain, &http_only);
@@ -272,7 +272,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 			return;
 		}
 
-		ZVAL_STRING(&service, ISV(response));
+		ZVAL_STR(&service, IS(response));
 
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 	}
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &cookies, name, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &cookies, name, PH_COPY)) {
 		/**
 		 * Create the cookie if the it does not exist
 		 */
@@ -368,7 +368,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 	/**
 	 * Check the internal bag
 	 */
-	if (phalcon_array_isset_fetch(&cookie, &cookies, name, 0)) {
+	if (phalcon_array_isset_fetch(&cookie, &cookies, name, PH_READONLY)) {
 		PHALCON_CALL_METHOD(NULL, &cookie, "delete");
 		RETURN_TRUE;
 	}

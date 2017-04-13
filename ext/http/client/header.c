@@ -266,7 +266,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 	if (Z_TYPE_P(content) == IS_STRING) {
 		phalcon_fast_explode_str(&content_parts, SL("\r\n"), content);
 	} else if (Z_TYPE_P(content) == IS_ARRAY) {
-		PHALCON_CPY_WRT_CTOR(&content_parts, content);
+		ZVAL_COPY_VALUE(&content_parts, content);
 	} else {
 		RETURN_FALSE;
 	}
@@ -280,7 +280,8 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 			} else {
 				if (phalcon_start_with_str(header , SL("HTTP/"))) {
 					phalcon_fast_explode_str(&header_parts, SL(" "), header);
-					if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 1) && phalcon_array_isset_fetch_long(&val2, &header_parts, 2)) {
+					if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 1, PH_READONLY)
+						&& phalcon_array_isset_fetch_long(&val2, &header_parts, 2, PH_READONLY)) {
 						phalcon_update_property(getThis(), SL("_status_code"), &val1);
 						phalcon_update_property(getThis(), SL("_status_message"), &val2);
 					}
@@ -288,12 +289,14 @@ PHP_METHOD(Phalcon_Http_Client_Header, parse){
 				continue;
 			}
 		} else {
-			PHALCON_CPY_WRT_CTOR(&header_parts, header);
+			ZVAL_COPY_VALUE(&header_parts, header);
 		}
 
-		if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 0) && phalcon_array_isset_fetch_long(&val2, &header_parts, 1)) {
+		if (Z_TYPE(header_parts) == IS_ARRAY && phalcon_array_isset_fetch_long(&val1, &header_parts, 0, PH_READONLY)
+			&& phalcon_array_isset_fetch_long(&val2, &header_parts, 1, PH_READONLY)) {
 				ZVAL_STR(&trimmed, phalcon_trim(&val2, NULL, PHALCON_TRIM_BOTH));
 				PHALCON_CALL_METHOD(NULL, getThis(), "set", &val1, &trimmed);
+				zval_ptr_dtor(&trimmed);
 		}
 	} ZEND_HASH_FOREACH_END();
 }

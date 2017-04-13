@@ -55,6 +55,7 @@
 #include "cache/backend/xcache.h"
 #include "cache/backend/redis.h"
 #include "cache/backend/yac.h"
+#include "cache/backend/wiredtiger.h"
 #include "cache/exception.h"
 #include "cache/frontendinterface.h"
 #include "cache/frontend/base64.h"
@@ -222,6 +223,10 @@
 
 #include "application.h"
 #include "application/exception.h"
+
+#include "router.h"
+#include "routerinterface.h"
+#include "router/exception.h"
 
 #include "cli/console.h"
 #include "cli/console/exception.h"

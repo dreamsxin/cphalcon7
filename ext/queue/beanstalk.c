@@ -145,7 +145,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 	if (Z_TYPE_P(options) != IS_ARRAY) {
 		array_init_size(&parameters, 2);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&parameters, options);
+		ZVAL_DUP(&parameters, options);
 	}
 
 	if (!phalcon_array_isset_str(&parameters, SL("host"))) {
@@ -170,7 +170,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, connect){
 
 	phalcon_read_property(&parameters, getThis(), SL("_parameters"), PH_NOISY|PH_READONLY);
 
-	if (!phalcon_array_isset_fetch_str(&host, &parameters, SL("host")) || !phalcon_array_isset_fetch_str(&port, &parameters, SL("port"))) {
+	if (!phalcon_array_isset_fetch_str(&host, &parameters, SL("host"), PH_READONLY)
+		|| !phalcon_array_isset_fetch_str(&port, &parameters, SL("port"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -235,15 +236,15 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, put){
 	/**
 	 * Priority is 100 by default
 	 */
-	if (!phalcon_array_isset_fetch_str(&priority, options, SL("priority"))) {
+	if (!phalcon_array_isset_fetch_str(&priority, options, SL("priority"), PH_READONLY)) {
 		ZVAL_STRING(&priority, "100");
 	}
 
-	if (!phalcon_array_isset_fetch_str(&delay, options, SL("delay"))) {
+	if (!phalcon_array_isset_fetch_str(&delay, options, SL("delay"), PH_READONLY)) {
 		ZVAL_STRING(&delay, "0");
 	}
 
-	if (!phalcon_array_isset_fetch_str(&ttr, options, SL("ttr"))) {
+	if (!phalcon_array_isset_fetch_str(&ttr, options, SL("ttr"), PH_READONLY)) {
 		ZVAL_STRING(&ttr, "86400");
 	}
 
@@ -438,11 +439,11 @@ static void phalcon_queue_beanstalk_peek_common(zval *return_value, zval *this_p
 {
 	zval job_id = {}, length = {}, serialized = {}, body = {};
 
-	if (!phalcon_array_isset_fetch_long(&job_id, response, 1)) {
+	if (!phalcon_array_isset_fetch_long(&job_id, response, 1, PH_READONLY)) {
 		ZVAL_NULL(&job_id);
 	}
 
-	if (!phalcon_array_isset_fetch_long(&length, response, 2)) {
+	if (!phalcon_array_isset_fetch_long(&length, response, 2, PH_READONLY)) {
 		ZVAL_NULL(&length);
 	}
 
@@ -544,7 +545,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, readYaml){
 
 	phalcon_array_fetch_long(&status, &response, 0, PH_NOISY|PH_READONLY);
 
-	if (phalcon_array_isset_fetch_long(&num_bytes, &response, 1)) {
+	if (phalcon_array_isset_fetch_long(&num_bytes, &response, 1, PH_READONLY)) {
 		PHALCON_CALL_METHOD(&yaml_data, getThis(), "read");
 		PHALCON_CALL_FUNCTION(&data, "yaml_parse", &yaml_data);
 	} else {
@@ -582,7 +583,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		PHALCON_ENSURE_IS_LONG(length);
 	}
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "connect");
 		if (Z_TYPE(connection) != IS_RESOURCE) {
@@ -609,7 +610,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
 		array_init_size(&meta, 4);
 		if (php_stream_populate_meta_data(stream, &meta)) {
-			if (phalcon_array_isset_fetch_str(&timed_out, &meta, SL("timed_out"))) {
+			if (phalcon_array_isset_fetch_str(&timed_out, &meta, SL("timed_out"), PH_READONLY)) {
 				timeout = zend_is_true(&timed_out);
 			}
 		}
@@ -659,7 +660,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, write){
 
 	phalcon_fetch_params(0, 1, 0, &data);
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		PHALCON_CALL_METHOD(&connection, getThis(), "connect");
 		if (Z_TYPE(connection) != IS_RESOURCE) {
@@ -687,7 +688,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, disconnect){
 	zval connection = {};
 	php_stream *stream;
 
-	phalcon_return_property(&connection, getThis(), SL("_connection"));
+	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
 		RETURN_FALSE;
 	}
@@ -725,8 +726,8 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	phalcon_read_property(&params, getThis(), SL("_parameters"), PH_NOISY|PH_READONLY);
 	if (
 			Z_TYPE(params) != IS_ARRAY
-		 || !phalcon_array_isset_fetch_str(&host, &params, SL("host"))
-		 || !phalcon_array_isset_fetch_str(&port, &params, SL("port"))
+		 || !phalcon_array_isset_fetch_str(&host, &params, SL("host"), PH_READONLY)
+		 || !phalcon_array_isset_fetch_str(&port, &params, SL("port"), PH_READONLY)
 	) {
 		fail = 1;
 	} else if (Z_TYPE(host) != IS_STRING || Z_TYPE(port) != IS_LONG) {

@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	} else if (Z_TYPE_P(uri) == IS_STRING) {
 		PHALCON_CALL_FUNCTION(&parts, "parse_url", uri);
-		if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"))) {
+		if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"), PH_READONLY)) {
 			ZVAL_MAKE_REF(&params);
 			PHALCON_CALL_FUNCTION(NULL, "parse_str", &query, &params);
 			ZVAL_UNREF(&params);
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
 		phalcon_update_property(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
-		phalcon_return_property(&parts, uri, SL("_parts"));
+		phalcon_read_property(&parts, uri, SL("_parts"), PH_READONLY);
 		phalcon_update_property(getThis(), SL("_parts"), &parts);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
@@ -259,7 +259,7 @@ PHP_METHOD(Phalcon_Http_Uri, getPath)
 
 	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
-	if (!phalcon_array_isset_fetch_str(&value, &parts, SL("path"))) {
+	if (!phalcon_array_isset_fetch_str(&value, &parts, SL("path"), PH_READONLY)) {
 		 RETURN_NULL();
 	}
 
@@ -277,10 +277,10 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 
 	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
-	if (phalcon_array_isset_fetch_str(&scheme, &parts, SL("scheme")) && PHALCON_IS_NOT_EMPTY(&scheme)) {
-		if (phalcon_array_isset_fetch_str(&host, &parts, SL("host")) && PHALCON_IS_NOT_EMPTY(&host)) {
-			if (phalcon_array_isset_fetch_str(&user, &parts, SL("user")) && PHALCON_IS_NOT_EMPTY(&user)) {
-				if (phalcon_array_isset_fetch_str(&pass, &parts, SL("pass")) && PHALCON_IS_NOT_EMPTY(&pass)) {
+	if (phalcon_array_isset_fetch_str(&scheme, &parts, SL("scheme"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&scheme)) {
+		if (phalcon_array_isset_fetch_str(&host, &parts, SL("host"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&host)) {
+			if (phalcon_array_isset_fetch_str(&user, &parts, SL("user"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&user)) {
+				if (phalcon_array_isset_fetch_str(&pass, &parts, SL("pass"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&pass)) {
 					PHALCON_CONCAT_VSVSVSV(&uri, &scheme, "://", &user, ":", &pass, "@", &host);
 				} else {
 					PHALCON_CONCAT_VSVSV(&uri, &scheme, "://", &user, "@", &host);
@@ -293,11 +293,11 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&port, &parts, SL("port")) && PHALCON_IS_NOT_EMPTY(&port)) {
+	if (phalcon_array_isset_fetch_str(&port, &parts, SL("port"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&port)) {
 		PHALCON_SCONCAT_SV(&uri, ":", &port);
 	}
 
-	if (phalcon_array_isset_fetch_str(&path, &parts, SL("path")) && PHALCON_IS_NOT_EMPTY(&path)) {
+	if (phalcon_array_isset_fetch_str(&path, &parts, SL("path"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&path)) {
 		if (!phalcon_start_with_str(&path, SL("/"))) {
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
@@ -305,12 +305,12 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query")) && PHALCON_IS_NOT_EMPTY(&query)) {
+	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&query)) {
 		phalcon_http_build_query(&tmp, &query, "&");
 		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
 	}
 
-	if (phalcon_array_isset_fetch_str(&fragment, &parts, SL("fragment")) && PHALCON_IS_NOT_EMPTY(&fragment)) {
+	if (phalcon_array_isset_fetch_str(&fragment, &parts, SL("fragment"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&fragment)) {
 		PHALCON_SCONCAT_SV(&uri, "#", &fragment);
 	}
 

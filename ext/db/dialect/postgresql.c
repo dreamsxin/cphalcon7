@@ -589,15 +589,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 
 	phalcon_fetch_params(0, 3, 0, &table_name, &schema_name, &definition);
 
-	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"))) {
+	if (!phalcon_array_isset_fetch_str(&columns, definition, SL("columns"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'columns' is required in the definition array");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
 
-	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"))) {
-		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"))) {
+	if (phalcon_array_isset_fetch_str(&options, definition, SL("options"), PH_READONLY)) {
+		if (!phalcon_array_isset_fetch_str(&temporary, &options, SL("temporary"), PH_READONLY)) {
 			ZVAL_FALSE(&temporary);
 		}
 	} else {
@@ -662,7 +662,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	 * Create related indexes
 	 */
 	ZVAL_NULL(&indexsql_aftercreate);
-	if (phalcon_array_isset_fetch_str(&indexes, definition, SL("indexes"))) {
+	if (phalcon_array_isset_fetch_str(&indexes, definition, SL("indexes"), PH_READONLY)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&indexes), index) {
 			zval index_name = {}, columns = {}, column_list = {}, index_type = {}, index_sql = {};
 
@@ -688,7 +688,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createTable){
 	/**
 	 * Create related references
 	 */
-	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"))) {
+	if (phalcon_array_isset_fetch_str(&references, definition, SL("references"), PH_READONLY)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&references), reference) {
 			zval name = {}, columns = {}, column_list = {}, referenced_table = {}, referenced_columns = {}, referenced_column_list = {}, constaint_sql = {}, reference_sql = {}, on_delete = {}, on_update = {};
 
@@ -768,20 +768,20 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
 
-	zval *view_name, *definition, *schema_name, view_sql = {}, view = {}, sql = {};
+	zval *view_name, *definition, *schema_name, view_sql = {}, view = {};
 
 	phalcon_fetch_params(0, 3, 0, &view_name, &definition, &schema_name);
 
-	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"))) {
+	if (!phalcon_array_isset_fetch_str(&view_sql, definition, SL("sql"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'sql' is required in the definition array");
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
-	PHALCON_CONCAT_SVSV(&sql, "CREATE VIEW ", &view, " AS ", &view_sql);
+	PHALCON_CONCAT_SVSV(return_value, "CREATE VIEW ", &view, " AS ", &view_sql);
 
-	RETURN_CTOR(&sql);
+	zval_ptr_dtor(&view);
 }
 
 /**
@@ -794,7 +794,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, createView){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 
-	zval *view_name, *schema_name, *if_exists = NULL, view = {}, sql = {};
+	zval *view_name, *schema_name, *if_exists = NULL, view = {};
 
 	phalcon_fetch_params(0, 2, 1, &view_name, &schema_name, &if_exists);
 
@@ -805,12 +805,11 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, dropView){
 	PHALCON_CALL_METHOD(&view, getThis(), "preparetable", view_name, schema_name);
 
 	if (zend_is_true(if_exists)) {
-		PHALCON_CONCAT_SV(&sql, "DROP VIEW IF EXISTS ", &view);
+		PHALCON_CONCAT_SV(return_value, "DROP VIEW IF EXISTS ", &view);
 	} else {
-		PHALCON_CONCAT_SV(&sql, "DROP VIEW ", &view);
+		PHALCON_CONCAT_SV(return_value, "DROP VIEW ", &view);
 	}
-
-	RETURN_CTOR(&sql);
+	zval_ptr_dtor(&view);
 }
 
 /**
@@ -851,7 +850,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, tableExists){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, viewExists){
 
-	zval *view_name, *schema_name = NULL, sql = {};
+	zval *view_name, *schema_name = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &view_name, &schema_name);
 
@@ -860,12 +859,10 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, viewExists){
 	}
 
 	if (zend_is_true(schema_name)) {
-		PHALCON_CONCAT_SVSVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM pg_views WHERE viewname='", view_name, "' AND schemaname='", schema_name, "'");
+		PHALCON_CONCAT_SVSVS(return_value, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM pg_views WHERE viewname='", view_name, "' AND schemaname='", schema_name, "'");
 	} else {
-		PHALCON_CONCAT_SVS(&sql, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM pg_views WHERE viewname='", view_name, "'");
+		PHALCON_CONCAT_SVS(return_value, "SELECT CASE WHEN COUNT(*) > 0 THEN 1 ELSE 0 END FROM pg_views WHERE viewname='", view_name, "'");
 	}
-
-	RETURN_CTOR(&sql);
 }
 
 /**

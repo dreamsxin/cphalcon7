@@ -39,6 +39,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cryptinterface_setoptions, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, options, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cryptinterface_setpadding, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, padding, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cryptinterface_encrypt, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 1)

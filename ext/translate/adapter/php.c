@@ -91,12 +91,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"))) {
+	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation locale was not provided");
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"))) {
+	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
 		phalcon_add_trailing_slash(&directory);
 		PHALCON_CONCAT_VVS(&file, &directory, &locale, ".php");
 	} else {
@@ -137,8 +137,8 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, query){
 	}
 
 	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&translation, &translate, index, 0)) {
-		PHALCON_CPY_WRT_CTOR(&translation, index);
+	if (!phalcon_array_isset_fetch(&translation, &translate, index, PH_READONLY)) {
+		ZVAL_COPY_VALUE(&translation, index);
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {

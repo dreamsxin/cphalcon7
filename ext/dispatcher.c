@@ -51,13 +51,20 @@ zend_class_entry *phalcon_dispatcher_ce;
 
 PHP_METHOD(Phalcon_Dispatcher, __construct);
 PHP_METHOD(Phalcon_Dispatcher, setActionSuffix);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultModule);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultModule);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultHandler);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultHandler);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultAction);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultAction);
 PHP_METHOD(Phalcon_Dispatcher, setModuleName);
 PHP_METHOD(Phalcon_Dispatcher, getModuleName);
 PHP_METHOD(Phalcon_Dispatcher, setNamespaceName);
 PHP_METHOD(Phalcon_Dispatcher, getNamespaceName);
-PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace);
-PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace);
-PHP_METHOD(Phalcon_Dispatcher, setDefaultAction);
+PHP_METHOD(Phalcon_Dispatcher, setHandlerName);
+PHP_METHOD(Phalcon_Dispatcher, getHandlerName);
 PHP_METHOD(Phalcon_Dispatcher, setActionName);
 PHP_METHOD(Phalcon_Dispatcher, getActionName);
 PHP_METHOD(Phalcon_Dispatcher, setLogicBinding);
@@ -84,14 +91,10 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, fireEvent);
 PHP_METHOD(Phalcon_Dispatcher, getLastException);
 PHP_METHOD(Phalcon_Dispatcher, getLastHandler);
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setmodulename, 0, 0, 1)
-	ZEND_ARG_INFO(0, moduleName)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setnamespacename, 0, 0, 1)
-	ZEND_ARG_INFO(0, namespaceName)
-ZEND_END_ARG_INFO()
+PHP_METHOD(Phalcon_Dispatcher, getPreviousNamespaceName);
+PHP_METHOD(Phalcon_Dispatcher, getPreviousActionName);
+PHP_METHOD(Phalcon_Dispatcher, getPreviousParams);
+PHP_METHOD(Phalcon_Dispatcher, getPreviousParam);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setreturnedvalue, 0, 0, 1)
 	ZEND_ARG_INFO(0, value)
@@ -104,13 +107,20 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Dispatcher, setActionSuffix, arginfo_phalcon_dispatcherinterface_setactionsuffix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, setModuleName, arginfo_phalcon_dispatcher_setmodulename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, getModuleName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, setNamespaceName, arginfo_phalcon_dispatcher_setnamespacename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setDefaultModule, arginfo_phalcon_dispatcherinterface_setdefaultmodule, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultNamespace, arginfo_phalcon_dispatcherinterface_setdefaultnamespace, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getDefaultNamespace, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setDefaultHandler, arginfo_phalcon_dispatcherinterface_setdefaulthandler, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultAction, arginfo_phalcon_dispatcherinterface_setdefaultaction, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setModuleName, arginfo_phalcon_dispatcherinterface_setmodulename, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getModuleName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setNamespaceName, arginfo_phalcon_dispatcherinterface_setnamespacename, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setHandlerName, arginfo_phalcon_dispatcherinterface_sethandlername, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getHandlerName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setActionName, arginfo_phalcon_dispatcherinterface_setactionname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getActionName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setLogicBinding, arginfo_phalcon_dispatcherinterface_setlogicbinding, ZEND_ACC_PUBLIC)
@@ -137,6 +147,10 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getLastException, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getLastHandler, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getPreviousNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getPreviousActionName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getPreviousParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getPreviousParam, arginfo_phalcon_dispatcherinterface_getparam, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -158,10 +172,11 @@ PHALCON_INIT_CLASS(Phalcon_Dispatcher){
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_params"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_returnedValue"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_lastHandler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultHandler"), ZEND_ACC_PROTECTED);
-	zend_declare_property_string(phalcon_dispatcher_ce, SL("_defaultAction"), "", ZEND_ACC_PROTECTED);
-	zend_declare_property_string(phalcon_dispatcher_ce, SL("_handlerSuffix"), "", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_handlerSuffix"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_dispatcher_ce, SL("_actionSuffix"), "Action", ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_isExactHandler"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_previousNamespaceName"), ZEND_ACC_PROTECTED);
@@ -194,32 +209,6 @@ PHP_METHOD(Phalcon_Dispatcher, __construct){
 }
 
 /**
- * Sets the events manager
- *
- * @param Phalcon\Events\ManagerInterface $eventsManager
- */
-PHP_METHOD(Phalcon_Dispatcher, setEventsManager){
-
-	zval *events_manager;
-
-	phalcon_fetch_params(0, 1, 0, &events_manager);
-
-	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
-
-}
-
-/**
- * Returns the internal event manager
- *
- * @return Phalcon\Events\ManagerInterface
- */
-PHP_METHOD(Phalcon_Dispatcher, getEventsManager){
-
-
-	RETURN_MEMBER(getThis(), "_eventsManager");
-}
-
-/**
  * Sets the default action suffix
  *
  * @param string $actionSuffix
@@ -232,6 +221,110 @@ PHP_METHOD(Phalcon_Dispatcher, setActionSuffix){
 
 	phalcon_update_property(getThis(), SL("_actionSuffix"), action_suffix);
 
+}
+
+/**
+ * Sets the default module
+ *
+ * @param string $module
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultModule){
+
+	zval *module;
+
+	phalcon_fetch_params(0, 1, 0, &module);
+
+	phalcon_update_property(getThis(), SL("_defaultModule"), module);
+
+}
+
+/**
+ * Returns the default module
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultModule){
+
+
+	RETURN_MEMBER(getThis(), "_defaultModule");
+}
+
+/**
+ * Sets the default namespace
+ *
+ * @param string $namespace
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace){
+
+	zval *namespace;
+
+	phalcon_fetch_params(0, 1, 0, &namespace);
+
+	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace);
+
+}
+
+/**
+ * Returns the default namespace
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace){
+
+
+	RETURN_MEMBER(getThis(), "_defaultNamespace");
+}
+
+/**
+ * Sets the default handler
+ *
+ * @param string $handler
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultHandler){
+
+	zval *handler;
+
+	phalcon_fetch_params(0, 1, 0, &handler);
+
+	phalcon_update_property(getThis(), SL("_defaultHandler"), handler);
+
+}
+
+/**
+ * Returns the default handler
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultHandler){
+
+
+	RETURN_MEMBER(getThis(), "_defaultHandler");
+}
+
+/**
+ * Sets the default action name
+ *
+ * @param string $actionName
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultAction){
+
+	zval *action_name;
+
+	phalcon_fetch_params(0, 1, 0, &action_name);
+
+	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
+
+}
+
+/**
+ * Returns the default action
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultAction){
+
+
+	RETURN_MEMBER(getThis(), "_defaultAction");
 }
 
 /**
@@ -287,44 +380,29 @@ PHP_METHOD(Phalcon_Dispatcher, getNamespaceName){
 }
 
 /**
- * Sets the default namespace
+ * Sets the action name to be dispatched
  *
- * @param string $namespace
+ * @param string $handlerName
  */
-PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace){
+PHP_METHOD(Phalcon_Dispatcher, setHandlerName){
 
-	zval *namespace;
+	zval *handler_name;
 
-	phalcon_fetch_params(0, 1, 0, &namespace);
+	phalcon_fetch_params(0, 1, 0, &handler_name);
 
-	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace);
+	phalcon_update_property(getThis(), SL("_handlerName"), handler_name);
 
 }
 
 /**
- * Returns the default namespace
+ * Gets the lastest dispatched handler name
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace){
+PHP_METHOD(Phalcon_Dispatcher, getHandlerName){
 
 
-	RETURN_MEMBER(getThis(), "_defaultNamespace");
-}
-
-/**
- * Sets the default action name
- *
- * @param string $actionName
- */
-PHP_METHOD(Phalcon_Dispatcher, setDefaultAction){
-
-	zval *action_name;
-
-	phalcon_fetch_params(0, 1, 0, &action_name);
-
-	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
-
+	RETURN_MEMBER(getThis(), "_handlerName");
 }
 
 /**
@@ -459,7 +537,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
 
 	phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&param_value, &params, param, 0)) {
+	if (phalcon_array_isset_fetch(&param_value, &params, param, PH_READONLY)) {
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
 			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -469,7 +547,7 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 				return;
 			}
 
-			ZVAL_STRING(&service, ISV(filter));
+			ZVAL_STR(&service, IS(filter));
 
 			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
 			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
@@ -593,6 +671,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	 */
 	ZVAL_STRING(&event_name, "dispatch:beforeDispatchLoop");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
@@ -669,6 +748,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "dispatch:beforeDispatch");
 			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
@@ -688,14 +768,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (!phalcon_memnstr_str(&handler_name, SL("\\"))) {
 			phalcon_read_property(&camelize, getThis(), SL("_camelizeController"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+				ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 			} else {
 				phalcon_camelize(&camelized_class, &handler_name);
 			}
 		} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 			ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+			ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 		}
 
 		/**
@@ -704,7 +784,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (zend_is_true(&namespace_name)) {
 			phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_READONLY);
 			if (!zend_is_true(&camelize)) {
-				PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
+				ZVAL_COPY_VALUE(&camelized_namespace, &namespace_name);
 			} else {
 				phalcon_camelize(&camelized_namespace, &namespace_name);
 			}
@@ -792,6 +872,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				ZVAL_STRING(&event_name, "dispatch:beforeNotFoundAction");
 				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
 					continue;
 				}
@@ -824,6 +905,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "dispatch:beforeExecuteRoute");
 			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
@@ -869,6 +951,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				ZVAL_STRING(&event_name, "dispatch:afterInitialize");
 				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
 					continue;
 				}
@@ -942,10 +1025,10 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					}
 				} else {
 					PHALCON_CALL_METHOD(&var_name, reflection_parameter, "getname");
-					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, 0)) {
+					if (phalcon_array_isset_fetch(&var_value, &action_params, &var_name, PH_COPY)) {
 						phalcon_array_update(&params, &var_name, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &var_name, 0);
-					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, PH_READONLY)) {
+					} else if (count_action_params >= 0 && phalcon_array_isset_fetch(&var_value, &action_params, &key, PH_COPY)) {
 						phalcon_array_update(&params, &key, &var_value, PH_COPY);
 						phalcon_array_unset(&tmp_params, &key, 0);
 					} else if (count_action_params) {
@@ -966,7 +1049,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				phalcon_array_append(&params, param, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			PHALCON_CPY_WRT_CTOR(&params, &action_params);
+			ZVAL_COPY_VALUE(&params, &action_params);
 		}
 
 		/**
@@ -1026,6 +1109,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			ZVAL_STRING(&event_name, "dispatch:afterExecuteRoute");
 			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
@@ -1040,6 +1124,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			ZVAL_STRING(&event_name, "dispatch:afterDispatch");
 			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 		}
 
 		/**
@@ -1063,6 +1148,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	 */
 	ZVAL_STRING(&event_name, "dispatch:afterDispatchLoop");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	RETURN_CTOR(&handler);
 }
@@ -1088,6 +1174,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 
 	ZVAL_STRING(&event_name, "dispatch:beforeForward");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, forward);
+	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE_P(forward) == IS_STRING) {
 		array_init(&forward_parts);
@@ -1126,7 +1213,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 					phalcon_array_update_str(&forward_parts, SL("namespace"), &real_namespace_name, PH_COPY);
 				}
 			} else {
-				PHALCON_CPY_WRT_CTOR(&real_controller_name, &controller_part);
+				ZVAL_COPY_VALUE(&real_controller_name, &controller_part);
 			}
 
 			phalcon_uncamelize(&controller_part, &real_controller_name);
@@ -1137,7 +1224,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 			}
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&forward_parts, forward);
+		ZVAL_COPY_VALUE(&forward_parts, forward);
 	}
 
 	if (Z_TYPE(forward_parts) != IS_ARRAY) {
@@ -1162,30 +1249,30 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	/**
 	 * Check if we need to forward to another namespace
 	 */
-	if (phalcon_array_isset_fetch_str(&namespace_name, &forward_parts, SL("namespace"))) {
+	if (phalcon_array_isset_fetch_str(&namespace_name, &forward_parts, SL("namespace"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_namespaceName"), &namespace_name);
 	}
 
 	/**
 	 * Check if we need to forward to another controller
 	 */
-	if (phalcon_array_isset_fetch_str(&controller_name, &forward_parts, SL("controller"))) {
+	if (phalcon_array_isset_fetch_str(&controller_name, &forward_parts, SL("controller"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_handlerName"), &controller_name);
-	} else if (phalcon_array_isset_fetch_str(&task_name, &forward_parts, SL("task"))) {
+	} else if (phalcon_array_isset_fetch_str(&task_name, &forward_parts, SL("task"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_handlerName"), &task_name);
 	}
 
 	/**
 	 * Check if we need to forward to another action
 	 */
-	if (phalcon_array_isset_fetch_str(&action_name, &forward_parts, SL("action"))) {
+	if (phalcon_array_isset_fetch_str(&action_name, &forward_parts, SL("action"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_actionName"), &action_name);
 	}
 
 	/**
 	 * Check if we need to forward changing the current parameters
 	 */
-	if (phalcon_array_isset_fetch_str(&params, &forward_parts, SL("params"))) {
+	if (phalcon_array_isset_fetch_str(&params, &forward_parts, SL("params"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_params"), &params);
 	}
 
@@ -1244,7 +1331,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	} else if (phalcon_start_with_str(&handler_name, SL("\\"))) {
 		ZVAL_STRINGL(&camelized_class, Z_STRVAL(handler_name)+1, Z_STRLEN(handler_name)-1);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&camelized_class, &handler_name);
+		ZVAL_COPY_VALUE(&camelized_class, &handler_name);
 	}
 
 	/**
@@ -1253,7 +1340,7 @@ PHP_METHOD(Phalcon_Dispatcher, getHandlerClass){
 	if (zend_is_true(&namespace_name)) {
 		phalcon_read_property(&camelize, getThis(), SL("_camelizeNamespace"), PH_NOISY|PH_READONLY);
 		if (!zend_is_true(&camelize)) {
-			PHALCON_CPY_WRT_CTOR(&camelized_namespace, &namespace_name);
+			ZVAL_COPY_VALUE(&camelized_namespace, &namespace_name);
 		} else {
 			phalcon_camelize(&camelized_namespace, &namespace_name);
 		}
@@ -1354,7 +1441,7 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 	phalcon_read_property(&error_handlers, getThis(), SL("_errorHandlers"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(error_handlers) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, exception_code, 0)) {
+		if (phalcon_array_isset_fetch(&error_handler, &error_handlers, exception_code, PH_READONLY)) {
 			RETURN_CTOR(&error_handler);
 		}
 	}
@@ -1400,6 +1487,7 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 
 		zval *params[] = {&event_name, &exception};
 		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
+		zval_ptr_dtor(&event_name);
 		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -1432,4 +1520,81 @@ PHP_METHOD(Phalcon_Dispatcher, getLastHandler){
 
 
 	RETURN_MEMBER(getThis(), "_lastHandler");
+}
+
+/**
+ * Returns the previons namespace
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getPreviousNamespaceName){
+
+
+	RETURN_MEMBER(getThis(), "_previousNamespaceName");
+}
+
+/**
+ * Returns the previons action
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getPreviousActionName){
+
+
+	RETURN_MEMBER(getThis(), "_previousActionName");
+}
+
+/**
+ * Returns the previons action params
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Dispatcher, getPreviousParams){
+
+
+	RETURN_MEMBER(getThis(), "_previousParams");
+}
+
+/**
+ * Gets a previons param by its name or numeric index
+ *
+ * @param mixed $param
+ * @param string|array $filters
+ * @param mixed $defaultValue
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Dispatcher, getPreviousParam){
+
+	zval *param, *filters = NULL, *default_value = NULL, params = {}, param_value = {}, dependency_injector = {}, exception_code = {}, exception_message = {};
+	zval service = {}, filter = {};
+
+	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
+
+	phalcon_read_property(&params, getThis(), SL("_previousParams"), PH_NOISY|PH_READONLY);
+	if (phalcon_array_isset_fetch(&param_value, &params, param, PH_READONLY)) {
+		if (filters && Z_TYPE_P(filters) != IS_NULL) {
+			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+				ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_NO_DI);
+				ZVAL_STRING(&exception_message, "A dependency injection object is required to access the 'filter' service");
+				PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+				return;
+			}
+
+			ZVAL_STR(&service, IS(filter));
+
+			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
+			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+			PHALCON_CALL_METHOD(return_value, &filter, "sanitize", &param_value, filters);
+			return;
+		} else {
+			RETURN_CTOR(&param_value);
+		}
+	}
+
+	if (default_value) {
+		RETURN_CTOR(default_value);
+	}
+
+	RETURN_NULL();
 }

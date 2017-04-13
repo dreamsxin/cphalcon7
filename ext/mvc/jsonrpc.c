@@ -223,8 +223,10 @@ static int phalcon_mvc_jsonrpc_fire_event(zval *mgr, const char *event, zval *th
 		p[2] = params;
 
 		if (FAILURE == phalcon_call_method(&status, mgr, "fire", params_cnt, p)) {
+			zval_ptr_dtor(&event_name);
 			return FAILURE;
 		}
+		zval_ptr_dtor(&event_name);
 
 		return zend_is_true(&status) ? SUCCESS : FAILURE;
 	}
@@ -260,7 +262,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 	/* Deserializer Json */
 
-	ZVAL_STRING(&service, ISV(request));
+	ZVAL_STR(&service, IS(request));
 
 	PHALCON_CALL_METHOD(&request, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&request, phalcon_http_requestinterface_ce);
@@ -268,7 +270,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	PHALCON_CALL_METHOD(&json, &request, "getrawbody");
 	PHALCON_CALL_FUNCTION(&data, "json_decode", &json, &PHALCON_GLOBAL(z_true));
 
-	ZVAL_STRING(&service, ISV(response));
+	ZVAL_STR(&service, IS(response));
 
 	PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
@@ -285,21 +287,21 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 	} else if (!phalcon_array_isset_str(&data, SL("jsonrpc"))) {
 			phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
 			phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
-	} else if (!phalcon_array_isset_fetch_str(&jsonrpc_method, &data, SL("method"))) {
+	} else if (!phalcon_array_isset_fetch_str(&jsonrpc_method, &data, SL("method"), PH_READONLY)) {
 			phalcon_array_update_str_long(&jsonrpc_error, SL("code"), __LINE__, 0);
 			phalcon_array_update_str_str(&jsonrpc_error, SL("message"), SL("Invalid Request"), PH_COPY);
 	} else {
-		if (!phalcon_array_isset_fetch_str(&jsonrpc_params, &data, SL("params"))) {
+		if (!phalcon_array_isset_fetch_str(&jsonrpc_params, &data, SL("params"), PH_READONLY)) {
 			array_init(&jsonrpc_params);
 		}
 
-		ZVAL_STRING(&service, ISV(url));
+		ZVAL_STR(&service, IS(url));
 		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 
 		PHALCON_CALL_METHOD(&uri, &url, "get", &jsonrpc_method);
 
-		ZVAL_STRING(&service, ISV(router));
+		ZVAL_STR(&service, IS(router));
 		PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
@@ -311,7 +313,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 
 		/* If the router doesn't return a valid module we use the default module */
 		if (!zend_is_true(&module_name)) {
-			phalcon_return_property(&module_name, getThis(), SL("_defaultModule"));
+			phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_READONLY);
 		}
 
 		/**
@@ -343,12 +345,12 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 			/* An array module definition contains a path to a module definition class */
 			if (Z_TYPE(module) == IS_ARRAY) {
 				/* Class name used to load the module definition */
-				if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"))) {
+				if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_READONLY)) {
 					ZVAL_STRING(&class_name, "Module");
 				}
 
 				/* If the developer has specified a path, try to include the file */
-				if (phalcon_array_isset_fetch_str(&path, &module, SL("path"))) {
+				if (phalcon_array_isset_fetch_str(&path, &module, SL("path"), PH_READONLY)) {
 					convert_to_string_ex(&path);
 					if (Z_TYPE(class_name) != IS_STRING || phalcon_class_exists(&class_name, 0) == NULL) {
 						if (phalcon_file_exists(&path) == SUCCESS) {
@@ -393,7 +395,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		PHALCON_CALL_METHOD(&params, &router, "getparams");
 		PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
 
-		ZVAL_STRING(&service, ISV(dispatcher));
+		ZVAL_STR(&service, IS(dispatcher));
 
 		PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
@@ -430,7 +432,7 @@ PHP_METHOD(Phalcon_Mvc_JsonRpc, handle){
 		phalcon_array_update_str(&jsonrpc_message, SL("result"), &jsonrpc_result, PH_COPY);
 	}
 
-	if (phalcon_array_isset_fetch_str(&jsonrpc_id, &data, SL("id"))) {
+	if (phalcon_array_isset_fetch_str(&jsonrpc_id, &data, SL("id"), PH_READONLY)) {
 		phalcon_array_update_str(&jsonrpc_message, SL("id"), &jsonrpc_id, PH_COPY);
 	} else {
 		phalcon_array_update_str(&jsonrpc_message, SL("id"), &PHALCON_GLOBAL(z_null), PH_COPY);

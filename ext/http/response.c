@@ -540,22 +540,19 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		external_redirect = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!_status_code) {
+	if (!_status_code || Z_TYPE_P(_status_code) == IS_NULL) {
 		ZVAL_LONG(&status_code, 302);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&status_code, _status_code);
-		if (unlikely(Z_TYPE(status_code) != IS_LONG)) {
-			convert_to_long(&status_code);
-		}
+		ZVAL_COPY_VALUE(&status_code, _status_code);
 	}
 
 	if (Z_TYPE_P(location) == IS_STRING && zend_is_true(external_redirect)) {
-		PHALCON_CPY_WRT_CTOR(&header, location);
+		ZVAL_COPY_VALUE(&header, location);
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
 		ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
 		RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL));
 		if (zend_is_true(&matched)) {
-			PHALCON_CPY_WRT_CTOR(&header, location);
+			ZVAL_COPY_VALUE(&header, location);
 		} else {
 			ZVAL_NULL(&header);
 		}
@@ -821,7 +818,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 	if (Z_TYPE_P(attachment_name) != IS_STRING) {
 		phalcon_basename(&base_path, file_path);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&base_path, attachment_name);
+		ZVAL_COPY_VALUE(&base_path, attachment_name);
 	}
 
 	if (zend_is_true(attachment)) {

@@ -115,7 +115,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
-	/** 
+	/**
 	 * Update the dependency injector if any
 	 */
 	if (dependency_injector && Z_TYPE_P(dependency_injector) != IS_NULL) {
@@ -123,26 +123,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
-		/** 
+		/**
 		 * Process conditions
 		 */
-		if (phalcon_array_isset_fetch_str(&conditions, params, SL("conditions")) || phalcon_array_isset_fetch_long(&conditions, params, 0)) {
+		if (phalcon_array_isset_fetch_str(&conditions, params, SL("conditions"), PH_READONLY)
+			|| phalcon_array_isset_fetch_long(&conditions, params, 0, PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setconditions", &conditions);
 		}
 
-		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"))) {
+		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setbindparams", &bind_params);
 		}
 
-		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"))) {
+		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setbindtypes", &bind_types);
 		}
 
-		if (phalcon_array_isset_fetch_str(&table, params, SL("table"))) {
+		if (phalcon_array_isset_fetch_str(&table, params, SL("table"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "settable", &table);
 		}
 
-		if (phalcon_array_isset_fetch_str(&set, params, SL("set"))) {
+		if (phalcon_array_isset_fetch_str(&set, params, SL("set"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "set", &set);
 		}
 	}
@@ -247,7 +248,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 		PHALCON_CONCAT_SV(&key, "phu_", &column);
 
 		PHALCON_CONCAT_SVSVSVS(&update_column, "[", &table, "].", &column, " = :", &key, ":");
-		
+
 		phalcon_array_append(&update_columns, &update_column, PH_COPY);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
@@ -255,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 	phalcon_fast_join_str(&joined_columns, SL(", "), &update_columns);
 	phalcon_concat_self(&phql, &joined_columns);
 
-	/** 
+	/**
 	 * Only append conditions if it's string
 	 */
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {

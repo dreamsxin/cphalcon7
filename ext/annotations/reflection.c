@@ -119,7 +119,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getClassAnnotations){
 	phalcon_read_property(&annotations, getThis(), SL("_classAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
 		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
-		if (phalcon_array_isset_fetch_str(&reflection_class, &reflection_data, SL("class"))) {
+		if (phalcon_array_isset_fetch_str(&reflection_class, &reflection_data, SL("class"), PH_READONLY)) {
 			object_init_ex(return_value, phalcon_annotations_collection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &reflection_class);
 
@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 	phalcon_read_property(&annotations, getThis(), SL("_methodAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
 		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
-		if (phalcon_array_isset_fetch_str(&reflection_methods, &reflection_data, SL("methods"))) {
+		if (phalcon_array_isset_fetch_str(&reflection_methods, &reflection_data, SL("methods"), PH_READONLY)) {
 			if (phalcon_fast_count_ev(&reflection_methods)) {
 				array_init(return_value);
 
@@ -192,7 +192,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 	phalcon_read_property(&annotations, getThis(), SL("_propertyAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
 		phalcon_read_property(&reflection_data, getThis(), SL("_reflectionData"), PH_READONLY);
-		if (phalcon_array_isset_fetch_str(&reflection_properties, &reflection_data, SL("properties"))) {
+		if (phalcon_array_isset_fetch_str(&reflection_properties, &reflection_data, SL("properties"), PH_READONLY)) {
 			if (phalcon_fast_count_ev(&reflection_properties)) {
 				array_init(return_value);
 
@@ -248,7 +248,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, __set_state){
 		/**
 		 * Check for a '_reflectionData' in the array to build the Reflection
 		 */
-		if (phalcon_array_isset_fetch_str(&reflection_data, data, SL("_reflectionData"))) {
+		if (phalcon_array_isset_fetch_str(&reflection_data, data, SL("_reflectionData"), PH_READONLY)) {
 			object_init_ex(return_value, phalcon_annotations_reflection_ce);
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &reflection_data);
 			return;

@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, get){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &headers, name, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &headers, name, PH_COPY)) {
 		RETURN_FALSE;
 	}
 }
@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 	phalcon_fetch_params(0, 1, 0, &data);
 
 	object_init_ex(&headers, phalcon_http_response_headers_ce);
-	if (phalcon_array_isset_fetch_str(&data_headers, data, SL("_headers"))) {
+	if (phalcon_array_isset_fetch_str(&data_headers, data, SL("_headers"), PH_READONLY)) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data_headers), idx, str_key, value) {
 			zval key = {};
 			if (str_key) {

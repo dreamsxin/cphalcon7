@@ -118,7 +118,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, validate)
 	PHALCON_CALL_SELF(&valid, "valid", &value, &minsize, &maxsize, &mimes, &minwidth, &maxwidth, &minheight, &maxheight);
 
 	if (PHALCON_IS_FALSE(&valid)) {
-		phalcon_return_property(&type, getThis(), SL("_type"));
+		phalcon_read_property(&type, getThis(), SL("_type"), PH_READONLY);
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
 		if (!zend_is_true(&label)) {
@@ -362,11 +362,11 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid)
 		PHALCON_CALL_METHOD(&height, &image, "getImageHeight");
 	} else if (phalcon_function_exists_ex(SL("getimagesize")) != FAILURE) {
 		PHALCON_CALL_FUNCTION(&imageinfo, "getimagesize", &pathname);
-		if (!phalcon_array_isset_fetch_long(&width, &imageinfo, 0)) {
+		if (!phalcon_array_isset_fetch_long(&width, &imageinfo, 0, PH_READONLY)) {
 			ZVAL_LONG(&width, -1);
 		}
 
-		if (!phalcon_array_isset_fetch_long(&height, &imageinfo, 1)) {
+		if (!phalcon_array_isset_fetch_long(&height, &imageinfo, 1, PH_READONLY)) {
 			ZVAL_LONG(&height, -1);
 		}
 	} else {

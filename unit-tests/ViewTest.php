@@ -350,6 +350,14 @@ class ViewTest extends PHPUnit_Framework_TestCase
 		$view = $this->_getViewDisabled(array(
 			View::LEVEL_BEFORE_TEMPLATE => true,
 			View::LEVEL_LAYOUT => true,
+			View::LEVEL_AFTER_TEMPLATE => true
+		));
+
+		$this->assertEquals($view->getContent(), '<html><div class="action">Action</div></html>' . PHP_EOL);
+
+		$view = $this->_getViewDisabled(array(
+			View::LEVEL_BEFORE_TEMPLATE => true,
+			View::LEVEL_LAYOUT => true,
 			View::LEVEL_AFTER_TEMPLATE => true,
 			View::LEVEL_MAIN_LAYOUT => true
 		));

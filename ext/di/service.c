@@ -64,7 +64,7 @@ PHP_METHOD(Phalcon_Di_Service, isResolved);
 PHP_METHOD(Phalcon_Di_Service, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_service___construct, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, definition)
 	ZEND_ARG_INFO(0, shared)
 ZEND_END_ARG_INFO()
@@ -115,7 +115,6 @@ PHP_METHOD(Phalcon_Di_Service, __construct){
 	zval *name, *definition, *shared = NULL;
 
 	phalcon_fetch_params(0, 2, 1, &name, &definition, &shared);
-	PHALCON_ENSURE_IS_STRING(name);
 
 	phalcon_update_property(getThis(), SL("_name"), name);
 	phalcon_update_property(getThis(), SL("_definition"), definition);
@@ -298,7 +297,7 @@ PHP_METHOD(Phalcon_Di_Service, setParameter){
 	}
 
 	/* Update the parameter */
-	if (phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments"))) {
+	if (phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments"), PH_READONLY)) {
 		phalcon_array_update(&arguments, position, parameter, PH_COPY);
 	} else {
 		array_init_size(&arguments, 1);
@@ -333,8 +332,8 @@ PHP_METHOD(Phalcon_Di_Service, getParameter){
 
 	/* Update the parameter */
 	if (
-		!phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments")) ||
-		!phalcon_array_isset_fetch(return_value, &arguments, position, 0)
+		!phalcon_array_isset_fetch_str(&arguments, &definition, SL("arguments"), PH_READONLY) ||
+		!phalcon_array_isset_fetch(return_value, &arguments, position, PH_COPY)
 	) {
 		RETURN_NULL();
 	}
@@ -363,9 +362,9 @@ PHP_METHOD(Phalcon_Di_Service, __set_state){
 	phalcon_fetch_params(0, 1, 0, &attributes);
 
 	if (
-			!phalcon_array_isset_fetch_str(&name, attributes, SL("_name"))
-		 || !phalcon_array_isset_fetch_str(&definition, attributes, SL("_definition"))
-		 || !phalcon_array_isset_fetch_str(&shared, attributes, SL("_shared"))
+			!phalcon_array_isset_fetch_str(&name, attributes, SL("_name"), PH_READONLY)
+		 || !phalcon_array_isset_fetch_str(&definition, attributes, SL("_definition"), PH_READONLY)
+		 || !phalcon_array_isset_fetch_str(&shared, attributes, SL("_shared"), PH_READONLY)
 	) {
 		PHALCON_THROW_EXCEPTION_STR(spl_ce_BadMethodCallException, "Bad parameters passed to Phalcon\\Di\\Service::__set_state()");
 		return;

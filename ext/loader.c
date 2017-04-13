@@ -252,7 +252,7 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces){
 		if (Z_TYPE(current_namespaces) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_namespaces, &current_namespaces, namespaces);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_namespaces, namespaces);
+			ZVAL_COPY_VALUE(&merged_namespaces, namespaces);
 		}
 
 		phalcon_update_property(getThis(), SL("_namespaces"), &merged_namespaces);
@@ -292,7 +292,7 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 		if (Z_TYPE(current_prefixes) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_prefixes, &current_prefixes, prefixes);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_prefixes, prefixes);
+			ZVAL_COPY_VALUE(&merged_prefixes, prefixes);
 		}
 
 		phalcon_update_property(getThis(), SL("_prefixes"), &merged_prefixes);
@@ -332,7 +332,7 @@ PHP_METHOD(Phalcon_Loader, registerDirs){
 		if (Z_TYPE(current_directories) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_directories, &current_directories, directories);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_directories, directories);
+			ZVAL_COPY_VALUE(&merged_directories, directories);
 		}
 
 		phalcon_update_property(getThis(), SL("_directories"), &merged_directories);
@@ -372,7 +372,7 @@ PHP_METHOD(Phalcon_Loader, registerClasses){
 		if (Z_TYPE(current_classes) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_classes, &current_classes, classes);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_classes, classes);
+			ZVAL_COPY_VALUE(&merged_classes, classes);
 		}
 
 		phalcon_update_property(getThis(), SL("_classes"), &merged_classes);
@@ -458,13 +458,13 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		array_init(&directories);
 		phalcon_array_append(&directories, directory, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&directories, directory);
+		ZVAL_COPY_VALUE(&directories, directory);
 	}
 
 	if (ds == NULL) {
 		ZVAL_STRING(&ds_slash, slash);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&ds_slash, ds);
+		ZVAL_COPY_VALUE(&ds_slash, ds);
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -497,6 +497,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 				ZVAL_STRING(&event_name, "loader:beforeCheckPath");
 				PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+				zval_ptr_dtor(&event_name);
 			}
 
 			/**
@@ -513,6 +514,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 					ZVAL_STRING(&event_name, "loader:pathFound");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
+					zval_ptr_dtor(&event_name);
 				}
 
 				/**
@@ -550,10 +552,11 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	phalcon_fetch_params(0, 1, 0, &class_name);
 
-	phalcon_return_property(&events_manager, getThis(), SL("_eventsManager"));
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:beforeCheckClass");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
+		zval_ptr_dtor(&event_name);
 	}
 
 	/**
@@ -561,13 +564,14 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	 */
 	phalcon_read_property(&classes, getThis(), SL("_classes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(classes) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&file_path, &classes, class_name, 0)) {
+		if (phalcon_array_isset_fetch(&file_path, &classes, class_name, PH_READONLY)) {
 			convert_to_string_ex(&file_path);
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				phalcon_update_property(getThis(), SL("_foundPath"), &file_path);
 
 				ZVAL_STRING(&event_name, "loader:pathFound");
 				PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
+				zval_ptr_dtor(&event_name);
 			}
 
 			RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
@@ -587,7 +591,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		/**
 		 * Checking in namespaces
 		 */
-		phalcon_return_property(&namespaces, getThis(), SL("_namespaces"));
+		phalcon_read_property(&namespaces, getThis(), SL("_namespaces"), PH_READONLY);
 		if (Z_TYPE(namespaces) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(namespaces), idx, str_key, directory) {
 				zval ns_prefix = {}, ns_prefixed = {}, file_name = {};
@@ -624,7 +628,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		/**
 		 * Checking in prefixes
 		 */
-		phalcon_return_property(&prefixes, getThis(), SL("_prefixes"));
+		phalcon_read_property(&prefixes, getThis(), SL("_prefixes"), PH_READONLY);
 		if (Z_TYPE(prefixes) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(prefixes), idx, str_key, directory) {
 				zval prefix = {}, file_name = {};
@@ -668,7 +672,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		/**
 		 * Checking in directories
 		 */
-		phalcon_return_property(&directories, getThis(), SL("_directories"));
+		phalcon_read_property(&directories, getThis(), SL("_directories"), PH_READONLY);
 
 		PHALCON_CALL_METHOD(&found, getThis(), "findfile", &ns_class_name, &directories, &extensions, &ds);
 	}
@@ -679,6 +683,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:afterCheckClass");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
+		zval_ptr_dtor(&event_name);
 	}
 
 	if (zend_is_true(&found)) {

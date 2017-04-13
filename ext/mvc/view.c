@@ -751,7 +751,7 @@ PHP_METHOD(Phalcon_Mvc_View, getVar){
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &params, key, 0)) {
+	if (phalcon_array_isset_fetch(&value, &params, key, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 
@@ -877,7 +877,7 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
 	zval engines = {}, dependency_injector = {}, registered_engines = {}, php_engine = {}, arguments = {}, *engine_service;
 	zend_string *str_key;
 
-	phalcon_return_property(&engines, getThis(), SL("_engines"));
+	phalcon_read_property(&engines, getThis(), SL("_engines"), PH_READONLY);
 
 	/**
 	 * If the engines aren't initialized 'engines' is false
@@ -1027,14 +1027,14 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		 * Check if the cache is started, the first time a cache is started we start the
 		 * cache
 		 */
-		phalcon_return_property(&view_options, getThis(), SL("_options"));
+		phalcon_read_property(&view_options, getThis(), SL("_options"), PH_READONLY);
 
 		/**
 		 * Check if the user has defined a different options to the default
 		 */
 		ZVAL_NULL(&lifetime);
 		if (Z_TYPE(view_options) == IS_ARRAY) {
-			if (phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"))) {
+			if (phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"), PH_READONLY)) {
 				if (Z_TYPE(cache_options) == IS_ARRAY) {
 					if (phalcon_array_isset_str(&cache_options, SL("key"))) {
 						phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY|PH_READONLY);
@@ -1096,6 +1096,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 						ZVAL_STRING(&event_name, "view:beforeRenderView");
 						PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
+						zval_ptr_dtor(&event_name);
 
 						if (PHALCON_IS_FALSE(&status)) {
 							continue;
@@ -1112,6 +1113,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 					if (Z_TYPE(events_manager) == IS_OBJECT) {
 						ZVAL_STRING(&event_name, "view:afterRenderView");
 						PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+						zval_ptr_dtor(&event_name);
 					}
 
 					break;
@@ -1135,6 +1137,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "view:notFoundView");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+			zval_ptr_dtor(&event_name);
 		}
 		if (!zend_is_true(silence)) {
 			PHALCON_CONCAT_SVS(&exception_message, "View '", view_path, "' was not found in the views directory");
@@ -1352,7 +1355,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/**
 	 * Check if there is a layouts directory set
 	 */
-	phalcon_return_property(&layouts_dir, getThis(), SL("_layoutsDir"));
+	phalcon_read_property(&layouts_dir, getThis(), SL("_layoutsDir"), PH_READONLY);
 	if (!zend_is_true(&layouts_dir)) {
 		ZVAL_STRING(&layouts_dir, "layouts/");
 	}
@@ -1391,7 +1394,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/**
 	 * Check if the user has picked a view diferent than the automatic
 	 */
-	phalcon_return_property(&pick_view, getThis(), SL("_pickView"));
+	phalcon_read_property(&pick_view, getThis(), SL("_pickView"), PH_READONLY);
 	if (Z_TYPE(pick_view) == IS_NULL) {
 		if (PHALCON_IS_NOT_EMPTY(&ds_lower_namespace_name)) {
 			PHALCON_CONCAT_VSVSV(&render_view, &ds_lower_namespace_name, "/", &lower_controller_name, "/", &lower_action_name);
@@ -1404,7 +1407,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		 * second the action
 		 */
 		phalcon_array_fetch_long(&render_view, &pick_view, 0, PH_NOISY|PH_READONLY);
-		if (phalcon_array_isset_fetch_long(&pick_view_action, &pick_view, 1)) {
+		if (phalcon_array_isset_fetch_long(&pick_view_action, &pick_view, 1, PH_READONLY)) {
 			ZVAL_COPY_VALUE(&layout_name, &pick_view_action);
 		}
 	}
@@ -1413,8 +1416,8 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 * Call beforeRender if there is an events manager
 	 */
 	ZVAL_STRING(&event_name, "view:beforeRender");
-
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
@@ -1437,7 +1440,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	phalcon_read_property(&render_level, getThis(), SL("_renderLevel"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&render_level)) {
-		phalcon_return_property(&enable_layouts_absolute_path, getThis(), SL("_enableLayoutsAbsolutePath"));
+		phalcon_read_property(&enable_layouts_absolute_path, getThis(), SL("_enableLayoutsAbsolutePath"), PH_READONLY);
 
 		if (use_model) {
 			PHALCON_CALL_METHOD(NULL, view_model, "setview", getThis());
@@ -1550,6 +1553,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	ZVAL_STRING(&event_name, "view:afterRender");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	RETURN_THIS();
 }
@@ -1793,7 +1797,7 @@ PHP_METHOD(Phalcon_Mvc_View, _createCache){
 
 	phalcon_read_property(&view_options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(view_options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"))) {
+		if (phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"), PH_READONLY)) {
 			if (Z_TYPE(cache_options) == IS_ARRAY && phalcon_array_isset_str(&cache_options, SL("service"))) {
 				phalcon_array_fetch_str(&cache_service, &cache_options, SL("service"), PH_NOISY|PH_READONLY);
 			}
@@ -1834,7 +1838,7 @@ PHP_METHOD(Phalcon_Mvc_View, getCache){
 
 	zval cache = {};
 
-	phalcon_return_property(&cache, getThis(), SL("_cache"));
+	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 	if (zend_is_true(&cache)) {
 		if (Z_TYPE(cache) != IS_OBJECT) {
 			PHALCON_CALL_METHOD(&cache, getThis(), "_createcache");
@@ -1871,7 +1875,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 	}
 
 	if (Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_return_property(&view_options, getThis(), SL("_options"));
+		phalcon_read_property(&view_options, getThis(), SL("_options"), PH_READONLY);
 		if (Z_TYPE(view_options) != IS_ARRAY) {
 			array_init(&view_options);
 		}
@@ -1879,7 +1883,7 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 		/**
 		 * Get the default cache options
 		 */
-		if (!phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"))) {
+		if (!phalcon_array_isset_fetch_str(&cache_options, &view_options, SL("cache"), PH_READONLY)) {
 			array_init(&cache_options);
 		}
 
@@ -1895,13 +1899,13 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
 		/**
 		 * Check if the user has defined a default cache level or use 5 as default
 		 */
-		if (phalcon_array_isset_fetch_str(&cache_level, &cache_options, SL("level"))) {
+		if (phalcon_array_isset_fetch_str(&cache_level, &cache_options, SL("level"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_cacheLevel"), &cache_level);
 		} else {
 			phalcon_update_property_long(getThis(), SL("_cacheLevel"), 5);
 		}
 
-		if (phalcon_array_isset_fetch_str(&cache_mode, &cache_options, SL("mode"))) {
+		if (phalcon_array_isset_fetch_str(&cache_mode, &cache_options, SL("mode"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_cacheMode"), &cache_mode);
 		} else {
 			phalcon_update_property_bool(getThis(), SL("_cacheMode"), 0);
@@ -2146,7 +2150,7 @@ PHP_METHOD(Phalcon_Mvc_View, getConverter) {
 
 	phalcon_read_property(&converters, getThis(), SL("_converters"), PH_NOISY|PH_READONLY);
 
-	if (phalcon_array_isset_fetch(&converter, &converters, name, 0)) {
+	if (phalcon_array_isset_fetch(&converter, &converters, name, PH_READONLY)) {
 		RETURN_CTOR(&converter);
 	}
 
@@ -2209,7 +2213,7 @@ PHP_METHOD(Phalcon_Mvc_View, __get){
 	phalcon_fetch_params(0, 1, 0, &key);
 
 	phalcon_read_property(&params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &params, key, 0)) {
+	if (phalcon_array_isset_fetch(&value, &params, key, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 

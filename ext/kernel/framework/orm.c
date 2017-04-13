@@ -152,7 +152,9 @@ void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
 			} ZEND_HASH_FOREACH_END();
 
 			phalcon_fast_join_str(&joined_items, SL(", "), &group_items);
+			zval_ptr_dtor(&group_items);
 			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", &joined_items);
+			zval_ptr_dtor(&joined_items);
 		} else {
 			if (phalcon_is_numeric(group)) {
 				PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
@@ -161,10 +163,11 @@ void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
 					PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
 				} else if (phalcon_memnstr_str(group, SL(","))) {
 					phalcon_fast_explode_str(&group_items, SL(", "), group);
-
 					phalcon_fast_join_str(&joined_items, SL("], ["), &group_items);
+					zval_ptr_dtor(&group_items);
 
 					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", &joined_items, "]");
+					zval_ptr_dtor(&joined_items);
 				} else {
 					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", group, "]");
 				}
@@ -196,7 +199,9 @@ void phalcon_orm_phql_build_order(zval *return_value, zval *order) {
 			} ZEND_HASH_FOREACH_END();
 
 			phalcon_fast_join_str(&joined_items, SL(", "), &order_items);
+			zval_ptr_dtor(&order_items);
 			PHALCON_SCONCAT_SV(return_value, " ORDER BY ", &joined_items);
+			zval_ptr_dtor(&joined_items);
 		} else {
 			PHALCON_SCONCAT_SV(return_value, " ORDER BY ", order);
 		}
@@ -209,8 +214,8 @@ void phalcon_orm_phql_build_limit(zval *return_value, zval *limit) {
 
 	if (PHALCON_IS_NOT_EMPTY(limit)) {
 		if (Z_TYPE_P(limit) == IS_ARRAY) {
-			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY);
-			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset")) && Z_TYPE(offset) != IS_NULL) {
+			phalcon_array_fetch_str(&number, limit, SL("number"), PH_NOISY|PH_READONLY);
+			if (phalcon_array_isset_fetch_str(&offset, limit, SL("offset"), PH_READONLY) && Z_TYPE(offset) != IS_NULL) {
 				PHALCON_SCONCAT_SVSV(return_value, " LIMIT ", &number, " OFFSET ", &offset);
 			} else {
 				PHALCON_SCONCAT_SV(return_value, " LIMIT ", &number);

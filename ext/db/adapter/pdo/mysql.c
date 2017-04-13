@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, escapeIdentifier){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 
-	zval *table, *_schema = NULL, schema = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, columns = {}, size_pattern = {}, *field, old_column = {};
+	zval *table, *_schema = NULL, schema = {}, dialect = {}, sql = {}, fetch_num = {}, describe = {}, size_pattern = {}, *field, old_column = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &_schema);
 
@@ -157,7 +157,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	 */
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
 
-	array_init(&columns);
+	array_init(return_value);
 
 	ZVAL_STRING(&size_pattern, "#\\(([0-9]++)(?:,\\s*([0-9]++))?\\)#");
 
@@ -187,14 +187,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
 			ZVAL_UNREF(&matches);
 			if (zend_is_true(&pos)) {
-				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1)) {
+				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1, PH_READONLY)) {
 					convert_to_long(&match_one);
-					phalcon_array_update_str(&definition, SL("size"), &match_one, PH_COPY);
-					phalcon_array_update_str(&definition, SL("bytes"), &match_one, PH_COPY);
+					phalcon_array_update_str_long(&definition, SL("size"), Z_LVAL(match_one), PH_COPY);
+					phalcon_array_update_str_long(&definition, SL("bytes"), Z_LVAL(match_one), PH_COPY);
 				}
-				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2)) {
+				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_READONLY)) {
 					convert_to_long(&match_two);
-					phalcon_array_update_str(&definition, SL("scale"), &match_two, PH_COPY);
+					phalcon_array_update_str_long(&definition, SL("scale"), Z_LVAL(match_two), PH_COPY);
 				}
 			}
 		}
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_DECIMAL, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
-				if (phalcon_is_numeric(&match_one)) {
+				if (Z_TYPE(match_one) == IS_LONG) {
 					if (phalcon_is_numeric(&match_two) && PHALCON_GT(&match_two, &match_one)) {
 						phalcon_array_update_str_long(&definition, SL("bytes"), (Z_LVAL(match_two) + 2), 0);
 					} else {
@@ -296,8 +296,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 					phalcon_array_update_str_long(&definition, SL("size"), 30, 0);
 					phalcon_array_update_str_long(&definition, SL("bytes"), 10, 0);
 				}
-				if (phalcon_is_numeric(&match_two)) {
-					phalcon_array_update_str(&definition, SL("scale"), &match_two, PH_COPY);
+				if (Z_TYPE(match_two) == IS_LONG) {
+					phalcon_array_update_str_long(&definition, SL("scale"), Z_LVAL(match_two), 0);
 				} else {
 					phalcon_array_update_str_long(&definition, SL("scale"), 6, 0);
 				}
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 				phalcon_array_update_str_long(&definition, SL("type"), PHALCON_DB_COLUMN_TYPE_FLOAT, 0);
 				phalcon_array_update_str(&definition, SL("isNumeric"), &PHALCON_GLOBAL(z_true), PH_COPY);
 				phalcon_array_update_str_long(&definition, SL("bindType"), PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
-				if (phalcon_is_numeric(&match_one) && PHALCON_GE_LONG(&match_one, 25)) {
+				if (Z_TYPE(match_one) == IS_LONG && PHALCON_GE_LONG(&match_one, 25)) {
 					phalcon_array_update_str_long(&definition, SL("bytes"), 8, 0);
 				} else {
 					phalcon_array_update_str_long(&definition, SL("bytes"), 4, 0);
@@ -474,12 +474,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 		object_init_ex(&column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
-		phalcon_array_append(&columns, &column, PH_COPY);
+		phalcon_array_append(return_value, &column, PH_COPY);
 
 		ZVAL_COPY_VALUE(&old_column, &column_name);
+		zval_ptr_dtor(&definition);
 	} ZEND_HASH_FOREACH_END();
-
-	RETURN_CTOR(&columns);
+	zval_ptr_dtor(&size_pattern);
 }
 
 /**

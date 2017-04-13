@@ -173,7 +173,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, current){
 
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&annotations, getThis(), SL("_annotations"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(return_value, &annotations, &position, 0)) {
+	if (!phalcon_array_isset_fetch(return_value, &annotations, &position, PH_COPY)) {
 		RETURN_NULL();
 	}
 }

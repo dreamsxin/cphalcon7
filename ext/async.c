@@ -257,7 +257,7 @@ PHP_METHOD(Phalcon_Async, count){
 	PHALCON_CALL_FUNCTION(&seg, "msg_get_queue", &key);
 	PHALCON_CALL_FUNCTION(&result, "msg_stat_queue", &seg);
 
-	if (phalcon_array_isset_fetch_str(&num, &result, SL("msg_qnum"))) {
+	if (phalcon_array_isset_fetch_str(&num, &result, SL("msg_qnum"), PH_READONLY)) {
 		RETURN_CTOR(&num);
 	}
 

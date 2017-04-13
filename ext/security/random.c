@@ -517,7 +517,7 @@ PHP_METHOD(Phalcon_Security_Random, number) {
 
 	if (((phalcon_fast_strlen_ev(&hex) & 1)) == 1) {
 		PHALCON_CONCAT_SV(&hex_tmp, "0", &hex);
-		PHALCON_CPY_WRT_CTOR(&hex, &hex_tmp);
+		ZVAL_COPY_VALUE(&hex, &hex_tmp);
 	}
 
 	ZVAL_STRING(&format, "H*");

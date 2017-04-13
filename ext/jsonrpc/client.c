@@ -105,7 +105,7 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 	phalcon_fetch_params(0, 1, 1, &method, &data);
 
 	phalcon_read_property(&httpclient, getThis(), SL("_httpclient"), PH_NOISY|PH_READONLY);
-	phalcon_return_property(&id, getThis(), SL("_id"));
+	phalcon_read_property(&id, getThis(), SL("_id"), PH_READONLY);
 
 	i = Z_LVAL(id) + 1;
 	ZVAL_LONG(&id, i);
@@ -141,15 +141,15 @@ PHP_METHOD(Phalcon_JsonRpc_Client, call)
 		PHALCON_CALL_FUNCTION(&json, "json_decode", &body, &PHALCON_GLOBAL(z_true));
 
 		if (Z_TYPE(json) == IS_ARRAY) {
-			if (phalcon_array_isset_fetch_str(&id, &json, SL("id"))) {
+			if (phalcon_array_isset_fetch_str(&id, &json, SL("id"), PH_READONLY)) {
 				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "setid", &id);
 			}
 
-			if (phalcon_array_isset_fetch_str(&result, &json, SL("result"))) {
+			if (phalcon_array_isset_fetch_str(&result, &json, SL("result"), PH_READONLY)) {
 				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "setresult", &result);
 			}
 
-			if (phalcon_array_isset_fetch_str(&error, &json, SL("error"))) {
+			if (phalcon_array_isset_fetch_str(&error, &json, SL("error"), PH_READONLY)) {
 				PHALCON_CALL_METHOD(NULL, &jsonrpc_response, "seterror", &error);
 			}
 		}

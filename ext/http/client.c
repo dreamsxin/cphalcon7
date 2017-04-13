@@ -74,7 +74,7 @@ PHP_METHOD(Phalcon_Http_Client, factory)
 	if (!_method) {
 		ZVAL_STRING(&method, "GET");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&method, _method);
+		ZVAL_COPY_VALUE(&method, _method);
 	}
 
 	if (phalcon_function_exists_ex(SL("curl_init")) != FAILURE) {

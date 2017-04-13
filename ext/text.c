@@ -51,71 +51,71 @@ PHP_METHOD(Phalcon_Text, underscore);
 PHP_METHOD(Phalcon_Text, humanize);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_camelize, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_uncamelize, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_increment, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 	ZEND_ARG_INFO(0, separator)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_decrement, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 	ZEND_ARG_INFO(0, separator)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_random, 0, 0, 1)
-	ZEND_ARG_INFO(0, type)
-	ZEND_ARG_INFO(0, length)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_startswith, 0, 0, 2)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, start)
-	ZEND_ARG_INFO(0, ignoreCase)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, start, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ignoreCase, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_endswith, 0, 0, 2)
-	ZEND_ARG_INFO(0, str)
-	ZEND_ARG_INFO(0, end)
-	ZEND_ARG_INFO(0, ignoreCase)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, end, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ignoreCase, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_lower, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_upper, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_bytes, 0, 0, 1)
-	ZEND_ARG_INFO(0, size)
-	ZEND_ARG_INFO(0, forceUnit)
-	ZEND_ARG_INFO(0, format)
-	ZEND_ARG_INFO(0, si)
+	ZEND_ARG_TYPE_INFO(0, size, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, forceUnit, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, si, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_reduceslashes, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_concat, 0, 0, 3)
-	ZEND_ARG_INFO(0, separator)
-	ZEND_ARG_INFO(0, strA)
-	ZEND_ARG_INFO(0, strB)
+	ZEND_ARG_TYPE_INFO(0, separator, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, strA, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, strB, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_underscore, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_humanize, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_text_method_entry[] = {
@@ -211,7 +211,11 @@ PHP_METHOD(Phalcon_Text, increment){
 	if (!separator || PHALCON_IS_EMPTY(separator)) {
 		ZVAL_STRING(&sep, "_");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&sep, separator);
+		if (Z_TYPE_P(separator) != IS_LONG && Z_TYPE_P(separator) != IS_STRING) {
+			PHALCON_SEPARATE_PARAM(separator);
+			convert_to_string(separator);
+		}
+		ZVAL_COPY_VALUE(&sep, separator);
 	}
 
 	if (Z_TYPE(sep) == IS_LONG) {
@@ -222,13 +226,13 @@ PHP_METHOD(Phalcon_Text, increment){
 		PHALCON_CONCAT_VV(return_value, &first_part, &number);
 	} else {
 		phalcon_fast_explode(&parts, &sep, str);
-		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1, PH_READONLY)) {
 			phalcon_increment(&number);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
+			ZVAL_COPY_VALUE(&number, &PHALCON_GLOBAL(z_one));
 		}
 
-		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY|PH_READONLY);
 		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
 	}
 }
@@ -254,7 +258,7 @@ PHP_METHOD(Phalcon_Text, decrement){
 	if (!separator || PHALCON_IS_EMPTY(separator)) {
 		ZVAL_STRING(&sep, "_");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&sep, separator);
+		ZVAL_COPY_VALUE(&sep, separator);
 	}
 
 	if (Z_TYPE(sep) == IS_LONG) {
@@ -265,13 +269,13 @@ PHP_METHOD(Phalcon_Text, decrement){
 		PHALCON_CONCAT_VV(return_value, &first_part, &number);
 	} else {
 		phalcon_fast_explode(&parts, &sep, str);
-		if (phalcon_array_isset_fetch_long(&number, &parts, 1)) {
+		if (phalcon_array_isset_fetch_long(&number, &parts, 1, PH_READONLY)) {
 			phalcon_decrement(&number);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&number, &PHALCON_GLOBAL(z_one));
+			ZVAL_LONG(&number, Z_LVAL(PHALCON_GLOBAL(z_one)));
 		}
 
-		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY);
+		phalcon_array_fetch_long(&first_part, &parts, 0, PH_NOISY|PH_READONLY);
 		PHALCON_CONCAT_VVV(return_value, &first_part, &sep, &number);
 	}
 }
@@ -373,7 +377,7 @@ PHP_METHOD(Phalcon_Text, lower){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	/** 
+	/**
 	 * 'lower' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
@@ -397,7 +401,7 @@ PHP_METHOD(Phalcon_Text, upper){
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
-	/** 
+	/**
 	 * 'upper' checks for the mbstring extension to make a correct lowercase
 	 * transformation
 	 */
@@ -430,22 +434,19 @@ PHP_METHOD(Phalcon_Text, bytes){
 
 	phalcon_fetch_params(0, 1, 3, &_z_size, &_z_force_unit, &_format, &si);
 
-	PHALCON_CPY_WRT_CTOR(&z_size, _z_size);
-	convert_to_double(&z_size);
+	ZVAL_COPY_VALUE(&z_size, _z_size);
 
-	size = Z_DVAL(z_size);
+	size = Z_LVAL(z_size);
 
-	if (_z_force_unit) {
-		PHALCON_CPY_WRT_CTOR(&z_force_unit, _z_force_unit);
-		convert_to_string(&z_force_unit);
+	if (_z_force_unit && PHALCON_IS_NOT_EMPTY(_z_force_unit)) {
+		ZVAL_COPY_VALUE(&z_force_unit, _z_force_unit);
+	} else {
+		ZVAL_NULL(&z_force_unit);
 	}
 
-	if (_format) {
-		PHALCON_CPY_WRT_CTOR(&format, _format);
-		convert_to_string(&format);
-	}
-		
-	if (PHALCON_IS_EMPTY(&format)) {
+	if (_format && PHALCON_IS_NOT_EMPTY(_format)) {
+		ZVAL_COPY_VALUE(&format, _format);
+	} else {
 		ZVAL_STRING(&format, "%01.2f %s");
 	}
 
@@ -453,7 +454,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 		si = &PHALCON_GLOBAL(z_true);
 	}
 
-	if (!zend_is_true(si) || (!PHALCON_IS_EMPTY(&z_force_unit) && phalcon_memnstr_str(&z_force_unit, SL("i")))) {
+	if (!zend_is_true(si) || (PHALCON_IS_NOT_EMPTY(&z_force_unit) && phalcon_memnstr_str(&z_force_unit, SL("i")))) {
 		units = units2;
 		mod = 1024;
 	} else {
@@ -461,7 +462,7 @@ PHP_METHOD(Phalcon_Text, bytes){
 		mod = 1000;
 	}
 
-	if (!PHALCON_IS_EMPTY(&z_force_unit)) {
+	if (PHALCON_IS_NOT_EMPTY(&z_force_unit)) {
 		force_unit = Z_STRVAL(z_force_unit);
 		for (i = 0; i < sizeof(units); i++)
 		{
@@ -545,7 +546,7 @@ PHP_METHOD(Phalcon_Text, concat){
 			PHALCON_SCONCAT_VV(&str, &trimmed, separator);
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&str, b);
+		ZVAL_COPY_VALUE(&str, b);
 	}
 
 	ZVAL_STR(&a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));

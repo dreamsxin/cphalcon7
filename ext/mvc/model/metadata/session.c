@@ -87,7 +87,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, __construct)
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"))) {
+		if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_prefix"), &prefix);
 		}
 	}

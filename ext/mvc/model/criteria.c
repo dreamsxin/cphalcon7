@@ -133,10 +133,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_having, 0, 0, 1)
 	ZEND_ARG_INFO(0, having)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_execute, 0, 0, 1)
-	ZEND_ARG_INFO(0, useRawsql)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_cache, 0, 0, 1)
 	ZEND_ARG_ARRAY_INFO(0, options, 0)
 ZEND_END_ARG_INFO()
@@ -177,7 +173,7 @@ static const zend_function_entry phalcon_mvc_model_criteria_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Criteria, fromInput, arginfo_phalcon_mvc_model_criteriainterface_frominput, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, groupBy, arginfo_phalcon_mvc_model_criteria_groupby, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, having, arginfo_phalcon_mvc_model_criteria_having, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Criteria, execute, arginfo_phalcon_mvc_model_criteria_execute, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Criteria, execute, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, cache, arginfo_phalcon_mvc_model_criteria_cache, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, insert, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, update, NULL, ZEND_ACC_PUBLIC)
@@ -281,7 +277,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bind) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -314,7 +310,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, bindTypes) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_types);
@@ -389,7 +385,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, join) {
 	phalcon_array_append(&new_join, alias, PH_COPY);
 	phalcon_array_append(&new_join, type, PH_COPY);
 
-	phalcon_return_property(&joins, getThis(), SL("_joins"));
+	phalcon_read_property(&joins, getThis(), SL("_joins"), PH_READONLY);
 
 	if (Z_TYPE(joins) != IS_ARRAY) {
 		array_init_size(&joins, 1);
@@ -540,7 +536,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -554,7 +550,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, where) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -607,7 +603,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 	if (!PHALCON_IS_EMPTY(&current_conditions)) {
 		PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") AND (", conditions, ")");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&new_conditions, conditions);
+		ZVAL_COPY_VALUE(&new_conditions, conditions);
 	}
 
 	phalcon_update_property(getThis(), SL("_conditions"), &new_conditions);
@@ -620,7 +616,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -634,7 +630,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, andWhere) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -675,7 +671,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 	if (!PHALCON_IS_EMPTY(&current_conditions)) {
 		PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") OR (", conditions, ")");
 	} else {
-		PHALCON_CPY_WRT_CTOR(&new_conditions, conditions);
+		ZVAL_COPY_VALUE(&new_conditions, conditions);
 	}
 
 	phalcon_update_property(getThis(), SL("_conditions"), &new_conditions);
@@ -688,7 +684,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		if (Z_TYPE(current_bind_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &current_bind_params, bind_params);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params, bind_params);
+			ZVAL_COPY_VALUE(&merged_params, bind_params);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindParams"), &merged_params);
@@ -702,7 +698,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, orWhere) {
 		if (Z_TYPE(current_bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params_types, &current_bind_types, bind_types);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&merged_params_types, bind_types);
+			ZVAL_COPY_VALUE(&merged_params_types, bind_types);
 		}
 
 		phalcon_update_property(getThis(), SL("_bindTypes"), &merged_params_types);
@@ -858,7 +854,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, inWhere) {
 		return;
 	}
 
-	phalcon_return_property(&hidden_param, getThis(), SL("_hiddenParamNumber"));
+	phalcon_read_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_READONLY);
 
 	array_init(&bind_params);
 	array_init(&bind_keys);
@@ -923,7 +919,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, notInWhere) {
 		return;
 	}
 
-	phalcon_return_property(&hidden_param, getThis(), SL("_hiddenParamNumber"));
+	phalcon_read_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_READONLY);
 
 	array_init(&bind_params);
 	array_init(&bind_keys);
@@ -1242,7 +1238,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 	object_init_ex(return_value, phalcon_mvc_model_criteria_ce);
 
 	if (zend_hash_num_elements(Z_ARRVAL_P(data))) {
-		ZVAL_STRING(&service, ISV(modelsMetadata));
+		ZVAL_STR(&service, IS(modelsMetadata));
 
 		PHALCON_CALL_METHOD(&meta_data, dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -1273,11 +1269,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput) {
 				ZVAL_LONG(&field, idx);
 			}
 
-			if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&real_field, &column_map, &field, 0)) {
-				PHALCON_CPY_WRT_CTOR(&real_field, &field);
+			if (Z_TYPE(column_map) != IS_ARRAY || !phalcon_array_isset_fetch(&real_field, &column_map, &field, PH_READONLY)) {
+				ZVAL_COPY_VALUE(&real_field, &field);
 			}
 
-			if (phalcon_array_isset_fetch(&type, &data_types, &real_field, 0)) {
+			if (phalcon_array_isset_fetch(&type, &data_types, &real_field, PH_READONLY)) {
 				if (Z_TYPE_P(value) != IS_NULL && !PHALCON_IS_STRING(value, "")) {
 					if (PHALCON_IS_LONG(&type, PHALCON_DB_COLUMN_TYPE_VARCHAR)) {
 						/**
@@ -1349,14 +1345,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, having) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
-	zval *use_rawsql = NULL, phql = {}, dependency_injector = {}, cache_options = {}, unique_row = {};
+	zval phql = {}, dependency_injector = {}, cache_options = {}, unique_row = {};
 	zval query = {}, bind_params = {}, bind_types = {};
-
-	phalcon_fetch_params(0, 0, 1, &use_rawsql);
-
-	if (!use_rawsql) {
-		use_rawsql = &PHALCON_GLOBAL(z_false);
-	}
 
 	PHALCON_CALL_SELF(&phql, "getphql");
 
@@ -1539,14 +1529,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 		return;
 	}
 
-	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
+	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
 	if (phalcon_is_numeric(&conditions)) {
 
 		/**
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		ZVAL_STRING(&service_name, ISV(modelsMetadata));
+		ZVAL_STR(&service_name, IS(modelsMetadata));
 
 		/**
 		 * Get the models metadata service to obtain the column names, column map and
@@ -1565,24 +1555,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_READONLY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&attribute_field, &first_primary_key);
+					ZVAL_COPY_VALUE(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-				PHALCON_CPY_WRT_CTOR(&conditions, &primary_key_condition);
+				ZVAL_COPY_VALUE(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}
@@ -1652,7 +1642,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 			/**
 			 * Create the join according to the type
 			 */
-			if (phalcon_array_isset_fetch_long(&join_type, join, 3) && zend_is_true(&join_type)) {
+			if (phalcon_array_isset_fetch_long(&join_type, join, 3, PH_READONLY) && zend_is_true(&join_type)) {
 				PHALCON_SCONCAT_SVSVS(&phql, " ", &join_type, " JOIN [", &join_model, "]");
 			} else {
 				PHALCON_SCONCAT_SVS(&phql, " JOIN [", &join_model, "]");
@@ -1661,14 +1651,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 			/**
 			 * Alias comes first
 			 */
-			if (phalcon_array_isset_fetch_long(&join_alias, join, 2) && zend_is_true(&join_alias)) {
+			if (phalcon_array_isset_fetch_long(&join_alias, join, 2, PH_READONLY) && zend_is_true(&join_alias)) {
 				PHALCON_SCONCAT_SVS(&phql, " AS [", &join_alias, "]");
 			}
 
 			/**
 			 * Conditions then
 			 */
-			if (phalcon_array_isset_fetch_long(&join_conditions, join, 1) && zend_is_true(&join_conditions)) {
+			if (phalcon_array_isset_fetch_long(&join_conditions, join, 1, PH_READONLY) && zend_is_true(&join_conditions)) {
 				PHALCON_SCONCAT_SV(&phql, " ON ", &join_conditions);
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -1707,7 +1697,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateSelect) {
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
-		phalcon_return_property(&offset, getThis(), SL("_offset"));
+		phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
 		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
@@ -1842,7 +1832,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 		return;
 	}
 
-	ZVAL_STRING(&service_name, ISV(modelsMetadata));
+	ZVAL_STR(&service_name, IS(modelsMetadata));
 
 	PHALCON_CALL_METHOD(&meta_data, &dependency_injector, "getshared", &service_name);
 	PHALCON_VERIFY_INTERFACE(&meta_data, phalcon_mvc_model_metadatainterface_ce);
@@ -1855,30 +1845,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 
 	PHALCON_CALL_METHOD(&connection, &model_instance, "getreadconnection");
 
-	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
+	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
 	if (phalcon_is_numeric(&conditions)) {
 		ZVAL_TRUE(&no_primary);
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_READONLY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
 					}
 				} else {
-					PHALCON_CPY_WRT_CTOR(&attribute_field, &first_primary_key);
+					ZVAL_COPY_VALUE(&attribute_field, &first_primary_key);
 				}
 
 				PHALCON_CONCAT_SVSVSV(&primary_key_condition, "[", &model, "].[", &attribute_field, "] = ", &conditions);
-				PHALCON_CPY_WRT_CTOR(&conditions, &primary_key_condition);
+				ZVAL_COPY_VALUE(&conditions, &primary_key_condition);
 
 				ZVAL_FALSE(&no_primary);
 			}
@@ -1945,7 +1935,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateUpdate) {
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
-		phalcon_return_property(&offset, getThis(), SL("_offset"));
+		phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
 		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}
@@ -1975,14 +1965,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 		return;
 	}
 
-	phalcon_return_property(&conditions, getThis(), SL("_conditions"));
+	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
 	if (phalcon_is_numeric(&conditions)) {
 
 		/**
 		 * If the conditions is a single numeric field. We internally create a condition
 		 * using the related primary key
 		 */
-		ZVAL_STRING(&service_name, ISV(modelsMetadata));
+		ZVAL_STR(&service_name, IS(modelsMetadata));
 
 		/**
 		 * Get the models metadata service to obtain the column names, column map and
@@ -2001,14 +1991,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 
 		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0)) {
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
 				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
-					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, 0)) {
+					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_READONLY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
 						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 						return;
@@ -2055,7 +2045,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, _generateDelete) {
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
-		phalcon_return_property(&offset, getThis(), SL("_offset"));
+		phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
 		if (PHALCON_IS_NOT_EMPTY(&offset)) {
 			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
 		}

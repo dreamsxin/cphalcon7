@@ -82,11 +82,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 
 	phalcon_update_property(getThis(), SL("_config"), config);
 
-	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"))) {
+	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
-	if (phalcon_array_isset_fetch_str(&page, config, SL("page"))) {
+	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 }
@@ -117,13 +117,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	zval page_items = {}, maximum_pages = {}, next = {}, additional_page = {}, before = {}, remainder = {}, pages_total = {};
 	long int i, i_show;
 
-	phalcon_return_property(&show, getThis(), SL("_limitRows"));
-	phalcon_return_property(&config, getThis(), SL("_config"));
-	phalcon_return_property(&page_number, getThis(), SL("_page"));
+	phalcon_read_property(&show, getThis(), SL("_limitRows"), PH_READONLY);
+	phalcon_read_property(&config, getThis(), SL("_config"), PH_READONLY);
+	phalcon_read_property(&page_number, getThis(), SL("_page"), PH_READONLY);
 
 	i_show = phalcon_get_intval(&show);
 
-	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY);
+	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(page_number) == IS_NULL || PHALCON_LT(&show, &PHALCON_GLOBAL(z_zero))) {
 		ZVAL_COPY_VALUE(&page_number, &PHALCON_GLOBAL(z_one));

@@ -114,10 +114,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, __construct){
 	if (!_options || Z_TYPE_P(_options) == IS_NULL) {
 		array_init(&options);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&options, _options);
+		ZVAL_DUP(&options, _options);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")) || PHALCON_IS_EMPTY_STRING(&special_key)) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCX"), PH_COPY);
 	}
 
@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, save){
 	if (zend_is_true(&success)) {
 		phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-		if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
+		if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 			return;
 		}
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, delete){
 
 	PHALCON_CALL_FUNCTION(NULL, "xcache_unset", &prefixed_key);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -298,7 +298,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, queryKeys){
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
@@ -412,7 +412,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Xcache, flush){
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey")))) {
+	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}

@@ -182,42 +182,38 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, __construct){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 {
-	zval *_descriptor = NULL, descriptor = {}, username = {}, password = {}, options = {}, dsn_parts = {}, *value, dsn_attributes = {}, pdo_type = {}, dsn = {}, persistent = {}, pdo = {};
+	zval *desc = NULL, descriptor = {}, username = {}, password = {}, options = {}, dsn_parts = {}, *value, dsn_attributes = {}, pdo_type = {}, dsn = {}, persistent = {}, pdo = {};
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 0, 1, &_descriptor);
+	phalcon_fetch_params(0, 0, 1, &desc);
 
-	if (!_descriptor || Z_TYPE_P(_descriptor) == IS_NULL) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_READONLY);
+	if (!desc || Z_TYPE_P(desc) == IS_NULL) {
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_CTOR);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&descriptor, _descriptor);
-	}
-
-	if (Z_TYPE(descriptor) != IS_ARRAY) {
-		RETURN_FALSE;
+		ZVAL_DUP(&descriptor, desc);
 	}
 
 	/**
 	 * Check for a username or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"))) {
-		phalcon_array_unset_str(&descriptor, SL("username"), PH_SEPARATE);
+	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"), PH_COPY)) {
+		phalcon_array_unset_str(&descriptor, SL("username"), 0);
 	}
 
 	/**
 	 * Check for a password or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"))) {
-		phalcon_array_unset_str(&descriptor, SL("password"), PH_SEPARATE);
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_COPY)) {
+		phalcon_array_unset_str(&descriptor, SL("password"), 0);
 	}
 
 	/**
 	 * Check if the developer has defined custom options or create one from scratch
 	 */
-	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"))) {
-		phalcon_array_unset_str(&descriptor, SL("options"), PH_SEPARATE);
+	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"), PH_COPY)) {
+		phalcon_array_unset_str(&descriptor, SL("options"), 0);
 	} else {
 		array_init(&options);
 	}
@@ -226,13 +222,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	 * Remove the dialectClass from the descriptor if any
 	 */
 	if (phalcon_array_isset_str(&descriptor, SL("dialectClass"))) {
-		phalcon_array_unset_str(&descriptor, SL("dialectClass"), PH_SEPARATE);
+		phalcon_array_unset_str(&descriptor, SL("dialectClass"), 0);
 	}
 
 	/**
 	 * Check if the user has defined a custom dsn
 	 */
-	if (!phalcon_array_isset_fetch_str(&dsn_attributes, &descriptor, SL("dsn"))) {
+	if (!phalcon_array_isset_fetch_str(&dsn_attributes, &descriptor, SL("dsn"), PH_COPY)) {
 		array_init(&dsn_parts);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(descriptor), idx, str_key, value) {
@@ -243,15 +239,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 				ZVAL_LONG(&key, idx);
 			}
 			PHALCON_CONCAT_VSV(&dsn_attribute, &key, "=", value);
-			phalcon_array_append(&dsn_parts, &dsn_attribute, PH_COPY);
+			phalcon_array_append(&dsn_parts, &dsn_attribute, PH_READONLY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&dsn_attributes, SL(";"), &dsn_parts);
+		zval_ptr_dtor(&dsn_parts);
 	}
 
 	phalcon_read_property(&pdo_type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VSV(&dsn, &pdo_type, ":", &dsn_attributes);
+	zval_ptr_dtor(&dsn_attributes);
 
 	/**
 	 * Default options
@@ -261,12 +259,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check if the connection must be persistent
 	 */
-	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"))) {
-		phalcon_array_unset_str(&descriptor, SL("persistent"), PH_SEPARATE);
+	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_COPY)) {
+		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
 		if (zend_is_true(&persistent)) {
 			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, PH_COPY);
 		}
 	}
+
+	zval_ptr_dtor(&descriptor);
 
 	/**
 	 * Create the connection using PDO
@@ -275,8 +275,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 
 	PHALCON_OBJECT_INIT(&pdo, ce);
 	PHALCON_CALL_METHOD(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
+	zval_ptr_dtor(&dsn);
+	zval_ptr_dtor(&options);
 
 	phalcon_update_property(getThis(), SL("_pdo"), &pdo);
+	zval_ptr_dtor(&pdo);
 }
 
 /**
@@ -468,6 +471,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
 		ZVAL_STRING(&event_name, "db:beforeQuery");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -475,6 +479,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 
 	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
 	PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+	zval_ptr_dtor(&statement);
 	ZVAL_COPY_VALUE(&statement, &new_statement);
 
 	/**
@@ -484,11 +489,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:afterQuery");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
+			zval_ptr_dtor(&event_name);
 		}
 
 		object_init_ex(return_value, phalcon_db_result_pdo_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", getThis(), &statement, sql_statement, bind_params, bind_types);
-
+		zval_ptr_dtor(&statement);
 		return;
 	}
 
@@ -551,6 +557,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
 		ZVAL_STRING(&event_name, "db:beforeExecute");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
+		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -561,9 +568,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		if (Z_TYPE(statement) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
 			PHALCON_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
+			zval_ptr_dtor(&new_statement);
 		} else {
 			ZVAL_LONG(&affected_rows, 0);
 		}
+		zval_ptr_dtor(&statement);
 	} else {
 		phalcon_read_property(&pdo, getThis(), SL("_pdo"), PH_NOISY|PH_READONLY);
 		phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY|PH_READONLY);
@@ -584,6 +593,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:afterExecute");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
+			zval_ptr_dtor(&event_name);
 		}
 	}
 
@@ -705,7 +715,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 			phalcon_array_fetch_long(&numeric_place, place_match, 1, PH_NOISY|PH_READONLY);
 			if (!phalcon_array_isset_fetch(&value, params, &numeric_place, 0)) {
-				if (phalcon_array_isset_fetch_long(&str_place, place_match, 2)) {
+				if (phalcon_array_isset_fetch_long(&str_place, place_match, 2, PH_READONLY)) {
 					if (!phalcon_array_isset_fetch(&value, params, &str_place, 0)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");
 						return;
@@ -814,9 +824,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:beginTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+			zval_ptr_dtor(&event_name);
 		}
 
-		PHALCON_RETURN_CALL_METHOD(&pdo, "begintransaction");
+		PHALCON_CALL_METHOD(return_value, &pdo, "begintransaction");
 		return;
 	}
 
@@ -832,9 +843,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "db:createSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
+					zval_ptr_dtor(&event_name);
 				}
 
-				PHALCON_RETURN_CALL_METHOD(getThis(), "createsavepoint", &savepoint_name);
+				PHALCON_CALL_METHOD(return_value, getThis(), "createsavepoint", &savepoint_name);
+				zval_ptr_dtor(&savepoint_name);
 				return;
 			}
 		}
@@ -888,6 +901,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:rollbackTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+			zval_ptr_dtor(&event_name);
 		}
 
 		/**
@@ -910,13 +924,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "db:rollbackSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
+					zval_ptr_dtor(&event_name);
 				}
 
 				/**
 				 * Reduce the transaction nesting level
 				 */
 				phalcon_property_decr(getThis(), SL("_transactionLevel"));
-				PHALCON_RETURN_CALL_METHOD(getThis(), "rollbacksavepoint", &savepoint_name);
+				PHALCON_CALL_METHOD(return_value, getThis(), "rollbacksavepoint", &savepoint_name);
+				zval_ptr_dtor(&savepoint_name);
 				return;
 			}
 		}
@@ -976,6 +992,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "db:commitTransaction");
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
+			zval_ptr_dtor(&event_name);
 		}
 
 		/**
@@ -1002,13 +1019,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					ZVAL_STRING(&event_name, "db:releaseSavepoint");
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
+					zval_ptr_dtor(&event_name);
 				}
 
 				/**
 				 * Reduce the transaction nesting level
 				 */
 				phalcon_property_decr(getThis(), SL("_transactionLevel"));
-				PHALCON_RETURN_CALL_METHOD(getThis(), "releasesavepoint", &savepoint_name);
+				PHALCON_CALL_METHOD(return_value, getThis(), "releasesavepoint", &savepoint_name);
+				zval_ptr_dtor(&savepoint_name);
 				return;
 			}
 		}

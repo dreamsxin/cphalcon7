@@ -21,7 +21,7 @@
 #include "cli/console.h"
 #include "cli/../application.h"
 #include "cli/console/exception.h"
-#include "cli/router.h"
+#include "cli/../routerinterface.h"
 #include "diinterface.h"
 #include "dispatcherinterface.h"
 #include "diinterface.h"
@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	}
 
 	PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_CLASS(&router, phalcon_cli_router_ce);
+	PHALCON_VERIFY_INTERFACE(&router, phalcon_routerinterface_ce);
 
 	PHALCON_CALL_METHOD(NULL, &router, "handle", &arguments);
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	}
 
 	PHALCON_CALL_METHOD(&namespace_name, &router, "getnamespacename");
-	PHALCON_CALL_METHOD(&task_name, &router, "gettaskname");
+	PHALCON_CALL_METHOD(&task_name, &router, "gethandlername");
 	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
 
@@ -227,7 +227,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
 
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setnamespacename", &namespace_name);
-	PHALCON_CALL_METHOD(NULL, &dispatcher, "settaskname", &task_name);
+	PHALCON_CALL_METHOD(NULL, &dispatcher, "sethandlername", &task_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setactionname", &action_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &params);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {

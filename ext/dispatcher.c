@@ -51,13 +51,20 @@ zend_class_entry *phalcon_dispatcher_ce;
 
 PHP_METHOD(Phalcon_Dispatcher, __construct);
 PHP_METHOD(Phalcon_Dispatcher, setActionSuffix);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultModule);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultModule);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultHandler);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultHandler);
+PHP_METHOD(Phalcon_Dispatcher, setDefaultAction);
+PHP_METHOD(Phalcon_Dispatcher, getDefaultAction);
 PHP_METHOD(Phalcon_Dispatcher, setModuleName);
 PHP_METHOD(Phalcon_Dispatcher, getModuleName);
 PHP_METHOD(Phalcon_Dispatcher, setNamespaceName);
 PHP_METHOD(Phalcon_Dispatcher, getNamespaceName);
-PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace);
-PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace);
-PHP_METHOD(Phalcon_Dispatcher, setDefaultAction);
+PHP_METHOD(Phalcon_Dispatcher, setHandlerName);
+PHP_METHOD(Phalcon_Dispatcher, getHandlerName);
 PHP_METHOD(Phalcon_Dispatcher, setActionName);
 PHP_METHOD(Phalcon_Dispatcher, getActionName);
 PHP_METHOD(Phalcon_Dispatcher, setLogicBinding);
@@ -89,14 +96,6 @@ PHP_METHOD(Phalcon_Dispatcher, getPreviousActionName);
 PHP_METHOD(Phalcon_Dispatcher, getPreviousParams);
 PHP_METHOD(Phalcon_Dispatcher, getPreviousParam);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setmodulename, 0, 0, 1)
-	ZEND_ARG_INFO(0, moduleName)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setnamespacename, 0, 0, 1)
-	ZEND_ARG_INFO(0, namespaceName)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcher_setreturnedvalue, 0, 0, 1)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
@@ -108,13 +107,20 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Dispatcher, setActionSuffix, arginfo_phalcon_dispatcherinterface_setactionsuffix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, setModuleName, arginfo_phalcon_dispatcher_setmodulename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, getModuleName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, setNamespaceName, arginfo_phalcon_dispatcher_setnamespacename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setDefaultModule, arginfo_phalcon_dispatcherinterface_setdefaultmodule, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultNamespace, arginfo_phalcon_dispatcherinterface_setdefaultnamespace, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getDefaultNamespace, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setDefaultHandler, arginfo_phalcon_dispatcherinterface_setdefaulthandler, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultAction, arginfo_phalcon_dispatcherinterface_setdefaultaction, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setModuleName, arginfo_phalcon_dispatcherinterface_setmodulename, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getModuleName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setNamespaceName, arginfo_phalcon_dispatcherinterface_setnamespacename, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setHandlerName, arginfo_phalcon_dispatcherinterface_sethandlername, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getHandlerName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setActionName, arginfo_phalcon_dispatcherinterface_setactionname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getActionName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setLogicBinding, arginfo_phalcon_dispatcherinterface_setlogicbinding, ZEND_ACC_PUBLIC)
@@ -166,10 +172,11 @@ PHALCON_INIT_CLASS(Phalcon_Dispatcher){
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_params"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_returnedValue"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_lastHandler"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultHandler"), ZEND_ACC_PROTECTED);
-	zend_declare_property_string(phalcon_dispatcher_ce, SL("_defaultAction"), "", ZEND_ACC_PROTECTED);
-	zend_declare_property_string(phalcon_dispatcher_ce, SL("_handlerSuffix"), "", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_dispatcher_ce, SL("_handlerSuffix"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_dispatcher_ce, SL("_actionSuffix"), "Action", ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_dispatcher_ce, SL("_isExactHandler"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_dispatcher_ce, SL("_previousNamespaceName"), ZEND_ACC_PROTECTED);
@@ -202,32 +209,6 @@ PHP_METHOD(Phalcon_Dispatcher, __construct){
 }
 
 /**
- * Sets the events manager
- *
- * @param Phalcon\Events\ManagerInterface $eventsManager
- */
-PHP_METHOD(Phalcon_Dispatcher, setEventsManager){
-
-	zval *events_manager;
-
-	phalcon_fetch_params(0, 1, 0, &events_manager);
-
-	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
-
-}
-
-/**
- * Returns the internal event manager
- *
- * @return Phalcon\Events\ManagerInterface
- */
-PHP_METHOD(Phalcon_Dispatcher, getEventsManager){
-
-
-	RETURN_MEMBER(getThis(), "_eventsManager");
-}
-
-/**
  * Sets the default action suffix
  *
  * @param string $actionSuffix
@@ -240,6 +221,110 @@ PHP_METHOD(Phalcon_Dispatcher, setActionSuffix){
 
 	phalcon_update_property(getThis(), SL("_actionSuffix"), action_suffix);
 
+}
+
+/**
+ * Sets the default module
+ *
+ * @param string $module
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultModule){
+
+	zval *module;
+
+	phalcon_fetch_params(0, 1, 0, &module);
+
+	phalcon_update_property(getThis(), SL("_defaultModule"), module);
+
+}
+
+/**
+ * Returns the default module
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultModule){
+
+
+	RETURN_MEMBER(getThis(), "_defaultModule");
+}
+
+/**
+ * Sets the default namespace
+ *
+ * @param string $namespace
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace){
+
+	zval *namespace;
+
+	phalcon_fetch_params(0, 1, 0, &namespace);
+
+	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace);
+
+}
+
+/**
+ * Returns the default namespace
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace){
+
+
+	RETURN_MEMBER(getThis(), "_defaultNamespace");
+}
+
+/**
+ * Sets the default handler
+ *
+ * @param string $handler
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultHandler){
+
+	zval *handler;
+
+	phalcon_fetch_params(0, 1, 0, &handler);
+
+	phalcon_update_property(getThis(), SL("_defaultHandler"), handler);
+
+}
+
+/**
+ * Returns the default handler
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultHandler){
+
+
+	RETURN_MEMBER(getThis(), "_defaultHandler");
+}
+
+/**
+ * Sets the default action name
+ *
+ * @param string $actionName
+ */
+PHP_METHOD(Phalcon_Dispatcher, setDefaultAction){
+
+	zval *action_name;
+
+	phalcon_fetch_params(0, 1, 0, &action_name);
+
+	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
+
+}
+
+/**
+ * Returns the default action
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getDefaultAction){
+
+
+	RETURN_MEMBER(getThis(), "_defaultAction");
 }
 
 /**
@@ -295,44 +380,29 @@ PHP_METHOD(Phalcon_Dispatcher, getNamespaceName){
 }
 
 /**
- * Sets the default namespace
+ * Sets the action name to be dispatched
  *
- * @param string $namespace
+ * @param string $handlerName
  */
-PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace){
+PHP_METHOD(Phalcon_Dispatcher, setHandlerName){
 
-	zval *namespace;
+	zval *handler_name;
 
-	phalcon_fetch_params(0, 1, 0, &namespace);
+	phalcon_fetch_params(0, 1, 0, &handler_name);
 
-	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace);
+	phalcon_update_property(getThis(), SL("_handlerName"), handler_name);
 
 }
 
 /**
- * Returns the default namespace
+ * Gets the lastest dispatched handler name
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Dispatcher, getDefaultNamespace){
+PHP_METHOD(Phalcon_Dispatcher, getHandlerName){
 
 
-	RETURN_MEMBER(getThis(), "_defaultNamespace");
-}
-
-/**
- * Sets the default action name
- *
- * @param string $actionName
- */
-PHP_METHOD(Phalcon_Dispatcher, setDefaultAction){
-
-	zval *action_name;
-
-	phalcon_fetch_params(0, 1, 0, &action_name);
-
-	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
-
+	RETURN_MEMBER(getThis(), "_handlerName");
 }
 
 /**

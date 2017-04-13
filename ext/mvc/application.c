@@ -331,7 +331,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STR(&service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
+	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_mvc_dispatcherinterface_ce);
 
 	/* Assign the values passed from the router */
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setmodulename", &module_name);

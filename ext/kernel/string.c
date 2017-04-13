@@ -19,6 +19,7 @@
 #include "kernel/string.h"
 
 #include <ctype.h>
+
 #include <Zend/zend_smart_str.h>
 #include <ext/standard/php_string.h>
 #include <ext/standard/php_rand.h>
@@ -780,7 +781,7 @@ int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char
 		return 0;
 	}
 
-	found = php_memnstr(Z_STRVAL_P(haystack), needle, needle_length, Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
+	found = zend_memnstr(Z_STRVAL_P(haystack), needle, needle_length, Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
 
 	if (found) {
 		if (return_value) {
@@ -814,7 +815,72 @@ int phalcon_fast_stripos_str(zval *return_value, const zval *haystack, const cha
 	needle_dup = estrndup(needle, needle_length);
 	zend_str_tolower(needle_dup, needle_length);
 
-	found = php_memnstr(haystack_dup, needle, needle_length, haystack_dup + Z_STRLEN_P(haystack));
+	found = zend_memnstr(haystack_dup, needle, needle_length, haystack_dup + Z_STRLEN_P(haystack));
+
+	efree(haystack_dup);
+	efree(needle_dup);
+
+	if (found) {
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
+	}
+
+	if (return_value) {
+		ZVAL_FALSE(return_value);
+	}
+	return 0;
+}
+
+/**
+ * Inmediate function resolution for strrpos function
+ */
+int phalcon_fast_strrpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length) {
+
+	const char *found = NULL;
+
+	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
+		ZVAL_NULL(return_value);
+		zend_error(E_WARNING, "Invalid arguments supplied for strpos()");
+		return 0;
+	}
+
+	found = zend_memnrstr(Z_STRVAL_P(haystack), needle, needle_length, Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
+
+	if (found) {
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
+	}
+	if (return_value) {
+		ZVAL_FALSE(return_value);
+	}
+	return 0;
+}
+
+/**
+ * Inmediate function resolution for strripos function
+ */
+int phalcon_fast_strripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length) {
+
+	const char *found = NULL;
+	char *needle_dup, *haystack_dup;
+
+	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
+		ZVAL_NULL(return_value);
+		zend_error(E_WARNING, "Invalid arguments supplied for stripos()");
+		return 0;
+	}
+
+	haystack_dup = estrndup(Z_STRVAL_P(haystack), Z_STRLEN_P(haystack));
+	zend_str_tolower(haystack_dup, Z_STRLEN_P(haystack));
+
+	needle_dup = estrndup(needle, needle_length);
+	zend_str_tolower(needle_dup, needle_length);
+
+	found = zend_memnrstr(haystack_dup, needle, needle_length, haystack_dup + Z_STRLEN_P(haystack));
 
 	efree(haystack_dup);
 	efree(needle_dup);

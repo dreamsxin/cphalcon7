@@ -224,6 +224,10 @@
 #include "application.h"
 #include "application/exception.h"
 
+#include "router.h"
+#include "routerinterface.h"
+#include "router/exception.h"
+
 #include "cli/console.h"
 #include "cli/console/exception.h"
 #include "cli/dispatcher.h"

@@ -438,8 +438,11 @@ debug.c \
 debug/exception.c \
 debug/dump.c \
 tag.c \
-application/exception.c \
 application.c \
+application/exception.c \
+router.c \
+routerinterface.c \
+router/exception.c \
 cli/dispatcher/exception.c \
 cli/console.c \
 cli/router.c \

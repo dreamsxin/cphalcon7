@@ -252,3 +252,17 @@ PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, getRouteByName);
  * @return boolean
  */
 PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, isExactControllerName);
+
+/**
+ * Sets the default controller name
+ *
+ * @param string $controllerName
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, setDefaultController);
+
+/**
+ * Returns processed controller name
+ *
+ * @return string
+ */
+PHALCON_DOC_METHOD(Phalcon_Mvc_RouterInterface, getControllerName);

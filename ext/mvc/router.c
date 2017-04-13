@@ -18,7 +18,9 @@
 */
 
 #include "mvc/router.h"
+#include "mvc/../router.h"
 #include "mvc/routerinterface.h"
+#include "mvc/../routerinterface.h"
 #include "mvc/router/exception.h"
 #include "mvc/router/group.h"
 #include "mvc/router/route.h"
@@ -76,14 +78,6 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct);
 PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri);
 PHP_METHOD(Phalcon_Mvc_Router, setUriSource);
 PHP_METHOD(Phalcon_Mvc_Router, removeExtraSlashes);
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultNamespace);
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultNamespace);
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultModule);
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultModule);
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultController);
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultController);
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultAction);
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultAction);
 PHP_METHOD(Phalcon_Mvc_Router, setDefaults);
 PHP_METHOD(Phalcon_Mvc_Router, getDefaults);
 PHP_METHOD(Phalcon_Mvc_Router, handle);
@@ -98,16 +92,6 @@ PHP_METHOD(Phalcon_Mvc_Router, addHead);
 PHP_METHOD(Phalcon_Mvc_Router, mount);
 PHP_METHOD(Phalcon_Mvc_Router, notFound);
 PHP_METHOD(Phalcon_Mvc_Router, clear);
-PHP_METHOD(Phalcon_Mvc_Router, setNamespaceName);
-PHP_METHOD(Phalcon_Mvc_Router, getNamespaceName);
-PHP_METHOD(Phalcon_Mvc_Router, setModuleName);
-PHP_METHOD(Phalcon_Mvc_Router, getModuleName);
-PHP_METHOD(Phalcon_Mvc_Router, setControllerName);
-PHP_METHOD(Phalcon_Mvc_Router, getControllerName);
-PHP_METHOD(Phalcon_Mvc_Router, setActionName);
-PHP_METHOD(Phalcon_Mvc_Router, getActionName);
-PHP_METHOD(Phalcon_Mvc_Router, setParams);
-PHP_METHOD(Phalcon_Mvc_Router, getParams);
 PHP_METHOD(Phalcon_Mvc_Router, getMatchedRoute);
 PHP_METHOD(Phalcon_Mvc_Router, getMatches);
 PHP_METHOD(Phalcon_Mvc_Router, wasMatched);
@@ -115,6 +99,10 @@ PHP_METHOD(Phalcon_Mvc_Router, getRoutes);
 PHP_METHOD(Phalcon_Mvc_Router, getRouteById);
 PHP_METHOD(Phalcon_Mvc_Router, getRouteByName);
 PHP_METHOD(Phalcon_Mvc_Router, isExactControllerName);
+PHP_METHOD(Phalcon_Mvc_Router, setDefaultController);
+PHP_METHOD(Phalcon_Mvc_Router, getDefaultController);
+PHP_METHOD(Phalcon_Mvc_Router, setControllerName);
+PHP_METHOD(Phalcon_Mvc_Router, getControllerName);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router___construct, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, defaultRoutes, _IS_BOOL, 1)
@@ -128,10 +116,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_removeextraslashes, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, remove, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setdefaultnamespace, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, namespaceName, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_mount, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, group, Phalcon\\Mvc\\Router\\Group, 0)
 ZEND_END_ARG_INFO()
@@ -140,39 +124,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_notfound, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, paths, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setnamespacename, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, namespaceName, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setmodulename, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, moduleName, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setcontrollername, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, controllerName, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setactionname, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, actionName, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_router_setparams, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 0)
-ZEND_END_ARG_INFO()
-
 static const zend_function_entry phalcon_mvc_router_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Router, __construct, arginfo_phalcon_mvc_router___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Router, getRewriteUri, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, setUriSource, arginfo_phalcon_mvc_router_seturisource, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, removeExtraSlashes, arginfo_phalcon_mvc_router_removeextraslashes, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setDefaultNamespace, arginfo_phalcon_mvc_router_setdefaultnamespace, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getDefaultNamespace, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setDefaultModule, arginfo_phalcon_mvc_routerinterface_setdefaultmodule, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setDefaultController, arginfo_phalcon_mvc_routerinterface_setdefaultcontroller, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getDefaultController, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setDefaultAction, arginfo_phalcon_mvc_routerinterface_setdefaultaction, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, setDefaults, arginfo_phalcon_mvc_routerinterface_setdefaults, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, getDefaults, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, handle, arginfo_phalcon_mvc_routerinterface_handle, ZEND_ACC_PUBLIC)
@@ -187,16 +143,6 @@ static const zend_function_entry phalcon_mvc_router_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Router, mount, arginfo_phalcon_mvc_router_mount, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, notFound, arginfo_phalcon_mvc_router_notfound, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, clear, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setNamespaceName, arginfo_phalcon_mvc_router_setnamespacename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getNamespaceName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setModuleName, arginfo_phalcon_mvc_router_setmodulename, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getModuleName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setControllerName, arginfo_phalcon_mvc_router_setcontrollername, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getControllerName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setActionName, arginfo_phalcon_mvc_router_setactionname, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getActionName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, setParams, arginfo_phalcon_mvc_router_setparams, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Router, getParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, getMatchedRoute, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, getMatches, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, wasMatched, NULL, ZEND_ACC_PUBLIC)
@@ -204,6 +150,10 @@ static const zend_function_entry phalcon_mvc_router_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Router, getRouteById, arginfo_phalcon_mvc_routerinterface_getroutebyid, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, getRouteByName, arginfo_phalcon_mvc_routerinterface_getroutebyname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Router, isExactControllerName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Router, setDefaultController, arginfo_phalcon_routerinterface_setdefaulthandler, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Router, getDefaultController, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Router, setControllerName, arginfo_phalcon_routerinterface_sethandlername, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Router, getControllerName, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -212,24 +162,14 @@ static const zend_function_entry phalcon_mvc_router_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_Router){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Router, mvc_router, phalcon_di_injectable_ce, phalcon_mvc_router_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Router, mvc_router, phalcon_router_ce, phalcon_mvc_router_method_entry, 0);
 
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_uriSource"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_namespace"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_module"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_controller"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_action"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_params"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_routes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_routesNameLookup"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_matchedRoute"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_matches"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_router_ce, SL("_wasMatched"), 0, ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_defaultNamespace"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_defaultModule"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_defaultController"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_removeExtraSlashes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_ce, SL("_notFoundPaths"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_router_ce, SL("_isExactControllerName"), 0, ZEND_ACC_PROTECTED);
@@ -384,110 +324,6 @@ PHP_METHOD(Phalcon_Mvc_Router, removeExtraSlashes){
 }
 
 /**
- * Sets the name of the default namespace
- *
- * @param string $namespaceName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultNamespace){
-
-	zval *namespace_name;
-
-	phalcon_fetch_params(0, 1, 0, &namespace_name);
-
-	phalcon_update_property(getThis(), SL("_defaultNamespace"), namespace_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the name of the default namespace
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultNamespace){
-
-	RETURN_MEMBER(getThis(), "_defaultNamespace");
-}
-
-/**
- * Sets the name of the default module
- *
- * @param string $moduleName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultModule){
-
-	zval *module_name;
-
-	phalcon_fetch_params(0, 1, 0, &module_name);
-
-	phalcon_update_property(getThis(), SL("_defaultModule"), module_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the name of the default module
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultModule){
-
-	RETURN_MEMBER(getThis(), "_defaultModule");
-}
-
-/**
- * Sets the default controller name
- *
- * @param string $controllerName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultController){
-
-	zval *controller_name;
-
-	phalcon_fetch_params(0, 1, 0, &controller_name);
-
-	phalcon_update_property(getThis(), SL("_defaultController"), controller_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the default controller name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultController){
-
-	RETURN_MEMBER(getThis(), "_defaultController");
-}
-
-/**
- * Sets the default action name
- *
- * @param string $actionName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setDefaultAction){
-
-	zval *action_name;
-
-	phalcon_fetch_params(0, 1, 0, &action_name);
-
-	phalcon_update_property(getThis(), SL("_defaultAction"), action_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the default action name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getDefaultAction){
-
-	RETURN_MEMBER(getThis(), "_defaultAction");
-}
-
-/**
  * Sets an array of default paths. If a route is missing a path the router will use the defined here
  * This method must not be used to set a 404 route
  *
@@ -524,7 +360,7 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaults){
 
 	/* Set the default controller */
 	if (phalcon_array_isset_fetch_str(&controller_name, defaults, SL("controller"), PH_READONLY)) {
-		phalcon_update_property(getThis(), SL("_defaultController"), &controller_name);
+		phalcon_update_property(getThis(), SL("_defaultHandle"), &controller_name);
 	}
 
 	/* Set the default action */
@@ -551,7 +387,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
 	phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&controller_name, getThis(), SL("_defaultController"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&controller_name, getThis(), SL("_defaultHandle"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&params, getThis(), SL("_defaultParams"), PH_NOISY|PH_READONLY);
 
@@ -581,7 +417,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	zval *uri = NULL, real_uri = {}, removeextraslashes = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, dependency_injector = {}, request = {}, debug_message = {}, event_name = {};
 	zval current_host_name = {}, routes = {}, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
-	zval controller = {}, default_controller = {}, action = {}, default_action = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
+	zval controller = {}, default_handler = {}, action = {}, default_action = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -916,11 +752,11 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			PHALCON_CALL_METHOD(NULL, getThis(), "setcontrollername", &controller);
 			phalcon_array_unset_str(&parts, SL("controller"), 0);
 		} else {
-			PHALCON_CALL_METHOD(&default_controller, route, "getdefaultcontroller");
-			if (Z_TYPE(default_controller) == IS_NULL) {
-				phalcon_read_property(&default_controller, getThis(), SL("_defaultController"), PH_READONLY);
+			PHALCON_CALL_METHOD(&default_handler, route, "getdefaultcontroller");
+			if (Z_TYPE(default_handler) == IS_NULL) {
+				phalcon_read_property(&default_handler, getThis(), SL("_defaultHandler"), PH_READONLY);
 			}
-			PHALCON_CALL_METHOD(NULL, getThis(), "setcontrollername", &default_controller);
+			PHALCON_CALL_METHOD(NULL, getThis(), "setcontrollername", &default_handler);
 		}
 
 		/**
@@ -991,8 +827,8 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		phalcon_read_property(&default_module, getThis(), SL("_defaultModule"), PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, getThis(), "setmodulename", &default_module);
 
-		phalcon_read_property(&default_controller, getThis(), SL("_defaultController"), PH_READONLY);
-		PHALCON_CALL_METHOD(NULL, getThis(), "setcontrollername", &default_controller);
+		phalcon_read_property(&default_handler, getThis(), SL("_defaultHandler"), PH_READONLY);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setcontrollername", &default_handler);
 
 		phalcon_read_property(&default_action, getThis(), SL("_defaultAction"), PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, getThis(), "setactionname", &default_action);
@@ -1275,141 +1111,6 @@ PHP_METHOD(Phalcon_Mvc_Router, clear){
 }
 
 /**
- * Sets the name of the namespace
- *
- * @param string $namespaceName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setNamespaceName){
-
-	zval *namespace_name;
-
-	phalcon_fetch_params(0, 1, 0, &namespace_name);
-
-	phalcon_update_property(getThis(), SL("_namespace"), namespace_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the processed namespace name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getNamespaceName){
-
-
-	RETURN_MEMBER(getThis(), "_namespace");
-}
-
-/**
- * Sets the name of the module
- *
- * @param string $moduleName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setModuleName){
-
-	zval *module_name;
-
-	phalcon_fetch_params(0, 1, 0, &module_name);
-
-	phalcon_update_property(getThis(), SL("_module"), module_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the processed module name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getModuleName){
-
-
-	RETURN_MEMBER(getThis(), "_module");
-}
-
-/**
- * Sets the name of the controller
- *
- * @param string $controllerName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setControllerName){
-
-	zval *controller_name;
-
-	phalcon_fetch_params(0, 1, 0, &controller_name);
-
-	phalcon_update_property(getThis(), SL("_controller"), controller_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the processed controller name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getControllerName){
-
-
-	RETURN_MEMBER(getThis(), "_controller");
-}
-
-/**
- * Sets the name of the action
- *
- * @param string $actionName
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setActionName){
-
-	zval *action_name;
-
-	phalcon_fetch_params(0, 1, 0, &action_name);
-
-	phalcon_update_property(getThis(), SL("_action"), action_name);
-	RETURN_THIS();
-}
-
-/**
- * Returns the processed action name
- *
- * @return string
- */
-PHP_METHOD(Phalcon_Mvc_Router, getActionName){
-
-
-	RETURN_MEMBER(getThis(), "_action");
-}
-
-/**
- * Sets the params
- *
- * @param array $params
- * @return Phalcon\Mvc\Router
- */
-PHP_METHOD(Phalcon_Mvc_Router, setParams){
-
-	zval *params;
-
-	phalcon_fetch_params(0, 1, 0, &params);
-
-	phalcon_update_property(getThis(), SL("_params"), params);
-	RETURN_THIS();
-}
-
-/**
- * Returns the processed parameters
- *
- * @return array
- */
-PHP_METHOD(Phalcon_Mvc_Router, getParams){
-
-
-	RETURN_MEMBER(getThis(), "_params");
-}
-
-/**
  * Returns the route that matchs the handled URI
  *
  * @return Phalcon\Mvc\Router\Route
@@ -1524,4 +1225,56 @@ PHP_METHOD(Phalcon_Mvc_Router, getRouteByName){
  */
 PHP_METHOD(Phalcon_Mvc_Router, isExactControllerName) {
 	RETURN_MEMBER(getThis(), "_isExactControllerName");
+}
+
+/**
+ * Sets the default controller name
+ *
+ * @param string $controllerName
+ */
+PHP_METHOD(Phalcon_Mvc_Router, setDefaultController){
+
+	zval *controller_name;
+
+	phalcon_fetch_params(0, 1, 0, &controller_name);
+
+	phalcon_update_property(getThis(), SL("_defaultHandle"), controller_name);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the default controller name
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Router, getDefaultController){
+
+
+	RETURN_MEMBER(getThis(), "_defaultHandle");
+}
+
+/**
+ * Sets the controller name
+ *
+ * @param string $controllerName
+ */
+PHP_METHOD(Phalcon_Mvc_Router, setControllerName){
+
+	zval *controller_name;
+
+	phalcon_fetch_params(0, 1, 0, &controller_name);
+
+	phalcon_update_property(getThis(), SL("_handler"), controller_name);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the controller name
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Router, getControllerName){
+
+
+	RETURN_MEMBER(getThis(), "_handler");
 }

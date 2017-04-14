@@ -476,7 +476,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	}
 
 	phalcon_array_update_multi_2(&meta_data, &key, index, data, PH_COPY);
-	phalcon_update_property(getThis(), SL("_metaData"), &meta_data);
 }
 
 /**

@@ -715,6 +715,11 @@ PHP_METHOD(Phalcon_Security, checkToken){
 		name = &PHALCON_GLOBAL(z_null);
 	}
 
+	ZVAL_STR(&service, IS(session));
+
+	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+
 	if (!_token_key || Z_TYPE_P(_token_key) == IS_NULL) {
 		ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
 
@@ -730,11 +735,6 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	if (!token_value) {
 		token_value = &PHALCON_GLOBAL(z_null);
 	}
-
-	ZVAL_STR(&service, IS(session));
-
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		ZVAL_STR(&service, IS(request));

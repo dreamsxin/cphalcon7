@@ -47,6 +47,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_routerinterface_setdefaultparams, 0, 0, 1
 	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_routerinterface_setmode, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_routerinterface_setmodulename, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, moduleName, IS_STRING, 0)
 ZEND_END_ARG_INFO()

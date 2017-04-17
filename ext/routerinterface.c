@@ -34,6 +34,8 @@ static const zend_function_entry phalcon_routerinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getDefaultAction, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setDefaultParams, arginfo_phalcon_routerinterface_setdefaultparams)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getDefaultParams, NULL)
+	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setMode, arginfo_phalcon_routerinterface_setmode)
+	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getMode, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setModuleName, arginfo_phalcon_routerinterface_setmodulename)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getModuleName, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setNamespaceName, arginfo_phalcon_routerinterface_setnamespacename)

@@ -972,4 +972,27 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals($router->getMatches(), array(0 => '/c', 1 => '/c', 2 => 'c'));
 	}
+
+	public function testRestMode()
+	{
+		Phalcon\Mvc\Router\Route::reset();
+
+		$router = new Phalcon\Mvc\Router();
+
+		$router->setMode(Phalcon\Router::MODE_REST);
+
+		$routes = array(
+			'/user/info' => array(
+				'controller' => 'user',
+				'action' => 'infoPost',
+			),
+		);
+
+		foreach ($routes as $route => $paths) {
+			$_SERVER['REQUEST_METHOD'] = 'POST';
+			$router->handle($route);
+			$this->assertEquals($router->getControllerName(), $paths['controller']);
+			$this->assertEquals($router->getActionName(), $paths['action']);
+		}
+	}
 }

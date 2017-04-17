@@ -52,6 +52,8 @@ PHP_METHOD(Phalcon_Router, setDefaultAction);
 PHP_METHOD(Phalcon_Router, getDefaultAction);
 PHP_METHOD(Phalcon_Router, setDefaultParams);
 PHP_METHOD(Phalcon_Router, getDefaultParams);
+PHP_METHOD(Phalcon_Router, setMode);
+PHP_METHOD(Phalcon_Router, getMode);
 PHP_METHOD(Phalcon_Router, setModuleName);
 PHP_METHOD(Phalcon_Router, getModuleName);
 PHP_METHOD(Phalcon_Router, setNamespaceName);
@@ -74,6 +76,8 @@ static const zend_function_entry phalcon_router_method_entry[] = {
 	PHP_ME(Phalcon_Router, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setDefaultParams, arginfo_phalcon_routerinterface_setdefaultparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, getDefaultParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Router, setMode, arginfo_phalcon_routerinterface_setmode, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Router, getMode, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setModuleName, arginfo_phalcon_routerinterface_setmodulename, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, getModuleName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setNamespaceName, arginfo_phalcon_routerinterface_setnamespacename, ZEND_ACC_PUBLIC)
@@ -104,6 +108,10 @@ PHALCON_INIT_CLASS(Phalcon_Router){
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultHandler"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_router_ce, SL("_mode"), PHALCON_ROUTER_MODE_NONE, ZEND_ACC_PROTECTED);
+
+	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_NONE"),   PHALCON_ROUTER_MODE_NONE);
+	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_REST"),   PHALCON_ROUTER_MODE_REST);
 
 	zend_class_implements(phalcon_router_ce, 1, phalcon_routerinterface_ce);
 
@@ -238,6 +246,32 @@ PHP_METHOD(Phalcon_Router, getDefaultParams){
 
 
 	RETURN_MEMBER(getThis(), "_defaultParams");
+}
+
+/**
+ * Sets the mode
+ *
+ * @param int $mode
+ */
+PHP_METHOD(Phalcon_Router, setMode){
+
+	zval *mode;
+
+	phalcon_fetch_params(0, 1, 0, &mode);
+
+	phalcon_update_property(getThis(), SL("_mode"), mode);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the mode
+ *
+ * @param int $mode
+ */
+PHP_METHOD(Phalcon_Router, getMode){
+
+
+	RETURN_MEMBER(getThis(), "_mode");
 }
 
 /**

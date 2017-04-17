@@ -18,7 +18,7 @@
 */
 
 #include "mvc/user/component.h"
-#include "di/injectable.h"
+#include "mvc/../user/component.h"
 #include "kernel/main.h"
 
 /**
@@ -34,7 +34,7 @@ zend_class_entry *phalcon_mvc_user_component_ce;
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_User_Component){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\User, Component, mvc_user_component, phalcon_di_injectable_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\User, Component, mvc_user_component, phalcon_user_component_ce, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	return SUCCESS;
 }

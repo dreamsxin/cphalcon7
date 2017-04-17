@@ -14,27 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#include "mvc/user/module.h"
-#include "mvc/../user/module.h"
-#include "kernel/main.h"
+#ifndef PHALCON_USER_LOGIC_H
+#define PHALCON_USER_LOGIC_H
 
-/**
- * Phalcon\Mvc\User\Module
- *
- * This class can be used to provide user modules easy access to services
- * in the application
- */
-zend_class_entry *phalcon_mvc_user_module_ce;
+#include "php_phalcon.h"
 
-/**
- * Phalcon\Mvc\User\Module initializer
- */
-PHALCON_INIT_CLASS(Phalcon_Mvc_User_Module){
+extern zend_class_entry *phalcon_user_logic_ce;
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\User, Module, mvc_user_module, phalcon_user_module_ce, NULL, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+PHALCON_INIT_CLASS(Phalcon_User_Logic);
 
-	return SUCCESS;
-}
+#endif /* PHALCON_USER_LOGIC_H */

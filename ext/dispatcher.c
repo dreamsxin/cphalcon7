@@ -27,7 +27,7 @@
 #include "exception.h"
 #include "continueexception.h"
 #include "filterinterface.h"
-#include "mvc/user/logic.h"
+#include "user/logic.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -1014,7 +1014,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					PHALCON_CALL_METHOD(&logic_classname, &reflection_class, "getname");
 					if (Z_TYPE(logic_classname) == IS_STRING) {
 						logic_ce = phalcon_fetch_class(&logic_classname, ZEND_FETCH_CLASS_AUTO);
-						if (instanceof_function_ex(logic_ce, phalcon_mvc_user_logic_ce, 0)) {
+						if (instanceof_function_ex(logic_ce, phalcon_user_logic_ce, 0)) {
 							PHALCON_CALL_CE_STATIC(&logic, logic_ce, "call", &action_name, &action_params);
 							phalcon_array_update(&params, &key, &logic, PH_COPY);
 
@@ -1095,7 +1095,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 		if (zend_is_true(&logic_binding)) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(params), param) {
-				if (Z_TYPE_P(param) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(param), phalcon_mvc_user_logic_ce, 0)) {
+				if (Z_TYPE_P(param) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(param), phalcon_user_logic_ce, 0)) {
 					if (phalcon_method_exists_ex(param, SL("finish")) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, param, "finish");
 					}

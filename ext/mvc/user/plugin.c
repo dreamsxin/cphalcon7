@@ -18,7 +18,7 @@
 */
 
 #include "mvc/user/plugin.h"
-#include "di/injectable.h"
+#include "mvc/../user/plugin.h"
 #include "kernel/main.h"
 
 /**
@@ -34,7 +34,7 @@ zend_class_entry *phalcon_mvc_user_plugin_ce;
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_User_Plugin){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\User, Plugin, mvc_user_plugin, phalcon_di_injectable_ce, NULL, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\User, Plugin, mvc_user_plugin, phalcon_user_plugin_ce, NULL, 0);
 
 	return SUCCESS;
 }

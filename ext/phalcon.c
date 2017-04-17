@@ -424,6 +424,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
 
+	PHALCON_INIT(Phalcon_User_Module);
+	PHALCON_INIT(Phalcon_User_Plugin);
+	PHALCON_INIT(Phalcon_User_Component);
+	PHALCON_INIT(Phalcon_User_Logic);
+
 	PHALCON_INIT(Phalcon_Application);
 	PHALCON_INIT(Phalcon_Router);
 	PHALCON_INIT(Phalcon_Cli_Task);

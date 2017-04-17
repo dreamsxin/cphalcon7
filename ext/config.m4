@@ -438,6 +438,10 @@ debug.c \
 debug/exception.c \
 debug/dump.c \
 tag.c \
+user/component.c \
+user/plugin.c \
+user/module.c \
+user/logic.c \
 application.c \
 application/exception.c \
 router.c \

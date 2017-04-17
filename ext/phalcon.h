@@ -221,6 +221,11 @@
 #include "logger/item.h"
 #include "logger/multiple.h"
 
+#include "user/component.h"
+#include "user/module.h"
+#include "user/plugin.h"
+#include "user/logic.h"
+
 #include "application.h"
 #include "application/exception.h"
 

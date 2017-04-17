@@ -222,11 +222,13 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 	phalcon_fetch_params(0, 0, 3, &_width, &_height, &_master);
 
 	if (_width && Z_TYPE_P(_width) != IS_NULL) {
+		PHALCON_SEPARATE_PARAM(_width);
 		ZVAL_COPY_VALUE(&width, _width);
 		tmp_width = Z_LVAL(width);
 	}
 
 	if (_height && Z_TYPE_P(_height) != IS_NULL) {
+		PHALCON_SEPARATE_PARAM(_height);
 		ZVAL_COPY_VALUE(&height, _height);
 		tmp_height = Z_LVAL(height);
 	}
@@ -261,21 +263,29 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 			return;
 		}
 	} else {
+		if (Z_TYPE(width) <= IS_NULL && Z_TYPE(height) <= IS_NULL) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "width and height parameters must be specified");
+			return;
+		}
 		if (PHALCON_IMAGE_AUTO == master)
 		{
-			if (Z_TYPE(width) <= IS_NULL || Z_TYPE(height) <= IS_NULL) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "width and height parameters must be specified");
-				return;
+			if (Z_TYPE(width) <= IS_NULL) {
+				master = PHALCON_IMAGE_HEIGHT;
+			} else if (Z_TYPE(height) <= IS_NULL) {
+				master = PHALCON_IMAGE_WIDTH;
+			} else {
+				master = (tmp_image_width / tmp_width) > (tmp_image_height / tmp_height) ? PHALCON_IMAGE_WIDTH : PHALCON_IMAGE_HEIGHT;
 			}
-			master = (tmp_image_width / tmp_width) > (tmp_image_height / tmp_height) ? PHALCON_IMAGE_WIDTH : PHALCON_IMAGE_HEIGHT;
 		}
 		else if (PHALCON_IMAGE_INVERSE == master)
 		{
-			if (Z_TYPE(width) <= IS_NULL || Z_TYPE(height) <= IS_NULL) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "width and height parameters must be specified");
-				return;
+			if (Z_TYPE(width) <= IS_NULL) {
+				master = PHALCON_IMAGE_HEIGHT;
+			} else if (Z_TYPE(height) <= IS_NULL) {
+				master = PHALCON_IMAGE_WIDTH;
+			} else {
+				master = (tmp_image_width / tmp_width) > (tmp_image_height / tmp_height) ? PHALCON_IMAGE_HEIGHT : PHALCON_IMAGE_WIDTH;
 			}
-			master = (tmp_image_width / tmp_width) > (tmp_image_height / tmp_height) ? PHALCON_IMAGE_HEIGHT : PHALCON_IMAGE_WIDTH;
 		}
 
 		switch (master) {
@@ -288,7 +298,7 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 				break;
 
 			case PHALCON_IMAGE_HEIGHT:
-				if (Z_TYPE(width) <= IS_NULL) {
+				if (Z_TYPE(height) <= IS_NULL) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "height parameters must be specified");
 					return;
 				}
@@ -298,8 +308,7 @@ PHP_METHOD(Phalcon_Image_Adapter, resize){
 			case PHALCON_IMAGE_NONE:
 				if (Z_TYPE(width) <= IS_NULL) {
 					tmp_width = tmp_image_width;
-				}
-				if (Z_TYPE(width) <= IS_NULL) {
+				} else if (Z_TYPE(height) <= IS_NULL) {
 					tmp_height = tmp_image_height;
 				}
 				break;

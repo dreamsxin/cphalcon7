@@ -1045,7 +1045,7 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 		RETURN_CTOR(&address);
 	}
 
-	RETURN_FALSE;
+	RETURN_NULL();
 }
 
 static const char* phalcon_http_request_getmethod_helper()

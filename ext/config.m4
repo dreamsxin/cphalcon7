@@ -27,7 +27,7 @@ PHP_ARG_ENABLE(chart, whether to enable chart support,
 
 AC_MSG_CHECKING([Include chart])
 if test "$PHP_CHART" = "yes"; then
-	AC_DEFINE([PHALCON_CHART], [1], [Whether process are available])
+	AC_DEFINE([PHALCON_CHART], [1], [Whether chart are available])
 	AC_MSG_RESULT([yes, chart])
 else
 	AC_MSG_RESULT([no])

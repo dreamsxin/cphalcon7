@@ -46,6 +46,7 @@
 #include "kernel/concat.h"
 #include "kernel/file.h"
 #include "kernel/require.h"
+#include "kernel/string.h"
 
 #include "interned-strings.h"
 
@@ -175,7 +176,7 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	zval *uri = NULL, dependency_injector = {}, event_name = {}, status = {}, service = {}, router = {}, module_name = {};
-	zval modules = {}, module = {}, class_name = {}, path = {}, module_object = {}, module_params = {};
+	zval modules = {}, module = {}, module_namespace = {}, module_class = {}, class_name = {}, path = {}, module_object = {}, module_params = {};
 	zval implicit_view = {}, view = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {}, exact = {};
 	zval dispatcher = {}, controller = {}, possible_response = {}, returned_response = {}, response = {}, content = {};
 	int f_implicit_view;
@@ -249,10 +250,25 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 
 		/* An array module definition contains a path to a module definition class */
-		if (Z_TYPE(module) == IS_ARRAY) {
+		if (unlikely(Z_TYPE(module) == IS_ARRAY)) {
 			/* Class name used to load the module definition */
-			if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_READONLY)) {
-				ZVAL_STRING(&class_name, "Module");
+			if (!phalcon_array_isset_fetch_str(&module_namespace, &module, SL("namespaceName"), PH_READONLY)) {
+				ZVAL_EMPTY_STRING(&module_namespace);
+			}
+
+			/* Class name used to load the module definition */
+			if (!phalcon_array_isset_fetch_str(&module_class, &module, SL("className"), PH_READONLY)) {
+				ZVAL_STRING(&module_class, "Module");
+			}
+
+			if (Z_TYPE(module_class) == IS_STRING && zend_is_true(&module_namespace) && !phalcon_memnstr_str(&module_class, SL("\\"))) {
+				if (phalcon_end_with_str(&module_namespace, SL("\\"))) {
+					PHALCON_CONCAT_VV(&class_name, &module_namespace, &module_class);
+				} else {
+					PHALCON_CONCAT_VSV(&class_name, &module_namespace, "\\", &module_class);
+				}
+			} else {
+				ZVAL_COPY_VALUE(&class_name, &module_class);
 			}
 
 			/* If the developer has specified a path, try to include the file */
@@ -327,6 +343,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
 	PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
+
+	if (!zend_is_true(&namespace_name) && zend_is_true(&module_namespace)) {
+		ZVAL_COPY_VALUE(&namespace_name, &module_namespace);
+	}
 
 	ZVAL_STR(&service, IS(dispatcher));
 

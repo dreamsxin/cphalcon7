@@ -170,6 +170,47 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 		$loader->unregister();
 	}
 
+	public function testApplicationModuleNamespaceDefinition()
+	{
+		Phalcon\Di::reset();
+
+		// Creates the autoloader
+		$loader = new \Phalcon\Loader();
+
+		$loader->registerNamespaces(array(
+			'Frontend\Controllers' => 'unit-tests/modules/frontend/controllers/',
+		));
+
+		$loader->register();
+
+		$di = new Phalcon\Di\FactoryDefault();
+
+		$di->set('router', function(){
+			$router = new Phalcon\Mvc\Router(false);
+
+			$router->add('/index', array(
+				'controller' => 'index',
+				'module' => 'frontend',
+			));
+
+			return $router;
+		});
+
+		$application = new Phalcon\Mvc\Application();
+
+		$application->registerModules(array(
+			'frontend' => array(
+				'path' => 'unit-tests/modules/frontend/Module.php',
+				'className' => 'Frontend\Module',
+				'namespaceName' => 'Frontend\Controllers',
+			)
+		));
+
+		$this->assertEquals($application->handle('/index')->getContent(), '<html>here</html>'.PHP_EOL);
+
+		$loader->unregister();
+	}
+
 	public function testHMVC()
 	{
 		// Creates the autoloader

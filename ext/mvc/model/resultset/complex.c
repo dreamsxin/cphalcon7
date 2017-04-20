@@ -40,6 +40,8 @@
 
 #include "internal/arginfo.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Mvc\Model\Resultset\Complex
  *
@@ -147,7 +149,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, __construct){
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
 	zval source_model = {}, type = {}, result = {}, row = {}, rows = {}, hydrate_mode = {}, columns_types = {}, underscore = {}, empty_str = {};
-	zval active_row = {}, dirty_state = {}, *column;
+	zval dependency_injector = {}, service_name = {}, has = {}, active_row = {}, dirty_state = {}, *column;
 	zend_class_entry *ce;
 	zend_string *str_key;
 	ulong idx;
@@ -214,7 +216,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			 */
 			switch (i_hydrate_mode) {
 				case 0:
-					object_init_ex(&active_row, phalcon_mvc_model_row_ce);
+					ZVAL_STR(&service_name, IS(modelsRow));
+
+					PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+					PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+					if (zend_is_true(&has)) {
+						PHALCON_CALL_METHOD(&active_row, &dependency_injector, "get", &service_name);
+	   					PHALCON_VERIFY_CLASS_EX(&active_row, phalcon_mvc_model_row_ce, phalcon_mvc_model_row_ce);
+					} else {
+						object_init_ex(&active_row, phalcon_mvc_model_row_ce);
+					}
 					break;
 
 				case 1:
@@ -270,7 +281,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					/**
 					 * Generate the column value according to the hydration type
 					 */
-					switch (phalcon_get_intval(&hydrate_mode)) {
+					switch (i_hydrate_mode) {
 
 						case 0: {
 							zval instance = {};
@@ -340,7 +351,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 					return;
 				}
 
-				switch (phalcon_get_intval(&hydrate_mode)) {
+				switch (i_hydrate_mode) {
 
 					case 1:
 						phalcon_array_update(&active_row, &alias, &value, PH_COPY);
@@ -352,6 +363,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 
 				}
 			} ZEND_HASH_FOREACH_END();
+			if (Z_TYPE(active_row) == IS_OBJECT && phalcon_method_exists_ex(&active_row, SL("afterfetch")) == SUCCESS) {
+				PHALCON_CALL_METHOD(NULL, &active_row, "afterfetch");
+			}
 
 			/**
 			 * Store the generated row in this_ptr->activeRow to be retrieved by 'current'

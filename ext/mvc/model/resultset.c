@@ -20,6 +20,7 @@
 #include "mvc/model/resultset.h"
 #include "mvc/model/resultsetinterface.h"
 #include "mvc/model/exception.h"
+#include "di/injectable.h"
 
 #ifdef PHALCON_USE_PHP_JSON
 #include <ext/json/php_json.h>
@@ -137,7 +138,7 @@ static const zend_function_entry phalcon_mvc_model_resultset_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Resultset){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Resultset, mvc_model_resultset, phalcon_mvc_model_resultset_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model, Resultset, mvc_model_resultset, phalcon_di_injectable_ce, phalcon_mvc_model_resultset_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_long(phalcon_mvc_model_resultset_ce, SL("_type"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_resultset_ce, SL("_result"), ZEND_ACC_PROTECTED);

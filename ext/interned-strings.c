@@ -76,6 +76,7 @@ zend_string *phalcon_interned_modelsQueryBuilderForDelete	= NULL;
 zend_string *phalcon_interned_modelsCriteria				= NULL;
 zend_string *phalcon_interned_modelsResultsetSimple			= NULL;
 zend_string *phalcon_interned_modelsResultsetComplex		= NULL;
+zend_string *phalcon_interned_modelsRow						= NULL;
 zend_string *phalcon_interned_module						= NULL;
 zend_string *phalcon_interned_name							= NULL;
 zend_string *phalcon_interned_namespace						= NULL;
@@ -184,6 +185,7 @@ PHALCON_STATIC void phalcon_init_interned_strings()
 	phalcon_interned_modelsCriteria					= SSL("modelsCriteria");
 	phalcon_interned_modelsResultsetSimple			= SSL("modelsResultsetSimple");
 	phalcon_interned_modelsResultsetComplex			= SSL("modelsResultsetComplex");
+	phalcon_interned_modelsRow						= SSL("modelsRow");
 	phalcon_interned_module							= SSL("module");
 	phalcon_interned_name							= SSL("name");
 	phalcon_interned_namespace						= SSL("namespace");
@@ -293,6 +295,7 @@ PHALCON_STATIC void phalcon_release_interned_strings()
 	zend_string_release(phalcon_interned_modelsCriteria);
 	zend_string_release(phalcon_interned_modelsResultsetSimple);
 	zend_string_release(phalcon_interned_modelsResultsetComplex);
+	zend_string_release(phalcon_interned_modelsRow);
 	zend_string_release(phalcon_interned_module);
 	zend_string_release(phalcon_interned_name);
 	zend_string_release(phalcon_interned_namespace);

@@ -728,8 +728,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 		if (distinct) {
 			add_assoc_bool_ex(return_value, ISL(distinct), distinct);
 		}
-
-		zval_ptr_dtor(&function_args);
 	}
 }
 
@@ -968,7 +966,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 
 					PHALCON_CONCAT_SVS(&expr_value, "'", &escaped_value, "'");
 				} else {
-					PHALCON_CPY_WRT_CTOR(&expr_value, &value);
+					ZVAL_COPY_VALUE(&expr_value, &value);
 				}
 
 				array_init_size(return_value, 2);
@@ -3664,7 +3662,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			/**
 			 * If the result is a simple standard object use an Phalcon\Mvc\Model\Row as base
 			 */
-			object_init_ex(&result_object, phalcon_mvc_model_row_ce);
+			ZVAL_STR(&service_name, IS(modelsRow));
+zend_print_zval_r(&service_name, 0);
+			PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+			if (zend_is_true(&has)) {
+				PHALCON_CALL_METHOD(&result_object, &dependency_injector, "get", &service_name);
+				PHALCON_VERIFY_CLASS_EX(&result_object, phalcon_mvc_model_row_ce, phalcon_mvc_model_query_exception_ce);
+			} else {
+				object_init_ex(&result_object, phalcon_mvc_model_row_ce);
+			}
 		} else {
 			if (Z_TYPE(instance) == IS_OBJECT) {
 				ZVAL_COPY_VALUE(&result_object, &instance);
@@ -3695,6 +3701,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			phalcon_array_append(&service_params, &model, PH_COPY);
 
 			PHALCON_CALL_METHOD(&resultset, &dependency_injector, "get", &service_name, &service_params);
+			zval_ptr_dtor(&service_params);
 		} else {
 			object_init_ex(&resultset, phalcon_mvc_model_resultset_simple_ce);
 			PHALCON_CALL_METHOD(NULL, &resultset, "__construct", &simple_column_map, &result_object, &result_data, &cache, &model);

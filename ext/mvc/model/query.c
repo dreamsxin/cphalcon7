@@ -3663,7 +3663,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			 * If the result is a simple standard object use an Phalcon\Mvc\Model\Row as base
 			 */
 			ZVAL_STR(&service_name, IS(modelsRow));
-zend_print_zval_r(&service_name, 0);
 			PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 			if (zend_is_true(&has)) {
 				PHALCON_CALL_METHOD(&result_object, &dependency_injector, "get", &service_name);

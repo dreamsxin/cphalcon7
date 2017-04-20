@@ -30,7 +30,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventsawareinterface_geteventsmana
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_eventsawareinterface_seteventsmanager, 0, 0, 1)
-	ZEND_ARG_INFO(0, eventsManager)
+	ZEND_ARG_OBJ_INFO(0, eventsManager, Phalcon\\Events\\ManagerInterface, 0)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_EVENTS_EVENTSAWAREINTERFACE_H */

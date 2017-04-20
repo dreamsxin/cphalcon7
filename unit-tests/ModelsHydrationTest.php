@@ -18,6 +18,12 @@
   +------------------------------------------------------------------------+
 */
 
+class MyRow extends Phalcon\Mvc\Model\Row {
+
+	public function afterFetch() {
+	}
+}
+
 class ModelsHydrationTest extends PHPUnit_Framework_TestCase
 {
 
@@ -331,6 +337,31 @@ class ModelsHydrationTest extends PHPUnit_Framework_TestCase
 			$this->assertEquals(get_class($row->robotsParts), 'stdClass');
 		}
 
+		$di->set('modelsRow', 'MyRow');
+		$result = $di->get('modelsManager')->executeQuery('SELECT id FROM Robots');
+
+		//Scalar complex query
+		foreach ($result as $row) {
+			$this->assertEquals(get_class($row), 'MyRow');
+			$this->assertTrue(is_numeric($row->id));
+		}
+
+		$result->setHydrateMode(Phalcon\Mvc\Model\Resultset::HYDRATE_RECORDS);
+		foreach ($result as $row) {
+			$this->assertEquals(get_class($row), 'MyRow');
+			$this->assertTrue(is_numeric($row->id));
+		}
+
+		//Complex resultset including scalars and complete objects
+		$result = $di->get('modelsManager')->executeQuery('SELECT Robots.id, Robots.*, RobotsParts.* FROM Robots JOIN RobotsParts');
+		foreach ($result as $row) {
+			$this->assertEquals(get_class($row), 'MyRow');
+			$this->assertTrue(is_numeric($row->id));
+			$this->assertEquals(gettype($row->robots), 'object');
+			$this->assertEquals(get_class($row->robots), 'Robots');
+			$this->assertEquals(gettype($row->robotsParts), 'object');
+			$this->assertEquals(get_class($row->robotsParts), 'RobotsParts');
+		}
 	}
 
 }

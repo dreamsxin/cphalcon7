@@ -684,5 +684,6 @@ int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int ty
 
 void phalcon_array_append_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
 int phalcon_array_append_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
+int phalcon_array_ksort(zval *arr, int reverse);
 
 #endif /* PHALCON_KERNEL_ARRAY_H */

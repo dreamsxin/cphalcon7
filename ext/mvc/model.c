@@ -1489,9 +1489,11 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	if (Z_TYPE_P(return_value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
-		PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
-		PHALCON_CALL_METHOD(NULL, return_value, "build");
+	if (Z_TYPE_P(return_value) == IS_OBJECT) {
+		if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
+			PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
+			PHALCON_CALL_METHOD(NULL, return_value, "build");
+		}
 
 		/**
 		 * Call afterFetch, this allows the developer to execute actions after a record is

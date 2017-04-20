@@ -76,6 +76,7 @@ extern zend_string *phalcon_interned_modelsQueryBuilderForDelete;
 extern zend_string *phalcon_interned_modelsCriteria;
 extern zend_string *phalcon_interned_modelsResultsetSimple;
 extern zend_string *phalcon_interned_modelsResultsetComplex;
+extern zend_string *phalcon_interned_modelsRow;
 extern zend_string *phalcon_interned_module;
 extern zend_string *phalcon_interned_name;
 extern zend_string *phalcon_interned_namespace;

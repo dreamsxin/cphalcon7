@@ -242,7 +242,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			break;
 
 		default:
-			phalcon_read_property(&rows_objects, getThis(), SL("_rowsOthers"), PH_NOISY|PH_READONLY);
+			phalcon_read_property(&rows_objects, getThis(), SL("_rowsObjects"), PH_NOISY|PH_READONLY);
 			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
 				/**
 				 * Other kinds of hydrations

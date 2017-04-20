@@ -35,6 +35,14 @@ static const zend_function_entry phalcon_mvc_router_routeinterface_method_entry[
 	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getPaths, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getHttpMethods, NULL)
 	ZEND_FENTRY(reset, NULL, NULL, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, setDefaults, arginfo_phalcon_mvc_router_routeinterface_setdefaults)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getDefaultModule, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getDefaultNamespace, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getDefaultController, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getDefaultAction, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getDefaultParams, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, setMode, arginfo_phalcon_mvc_router_routeinterface_setmode)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Router_RouteInterface, getMode, NULL)
 	PHP_FE_END
 };
 

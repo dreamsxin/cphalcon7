@@ -986,7 +986,35 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 				'controller' => 'user',
 				'action' => 'infoPost',
 			),
+			'/post/info' => array(
+				'controller' => 'post',
+				'action' => 'infoPost',
+			),
 		);
+
+		foreach ($routes as $route => $paths) {
+			$_SERVER['REQUEST_METHOD'] = 'POST';
+			$router->handle($route);
+			$this->assertEquals($router->getControllerName(), $paths['controller']);
+			$this->assertEquals($router->getActionName(), $paths['action']);
+		}
+
+		$routes = array(
+			'/user/info' => array(
+				'controller' => 'user',
+				'action' => 'infoPost',
+			),
+			'/post/info' => array(
+				'controller' => 'post',
+				'action' => 'info',
+			),
+		);
+
+		$router->add('/post/:action/:params', array(
+			"controller" => 'post',
+			"action" => 1,
+			"params" => 2,
+		))->setMode(Phalcon\Router::MODE_NONE);
 
 		foreach ($routes as $route => $paths) {
 			$_SERVER['REQUEST_METHOD'] = 'POST';

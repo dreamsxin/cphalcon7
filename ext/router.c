@@ -108,8 +108,9 @@ PHALCON_INIT_CLASS(Phalcon_Router){
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultHandler"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_router_ce, SL("_mode"), PHALCON_ROUTER_MODE_NONE, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_router_ce, SL("_mode"), PHALCON_ROUTER_MODE_DEFAULT, ZEND_ACC_PROTECTED);
 
+	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_DEFAULT"),   PHALCON_ROUTER_MODE_DEFAULT);
 	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_NONE"),   PHALCON_ROUTER_MODE_NONE);
 	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_REST"),   PHALCON_ROUTER_MODE_REST);
 

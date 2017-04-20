@@ -23,8 +23,9 @@
 
 #include "php_phalcon.h"
 
-#define PHALCON_ROUTER_MODE_NONE		0
-#define PHALCON_ROUTER_MODE_REST		1
+#define PHALCON_ROUTER_MODE_DEFAULT		0
+#define PHALCON_ROUTER_MODE_NONE		1
+#define PHALCON_ROUTER_MODE_REST		2
 
 extern zend_class_entry *phalcon_router_ce;
 

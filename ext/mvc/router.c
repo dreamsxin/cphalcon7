@@ -779,7 +779,10 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 		}
 
-		PHALCON_CALL_METHOD(&mode, getThis(), "getmode");
+		PHALCON_CALL_METHOD(&mode, route, "getmode");
+		if (Z_LVAL(mode) <= PHALCON_ROUTER_MODE_DEFAULT) {
+			PHALCON_CALL_METHOD(&mode, getThis(), "getmode");
+		}
 		if (unlikely(Z_LVAL(mode) == PHALCON_ROUTER_MODE_REST)) {
 			zval camelized_method = {};
 			PHALCON_CALL_METHOD(&http_method, &request, "getmethod");

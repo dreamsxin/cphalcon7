@@ -166,65 +166,89 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	}
 
 	/**
+	 * Strict encoding detection with fallback to non-strict detection.
+	 */
+	ZVAL_TRUE(&strict_check);
+
+	/**
+	 * Check for UTF-32 encoding
+	 */
+	ZVAL_STRING(&charset, "UTF-32");
+
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_detect_encoding(&detected, str, &charset, &strict_check);
+#else
+	/**
 	 * We require mbstring extension here
 	 */
 	if (phalcon_function_exists_ex(SL("mb_detect_encoding")) == FAILURE) {
 		RETURN_NULL();
 	}
 
-	/**
-	 * Strict encoding detection with fallback to non-strict detection.
-	 */
-	ZVAL_TRUE(&strict_check);
-	ZVAL_STRING(&charset, "UTF-32");
-
-	/**
-	 * Check for UTF-32 encoding
-	 */
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
+#endif
 	if (zend_is_true(&detected)) {
 		RETURN_CTOR(&charset);
 	}
-
-	ZVAL_STRING(&charset, "UTF-16");
+	zval_ptr_dtor(&charset);
 
 	/**
 	 * Check for UTF-16 encoding
 	 */
+	ZVAL_STRING(&charset, "UTF-16");
+
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_detect_encoding(&detected, str, &charset, &strict_check);
+#else
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
+#endif
 	if (zend_is_true(&detected)) {
 		RETURN_CTOR(&charset);
 	}
-
-	ZVAL_STRING(&charset, "UTF-8");
+	zval_ptr_dtor(&charset);
 
 	/**
 	 * Check for UTF-8 encoding
 	 */
+	ZVAL_STRING(&charset, "UTF-8");
+
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_detect_encoding(&detected, str, &charset, &strict_check);
+#else
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
+#endif
 	if (zend_is_true(&detected)) {
 		RETURN_CTOR(&charset);
 	}
-
-	ZVAL_STRING(&charset, "ISO-8859-1");
+	zval_ptr_dtor(&charset);
 
 	/**
 	 * Check for ISO-8859-1 encoding
 	 */
+	ZVAL_STRING(&charset, "ISO-8859-1");
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_detect_encoding(&detected, str, &charset, &strict_check);
+#else
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
+#endif
 	if (zend_is_true(&detected)) {
 		RETURN_CTOR(&charset);
 	}
-
-	ZVAL_STRING(&charset, "ASCII");
+	zval_ptr_dtor(&charset);
 
 	/**
 	 * Check for ASCII encoding
 	 */
+	ZVAL_STRING(&charset, "ASCII");
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_detect_encoding(&detected, str, &charset, &strict_check);
+#else
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
+#endif
 	if (zend_is_true(&detected)) {
 		RETURN_CTOR(&charset);
 	}
+	zval_ptr_dtor(&charset);
 
 	/**
 	 * Fallback to global detection

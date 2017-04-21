@@ -388,28 +388,12 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "lower")) {
-		if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
-			/**
-			 * 'lower' checks for the mbstring extension to make a correct lowercase
-			 * transformation
-			 */
-			PHALCON_CALL_FUNCTION(&filtered, "mb_strtolower", value);
-		} else {
-			phalcon_fast_strtolower(&filtered, value);
-		}
+		phalcon_fast_strtolower(&filtered, value);
 		goto ph_end_0;
 	}
 
 	if (PHALCON_IS_STRING(filter, "upper")) {
-		if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
-			/**
-			 * 'upper' checks for the mbstring extension to make a correct lowercase
-			 * transformation
-			 */
-			PHALCON_CALL_FUNCTION(&filtered, "mb_strtoupper", value);
-		} else {
-			phalcon_fast_strtoupper(&filtered, value);
-		}
+		phalcon_strtoupper(&filtered, value);
 		goto ph_end_0;
 	}
 

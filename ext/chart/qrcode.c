@@ -731,17 +731,27 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		type = zbar_get_symbol_name(symbol_type);
 		quality = zbar_symbol_get_quality(symbol);
 
+#ifdef PHALCON_USE_PHP_MBSTRING
+		ZVAL_STRING(&fromtext, data);
+		ZVAL_STRING(&to, "shift-jis");
+		ZVAL_STRING(&from, "utf-8");
+		ZVAL_STRING(&fromtext, data);
+
+		phalcon_convert_encoding(&totext, &fromtext, &to, &from);
+		phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);
+#else
         if (phalcon_function_exists_ex(SS("mb_convert_encoding") TSRMLS_CC) == SUCCESS) {
 			ZVAL_STRING(&fromtext, data);
-			ZVAL_STRING(&from, "shift-jis");
-			ZVAL_STRING(&to, "utf-8");
+			ZVAL_STRING(&to, "shift-jis");
+			ZVAL_STRING(&from, "utf-8");
 			ZVAL_STRING(&fromtext, data);
 
-			PHALCON_CALL_FUNCTION(&totext, "mb_convert_encoding", &fromtext, &from, &to);
+			PHALCON_CALL_FUNCTION(&totext, "mb_convert_encoding", &fromtext, &to, &from);
 			phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);
         } else {
 			phalcon_array_update_str_str(&symbol_array, SL("data"), (char *)data, strlen(data), PH_COPY);
 		}
+#endif
 		phalcon_array_update_str_str(&symbol_array, SL("type"), (char *)type, strlen(type), PH_COPY);
 		phalcon_array_update_str_long(&symbol_array, SL("quality"), quality, 0);
 

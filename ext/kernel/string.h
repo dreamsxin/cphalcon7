@@ -22,21 +22,22 @@
 #include "php_phalcon.h"
 
 #ifdef PHALCON_USE_PHP_JSON
-#include <ext/json/php_json.h>
+# include <ext/json/php_json.h>
 #endif
 
 #define PHALCON_TRIM_LEFT  1
 #define PHALCON_TRIM_RIGHT 2
 #define PHALCON_TRIM_BOTH  3
 
-#define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
-#define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) PHALCON_CALL_FUNCTION(return_value, "preg_replace", regex, replace, subject)
-
 #define PHALCON_RANDOM_ALNUM   0
 #define PHALCON_RANDOM_ALPHA   1
 #define PHALCON_RANDOM_HEXDEC  2
 #define PHALCON_RANDOM_NUMERIC 3
 #define PHALCON_RANDOM_NOZERO  4
+
+#define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
+#define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) PHALCON_CALL_FUNCTION(return_value, "preg_replace", regex, replace, subject)
+
 
 /** Fast char position */
 int phalcon_memnstr(const zval *haystack, const zval *needle);
@@ -52,9 +53,13 @@ void phalcon_strtr_array(zval *return_value, zval *str, zval *replace_pairs);
 
 /** Function replacement */
 void phalcon_fast_strlen(zval *return_value, zval *str);
+void phalcon_strlen(zval *return_value, zval *str);
 int phalcon_fast_strlen_ev(zval *str);
 void phalcon_fast_strtolower(zval *return_value, zval *str);
+void phalcon_strtolower(zval *return_value, zval *str);
 void phalcon_strtolower_inplace(zval *s);
+void phalcon_fast_strtoupper(zval *return_value, zval *str);
+void phalcon_strtoupper(zval *return_value, zval *str);
 void phalcon_fast_join(zval *result, zval *glue, zval *pieces);
 void phalcon_fast_join_str(zval *result, char *glue, unsigned int glue_length, zval *pieces);
 void phalcon_fast_explode(zval *result, zval *delimiter, zval *str);
@@ -67,7 +72,6 @@ int phalcon_fast_strrpos_str(zval *return_value, const zval *haystack, const cha
 int phalcon_fast_strripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 zend_string* phalcon_trim(zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
-void phalcon_fast_strtoupper(zval *return_value, zval *str);
 void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where);
 void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, zval *subject);
 
@@ -144,5 +148,10 @@ void phalcon_addslashes(zval *return_value, zval *str);
 void phalcon_add_trailing_slash(zval* v);
 void phalcon_stripslashes(zval *return_value, zval *str);
 void phalcon_stripcslashes(zval *return_value, zval *str);
+
+#ifdef PHALCON_USE_PHP_MBSTRING
+void phalcon_detect_encoding(zval *return_value, zval *str, zval *charset, zend_bool strict);
+void phalcon_convert_encoding(zval *return_value, zval *str, zval *to, zval *from);
+#endif
 
 #endif /* PHALCON_KERNEL_STRING_H */

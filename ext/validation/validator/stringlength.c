@@ -184,13 +184,16 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, valid){
 		return;
 	}
 
+#ifdef PHALCON_USE_PHP_MBSTRING
+	phalcon_strlen(&length, &value);
+#else
 	/* Check if mbstring is available to calculate the correct length */
 	if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
 		PHALCON_CALL_FUNCTION(&length, "mb_strlen", value);
 	} else {
-		convert_to_string(value);
-		ZVAL_LONG(&length, Z_STRLEN_P(value));
+		phalcon_fast_strlen(&length, value);
 	}
+#endif
 
 	/* Maximum length */
 	if (Z_TYPE_P(maximum) != IS_NULL) {

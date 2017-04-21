@@ -704,6 +704,11 @@ static const zend_module_dep phalcon_deps[] = {
 #else
 	ZEND_MOD_OPTIONAL("sockets")
 #endif
+#if PHALCON_USE_PHP_MBSTRING
+	ZEND_MOD_REQUIRED("mbstring")
+#else
+	ZEND_MOD_OPTIONAL("mbstring")
+#endif
 	ZEND_MOD_OPTIONAL("apc")
 	ZEND_MOD_OPTIONAL("apcu")
 	ZEND_MOD_OPTIONAL("XCache")

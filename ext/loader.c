@@ -80,6 +80,7 @@ PHP_METHOD(Phalcon_Loader, findFile);
 PHP_METHOD(Phalcon_Loader, autoLoad);
 PHP_METHOD(Phalcon_Loader, getFoundPath);
 PHP_METHOD(Phalcon_Loader, getCheckedPath);
+PHP_METHOD(Phalcon_Loader, getDefault);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_loader_setextensions, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, extensions, IS_ARRAY, 0)
@@ -136,6 +137,7 @@ static const zend_function_entry phalcon_loader_method_entry[] = {
 	PHP_ME(Phalcon_Loader, autoLoad, arginfo_phalcon_loader_autoload, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, getFoundPath, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, getCheckedPath, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Loader, getDefault, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -716,4 +718,18 @@ PHP_METHOD(Phalcon_Loader, getCheckedPath){
 
 
 	RETURN_MEMBER(getThis(), "_checkedPath");
+}
+
+/**
+ * Return the default loader
+ *
+ * @return Phalcon\Loader
+ */
+PHP_METHOD(Phalcon_Loader, getDefault){
+
+	phalcon_read_static_property_ce(return_value, phalcon_loader_ce, SL("_default"), PH_COPY);
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
+		object_init_ex(return_value, phalcon_loader_ce);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct");
+	}
 }

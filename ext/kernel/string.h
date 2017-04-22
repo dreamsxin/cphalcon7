@@ -73,6 +73,16 @@ int phalcon_fast_strripos_str(zval *return_value, const zval *haystack, const ch
 zend_string* phalcon_trim(zval *str, zval *charlist, int where);
 void phalcon_fast_strip_tags(zval *return_value, zval *str);
 void phalcon_fast_trim(zval *return_value, zval *str, zval *charlist, int where);
+static inline void phalcon_fast_trim_str(zval *return_value, zval *str, const char *charlist, int where)
+{
+	zval c = {};
+
+	ZVAL_STRING(&c, charlist);
+
+	phalcon_fast_trim(return_value, str, &c, where);
+	zval_ptr_dtor(&c);
+}
+
 void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, zval *subject);
 
 static inline void phalcon_fast_str_replace_str(zval *return_value, const char *search, const char *replace, zval *subject)

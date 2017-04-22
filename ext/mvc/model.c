@@ -3577,13 +3577,16 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 					PHALCON_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 					if (Z_TYPE(field_size) != IS_NULL) {
+#ifdef PHALCON_USE_PHP_MBSTRING
+						phalcon_strlen(&length, &value);
+#else
 						if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
 							convert_to_string_ex(&value);
 							PHALCON_CALL_FUNCTION(&length, "mb_strlen", &value);
 						} else {
 							phalcon_fast_strlen(&length, &value);
 						}
-
+#endif
 						if (phalcon_greater(&length, &field_size)) {
 							ZVAL_STRING(&type, "TooLong");
 							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);

@@ -40,6 +40,11 @@
 #include <ext/json/php_json.h>
 #endif
 
+#ifdef PHALCON_USE_PHP_MBSTRING
+# include <ext/mbstring/mbstring.h>
+# include <ext/mbstring/php_unicode.h>
+#endif
+
 #include "kernel/main.h"
 #include "kernel/operators.h"
 #include "kernel/fcall.h"
@@ -61,9 +66,46 @@ void phalcon_fast_strlen(zval *return_value, zval *str)
 
 	ZVAL_LONG(return_value, Z_STRLEN_P(str));
 
-	if (use_copy) {
+	if (unlikely(use_copy)) {
 		zval_ptr_dtor(str);
 	}
+}
+void phalcon_strlen(zval *return_value, zval *str)
+{
+#ifdef PHALCON_USE_PHP_MBSTRING
+	zval copy = {};
+	int use_copy = 0, n;
+	mbfl_string string;
+
+	if (Z_TYPE_P(str) != IS_STRING) {
+		use_copy = zend_make_printable_zval(str, &copy);
+	} else {
+		ZVAL_COPY_VALUE(&copy, str);
+	}
+
+	if (ZEND_SIZE_T_UINT_OVFL(Z_STRLEN(copy))) {
+		php_error_docref(NULL, E_WARNING, "String overflows the max allowed length of %u", UINT_MAX);
+		return;
+	}
+
+	mbfl_string_init(&string);
+
+	string.len = (uint32_t)Z_STRLEN(copy);
+	string.no_language = MBSTRG(language);
+	string.no_encoding = MBSTRG(current_internal_encoding)->no_encoding;
+
+	n = mbfl_strlen(&string);
+	if (n >= 0) {
+		ZVAL_LONG(return_value, n);
+	} else {
+		ZVAL_FALSE(return_value);
+	}
+	if (unlikely(use_copy)) {
+		zval_ptr_dtor(&copy);
+	}
+#else
+	phalcon_fast_strlen(return_value, str);
+#endif
 }
 
 /**
@@ -118,10 +160,101 @@ void phalcon_fast_strtolower(zval *return_value, zval *str)
 	efree(lower_str);
 }
 
+void phalcon_strtolower(zval *return_value, zval *str)
+{
+#ifdef PHALCON_USE_PHP_MBSTRING
+	zval copy = {};
+	int use_copy = 0;
+	const char *from_encoding = MBSTRG(current_internal_encoding)->mime_name;
+	char *newstr;
+	size_t ret_len;
+
+	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
+		use_copy = zend_make_printable_zval(str, &copy);
+	} else {
+		ZVAL_COPY_VALUE(&copy, str);
+	}
+
+	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_LOWER, Z_STRVAL(copy), Z_STRLEN(copy), &ret_len, from_encoding);
+
+	if (newstr) {
+		ZVAL_STRINGL(return_value, newstr, ret_len);
+		efree(newstr);
+	} else {
+		ZVAL_FALSE(return_value);
+	}
+	
+	if (unlikely(use_copy)) {
+		zval_ptr_dtor(&copy);
+	}
+#else
+	phalcon_fast_strtolower(return_value, str);
+#endif
+}
+
 void phalcon_strtolower_inplace(zval *s) {
 	if (likely(Z_TYPE_P(s) == IS_STRING)) {
 		zend_str_tolower(Z_STRVAL_P(s), Z_STRLEN_P(s));
 	}
+}
+
+/**
+ * Fast call to PHP strtoupper() function
+ */
+void phalcon_fast_strtoupper(zval *return_value, zval *str)
+{
+	zval copy = {};
+	int use_copy = 0;
+	char *lower_str;
+	unsigned int length;
+
+	if (Z_TYPE_P(str) != IS_STRING) {
+		use_copy = zend_make_printable_zval(str, &copy);
+		if (use_copy) {
+			str = &copy;
+		}
+	}
+
+	length = Z_STRLEN_P(str);
+	lower_str = estrndup(Z_STRVAL_P(str), length);
+	php_strtoupper(lower_str, length);
+
+	if (use_copy) {
+		zval_ptr_dtor(str);
+	}
+
+	ZVAL_STRINGL(return_value, lower_str, length);
+}
+
+void phalcon_strtoupper(zval *return_value, zval *str)
+{
+#ifdef PHALCON_USE_PHP_MBSTRING
+	zval copy = {};
+	int use_copy = 0;
+	const char *from_encoding = MBSTRG(current_internal_encoding)->mime_name;
+	char *newstr;
+	size_t ret_len;
+
+	if (Z_TYPE_P(str) != IS_STRING) {
+		use_copy = zend_make_printable_zval(str, &copy);
+	} else {
+		ZVAL_COPY_VALUE(&copy, str);
+	}
+
+	newstr = php_unicode_convert_case(PHP_UNICODE_CASE_UPPER, Z_STRVAL(copy), Z_STRLEN(copy), &ret_len, from_encoding);
+
+	if (newstr) {
+		ZVAL_STRINGL(return_value, newstr, ret_len);
+		efree(newstr);
+	} else {
+		ZVAL_FALSE(return_value);
+	}
+	if (unlikely(use_copy)) {
+		zval_ptr_dtor(&copy);
+	}
+#else
+	phalcon_fast_strtoupper(return_value, str);
+#endif
 }
 
 /**
@@ -948,34 +1081,6 @@ void phalcon_fast_strip_tags(zval *return_value, zval *str)
 	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, NULL, 0);
 
 	ZVAL_STRINGL(return_value, stripped, len);
-}
-
-/**
- * Fast call to PHP strtoupper() function
- */
-void phalcon_fast_strtoupper(zval *return_value, zval *str)
-{
-	zval copy = {};
-	int use_copy = 0;
-	char *lower_str;
-	unsigned int length;
-
-	if (Z_TYPE_P(str) != IS_STRING) {
-		use_copy = zend_make_printable_zval(str, &copy);
-		if (use_copy) {
-			str = &copy;
-		}
-	}
-
-	length = Z_STRLEN_P(str);
-	lower_str = estrndup(Z_STRVAL_P(str), length);
-	php_strtoupper(lower_str, length);
-
-	if (use_copy) {
-		zval_ptr_dtor(str);
-	}
-
-	ZVAL_STRINGL(return_value, lower_str, length);
 }
 
 /**
@@ -1887,3 +1992,74 @@ void phalcon_stripcslashes(zval *return_value, zval *str)
 		zval_ptr_dtor(&copy);
 	}
 }
+
+#ifdef PHALCON_USE_PHP_MBSTRING
+void phalcon_detect_encoding(zval *return_value, zval *str, zval *charset, zend_bool strict)
+{
+	zval copy = {};
+	int use_copy = 0;
+	mbfl_string string;
+	const mbfl_encoding *ret;
+	const mbfl_encoding **elist, **list;
+	size_t size;
+
+	list = NULL;
+	size = 0;
+
+	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
+		use_copy = zend_make_printable_zval(str, &copy);
+		if (use_copy) {
+			str = &copy;
+		}
+	}
+
+	if (FAILURE == php_mb_parse_encoding_list(Z_STRVAL_P(charset), Z_STRLEN_P(charset), &list, &size, 0)) {
+		if (list) {
+			efree(list);
+			list = NULL;
+			size = 0;
+		}
+	}
+
+	if (size <= 0) {
+		php_error_docref(NULL, E_WARNING, "Illegal argument");
+	}
+
+	if (size > 0 && list != NULL) {
+		elist = list;
+	} else {
+		elist = MBSTRG(current_detect_order_list);
+		size = MBSTRG(current_detect_order_list_size);
+	}
+
+	mbfl_string_init(&string);
+	string.no_language = MBSTRG(language);
+	string.val = (unsigned char *)str;
+	string.len = str_len;
+	ret = mbfl_identify_encoding2(&string, elist, size, strict);
+
+	if (list != NULL) {
+		efree((void *)list);
+	}
+
+	if (ret == NULL) {
+		ZVAL_FALSE(return_value);
+	}
+
+	ZVAL_STRING(return_value, (char *)ret->name);
+}
+
+
+void phalcon_convert_encoding(zval *return_value, zval *str, zval *to, zval *from)
+{
+	char *ret;
+
+	ret = php_mb_convert_encoding(Z_STRVAL_P(str), Z_STRLEN_P(str), Z_STRVAL_P(to), Z_STRVAL_P(from), &size);
+	if (ret != NULL) {
+		ZVAL_STRINGL(return_value, ret, size);
+		efree(ret);
+	} else {
+		ZVAL_FALSE(return_value);
+	}
+}
+#endif

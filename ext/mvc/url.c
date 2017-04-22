@@ -118,15 +118,21 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Url){
  */
 PHP_METHOD(Phalcon_Mvc_Url, setBaseUri){
 
-	zval *base_uri, static_base_uri = {};
+	zval *base_uri, trimmed = {}, static_base_uri = {};
 
 	phalcon_fetch_params(0, 1, 0, &base_uri);
+	
+	if (!phalcon_end_with_str(base_uri, SL("/"))) {
+		PHALCON_CONCAT_VS(&trimmed, base_uri, "/");
+	} else {
+		ZVAL_COPY_VALUE(&trimmed, base_uri);
+	}
 
-	phalcon_update_property(getThis(), SL("_baseUri"), base_uri);
+	phalcon_update_property(getThis(), SL("_baseUri"), &trimmed);
 
 	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(static_base_uri) == IS_NULL) {
-		phalcon_update_property(getThis(), SL("_staticBaseUri"), base_uri);
+		phalcon_update_property(getThis(), SL("_staticBaseUri"), &trimmed);
 	}
 
 	RETURN_THIS();
@@ -144,11 +150,17 @@ PHP_METHOD(Phalcon_Mvc_Url, setBaseUri){
  */
 PHP_METHOD(Phalcon_Mvc_Url, setStaticBaseUri){
 
-	zval *static_base_uri;
+	zval *static_base_uri, trimmed = {};
 
 	phalcon_fetch_params(0, 1, 0, &static_base_uri);
+	
+	if (!phalcon_end_with_str(static_base_uri, SL("/"))) {
+		PHALCON_CONCAT_VS(&trimmed, static_base_uri, "/");
+	} else {
+		ZVAL_COPY_VALUE(&trimmed, static_base_uri);
+	}
 
-	phalcon_update_property(getThis(), SL("_staticBaseUri"), static_base_uri);
+	phalcon_update_property(getThis(), SL("_staticBaseUri"), &trimmed);
 	RETURN_THIS();
 }
 
@@ -282,7 +294,14 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
 		}
 
 		if (zend_is_true(&local)) {
-			PHALCON_CONCAT_VV(return_value, &base_uri, uri);
+			if (!phalcon_start_with_str(uri, SL("/"))) {
+				PHALCON_CONCAT_VV(return_value, &base_uri, uri);
+			} else {
+				zval trimmed = {};
+				phalcon_fast_trim_str(&trimmed, uri, "/", PHALCON_TRIM_LEFT);
+				PHALCON_SCONCAT_VV(return_value, &base_uri, &trimmed);
+				zval_ptr_dtor(&trimmed);
+			}
 		} else {
 			ZVAL_ZVAL(return_value, uri, 1, 0);
 		}
@@ -397,10 +416,24 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 
 	phalcon_read_property(&static_base_uri, getThis(), SL("_staticBaseUri"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(static_base_uri) != IS_NULL) {
-		PHALCON_CONCAT_VV(return_value, &static_base_uri, uri);
+		if (!phalcon_start_with_str(uri, SL("/"))) {
+			PHALCON_CONCAT_VV(return_value, &static_base_uri, uri);
+		} else {
+			zval trimmed = {};
+			phalcon_fast_trim_str(&trimmed, uri, "/", PHALCON_TRIM_LEFT);
+			PHALCON_SCONCAT_VV(return_value, &static_base_uri, &trimmed);
+			zval_ptr_dtor(&trimmed);
+		}
 	} else {
 		PHALCON_CALL_METHOD(&base_uri, getThis(), "getbaseuri");
-		PHALCON_CONCAT_VV(return_value, &base_uri, uri);
+		if (!phalcon_start_with_str(uri, SL("/"))) {
+			PHALCON_CONCAT_VV(return_value, &base_uri, uri);
+		} else {
+			zval trimmed = {};
+			phalcon_fast_trim_str(&trimmed, uri, "/", PHALCON_TRIM_LEFT);
+			PHALCON_SCONCAT_VV(return_value, &base_uri, &trimmed);
+			zval_ptr_dtor(&trimmed);
+		}
 	}
 
 	if (args) {

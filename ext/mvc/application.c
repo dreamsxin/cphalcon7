@@ -285,12 +285,19 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			}
 
 			PHALCON_CALL_METHOD(&module_object, &dependency_injector, "get", &class_name);
+			if (instanceof_function(Z_OBJCE(module_object), zend_ce_closure)) {
+				/* A module definition object, can be a Closure instance */
+				array_init_size(&module_params, 1);
+				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
-			/**
-			 * 'registerAutoloaders' and 'registerServices' are automatically called
-			 */
-			PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
-			PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
+				PHALCON_CALL_USER_FUNC_ARRAY(&status, &module_object, &module_params);
+			} else if (instanceof_function(Z_OBJCE(module_object), phalcon_mvc_moduledefinitioninterface_ce)) {
+				/**
+				 * 'registerAutoloaders' and 'registerServices' are automatically called
+				 */
+				PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
+				PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
+			}
 		} else if (Z_TYPE(module) == IS_OBJECT) {
 			if (instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */

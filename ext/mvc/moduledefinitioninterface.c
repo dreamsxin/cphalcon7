@@ -23,7 +23,7 @@
 zend_class_entry *phalcon_mvc_moduledefinitioninterface_ce;
 
 static const zend_function_entry phalcon_mvc_moduledefinitioninterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Mvc_ModuleDefinitionInterface, registerAutoloaders, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_ModuleDefinitionInterface, registerAutoloaders, arginfo_phalcon_mvc_moduledefinitioninterface_registerautoloaders)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_ModuleDefinitionInterface, registerServices, arginfo_phalcon_mvc_moduledefinitioninterface_registerservices)
 	PHP_FE_END
 };

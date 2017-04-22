@@ -1186,7 +1186,7 @@ PHP_METHOD(Phalcon_Date, createDateTimeZone){
  *
  * @param string $date_str
  * @param string $date_format
- * @return boolean
+ * @return string
  */
 PHP_METHOD(Phalcon_Date, filter){
 
@@ -1209,10 +1209,10 @@ PHP_METHOD(Phalcon_Date, filter){
 	if (Z_TYPE(errors) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count"), PH_READONLY)
 			&& PHALCON_GT_LONG(&warning_count, 0)) {
-			RETURN_FALSE;
+			RETURN_NULL();
 		}
 		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count"), PH_READONLY) && PHALCON_GT_LONG(&error_count, 0)) {
-			RETURN_FALSE;
+			RETURN_NULL();
 		}
 	}
 

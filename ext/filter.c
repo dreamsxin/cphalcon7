@@ -60,8 +60,13 @@ PHP_METHOD(Phalcon_Filter, sanitize);
 PHP_METHOD(Phalcon_Filter, _sanitize);
 PHP_METHOD(Phalcon_Filter, getFilters);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_filterinterface___construct, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+	ZEND_ARG_INFO(0, handler)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_filter_method_entry[] = {
-	PHP_ME(Phalcon_Filter, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Filter, __construct, arginfo_phalcon_filterinterface___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Filter, add, arginfo_phalcon_filterinterface_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Filter, sanitize, arginfo_phalcon_filterinterface_sanitize, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Filter, _sanitize, NULL, ZEND_ACC_PROTECTED)
@@ -79,6 +84,7 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
 	zend_declare_property_null(phalcon_filter_ce, SL("_filters"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_filter_ce, SL("_allowTags"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_filter_ce, SL("_allowAttributes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_filter_ce, SL("_dateFormat"), "Y-m-d H:i:s", ZEND_ACC_PROTECTED);
 
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_EMAIL"), "email", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_ABSINT"), "absint", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
@@ -104,63 +110,85 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
  */
 PHP_METHOD(Phalcon_Filter, __construct){
 
-	zval allow_tags = {}, allow_attributes = {};
+	zval *options = NULL, allow_tags = {}, allow_attributes = {}, date_format = {};
 
-	array_init(&allow_tags);
+	phalcon_fetch_params(0, 0, 1, options);
 
-	phalcon_array_append_string(&allow_tags, SL("a"), 0);
-	phalcon_array_append_string(&allow_tags, SL("img"), 0);
-	phalcon_array_append_string(&allow_tags, SL("br"), 0);
-	phalcon_array_append_string(&allow_tags, SL("hr"), 0);
-	phalcon_array_append_string(&allow_tags, SL("strong"), 0);
-	phalcon_array_append_string(&allow_tags, SL("strike"), 0);
-	phalcon_array_append_string(&allow_tags, SL("b"), 0);
-	phalcon_array_append_string(&allow_tags, SL("code"), 0);
-	phalcon_array_append_string(&allow_tags, SL("pre"), 0);
-	phalcon_array_append_string(&allow_tags, SL("p"), 0);
-	phalcon_array_append_string(&allow_tags, SL("div"), 0);
-	phalcon_array_append_string(&allow_tags, SL("u"), 0);
-	phalcon_array_append_string(&allow_tags, SL("i"), 0);
-	phalcon_array_append_string(&allow_tags, SL("em"), 0);
-	phalcon_array_append_string(&allow_tags, SL("span"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h1"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h2"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h3"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h4"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h5"), 0);
-	phalcon_array_append_string(&allow_tags, SL("h6"), 0);
-	phalcon_array_append_string(&allow_tags, SL("ul"), 0);
-	phalcon_array_append_string(&allow_tags, SL("ol"), 0);
-	phalcon_array_append_string(&allow_tags, SL("li"), 0);
-	phalcon_array_append_string(&allow_tags, SL("table"), 0);
-	phalcon_array_append_string(&allow_tags, SL("tr"), 0);
-	phalcon_array_append_string(&allow_tags, SL("th"), 0);
-	phalcon_array_append_string(&allow_tags, SL("td"), 0);
-	phalcon_array_append_string(&allow_tags, SL("u"), 0);
-	phalcon_array_append_string(&allow_tags, SL("sub"), 0);
-	phalcon_array_append_string(&allow_tags, SL("sup"), 0);
-	phalcon_array_append_string(&allow_tags, SL("small"), 0);
-	phalcon_array_append_string(&allow_tags, SL("body"), 0);
-	phalcon_array_append_string(&allow_tags, SL("html"), 0);
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (likely(Z_TYPE_P(options) != IS_ARRAY) 
+		|| !phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags"), PH_READONLY) 
+		|| Z_TYPE(allow_tags) != IS_ARRAY) {
+
+		array_init(&allow_tags);
+
+		phalcon_array_append_string(&allow_tags, SL("a"), 0);
+		phalcon_array_append_string(&allow_tags, SL("img"), 0);
+		phalcon_array_append_string(&allow_tags, SL("br"), 0);
+		phalcon_array_append_string(&allow_tags, SL("hr"), 0);
+		phalcon_array_append_string(&allow_tags, SL("strong"), 0);
+		phalcon_array_append_string(&allow_tags, SL("strike"), 0);
+		phalcon_array_append_string(&allow_tags, SL("b"), 0);
+		phalcon_array_append_string(&allow_tags, SL("code"), 0);
+		phalcon_array_append_string(&allow_tags, SL("pre"), 0);
+		phalcon_array_append_string(&allow_tags, SL("p"), 0);
+		phalcon_array_append_string(&allow_tags, SL("div"), 0);
+		phalcon_array_append_string(&allow_tags, SL("u"), 0);
+		phalcon_array_append_string(&allow_tags, SL("i"), 0);
+		phalcon_array_append_string(&allow_tags, SL("em"), 0);
+		phalcon_array_append_string(&allow_tags, SL("span"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h1"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h2"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h3"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h4"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h5"), 0);
+		phalcon_array_append_string(&allow_tags, SL("h6"), 0);
+		phalcon_array_append_string(&allow_tags, SL("ul"), 0);
+		phalcon_array_append_string(&allow_tags, SL("ol"), 0);
+		phalcon_array_append_string(&allow_tags, SL("li"), 0);
+		phalcon_array_append_string(&allow_tags, SL("table"), 0);
+		phalcon_array_append_string(&allow_tags, SL("tr"), 0);
+		phalcon_array_append_string(&allow_tags, SL("th"), 0);
+		phalcon_array_append_string(&allow_tags, SL("td"), 0);
+		phalcon_array_append_string(&allow_tags, SL("u"), 0);
+		phalcon_array_append_string(&allow_tags, SL("sub"), 0);
+		phalcon_array_append_string(&allow_tags, SL("sup"), 0);
+		phalcon_array_append_string(&allow_tags, SL("small"), 0);
+		phalcon_array_append_string(&allow_tags, SL("body"), 0);
+		phalcon_array_append_string(&allow_tags, SL("html"), 0);
+	}
 
 	phalcon_update_property(getThis(), SL("_allowTags"), &allow_tags);
 
-	array_init(&allow_attributes);
+	if (likely(Z_TYPE_P(options) != IS_ARRAY) 
+		|| !phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowTags"), PH_READONLY) 
+		|| Z_TYPE(allow_attributes) != IS_ARRAY) {
+		array_init(&allow_attributes);
 
-	phalcon_array_append_string(&allow_attributes, SL("id"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("name"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("title"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("alt"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("src"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("style"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("href"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("class"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("width"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("height"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("target"), 0);
-	phalcon_array_append_string(&allow_attributes, SL("align"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("id"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("name"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("title"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("alt"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("src"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("style"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("href"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("class"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("width"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("height"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("target"), 0);
+		phalcon_array_append_string(&allow_attributes, SL("align"), 0);
+	}
 
 	phalcon_update_property(getThis(), SL("_allowAttributes"), &allow_attributes);
+
+	if (likely(Z_TYPE_P(options) != IS_ARRAY) 
+		&& phalcon_array_isset_fetch_str(&date_format, options, SL("allowTags"), PH_READONLY) 
+		&& Z_TYPE(date_format) == IS_STRING) {
+
+		phalcon_update_property(getThis(), SL("_dateFormat"), &date_format);
+	}
 }
 
 /**
@@ -321,9 +349,19 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
-	if (PHALCON_IS_STRING(filter, "int!") || (PHALCON_IS_STRING(filter, "int?") && phalcon_is_numeric(value))) {
+	if (PHALCON_IS_STRING(filter, "int!")) {
 		ZVAL_DUP(&filtered, value);
 		convert_to_long_base(&filtered, 10);
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "int?")) {
+		if (phalcon_is_numeric(value)) {
+			ZVAL_ZVAL(&filtered, value, 1, 0);
+			convert_to_long_base(&filtered, 10);
+		} else {
+			ZVAL_COPY_VALUE(&filtered, value);
+		}
 		goto ph_end_0;
 	}
 
@@ -366,9 +404,19 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
-	if (PHALCON_IS_STRING(filter, "float!") || (PHALCON_IS_STRING(filter, "float?") && phalcon_is_numeric(value))) {
+	if (PHALCON_IS_STRING(filter, "float!")) {
 		ZVAL_ZVAL(&filtered, value, 1, 0);
 		convert_to_double(&filtered);
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "float?")) {
+		if (phalcon_is_numeric(value)) {
+			ZVAL_ZVAL(&filtered, value, 1, 0);
+			convert_to_double(&filtered);
+		} else {
+			ZVAL_COPY_VALUE(&filtered, value);
+		}
 		goto ph_end_0;
 	}
 
@@ -388,12 +436,28 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "lower")) {
-		phalcon_fast_strtolower(&filtered, value);
+		if (phalcon_function_exists_ex(SL("mb_strtolower")) == SUCCESS) {
+			/**
+			 * 'lower' checks for the mbstring extension to make a correct lowercase
+			 * transformation
+			 */
+			PHALCON_CALL_FUNCTION(&filtered, "mb_strtolower", value);
+		} else {
+			phalcon_fast_strtolower(&filtered, value);
+		}
 		goto ph_end_0;
 	}
 
 	if (PHALCON_IS_STRING(filter, "upper")) {
-		phalcon_strtoupper(&filtered, value);
+		if (phalcon_function_exists_ex(SL("mb_strtoupper")) == SUCCESS) {
+			/**
+			 * 'upper' checks for the mbstring extension to make a correct lowercase
+			 * transformation
+			 */
+			PHALCON_CALL_FUNCTION(&filtered, "mb_strtoupper", value);
+		} else {
+			phalcon_fast_strtoupper(&filtered, value);
+		}
 		goto ph_end_0;
 	}
 
@@ -423,9 +487,17 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "datetime")) {
-		ZVAL_STRING(&format, "Y-m-d H:i:s");
+		if (Z_TYPE_P(options) != IS_ARRAY || !phalcon_array_isset_fetch_str(&format, options, SL("dateFormat"), PH_READONLY)) {
+			phalcon_read_property(&format, getThis(), SL("_dateFormat"), PH_READONLY);
+		}
 		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value, &format);
-		zval_ptr_dtor(&format);
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "url")) {
+		ZVAL_LONG(&type, 518); /* FILTER_SANITIZE_URL */
+
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", value, &type);
 		goto ph_end_0;
 	}
 

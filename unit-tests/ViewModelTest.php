@@ -77,7 +77,6 @@ class ViewModelTest extends PHPUnit_Framework_TestCase
 
 		$content = $viewmodel->render();
 
-		var_dump($viewmodel->child1);
 		$this->assertEquals($content, '<ul>phalcon<li>First child</li><li>append</li><li>Second child</li></ul>');
 	}
 }

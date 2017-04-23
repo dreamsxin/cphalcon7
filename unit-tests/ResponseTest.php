@@ -140,7 +140,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 		//local URI
 		$this->_response->resetHeaders();
 
-		$this->_response->redirect("some/local/uri");
+		@$this->_response->redirect("some/local/uri");
 
 		$this->assertEquals(Phalcon\Http\Response\Headers::__set_state(array(
 			'_headers' => array(
@@ -153,7 +153,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 		//Full URL
 		$this->_response->resetHeaders();
 
-		$this->_response->redirect("http://google.com", true);
+		@$this->_response->redirect("http://google.com", true);
 
 		$this->assertEquals(Phalcon\Http\Response\Headers::__set_state(array(
 			'_headers' => array(
@@ -166,7 +166,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 		//HTTP code
 		$this->_response->resetHeaders();
 
-		$this->_response->redirect("http://google.com", true, 301);
+		@$this->_response->redirect("http://google.com", true, 301);
 
 		$this->assertEquals(Phalcon\Http\Response\Headers::__set_state(array(
 			'_headers' => array(
@@ -219,7 +219,7 @@ class ResponseTest extends PHPUnit_Framework_TestCase
 	{
 		$this->_response->resetHeaders();
 
-		$this->_response->redirect("http://google.com", false, 301);
+		@$this->_response->redirect("http://google.com", false, 301);
 
 		$this->assertEquals(Phalcon\Http\Response\Headers::__set_state(array(
 			'_headers' => array(

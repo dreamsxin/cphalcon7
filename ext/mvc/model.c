@@ -6384,10 +6384,12 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
 
 	ZVAL_STRING(&event_name, "afterToArray");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &data);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &data);
 	zval_ptr_dtor(&event_name);
 
-	RETURN_CTOR(&data);
+	if (Z_TYPE_P(return_value) != IS_ARRAY) {
+		RETURN_CTOR(&data);
+	}
 }
 
 /**

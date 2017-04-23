@@ -38,6 +38,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireeventcancel, 0, 0, 1)
 	ZEND_ARG_INFO(0, cancelable)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_fireeventdata, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, eventName, IS_STRING, 0)
+	ZEND_ARG_INFO(0, data)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectable_hasservice, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 ZEND_END_ARG_INFO()

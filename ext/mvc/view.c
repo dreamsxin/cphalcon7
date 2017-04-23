@@ -1131,6 +1131,11 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	} ZEND_HASH_FOREACH_END();
 
 	if (PHALCON_IS_TRUE(&not_exists)) {
+		zval contents = {};
+		phalcon_ob_get_contents(&contents);
+
+		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents);
+
 		/**
 		 * Notify about not found views
 		 */

@@ -26,6 +26,7 @@
 #include "mvc/urlinterface.h"
 #include "mvc/viewinterface.h"
 
+#include <main/SAPI.h>
 #include <ext/date/php_date.h>
 
 #include "kernel/main.h"
@@ -595,6 +596,10 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	 */
 	ZVAL_STRING(&header_name, "Location");
 	PHALCON_CALL_METHOD(NULL, getThis(), "setheader", &header_name, &header);
+
+	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
+		php_error_docref(NULL, E_WARNING, "Command line mode cannot redirect");
+	}
 
 	RETURN_THIS();
 }

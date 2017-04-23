@@ -56,6 +56,7 @@ PHP_METHOD(Phalcon_Di_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel);
+PHP_METHOD(Phalcon_Di_Injectable, fireEventData);
 PHP_METHOD(Phalcon_Di_Injectable, hasService);
 PHP_METHOD(Phalcon_Di_Injectable, setService);
 PHP_METHOD(Phalcon_Di_Injectable, getService);
@@ -77,6 +78,7 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, fireEventData, arginfo_phalcon_di_injectable_fireeventdata, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, setService, arginfo_phalcon_di_injectable_setservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getService, arginfo_phalcon_di_injectable_getservice, ZEND_ACC_PUBLIC)
@@ -311,6 +313,58 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 	}
 
 	RETURN_TRUE;
+}
+
+/**
+ * Fires an event, return data
+ *
+ * @param string $eventName
+ * @param mixed $data
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
+
+	zval *eventname, *data = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+
+	phalcon_fetch_params(0, 1, 1, &eventname, &data);
+
+	if (!data) {
+		data = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_fast_strtolower(&lower, eventname);
+
+	if (phalcon_memnstr_str(&lower, SL(":"))) {
+		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&name, &lower);
+	}
+
+	/**
+	 * Check if there is a method with the same name of the event
+	 */
+	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
+		PHALCON_CALL_METHOD(return_value, getThis(), Z_STRVAL(name), data);
+	}
+
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
+		zval arguments = {};
+		array_init_size(&arguments, 1);
+		phalcon_array_append(&arguments, data, PH_COPY);
+		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
+		zval_ptr_dtor(&arguments);
+	}
+
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	if (Z_TYPE(events_manager) != IS_NULL) {
+		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
+
+		/**
+		 * Send a notification to the events manager
+		 */
+		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
+	}
 }
 
 /**

@@ -3595,8 +3595,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							} else {
 								ZVAL_COPY_VALUE(&label, &attribute_field);
 							}
-							array_init_size(&pairs, 1);
+							array_init_size(&pairs, 2);
 							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+							phalcon_array_update_str(&pairs, SL(":max"), &field_size, PH_COPY);
 							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
 							zval_ptr_dtor(&pairs);
 

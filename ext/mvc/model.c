@@ -751,6 +751,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSource){
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelsource", getThis());
+	zval_ptr_dtor(&models_manager);
 }
 
 /**
@@ -781,6 +782,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelschema", getThis());
+	zval_ptr_dtor(&models_manager);
 }
 
 /**

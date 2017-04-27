@@ -425,7 +425,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		zval_ptr_dtor(&event_name);
 	}
 
-
 	RETURN_TRUE;
 }
 
@@ -557,17 +556,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
 
 	phalcon_read_property(&sources, getThis(), SL("_sources"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(sources) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&source, &sources, &entity_name, PH_READONLY)) {
+		if (phalcon_array_isset_fetch(return_value, &sources, &entity_name, PH_READONLY)) {
+			zval_ptr_dtor(&entity_name);
 			RETURN_CTOR(&source);
 		}
 	}
 
 	phalcon_get_class_ns(&class_name, model, 0);
 
-	phalcon_uncamelize(&source, &class_name);
-	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, &source);
+	phalcon_uncamelize(return_value, &class_name);
+	zval_ptr_dtor(&class_name);
 
-	RETURN_CTOR(&source);
+	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, return_value);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -617,10 +618,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
 
 	phalcon_read_property(&schemas, getThis(), SL("_schemas"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(schemas) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&schema, &schemas, &entity_name, PH_READONLY)) {
-			RETURN_CTOR(&schema);
+		if (!phalcon_array_isset_fetch(return_value, &schemas, &entity_name, PH_COPY)) {
+			ZVAL_NULL(return_value);
 		}
 	}
+	zval_ptr_dtor(&entity_name);
 }
 
 /**

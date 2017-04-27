@@ -132,11 +132,11 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	if (!arguments || Z_TYPE_P(arguments) != IS_ARRAY) {
 		if (likely(!strcmp(sapi_module.name, "cli"))) {
 			array_init(&longopts);
-			phalcon_array_append_string(&longopts, SL("module::"), 0);
-			phalcon_array_append_string(&longopts, SL("namespace::"), 0);
-			phalcon_array_append_string(&longopts, SL("task::"), 0);
-			phalcon_array_append_string(&longopts, SL("action::"), 0);
-			phalcon_array_append_string(&longopts, SL("params::"), 0);
+			phalcon_array_append_str(&longopts, SL("module::"), 0);
+			phalcon_array_append_str(&longopts, SL("namespace::"), 0);
+			phalcon_array_append_str(&longopts, SL("task::"), 0);
+			phalcon_array_append_str(&longopts, SL("action::"), 0);
+			phalcon_array_append_str(&longopts, SL("params::"), 0);
 			PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 		} else {
 			array_init(&options);

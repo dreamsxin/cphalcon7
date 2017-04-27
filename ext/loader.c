@@ -36,6 +36,8 @@
 #include "kernel/concat.h"
 #include "kernel/debug.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Loader
  *
@@ -172,8 +174,10 @@ PHP_METHOD(Phalcon_Loader, __construct){
 	zval extensions = {}, default_loader = {};
 
 	array_init_size(&extensions, 1);
-	add_next_index_stringl(&extensions, SL("php"));
+	phalcon_array_append_string(&extensions, IS(php), PH_COPY);
+
 	phalcon_update_property(getThis(), SL("_extensions"), &extensions);
+	zval_ptr_dtor(&extensions);
 
 	phalcon_read_static_property_ce(&default_loader, phalcon_loader_ce, SL("_default"), PH_READONLY);
 	if (Z_TYPE(default_loader) == IS_NULL) {
@@ -409,8 +413,10 @@ PHP_METHOD(Phalcon_Loader, register){
 	if (PHALCON_IS_FALSE(&registered)) {
 		array_init_size(&autoloader, 2);
 		phalcon_array_append(&autoloader, getThis(), PH_COPY);
-		add_next_index_stringl(&autoloader, SL("autoLoad"));
+		phalcon_array_append_string(&autoloader, IS(autoLoad), PH_COPY);
 		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_register", &autoloader);
+		zval_ptr_dtor(&autoloader);
+
 		phalcon_update_property(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_true));
 	}
 

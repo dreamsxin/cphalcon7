@@ -621,13 +621,13 @@ PHP_METHOD(Phalcon_Date, span){
 
 	if (!output) {
 		array_init(&output_arr);
-		phalcon_array_append_string(&output_arr, SL("years"), 0);
-		phalcon_array_append_string(&output_arr, SL("months"), 0);
-		phalcon_array_append_string(&output_arr, SL("weeks"), 0);
-		phalcon_array_append_string(&output_arr, SL("days"), 0);
-		phalcon_array_append_string(&output_arr, SL("hours"), 0);
-		phalcon_array_append_string(&output_arr, SL("minutes"), 0);
-		phalcon_array_append_string(&output_arr, SL("seconds"), 0);
+		phalcon_array_append_str(&output_arr, SL("years"), 0);
+		phalcon_array_append_str(&output_arr, SL("months"), 0);
+		phalcon_array_append_str(&output_arr, SL("weeks"), 0);
+		phalcon_array_append_str(&output_arr, SL("days"), 0);
+		phalcon_array_append_str(&output_arr, SL("hours"), 0);
+		phalcon_array_append_str(&output_arr, SL("minutes"), 0);
+		phalcon_array_append_str(&output_arr, SL("seconds"), 0);
 	} else if (Z_TYPE_P(output) != IS_ARRAY) {
 		ZVAL_STR(&tmp, phalcon_trim(output, NULL, PHALCON_TRIM_BOTH));
 
@@ -927,13 +927,13 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
 
 	if (!lables) {
 		array_init_size(&output, 7);
-		phalcon_array_append_string(&output, SL(" years"), 0);
-		phalcon_array_append_string(&output, SL(" months"), 0);
-		phalcon_array_append_string(&output, SL(" weeks"), 0);
-		phalcon_array_append_string(&output, SL(" days"), 0);
-		phalcon_array_append_string(&output, SL(" hours"), 0);
-		phalcon_array_append_string(&output, SL(" minutes"), 0);
-		phalcon_array_append_string(&output, SL(" seconds"), 0);
+		phalcon_array_append_str(&output, SL(" years"), 0);
+		phalcon_array_append_str(&output, SL(" months"), 0);
+		phalcon_array_append_str(&output, SL(" weeks"), 0);
+		phalcon_array_append_str(&output, SL(" days"), 0);
+		phalcon_array_append_str(&output, SL(" hours"), 0);
+		phalcon_array_append_str(&output, SL(" minutes"), 0);
+		phalcon_array_append_str(&output, SL(" seconds"), 0);
 	} else {
 		ZVAL_COPY_VALUE(&output, lables);
 	}

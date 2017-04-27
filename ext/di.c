@@ -42,6 +42,8 @@
 
 #include "internal/arginfo.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Di
  *
@@ -176,7 +178,7 @@ PHALCON_INIT_CLASS(Phalcon_Di){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Di, di, phalcon_di_method_entry, 0);
 
-	zend_declare_property_string(phalcon_di_ce, SL("_name"), "di", ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_di_ce, SL("_name"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_services"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_sharedInstances"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_di_ce, SL("_freshInstance"), ZEND_ACC_PROTECTED);
@@ -204,12 +206,13 @@ PHP_METHOD(Phalcon_Di, __construct){
 		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
 	}
 
-	if (_name && Z_TYPE_P(_name) != IS_NULL) {
-		phalcon_update_property(getThis(), SL("_name"), _name);
-		ZVAL_COPY_VALUE(&name, _name);
+	if (!_name || Z_TYPE_P(_name) != IS_STRING) {
+		ZVAL_STR(&name, IS(di));
 	} else {
-		phalcon_read_property(&name, getThis(), SL("_name"), PH_READONLY);
+		ZVAL_COPY_VALUE(&name, _name);
 	}
+
+	phalcon_update_property(getThis(), SL("_name"), &name);
 
 	phalcon_update_static_property_array_ce(phalcon_di_ce, SL("_list"), &name, getThis());
 }

@@ -640,9 +640,9 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 						const char *prop_name, *class_name;
 						size_t prop_len;
 						zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-						phalcon_array_append_string(result, prop_name, prop_len, 0);
+						phalcon_array_append_str(result, prop_name, prop_len, 0);
 					} else {
-						phalcon_array_append_string(result, ZSTR_VAL(key), ZSTR_LEN(key), 0);
+						phalcon_array_append_str(result, ZSTR_VAL(key), ZSTR_LEN(key), 0);
 					}
 				}
 			}

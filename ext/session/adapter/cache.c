@@ -143,32 +143,32 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	/* open callback */
 	array_init_size(&callable_open, 2);
 	phalcon_array_append(&callable_open, getThis(), 0);
-	phalcon_array_append_string(&callable_open, SL("open"), 0);
+	phalcon_array_append_str(&callable_open, SL("open"), 0);
 
 	/* close callback */
 	array_init_size(&callable_close, 2);
 	phalcon_array_append(&callable_close, getThis(), 0);
-	phalcon_array_append_string(&callable_close, SL("close"), 0);
+	phalcon_array_append_str(&callable_close, SL("close"), 0);
 
 	/* read callback */
 	array_init_size(&callable_read, 2);
 	phalcon_array_append(&callable_read, getThis(), 0);
-	phalcon_array_append_string(&callable_read, SL("read"), 0);
+	phalcon_array_append_str(&callable_read, SL("read"), 0);
 
 	/* write callback */
 	array_init_size(&callable_write, 2);
 	phalcon_array_append(&callable_write, getThis(), 0);
-	phalcon_array_append_string(&callable_write, SL("write"), 0);
+	phalcon_array_append_str(&callable_write, SL("write"), 0);
 
 	/* destroy callback */
 	array_init_size(&callable_destroy, 2);
 	phalcon_array_append(&callable_destroy, getThis(), 0);
-	phalcon_array_append_string(&callable_destroy, SL("destroy"), 0);
+	phalcon_array_append_str(&callable_destroy, SL("destroy"), 0);
 
 	/* gc callback */
 	array_init_size(&callable_gc, 2);
 	phalcon_array_append(&callable_gc, getThis(), 0);
-	phalcon_array_append_string(&callable_gc, SL("gc"), 0);
+	phalcon_array_append_str(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
 	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");

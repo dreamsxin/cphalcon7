@@ -188,13 +188,23 @@ static inline int phalcon_array_append_long(zval *arr, long value, int flags)
  *
  * Equivalent to <tt>$arr[] = $value</tt> in PHP, where @c $value is a string.
  */
-static inline int phalcon_array_append_string(zval *arr, const char *value, uint value_length, int separate)
+static inline int phalcon_array_append_str(zval *arr, const char *value, uint value_length, int flags)
 {
 	zval zvalue;
 	int ret;
 
 	ZVAL_STRINGL(&zvalue, value, value_length);
-	ret = phalcon_array_append(arr, &zvalue, separate);
+	ret = phalcon_array_append(arr, &zvalue, flags);
+	return ret;
+}
+
+static inline int phalcon_array_append_string(zval *arr, zend_string *value, int flags)
+{
+	zval zvalue;
+	int ret;
+
+	ZVAL_STR(&zvalue, value);
+	ret = phalcon_array_append(arr, &zvalue, flags);
 	return ret;
 }
 

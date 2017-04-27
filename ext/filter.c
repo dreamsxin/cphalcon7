@@ -124,40 +124,40 @@ PHP_METHOD(Phalcon_Filter, __construct){
 
 		array_init(&allow_tags);
 
-		phalcon_array_append_string(&allow_tags, SL("a"), 0);
-		phalcon_array_append_string(&allow_tags, SL("img"), 0);
-		phalcon_array_append_string(&allow_tags, SL("br"), 0);
-		phalcon_array_append_string(&allow_tags, SL("hr"), 0);
-		phalcon_array_append_string(&allow_tags, SL("strong"), 0);
-		phalcon_array_append_string(&allow_tags, SL("strike"), 0);
-		phalcon_array_append_string(&allow_tags, SL("b"), 0);
-		phalcon_array_append_string(&allow_tags, SL("code"), 0);
-		phalcon_array_append_string(&allow_tags, SL("pre"), 0);
-		phalcon_array_append_string(&allow_tags, SL("p"), 0);
-		phalcon_array_append_string(&allow_tags, SL("div"), 0);
-		phalcon_array_append_string(&allow_tags, SL("u"), 0);
-		phalcon_array_append_string(&allow_tags, SL("i"), 0);
-		phalcon_array_append_string(&allow_tags, SL("em"), 0);
-		phalcon_array_append_string(&allow_tags, SL("span"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h1"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h2"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h3"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h4"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h5"), 0);
-		phalcon_array_append_string(&allow_tags, SL("h6"), 0);
-		phalcon_array_append_string(&allow_tags, SL("ul"), 0);
-		phalcon_array_append_string(&allow_tags, SL("ol"), 0);
-		phalcon_array_append_string(&allow_tags, SL("li"), 0);
-		phalcon_array_append_string(&allow_tags, SL("table"), 0);
-		phalcon_array_append_string(&allow_tags, SL("tr"), 0);
-		phalcon_array_append_string(&allow_tags, SL("th"), 0);
-		phalcon_array_append_string(&allow_tags, SL("td"), 0);
-		phalcon_array_append_string(&allow_tags, SL("u"), 0);
-		phalcon_array_append_string(&allow_tags, SL("sub"), 0);
-		phalcon_array_append_string(&allow_tags, SL("sup"), 0);
-		phalcon_array_append_string(&allow_tags, SL("small"), 0);
-		phalcon_array_append_string(&allow_tags, SL("body"), 0);
-		phalcon_array_append_string(&allow_tags, SL("html"), 0);
+		phalcon_array_append_str(&allow_tags, SL("a"), 0);
+		phalcon_array_append_str(&allow_tags, SL("img"), 0);
+		phalcon_array_append_str(&allow_tags, SL("br"), 0);
+		phalcon_array_append_str(&allow_tags, SL("hr"), 0);
+		phalcon_array_append_str(&allow_tags, SL("strong"), 0);
+		phalcon_array_append_str(&allow_tags, SL("strike"), 0);
+		phalcon_array_append_str(&allow_tags, SL("b"), 0);
+		phalcon_array_append_str(&allow_tags, SL("code"), 0);
+		phalcon_array_append_str(&allow_tags, SL("pre"), 0);
+		phalcon_array_append_str(&allow_tags, SL("p"), 0);
+		phalcon_array_append_str(&allow_tags, SL("div"), 0);
+		phalcon_array_append_str(&allow_tags, SL("u"), 0);
+		phalcon_array_append_str(&allow_tags, SL("i"), 0);
+		phalcon_array_append_str(&allow_tags, SL("em"), 0);
+		phalcon_array_append_str(&allow_tags, SL("span"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h1"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h2"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h3"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h4"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h5"), 0);
+		phalcon_array_append_str(&allow_tags, SL("h6"), 0);
+		phalcon_array_append_str(&allow_tags, SL("ul"), 0);
+		phalcon_array_append_str(&allow_tags, SL("ol"), 0);
+		phalcon_array_append_str(&allow_tags, SL("li"), 0);
+		phalcon_array_append_str(&allow_tags, SL("table"), 0);
+		phalcon_array_append_str(&allow_tags, SL("tr"), 0);
+		phalcon_array_append_str(&allow_tags, SL("th"), 0);
+		phalcon_array_append_str(&allow_tags, SL("td"), 0);
+		phalcon_array_append_str(&allow_tags, SL("u"), 0);
+		phalcon_array_append_str(&allow_tags, SL("sub"), 0);
+		phalcon_array_append_str(&allow_tags, SL("sup"), 0);
+		phalcon_array_append_str(&allow_tags, SL("small"), 0);
+		phalcon_array_append_str(&allow_tags, SL("body"), 0);
+		phalcon_array_append_str(&allow_tags, SL("html"), 0);
 	}
 
 	phalcon_update_property(getThis(), SL("_allowTags"), &allow_tags);
@@ -167,18 +167,18 @@ PHP_METHOD(Phalcon_Filter, __construct){
 		|| Z_TYPE(allow_attributes) != IS_ARRAY) {
 		array_init(&allow_attributes);
 
-		phalcon_array_append_string(&allow_attributes, SL("id"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("name"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("title"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("alt"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("src"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("style"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("href"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("class"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("width"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("height"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("target"), 0);
-		phalcon_array_append_string(&allow_attributes, SL("align"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("id"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("name"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("title"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("alt"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("src"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("style"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("href"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("class"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("width"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("height"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("target"), 0);
+		phalcon_array_append_str(&allow_attributes, SL("align"), 0);
 	}
 
 	phalcon_update_property(getThis(), SL("_allowAttributes"), &allow_attributes);
@@ -466,8 +466,8 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 			if (!phalcon_array_isset_fetch_str(&allow_tags, options, SL("allowTags"), PH_READONLY) || Z_TYPE(allow_tags) != IS_ARRAY) {
 				phalcon_read_property(&allow_tags, getThis(), SL("_allowTags"), PH_READONLY);
 			} else {
-				phalcon_array_append_string(&allow_tags, SL("body"), 0);
-				phalcon_array_append_string(&allow_tags, SL("html"), 0);
+				phalcon_array_append_str(&allow_tags, SL("body"), 0);
+				phalcon_array_append_str(&allow_tags, SL("html"), 0);
 			}
 			if (!phalcon_array_isset_fetch_str(&allow_attributes, options, SL("allowAttributes"), PH_READONLY) || Z_TYPE(allow_attributes) != IS_ARRAY) {
 				phalcon_read_property(&allow_attributes, getThis(), SL("_allowAttributes"), PH_READONLY);

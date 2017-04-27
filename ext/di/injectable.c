@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Di_Injectable, setDI){
  */
 PHP_METHOD(Phalcon_Di_Injectable, getDI)
 {
-	zval *error = NULL, *not_use_default = NULL, dependency_injector = {};
+	zval *error = NULL, *not_use_default = NULL;
 
 	phalcon_fetch_params(0, 0, 2, &error, &not_use_default);
 
@@ -149,17 +149,15 @@ PHP_METHOD(Phalcon_Di_Injectable, getDI)
 		not_use_default = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&dependency_injector, getThis(), SL("_dependencyInjector"), PH_READONLY);
-	if (Z_TYPE(dependency_injector) != IS_OBJECT && !zend_is_true(not_use_default)) {
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault", &dependency_injector);
+	phalcon_read_property(return_value, getThis(), SL("_dependencyInjector"), PH_COPY);
+	if (Z_TYPE_P(return_value) != IS_OBJECT && !zend_is_true(not_use_default)) {
+		PHALCON_CALL_CE_STATIC(return_value, phalcon_di_ce, "getdefault", return_value);
 	}
 
-	if (Z_TYPE(dependency_injector) != IS_OBJECT && zend_is_true(error)) {
+	if (Z_TYPE_P(return_value) != IS_OBJECT && zend_is_true(error)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "A dependency injection container is not object");
 		return;
 	}
-
-	RETURN_CTOR(&dependency_injector);
 }
 
 /**
@@ -462,11 +460,12 @@ PHP_METHOD(Phalcon_Di_Injectable, getResolveService){
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", noerror);
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
 		if (zend_is_true(noshared)) {
-			PHALCON_RETURN_CALL_METHOD(&dependency_injector, "get", name, args, noerror);
+			PHALCON_CALL_METHOD(return_value, &dependency_injector, "get", name, args, noerror);
 		} else {
-			PHALCON_RETURN_CALL_METHOD(&dependency_injector, "getshared", name, args, noerror);
+			PHALCON_CALL_METHOD(return_value, &dependency_injector, "getshared", name, args, noerror);
 		}
 	}
+	zval_ptr_dtor(&dependency_injector);
 }
 
 /**

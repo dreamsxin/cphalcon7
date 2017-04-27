@@ -579,6 +579,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __construct){
 	 * The manager always initializes the object
 	 */
 	PHALCON_CALL_METHOD(NULL, &models_manager, "initialize", getThis());
+	zval_ptr_dtor(&models_manager);
 
 	/**
 	 * This allows the developer to execute initialization stuff every time an instance

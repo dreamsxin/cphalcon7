@@ -386,6 +386,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Models are just initialized once per request
 	 */
 	if (phalcon_array_isset(&initialized, &class_name)) {
+		zval_ptr_dtor(&class_name);
 		RETURN_TRUE;
 	}
 
@@ -400,6 +401,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	 * Update the model as initialized, this avoid cyclic initializations
 	 */
 	phalcon_update_property_array(getThis(), SL("_initialized"), &class_name, model);
+	zval_ptr_dtor(&class_name);
 
 	/**
 	 * Call the 'initialize' method if it's implemented

@@ -289,6 +289,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -305,6 +306,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -321,6 +323,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -337,6 +340,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -355,6 +359,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -373,6 +378,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		zval_ptr_dtor(&id_pattern);

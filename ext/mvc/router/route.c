@@ -289,6 +289,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -305,6 +306,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -321,6 +323,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -337,6 +340,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -355,6 +359,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		/**
@@ -373,6 +378,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, compilePattern){
 				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &pattern_copy);
 			}
 			zval_ptr_dtor(&wildcard);
+			zval_ptr_dtor(&pattern_copy);
 		}
 
 		zval_ptr_dtor(&id_pattern);
@@ -574,11 +580,12 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			 * The route has named parameters so we need to extract them
 			 */
 			phalcon_extract_named_params(&compiled_pattern, &pcre_pattern, &route_paths);
+			zval_ptr_dtor(&pcre_pattern);
 		} else {
 			ZVAL_COPY_VALUE(&compiled_pattern, &pcre_pattern);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&compiled_pattern, pattern);
+		ZVAL_COPY(&compiled_pattern, pattern);
 	}
 
 	/**
@@ -590,6 +597,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	 * Update the compiled pattern
 	 */
 	phalcon_update_property(getThis(), SL("_compiledPattern"), &compiled_pattern);
+	zval_ptr_dtor(&compiled_pattern);
 
 	/**
 	 * Update the route's paths

@@ -305,7 +305,7 @@ int phalcon_proc_parse_cmdline(phalcon_process *proc, unsigned int pid) {
 	/* And the char arrays */
 	c = buf;
 	for (i=0; i < argc; i++) {
-		phalcon_array_append_string(&(proc->args), c, strlen(c)+1, 0);
+		phalcon_array_append_str(&(proc->args), c, strlen(c)+1, 0);
 		while (*c != '\0'){
 				c++;
 		}

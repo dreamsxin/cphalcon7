@@ -289,17 +289,17 @@ PHP_METHOD(Phalcon_Process_Proc, getDescriptors){
 		case PHALCON_PROCESS_MODE_TTY:
 		{
 			array_init_size(&stdin, 3);
-			phalcon_array_append_string(&stdin, SL("file"), PH_COPY);
-			phalcon_array_append_string(&stdin, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("file"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("r"), PH_COPY);
 			array_init_size(&stdout, 3);
-			phalcon_array_append_string(&stdout, SL("file"), PH_COPY);
-			phalcon_array_append_string(&stdout, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("file"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("w"), PH_COPY);
 			array_init_size(&stderr, 3);
-			phalcon_array_append_string(&stderr, SL("file"), PH_COPY);
-			phalcon_array_append_string(&stderr, SL("/dev/tty"), PH_COPY);
-			phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("file"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("/dev/tty"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("w"), PH_COPY);
 
 			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
@@ -310,11 +310,11 @@ PHP_METHOD(Phalcon_Process_Proc, getDescriptors){
 		case PHALCON_PROCESS_MODE_PTY:
 		{
 			array_init_size(&stdin, 1);
-			phalcon_array_append_string(&stdin, SL("pty"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("pty"), PH_COPY);
 			array_init_size(&stdout, 1);
-			phalcon_array_append_string(&stdout, SL("pty"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("pty"), PH_COPY);
 			array_init_size(&stderr, 1);
-			phalcon_array_append_string(&stderr, SL("pty"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("pty"), PH_COPY);
 
 			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
@@ -325,14 +325,14 @@ PHP_METHOD(Phalcon_Process_Proc, getDescriptors){
 		default:
 		{
 			array_init_size(&stdin, 2);
-			phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
-			phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("pipe"), PH_COPY);
+			phalcon_array_append_str(&stdin, SL("r"), PH_COPY);
 			array_init_size(&stdout, 2);
-			phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
-			phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("pipe"), PH_COPY);
+			phalcon_array_append_str(&stdout, SL("w"), PH_COPY);
 			array_init_size(&stderr, 2);
-			phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
-			phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("pipe"), PH_COPY);
+			phalcon_array_append_str(&stderr, SL("w"), PH_COPY);
 
 			array_init_size(return_value, 3);
 			phalcon_array_append(return_value, &stdin, PH_COPY);
@@ -355,14 +355,14 @@ PHP_METHOD(Phalcon_Process_Proc, isPtySupported){
 	ZVAL_STRING(&command, "echo 1");
 
 	array_init_size(&stdin, 2);
-	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("r"), PH_COPY);
 	array_init_size(&stdout, 2);
-	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("w"), PH_COPY);
 	array_init_size(&stderr, 2);
-	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("w"), PH_COPY);
 
 	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);
@@ -632,14 +632,14 @@ PHP_METHOD(Phalcon_Process_Proc, getCommandForPid){
 	// ps eh -o args -p pid
 	PHALCON_CONCAT_SV(&command, "ps -o args -p ", pid);
 	array_init_size(&stdin, 2);
-	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("r"), PH_COPY);
 	array_init_size(&stdout, 2);
-	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("w"), PH_COPY);
 	array_init_size(&stderr, 2);
-	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("w"), PH_COPY);
 
 	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);
@@ -689,14 +689,14 @@ PHP_METHOD(Phalcon_Process_Proc, getStatForPid){
 
 	PHALCON_CONCAT_SV(&command, "ps h -o stat -p ", pid);
 	array_init_size(&stdin, 2);
-	phalcon_array_append_string(&stdin, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdin, SL("r"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdin, SL("r"), PH_COPY);
 	array_init_size(&stdout, 2);
-	phalcon_array_append_string(&stdout, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stdout, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stdout, SL("w"), PH_COPY);
 	array_init_size(&stderr, 2);
-	phalcon_array_append_string(&stderr, SL("pipe"), PH_COPY);
-	phalcon_array_append_string(&stderr, SL("w"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("pipe"), PH_COPY);
+	phalcon_array_append_str(&stderr, SL("w"), PH_COPY);
 
 	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, PH_COPY);

@@ -524,9 +524,9 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 			zval_ptr_dtor(&str_value);
 		} else {
 			if (Z_TYPE_P(value) == IS_NULL) {
-				phalcon_array_append_string(&placeholders, SL("null"), PH_READONLY);
+				phalcon_array_append_str(&placeholders, SL("null"), PH_READONLY);
 			} else {
-				phalcon_array_append_string(&placeholders, SL("?"), PH_READONLY);
+				phalcon_array_append_str(&placeholders, SL("?"), PH_READONLY);
 				phalcon_array_append(&insert_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, PH_READONLY)) {

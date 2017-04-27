@@ -243,8 +243,8 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 
 	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
 		array_init(&longopts);
-		phalcon_array_append_string(&longopts, SL("url::"), 0);
-		phalcon_array_append_string(&longopts, SL("uri::"), 0);
+		phalcon_array_append_str(&longopts, SL("url::"), 0);
+		phalcon_array_append_str(&longopts, SL("uri::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
 		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"), PH_READONLY)

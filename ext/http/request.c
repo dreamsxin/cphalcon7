@@ -921,7 +921,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 
 	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
 		array_init(&longopts);
-		phalcon_array_append_string(&longopts, SL("host::"), 0);
+		phalcon_array_append_str(&longopts, SL("host::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
 		if (phalcon_array_isset_fetch_str(&host, &options, SL("host"), PH_READONLY)) {
@@ -1081,7 +1081,7 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
 
 	if (unlikely(!strcmp(sapi_module.name, "method"))) {
 		array_init(&longopts);
-		phalcon_array_append_string(&longopts, SL("method::"), 0);
+		phalcon_array_append_str(&longopts, SL("method::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 
 		if (phalcon_array_isset_fetch_str(&method, &options, SL("method"), PH_READONLY)) {

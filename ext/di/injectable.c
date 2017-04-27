@@ -416,7 +416,7 @@ PHP_METHOD(Phalcon_Di_Injectable, setService){
  * Obtains a service from the DI
  *
  * @param string $serviceName
- * @return object
+ * @return object|null
  */
 PHP_METHOD(Phalcon_Di_Injectable, getService){
 
@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Di_Injectable, getService){
 	phalcon_fetch_params(0, 1, 0, &service_name);
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
-	PHALCON_RETURN_CALL_METHOD(&dependency_injector, "get", service_name);
+	PHALCON_RETURN_CALL_METHOD(&dependency_injector, "get", service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 }
 
 /**

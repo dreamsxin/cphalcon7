@@ -186,8 +186,13 @@ PHP_METHOD(Phalcon_Di_Injectable, setEventsManager)
  */
 PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
 
+	zval service_name = {};
 
-	RETURN_MEMBER(getThis(), "_eventsManager");
+	phalcon_read_property(return_value, getThis(), SL("_eventsManager"), PH_COPY);
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
+		ZVAL_STR(&service_name, IS(eventsManager));
+		PHALCON_CALL_METHOD(return_value, getThis(), "getService", &service_name);
+	}
 }
 
 /**

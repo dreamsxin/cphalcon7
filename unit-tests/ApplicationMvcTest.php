@@ -259,12 +259,13 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 			$view = new \Phalcon\Mvc\View();
 			$view->setViewsDir('unit-tests/views/');
 			return $view;
-		});
+		}, TRUE);
 		$di->set('response', 'CustomResponse');
+		$di->view->setVar('after', 'afterExecuteRoute');
 
 		$application = new Phalcon\Mvc\Application();
 		$application->setDi($di);
-		$this->assertEquals($application->handle()->getContent(), "<html>Continue</html>".PHP_EOL."Response");
+		$this->assertEquals($application->handle()->getContent(), "<html>Continue afterExecuteRoute</html>".PHP_EOL."Response");
 		$loader->unregister();
 	}
 
@@ -288,6 +289,10 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 			$view = new \Phalcon\Mvc\View();
 			$view->setViewsDir('unit-tests/views/');
 			return $view;
+		}, TRUE);
+
+		$di->dispatcher->attachEvent('afterExecuteRoute', function(){
+			$this->di->view->setVar('after', 'afterExecuteRoute');
 		});
 
 		$application = new Phalcon\Mvc\Application();
@@ -295,7 +300,7 @@ class ApplicationMvcTest extends PHPUnit_Framework_TestCase
 		$application->attachEvent('afterSendResponse', function($response){
 			$response->setContent($response->getContent().'Response');
 		});
-		$this->assertEquals($application->handle()->getContent(), "<html>Continue</html>".PHP_EOL."Response");
+		$this->assertEquals($application->handle()->getContent(), "<html>Continue afterExecuteRoute</html>".PHP_EOL."Response");
 		$loader->unregister();
 	}
 

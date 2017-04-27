@@ -419,6 +419,16 @@ static inline int phalcon_array_update_str_string(zval *arr, const char *index, 
 	return phalcon_array_update_str(arr, index, index_length, &zvalue, flags);
 }
 
+static inline int phalcon_array_update_string_long(zval *arr, zend_string *index, zend_long value, int flags)
+{
+	zval zvalue;
+	int ret;
+
+	ZVAL_LONG(&zvalue, value);
+	ret = phalcon_array_update_string(arr, index, &zvalue, flags);
+	return ret;
+}
+
 static inline int phalcon_array_update_string_str(zval *arr, zend_string *index, char *value, uint value_length, int flags)
 {
 	zval zvalue;

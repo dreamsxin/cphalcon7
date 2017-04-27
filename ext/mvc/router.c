@@ -206,30 +206,37 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		 * /:controller/:action/:params
 		 */
 		array_init_size(&paths, 1);
-		add_assoc_long_ex(&paths, ISL(controller), 1);
+		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
 
 		ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, &route, "__construct", &params_pattern, &paths);
-		phalcon_array_append(&routes, &route, PH_COPY);
+		phalcon_array_append(&routes, &route, 0);
+
+		zval_ptr_dtor(&paths);
+		zval_ptr_dtor(&params_pattern);
 
 
 		array_init_size(&paths, 3);
-		add_assoc_long_ex(&paths, ISL(controller), 1);
-		add_assoc_long_ex(&paths, ISL(action), 2);
-		add_assoc_long_ex(&paths, ISL(params), 3);
+		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
+		phalcon_array_update_string_long(&paths, IS(action), 2, 0);
+		phalcon_array_update_string_long(&paths, IS(params), 3, 0);
 
 		ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
 		PHALCON_CALL_METHOD(NULL, &route, "__construct", &params_pattern, &paths);
-		phalcon_array_append(&routes, &route, PH_COPY);
+		phalcon_array_append(&routes, &route, 0);
+
+		zval_ptr_dtor(&paths);
+		zval_ptr_dtor(&params_pattern);
 	}
 
 	phalcon_update_property_empty_array(getThis(), SL("_params"));
 	phalcon_update_property(getThis(), SL("_routes"), &routes);
 	phalcon_update_property_empty_array(getThis(), SL("_routesNameLookup"));
+	zval_ptr_dtor(&routes);
 }
 
 /**

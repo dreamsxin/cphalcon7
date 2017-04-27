@@ -237,14 +237,18 @@ PHP_METHOD(Phalcon_Di_Service, resolve){
 		/* Object definitions can be a Closure or an already resolved instance */
 		found = 1;
 		if (instanceof_function_ex(Z_OBJCE(definition), zend_ce_closure, 0)) {
+			zval closure = {};
 			if (likely(Z_TYPE_P(dependency_injector) == IS_OBJECT)) {
-				PHALCON_CALL_CE_STATIC(&definition, zend_ce_closure, "bind", &definition, dependency_injector);
+				PHALCON_CALL_CE_STATIC(&closure, zend_ce_closure, "bind", &definition, dependency_injector);
+			} else {
+				ZVAL_COPY(&closure, &definition);
 			}
 			if (Z_TYPE_P(parameters) == IS_ARRAY) {
-				PHALCON_CALL_USER_FUNC_ARRAY(return_value, &definition, parameters);
+				PHALCON_CALL_USER_FUNC_ARRAY(return_value, &closure, parameters);
 			} else {
-				PHALCON_CALL_USER_FUNC(return_value, &definition);
+				PHALCON_CALL_USER_FUNC(return_value, &closure);
 			}
+			zval_ptr_dtor(&closure);
 		} else {
 			ZVAL_COPY(return_value, &definition);
 		}

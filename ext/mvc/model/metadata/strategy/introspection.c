@@ -92,6 +92,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 	 * Check if the mapped table exists on the database
 	 */
 	PHALCON_CALL_METHOD(&read_connection, model, "getreadconnection");
+
 	PHALCON_CALL_METHOD(&exists, &read_connection, "tableexists", &table, &schema);
 
 	if (!zend_is_true(&exists)) {

@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSource){
 
 	phalcon_read_property(&sources, getThis(), SL("_sources"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(sources) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(return_value, &sources, &entity_name, PH_READONLY)) {
+		if (phalcon_array_isset_fetch(&source, &sources, &entity_name, PH_READONLY)) {
 			zval_ptr_dtor(&entity_name);
 			RETURN_CTOR(&source);
 		}
@@ -605,7 +605,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema){
 
-	zval *model, entity_name = {}, schemas = {}, schema = {};
+	zval *model, entity_name = {}, schemas = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -730,7 +730,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 
-	zval *model, service = {}, dependency_injector = {}, connection = {};
+	zval *model, service = {}, dependency_injector = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -745,14 +745,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection){
 	/**
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
-	if (Z_TYPE(connection) != IS_OBJECT) {
+	PHALCON_CALL_METHOD(return_value, &dependency_injector, "getshared", &service);
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&service);
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
-	RETURN_CTOR(&connection);
+	PHALCON_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
 }
 
 /**

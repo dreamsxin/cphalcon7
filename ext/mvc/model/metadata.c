@@ -319,16 +319,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 
-	zval strategy = {}, s = {};
-
-	phalcon_read_property(&strategy, getThis(), SL("_strategy"), PH_NOISY|PH_READONLY);
-	if (Z_TYPE(strategy) == IS_NULL) {
-		object_init_ex(&s, phalcon_mvc_model_metadata_strategy_introspection_ce);
-		phalcon_update_property(getThis(), SL("_strategy"), &s);
-		RETURN_CTOR(&s);
+	phalcon_read_property(return_value, getThis(), SL("_strategy"), PH_COPY);
+	if (Z_TYPE_P(return_value) == IS_NULL) {
+		object_init_ex(return_value, phalcon_mvc_model_metadata_strategy_introspection_ce);
+		phalcon_update_property(getThis(), SL("_strategy"), return_value);
 	}
-
-	RETURN_CTOR(&strategy);
 }
 
 /**

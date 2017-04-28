@@ -852,6 +852,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &fire_event_name, model);
+			zval_ptr_dtor(&fire_event_name);
 		}
 	}
 
@@ -864,11 +865,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 			if (phalcon_array_isset_fetch(&events_manager, &custom_events_manager, &entity_name, PH_READONLY)) {
 				PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 				PHALCON_CALL_METHOD(&status, &events_manager, "fire", &fire_event_name, model);
+				zval_ptr_dtor(&fire_event_name);
 			}
 		}
 	}
 
-
+	zval_ptr_dtor(&entity_name);
 	RETURN_CTOR(&status);
 }
 
@@ -2378,7 +2380,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	if (!_type) {
 		phalcon_get_class_constant(&type, phalcon_mvc_model_query_ce, SL("TYPE_SELECT"));
 	} else {
-		ZVAL_COPY_VALUE(&type, _type);
+		ZVAL_COPY(&type, _type);
 	}
 
 	if (params) {

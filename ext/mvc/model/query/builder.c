@@ -44,6 +44,7 @@
 #include "kernel/string.h"
 #include "kernel/file.h"
 #include "kernel/hash.h"
+#include "kernel/debug.h"
 #include "kernel/framework/orm.h"
 
 #include "interned-strings.h"
@@ -503,7 +504,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, compile){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "compile");
-	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
+	RETURN_MEMBER(getThis(), "_phql");
 }
 
 /**
@@ -513,13 +514,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
-	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {}, query = {};
+	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {};
 
 	/**
 	 * Process the PHQL
 	 */
 	PHALCON_CALL_METHOD(&phql, getThis(), "getphql");
-
 	PHALCON_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
 	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
 
@@ -534,25 +534,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 		phalcon_array_append(&args, &phql, PH_COPY);
 		phalcon_array_append(&args, &dependency_injector, PH_COPY);
 
-		PHALCON_CALL_METHOD(&query, &dependency_injector, "get", &service_name, &args);
+		PHALCON_CALL_METHOD(return_value, &dependency_injector, "get", &service_name, &args);
+		zval_ptr_dtor(&args);
 	} else {
-		object_init_ex(&query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
+		object_init_ex(return_value, phalcon_mvc_model_query_ce);
+		PHALCON_CALL_METHOD(NULL, return_value, "__construct", &phql, &dependency_injector);
 	}
+	zval_ptr_dtor(&phql);
+	zval_ptr_dtor(&dependency_injector);
 
 	/**
 	 * Set default bind params
 	 */
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
+		PHALCON_CALL_METHOD(NULL, return_value, "setbindparams", &bind_params);
+		zval_ptr_dtor(&bind_params);
 	}
 
 	/**
 	 * Set default bind params
 	 */
 	if (Z_TYPE(bind_types) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
+		PHALCON_CALL_METHOD(NULL, return_value, "setbindtypes", &bind_types);
+		zval_ptr_dtor(&bind_types);
 	}
-
-	RETURN_CTOR(&query);
 }

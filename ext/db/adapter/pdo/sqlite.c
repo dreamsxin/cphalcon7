@@ -174,12 +174,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			RETURN_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches));
 			ZVAL_UNREF(&matches);
 			if (zend_is_true(&pos)) {
-				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1, PH_READONLY)) {
+				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1, PH_COPY)) {
 					convert_to_long(&match_one);
 					phalcon_array_update_str_long(&definition, SL("size"), Z_LVAL(match_one), PH_COPY);
 					phalcon_array_update_str_long(&definition, SL("bytes"), Z_LVAL(match_one), PH_COPY);
 				}
-				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_READONLY)) {
+				if (phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_COPY)) {
 					convert_to_long(&match_two);
 					phalcon_array_update_str_long(&definition, SL("scale"), Z_LVAL(match_two), PH_COPY);
 				}

@@ -107,22 +107,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Table \"", &complete_table, "\" doesn't exist on database when dumping meta-data for ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-		zval_ptr_dtor(&exception_message);
-		zval_ptr_dtor(&class_name);
+		zval_ptr_dtor(&exists);
+		zval_ptr_dtor(&complete_table);
 		zval_ptr_dtor(&table);
 		zval_ptr_dtor(&schema);
+		zval_ptr_dtor(&class_name);
 		return;
 	}
+	zval_ptr_dtor(&exists);
 
 	/**
 	 * Try to describe the table
 	 */
 	PHALCON_CALL_METHOD(&columns, &read_connection, "describecolumns", &table, &schema);
+	zval_ptr_dtor(&read_connection);
+
 	if (!phalcon_fast_count_ev(&columns)) {
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY_VALUE(&complete_table, &table);
+			ZVAL_COPY(&complete_table, &table);
 		}
 
 		/**
@@ -130,9 +134,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Cannot obtain table columns for the mapped source \"", &complete_table, "\" used in model ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&complete_table);
+		zval_ptr_dtor(&table);
+		zval_ptr_dtor(&schema);
 		zval_ptr_dtor(&class_name);
 		return;
 	}
+	zval_ptr_dtor(&table);
+	zval_ptr_dtor(&schema);
 	zval_ptr_dtor(&class_name);
 
 	/**
@@ -158,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		zval field_name = {}, feature = {}, type = {}, size = {}, bytes = {}, scale = {}, bind_type = {}, default_value = {};
 
 		PHALCON_CALL_METHOD(&field_name, column, "getname");
-		phalcon_array_append(&attributes, &field_name, PH_COPY);
+		phalcon_array_append(&attributes, &field_name, 0);
 
 		/**
 		 * To mark fields as primary keys

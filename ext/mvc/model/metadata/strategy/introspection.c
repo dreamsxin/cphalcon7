@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY_VALUE(&complete_table, &table);
+			ZVAL_COPY(&complete_table, &table);
 		}
 
 		/**
@@ -107,7 +107,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Table \"", &complete_table, "\" doesn't exist on database when dumping meta-data for ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&exception_message);
 		zval_ptr_dtor(&class_name);
+		zval_ptr_dtor(&table);
+		zval_ptr_dtor(&schema);
 		return;
 	}
 

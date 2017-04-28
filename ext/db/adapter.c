@@ -909,7 +909,7 @@ PHP_METHOD(Phalcon_Db_Adapter, limit){
  */
 PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
-	zval *table_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, num = {}, first = {};
+	zval *table_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, num = {};
 
 	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
 
@@ -924,9 +924,10 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
-	phalcon_array_fetch_long(&first, &num, 0, PH_NOISY|PH_READONLY);
-	RETURN_CTOR(&first);
+	phalcon_array_fetch_long(return_value, &num, 0, PH_COPY);
+	zval_ptr_dtor(&num);
 }
 
 /**

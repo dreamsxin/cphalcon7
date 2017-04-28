@@ -394,7 +394,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(&models, getThis(), SL("_models"), PH_COPY);
 		if (Z_TYPE(models) != IS_ARRAY) {
 			array_init(&models);
 		}
@@ -413,6 +413,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 	}
 
 	phalcon_update_property(getThis(), SL("_models"), &models);
+	zval_ptr_dtor(&models);
 
 	RETURN_THIS();
 }

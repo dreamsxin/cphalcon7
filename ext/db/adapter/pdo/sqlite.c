@@ -158,6 +158,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), field) {
 		zval definition = {}, column_type = {}, matches = {}, pos = {}, match_one = {}, match_two = {}, attribute = {}, column_name = {}, column = {};
@@ -183,6 +184,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 					phalcon_array_update_str_long(&definition, SL("scale"), Z_LVAL(match_two), PH_COPY);
 				}
 			}
+			zval_ptr_dtor(&matches);
 		}
 
 		/**
@@ -427,10 +429,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 		 */
 		object_init_ex(&column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
-		phalcon_array_append(return_value, &column, PH_COPY);
+		phalcon_array_append(return_value, &column, 0);
 		ZVAL_COPY_VALUE(&old_column, &column_name);
 		zval_ptr_dtor(&definition);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&describe);
 	zval_ptr_dtor(&size_pattern);
 }
 

@@ -483,10 +483,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 		object_init_ex(&column, phalcon_db_column_ce);
 		PHALCON_CALL_METHOD(NULL, &column, "__construct", &column_name, &definition);
 
-		phalcon_array_append(return_value, &column, PH_COPY);
+		phalcon_array_append(return_value, &column, 0);
 		ZVAL_COPY_VALUE(&old_column, &column_name);
 		zval_ptr_dtor(&definition);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&describe);
 }
 
 /**

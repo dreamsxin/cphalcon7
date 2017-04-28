@@ -164,7 +164,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 
 	if (Z_TYPE_P(_di) == IS_OBJECT) {
 		PHALCON_VERIFY_INTERFACE(_di, phalcon_diinterface_ce);
-		ZVAL_COPY_VALUE(&di, _di);
+		ZVAL_COPY(&di, _di);
 	} else {
 		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault", _di);
 	}
@@ -219,6 +219,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 	}
+	zval_ptr_dtor(&di);
 
 	PHALCON_VERIFY_INTERFACE(return_value, phalcon_mvc_model_query_builderinterface_ce);
 }

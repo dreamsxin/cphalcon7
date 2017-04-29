@@ -98,6 +98,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 	PHALCON_CALL_METHOD(&annotations, dependency_injector, "get", &service);
 	PHALCON_CALL_METHOD(&reflection, &annotations, "get", &class_name);
+	zval_ptr_dtor(&annotations);
 
 	if (Z_TYPE(reflection) != IS_OBJECT) {
 		PHALCON_CONCAT_SV(&exception_message, "No annotations were found in class ", &class_name);
@@ -110,6 +111,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 	 * Get the properties defined in 
 	 */
 	PHALCON_CALL_METHOD(&properties_annotations, &reflection, "getpropertiesannotations");
+	zval_ptr_dtor(&reflection);
 
 	if (Z_TYPE(properties_annotations) != IS_ARRAY || !phalcon_fast_count_ev(&properties_annotations)) {
 		PHALCON_CONCAT_SV(&exception_message, "No properties with annotations were found in class ", &class_name);
@@ -279,7 +281,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 
 		phalcon_array_append(&attributes, &real_property, PH_COPY);
 		zval_ptr_dtor(&real_property);
+		zval_ptr_dtor(&column_annotation);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&properties_annotations);
 
 	zval_ptr_dtor(&column_annot_name);
 	zval_ptr_dtor(&primary_annot_name);
@@ -340,6 +344,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	phalcon_get_class(&class_name, model, 0);
 
 	PHALCON_CALL_METHOD(&reflection, &annotations, "get", &class_name);
+	zval_ptr_dtor(&annotations);
 	if (Z_TYPE(reflection) != IS_OBJECT) {
 		PHALCON_CONCAT_SV(&exception_message, "No annotations were found in class ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
@@ -355,6 +360,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
+	zval_ptr_dtor(&reflection);
 
 	/** 
 	 * Check for a columnMap() method on the model
@@ -399,10 +405,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 		 * Check column map
 		 */
 		PHALCON_CALL_METHOD(&real_property, &column_annotation, "getargument", &column_map_name);
+		zval_ptr_dtor(&column_annotation);
 		if (PHALCON_IS_NOT_EMPTY(&real_property)) {
 			if (!phalcon_array_isset(&ordered_column_map, &real_property)) {
 				phalcon_array_update(&ordered_column_map, &real_property, &property, PH_COPY);
 			}
+			zval_ptr_dtor(&real_property);
 		} else {
 			if (!phalcon_array_isset(&ordered_column_map, &property)) {
 				phalcon_array_update(&ordered_column_map, &property, &property, PH_COPY);
@@ -410,6 +418,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 			phalcon_array_update(&ordered_column_map, &property, &property, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&column_annot_name);
+	zval_ptr_dtor(&column_map_name);
+	zval_ptr_dtor(&properties_annotations);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, column_name) {
 		zval name = {};
@@ -422,7 +433,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps){
 	} ZEND_HASH_FOREACH_END();
 
 	array_init_size(return_value, 2);
-	phalcon_array_update_long(return_value, 0, &ordered_column_map, PH_COPY);
-	phalcon_array_update_long(return_value, 1, &reversed_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, 0, &ordered_column_map, 0);
+	phalcon_array_update_long(return_value, 1, &reversed_column_map, 0);
 }
 

@@ -1507,10 +1507,12 @@ PHP_METHOD(Phalcon_Db_Dialect, escapeSchema){
 	ZVAL_STR(&schema, phalcon_trim(_schema, &escape_char, PHALCON_TRIM_BOTH));
 
 	if (!PHALCON_GLOBAL(db).escape_identifiers) {
-		RETURN_CTOR(&schema);
+		RETVAL_ZVAL(&schema, 0, 0);
+		return;
 	}
 
 	PHALCON_CONCAT_VVV(return_value, &escape_char, &schema, &escape_char);
+	zval_ptr_dtor(&schema);
 }
 
 /**
@@ -1537,6 +1539,7 @@ PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
 		if (_schema && PHALCON_IS_NOT_EMPTY(_schema)) {
 			PHALCON_CALL_METHOD(&schema, getThis(), "escapeschema", _schema, escape);
 			PHALCON_CONCAT_VSV(return_value, &schema, ".", &table);
+			zval_ptr_dtor(&schema);
 		} else {
 			ZVAL_COPY(return_value, &table);
 		}

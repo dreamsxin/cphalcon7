@@ -222,6 +222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 				}
 
 				phalcon_update_property(getThis(), SL("_rows"), &r);
+				zval_ptr_dtor(&r);
 			}
 		} else if (Z_TYPE(rows) == IS_ARRAY) {
 			zend_hash_internal_pointer_reset(Z_ARRVAL(rows));
@@ -274,6 +275,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 				if (PHALCON_IS_NOT_FALSE(&result)) {
 					PHALCON_CALL_METHOD(&rows, &result, "fetchall");
 					phalcon_update_property(getThis(), SL("_rows"), &rows);
+					zval_ptr_dtor(&rows);
 				}
 			}
 
@@ -338,6 +340,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 				if (Z_TYPE(result) == IS_OBJECT) {
 					PHALCON_CALL_METHOD(&rows, &result, "fetchall");
 					phalcon_update_property(getThis(), SL("_rows"), &rows);
+					zval_ptr_dtor(&rows);
 				}
 			}
 
@@ -627,6 +630,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			 */
 			if (phalcon_method_exists_ex(&record, SL("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
+				zval_ptr_dtor(&record);
 				return;
 			}
 
@@ -644,7 +648,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			phalcon_array_append(&parameters, &record, PH_COPY);
 
 			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
+			zval_ptr_dtor(&parameters);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&record);
 				continue;
 			}
 		}
@@ -659,6 +665,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			 */
 			PHALCON_CALL_METHOD(&messages, &record, "getmessages");
 			phalcon_update_property(getThis(), SL("_errorMessages"), &messages);
+			zval_ptr_dtor(&messages);
 
 			/**
 			 * Rollback the transaction
@@ -669,6 +676,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			break;
 		}
 
+		zval_ptr_dtor(&record);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
@@ -677,6 +685,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 	 */
 	if (PHALCON_IS_TRUE(&transaction)) {
 		PHALCON_CALL_METHOD(NULL, &connection, "commit");
+		zval_ptr_dtor(&connection);
 	}
 
 	RETURN_TRUE;

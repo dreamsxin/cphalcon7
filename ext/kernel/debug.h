@@ -28,9 +28,9 @@
 
 #define PHV(v) phalcon_vdump(v)
 #define PHPR(v) phalcon_print_r(v)
-#define PHALCON_DEBUG_ZVAL(v) php_debug_zval_dump(v, 1)
-#define PHALCON_DEBUG_SIMPLE() zend_printf("\n File:%s, Line:%d\n", __FILE__, __LINE__)
-#define PHALCON_DEBUG_SIMPLE_ZVAL(v) zend_printf("\n Var:%s, Refcount:%d, File:%s, Line:%d\n", #v, Z_REFCOUNT_P(v), __FILE__, __LINE__)
+#define PHALCON_DEBUG_ZVAL(v) PHALCON_DEBUG_SIMPLE(); php_debug_zval_dump(v, 1)
+#define PHALCON_DEBUG_SIMPLE() zend_printf("\nFile:%s, Line:%d\n", __FILE__, __LINE__)
+#define PHALCON_DEBUG_SIMPLE_ZVAL(v) zend_printf("\nVar:%s, Refcount:%d, File:%s, Line:%d\n", #v, Z_REFCOUNT_P(v), __FILE__, __LINE__)
 
 typedef struct _phalcon_debug_entry {
 	struct _phalcon_debug_entry *prev;

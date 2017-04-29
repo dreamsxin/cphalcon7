@@ -42,6 +42,7 @@
 #include "kernel/file.h"
 #include "kernel/hash.h"
 #include "kernel/framework/orm.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -394,7 +395,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 	}
 
 	if (zend_is_true(merge)) {
-		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(&models, getThis(), SL("_models"), PH_COPY);
 		if (Z_TYPE(models) != IS_ARRAY) {
 			array_init(&models);
 		}
@@ -413,6 +414,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, from){
 	}
 
 	phalcon_update_property(getThis(), SL("_models"), &models);
+	zval_ptr_dtor(&models);
 
 	RETURN_THIS();
 }
@@ -641,7 +643,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 		return;
 	}
-
 	PHALCON_CALL_SELF(&conditions, "getConditions");
 
 	phalcon_read_property(&distinct, getThis(), SL("_distinct"), PH_NOISY|PH_READONLY);
@@ -676,12 +677,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 					phalcon_array_append(&selected_columns, column, PH_COPY);
 				} else {
 					PHALCON_CONCAT_VSV(&aliased_column, column, " AS ", &column_alias);
-					phalcon_array_append(&selected_columns, &aliased_column, PH_COPY);
+					phalcon_array_append(&selected_columns, &aliased_column, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 
 			phalcon_fast_join_str(&joined_columns, SL(", "), &selected_columns);
+			zval_ptr_dtor(&selected_columns);
 			phalcon_concat_self(&phql, &joined_columns);
+			zval_ptr_dtor(&joined_columns);
 		} else {
 			phalcon_concat_self(&phql, &columns);
 		}
@@ -705,11 +708,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 				} else {
 					PHALCON_CONCAT_SVS(&selected_column, "[", &model_column_alias, "].*");
 				}
-				phalcon_array_append(&selected_columns, &selected_column, PH_COPY);
+				phalcon_array_append(&selected_columns, &selected_column, 0);
 			} ZEND_HASH_FOREACH_END();
 
 			phalcon_fast_join_str(&joined_columns, SL(", "), &selected_columns);
+			zval_ptr_dtor(&selected_columns);
 			phalcon_concat_self(&phql, &joined_columns);
+			zval_ptr_dtor(&joined_columns);
 		} else {
 			PHALCON_SCONCAT_SVS(&phql, "[", &models, "].*");
 		}
@@ -734,11 +739,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 			} else {
 				PHALCON_CONCAT_SVS(&selected_model, "[", model, "]");
 			}
-			phalcon_array_append(&selected_models, &selected_model, PH_COPY);
+			phalcon_array_append(&selected_models, &selected_model, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&joined_models, SL(", "), &selected_models);
+		zval_ptr_dtor(&selected_models);
 		PHALCON_SCONCAT_SV(&phql, " FROM ", &joined_models);
+		zval_ptr_dtor(&joined_models);
 	} else {
 		PHALCON_SCONCAT_SVS(&phql, " FROM [", &models, "]");
 	}
@@ -800,6 +807,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	 */
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
+		zval_ptr_dtor(&conditions);
 	}
 
 	/**
@@ -826,14 +834,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	 * Process limit parameters
 	 */
 	phalcon_read_property(&limit, getThis(), SL("_limit"), PH_NOISY|PH_READONLY);
-	if (PHALCON_IS_NOT_EMPTY(&limit) && Z_TYPE(limit) != IS_ARRAY) {
-		phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
-		if (PHALCON_IS_NOT_EMPTY(&offset)) {
-			PHALCON_SCONCAT_SV(&limit, " OFFSET ", &offset);
+	if (PHALCON_IS_NOT_EMPTY(&limit)) {
+		if (Z_TYPE(limit) != IS_ARRAY) {
+			zval tmp = {};
+			phalcon_read_property(&offset, getThis(), SL("_offset"), PH_READONLY);
+			if (PHALCON_IS_NOT_EMPTY(&offset)) {
+				PHALCON_CONCAT_VSV(&tmp, &limit, " OFFSET ", &offset);
+			} else {
+				ZVAL_COPY(&tmp, &limit);
+			}
+
+			phalcon_orm_phql_build_limit(&phql, &tmp);
+			zval_ptr_dtor(&tmp);
+		} else {
+			phalcon_orm_phql_build_limit(&phql, &limit);
 		}
 	}
-
-	phalcon_orm_phql_build_limit(&phql, &limit);
 
 	/**
 	 * Process FOR UPDATE clause
@@ -850,4 +866,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
 
 	phalcon_update_property(getThis(), SL("_phql"), &phql);
+	zval_ptr_dtor(&phql);
 }

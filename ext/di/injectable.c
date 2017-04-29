@@ -217,10 +217,12 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
+		zval_ptr_dtor(&event_parts);
 	} else {
-		ZVAL_COPY_VALUE(&name, &lower);
+		ZVAL_COPY(&name, &lower);
 	}
+	zval_ptr_dtor(&lower);
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -236,6 +238,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
 		zval_ptr_dtor(&arguments);
 	}
+	zval_ptr_dtor(&name);
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 
@@ -279,10 +282,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&name, &lower);
+		ZVAL_COPY(&name, &lower);
 	}
+	zval_ptr_dtor(&lower);
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -301,6 +305,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		PHALCON_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
 		zval_ptr_dtor(&arguments);
 	}
+	zval_ptr_dtor(&name);
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) != IS_NULL) {
@@ -339,10 +344,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&name, &lower);
+		ZVAL_COPY(&name, &lower);
 	}
+	zval_ptr_dtor(&lower);
 
 	/**
 	 * Check if there is a method with the same name of the event
@@ -358,6 +364,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
 		zval_ptr_dtor(&arguments);
 	}
+	zval_ptr_dtor(&name);
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) != IS_NULL) {

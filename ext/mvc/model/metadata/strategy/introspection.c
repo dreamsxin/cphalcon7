@@ -99,7 +99,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY_VALUE(&complete_table, &table);
+			ZVAL_COPY(&complete_table, &table);
 		}
 
 		/**
@@ -107,19 +107,26 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Table \"", &complete_table, "\" doesn't exist on database when dumping meta-data for ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&exists);
+		zval_ptr_dtor(&complete_table);
+		zval_ptr_dtor(&table);
+		zval_ptr_dtor(&schema);
 		zval_ptr_dtor(&class_name);
 		return;
 	}
+	zval_ptr_dtor(&exists);
 
 	/**
 	 * Try to describe the table
 	 */
 	PHALCON_CALL_METHOD(&columns, &read_connection, "describecolumns", &table, &schema);
+	zval_ptr_dtor(&read_connection);
+
 	if (!phalcon_fast_count_ev(&columns)) {
 		if (zend_is_true(&schema)) {
 			PHALCON_CONCAT_VSV(&complete_table, &schema, "\".\"", &table);
 		} else {
-			ZVAL_COPY_VALUE(&complete_table, &table);
+			ZVAL_COPY(&complete_table, &table);
 		}
 
 		/**
@@ -127,9 +134,14 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 */
 		PHALCON_CONCAT_SVSV(&exception_message, "Cannot obtain table columns for the mapped source \"", &complete_table, "\" used in model ", &class_name);
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&complete_table);
+		zval_ptr_dtor(&table);
+		zval_ptr_dtor(&schema);
 		zval_ptr_dtor(&class_name);
 		return;
 	}
+	zval_ptr_dtor(&table);
+	zval_ptr_dtor(&schema);
 	zval_ptr_dtor(&class_name);
 
 	/**
@@ -155,7 +167,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		zval field_name = {}, feature = {}, type = {}, size = {}, bytes = {}, scale = {}, bind_type = {}, default_value = {};
 
 		PHALCON_CALL_METHOD(&field_name, column, "getname");
-		phalcon_array_append(&attributes, &field_name, PH_COPY);
+		phalcon_array_append(&attributes, &field_name, 0);
 
 		/**
 		 * To mark fields as primary keys
@@ -187,8 +199,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 * To mark fields as identity columns
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isautoincrement");
-		if (PHALCON_IS_TRUE(&feature)) {
-			ZVAL_COPY_VALUE(&identity_field, &field_name);
+		if (PHALCON_IS_TRUE(&feature) && !zend_is_true(&identity_field)) {
+			ZVAL_COPY(&identity_field, &field_name);
 		}
 
 		/**
@@ -285,6 +297,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 				phalcon_array_update(&ordered_column_map, column_name, column_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&columns);
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, column_name) {
@@ -302,6 +315,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	 * Store the column map
 	 */
 	array_init_size(return_value, 2);
-	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP, &ordered_column_map, PH_COPY);
-	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP, &reversed_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP, &ordered_column_map, 0);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP, &reversed_column_map, 0);
 }

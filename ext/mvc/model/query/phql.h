@@ -21,6 +21,9 @@
 #define PHALCON_MVC_MODEL_QUERY_PHQL_H
 
 #include "php_phalcon.h"
+
+#include "kernel/debug.h"
+
 #include "mvc/model/query/scanner.h"
 
 typedef struct _phql_parser_token {

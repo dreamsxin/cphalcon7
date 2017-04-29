@@ -58,24 +58,67 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 			return new Phalcon\Mvc\Model\Metadata\Memory();
 		}, true);
 
-		$di->set('db', function(){
-			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
-		}, true);
-
 		return $di;
 	}
 
-	public function testSelectBuilder()
+	public function testExecuteMysql()
 	{
 		require 'unit-tests/config.db.php';
 		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
+			$this->markTestSkipped("Skipped");
 			return;
 		}
 
 		$di = $this->_getDI();
 
+		$di->set('db', function() {
+			require 'unit-tests/config.db.php';
+			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+		}, true);
+
+		$this->_testSelectBuilder($di);
+		$this->_testUpdateBuilder($di);
+		$this->_testInsertBuilder($di);
+		$this->_testDeleteBuilder($di);
+		$this->_testIssue701($di);
+		$this->_testIssue1115($di);
+		$this->_testSelectDistinctAll($di);
+		$this->_testConstructor($di);
+		$this->_testConstructorLimit($di);
+		$this->_testConstructorConditions($di);
+		$this->_testGroup($di);
+	}
+
+	public function testExecuteSqlite()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configSqlite)) {
+			$this->markTestSkipped("Skipped");
+			return;
+		}
+
+		$di = $this->_getDI();
+
+		$di->set('db', function() {
+			require 'unit-tests/config.db.php';
+			return new Phalcon\Db\Adapter\Pdo\Sqlite($configSqlite);
+		}, true);
+
+		$this->_testSelectBuilder($di);
+		$this->_testUpdateBuilder($di);
+		$this->_testInsertBuilder($di);
+		$this->_testDeleteBuilder($di);
+		$this->_testIssue701($di);
+		$this->_testIssue1115($di);
+		$this->_testSelectDistinctAll($di);
+		$this->_testConstructor($di);
+		$this->_testConstructorLimit($di);
+		$this->_testConstructorConditions($di);
+		$this->_testGroup($di);
+	}
+
+	public function _testSelectBuilder($di)
+	{
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
 						->from('Robots')
@@ -294,16 +337,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($builder->getMergeBindParams(), ['phi0' => 1, 'phi1' => 2, 'phi2' => 3]);
 	}
 
-	public function testUpdateBuilder()
+	public function _testUpdateBuilder($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = Builder::CreateUpdateBuilder();
 		$phql = $builder->table('Robots')
 						->set(array('name' => 'Google', 'price' => 1.0))
@@ -311,16 +346,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($phql, 'UPDATE [Robots] SET [Robots].name = :phu_name:, [Robots].price = :phu_price:');
 	}
 
-	public function testInsertBuilder()
+	public function _testInsertBuilder($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = Builder::CreateInsertBuilder();
 		$phql = $builder->table('Robots')->columns(array('name', 'price'))
 						->values(array(
@@ -330,32 +357,16 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($phql, 'INSERT INTO [Robots] ([name], [price]) VALUES ( :phi_0_0:,  :phi_0_1:)');
 	}
 
-	public function testDeleteBuilder()
+	public function _testDeleteBuilder($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = Builder::CreateDeleteBuilder();
 		$phql = $builder->table('Robots')->where('name = "Google"')
 						->getPhql();
 		$this->assertEquals($phql, 'DELETE FROM [Robots] WHERE name = "Google"');
 	}
 
-	public function testIssue701()
+	public function _testIssue701($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
 			->from('Robots')
@@ -376,16 +387,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($params['name'], 'Voltron');
 	}
 
-	public function testIssue1115()
+	public function _testIssue1115($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
 			->columns(array('Robots.name'))
@@ -395,16 +398,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($phql, 'SELECT Robots.name FROM [Robots] HAVING Robots.price > 1000');
 	}
 
-	public function testSelectDistinctAll()
+	public function _testSelectDistinctAll($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
 			->distinct(true)
@@ -435,16 +430,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 	 * Test checks passing query params and dependency injector into
 	 * constructor
 	 */
-	public function testConstructor()
+	public function _testConstructor($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$params = array(
 			'models'     => 'Robots',
 			'columns'    => array('id', 'name', 'status'),
@@ -473,16 +460,9 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 	 * - signle numeric value
 	 * - array of 2 values (limit, offset)
 	 */
-	public function testConstructorLimit()
+	public function _testConstructorLimit($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
 		// separate limit and offset
-
 		$params = array(
 			'models' => 'Robots',
 			'limit'  => 10,
@@ -517,14 +497,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 	 *
 	 * First two params are REQUIRED, bind types are optional.
 	 */
-	public function testConstructorConditions()
+	public function _testConstructorConditions($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
 		// ------------- test for setters(classic) way ----------------
 
 		$standardSelectBuilder = new SelectBuilder();
@@ -589,16 +563,8 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$this->assertInstanceOf("Phalcon\Mvc\Model\Resultset\Simple", $multipleConditionResult);
     }
 
-	public function testGroup()
+	public function _testGroup($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$di = $this->_getDI();
-
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)
 						->columns(array('name', 'SUM(price)'))

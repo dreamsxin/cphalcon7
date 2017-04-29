@@ -39,7 +39,7 @@ class ModelsBehaviorsTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	protected function _prepareDI()
+	protected function _getDI()
 	{
 		Phalcon\Di::reset();
 
@@ -53,23 +53,49 @@ class ModelsBehaviorsTest extends PHPUnit_Framework_TestCase
 			return new Phalcon\Mvc\Model\Metadata\Memory();
 		}, true);
 
-		$di->set('db', function() {
+		return $di;
+	}
+
+	public function testModelsMysql()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configMysql)) {
+			$this->markTestSkipped('Test skipped');
+			return;
+		}
+
+		$di = $this->_getDI();
+
+		$di->set('db', function(){
 			require 'unit-tests/config.db.php';
 			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
 		}, true);
 
+		$this->_testBehaviorsTimestampable($di);
+		$this->_testBehaviorsSoftDelete($di);
 	}
 
-	public function testBehaviorsTimestampable()
+	public function testModelsSqlite()
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
+		if (empty($configSqlite)) {
+			$this->markTestSkipped('Test skipped');
 			return;
 		}
 
-		$this->_prepareDI();
+		$di = $this->_getDI();
 
+		$di->set('db', function(){
+			require 'unit-tests/config.db.php';
+			return new Phalcon\Db\Adapter\Pdo\Sqlite($configSqlite);
+		}, true);
+
+		$this->_testBehaviorsTimestampable($di);
+		$this->_testBehaviorsSoftDelete($di);
+	}
+
+	public function _testBehaviorsTimestampable($di)
+	{
 		$subscriber = new News\Subscribers();
 		$subscriber->email = 'some@some.com';
 		$subscriber->status = 'I';
@@ -77,16 +103,8 @@ class ModelsBehaviorsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(preg_match('/[0-9]{4}-[0-9]{2}-[0-9]{2}/', $subscriber->created_at), 1);
 	}
 
-	public function testBehaviorsSoftDelete()
+	public function _testBehaviorsSoftDelete($di)
 	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped("Test skipped");
-			return;
-		}
-
-		$this->_prepareDI();
-
 		$number = News\Subscribers::count();
 
 		$subscriber = News\Subscribers::findFirst();

@@ -1362,7 +1362,6 @@ PHP_METHOD(Phalcon_Db_Dialect, createSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1378,7 +1377,6 @@ PHP_METHOD(Phalcon_Db_Dialect, releaseSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "RELEASE SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1394,7 +1392,6 @@ PHP_METHOD(Phalcon_Db_Dialect, rollbackSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "ROLLBACK TO SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1450,11 +1447,13 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 	ZVAL_STR(&str, phalcon_trim(_str, &escape_char, PHALCON_TRIM_BOTH));
 
 	if (!PHALCON_GLOBAL(db).escape_identifiers) {
-		RETURN_CTOR(&str);
+		RETVAL_ZVAL(&str, 0, 0);
+		return;
 	}
 
 	if (phalcon_start_with_str(&str, SL("*"))) {
-		RETURN_CTOR(&str);
+		RETVAL_ZVAL(&str, 0, 0);
+		return;
 	}
 
 	if (phalcon_memnstr_str(&str, SL("."))) {
@@ -1475,9 +1474,11 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
-		return;
+		zval_ptr_dtor(&parts);
+	} else {
+		PHALCON_CONCAT_VVV(return_value, &escape_char, &str, &escape_char);
 	}
-	PHALCON_CONCAT_VVV(return_value, &escape_char, &str, &escape_char);
+	zval_ptr_dtor(&str);
 }
 
 /**

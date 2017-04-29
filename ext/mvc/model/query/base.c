@@ -583,7 +583,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 					add_assoc_long(&parser_status->ret, "id", Z_LVAL(unique_id));
 				}
 
-				ZVAL_COPY(result, &parser_status->ret);
+				ZVAL_COPY_VALUE(result, &parser_status->ret);
 
 				/**
 				 * Store the parsed definition in the cache

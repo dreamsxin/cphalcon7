@@ -195,12 +195,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 	phalcon_get_class(&class_name, model, 0);
 
-	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_READONLY);
+	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_COPY);
 	if (Z_TYPE(meta_data) != IS_ARRAY) {
 		array_init(&meta_data);
 	}
 
 	if (!phalcon_array_isset(&meta_data, key)) {
+		/**
+		 * Get the meta-data extraction strategy
+		 */
+		PHALCON_CALL_METHOD(&strategy, getThis(), "getstrategy");
 		PHALCON_CONCAT_SV(&prefix_key, "meta-", key);
 
 		/**
@@ -219,14 +223,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 				if (Z_TYPE(model_metadata) != IS_ARRAY) {
 					PHALCON_CONCAT_SV(&exception_message, "Invalid meta-data for model ", &class_name);
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-					return;
+					zval_ptr_dtor(&strategy);
+					zval_ptr_dtor(&prefix_key);
+					goto end;
 				}
 			} else {
-				/**
-				 * Get the meta-data extraction strategy
-				 */
-				PHALCON_CALL_METHOD(&strategy, getThis(), "getstrategy");
-
 				/**
 				 * Get the meta-data
 				 */
@@ -243,17 +244,20 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 			 */
 			PHALCON_CALL_METHOD(NULL, getThis(), "write", &prefix_key, &model_metadata);
 		}
+		zval_ptr_dtor(&prefix_key);
 		zval_ptr_dtor(&model_metadata);
 
 		/**
 		 * Check for a column map, store in _columnMap in order and reversed order
 		 */
-		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_READONLY);
+		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_COPY);
 
 		if (Z_TYPE(column_map) != IS_ARRAY) {
 			array_init(&column_map);
 		} else if (phalcon_array_isset_fetch(&model_column_map, &column_map, key, PH_READONLY) && Z_TYPE(model_column_map) != IS_NULL) {
-			return;
+			zval_ptr_dtor(&strategy);
+			zval_ptr_dtor(&column_map);
+			goto end;
 		}
 
 		PHALCON_CONCAT_SV(&prefix_key, "map-", key);
@@ -265,20 +269,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		if (Z_TYPE(model_column_map) != IS_NULL) {
 			phalcon_array_update(&column_map, key, &model_column_map, PH_COPY);
 			phalcon_update_property(getThis(), SL("_columnMap"), &column_map);
-			RETURN_NULL();
+			zval_ptr_dtor(&model_column_map);
+			zval_ptr_dtor(&prefix_key);
+			zval_ptr_dtor(&column_map);
+			zval_ptr_dtor(&strategy);
+			goto end;
 		}
-
-		/**
-		 * Get the meta-data extraction strategy
-		 */
-		if (Z_TYPE(strategy) != IS_OBJECT) {
-			PHALCON_CALL_METHOD(&strategy, getThis(), "getstrategy");
-		}
+		zval_ptr_dtor(&column_map);
 
 		/**
 		 * Get the meta-data
 		 */
 		PHALCON_CALL_METHOD(&model_column_map, &strategy, "getcolumnmaps", model, &dependency_injector);
+		zval_ptr_dtor(&strategy);
 
 		/**
 		 * Update the column map locally
@@ -290,7 +293,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 		 */
 		PHALCON_CALL_METHOD(NULL, getThis(), "write", &prefix_key, &model_column_map);
 		zval_ptr_dtor(&model_column_map);
+		zval_ptr_dtor(&prefix_key);
 	}
+end:
+	zval_ptr_dtor(&meta_data);
+	zval_ptr_dtor(&class_name);
+	zval_ptr_dtor(&dependency_injector);
 }
 
 /**
@@ -392,6 +400,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+	zval_ptr_dtor(&class_name);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 
@@ -399,9 +408,13 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	}
+	zval_ptr_dtor(&schema);
+	zval_ptr_dtor(&table);
 
-	phalcon_array_fetch(&meta_data_index, &meta_data, &key, PH_NOISY|PH_READONLY);
-	phalcon_array_fetch(&attributes, &meta_data_index, index, PH_NOISY|PH_READONLY);
+	if (phalcon_array_isset_fetch(&meta_data_index, &meta_data, &key, PH_NOISY|PH_READONLY)) {
+		phalcon_array_fetch(&attributes, &meta_data_index, index, PH_NOISY|PH_READONLY);
+	}
+	zval_ptr_dtor(&key);
 
 	RETURN_CTOR(&attributes);
 }

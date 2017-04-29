@@ -146,7 +146,7 @@ void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
 						phalcon_array_append(&group_items, group_item, PH_COPY);
 					} else {
 						PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
-						phalcon_array_append(&group_items, &escaped_item, PH_COPY);
+						phalcon_array_append(&group_items, &escaped_item, 0);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();
@@ -193,7 +193,7 @@ void phalcon_orm_phql_build_order(zval *return_value, zval *order) {
 						phalcon_array_append(&order_items, order_item, PH_COPY);
 					} else {
 						PHALCON_CONCAT_SVS(&escaped_item, "[", order_item, "]");
-						phalcon_array_append(&order_items, &escaped_item, PH_COPY);
+						phalcon_array_append(&order_items, &escaped_item, 0);
 					}
 				}
 			} ZEND_HASH_FOREACH_END();

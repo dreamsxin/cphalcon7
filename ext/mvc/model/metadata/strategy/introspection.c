@@ -199,8 +199,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 * To mark fields as identity columns
 		 */
 		PHALCON_CALL_METHOD(&feature, column, "isautoincrement");
-		if (PHALCON_IS_TRUE(&feature)) {
-			ZVAL_COPY_VALUE(&identity_field, &field_name);
+		if (PHALCON_IS_TRUE(&feature) && !zend_is_true(&identity_field)) {
+			ZVAL_COPY(&identity_field, &field_name);
 		}
 
 		/**
@@ -297,6 +297,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 				phalcon_array_update(&ordered_column_map, column_name, column_name, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&columns);
 	}
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(ordered_column_map), idx, str_key, column_name) {
@@ -314,6 +315,6 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getColumnMaps){
 	 * Store the column map
 	 */
 	array_init_size(return_value, 2);
-	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP, &ordered_column_map, PH_COPY);
-	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP, &reversed_column_map, PH_COPY);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_COLUMN_MAP, &ordered_column_map, 0);
+	phalcon_array_update_long(return_value, PHALCON_MVC_MODEL_METADATA_MODELS_REVERSE_COLUMN_MAP, &reversed_column_map, 0);
 }

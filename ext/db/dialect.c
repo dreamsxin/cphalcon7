@@ -1253,18 +1253,21 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
 		zval sql_table = {};
 		PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
-		phalcon_array_append(&updated_tables, &sql_table, PH_COPY);
+		phalcon_array_append(&updated_tables, &sql_table, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&tables_sql, SL(", "), &updated_tables);
+	zval_ptr_dtor(&updated_tables);
 
 	PHALCON_SCONCAT_SV(&sql, "DELETE FROM ", &tables_sql);
+	zval_ptr_dtor(&tables_sql);
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"), PH_READONLY)) {
 		if (Z_TYPE(where_conditions) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
+			zval_ptr_dtor(&where_expression);
 		} else {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
 		}
@@ -1287,13 +1290,16 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 			if (phalcon_array_isset_fetch_long(&sql_order_type, order_item, 1, PH_READONLY)) {
 				PHALCON_CONCAT_VSV(&order_sql_item_type, &order_sql_item, " ", &sql_order_type);
 			} else {
-				ZVAL_COPY_VALUE(&order_sql_item_type, &order_sql_item);
+				ZVAL_COPY(&order_sql_item_type, &order_sql_item);
 			}
-			phalcon_array_append(&order_items, &order_sql_item_type, PH_COPY);
+			phalcon_array_append(&order_items, &order_sql_item_type, 0);
+			zval_ptr_dtor(&order_sql_item);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&order_sql, SL(", "), &order_items);
+		zval_ptr_dtor(&order_items);
 		PHALCON_SCONCAT_SV(&sql, " ORDER BY ", &order_sql);
+		zval_ptr_dtor(&order_sql);
 	}
 
 	/**
@@ -1319,7 +1325,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		}
 	}
 
-	RETURN_CTOR(&sql);
+	RETVAL_ZVAL(&sql, 0, 0);
 }
 
 /**
@@ -1356,7 +1362,6 @@ PHP_METHOD(Phalcon_Db_Dialect, createSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1372,7 +1377,6 @@ PHP_METHOD(Phalcon_Db_Dialect, releaseSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "RELEASE SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1388,7 +1392,6 @@ PHP_METHOD(Phalcon_Db_Dialect, rollbackSavepoint){
 	phalcon_fetch_params(0, 1, 0, &name);
 
 	PHALCON_CONCAT_SV(return_value, "ROLLBACK TO SAVEPOINT ", name);
-	return;
 }
 
 /**
@@ -1444,11 +1447,13 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 	ZVAL_STR(&str, phalcon_trim(_str, &escape_char, PHALCON_TRIM_BOTH));
 
 	if (!PHALCON_GLOBAL(db).escape_identifiers) {
-		RETURN_CTOR(&str);
+		RETVAL_ZVAL(&str, 0, 0);
+		return;
 	}
 
 	if (phalcon_start_with_str(&str, SL("*"))) {
-		RETURN_CTOR(&str);
+		RETVAL_ZVAL(&str, 0, 0);
+		return;
 	}
 
 	if (phalcon_memnstr_str(&str, SL("."))) {
@@ -1469,9 +1474,11 @@ PHP_METHOD(Phalcon_Db_Dialect, escape){
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
-		return;
+		zval_ptr_dtor(&parts);
+	} else {
+		PHALCON_CONCAT_VVV(return_value, &escape_char, &str, &escape_char);
 	}
-	PHALCON_CONCAT_VVV(return_value, &escape_char, &str, &escape_char);
+	zval_ptr_dtor(&str);
 }
 
 /**
@@ -1500,10 +1507,12 @@ PHP_METHOD(Phalcon_Db_Dialect, escapeSchema){
 	ZVAL_STR(&schema, phalcon_trim(_schema, &escape_char, PHALCON_TRIM_BOTH));
 
 	if (!PHALCON_GLOBAL(db).escape_identifiers) {
-		RETURN_CTOR(&schema);
+		RETVAL_ZVAL(&schema, 0, 0);
+		return;
 	}
 
 	PHALCON_CONCAT_VVV(return_value, &escape_char, &schema, &escape_char);
+	zval_ptr_dtor(&schema);
 }
 
 /**
@@ -1530,6 +1539,7 @@ PHP_METHOD(Phalcon_Db_Dialect, prepareTable){
 		if (_schema && PHALCON_IS_NOT_EMPTY(_schema)) {
 			PHALCON_CALL_METHOD(&schema, getThis(), "escapeschema", _schema, escape);
 			PHALCON_CONCAT_VSV(return_value, &schema, ".", &table);
+			zval_ptr_dtor(&schema);
 		} else {
 			ZVAL_COPY(return_value, &table);
 		}

@@ -60,7 +60,7 @@ class ModelsFindersTest extends PHPUnit_Framework_TestCase
 		return $di;
 	}
 
-	public function testModels()
+	public function testModelsMysql()
 	{
 		require 'unit-tests/config.db.php';
 		if (empty($configMysql)) {
@@ -73,6 +73,25 @@ class ModelsFindersTest extends PHPUnit_Framework_TestCase
 		$di->set('db', function(){
 			require 'unit-tests/config.db.php';
 			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+		}, true);
+
+		$this->_executeTestsNormal($di);
+		$this->_executeTestsRenamed($di);
+	}
+
+	public function testModelsSqlite()
+	{
+		require 'unit-tests/config.db.php';
+		if (empty($configSqlite)) {
+			$this->markTestSkipped('Test skipped');
+			return;
+		}
+
+		$di = $this->_getDI();
+
+		$di->set('db', function(){
+			require 'unit-tests/config.db.php';
+			return new Phalcon\Db\Adapter\Pdo\Sqlite($configSqlite);
 		}, true);
 
 		$this->_executeTestsNormal($di);

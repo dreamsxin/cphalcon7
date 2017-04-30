@@ -1030,6 +1030,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		if (!PHALCON_IS_EQUAL(&number_fields, &number_values)) {
 			PHALCON_CONCAT_SVSVS(&exception_message, "The fields count(", &number_fields, ") does not match the values count(", &number_values, ")");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
+			zval_ptr_dtor(&joined_rows);
 			return;
 		}
 
@@ -1040,14 +1041,16 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 
 			PHALCON_CALL_METHOD(&insert_value, getThis(), "getsqlexpression", value, &escape_char);
 
-			phalcon_array_append(&insert_row_values, &insert_value, PH_COPY);
+			phalcon_array_append(&insert_row_values, &insert_value, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&joined_row, SL(", "), &insert_row_values);
+		zval_ptr_dtor(&insert_row_values);
 		phalcon_array_append(&joined_rows, &joined_row, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&joined_values, SL("), ("), &joined_rows);
+	zval_ptr_dtor(&joined_rows);
 
 	if (Z_TYPE(fields) == IS_ARRAY) {
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
@@ -1056,19 +1059,22 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(fields), field) {
 				zval escaped_field = {};
 				PHALCON_CONCAT_VVV(&escaped_field, &escape_char, field, &escape_char);
-				phalcon_array_append(&escaped_fields, &escaped_field, PH_COPY);
+				phalcon_array_append(&escaped_fields, &escaped_field, 0);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
-			ZVAL_COPY_VALUE(&escaped_fields, &fields);
+			ZVAL_COPY(&escaped_fields, &fields);
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
 
 		PHALCON_CONCAT_SVSVSVS(return_value, "INSERT INTO ", &escaped_table, " (", &joined_fields, ") VALUES (", &joined_values, ")");
+		zval_ptr_dtor(&joined_fields);
 	} else {
 		PHALCON_CONCAT_SVSVS(return_value, "INSERT INTO ", &escaped_table, " VALUES (", &joined_values, ")");
 	}
+	zval_ptr_dtor(&escaped_table);
+	zval_ptr_dtor(&joined_values);
 }
 
 /**

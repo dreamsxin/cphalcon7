@@ -2204,10 +2204,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 			array_init(&params);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"), PH_COPY)) {
 		ZVAL_STRING(&group_column, "*");
 	}
 
@@ -2223,6 +2223,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 			PHALCON_CONCAT_VSVSV(&columns, function, "(", &group_column, ") AS ", alias);
 		}
 	}
+	zval_ptr_dtor(&group_column);
 
 	phalcon_get_called_class(&model_name);
 
@@ -2236,20 +2237,24 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
-
+	zval_ptr_dtor(&dependency_injector);
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
 	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", &params);
+	zval_ptr_dtor(&manager);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "columns", &columns);
 	zval_ptr_dtor(&columns);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
+	zval_ptr_dtor(&model_name);
 
 	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, &model, "beforequery", &builder);
 	}
+	zval_ptr_dtor(&model);
 
 	PHALCON_CALL_METHOD(&query, &builder, "getquery");
+	zval_ptr_dtor(&builder);
 
 	/**
 	 * Pass the cache options to the query
@@ -2262,13 +2267,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	 * Execute the query
 	 */
 	PHALCON_CALL_METHOD(&resultset, &query, "execute");
+	zval_ptr_dtor(&query);
 
 	/**
 	 * Return the full resultset if the query is grouped
 	 */
 	if (phalcon_array_isset_str(&params, SL("group"))) {
-		RETURN_CTOR(&resultset);
+		zval_ptr_dtor(&params);
+		RETVAL_ZVAL(&resultset, 0, 0);
+		return;
 	}
+	zval_ptr_dtor(&params);
 
 	/**
 	 * Return only the value in the first result
@@ -2277,6 +2286,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	zval_ptr_dtor(&resultset);
 
 	phalcon_read_property_zval(return_value, &first_row, alias, PH_COPY);
+	zval_ptr_dtor(&first_row);
 }
 
 /**

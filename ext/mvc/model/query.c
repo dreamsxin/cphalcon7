@@ -2894,7 +2894,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		array_init_size(&update_tables, 1);
 		phalcon_array_append(&update_tables, &tables, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&update_tables, &tables);
+		ZVAL_COPY(&update_tables, &tables);
 	}
 
 	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
@@ -2918,14 +2918,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 			 * Create the real namespaced name
 			 */
 			PHALCON_CONCAT_VSV(&real_model_name, &real_namespace, "\\", &model_name);
+			zval_ptr_dtor(&real_namespace);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&real_model_name, &model_name);
+			ZVAL_COPY(&real_model_name, &model_name);
 		}
 
 		/**
 		 * Load a model instance from the models manager
 		 */
 		PHALCON_CALL_METHOD(&model, &manager, "load", &real_model_name);
+		zval_ptr_dtor(&real_model_name);
 		PHALCON_CALL_METHOD(&source, &model, "getsource");
 		PHALCON_CALL_METHOD(&schema, &model, "getschema");
 
@@ -2956,10 +2958,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 			phalcon_array_update(&sql_aliases_models_instances, &model_name, &model, PH_COPY);
 			phalcon_array_update(&models, &model_name, &source, PH_COPY);
 		}
+		zval_ptr_dtor(&schema);
+		zval_ptr_dtor(&source);
 
 		phalcon_array_append(&sql_models, &model_name, PH_COPY);
 		phalcon_array_update(&models_instances, &model_name, &model, PH_COPY);
+		zval_ptr_dtor(&model);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&manager);
 
 	/**
 	 * Update the models/alias/sources in the object
@@ -2969,6 +2975,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 	phalcon_update_property(getThis(), SL("_modelsInstances"), &models_instances);
 	phalcon_update_property(getThis(), SL("_sqlAliases"), &sql_aliases);
 	phalcon_update_property(getThis(), SL("_sqlAliasesModelsInstances"), &sql_aliases_models_instances);
+	
+	zval_ptr_dtor(&models);
+	zval_ptr_dtor(&models_instances);
+	zval_ptr_dtor(&sql_aliases);
+	zval_ptr_dtor(&sql_aliases_models_instances);
 
 	array_init(&sql_fields);
 	array_init(&sql_values);
@@ -2986,7 +2997,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		phalcon_array_fetch_str(&column, update_value, SL("column"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CALL_METHOD(&sql_column, getThis(), "_getexpression", &column);
-		phalcon_array_append(&sql_fields, &sql_column, PH_COPY);
+		phalcon_array_append(&sql_fields, &sql_column, 0);
 
 		phalcon_array_fetch_str(&expr_column, update_value, SL("expr"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(&expr_value, getThis(), "_getexpression", &expr_column);
@@ -2995,7 +3006,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 
 		array_init_size(&value, 2);
 		phalcon_array_update_string(&value, IS(type), &type, PH_COPY);
-		phalcon_array_update_str(&value, SL("value"), &expr_value, PH_COPY);
+		phalcon_array_update_str(&value, SL("value"), &expr_value, 0);
 		phalcon_array_append(&sql_values, &value, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
@@ -3004,15 +3015,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 	phalcon_array_update_string(return_value, IS(models), &sql_models, PH_COPY);
 	phalcon_array_update_string(return_value, IS(fields), &sql_fields, PH_COPY);
 	phalcon_array_update_string(return_value, IS(values), &sql_values, PH_COPY);
+	zval_ptr_dtor(&sql_tables);
+	zval_ptr_dtor(&sql_models);
+	zval_ptr_dtor(&sql_values);
+	zval_ptr_dtor(&sql_fields);
 
 	if (phalcon_array_isset_fetch_str(&where, &ast, SL("where"), PH_READONLY)) {
 		PHALCON_CALL_METHOD(&where_expr, getThis(), "_getexpression", &where);
-		phalcon_array_update_string(return_value, IS(where), &where_expr, PH_COPY);
+		phalcon_array_update_string(return_value, IS(where), &where_expr, 0);
 	}
 
 	if (phalcon_array_isset_fetch_str(&limit, &ast, SL("limit"), PH_READONLY)) {
 		PHALCON_CALL_METHOD(&sql_limit, getThis(), "_getlimitclause", &limit);
-		phalcon_array_update_string(return_value, IS(limit), &sql_limit, PH_COPY);
+		phalcon_array_update_string(return_value, IS(limit), &sql_limit, 0);
 	}
 
 	ZVAL_STRING(&event_name, "query:afterPrepareUpdate");
@@ -4028,8 +4043,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
-	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {}, manager = {};
-	zval connection = {}, dialect = {}, success = {}, update_sql = {}, processed = {}, processed_types = {}, *value = NULL;
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, connection = {};
+	zval dialect = {}, success = {}, update_sql = {}, processed = {}, processed_types = {}, *value = NULL;
 	zend_string *str_key;
 	ulong idx;
 
@@ -4042,29 +4057,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	PHALCON_SEPARATE(&intermediate);
 	PHALCON_CALL_SELF(&bind_params, "getmergebindparams");
 	PHALCON_CALL_SELF(&bind_types, "getmergebindtypes");
-
-	phalcon_array_fetch_str(&models, &intermediate, SL("models"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_long(&models, 1)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Updating several models at the same time is still not supported");
-		return;
-	}
-
-	phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY|PH_READONLY);
-
-	/**
-	 * Load the model from the modelsManager or from the _modelsInstances property
-	 */
-	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
-	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
-		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
-		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
-	}
-
+	PHALCON_SEPARATE(&bind_types);
 	PHALCON_CALL_SELF(&connection, "getconnection");
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 
-
 	PHALCON_CALL_METHOD(&update_sql, &dialect, "update", &intermediate);
+	zval_ptr_dtor(&dialect);
+	//zval_ptr_dtor(&intermediate);
 
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		array_init(&processed);
@@ -4115,6 +4114,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	} else {
 		ZVAL_COPY(&processed, &bind_params);
 	}
+	zval_ptr_dtor(&bind_params);
 
 	/**
 	 * Replace the bind Types
@@ -4140,8 +4140,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	} else {
 		ZVAL_COPY(&processed_types, &bind_types);
 	}
+	zval_ptr_dtor(&bind_types);
 
 	PHALCON_CALL_METHOD(&success, &connection, "execute", &update_sql, &processed, &processed_types);
+	zval_ptr_dtor(&update_sql);
 	zval_ptr_dtor(&processed_types);
 	zval_ptr_dtor(&processed);
 	if (zend_is_true(&success)) {
@@ -4149,6 +4151,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			PHALCON_CALL_METHOD(&success, &connection, "affectedrows");
 		}
 	}
+	zval_ptr_dtor(&connection);
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &success);

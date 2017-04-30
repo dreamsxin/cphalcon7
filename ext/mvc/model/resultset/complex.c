@@ -379,6 +379,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 		}
 		RETURN_TRUE;
 	}
+	zval_ptr_dtor(&row);
 
 	/**
 	 * There are no results to retrieve so we update this_ptr->activeRow as false
@@ -409,9 +410,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, toArray){
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, &current, "toarray");
-			phalcon_array_append(return_value, &arr, PH_COPY);
+			phalcon_array_append(return_value, &arr, 0);
+			zval_ptr_dtor(&current);
 		} else {
-			phalcon_array_append(return_value, &current, PH_COPY);
+			phalcon_array_append(return_value, &current, 0);
 		}
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
@@ -437,11 +439,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, serialize){
 
 	array_init_size(&data, 4);
 	phalcon_array_update_str(&data, SL("cache"), &cache, PH_COPY);
-	phalcon_array_update_str(&data, SL("rows"), &records, PH_COPY);
+	phalcon_array_update_str(&data, SL("rows"), &records, 0);
 	phalcon_array_update_str(&data, SL("columnTypes"), &column_types, PH_COPY);
 	phalcon_array_update_str(&data, SL("hydrateMode"), &hydrate_mode, PH_COPY);
 
 	phalcon_serialize(return_value, &data);
+	zval_ptr_dtor(&data);
 }
 
 /**

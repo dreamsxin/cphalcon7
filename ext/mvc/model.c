@@ -1460,13 +1460,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		dirty_state = &PHALCON_GLOBAL(z_zero);
 	}
 
+	if (phalcon_clone(return_value, base) == FAILURE) {
+		return;
+	}
+
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&data_types, source_model, "getdatatypes");
 		PHALCON_CALL_METHOD(&connection, source_model, "getreadconnection");
-	}
-
-	if (phalcon_clone(return_value, base) == FAILURE) {
-		return;
 	}
 
 	/**
@@ -1493,13 +1493,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
-							ZVAL_COPY_VALUE(&convert_value, value);
+							ZVAL_COPY(&convert_value, value);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&convert_value, value);
+					ZVAL_COPY(&convert_value, value);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&convert_value, value);
+				ZVAL_COPY(&convert_value, value);
 			}
 
 			/**
@@ -1519,8 +1519,16 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 			} else {
 				phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 			}
+			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
+ 
+	if (zend_is_true(&data_types)) {
+		zval_ptr_dtor(&data_types);
+	}
+	if (zend_is_true(&connection)) {
+		zval_ptr_dtor(&connection);
+	}
 
 	if (Z_TYPE_P(return_value) == IS_OBJECT) {
 		if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
@@ -1598,13 +1606,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
-							ZVAL_COPY_VALUE(&convert_value, value);
+							ZVAL_COPY(&convert_value, value);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&convert_value, value);
+					ZVAL_COPY(&convert_value, value);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&convert_value, value);
+				ZVAL_COPY(&convert_value, value);
 			}
 
 			if (Z_TYPE_P(column_map) == IS_ARRAY) {
@@ -1629,8 +1637,16 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 					phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 				}
 			}
+			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
+ 
+	if (zend_is_true(&data_types)) {
+		zval_ptr_dtor(&data_types);
+	}
+	if (zend_is_true(&connection)) {
+		zval_ptr_dtor(&connection);
+	}
 }
 
 /**
@@ -2204,10 +2220,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 			array_init(&params);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"), PH_COPY)) {
 		ZVAL_STRING(&group_column, "*");
 	}
 
@@ -2223,6 +2239,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 			PHALCON_CONCAT_VSVSV(&columns, function, "(", &group_column, ") AS ", alias);
 		}
 	}
+	zval_ptr_dtor(&group_column);
 
 	phalcon_get_called_class(&model_name);
 
@@ -2236,20 +2253,24 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
-
+	zval_ptr_dtor(&dependency_injector);
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
 	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", &params);
+	zval_ptr_dtor(&manager);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "columns", &columns);
 	zval_ptr_dtor(&columns);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
+	zval_ptr_dtor(&model_name);
 
 	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
 		PHALCON_CALL_METHOD(NULL, &model, "beforequery", &builder);
 	}
+	zval_ptr_dtor(&model);
 
 	PHALCON_CALL_METHOD(&query, &builder, "getquery");
+	zval_ptr_dtor(&builder);
 
 	/**
 	 * Pass the cache options to the query
@@ -2262,13 +2283,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	 * Execute the query
 	 */
 	PHALCON_CALL_METHOD(&resultset, &query, "execute");
+	zval_ptr_dtor(&query);
 
 	/**
 	 * Return the full resultset if the query is grouped
 	 */
 	if (phalcon_array_isset_str(&params, SL("group"))) {
-		RETURN_CTOR(&resultset);
+		zval_ptr_dtor(&params);
+		RETVAL_ZVAL(&resultset, 0, 0);
+		return;
 	}
+	zval_ptr_dtor(&params);
 
 	/**
 	 * Return only the value in the first result
@@ -2277,6 +2302,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	zval_ptr_dtor(&resultset);
 
 	phalcon_read_property_zval(return_value, &first_row, alias, PH_COPY);
+	zval_ptr_dtor(&first_row);
 }
 
 /**
@@ -4438,8 +4464,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 							 * Rollback the implicit transaction
 							 */
 							PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+							zval_ptr_dtor(&intermediate_model);
 							RETURN_FALSE;
 						}
+						zval_ptr_dtor(&intermediate_model);
 					}
 				} ZEND_HASH_FOREACH_END();
 
@@ -4584,6 +4612,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	 * Create/Get the current database connection
 	 */
 	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+	zval_ptr_dtor(&bind_params);
 
 	/**
 	 * Save related records in belongsTo relationships
@@ -4680,6 +4709,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&write_connection);
 
 	/**
 	 * Change the dirty state to persistent

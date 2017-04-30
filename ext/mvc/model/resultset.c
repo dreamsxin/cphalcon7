@@ -673,11 +673,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 			PHALCON_CALL_METHOD(NULL, &connection, "rollback");
 
 			ZVAL_BOOL(&transaction, 0);
+			zval_ptr_dtor(&record);
 			break;
 		}
 
-		zval_ptr_dtor(&record);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
+		zval_ptr_dtor(&record);
 	}
 
 	/**
@@ -685,6 +686,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 	 */
 	if (PHALCON_IS_TRUE(&transaction)) {
 		PHALCON_CALL_METHOD(NULL, &connection, "commit");
+	}
+	if (zend_is_true(&connection)) {
 		zval_ptr_dtor(&connection);
 	}
 
@@ -729,6 +732,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 		phalcon_array_update_long(&parameters, 0, &record, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, &parameters);
+		zval_ptr_dtor(&parameters);
+		zval_ptr_dtor(&record);
 
 		/**
 		 * Only add processed records to 'records' if the returned value is an array/object
@@ -743,7 +748,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
-	RETURN_CTOR(&records);
+	RETVAL_ZVAL(&records, 0, 0);
 }
 
 /**
@@ -782,6 +787,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			 */
 			if (phalcon_method_exists_ex(&record, SL("getwriteconnection")) == FAILURE) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
+				zval_ptr_dtor(&record);
 				return;
 			}
 
@@ -799,7 +805,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			phalcon_array_append(&parameters, &record, PH_COPY);
 
 			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
+			zval_ptr_dtor(&parameters);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&record);
 				continue;
 			}
 		}
@@ -814,6 +822,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			 */
 			PHALCON_CALL_METHOD(&messages, &record, "getmessages");
 			phalcon_update_property(getThis(), SL("_errorMessages"), &messages);
+			zval_ptr_dtor(&messages);
 
 			/**
 			 * Rollback the transaction
@@ -821,10 +830,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 			PHALCON_CALL_METHOD(NULL, &connection, "rollback");
 
 			ZVAL_FALSE(&transaction);
+			zval_ptr_dtor(&record);
 			break;
 		}
 
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
+		zval_ptr_dtor(&record);
 	}
 
 	/**
@@ -832,6 +843,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, update){
 	 */
 	if (PHALCON_IS_TRUE(&transaction)) {
 		PHALCON_CALL_METHOD(NULL, &connection, "commit");
+	}
+	if (zend_is_true(&connection)) {
+		zval_ptr_dtor(&connection);
 	}
 
 	RETURN_TRUE;
@@ -873,9 +887,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, jsonSerialize) {
 		if (status) {
 			PHALCON_CALL_METHOD(&jsondata, &current, "jsonserialize");
 
-			phalcon_array_append(return_value, &jsondata, PH_COPY);
+			phalcon_array_append(return_value, &jsondata, 0);
+			zval_ptr_dtor(&current);
 		} else {
-			phalcon_array_append(return_value, &current, PH_COPY);
+			phalcon_array_append(return_value, &current, 0);
 		}
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}

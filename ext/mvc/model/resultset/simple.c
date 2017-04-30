@@ -176,6 +176,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			if (Z_TYPE(result) == IS_OBJECT) {
 				PHALCON_CALL_METHOD(&rows, &result, "fetchall");
 				phalcon_update_property(getThis(), SL("_rows"), &rows);
+				zval_ptr_dtor(&rows);
 			}
 		}
 
@@ -226,7 +227,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		case 0:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsModels"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_COPY)) {
 				/**
 				 * this_ptr->model is the base entity
 				 */
@@ -243,7 +244,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		default:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsObjects"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_COPY)) {
 				/**
 				 * Other kinds of hydrations
 				 */
@@ -253,8 +254,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			}
 			break;
 	}
+	zval_ptr_dtor(&row);
+	zval_ptr_dtor(&key);
 
 	phalcon_update_property(getThis(), SL("_activeRow"), &active_row);
+	zval_ptr_dtor(&active_row);
 	RETURN_TRUE;
 }
 
@@ -295,14 +299,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&arr, &current, "toarray", columns, rename_columns);
-			phalcon_array_append(&records, &arr, PH_COPY);
+			phalcon_array_append(&records, &arr, 0);
+			zval_ptr_dtor(&current);
 		} else {
-			phalcon_array_append(&records, &current, PH_COPY);
+			phalcon_array_append(&records, &current, 0);
 		}
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
-	RETURN_CTOR(&records);
+	RETVAL_ZVAL(&records, 0, 0);
 }
 
 /**
@@ -324,7 +329,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, serialize){
 	array_init_size(&data, 5);
 	phalcon_array_update_str(&data, SL("model"), &model, PH_COPY);
 	phalcon_array_update_str(&data, SL("cache"), &cache, PH_COPY);
-	phalcon_array_update_str(&data, SL("rows"), &records, PH_COPY);
+	phalcon_array_update_str(&data, SL("rows"), &records, 0);
 	phalcon_array_update_str(&data, SL("columnMap"), &column_map, PH_COPY);
 	phalcon_array_update_str(&data, SL("hydrateMode"), &hydrate_mode, PH_COPY);
 
@@ -372,4 +377,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 
 	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY|PH_READONLY);
 	phalcon_update_property(getThis(), SL("_hydrateMode"), &hydrate_mode);
+	zval_ptr_dtor(&resultset);
 }

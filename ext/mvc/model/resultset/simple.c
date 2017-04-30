@@ -377,4 +377,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, unserialize){
 
 	phalcon_array_fetch_str(&hydrate_mode, &resultset, SL("hydrateMode"), PH_NOISY|PH_READONLY);
 	phalcon_update_property(getThis(), SL("_hydrateMode"), &hydrate_mode);
+	zval_ptr_dtor(&resultset);
 }

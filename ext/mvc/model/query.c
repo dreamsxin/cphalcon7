@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 		 */
 		phalcon_update_property(getThis(), SL("_modelsMetaData"), &service);
 
-		RETURN_CTOR(&service);
+		RETVAL_ZVAL(&service, 0, 0);
 	}
 }
 
@@ -1055,6 +1055,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 								phalcon_array_update_str_long(return_value, SL("times"), value_times, 0);
 							}
 						}
+						zval_ptr_dtor(&value_param);
 					} else {
 						error = 1;
 						PHALCON_THROW_EXCEPTION_FORMAT(phalcon_mvc_model_query_exception_ce, "Unknown bind type: %s", Z_STRVAL_P(&value_type));
@@ -1289,13 +1290,12 @@ switchend:
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(expr), expr_list_item) {
 			zval expr_item = {};
 			PHALCON_CALL_METHOD(&expr_item, getThis(), "_getexpression", expr_list_item);
-			phalcon_array_append(&list_items, &expr_item, PH_COPY);
+			phalcon_array_append(&list_items, &expr_item, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		array_init_size(return_value, 2);
-		phalcon_array_update_string_str(return_value, IS(type), SL("list"), PH_COPY);
-		phalcon_array_append(return_value, &list_items, PH_COPY);
-		zval_ptr_dtor(&list_items);
+		phalcon_array_update_string_str(return_value, IS(type), SL("list"), 0);
+		phalcon_array_append(return_value, &list_items, 0);
 		return;
 	}
 
@@ -1421,11 +1421,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSelectColumn){
 			phalcon_array_update_string(&sql_column, IS(sqlAlias), &balias, PH_COPY);
 		}
 
-		phalcon_array_update_string(&sql_column, IS(column), &sql_expr_column, PH_COPY);
+		phalcon_array_update_string(&sql_column, IS(column), &sql_expr_column, 0);
 
 		array_init_size(return_value, 1);
 		phalcon_array_append(return_value, &sql_column, 0);
-		zval_ptr_dtor(&sql_expr_column);
 		return;
 	}
 
@@ -1450,14 +1449,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 		PHALCON_CALL_METHOD(&model, manager, "load", &model_name);
 		PHALCON_CALL_METHOD(&source, &model, "getsource");
 		PHALCON_CALL_METHOD(&schema, &model, "getschema");
+		zval_ptr_dtor(&model);
 		if (zend_is_true(&schema)) {
 			array_init_size(return_value, 2);
-			phalcon_array_append(return_value, &schema, PH_COPY);
-			phalcon_array_append(return_value, &source, PH_COPY);
-			return;
+			phalcon_array_append(return_value, &schema, 0);
+			phalcon_array_append(return_value, &source, 0);
+		} else {
+			RETVAL_ZVAL(&source, 0, 0);
 		}
-
-		RETURN_CTOR(&source);
+		return;
 	}
 	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Corrupted SELECT AST 3");
 }
@@ -1485,10 +1485,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 			PHALCON_CALL_METHOD(&schema, &model, "getschema");
 
 			array_init_size(return_value, 4);
-			phalcon_array_update_str(return_value, SL("schema"), &schema, PH_COPY);
-			phalcon_array_update_str(return_value, SL("source"), &source, PH_COPY);
+			phalcon_array_update_str(return_value, SL("schema"), &schema, 0);
+			phalcon_array_update_str(return_value, SL("source"), &source, 0);
 			phalcon_array_update_str(return_value, SL("modelName"), &model_name, PH_COPY);
-			phalcon_array_update_str(return_value, SL("model"), &model, PH_COPY);
+			phalcon_array_update_str(return_value, SL("model"), &model, 0);
 			return;
 		}
 	}
@@ -1591,7 +1591,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 * Create the right part of the expression
 		 */
 		array_init_size(&right, 3);
-		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), 0);
 		phalcon_array_update_string(&right, IS(domain), join_alias, PH_COPY);
 		phalcon_array_update_string(&right, IS(name), &referenced_fields, PH_COPY);
 
@@ -1602,12 +1602,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 		 * Create a binary operation for the join conditions
 		 */
 		array_init_size(&sql_join_condition, 4);
-		phalcon_array_update_string_str(&sql_join_condition, IS(type), SL("binary-op"), PH_COPY);
-		phalcon_array_update_string_str(&sql_join_condition, IS(op), SL("="), PH_COPY);
-		phalcon_array_update_string(&sql_join_condition, IS(left), &left_expr, PH_COPY);
-		phalcon_array_update_string(&sql_join_condition, IS(right), &right_expr, PH_COPY);
+		phalcon_array_update_string_str(&sql_join_condition, IS(type), SL("binary-op"), 0);
+		phalcon_array_update_string_str(&sql_join_condition, IS(op), SL("="), 0);
+		phalcon_array_update_string(&sql_join_condition, IS(left), &left_expr, 0);
+		phalcon_array_update_string(&sql_join_condition, IS(right), &right_expr, 0);
 
-		phalcon_array_append(&sql_join_conditions, &sql_join_condition, PH_COPY);
+		phalcon_array_append(&sql_join_conditions, &sql_join_condition, 0);
 	} else {
 		/**
 		 * Resolve the compound operation
@@ -1643,7 +1643,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 			 * Create the right part of the expression
 			 */
 			array_init_size(&right, 3);
-			phalcon_array_update_string_str(&right, IS(type), SL("qualified"), PH_COPY);
+			phalcon_array_update_string_str(&right, IS(type), SL("qualified"), 0);
 			phalcon_array_update_string(&right, IS(domain), join_alias, PH_COPY);
 			phalcon_array_update_string(&right, IS(name), &referenced_field, PH_COPY);
 
@@ -1654,14 +1654,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 			 * Create a binary operation for the join conditions
 			 */
 			array_init_size(&sql_join_condition, 4);
-			phalcon_array_update_string_str(&sql_join_condition, IS(type), SL("binary-op"), PH_COPY);
-			phalcon_array_update_string_str(&sql_join_condition, IS(op), SL("="), PH_COPY);
-			phalcon_array_update_string(&sql_join_condition, IS(left), &left_expr, PH_COPY);
-			phalcon_array_update_string(&sql_join_condition, IS(right), &right_expr, PH_COPY);
-			phalcon_array_append(&sql_join_conditions, &sql_join_condition, PH_COPY);
+			phalcon_array_update_string_str(&sql_join_condition, IS(type), SL("binary-op"), 0);
+			phalcon_array_update_string_str(&sql_join_condition, IS(op), SL("="), 0);
+			phalcon_array_update_string(&sql_join_condition, IS(left), &left_expr, 0);
+			phalcon_array_update_string(&sql_join_condition, IS(right), &right_expr, 0);
+
+			phalcon_array_append(&sql_join_conditions, &sql_join_condition, 0);
 		} ZEND_HASH_FOREACH_END();
 
 	}
+	zval_ptr_dtor(&fields);
+	zval_ptr_dtor(&referenced_fields);
 
 	/**
 	 * A single join
@@ -1669,8 +1672,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 	array_init_size(return_value, 3);
 	phalcon_array_update_string(return_value, IS(type), join_type, PH_COPY);
 	phalcon_array_update_string(return_value, IS(source), join_source, PH_COPY);
-	phalcon_array_update_string(return_value, IS(conditions), &sql_join_conditions, PH_COPY);
-	zval_ptr_dtor(&sql_join_conditions);
+	phalcon_array_update_string(return_value, IS(conditions), &sql_join_conditions, 0);
 }
 
 /**
@@ -1686,7 +1688,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getSingleJoin){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 
 	zval *join_type, *join_source, *model_alias, *join_alias, *relation, fields = {}, referenced_fields = {}, intermediate_model_name = {}, manager = {};
-	zval intermediate_model = {}, intermediate_source = {}, intermediate_schema = {}, intermediate_fields = {}, intermediate_referenced_fields = {};
+	zval intermediate_model = {}, intermediate_source = {}, intermediate_fields = {}, intermediate_referenced_fields = {};
 	zval referenced_model_name = {}, *field, left = {}, left_expr = {}, right = {}, right_expr = {}, exception_message = {};
 	zval sql_join_condition_first = {}, sql_join_conditions_first = {}, sql_join_first = {}, sql_join_condition_second = {}, sql_join_conditions_second = {}, sql_join_second = {};
 	zend_string *str_key;
@@ -1717,16 +1719,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	 * Get the intermediate model instance
 	 */
 	PHALCON_CALL_METHOD(&intermediate_model, &manager, "load", &intermediate_model_name);
+	zval_ptr_dtor(&manager);
 
 	/**
 	 * Source of the related model
 	 */
 	PHALCON_CALL_METHOD(&intermediate_source, &intermediate_model, "getsource");
-
-	/**
-	 * Schema of the related model
-	 */
-	PHALCON_CALL_METHOD(&intermediate_schema, &intermediate_model, "getschema");
 
 	/**
 	 * Update the internal sqlAliases to set up the intermediate model
@@ -1737,6 +1735,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	 * Update the internal _sqlAliasesModelsInstances to rename columns if necessary
 	 */
 	phalcon_update_property_array(getThis(), SL("_sqlAliasesModelsInstances"), &intermediate_model_name, &intermediate_model);
+	zval_ptr_dtor(&intermediate_model);
 
 	/**
 	 * Fields that join the 'from' model with the 'intermediate' model
@@ -1779,25 +1778,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 			phalcon_array_update_string(&left, IS(name), field, PH_COPY);
 
 			PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", &left);
+			zval_ptr_dtor(&left);
 
 			/**
 			 * Create the right part of the expression
 			 */
 			array_init_size(&right, 3);
-			phalcon_array_update_string_str(&right, IS(type), SL("qualified"), PH_COPY);
+			phalcon_array_update_string_str(&right, IS(type), SL("qualified"), 0);
 			phalcon_array_update_string(&right, IS(domain), join_alias, PH_COPY);
 			phalcon_array_update_string(&right, IS(name), &referenced_fields, PH_COPY);
 
 			PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", &right);
+			zval_ptr_dtor(&right);
 
 			/**
 			 * Create a binary operation for the join conditions
 			 */
 			array_init_size(&sql_equals_join_condition, 4);
-			phalcon_array_update_string_str(&sql_equals_join_condition, IS(type), SL("binary-op"), PH_COPY);
-			phalcon_array_update_string_str(&sql_equals_join_condition, IS(op), SL("="), PH_COPY);
-			phalcon_array_update_string(&sql_equals_join_condition, IS(left), &left_expr, PH_COPY);
-			phalcon_array_update_string(&sql_equals_join_condition, IS(right), &right_expr, PH_COPY);
+			phalcon_array_update_string_str(&sql_equals_join_condition, IS(type), SL("binary-op"), 0);
+			phalcon_array_update_string_str(&sql_equals_join_condition, IS(op), SL("="), 0);
+			phalcon_array_update_string(&sql_equals_join_condition, IS(left), &left_expr, 0);
+			phalcon_array_update_string(&sql_equals_join_condition, IS(right), &right_expr, 0);
 		} ZEND_HASH_FOREACH_END();
 	} else {
 		/**
@@ -1809,28 +1810,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		phalcon_array_update_string(&left, IS(name), &fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", &left);
+		zval_ptr_dtor(&left);
 
 		/**
 		 * Create the right part of the expression
 		 */
 		array_init_size(&right, 3);
-		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), 0);
 		phalcon_array_update_string(&right, IS(domain), &intermediate_model_name, PH_COPY);
 		phalcon_array_update_string(&right, IS(name), &intermediate_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", &right);
+		zval_ptr_dtor(&right);
 
 		/**
 		 * Create a binary operation for the join conditions
 		 */
 		array_init_size(&sql_join_condition_first, 4);
-		phalcon_array_update_string_str(&sql_join_condition_first, IS(type), SL("binary-op"), PH_COPY);
-		phalcon_array_update_string_str(&sql_join_condition_first, IS(op), SL("="), PH_COPY);
-		phalcon_array_update_string(&sql_join_condition_first, IS(left), &left_expr, PH_COPY);
-		phalcon_array_update_string(&sql_join_condition_first, IS(right), &right_expr, PH_COPY);
+		phalcon_array_update_string_str(&sql_join_condition_first, IS(type), SL("binary-op"), 0);
+		phalcon_array_update_string_str(&sql_join_condition_first, IS(op), SL("="), 0);
+		phalcon_array_update_string(&sql_join_condition_first, IS(left), &left_expr, 0);
+		phalcon_array_update_string(&sql_join_condition_first, IS(right), &right_expr, 0);
 
 		array_init_size(&sql_join_conditions_first, 1);
-		phalcon_array_append(&sql_join_conditions_first, &sql_join_condition_first, PH_COPY);
+		phalcon_array_append(&sql_join_conditions_first, &sql_join_condition_first, 0);
 
 		/**
 		 * A single join
@@ -1838,7 +1841,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		array_init_size(&sql_join_first, 3);
 		phalcon_array_update_string(&sql_join_first, IS(type), join_type, PH_COPY);
 		phalcon_array_update_string(&sql_join_first, IS(source), &intermediate_source, PH_COPY);
-		phalcon_array_update_string(&sql_join_first, IS(conditions), &sql_join_conditions_first, PH_COPY);
+		phalcon_array_update_string(&sql_join_first, IS(conditions), &sql_join_conditions_first, 0);
 
 		/**
 		 * Create the left part of the expression
@@ -1849,28 +1852,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		phalcon_array_update_string(&left, IS(name), &intermediate_referenced_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&left_expr, getThis(), "_getqualified", &left);
+		zval_ptr_dtor(&left);
 
 		/**
 		 * Create the right part of the expression
 		 */
 		array_init_size(&right, 3);
-		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), PH_COPY);
+		phalcon_array_update_string_str(&right, IS(type), SL("qualified"), 0);
 		phalcon_array_update_string(&right, IS(domain), &referenced_model_name, PH_COPY);
 		phalcon_array_update_string(&right, IS(name), &referenced_fields, PH_COPY);
 
 		PHALCON_CALL_METHOD(&right_expr, getThis(), "_getqualified", &right);
+		zval_ptr_dtor(&right);
 
 		/**
 		 * Create a binary operation for the join conditions
 		 */
 		array_init_size(&sql_join_condition_second, 4);
-		phalcon_array_update_string_str(&sql_join_condition_second, IS(type), SL("binary-op"), PH_COPY);
-		phalcon_array_update_string_str(&sql_join_condition_second, IS(op), SL("="), PH_COPY);
-		phalcon_array_update_string(&sql_join_condition_second, IS(left), &left_expr, PH_COPY);
-		phalcon_array_update_string(&sql_join_condition_second, IS(right), &right_expr, PH_COPY);
+		phalcon_array_update_string_str(&sql_join_condition_second, IS(type), SL("binary-op"), 0);
+		phalcon_array_update_string_str(&sql_join_condition_second, IS(op), SL("="), 0);
+		phalcon_array_update_string(&sql_join_condition_second, IS(left), &left_expr, 0);
+		phalcon_array_update_string(&sql_join_condition_second, IS(right), &right_expr, 0);
 
 		array_init_size(&sql_join_conditions_second, 1);
-		phalcon_array_append(&sql_join_conditions_second, &sql_join_condition_second, PH_COPY);
+		phalcon_array_append(&sql_join_conditions_second, &sql_join_condition_second, 0);
 
 		/**
 		 * A single join
@@ -1878,11 +1883,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 		array_init_size(&sql_join_second, 3);
 		phalcon_array_update_string(&sql_join_second, IS(type), join_type, PH_COPY);
 		phalcon_array_update_string(&sql_join_second, IS(source), join_source, PH_COPY);
-		phalcon_array_update_string(&sql_join_second, IS(conditions), &sql_join_conditions_second, PH_COPY);
+		phalcon_array_update_string(&sql_join_second, IS(conditions), &sql_join_conditions_second, 0);
 
-		phalcon_array_update_long(return_value, 0, &sql_join_first, PH_COPY);
-		phalcon_array_update_long(return_value, 1, &sql_join_second, PH_COPY);
+		phalcon_array_update_long(return_value, 0, &sql_join_first, 0);
+		phalcon_array_update_long(return_value, 1, &sql_join_second, 0);
 	}
+	zval_ptr_dtor(&fields);
+	zval_ptr_dtor(&referenced_fields);
+	zval_ptr_dtor(&referenced_model_name);
+	zval_ptr_dtor(&intermediate_model_name);
+	zval_ptr_dtor(&intermediate_referenced_fields);
+	zval_ptr_dtor(&intermediate_source);
 }
 
 /**
@@ -2071,6 +2082,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 		}
 
 		phalcon_array_update(&models_instances, &model_name, &model, PH_COPY);
+		zval_ptr_dtor(&join_data);
 	} ZEND_HASH_FOREACH_END();
 
 	/**

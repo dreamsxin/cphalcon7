@@ -3838,9 +3838,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
-	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, manager = {}, connection = {}, models_instances = {}, model = {};
-	zval dialect = {}, sql_insert = {};
-	zval processed = {}, processed_types = {}, *value = NULL, success = {}, identity_field = {}, support_sequences = {}, sequence_name = {}, schema = {}, source = {};
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, connection = {};
+	zval models_instances = {}, model = {}, dialect = {}, sql_insert = {}, processed = {}, processed_types = {}, *value = NULL;
+	zval success = {}, identity_field = {}, support_sequences = {}, sequence_name = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -3852,18 +3852,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	PHALCON_SEPARATE(&intermediate);
 	PHALCON_CALL_SELF(&bind_params, "getmergebindparams");
 	PHALCON_CALL_SELF(&bind_types, "getmergebindtypes");
-	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 	PHALCON_CALL_SELF(&connection, "getconnection");
 
 	phalcon_array_fetch_str(&model_name, &intermediate, SL("model"), PH_NOISY|PH_READONLY);
 
 	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
-	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_COPY)) {
+		zval manager = {};
+		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+		zval_ptr_dtor(&manager);
 	}
 
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&sql_insert, &dialect, "insert", &intermediate);
+	zval_ptr_dtor(&dialect);
+	zval_ptr_dtor(&intermediate);
 
 	/**
 	 * Replace the placeholders
@@ -3885,8 +3889,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
 
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_insert);
-
+				zval_ptr_dtor(&sql_insert);
+				zval_ptr_dtor(&tmp_value);
+				zval_ptr_dtor(&string_wildcard);
 				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
+				zval_ptr_dtor(&sql_tmp);
 
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
@@ -3901,18 +3908,25 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 					PHALCON_CONCAT_SVV(&k, "phi", &wildcard, &hidden_param);
 
 					PHALCON_CONCAT_SV(&query_key, ":", &k);
-					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					phalcon_array_append(&bind_keys, &query_key, 0);
 					phalcon_array_update(&processed, &k, v, PH_COPY);
+					zval_ptr_dtor(&k);
 					phalcon_increment(&hidden_param);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+				zval_ptr_dtor(&bind_keys);
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_insert);
+				zval_ptr_dtor(&joined_keys);
+				zval_ptr_dtor(&string_wildcard);
+				zval_ptr_dtor(&sql_insert);
 				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
+				zval_ptr_dtor(&sql_tmp);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
@@ -3921,6 +3935,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	} else {
 		ZVAL_COPY(&processed, &bind_params);
 	}
+	zval_ptr_dtor(&bind_params);
 
 	/**
 	 * Replace the bind Types
@@ -3938,6 +3953,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 			if (Z_TYPE(tmp) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &tmp);
 				phalcon_array_update(&processed_types, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed_types, &tmp, value, PH_COPY);
 			}
@@ -3946,11 +3962,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	} else {
 		ZVAL_COPY(&processed_types, &bind_types);
 	}
+	zval_ptr_dtor(&bind_types);
 
 	/**
 	 * Execute the query
 	 */
 	PHALCON_CALL_METHOD(&success, &connection, "execute", &sql_insert, &processed, &processed_types);
+	zval_ptr_dtor(&sql_insert);
 	zval_ptr_dtor(&processed_types);
 	zval_ptr_dtor(&processed);
 
@@ -3966,6 +3984,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 			if (phalcon_method_exists_ex(&model, SL("getsequencename")) == SUCCESS) {
 				PHALCON_CALL_METHOD(&sequence_name, &model, "getsequencename");
 			} else {
+				zval schema = {}, source = {};
 				PHALCON_CALL_METHOD(&schema, &model, "getschema");
 				PHALCON_CALL_METHOD(&source, &model, "getsource");
 
@@ -3974,6 +3993,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				} else {
 					PHALCON_CONCAT_VSVSVS(&sequence_name, &schema, ".", &source, "_", &identity_field, "_seq");
 				}
+				zval_ptr_dtor(&schema);
+				zval_ptr_dtor(&source);
 			}
 		} else {
 			ZVAL_NULL(&sequence_name);
@@ -3983,7 +4004,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		 * Recover the last "insert id" and assign it to the object
 		 */
 		PHALCON_CALL_METHOD(&success, &connection, "lastinsertid", &sequence_name);
+		zval_ptr_dtor(&sequence_name);
 	}
+	zval_ptr_dtor(&model);
+	zval_ptr_dtor(&connection);
+	zval_ptr_dtor(&identity_field);
 
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &success);

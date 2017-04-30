@@ -3332,13 +3332,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	}
 
 	phalcon_update_property(getThis(), SL("_intermediate"), &ir_phql);
-	zval_ptr_dtor(&ir_phql);
 
 	ZVAL_STRING(&event_name, "query:afterParse");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
-	RETURN_CTOR(&ir_phql);
+	RETVAL_ZVAL(&ir_phql, 0, 0);
 }
 
 /**
@@ -3392,7 +3391,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
 	zval model_name = {}, model = {}, instance = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
 	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {};
-	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {}, result_object = {};
+	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {};
 	zval service_name = {}, has = {}, service_params = {};
 	zend_string *str_key;
 	ulong idx;
@@ -3439,20 +3438,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		 * Load first model if is not loaded
 		 */
 		phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY|PH_READONLY);
-		if (!phalcon_array_isset(&models_instances, &model_name)) {
+		if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_COPY)) {
 			PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
-			phalcon_array_update(&models_instances, &model_name, &model, 0);
-		} else {
-			phalcon_array_fetch(&model, &models_instances, &model_name, PH_NOISY|PH_READONLY);
+			phalcon_array_update(&models_instances, &model_name, &model, PH_COPY);
 		}
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models), model_name2) {
-			if (!phalcon_array_isset_fetch(&model, &models_instances, model_name2, PH_READONLY)) {
-				PHALCON_CALL_METHOD(&model, &manager, "load", model_name2);
-				phalcon_array_update(&models_instances, model_name2, &model, 0);
+			zval model2 = {};
+			if (!phalcon_array_isset_fetch(&model2, &models_instances, model_name2, PH_READONLY)) {
+				PHALCON_CALL_METHOD(&model2, &manager, "load", model_name2);
+				phalcon_array_update(&models_instances, model_name2, &model2, 0);
+			}
+			if (Z_TYPE(model) != IS_OBJECT) {
+				ZVAL_COPY(&model, &model2);
 			}
 		} ZEND_HASH_FOREACH_END();
-
 	}
 
 	phalcon_array_fetch_str(&columns, &intermediate, SL("columns"), PH_NOISY|PH_READONLY);
@@ -3499,7 +3499,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	array_init(&simple_column_map);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(columns), idx, str_key, column) {
-		zval key = {}, type = {}, sql_column = {}, model_name = {}, column_alias = {}, sql_alias = {};
+		zval key = {}, type = {}, sql_column = {}, model_name = {}, model2= {}, column_alias = {}, sql_alias = {};
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
 		} else {
@@ -3519,18 +3519,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			/**
 			 * Base instance
 			 */
-			if (!phalcon_array_isset_fetch(&instance, &models_instances, &model_name, PH_READONLY)) {
-				PHALCON_CALL_METHOD(&instance, &manager, "load", &model_name);
-				phalcon_array_update(&models_instances, &model_name, &instance, 0);
+			if (!phalcon_array_isset_fetch(&model2, &models_instances, &model_name, PH_READONLY)) {
+				PHALCON_CALL_METHOD(&model2, &manager, "load", &model_name);
+				phalcon_array_update(&models_instances, &model_name, &model2, 0);
+			}
+			if (Z_TYPE(instance) != IS_OBJECT) {
+				ZVAL_COPY(&instance, &model2);
 			}
 
-			PHALCON_CALL_METHOD(&attributes, &instance, "getattributes");
+			PHALCON_CALL_METHOD(&attributes, &model2, "getattributes");
 			if (is_complex) {
-				zval  column_map = {};
+				zval column_map = {};
 				/**
 				 * If the resultset is complex we open every model into their columns
 				 */
-				PHALCON_CALL_METHOD(&column_map, &instance, "getcolumnmap");
+				PHALCON_CALL_METHOD(&column_map, &model2, "getcolumnmap");
 
 				/**
 				 * Add every attribute in the model to the generated select
@@ -3551,7 +3554,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				/**
 				 * We cache required meta-data to make its future access faster
 				 */
-				phalcon_array_update_str_multi_2(&columns, &key, SL("instance"), &instance, PH_COPY);
+				phalcon_array_update_str_multi_2(&columns, &key, SL("instance"), &model2, PH_COPY);
 				phalcon_array_update_str_multi_2(&columns, &key, SL("attributes"), &attributes, PH_COPY);
 				phalcon_array_update_str_multi_2(&columns, &key, SL("columnMap"), &column_map, 0);
 			} else {
@@ -3597,7 +3600,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&models_instances);
 	zval_ptr_dtor(&manager);
 
 	phalcon_array_update_str(&intermediate, SL("columns"), &select_columns, PH_COPY);
@@ -3634,9 +3636,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_select);
 				zval_ptr_dtor(&tmp_value);
 				zval_ptr_dtor(&string_wildcard);
+				zval_ptr_dtor(&sql_select);
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
-
 				zval_ptr_dtor(&sql_tmp);
 
 				phalcon_array_unset(&bind_types, &wildcard, 0);
@@ -3666,6 +3668,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_select);
 				zval_ptr_dtor(&joined_keys);
 				zval_ptr_dtor(&string_wildcard);
+				zval_ptr_dtor(&sql_select);
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
 				phalcon_array_unset(&bind_types, &wildcard, 0);
@@ -3730,6 +3733,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	} else {
 		ZVAL_BOOL(&result_data, 0);
 	}
+	zval_ptr_dtor(&result);
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
@@ -3738,6 +3742,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	 */
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
 	if (!is_complex) {
+		zval result_object = {};
 		/**
 		 * Select the base object
 		 */
@@ -3765,6 +3770,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			/**
 			 * Get the column map
 			 */
+			zval_ptr_dtor(&simple_column_map);
 			PHALCON_CALL_METHOD(&simple_column_map, &model, "getcolumnmap");
 		}
 
@@ -3810,11 +3816,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			PHALCON_CALL_METHOD(NULL, return_value, "__construct", &columns, &result_data, &cache, &model);
 		}
 	}
-
-	zval_ptr_dtor(&result);
 	zval_ptr_dtor(&result_data);
-	zval_ptr_dtor(&dependency_injector);
 	zval_ptr_dtor(&simple_column_map);
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&models_instances);
+	zval_ptr_dtor(&model);
+	zval_ptr_dtor(&instance);
 
 	ZVAL_STRING(&event_name, "query:afterExecuteSelect");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);

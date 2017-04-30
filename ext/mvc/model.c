@@ -1460,13 +1460,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		dirty_state = &PHALCON_GLOBAL(z_zero);
 	}
 
+	if (phalcon_clone(return_value, base) == FAILURE) {
+		return;
+	}
+
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&data_types, source_model, "getdatatypes");
 		PHALCON_CALL_METHOD(&connection, source_model, "getreadconnection");
-	}
-
-	if (phalcon_clone(return_value, base) == FAILURE) {
-		return;
 	}
 
 	/**
@@ -1493,13 +1493,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
-							ZVAL_COPY_VALUE(&convert_value, value);
+							ZVAL_COPY(&convert_value, value);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&convert_value, value);
+					ZVAL_COPY(&convert_value, value);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&convert_value, value);
+				ZVAL_COPY(&convert_value, value);
 			}
 
 			/**
@@ -1519,8 +1519,16 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 			} else {
 				phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 			}
+			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
+ 
+	if (zend_is_true(&data_types)) {
+		zval_ptr_dtor(&data_types);
+	}
+	if (zend_is_true(&connection)) {
+		zval_ptr_dtor(&connection);
+	}
 
 	if (Z_TYPE_P(return_value) == IS_OBJECT) {
 		if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
@@ -1598,13 +1606,13 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
-							ZVAL_COPY_VALUE(&convert_value, value);
+							ZVAL_COPY(&convert_value, value);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&convert_value, value);
+					ZVAL_COPY(&convert_value, value);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&convert_value, value);
+				ZVAL_COPY(&convert_value, value);
 			}
 
 			if (Z_TYPE_P(column_map) == IS_ARRAY) {
@@ -1629,8 +1637,16 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 					phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 				}
 			}
+			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
+ 
+	if (zend_is_true(&data_types)) {
+		zval_ptr_dtor(&data_types);
+	}
+	if (zend_is_true(&connection)) {
+		zval_ptr_dtor(&connection);
+	}
 }
 
 /**
@@ -4448,8 +4464,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 							 * Rollback the implicit transaction
 							 */
 							PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+							zval_ptr_dtor(&intermediate_model);
 							RETURN_FALSE;
 						}
+						zval_ptr_dtor(&intermediate_model);
 					}
 				} ZEND_HASH_FOREACH_END();
 
@@ -4594,6 +4612,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	 * Create/Get the current database connection
 	 */
 	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+	zval_ptr_dtor(&bind_params);
 
 	/**
 	 * Save related records in belongsTo relationships
@@ -4690,6 +4709,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&write_connection);
 
 	/**
 	 * Change the dirty state to persistent

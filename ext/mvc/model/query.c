@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	if (phalcon_array_isset(&sql_column_aliases, &column_name)) {
 		array_init_size(return_value, 2);
 		ZVAL_STR(&s_qualified, IS(qualified));
-		phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
+		phalcon_array_update_string(return_value, IS(type), &s_qualified, 0);
 		phalcon_array_update_string(return_value, IS(name), &column_name, PH_COPY);
 		return;
 	}
@@ -497,15 +497,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		PHALCON_CALL_METHOD(&column_map, &model, "getreversecolumnmap");
 
 		if (Z_TYPE(column_map) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch(&real_column_name, &column_map, &column_name, PH_READONLY)) {
+			if (!phalcon_array_isset_fetch(&real_column_name, &column_map, &column_name, PH_COPY)) {
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 				PHALCON_CONCAT_SVSVSV(&exception_message, "Column '", &column_name, "' doesn't belong to the model or alias '", &column_domain, "', when executing: ", &phql);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
+			zval_ptr_dtor(&column_map);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&real_column_name, &column_name);
+			ZVAL_COPY(&real_column_name, &column_name);
 		}
 	} else {
 		/**
@@ -531,7 +532,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 					return;
 				}
 
-				PHALCON_CPY_WRT_CTOR(&has_model, model_instance);
+				ZVAL_COPY(&has_model, model_instance);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -567,18 +568,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
+		zval_ptr_dtor(&class_name);
 
 		/**
 		 * Rename the column
 		 */
 		PHALCON_CALL_METHOD(&column_map, &has_model, "getreversecolumnmap");
+		zval_ptr_dtor(&has_model);
 
 		if (Z_TYPE(column_map) == IS_ARRAY) {
 			/**
 			 * The real column name is in the column map
 			 */
 			if (phalcon_array_isset(&column_map, &column_name)) {
-				phalcon_array_fetch(&real_column_name, &column_map, &column_name, PH_NOISY|PH_READONLY);
+				phalcon_array_fetch(&real_column_name, &column_map, &column_name, PH_NOISY|PH_COPY);
 			} else {
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
@@ -586,8 +589,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
+			zval_ptr_dtor(&column_map);
 		} else {
-			PHALCON_CPY_WRT_CTOR(&real_column_name, &column_name);
+			ZVAL_COPY(&real_column_name, &column_name);
 		}
 	}
 
@@ -596,9 +600,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	 */
 	ZVAL_STR(&s_qualified, IS(qualified));
 	array_init_size(return_value, 4);
-	phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
+	phalcon_array_update_string(return_value, IS(type), &s_qualified, 0);
 	phalcon_array_update_string(return_value, IS(domain), &source, PH_COPY);
-	phalcon_array_update_string(return_value, IS(name), &real_column_name, PH_COPY);
+	phalcon_array_update_string(return_value, IS(name), &real_column_name, 0);
 	phalcon_array_update_string(return_value, IS(balias), &column_name, PH_COPY);
 }
 
@@ -617,7 +621,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCallArgument){
 	phalcon_array_fetch_string(&argument_type, argument, IS(type), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_LONG(&argument_type, PHQL_T_STARALL)) {
 		ZVAL_STRING(&s_all, ISV(all));
-		Z_TRY_ADDREF(s_all);
 		array_init_size(return_value, 1);
 		add_assoc_zval_ex(return_value, ISL(type), &s_all);
 		return;
@@ -662,23 +665,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 				PHALCON_CALL_METHOD(&when_right, getThis(), "_getexpression", &expr_right);
 			}
 
-			phalcon_array_update_string_str(&tmp1, IS(type), SL("when"), PH_COPY);
-			phalcon_array_update_str(&tmp1, SL("when"), &when_left, PH_COPY);
-			phalcon_array_update_str(&tmp1, SL("then"), &when_right, PH_COPY);
+			phalcon_array_update_string_str(&tmp1, IS(type), SL("when"), 0);
+			phalcon_array_update_str(&tmp1, SL("when"), &when_left, 0);
+			phalcon_array_update_str(&tmp1, SL("then"), &when_right, 0);
 		} else {
-			phalcon_array_update_string_str(&tmp1, IS(type), SL("else"), PH_COPY);
-			phalcon_array_update_str(&tmp1, SL("expr"), &when_left, PH_COPY);
+			phalcon_array_update_string_str(&tmp1, IS(type), SL("else"), 0);
+			phalcon_array_update_str(&tmp1, SL("expr"), &when_left, 0);
 		}
-		phalcon_array_append(&when_clauses, &tmp1, PH_COPY);
+		phalcon_array_append(&when_clauses, &tmp1, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&tmp, getThis(), "_getexpression", &left);
 
 	array_init(return_value);
 
-	phalcon_array_update_string_str(return_value, IS(type), SL("case"), PH_COPY);
-	phalcon_array_update_str(return_value, SL("expr"), &tmp, PH_COPY);
-	phalcon_array_update_str(return_value, SL("when-clauses"), &when_clauses, PH_COPY);
+	phalcon_array_update_string_str(return_value, IS(type), SL("case"), 0);
+	phalcon_array_update_str(return_value, SL("expr"), &tmp, 0);
+	phalcon_array_update_str(return_value, SL("when-clauses"), &when_clauses, 0);
 }
 
 /**
@@ -710,7 +713,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 			 */
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument) {
 				PHALCON_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", argument);
-				phalcon_array_append(&function_args, &argument_expr, PH_COPY);
+				phalcon_array_append(&function_args, &argument_expr, 0);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
@@ -718,10 +721,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 			 * There is only one argument
 			 */
 			PHALCON_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", &arguments);
-			phalcon_array_append(&function_args, &argument_expr, PH_COPY);
+			phalcon_array_append(&function_args, &argument_expr, 0);
 		}
 
-		phalcon_array_update_string(return_value, IS(arguments), &function_args, PH_COPY);
+		phalcon_array_update_string(return_value, IS(arguments), &function_args, 0);
 
 		if (distinct) {
 			add_assoc_bool_ex(return_value, ISL(distinct), distinct);

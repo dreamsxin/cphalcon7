@@ -130,11 +130,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_COPY)) {
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 
-	phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, PH_COPY);
+	phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, 0);
 
 	/* create redis instance */
 	array_init_size(&frontend_option, 1);
@@ -144,13 +144,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
 	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
+	zval_ptr_dtor(&frontend_option);
 
 	object_init_ex(&redis, phalcon_cache_backend_redis_ce);
 
 	PHALCON_CALL_METHOD(NULL, &redis, "__construct", &frontend_data, &backend_option);
+	zval_ptr_dtor(&frontend_data);
+	zval_ptr_dtor(&backend_option);
 
 	phalcon_update_property(getThis(), SL("_redis"), &redis);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
+	zval_ptr_dtor(&redis);
 }
 
 /**

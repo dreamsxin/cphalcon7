@@ -151,47 +151,57 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, start){
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
 	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
+	zval_ptr_dtor(&frontend_option);
 
 	object_init_ex(&memcached, phalcon_cache_backend_memcached_ce);
 
 	PHALCON_CALL_METHOD(NULL, &memcached, "__construct", &frontend_data, &backend_option);
+	zval_ptr_dtor(&frontend_data);
+	zval_ptr_dtor(&backend_option);
 
 	phalcon_update_property(getThis(), SL("_memcached"), &memcached);
+	zval_ptr_dtor(&memcached);
 
 //#ifdef PHALCON_USE_PHP_SESSION
 //	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", getThis(), &PHALCON_GLOBAL(z_true));
 //#else
 	/* open callback */
 	array_init_size(&callable_open, 2);
-	phalcon_array_append(&callable_open, getThis(), 0);
+	phalcon_array_append(&callable_open, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_open, SL("open"), 0);
 
 	/* close callback */
 	array_init_size(&callable_close, 2);
-	phalcon_array_append(&callable_close, getThis(), 0);
+	phalcon_array_append(&callable_close, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_close, SL("close"), 0);
 
 	/* read callback */
 	array_init_size(&callable_read, 2);
-	phalcon_array_append(&callable_read, getThis(), 0);
+	phalcon_array_append(&callable_read, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_read, SL("read"), 0);
 
 	/* write callback */
 	array_init_size(&callable_write, 2);
-	phalcon_array_append(&callable_write, getThis(), 0);
+	phalcon_array_append(&callable_write, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_write, SL("write"), 0);
 
 	/* destroy callback */
 	array_init_size(&callable_destroy, 2);
-	phalcon_array_append(&callable_destroy, getThis(), 0);
+	phalcon_array_append(&callable_destroy, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_destroy, SL("destroy"), 0);
 
 	/* gc callback */
 	array_init_size(&callable_gc, 2);
-	phalcon_array_append(&callable_gc, getThis(), 0);
+	phalcon_array_append(&callable_gc, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	zval_ptr_dtor(&callable_open);
+	zval_ptr_dtor(&callable_close);
+	zval_ptr_dtor(&callable_read);
+	zval_ptr_dtor(&callable_write);
+	zval_ptr_dtor(&callable_destroy);
+	zval_ptr_dtor(&callable_gc);
 	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");
 //#endif
 	if (!zend_is_true(return_value)) {

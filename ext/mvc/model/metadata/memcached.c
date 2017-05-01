@@ -121,7 +121,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 
 	phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_COPY)) {
 		ZVAL_EMPTY_STRING(&prefix);
 	}
 
@@ -133,10 +133,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
 
 	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
+	zval_ptr_dtor(&option);
 
 	array_init(&option);
 
-	phalcon_array_update_str_str(&option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str_str(&option, SL("statsKey"), SL("$PMM$"), 0);
 	phalcon_array_update_str(&option, SL("servers"), &servers, PH_COPY);
 
 	if (Z_TYPE(client) > IS_NULL) {
@@ -144,12 +145,16 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Memcached, __construct)
 	}
 
 	phalcon_array_update_str(&option, SL("prefix"), &prefix, PH_COPY);
+	zval_ptr_dtor(&prefix);
 
 	object_init_ex(&memcached, phalcon_cache_backend_memcached_ce);
 
 	PHALCON_CALL_METHOD(NULL, &memcached, "__construct", &frontend_data, &option);
+	zval_ptr_dtor(&frontend_data);
+	zval_ptr_dtor(&option);
 
 	phalcon_update_property(getThis(), SL("_memcached"), &memcached);
+	zval_ptr_dtor(&memcached);
 
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
 }

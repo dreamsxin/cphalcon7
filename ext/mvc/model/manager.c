@@ -341,6 +341,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setCustomEventsManager){
 
 	phalcon_get_class(&class_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_customEventsManager"), &class_name, events_manager);
+	zval_ptr_dtor(&class_name);
 }
 
 /**
@@ -359,8 +360,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
 	if (Z_TYPE(custom_events_manager) == IS_ARRAY) {
 		phalcon_get_class(&class_name, model, 1);
 		if (phalcon_array_isset_fetch(&events_manager, &custom_events_manager, &class_name, PH_READONLY)) {
+			zval_ptr_dtor(&class_name);
 			RETURN_CTOR(&events_manager);
 		}
+		zval_ptr_dtor(&class_name);
 	}
 
 	RETURN_NULL();
@@ -445,6 +448,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isInitialized){
 	phalcon_fast_strtolower(&lowercased, model_name);
 
 	RETVAL_BOOL(phalcon_array_isset(&initialized, &lowercased));
+	zval_ptr_dtor(&lowercased);
 }
 
 /**
@@ -533,6 +537,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSource){
 	}
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_sources"), &entity_name, source);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -595,6 +600,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setModelSchema){
 
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_schemas"), &entity_name, schema);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -645,6 +651,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService){
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), &entity_name, connection_service);
 	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), &entity_name, connection_service);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -666,6 +673,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService){
 
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_writeConnectionServices"), &entity_name, connection_service);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -687,6 +695,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
 
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_readConnectionServices"), &entity_name, connection_service);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -697,7 +706,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 
-	zval *model, service = {}, dependency_injector = {}, connection = {};
+	zval *model, service = {}, dependency_injector = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -706,20 +715,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		zval_ptr_dtor(&service);
 		return;
 	}
 
 	/**
 	 * Request the connection service from the DI
 	 */
-	PHALCON_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
-	if (Z_TYPE(connection) != IS_OBJECT) {
+	PHALCON_CALL_METHOD(return_value, &dependency_injector, "getshared", &service);
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&service);
+	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid injected connection service");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
-	RETURN_CTOR(&connection);
+	PHALCON_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
 }
 
 /**
@@ -776,8 +787,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
 		 * Check if there is a custom service connection name
 		 */
 		if (phalcon_array_isset_fetch(&connection, &connection_services, &entity_name, PH_READONLY)) {
+			zval_ptr_dtor(&entity_name);
 			RETURN_CTOR(&connection);
 		}
+		zval_ptr_dtor(&entity_name);
 	}
 
 	RETURN_STRING("db");
@@ -803,8 +816,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 		 * Check if there is a custom service connection name
 		 */
 		if (phalcon_array_isset_fetch(&connection, &connection_services, &entity_name, PH_READONLY)) {
+			zval_ptr_dtor(&entity_name);
 			RETURN_CTOR(&connection);
 		}
+		zval_ptr_dtor(&entity_name);
 	}
 
 	RETURN_STRING("db");
@@ -903,11 +918,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
 				PHALCON_CALL_METHOD(&result, behavior, "missingmethod", model, eventname, data);
 				if (Z_TYPE(result) != IS_NULL) {
-					RETURN_CTOR(&result);
+					RETVAL_ZVAL(&result, 0, 0);
+					zval_ptr_dtor(&entity_name);
+					return;
 				}
 			} ZEND_HASH_FOREACH_END();
-
 		}
+		zval_ptr_dtor(&entity_name);
 	}
 
 	/**
@@ -917,6 +934,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 		PHALCON_RETURN_CALL_METHOD(&events_manager, "fire", &fire_event_name, model, data);
+		zval_ptr_dtor(&fire_event_name);
 		return;
 	}
 
@@ -946,7 +964,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 	 * Get the current behaviors
 	 */
 	phalcon_read_property(&behaviors, getThis(), SL("_behaviors"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_COPY)) {
 		array_init(&models_behaviors);
 	}
 
@@ -959,6 +977,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 	 * Update the behaviors list
 	 */
 	phalcon_update_property_array(getThis(), SL("_behaviors"), &entity_name, &models_behaviors);
+	zval_ptr_dtor(&entity_name);
+	zval_ptr_dtor(&models_behaviors);
 }
 
 /**
@@ -975,6 +995,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, useDynamicUpdate){
 
 	phalcon_get_class(&entity_name, model, 1);
 	phalcon_update_property_array(getThis(), SL("_dynamicUpdate"), &entity_name, dynamic_update);
+	zval_ptr_dtor(&entity_name);
 }
 
 /**
@@ -992,8 +1013,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, isUsingDynamicUpdate){
 	if (Z_TYPE(dynamic_update) == IS_ARRAY) {
 		phalcon_get_class(&entity_name, model, 1);
 		if (phalcon_array_isset_fetch(return_value, &dynamic_update, &entity_name, PH_COPY)) {
+			zval_ptr_dtor(&entity_name);
 			return;
 		}
+		zval_ptr_dtor(&entity_name);
 	}
 
 	RETURN_TRUE;
@@ -1027,7 +1050,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &referenced_entity);
 
 	phalcon_read_property(&has_one, getThis(), SL("_hasOne"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&relations, &has_one, &key_relation, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&relations, &has_one, &key_relation, PH_COPY)) {
 		array_init(&relations);
 	}
 
@@ -1060,8 +1083,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"), PH_READONLY)) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY_VALUE(&lower_alias, &referenced_entity);
+		ZVAL_COPY(&lower_alias, &referenced_entity);
 	}
+	zval_ptr_dtor(&referenced_entity);
 
 	/**
 	 * Append a new relationship
@@ -1072,18 +1096,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	 * Update the global alias
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
+	zval_ptr_dtor(&lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	zval_ptr_dtor(&key_alias);
 
 	/**
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasOne"), &key_relation, &relations);
+	zval_ptr_dtor(&key_relation);
+	zval_ptr_dtor(&relations);
 
 	/**
 	 * Get existing relations by model
 	 */
 	phalcon_read_property(&has_one_single, getThis(), SL("_hasOneSingle"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&single_relations, &has_one_single, &entity_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&single_relations, &has_one_single, &entity_name, PH_COPY)) {
 		array_init(&single_relations);
 	}
 
@@ -1096,8 +1124,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasOne){
 	 * Update relations by model
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasOneSingle"), &entity_name, &single_relations);
+	zval_ptr_dtor(&entity_name);
+	zval_ptr_dtor(&single_relations);
 
-	RETURN_CTOR(&relation);
+	RETVAL_ZVAL(&relation, 0, 0);
 }
 
 /**
@@ -1127,7 +1157,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &referenced_entity);
 
 	phalcon_read_property(&belongs_to, getThis(), SL("_belongsTo"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&relations, &belongs_to, &key_relation, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&relations, &belongs_to, &key_relation, PH_COPY)) {
 		array_init(&relations);
 	}
 
@@ -1160,8 +1190,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"), PH_READONLY)) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&lower_alias, &referenced_entity);
+		ZVAL_COPY(&lower_alias, &referenced_entity);
 	}
+	zval_ptr_dtor(&referenced_entity);
 
 	/**
 	 * Append a new relationship
@@ -1172,18 +1203,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 * Update the global alias
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
+	zval_ptr_dtor(&lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	zval_ptr_dtor(&key_alias);
 
 	/**
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsTo"), &key_relation, &relations);
+	zval_ptr_dtor(&key_relation);
+	zval_ptr_dtor(&relations);
 
 	/**
 	 * Get existing relations by model
 	 */
 	phalcon_read_property(&belongs_to_single, getThis(), SL("_belongsToSingle"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&single_relations, &belongs_to_single, &entity_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&single_relations, &belongs_to_single, &entity_name, PH_COPY)) {
 		array_init(&single_relations);
 	}
 
@@ -1196,9 +1231,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 * Update relations by model
 	 */
 	phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
+	zval_ptr_dtor(&entity_name);
+	zval_ptr_dtor(&single_relations);
 
 
-	RETURN_CTOR(&relation);
+	RETVAL_ZVAL(&relation, 0, 0);
 }
 
 /**
@@ -1228,7 +1265,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &referenced_entity);
 
 	phalcon_read_property(&has_many, getThis(), SL("_hasMany"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&relations, &has_many, &key_relation, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&relations, &has_many, &key_relation, PH_COPY)) {
 		array_init(&relations);
 	}
 
@@ -1261,8 +1298,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"), PH_READONLY)) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		ZVAL_COPY_VALUE(&lower_alias, &referenced_entity);
+		ZVAL_COPY(&lower_alias, &referenced_entity);
 	}
+	zval_ptr_dtor(&referenced_entity);
 
 	/**
 	 * Append a new relationship
@@ -1273,18 +1311,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	 * Update the global alias
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
+	zval_ptr_dtor(&lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	zval_ptr_dtor(&key_alias);
 
 	/**
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasMany"), &key_relation, &relations);
+	zval_ptr_dtor(&key_relation);
+	zval_ptr_dtor(&relations);
 
 	/**
 	 * Get existing relations by model
 	 */
 	phalcon_read_property(&has_many_single, getThis(), SL("_hasManySingle"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&single_relations, &has_many_single, &entity_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&single_relations, &has_many_single, &entity_name, PH_COPY)) {
 		array_init(&single_relations);
 	}
 
@@ -1297,8 +1339,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 	 * Update relations by model
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasManySingle"), &entity_name, &single_relations);
+	zval_ptr_dtor(&entity_name);
+	zval_ptr_dtor(&single_relations);
 
-	RETURN_CTOR(&relation);
+	RETVAL_ZVAL(&relation, 0, 0);
 }
 
 /**
@@ -1316,7 +1360,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasMany){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 
 	zval *model, *fields, *intermediate_model, *intermediate_fields, *intermediate_referenced_fields, *referenced_model, *referenced_fields, *options = NULL;
-	zval entity_name = {}, intermediate_entity = {}, referenced_entity = {}, key_relation = {}, has_many_to_many = {}, relations = {}, number_fields = {}, number_referenced = {}, type = {};
+	zval entity_name = {}, referenced_entity = {}, key_relation = {}, has_many_to_many = {}, relations = {}, number_fields = {}, number_referenced = {}, type = {};
 	zval relation = {}, alias = {}, lower_alias = {}, key_alias = {}, has_many_to_many_single = {}, single_relations = {};
 
 	phalcon_fetch_params(0, 7, 1, &model, &fields, &intermediate_model, &intermediate_fields, &intermediate_referenced_fields, &referenced_model, &referenced_fields, &options);
@@ -1327,13 +1371,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 
 	phalcon_get_class(&entity_name, model, 1);
 
-	phalcon_fast_strtolower(&intermediate_entity, intermediate_model);
 	phalcon_fast_strtolower(&referenced_entity, referenced_model);
 
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &referenced_entity);
 
 	phalcon_read_property(&has_many_to_many, getThis(), SL("_hasManyToMany"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&relations, &has_many_to_many, &key_relation, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&relations, &has_many_to_many, &key_relation, PH_COPY)) {
 		array_init(&relations);
 	}
 
@@ -1385,7 +1428,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	if (phalcon_array_isset_fetch_str(&alias, options, SL("alias"), PH_READONLY)) {
 		phalcon_fast_strtolower(&lower_alias, &alias);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&lower_alias, &referenced_entity);
+		ZVAL_COPY(&lower_alias, &referenced_entity);
 	}
 
 	/**
@@ -1397,18 +1440,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	 * Update the global alias
 	 */
 	PHALCON_CONCAT_VSV(&key_alias, &entity_name, "$", &lower_alias);
+	zval_ptr_dtor(&lower_alias);
 	phalcon_update_property_array(getThis(), SL("_aliases"), &key_alias, &relation);
+	zval_ptr_dtor(&key_alias);
 
 	/**
 	 * Update the relations
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasManyToMany"), &key_relation, &relations);
+	zval_ptr_dtor(&key_relation);
+	zval_ptr_dtor(&relations);
 
 	/**
 	 * Get existing relations by model
 	 */
 	phalcon_read_property(&has_many_to_many_single, getThis(), SL("_hasManyToManySingle"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&single_relations, &has_many_to_many_single, &entity_name, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&single_relations, &has_many_to_many_single, &entity_name, PH_COPY)) {
 		array_init(&single_relations);
 	}
 
@@ -1421,8 +1468,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addHasManyToMany){
 	 * Update relations by model
 	 */
 	phalcon_update_property_array(getThis(), SL("_hasManyToManySingle"), &entity_name, &single_relations);
+	zval_ptr_dtor(&entity_name);
+	zval_ptr_dtor(&single_relations);
 
-	RETURN_CTOR(&relation);
+	RETVAL_ZVAL(&relation, 0, 0);
 }
 
 /**
@@ -1441,13 +1490,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
 	phalcon_read_property(&initialized, getThis(), SL("_initialized"), PH_NOISY|PH_READONLY);
 
 	phalcon_fast_strtolower(&entity_name, model_name);
-
 	phalcon_fast_strtolower(&entity_relation, model_relation);
 
 	/**
 	 * Relationship unique key
 	 */
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+	zval_ptr_dtor(&entity_relation);
 
 	/**
 	 * Initialize the model first
@@ -1458,10 +1507,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsBelongsTo){
 
 	phalcon_read_property(&belongs_to, getThis(), SL("_belongsTo"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&belongs_to, &key_relation)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&key_relation);
 }
 
 /**
@@ -1486,6 +1536,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasMany){
 	 * Relationship unique key
 	 */
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+	zval_ptr_dtor(&entity_relation);
 
 	/**
 	 * Initialize the model first
@@ -1496,10 +1547,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasMany){
 
 	phalcon_read_property(&has_many, getThis(), SL("_hasMany"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&has_many, &key_relation)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&key_relation);
 }
 
 /**
@@ -1524,6 +1576,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasOne){
 	 * Relationship unique key
 	 */
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+	zval_ptr_dtor(&entity_relation);
 
 	/**
 	 * Initialize the model first
@@ -1534,10 +1587,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasOne){
 
 	phalcon_read_property(&has_one, getThis(), SL("_hasOne"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&has_one, &key_relation)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&key_relation);
 }
 
 /**
@@ -1562,6 +1616,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasManyToMany){
 	 * Relationship unique key
 	 */
 	PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+	zval_ptr_dtor(&entity_relation);
 
 	/**
 	 * Initialize the model first
@@ -1572,10 +1627,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, existsHasManyToMany){
 
 	phalcon_read_property(&has_many_to_many, getThis(), SL("_hasManyToMany"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&has_many_to_many, &key_relation)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&key_relation);
 }
 
 /**
@@ -1596,8 +1652,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationByAlias){
 		PHALCON_CONCAT_VSV(&key_alias, model_name, "$", alias);
 		phalcon_fast_strtolower(&key_lower, &key_alias);
 		if (phalcon_array_isset_fetch(&relation, &aliases, &key_lower, PH_READONLY)) {
+			zval_ptr_dtor(&key_alias);
+			zval_ptr_dtor(&key_lower);
 			RETURN_CTOR(&relation);
 		}
+		zval_ptr_dtor(&key_alias);
+		zval_ptr_dtor(&key_lower);
 	}
 
 	RETURN_FALSE;
@@ -1625,19 +1685,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_fetch_params(0, 3, 1, &relation, &method, &record, &p);
 
 	if (p) {
-		PHALCON_SEPARATE_PARAM(p);
-		ZVAL_COPY_VALUE(&parameters, p);
+		ZVAL_DUP(&parameters, p);
 	}
 
 	if (Z_TYPE(parameters) == IS_ARRAY) {
 		/**
 		 * Re-use conditions
 		 */
-		if (phalcon_array_isset_fetch_long(&pre_conditions, &parameters, 0, PH_READONLY)) {
-			phalcon_array_unset_long(&parameters, 0, PH_SEPARATE);
+		if (phalcon_array_isset_fetch_long(&pre_conditions, &parameters, 0, PH_COPY)) {
+			phalcon_array_unset_long(&parameters, 0, 0);
 		} else {
-			if (phalcon_array_isset_fetch_str(&pre_conditions, &parameters, SL("conditions"), PH_READONLY)) {
-				phalcon_array_unset_str(&parameters, SL("conditions"), PH_SEPARATE);
+			if (phalcon_array_isset_fetch_str(&pre_conditions, &parameters, SL("conditions"), PH_COPY)) {
+				phalcon_array_unset_str(&parameters, SL("conditions"), 0);
 			}
 		}
 
@@ -1645,13 +1704,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * Re-use bound parameters
 		 */
 		if (phalcon_array_isset_fetch_str(&placeholders, &parameters, SL("bind"), PH_CTOR)) {
-			phalcon_array_unset_str(&parameters, SL("bind"), PH_SEPARATE);
+			phalcon_array_unset_str(&parameters, SL("bind"), 0);
 		} else {
 			array_init(&placeholders);
 		}
 	} else {
 		if (Z_TYPE(parameters) == IS_STRING) {
-			ZVAL_COPY_VALUE(&pre_conditions, &parameters);
+			ZVAL_COPY(&pre_conditions, &parameters);
 		}
 
 		array_init(&placeholders);
@@ -1670,18 +1729,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		array_init(&conditions);
 
 		PHALCON_CALL_METHOD(&intermediate_model, relation, "getintermediatemodel");
-		PHALCON_CALL_METHOD(&intermediate_fields, relation, "getintermediatefields");
 
 		/**
 		 * Appends conditions created from the fields defined in the relation
 		 */
 		PHALCON_CALL_METHOD(&fields, relation, "getfields");
 		if (Z_TYPE(fields) != IS_ARRAY) {
+			PHALCON_CALL_METHOD(&intermediate_fields, relation, "getintermediatefields");
 			PHALCON_CALL_METHOD(&value, record, "readattribute", &fields);
 
 			PHALCON_CONCAT_SVSVS(&condition, "[", &intermediate_model, "].[", &intermediate_fields, "] = ?0");
-			phalcon_array_append(&conditions, &condition, PH_COPY|PH_SEPARATE);
-			phalcon_array_append(&placeholders, &value, PH_COPY|PH_SEPARATE);
+			phalcon_array_append(&conditions, &condition, 0);
+			phalcon_array_append(&placeholders, &value, 0);
+			zval_ptr_dtor(&intermediate_fields);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
@@ -1698,7 +1758,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 			PHALCON_CONCAT_SVSV(&condition, "[", &intermediate_model, "].[", &intermediate_fields);
 			PHALCON_SCONCAT_SVSVS(&condition, "] = [", &referenced_model, "].[", &referenced_fields, "]");
-			phalcon_array_append(&join_conditions, &condition, PH_COPY);
+			phalcon_array_append(&join_conditions, &condition, 0);
+			zval_ptr_dtor(&referenced_fields);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
@@ -1708,6 +1769,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * We don't trust the user or the database so we use bound parameters
 		 */
 		phalcon_fast_join_str(&joined_join_conditions, SL(" AND "), &join_conditions);
+		zval_ptr_dtor(&join_conditions);
 
 		/**
 		 * Add extra conditions passed by the programmer
@@ -1720,6 +1782,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * We don't trust the user or the database so we use bound parameters
 		 */
 		phalcon_fast_join_str(&joined_conditions, SL(" AND "), &conditions);
+		zval_ptr_dtor(&conditions);
 
 		/**
 		 * Create a query builder
@@ -1728,16 +1791,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		PHALCON_CALL_METHOD(NULL, &builder, "from", &referenced_model);
 		PHALCON_CALL_METHOD(NULL, &builder, "innerjoin", &intermediate_model, &joined_join_conditions);
 		PHALCON_CALL_METHOD(NULL, &builder, "andwhere", &joined_conditions, &placeholders);
+		zval_ptr_dtor(&intermediate_model);
+		zval_ptr_dtor(&referenced_model);
+		zval_ptr_dtor(&joined_conditions);
+		zval_ptr_dtor(&joined_join_conditions);
+		zval_ptr_dtor(&placeholders);
+		zval_ptr_dtor(&parameters);
 
 		/**
 		 * Get the query
 		 */
 		PHALCON_CALL_METHOD(&query, &builder, "getquery");
+		zval_ptr_dtor(&builder);
 
 		/**
 		 * Execute the query
 		 */
 		PHALCON_RETURN_CALL_METHOD(&query, "execute");
+		zval_ptr_dtor(&query);
 		return;
 	}
 
@@ -1747,6 +1818,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	} else {
 		array_init(&conditions);
 	}
+	zval_ptr_dtor(&pre_conditions);
 
 	/**
 	 * Appends conditions created from the fields defined in the relation
@@ -1757,8 +1829,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		PHALCON_CALL_METHOD(&referenced_field, relation, "getreferencedfields");
 
 		PHALCON_CONCAT_SVS(&condition, "[", &referenced_field, "] = ?0");
-		phalcon_array_append(&conditions, &condition, PH_COPY);
-		phalcon_array_append(&placeholders, &value, PH_COPY);
+		phalcon_array_append(&conditions, &condition, 0);
+		phalcon_array_append(&placeholders, &value, 0);
+		zval_ptr_dtor(&referenced_field);
 	} else {
 		/**
 		 * Compound relation
@@ -1777,11 +1850,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY|PH_READONLY);
 
 			PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &tmp);
-			phalcon_array_append(&conditions, &condition, PH_COPY);
-			phalcon_array_append(&placeholders, &value, PH_COPY);
+			phalcon_array_append(&conditions, &condition, 0);
+			phalcon_array_append(&placeholders, &value, 0);
 		} ZEND_HASH_FOREACH_END();
-
+		zval_ptr_dtor(&referenced_fields);
 	}
+	zval_ptr_dtor(&fields);
 
 	PHALCON_CALL_METHOD(&dependency_injector, record, "getdi");
 
@@ -1789,6 +1863,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	 * We don't trust the user or the database so we use bound parameters
 	 */
 	phalcon_fast_join_str(&joined_conditions, SL(" AND "), &conditions);
+	zval_ptr_dtor(&conditions);
 
 	/**
 	 * Create a valid params array to pass to the find/findFirst method
@@ -1800,11 +1875,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	if (Z_TYPE(parameters) == IS_ARRAY) {
 		phalcon_fast_array_merge(&find_arguments, &find_params, &parameters);
 	} else {
-		ZVAL_COPY_VALUE(&find_arguments, &find_params);
+		ZVAL_COPY(&find_arguments, &find_params);
 	}
+	zval_ptr_dtor(&parameters);
+	zval_ptr_dtor(&find_params);
+	zval_ptr_dtor(&joined_conditions);
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&placeholders);
 
 	array_init_size(&arguments, 1);
-	phalcon_array_append(&arguments, &find_arguments, PH_COPY);
+	phalcon_array_append(&arguments, &find_arguments, 0);
 
 	/**
 	 * Check the right method to get the data
@@ -1828,7 +1908,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 		}
 	} else {
-		PHALCON_CPY_WRT_CTOR(&retrieve_method, method);
+		ZVAL_COPY(&retrieve_method, method);
 	}
 
 	/**
@@ -1842,7 +1922,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 		PHALCON_CALL_METHOD(&records, getThis(), "getreusablerecords", &referenced_model, &unique_key);
 		if (Z_TYPE(records) == IS_ARRAY || Z_TYPE(records) == IS_OBJECT) {
-			RETURN_CTOR(&records);
+			RETVAL_ZVAL(&records, 0, 0);
+			zval_ptr_dtor(&arguments);
+			zval_ptr_dtor(&referenced_model);
+			zval_ptr_dtor(&retrieve_method);
+			zval_ptr_dtor(&unique_key);
+			return;
 		}
 	} else {
 		/* Use int variable in order not to confuse static code analysers */
@@ -1862,15 +1947,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	phalcon_array_append(&call_object, &retrieve_method, PH_COPY);
 
 	PHALCON_CALL_USER_FUNC_ARRAY(&records, &call_object, &arguments);
+	zval_ptr_dtor(&call_object);
+	zval_ptr_dtor(&arguments);
+	zval_ptr_dtor(&referenced_entity);
+	zval_ptr_dtor(&retrieve_method);
 
 	/**
 	 * Store the result in the cache if it's reusable
 	 */
 	if (f_reusable) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "setreusablerecords", &referenced_model, &unique_key, &records);
+		zval_ptr_dtor(&unique_key);
 	}
+	zval_ptr_dtor(&referenced_model);
 
-	RETURN_CTOR(&records);
+	RETVAL_ZVAL(&records, 0, 0);
 }
 
 /**
@@ -1953,7 +2044,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsToRecords){
 		 * Check if there is a relation between them
 		 */
 		PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+		zval_ptr_dtor(&entity_name);
+		zval_ptr_dtor(&entity_relation);
 		if (!phalcon_array_isset(&belongs_to, &key_relation)) {
+			zval_ptr_dtor(&key_relation);
 			RETURN_FALSE;
 		}
 
@@ -1961,6 +2055,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsToRecords){
 		 * relations is an array with all the belongsTo relationships to that model
 		 */
 		phalcon_array_fetch(&relations, &belongs_to, &key_relation, PH_NOISY|PH_READONLY);
+		zval_ptr_dtor(&key_relation);
 
 		/**
 		 * Get the first relation
@@ -2007,7 +2102,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyRecords){
 		 * Check if there is a relation between them
 		 */
 		PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+		zval_ptr_dtor(&entity_name);
+		zval_ptr_dtor(&key_relation);
 		if (!phalcon_array_isset(&has_many, &key_relation)) {
+			zval_ptr_dtor(&key_relation);
 			RETURN_FALSE;
 		}
 
@@ -2015,6 +2113,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyRecords){
 		 * relations is an array with all the belongsTo relationships to that model
 		 */
 		phalcon_array_fetch(&relations, &has_many, &key_relation, PH_NOISY|PH_READONLY);
+		zval_ptr_dtor(&key_relation);
 
 		/**
 		 * Get the first relation
@@ -2061,7 +2160,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneRecords){
 		 * Check if there is a relation between them
 		 */
 		PHALCON_CONCAT_VSV(&key_relation, &entity_name, "$", &entity_relation);
+		zval_ptr_dtor(&entity_name);
+		zval_ptr_dtor(&entity_relation);
 		if (!phalcon_array_isset(&has_one, &key_relation)) {
+			zval_ptr_dtor(&key_relation);
 			RETURN_FALSE;
 		}
 
@@ -2069,6 +2171,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneRecords){
 		 * relations is an array with all the belongsTo relationships to that model
 		 */
 		phalcon_array_fetch(&relations, &has_one, &key_relation, PH_NOISY|PH_READONLY);
+		zval_ptr_dtor(&key_relation);
 
 		/**
 		 * Get the first relation
@@ -2105,8 +2208,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getBelongsTo){
 	if (Z_TYPE(belongs_to_single) == IS_ARRAY) {
 		phalcon_get_class(&lower_name, model, 1);
 		if (phalcon_array_isset_fetch(&relations, &belongs_to_single, &lower_name, PH_READONLY)) {
+			zval_ptr_dtor(&lower_name);
 			RETURN_CTOR(&relations);
 		}
+		zval_ptr_dtor(&lower_name);
 	}
 
 	RETURN_EMPTY_ARRAY();
@@ -2128,8 +2233,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasMany){
 	if (Z_TYPE(has_many_single) == IS_ARRAY) {
 		phalcon_get_class(&lower_name, model, 1);
 		if (phalcon_array_isset_fetch(&relations, &has_many_single, &lower_name, PH_READONLY)) {
+			zval_ptr_dtor(&lower_name);
 			RETURN_CTOR(&relations);
 		}
+		zval_ptr_dtor(&lower_name);
 	}
 
 	RETURN_EMPTY_ARRAY();
@@ -2151,8 +2258,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOne){
 	if (Z_TYPE(has_one_single) == IS_ARRAY) {
 		phalcon_get_class(&lower_name, model, 1);
 		if (phalcon_array_isset_fetch(&relations, &has_one_single, &lower_name, PH_READONLY)) {
+			zval_ptr_dtor(&lower_name);
 			RETURN_CTOR(&relations);
 		}
+		zval_ptr_dtor(&lower_name);
 	}
 
 	RETURN_EMPTY_ARRAY();
@@ -2174,8 +2283,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasManyToMany){
 	if (Z_TYPE(has_many_to_many_single) == IS_ARRAY) {
 		phalcon_get_class(&lower_name, model, 1);
 		if (phalcon_array_isset_fetch(&relations, &has_many_to_many_single, &lower_name, PH_READONLY)) {
+			zval_ptr_dtor(&lower_name);
 			RETURN_CTOR(&relations);
 		}
+		zval_ptr_dtor(&lower_name);
 	}
 
 	RETURN_EMPTY_ARRAY();
@@ -2196,6 +2307,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getHasOneAndHasMany){
 	PHALCON_CALL_METHOD(&has_one, getThis(), "gethasone", model);
 	PHALCON_CALL_METHOD(&has_many, getThis(), "gethasmany", model);
 	phalcon_fast_array_merge(return_value, &has_one, &has_many);
+	zval_ptr_dtor(&has_one);
+	zval_ptr_dtor(&has_many);
 }
 
 /**
@@ -2243,8 +2356,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelations){
 			phalcon_array_append(&all_relations, relation, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&entity_name);
 
-	RETURN_CTOR(&all_relations);
+	RETVAL_ZVAL(&all_relations, 0, 0);
 }
 
 /**
@@ -2264,12 +2378,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
 	phalcon_fast_strtolower(&second_name, second);
 
 	PHALCON_CONCAT_VSV(&key_relation, &first_name, "$", &second_name);
+	zval_ptr_dtor(&first_name);
+	zval_ptr_dtor(&second_name);
 
 	/**
 	 * Check if it's a belongs-to relationship
 	 */
 	phalcon_read_property(&belongs_to, getThis(), SL("_belongsTo"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(belongs_to) == IS_ARRAY && phalcon_array_isset_fetch(&relations, &belongs_to, &key_relation, PH_READONLY)) {
+		zval_ptr_dtor(&key_relation);
 		RETURN_CTOR(&relations);
 	}
 
@@ -2279,6 +2396,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
 	phalcon_read_property(&has_many, getThis(), SL("_hasMany"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(has_many) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&relations, &has_many, &key_relation, PH_READONLY)) {
+			zval_ptr_dtor(&key_relation);
 			RETURN_CTOR(&relations);
 		}
 	}
@@ -2289,9 +2407,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationsBetween){
 	phalcon_read_property(&has_one, getThis(), SL("_hasOne"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(has_one) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch(&relations, &has_one, &key_relation, PH_READONLY)) {
+			zval_ptr_dtor(&key_relation);
 			RETURN_CTOR(&relations);
 		}
 	}
+	zval_ptr_dtor(&key_relation);
 
 	RETURN_FALSE;
 }
@@ -2324,14 +2444,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createQuery){
 		phalcon_array_append(&parameters, &dependency_injector, PH_COPY);
 
 		PHALCON_CALL_METHOD(&query, &dependency_injector, "get", &service_name, &parameters);
+		zval_ptr_dtor(&parameters);
 	} else {
 		object_init_ex(&query, phalcon_mvc_model_query_ce);
 		PHALCON_CALL_METHOD(NULL, &query, "__construct", phql, &dependency_injector);
 	}
+	zval_ptr_dtor(&dependency_injector);
 
 	phalcon_update_property(getThis(), SL("_lastQuery"), &query);
 
-	RETURN_CTOR(&query);
+	RETVAL_ZVAL(&query, 0, 0);
 }
 
 /**
@@ -2363,6 +2485,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 	 * Execute the query
 	 */
 	PHALCON_RETURN_CALL_METHOD(&query, "execute", placeholders, types);
+	zval_ptr_dtor(&query);
 }
 
 /**
@@ -2388,6 +2511,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, createBuilder){
 	} else {
 		PHALCON_CALL_CE_STATIC(return_value, phalcon_mvc_model_query_builder_ce, "create", &type);
 	}
+	zval_ptr_dtor(&type);
 }
 
 /**

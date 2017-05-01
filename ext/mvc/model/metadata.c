@@ -551,6 +551,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	 * Unique key for map is created using class-name-schema-table
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+	zval_ptr_dtor(&class_name);
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
@@ -558,9 +559,12 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 
 		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	}
+	zval_ptr_dtor(&table);
+	zval_ptr_dtor(&schema);
 
 	phalcon_array_fetch(&column_map_model, &column_map, &key, PH_NOISY|PH_READONLY);
 	phalcon_array_fetch(&attributes, &column_map_model, index, PH_NOISY|PH_READONLY);
+	zval_ptr_dtor(&key);
 
 	RETURN_CTOR(&attributes);
 }

@@ -119,15 +119,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, get)
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
 	PHALCON_CALL_FUNCTION(&cached_content, "apc_fetch", &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 	if (PHALCON_IS_FALSE(&cached_content)) {
 		RETURN_NULL();
 	}
 
 	if (phalcon_is_numeric(&cached_content)) {
-		RETURN_CTOR(&cached_content);
+		RETURN_ZVAL(&cached_content, 0, 0);
 	} else {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
+		zval_ptr_dtor(&cached_content);
 	}
 }
 
@@ -163,13 +165,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY_VALUE(&cached_content, content);
+		ZVAL_COPY(&cached_content, content);
 	}
 
 	if (!phalcon_is_numeric(&cached_content)) {
 		PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 	} else {
-		ZVAL_COPY_VALUE(&prepared_content, &cached_content);
+		ZVAL_COPY(&prepared_content, &cached_content);
 	}
 
 	/**
@@ -178,7 +180,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
-		ZVAL_COPY_VALUE(&ttl, lifetime);
+		ZVAL_COPY(&ttl, lifetime);
 	}
 
 	/**
@@ -186,6 +188,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	 * compile time
 	 */
 	PHALCON_CALL_FUNCTION(NULL, "apc_store", &last_key, &prepared_content, &ttl);
+	zval_ptr_dtor(&last_key);
+	zval_ptr_dtor(&ttl);
+	zval_ptr_dtor(&prepared_content);
 
 	PHALCON_CALL_METHOD(&is_buffering, &frontend, "isbuffering");
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
@@ -195,6 +200,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, save)
 	if (PHALCON_IS_TRUE(&is_buffering)) {
 		zend_print_zval(&cached_content, 0);
 	}
+	zval_ptr_dtor(&cached_content);
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 }
@@ -229,9 +235,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, increment){
 			add_function(return_value, &cached_content, value);
 			PHALCON_CALL_METHOD(NULL, getThis(), "save", key_name, return_value);
 		} else {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&cached_content);
 	}
+	zval_ptr_dtor(&prefixed_key);
 }
 
 /**
@@ -264,9 +272,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, decrement){
 			phalcon_sub_function(return_value, &cached_content, value);
 			PHALCON_CALL_METHOD(NULL, getThis(), "save", key_name, return_value);
 		} else {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&cached_content);
 	}
+	zval_ptr_dtor(&prefixed_key);
 }
 
 /**
@@ -286,6 +296,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, delete){
 	PHALCON_CONCAT_SVV(&prefixed_key, "_PHCA", &prefix, key_name);
 
 	PHALCON_RETURN_CALL_FUNCTION("apc_delete", &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 }
 
 /**
@@ -317,9 +328,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	if (!phalcon_cache_backend_is_old_apcu) {
 		ZVAL_STRING(&type, "user");
 		PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &type, &prefix_pattern);
+		zval_ptr_dtor(&type);
 	}else {
 		PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &prefix_pattern);
 	}
+	zval_ptr_dtor(&prefix_pattern);
 
 	/* APCIterator implements Iterator */
 	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1));
@@ -342,13 +355,14 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 		it->funcs->get_current_key(it, &itkey);
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
 			ZVAL_STRINGL(&key, Z_STRVAL(itkey) + 5, Z_STRLEN(itkey) - 5);
-			phalcon_array_append(return_value, &key, PH_COPY);
+			phalcon_array_append(return_value, &key, 0);
 		}
 
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
+	zval_ptr_dtor(&iterator);
 }
 
 /**
@@ -368,10 +382,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, exists){
 
 	PHALCON_CALL_FUNCTION(&cache_exists, "apc_exists", &prefixed_key);
 	if (PHALCON_IS_NOT_FALSE(&cache_exists)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&prefixed_key);
 }
 
 /**
@@ -394,10 +409,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	if (!phalcon_cache_backend_is_old_apcu) {
 		ZVAL_STRING(&type, "user");
 		PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &type, &prefix_pattern);
-	}
-	else {
+		zval_ptr_dtor(&type);
+	} else {
 		PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &prefix_pattern);
 	}
+	zval_ptr_dtor(&prefix_pattern);
 
 	/* APCIterator implements Iterator */
 	assert(instanceof_function_ex(apciterator_ce, zend_ce_iterator, 1));
@@ -422,6 +438,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
 			ZVAL_STR(&key, Z_STR(itkey));
 			PHALCON_CALL_FUNCTION_FLAG(flag, NULL, "apc_delete", &key);
+			zval_ptr_dtor(&key);
 			if (FAILURE == flag) {
 				break;
 			}
@@ -431,5 +448,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 	}
 
 	it->funcs->dtor(it);
+	zval_ptr_dtor(&iterator);
 	RETURN_TRUE;
 }

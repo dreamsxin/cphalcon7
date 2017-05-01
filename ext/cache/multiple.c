@@ -194,7 +194,8 @@ PHP_METHOD(Phalcon_Cache_Multiple, get){
 			zval content = {};
 			PHALCON_CALL_METHOD(&content, backend, "get", key_name, lifetime);
 			if (Z_TYPE(content) > IS_NULL) {
-				RETURN_CTOR(&content);
+				RETVAL_ZVAL(&content, 0, 0);
+				return;
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

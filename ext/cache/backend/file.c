@@ -157,6 +157,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
@@ -168,6 +169,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
 		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
 		ttl = phalcon_get_intval(&lifetime);
+		zval_ptr_dtor(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -189,23 +191,24 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 			if (PHALCON_IS_FALSE(&cached_content)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Cache file ", &cache_file, " could not be opened");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cache_exception_ce, &exception_message);
-				return;
+				goto end;
 			}
 
 			if (phalcon_is_numeric(&cached_content)) {
-				RETURN_CTOR(&cached_content);
+				ZVAL_COPY(return_value, &cached_content);
 			} else {
 				/**
 				 * Use the frontend to process the content of the cache
 				 */
 				PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
 			}
-
-			return;
+			zval_ptr_dtor(&cached_content);
 		}
+	} else {
+		ZVAL_NULL(return_value);
 	}
-
-	RETURN_NULL();
+end:
+	zval_ptr_dtor(&cache_file);
 }
 
 /**
@@ -241,20 +244,21 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 
 	if (!content || !zend_is_true(content)) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY_VALUE(&cached_content, content);
+		ZVAL_COPY(&cached_content, content);
 	}
-
-	PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 
 	/**
 	 * We use file_put_contents to respect open-base-dir directive
 	 */
 	if (!phalcon_is_numeric(&cached_content)) {
+		PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 		phalcon_file_put_contents(&status, &cache_file, &prepared_content);
+		zval_ptr_dtor(&prepared_content);
 	} else {
 		phalcon_file_put_contents(&status, &cache_file, &cached_content);
 	}
@@ -271,6 +275,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	if (PHALCON_IS_TRUE(&is_buffering)) {
 		zend_print_zval(&cached_content, 0);
 	}
+	zval_ptr_dtor(&cached_content);
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 }
@@ -293,11 +298,13 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
 		phalcon_unlink(return_value, &cache_file);
 		return;
 	}
+	zval_ptr_dtor(&cache_file);
 
 	RETURN_FALSE;
 }
@@ -355,12 +362,14 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 			if (!EG(exception) && (!prefix || phalcon_start_with(&key, prefix, NULL))) {
 				phalcon_array_append(return_value, &key, PH_COPY);
 			}
+			zval_ptr_dtor(&key);
 		}
 
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
+	zval_ptr_dtor(&iterator);
 }
 
 /**
@@ -378,11 +387,11 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
 	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_READONLY);
-	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
+	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
@@ -393,16 +402,19 @@ PHP_METHOD(Phalcon_Cache_Backend_File, exists){
 		PHALCON_CALL_METHOD(&lifetime, &frontend, "getlifetime");
 
 		ttl = Z_LVAL(lifetime) ;
+		zval_ptr_dtor(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		mtime = likely(Z_TYPE(modified_time) == IS_LONG) ? Z_LVAL(modified_time) : phalcon_get_intval(&modified_time);
+		zval_ptr_dtor(&modified_time);
 
 		if (mtime + ttl > (long int)time(NULL)) {
-			RETURN_TRUE;
+			RETVAL_TRUE;
 		}
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&cache_file);
 }
 
 /**
@@ -431,6 +443,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
 
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 	assert(Z_TYPE(cache_file) == IS_STRING);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
@@ -445,6 +458,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 		 */
 		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
 		ttl = phalcon_get_intval(&lifetime);
+		zval_ptr_dtor(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -454,6 +468,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 		mtime   = Z_LVAL(modified_time);
 		diff    = now - ttl;
 		expired = diff > mtime;
+		zval_ptr_dtor(&modified_time);
 
 		/**
 		 * The content is only retrieved if the content has not expired
@@ -465,23 +480,23 @@ PHP_METHOD(Phalcon_Cache_Backend_File, increment){
 			phalcon_file_get_contents(&cached_content, &cache_file);
 			if (PHALCON_IS_FALSE(&cached_content)) {
 				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL(cache_file));
+				zval_ptr_dtor(&cache_file);
 				return;
 			}
 
 			phalcon_add_function(return_value, &cached_content, value);
+			zval_ptr_dtor(&cached_content);
 
 			phalcon_file_put_contents(&status, &cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(&status)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
-				return;
 			}
-
-			return;
 		}
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&cache_file);
 }
 
 /**
@@ -507,8 +522,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VV(&prefixed_key, &prefix, key_name);
-
 	PHALCON_CONCAT_VV(&cache_file, &cache_dir, &prefixed_key);
+	zval_ptr_dtor(&prefixed_key);
 	assert(Z_TYPE(cache_file) == IS_STRING);
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
@@ -523,6 +538,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		 */
 		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
 		ttl = phalcon_get_intval(&lifetime);
+		zval_ptr_dtor(&lifetime);
 
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
@@ -532,6 +548,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 		mtime   = Z_LVAL(modified_time);
 		diff    = now - ttl;
 		expired = diff > mtime;
+		zval_ptr_dtor(&modified_time);
 
 		/**
 		 * The content is only retrieved if the content has not expired
@@ -543,23 +560,23 @@ PHP_METHOD(Phalcon_Cache_Backend_File, decrement){
 			phalcon_file_get_contents(&cached_content, &cache_file);
 			if (PHALCON_IS_FALSE(&cached_content)) {
 				zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Failed to open cache file %s", Z_STRVAL(cache_file));
+				zval_ptr_dtor(&cache_file);
 				return;
 			}
 
 			phalcon_sub_function(return_value, &cached_content, value);
+			zval_ptr_dtor(&cached_content);
 
 			phalcon_file_put_contents(&status, &cache_file, return_value);
 
 			if (PHALCON_IS_FALSE(&status)) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cache directory can't be written");
-				return;
 			}
-
-			return;
 		}
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&cache_file);
 }
 
 /**
@@ -605,18 +622,22 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 			}
 
 			if (FAILURE == phalcon_call_method(&cache_file, item, "getpathname", 0, NULL)) {
+				zval_ptr_dtor(&key);
 				break;
 			}
 
 			if (PHALCON_IS_EMPTY(&prefix) || phalcon_start_with(&key, &prefix, NULL)) {
 				phalcon_unlink(return_value, &cache_file);
 			}
+			zval_ptr_dtor(&key);
+			zval_ptr_dtor(&cache_file);
 		}
 
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
+	zval_ptr_dtor(&iterator);
 
 	RETURN_TRUE;
 }

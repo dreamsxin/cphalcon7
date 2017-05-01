@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&cache, getThis(), "getresolveservice", &service);
 	} else {
-		ZVAL_COPY_VALUE(&cache, &service);
+		ZVAL_COPY(&cache, &service);
 	}
 	PHALCON_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 
@@ -139,38 +139,45 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, start){
 	}
 
 	phalcon_update_property(getThis(), SL("_cache"), &cache);
+	zval_ptr_dtor(&cache);
 
 	/* open callback */
 	array_init_size(&callable_open, 2);
-	phalcon_array_append(&callable_open, getThis(), 0);
+	phalcon_array_append(&callable_open, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_open, SL("open"), 0);
 
 	/* close callback */
 	array_init_size(&callable_close, 2);
-	phalcon_array_append(&callable_close, getThis(), 0);
+	phalcon_array_append(&callable_close, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_close, SL("close"), 0);
 
 	/* read callback */
 	array_init_size(&callable_read, 2);
-	phalcon_array_append(&callable_read, getThis(), 0);
+	phalcon_array_append(&callable_read, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_read, SL("read"), 0);
 
 	/* write callback */
 	array_init_size(&callable_write, 2);
-	phalcon_array_append(&callable_write, getThis(), 0);
+	phalcon_array_append(&callable_write, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_write, SL("write"), 0);
 
 	/* destroy callback */
 	array_init_size(&callable_destroy, 2);
-	phalcon_array_append(&callable_destroy, getThis(), 0);
+	phalcon_array_append(&callable_destroy, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_destroy, SL("destroy"), 0);
 
 	/* gc callback */
 	array_init_size(&callable_gc, 2);
-	phalcon_array_append(&callable_gc, getThis(), 0);
+	phalcon_array_append(&callable_gc, getThis(), PH_COPY);
 	phalcon_array_append_str(&callable_gc, SL("gc"), 0);
 
 	PHALCON_CALL_FUNCTION(return_value, "session_set_save_handler", &callable_open, &callable_close, &callable_read, &callable_write, &callable_destroy, &callable_gc);
+	zval_ptr_dtor(&callable_open);
+	zval_ptr_dtor(&callable_close);
+	zval_ptr_dtor(&callable_read);
+	zval_ptr_dtor(&callable_write);
+	zval_ptr_dtor(&callable_destroy);
+	zval_ptr_dtor(&callable_gc);
 	PHALCON_CALL_FUNCTION(NULL, "session_register_shutdown");
 
 	if (!zend_is_true(return_value)) {
@@ -250,12 +257,13 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy){
 	if (!_sid) {
 		PHALCON_CALL_SELF(&sid, "getid");
 	} else {
-		ZVAL_COPY_VALUE(&sid, _sid);
+		ZVAL_COPY(&sid, _sid);
 	}
 
 	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_NOISY|PH_READONLY);
 
 	PHALCON_RETURN_CALL_METHOD(&cache, "delete", &sid);
+	zval_ptr_dtor(&sid);
 }
 
 /**

@@ -168,6 +168,7 @@ PHP_METHOD(Phalcon_Config, val){
 			object_init_ex(&instance, phalcon_config_ce);
 			PHALCON_CALL_METHOD(NULL, &instance, "__construct", value);
 			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, &instance);
+			zval_ptr_dtor(&instance);
 		} else {
 			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, value);
 		}
@@ -305,7 +306,7 @@ PHP_METHOD(Phalcon_Config, merge){
 	if (Z_TYPE_P(config) == IS_OBJECT) {
 		phalcon_get_object_vars(&array_config, config, 0);
 	} else {
-		ZVAL_COPY_VALUE(&array_config, config);
+		ZVAL_COPY(&array_config, config);
 	}
 
 	if (Z_TYPE(array_config) == IS_ARRAY) {
@@ -335,6 +336,7 @@ PHP_METHOD(Phalcon_Config, merge){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&array_config);
 
 	RETURN_THIS();
 }
@@ -371,7 +373,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 			}
 			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
 				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
-					phalcon_array_update(return_value, &tmp, &array_value, PH_COPY);
+					phalcon_array_update(return_value, &tmp, &array_value, 0);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -383,7 +385,8 @@ PHP_METHOD(Phalcon_Config, count)
 	zval arr = {};
 
 	phalcon_get_object_vars(&arr, getThis(), 0);
-	RETURN_LONG(phalcon_fast_count_int(&arr));
+	RETVAL_LONG(phalcon_fast_count_int(&arr));
+	zval_ptr_dtor(&arr);
 }
 
 PHP_METHOD(Phalcon_Config, __wakeup)

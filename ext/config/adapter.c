@@ -104,6 +104,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 
 	phalcon_get_called_class(&class_name);
 	ce0 = phalcon_fetch_class(&class_name, ZEND_FETCH_CLASS_DEFAULT);
+	zval_ptr_dtor(&class_name);
 
 	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
 		object_init_ex(return_value, ce0);
@@ -111,7 +112,7 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	} else {
 		phalcon_read_static_property_ce(&instances, phalcon_config_adapter_ce, SL("_instances"), PH_READONLY);
 
-		if (phalcon_array_isset_fetch(return_value, &instances, file_path, 0)) {
+		if (phalcon_array_isset_fetch(return_value, &instances, file_path, PH_COPY)) {
 			return;
 		}
 		object_init_ex(return_value, ce0);

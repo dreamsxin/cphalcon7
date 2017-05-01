@@ -294,7 +294,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_read_property(&engines, getThis(), SL("_engines"), PH_READONLY);
+	phalcon_read_property(&engines, getThis(), SL("_engines"), PH_COPY);
 
 	/**
 	 * If the engines aren't initialized 'engines' is false
@@ -314,7 +314,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 			/**
 			 * Use .phtml as extension for the PHP engine
 			 */
-			phalcon_array_update_str(&engines, SL(".phtml"), &php_engine, PH_COPY);
+			phalcon_array_update_str(&engines, SL(".phtml"), &php_engine, 0);
 		} else {
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "A dependency injector container is required to obtain the application services");
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 					if (instanceof_function(Z_OBJCE_P(engine_service), zend_ce_closure)) {
 						PHALCON_CALL_USER_FUNC_ARRAY(&engine_object, engine_service, &arguments);
 					} else {
-						ZVAL_COPY_VALUE(&engine_object, engine_service);
+						ZVAL_COPY(&engine_object, engine_service);
 					}
 				} else if (Z_TYPE_P(engine_service) == IS_STRING) {
 					/**
@@ -356,15 +356,16 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 					return;
 				}
-				phalcon_array_update(&engines, &extension, &engine_object, PH_COPY);
+				phalcon_array_update(&engines, &extension, &engine_object, 0);
 			} ZEND_HASH_FOREACH_END();
-
+			zval_ptr_dtor(&arguments);
+			zval_ptr_dtor(&dependency_injector);
 		}
 
 		phalcon_update_property(getThis(), SL("_engines"), &engines);
 	}
 
-	RETURN_CTOR(&engines);
+	RETVAL_ZVAL(&engines, 0, 0);
 }
 
 /**
@@ -376,7 +377,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
 PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 	zval *view_path, *params, *absolute_path = NULL, events_manager = {}, event_name = {}, status = {}, debug_message = {};
-	zval not_exists = {}, views_dir = {}, views_dir_paths = {}, views_dir_path = {}, *path = NULL, engines = {}, *engine, exception_message = {};
+	zval not_exists = {}, views_dir = {}, views_dir_paths = {}, *path = NULL, engines = {}, *engine, exception_message = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -417,10 +418,12 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		phalcon_read_property(&views_dir, getThis(), SL("_viewsDir"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(views_dir) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(views_dir), path) {
+				zval views_dir_path = {};
 				PHALCON_CONCAT_VV(&views_dir_path, path, view_path);
-				phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
+				phalcon_array_append(&views_dir_paths, &views_dir_path, 0);
 			} ZEND_HASH_FOREACH_END();
 		} else {
+			zval views_dir_path = {};
 			PHALCON_CONCAT_VV(&views_dir_path, &views_dir, view_path);
 			phalcon_array_append(&views_dir_paths, &views_dir_path, PH_COPY);
 		}
@@ -486,12 +489,14 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&engines);
+	zval_ptr_dtor(&views_dir_paths);
 
 	/**
 	 * Always throw an exception if the view does not exist
 	 */
 	if (PHALCON_IS_TRUE(&not_exists)) {
-		PHALCON_CONCAT_SVS(&exception_message, "View '", &views_dir_path, "' was not found in the views directory");
+		PHALCON_CONCAT_SVS(&exception_message, "View '", view_path, "' was not found in the views directory");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
@@ -545,9 +550,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			 * Check if the user has defined a different options to the default
 			 */
 			if (Z_TYPE(cache_options) == IS_ARRAY) {
-				if (phalcon_array_isset_str(&cache_options, SL("key"))) {
-					phalcon_array_fetch_str(&key, &cache_options, SL("key"), PH_NOISY|PH_READONLY);
-				} else {
+				if (!phalcon_array_isset_fetch_str(&key, &cache_options, SL("key"), PH_COPY)) {
 					ZVAL_NULL(&key);
 				}
 				if (phalcon_array_isset_str(&cache_options, SL("lifetime"))) {
@@ -568,9 +571,12 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			 * We start the cache using the key set
 			 */
 			PHALCON_CALL_METHOD(&content, &cache, "start", &key, &lifetime);
+			zval_ptr_dtor(&key);
 			if (Z_TYPE(content) != IS_NULL) {
 				phalcon_update_property(getThis(), SL("_content"), &content);
-				RETURN_CTOR(&content);
+				RETVAL_ZVAL(&content, 0, 0);
+				zval_ptr_dtor(&cache);
+				return;
 			}
 		}
 	}
@@ -586,16 +592,17 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 		if (Z_TYPE(view_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &view_params, params);
 		} else {
-			ZVAL_COPY_VALUE(&merged_params, params);
+			ZVAL_COPY(&merged_params, params);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&merged_params, &view_params);
+		ZVAL_COPY(&merged_params, &view_params);
 	}
 
 	/**
 	 * internalRender is also reused by partials
 	 */
 	PHALCON_CALL_METHOD(NULL, getThis(), "_internalrender", path, &merged_params, absolute_path);
+	zval_ptr_dtor(&merged_params);
 
 	/**
 	 * Store the data in output into the cache
@@ -613,6 +620,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			PHALCON_CALL_METHOD(NULL, &cache, "stop");
 		}
 	}
+	zval_ptr_dtor(&cache);
 
 	phalcon_ob_end_clean();
 
@@ -667,16 +675,17 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 		if (Z_TYPE(view_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &view_params, params);
 		} else {
-			ZVAL_COPY_VALUE(&merged_params, params);
+			ZVAL_COPY(&merged_params, params);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&merged_params, params);
+		ZVAL_COPY(&merged_params, params);
 	}
 
 	/**
 	 * Call engine render, this checks in every registered engine for the partial
 	 */
 	PHALCON_CALL_METHOD(NULL, getThis(), "_internalrender", partial_path, &merged_params, absolute_path);
+	zval_ptr_dtor(&merged_params);
 
 	/**
 	 * Restore the original view params
@@ -737,7 +746,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(cache_options) != IS_ARRAY ||
-		!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_READONLY)) {
+		!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_COPY)) {
 		ZVAL_STRING(&cache_service, "viewCache");
 	}
 
@@ -745,6 +754,8 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
 	 * The injected service must be an object
 	 */
 	PHALCON_CALL_METHOD(return_value, &dependency_injector, "getshared", &cache_service);
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&cache_service);
 
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "The injected caching service is invalid");
@@ -761,18 +772,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _createCache){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, getCache){
 
-	zval cache = {};
 
-	phalcon_read_property(&cache, getThis(), SL("_cache"), PH_READONLY);
+	phalcon_read_property(return_value, getThis(), SL("_cache"), PH_COPY);
 
-	if (zend_is_true(&cache)) {
-		if (Z_TYPE(cache) != IS_OBJECT) {
-			PHALCON_CALL_METHOD(&cache, getThis(), "_createcache");
-			phalcon_update_property(getThis(), SL("_cache"), &cache);
-		}
+	if (Z_TYPE_P(return_value) == IS_TRUE) {
+		PHALCON_CALL_METHOD(return_value, getThis(), "_createcache");
+		phalcon_update_property(getThis(), SL("_cache"), return_value);
 	}
-
-	RETURN_CTOR(&cache);
 }
 
 /**

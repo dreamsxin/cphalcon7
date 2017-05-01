@@ -173,6 +173,7 @@ PHP_METHOD(Phalcon_Socket, _throwSocketException){
 
 	object_init_ex(&exception, phalcon_socket_exception_ce);
 	PHALCON_CALL_METHOD(NULL, &exception, "__construct", &exception_message, &exception_code);
+	zval_ptr_dtor(&exception_message);
 
 	phalcon_throw_exception(&exception);
 }

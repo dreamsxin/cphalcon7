@@ -360,16 +360,20 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+	zval_ptr_dtor(&class_name);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	}
+	zval_ptr_dtor(&schema);
+	zval_ptr_dtor(&table);
 
 	if (!phalcon_array_isset_fetch(return_value, &meta_data, &key, PH_COPY)) {
-		RETURN_NULL();
+		RETVAL_NULL();
 	}
+	zval_ptr_dtor(&key);
 }
 
 /**
@@ -458,6 +462,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	 * Unique key for meta-data is created using class-name-schema-table
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+	zval_ptr_dtor(&class_name);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
@@ -482,8 +487,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&schema);
+	zval_ptr_dtor(&table);
 
 	phalcon_array_update_multi_2(&meta_data, &key, index, data, PH_COPY);
+	zval_ptr_dtor(&key);
 }
 
 /**
@@ -512,14 +520,18 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 	 * Unique key for map is created using class-name-schema-table
 	 */
 	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+	zval_ptr_dtor(&class_name);
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "_initialize", model, &key, &table, &schema);
 		phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	}
+	zval_ptr_dtor(&schema);
+	zval_ptr_dtor(&table);
 
 	phalcon_array_fetch(&data, &column_map, &key, PH_NOISY|PH_READONLY);
+	zval_ptr_dtor(&key);
 
 	RETURN_CTOR(&data);
 }
@@ -690,10 +702,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNotNull){
 	PHALCON_CALL_METHOD(&data, getThis(), "getnotnullattributes", model);
 
 	if (phalcon_fast_in_array(attribute, &data)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -741,9 +754,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataType){
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypes", model);
 
-	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &data, attribute, PH_NOISY|PH_COPY)) {
+		RETVAL_NULL();
 	}
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -790,9 +804,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataSize){
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatasizes", model);
 
-	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &data, attribute, PH_NOISY|PH_COPY)) {
+		RETVAL_NULL();
 	}
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -839,9 +854,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataByte){
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatabytes", model);
 
-	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &data, attribute, PH_NOISY|PH_COPY)) {
+		RETVAL_NULL();
 	}
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -888,9 +904,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getDataScale){
 
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatascales", model);
 
-	if (phalcon_array_isset(&data, attribute)) {
-		phalcon_array_fetch(return_value, &data, attribute, PH_NOISY);
+	if (!phalcon_array_isset_fetch(return_value, &data, attribute, PH_NOISY|PH_COPY)) {
+		RETVAL_NULL();
 	}
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -938,10 +955,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, isNumeric){
 	PHALCON_CALL_METHOD(&data, getThis(), "getdatatypesnumeric", model);
 
 	if (phalcon_array_isset(&data, attribute)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&data);
 }
 
 /**
@@ -1184,29 +1202,35 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasAttribute){
 	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap", model);
 	if (Z_TYPE(reverse_column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&reverse_column_map)) {
 		if (phalcon_array_isset(&reverse_column_map, attribute)) {
-			RETURN_TRUE;
+			RETVAL_TRUE;
 		} else {
-			RETURN_FALSE
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&reverse_column_map);
+		return;
 	}
 
 	PHALCON_CALL_METHOD(&column_map, getThis(), "getcolumnmap", model);
 	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) {
 		if (phalcon_fast_in_array(attribute, &column_map)) {
-			RETURN_TRUE;
+			RETVAL_TRUE;
 		} else {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&column_map);
+		return;
 	}
+	zval_ptr_dtor(&column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
 	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, attribute)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&meta_data);
 }
 
 /**
@@ -1233,20 +1257,23 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getAttribute){
 
 	PHALCON_CALL_METHOD(&column_map, getThis(), "getcolumnmap", model);
 	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) {
-		if (phalcon_array_isset_fetch(return_value, &column_map, column, 0)) {
-			return;
-		} else {
-			RETURN_FALSE;
+		if (!phalcon_array_isset_fetch(return_value, &column_map, column, PH_COPY)) {
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&column_map);
+		return;
 	}
+	zval_ptr_dtor(&column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
 	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, column)) {
-		RETURN_CTOR(column);
+		RETVAL_ZVAL(column, 1, 0);
+	} else {
+		RETVAL_FALSE;
 	}
-	RETURN_FALSE;
+	zval_ptr_dtor(&meta_data);
 }
 
 /**
@@ -1274,29 +1301,36 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, hasRealAttribute){
 	PHALCON_CALL_METHOD(&column_map, getThis(), "getcolumnmap", model);
 	if (Z_TYPE(column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&column_map)) {
 		if (phalcon_array_isset(&column_map, attribute)) {
-			RETURN_TRUE;
+			RETVAL_TRUE;
 		} else {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&column_map);
+		return;
 	}
+	zval_ptr_dtor(&column_map);
 
 	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap", model);
 	if (Z_TYPE(reverse_column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&reverse_column_map)) {
 		if (phalcon_fast_in_array(attribute, &reverse_column_map)) {
-			RETURN_TRUE;
+			RETVAL_TRUE;
 		} else {
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&reverse_column_map);
+		return;
 	}
+	zval_ptr_dtor(&reverse_column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
 	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, attribute)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&meta_data);
 }
 
 /**
@@ -1323,20 +1357,23 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getRealAttribute){
 
 	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap", model);
 	if (Z_TYPE(reverse_column_map) == IS_ARRAY && PHALCON_IS_NOT_EMPTY(&reverse_column_map)) {
-		if (phalcon_array_isset_fetch(return_value, &reverse_column_map, column, 0)) {
-			return;
-		} else {
-			RETURN_FALSE;
+		if (!phalcon_array_isset_fetch(return_value, &reverse_column_map, column, PH_COPY)) {
+			RETVAL_FALSE;
 		}
+		zval_ptr_dtor(&reverse_column_map);
+		return;
 	}
+	zval_ptr_dtor(&reverse_column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "readmetadata", model);
 
 	phalcon_array_fetch_long(&data_types, &meta_data, PHALCON_MVC_MODEL_METADATA_MODELS_DATA_TYPES, PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset(&data_types, column)) {
-		RETURN_CTOR(column);
+		RETVAL_ZVAL(column, 1, 0);
+	} else {
+		RETVAL_FALSE;
 	}
-	RETURN_FALSE;
+	zval_ptr_dtor(&meta_data);
 }
 
 /**

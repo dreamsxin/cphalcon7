@@ -245,13 +245,13 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	if (!_foreground || Z_TYPE_P(_foreground) == IS_NULL) {
 		PHALCON_CALL_METHOD(&foreground, &random, "color", &color_type);
 	} else {
-		ZVAL_COPY_VALUE(&foreground, _foreground);
+		ZVAL_COPY(&foreground, _foreground);
 	}
 
 	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
 		PHALCON_CALL_METHOD(&background, &random, "color", &color_type);
 	} else {
-		ZVAL_COPY_VALUE(&background, _background);
+		ZVAL_COPY(&background, _background);
 	}
 
 	if (!_width || Z_TYPE_P(_width) == IS_NULL) {
@@ -276,7 +276,9 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 	object_init_ex(&bgpixel, imagickpixel_ce);
 	PHALCON_CALL_METHOD(NULL, &bgpixel, "__construct", &background);
+	zval_ptr_dtor(&background);
 	PHALCON_CALL_METHOD(NULL, &imagick, "newimage", &width,  &height, &bgpixel);
+	zval_ptr_dtor(&bgpixel);
 
 	object_init_ex(&draw, draw_ce);
 	if (phalcon_has_constructor(&draw)) {
@@ -291,7 +293,9 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 
 	object_init_ex(&fgpixel, imagickpixel_ce);
 	PHALCON_CALL_METHOD(NULL, &fgpixel, "__construct", &foreground);
+	zval_ptr_dtor(&foreground);
 	PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &fgpixel);
+	zval_ptr_dtor(&fgpixel);
 
 	if (!_background || Z_TYPE_P(_background) == IS_NULL) {
 		object_init_ex(&gradient, imagick_ce);
@@ -303,10 +307,15 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHOD(&bottom_color, &random, "color");
 
 		PHALCON_CONCAT_SVSV(&pseudostring, "gradient:", &top_color, "-", &bottom_color);
+		zval_ptr_dtor(&top_color);
+		zval_ptr_dtor(&bottom_color);
 		PHALCON_CALL_METHOD(NULL, &gradient, "newpseudoimage", &width,  &height, &pseudostring);
+		zval_ptr_dtor(&pseudostring);
 
 		phalcon_get_class_constant(&composite, imagick_ce, SL("COMPOSITE_OVER"));
 		PHALCON_CALL_METHOD(NULL, &imagick, "compositeimage", &gradient, &composite, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero));
+		zval_ptr_dtor(&composite);
+		zval_ptr_dtor(&gradient);
 	}
 
 	phalcon_read_property(&pad_type, getThis(), SL("_padType"), PH_NOISY|PH_READONLY);
@@ -323,6 +332,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 
 	PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+	zval_ptr_dtor(&gravity);
 	PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, offset_x, offset_y, &PHALCON_GLOBAL(z_zero), &word);
 
 	phalcon_read_property(&pad_size, getThis(), SL("_padSize"), PH_NOISY|PH_READONLY);
@@ -331,12 +341,16 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHOD(&word, &random, "alnum", &pad_size);
 		object_init_ex(&pixel, imagickpixel_ce);
 		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", &color);
+		zval_ptr_dtor(&color);
 		PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
+		zval_ptr_dtor(&pixel);
 
 		phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_WEST"));
 
 		PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+		zval_ptr_dtor(&gravity);
 		PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
+		zval_ptr_dtor(&word);
 	}
 
 	if (Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_BOTH || Z_LVAL(pad_type) == PHALCON_CHART_CAPTCHA_PAD_RIGHT) {
@@ -344,13 +358,18 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHOD(&word, &random, "alnum", &pad_size);
 		object_init_ex(&pixel, imagickpixel_ce);
 		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", &color);
+		zval_ptr_dtor(&color);
 		PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
+		zval_ptr_dtor(&pixel);
 
 		phalcon_get_class_constant(&gravity, imagick_ce, SL("GRAVITY_EAST"));
 
 		PHALCON_CALL_METHOD(NULL, &draw, "setgravity", &gravity);
+		zval_ptr_dtor(&gravity);
 		PHALCON_CALL_METHOD(NULL, &imagick, "annotateimage", &draw, &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &PHALCON_GLOBAL(z_zero), &word);
+		zval_ptr_dtor(&word);
 	}
+	zval_ptr_dtor(&draw);
 
 	ZVAL_LONG(&min, 20);
 	ZVAL_LONG(&max, 50);
@@ -376,6 +395,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	ZVAL_STRING(&format, "png");
 
 	PHALCON_CALL_METHOD(NULL, &imagick, "setImageFormat", &format);
+	zval_ptr_dtor(&format);
 	PHALCON_CALL_METHOD(NULL, &imagick, "stripImage");
 
 	phalcon_update_property(getThis(), SL("_imagick"), &imagick);
@@ -383,6 +403,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 		PHALCON_CALL_METHOD(NULL, &imagick, "writeImage", filename);
 	}
 	PHALCON_RETURN_CALL_METHOD(&imagick, "getImageBlob");
+	zval_ptr_dtor(&imagick);
 }
 
 /**

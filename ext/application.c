@@ -106,10 +106,11 @@ PHP_METHOD(Phalcon_Application, registerModules){
 		if (Z_TYPE(registered_modules) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_modules, &registered_modules, modules);
 		} else {
-			ZVAL_COPY_VALUE(&merged_modules, modules);
+			ZVAL_COPY(&merged_modules, modules);
 		}
 
 		phalcon_update_property(getThis(), SL("_modules"), &merged_modules);
+		zval_ptr_dtor(&merged_modules);
 	}
 
 	RETURN_THIS();

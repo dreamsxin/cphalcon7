@@ -287,6 +287,6 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len)
 		return 0;
 	}
 
-	ZVAL_COPY_VALUE(retval, constant);
+	ZVAL_COPY(retval, constant);
 	return 1;
 }

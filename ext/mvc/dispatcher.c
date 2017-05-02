@@ -147,6 +147,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName){
 	if (is_exact && zend_is_true(is_exact)) {
 		PHALCON_CONCAT_SV(&name, "\\", controller_name);
 		phalcon_update_property(getThis(), SL("_handlerName"), &name);
+		zval_ptr_dtor(&name);
 		phalcon_update_property(getThis(), SL("_isExactHandler"), &PHALCON_GLOBAL(z_true));
 	} else {
 		phalcon_update_property(getThis(), SL("_handlerName"), controller_name);
@@ -188,10 +189,9 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName){
  */
 PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
-	zval *message, *code = NULL, error_handlers = {}, error_handler = {}, previous_namespace_name = {}, previous_controller_name = {}, previous_action_name = {};
-	zval previous_params = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {}, dependency_injector = {};
-	zval exception_code = {}, exception_message = {}, exception = {}, service = {}, response = {}, status_code = {}, status_message = {};
-	zval events_manager = {}, event_name = {}, status = {};
+	zval *message, *code = NULL, error_handlers = {}, error_handler = {}, previous_namespace_name = {}, previous_controller_name = {};
+	zval previous_action_name = {}, previous_params = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {};
+	zval exception = {}, events_manager = {}, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &code);
 
@@ -227,31 +227,6 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
 		}
 	}
-
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		ZVAL_LONG(&exception_code, 0);
-		ZVAL_STRING(&exception_message, "A dependency injection container is required to access the 'response' service");
-
-		object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
-		PHALCON_CALL_METHOD(NULL, &exception, "__construct", &exception_message, &exception_code);
-
-		phalcon_throw_exception(&exception);
-		return;
-	}
-
-	ZVAL_STR(&service, IS(response));
-
-	PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
-	PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
-
-	/**
-	 * Dispatcher exceptions automatically send 404 status
-	 */
-	ZVAL_LONG(&status_code, 404);
-	ZVAL_STRING(&status_message, "Not Found");
-
-	PHALCON_CALL_METHOD(NULL, &response, "setstatuscode", &status_code, &status_message);
 
 	/**
 	 * Create the real exception

@@ -534,6 +534,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	array_init_size(&bind_params, 2);
 	phalcon_array_update(&bind_params, &minimum_key, minimum, PH_COPY);
 	phalcon_array_update(&bind_params, &maximum_key, maximum, PH_COPY);
+	zval_ptr_dtor(&minimum_key);
+	zval_ptr_dtor(&maximum_key);
 
 	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
@@ -543,6 +545,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, betweenWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
+	zval_ptr_dtor(&conditions);
+	zval_ptr_dtor(&bind_params);
 
 	phalcon_increment(&next_hidden_param);
 	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
@@ -593,6 +597,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	array_init_size(&bind_params, 2);
 	phalcon_array_update(&bind_params, &minimum_key, minimum, PH_COPY);
 	phalcon_array_update(&bind_params, &maximum_key, maximum, PH_COPY);
+	zval_ptr_dtor(&minimum_key);
+	zval_ptr_dtor(&maximum_key);
 
 	/**
 	 * Append the BETWEEN to the current conditions using and 'and'
@@ -602,6 +608,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
+	zval_ptr_dtor(&conditions);
+	zval_ptr_dtor(&bind_params);
 
 	phalcon_increment(&next_hidden_param);
 	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &next_hidden_param);
@@ -648,17 +656,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
 
 		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
-		phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+		phalcon_array_append(&bind_keys, &query_key, 0);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
+		zval_ptr_dtor(&key);
 		phalcon_increment(&hidden_param);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+	zval_ptr_dtor(&bind_keys);
 
 	/**
 	 * Create a standard IN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVS(&conditions, expr, " IN (", &joined_keys, ")");
+	zval_ptr_dtor(&joined_keys);
 
 	/**
 	 * Append the IN to the current conditions using and 'and'
@@ -668,6 +679,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, inWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
+	zval_ptr_dtor(&conditions);
+	zval_ptr_dtor(&bind_params);
 	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THIS();
@@ -713,17 +726,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
 
 		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
-		phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+		phalcon_array_append(&bind_keys, &query_key, 0);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
+		zval_ptr_dtor(&key);
 		phalcon_increment(&hidden_param);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
+	zval_ptr_dtor(&bind_keys);
 
 	/**
 	 * Create a standard IN condition with bind params
 	 */
 	PHALCON_CONCAT_VSVS(&conditions, expr, " NOT IN (", &joined_keys, ")");
+	zval_ptr_dtor(&joined_keys);
 
 	/**
 	 * Append the IN to the current conditions using and 'and'
@@ -733,6 +749,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere){
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "andwhere", &conditions, &bind_params);
 	}
+	zval_ptr_dtor(&conditions);
+	zval_ptr_dtor(&bind_params);
 	phalcon_update_property(getThis(), SL("_hiddenParamNumber"), &hidden_param);
 
 	RETURN_THIS();
@@ -768,10 +786,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, compile){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getPhql){
 
-	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
+	phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_COPY);
 	if (PHALCON_IS_EMPTY(return_value)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "compile");
-		phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY);
+		phalcon_read_property(return_value, getThis(), SL("_phql"), PH_NOISY|PH_COPY);
 	}
 }
 
@@ -804,10 +822,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 		phalcon_array_append(&args, &dependency_injector, PH_COPY);
 
 		PHALCON_CALL_METHOD(&query, &dependency_injector, "get", &service_name, &args);
+		zval_ptr_dtor(&args);
 	} else {
 		object_init_ex(&query, phalcon_mvc_model_query_ce);
 		PHALCON_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
 	}
+	zval_ptr_dtor(&dependency_injector);
+	zval_ptr_dtor(&phql);
 
 	/**
 	 * Set default bind params
@@ -823,5 +844,5 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 		PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
 	}
 
-	RETURN_CTOR(&query);
+	RETVAL_ZVAL(&query, 0, 0);
 }

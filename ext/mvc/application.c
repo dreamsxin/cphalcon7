@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* If the router doesn't return a valid module we use the default module */
 	if (!zend_is_true(&module_name)) {
-		 phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_READONLY);
+		 phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_COPY);
 	}
 
 	/**
@@ -228,6 +228,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		zval_ptr_dtor(&event_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&module_name);
+			zval_ptr_dtor(&dependency_injector);
 			RETURN_FALSE;
 		}
 
@@ -238,6 +240,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, PH_READONLY)) {
 			convert_to_string(&module_name);
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL(module_name));
+			zval_ptr_dtor(&module_name);
+			zval_ptr_dtor(&dependency_injector);
 			return;
 		}
 
@@ -246,13 +250,15 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		 */
 		if (Z_TYPE(module) != IS_ARRAY && Z_TYPE(module) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
+			zval_ptr_dtor(&module_name);
+			zval_ptr_dtor(&dependency_injector);
 			return;
 		}
 
 		/* An array module definition contains a path to a module definition class */
 		if (unlikely(Z_TYPE(module) == IS_ARRAY)) {
 			/* Class name used to load the module definition */
-			if (!phalcon_array_isset_fetch_str(&module_namespace, &module, SL("namespaceName"), PH_READONLY)) {
+			if (!phalcon_array_isset_fetch_str(&module_namespace, &module, SL("namespaceName"), PH_COPY)) {
 				ZVAL_EMPTY_STRING(&module_namespace);
 			}
 
@@ -268,8 +274,9 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 					PHALCON_CONCAT_VSV(&class_name, &module_namespace, "\\", &module_class);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&class_name, &module_class);
+				ZVAL_COPY(&class_name, &module_class);
 			}
+			zval_ptr_dtor(&module_namespace);
 
 			/* If the developer has specified a path, try to include the file */
 			if (phalcon_array_isset_fetch_str(&path, &module, SL("path"), PH_READONLY)) {
@@ -279,18 +286,22 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 						RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 					} else {
 						zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL(path));
+						zval_ptr_dtor(&dependency_injector);
+						zval_ptr_dtor(&module_name);
 						return;
 					}
 				}
 			}
 
 			PHALCON_CALL_METHOD(&module_object, &dependency_injector, "get", &class_name);
+			zval_ptr_dtor(&class_name);
 			if (instanceof_function(Z_OBJCE(module_object), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
 				array_init_size(&module_params, 1);
 				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
 				PHALCON_CALL_USER_FUNC_ARRAY(&status, &module_object, &module_params);
+				zval_ptr_dtor(&module_params);
 			} else if (instanceof_function(Z_OBJCE(module_object), phalcon_mvc_moduledefinitioninterface_ce)) {
 				/**
 				 * 'registerAutoloaders' and 'registerServices' are automatically called
@@ -298,6 +309,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
 				PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
 			}
+			zval_ptr_dtor(&module_object);
 		} else if (Z_TYPE(module) == IS_OBJECT) {
 			if (instanceof_function(Z_OBJCE(module), zend_ce_closure)) {
 				/* A module definition object, can be a Closure instance */
@@ -305,12 +317,15 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				phalcon_array_append(&module_params, &dependency_injector, PH_COPY);
 
 				PHALCON_CALL_USER_FUNC_ARRAY(&status, &module, &module_params);
+				zval_ptr_dtor(&module_params);
 			} else if (instanceof_function(Z_OBJCE(module), phalcon_mvc_moduledefinitioninterface_ce)) {
 				PHALCON_CALL_METHOD(NULL, &module, "registerautoloaders", &dependency_injector);
 				PHALCON_CALL_METHOD(NULL, &module, "registerservices", &dependency_injector);
 			}
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
+			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&module_name);
 			return;
 		}
 
@@ -318,8 +333,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		ZVAL_STRING(&event_name, "application:afterStartModule");
 		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &module_name);
 		zval_ptr_dtor(&event_name);
+		zval_ptr_dtor(&module_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&dependency_injector);
 			RETURN_FALSE;
 		}
 	}
@@ -350,9 +367,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
 	PHALCON_CALL_METHOD(&exact, &router, "isexactcontrollername");
+	zval_ptr_dtor(&router);
 
 	if (!zend_is_true(&namespace_name) && zend_is_true(&module_namespace)) {
-		ZVAL_COPY_VALUE(&namespace_name, &module_namespace);
+		ZVAL_COPY(&namespace_name, &module_namespace);
 	}
 
 	ZVAL_STR(&service, IS(dispatcher));
@@ -366,6 +384,12 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setcontrollername", &controller_name, &exact);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setactionname", &action_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &params);
+	zval_ptr_dtor(&module_name);
+	zval_ptr_dtor(&namespace_name);
+	zval_ptr_dtor(&controller_name);
+	zval_ptr_dtor(&exact);
+	zval_ptr_dtor(&action_name);
+	zval_ptr_dtor(&params);
 
 	if (f_implicit_view) {
 		/**
@@ -380,6 +404,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dependency_injector);
 		RETURN_FALSE;
 	}
 
@@ -392,6 +417,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dependency_injector);
+		zval_ptr_dtor(&controller);
 		RETURN_FALSE;
 	}
 
@@ -401,7 +428,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		/* Check if the returned object is already a response */
 		if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_http_responseinterface_ce, 1)) {
-			ZVAL_COPY_VALUE(&response, &possible_response);
+			ZVAL_COPY(&response, &possible_response);
 			ZVAL_TRUE(&returned_response);
 		} else {
 			ZVAL_STR(&service, IS(response));
@@ -410,10 +437,17 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
-				RETURN_CTOR(&response);
+				zval_ptr_dtor(&dependency_injector);
+				zval_ptr_dtor(&controller);
+				RETVAL_ZVAL(&response, 0, 0);
+				return;
 			} else if (Z_TYPE(possible_response) == IS_STRING) {
 				PHALCON_CALL_METHOD(NULL, &response, "setcontent", &possible_response);
-				RETURN_CTOR(&response);
+				zval_ptr_dtor(&possible_response);
+				zval_ptr_dtor(&dependency_injector);
+				zval_ptr_dtor(&controller);
+				RETVAL_ZVAL(&response, 0, 0);
+				return;
 			}
 			ZVAL_FALSE(&returned_response);
 		}
@@ -451,6 +485,11 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 					/* Automatic render based on the latest controller executed */
 					PHALCON_CALL_METHOD(NULL, &view, "render", &controller_name, &action_name, &params, &namespace_name);
 				}
+				zval_ptr_dtor(&namespace_name);
+				zval_ptr_dtor(&controller_name);
+				zval_ptr_dtor(&action_name);
+				zval_ptr_dtor(&params);
+				zval_ptr_dtor(&possible_response);
 			}
 		}
 	} else {
@@ -459,6 +498,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 	}
+	zval_ptr_dtor(&dependency_injector);
 
 	if (f_implicit_view) {
 		PHALCON_CALL_METHOD(NULL, &view, "finish");
@@ -474,7 +514,9 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			/* The content returned by the view is passed to the response service */
 			PHALCON_CALL_METHOD(&content, &view, "getcontent");
 			PHALCON_CALL_METHOD(NULL, &response, "setcontent", &content);
+			zval_ptr_dtor(&content);
 		}
+		zval_ptr_dtor(&view);
 	}
 
 	/* Calling beforeSendResponse */
@@ -483,6 +525,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&controller);
+		zval_ptr_dtor(&response);
 		RETURN_FALSE;
 	}
 
@@ -501,9 +545,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("aftersendresponse")) == SUCCESS)) {
 		PHALCON_CALL_METHOD(NULL, &controller, "aftersendresponse", &response);
 	}
+	zval_ptr_dtor(&controller);
 
 	/* Return the response */
-	RETURN_CTOR(&response);
+	RETURN_ZVAL(&response, 0, 0);
 }
 
 /**

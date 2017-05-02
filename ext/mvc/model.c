@@ -1878,7 +1878,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 					PHALCON_SCONCAT_VSVS(&condition, &id_condition, " = '", parameters, "'");
 					zval_ptr_dtor(&id_condition);
 					phalcon_array_append(&params, &condition, PH_COPY);
-					zval_ptr_dtor(&id_condition);
+					zval_ptr_dtor(&condition);
 				} else {
 					phalcon_array_append(&params, parameters, PH_COPY);
 				}
@@ -1894,6 +1894,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	zval_ptr_dtor(&manager);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
+	zval_ptr_dtor(&model_name);
 
 	ZVAL_STRING(&event_name, "beforeQuery");
 	PHALCON_CALL_METHOD(NULL, &model, "fireevent", &event_name, &builder);
@@ -1944,7 +1945,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	zval_ptr_dtor(&params);
 
 	if (zend_is_true(auto_create)) {
-		RETURN_CTOR(&model);
+		RETVAL_ZVAL(&model, 0, 0);
 	} else {
 		zval_ptr_dtor(&model);
 		RETURN_FALSE;

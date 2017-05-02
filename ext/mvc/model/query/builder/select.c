@@ -861,9 +861,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 
 	PHALCON_CALL_SELF(&bind_params, "getbindparams");
 	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
+	zval_ptr_dtor(&bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
+	zval_ptr_dtor(&bind_types);
 
 	phalcon_update_property(getThis(), SL("_phql"), &phql);
 	zval_ptr_dtor(&phql);

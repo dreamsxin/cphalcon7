@@ -352,16 +352,12 @@ PHP_METHOD(Phalcon_Image_Adapter, liquidRescale){
 	PHALCON_ENSURE_IS_LONG(width);
 	PHALCON_ENSURE_IS_LONG(height);
 
-	if (!delta_x) {
+	if (!delta_x || Z_TYPE_P(delta_x) == IS_NULL) {
 		delta_x = &PHALCON_GLOBAL(z_zero);
-	} else {
-		PHALCON_ENSURE_IS_LONG(delta_x);
 	}
 
-	if (!rigidity) {
+	if (!rigidity || Z_TYPE_P(rigidity) == IS_NULL) {
 		rigidity = &PHALCON_GLOBAL(z_zero);
-	} else {
-		PHALCON_ENSURE_IS_LONG(rigidity);
 	}
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "_liquidrescale", width, height, delta_x, rigidity);
@@ -389,16 +385,6 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 	phalcon_read_property(&image_width, getThis(), SL("_width"), PH_READONLY);
 	phalcon_read_property(&image_height, getThis(), SL("_height"), PH_READONLY);
 
-	if (ofs_x && Z_TYPE_P(ofs_x) > IS_NULL && !PHALCON_IS_BOOL(ofs_x) && Z_TYPE_P(ofs_x) != IS_LONG) {
-		SEPARATE_ZVAL_IF_NOT_REF(ofs_x);
-		convert_to_long(ofs_x);
-	}
-
-	if (ofs_y && Z_TYPE_P(ofs_y) > IS_NULL && !PHALCON_IS_BOOL(ofs_y) && Z_TYPE_P(ofs_x) != IS_LONG) {
-		SEPARATE_ZVAL_IF_NOT_REF(ofs_y);
-		convert_to_long(ofs_y);
-	}
-
 	tmp_width        = Z_LVAL_P(w);
 	tmp_height       = Z_LVAL_P(h);
 	tmp_image_width  = phalcon_get_intval(&image_width);
@@ -412,7 +398,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		tmp_height = tmp_image_height;
 	}
 
-	if (!ofs_x) {
+	if (!ofs_x || Z_TYPE_P(ofs_x) == IS_NULL) {
 		tmp_offset_x = (int)(((tmp_image_width - tmp_width) / 2) + 0.5);
 	} else if (PHALCON_IS_TRUE(ofs_x)) {
 		tmp_offset_x = tmp_image_width - tmp_width;
@@ -426,7 +412,7 @@ PHP_METHOD(Phalcon_Image_Adapter, crop){
 		tmp_offset_x = (int)(((tmp_image_width - tmp_width) / 2) + 0.5);
 	}
 
-	if (!ofs_y) {
+	if (!ofs_y || Z_TYPE_P(ofs_x) == IS_NULL) {
 		tmp_offset_y = (int)(((tmp_image_height - tmp_height) / 2) + 0.5);
 	} else if (PHALCON_IS_TRUE(ofs_y)) {
 		tmp_offset_y = tmp_image_height - tmp_height;
@@ -722,7 +708,6 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	if (!fontsize || Z_TYPE_P(fontsize) == IS_NULL) {
 		ZVAL_LONG(&size, 12);
 	} else {
-		PHALCON_ENSURE_IS_LONG(fontsize);
 		ZVAL_LONG(&size, Z_LVAL_P(fontsize));
 	}
 
@@ -751,12 +736,15 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 
 	phalcon_substr(&tmp, &color, 0, 2);
 	_php_math_basetozval(&tmp, 16, &r);
+	zval_ptr_dtor(&tmp);
 
 	phalcon_substr(&tmp, &color, 2, 2);
 	_php_math_basetozval(&tmp, 16, &g);
+	zval_ptr_dtor(&tmp);
 
 	phalcon_substr(&tmp, &color, 4, 2);
 	_php_math_basetozval(&tmp, 16, &b);
+	zval_ptr_dtor(&tmp);
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "_text", text, &offset_x, &offset_y, &opacity, &r, &g, &b, &size, fontfile);
 

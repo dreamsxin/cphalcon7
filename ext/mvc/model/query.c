@@ -3699,9 +3699,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 					PHALCON_CONCAT_SV(&query_key, ":", &k);
 					phalcon_array_append(&bind_keys, &query_key, 0);
 					phalcon_array_update(&processed, &k, v, PH_COPY);
-					phalcon_increment(&hidden_param);
-
 					zval_ptr_dtor(&k);
+					phalcon_increment(&hidden_param);
 				} ZEND_HASH_FOREACH_END();
 
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
@@ -3714,12 +3713,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 				zval_ptr_dtor(&sql_select);
 
 				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
-				phalcon_array_unset(&bind_types, &wildcard, 0);
-
 				zval_ptr_dtor(&sql_tmp);
+				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
@@ -3777,6 +3776,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		ZVAL_BOOL(&result_data, 0);
 	}
 	zval_ptr_dtor(&result);
+	zval_ptr_dtor(&count);
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 

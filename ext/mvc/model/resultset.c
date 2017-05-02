@@ -327,8 +327,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (PHALCON_IS_NOT_FALSE(&result)) {
 				PHALCON_CALL_METHOD(&number_rows, &result, "numrows");
-
 				ZVAL_LONG(&count, phalcon_get_intval(&number_rows));
+				zval_ptr_dtor(&number_rows);
 			}
 		} else {
 			/**
@@ -350,7 +350,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 		phalcon_update_property(getThis(), SL("_count"), &count);
 	}
 
-	RETURN_CTOR(&count);
+	RETURN_ZVAL(&count, 0, 0);
 }
 
 /**
@@ -367,6 +367,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetExists){
 
 	PHALCON_CALL_METHOD(&count, getThis(), "count");
 	is_smaller_function(return_value, index, &count);
+	zval_ptr_dtor(&count);
 }
 
 /**
@@ -403,13 +404,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetGet){
 		PHALCON_CALL_METHOD(&valid, getThis(), "valid");
 		if (PHALCON_IS_NOT_FALSE(&valid)) {
 			PHALCON_RETURN_CALL_METHOD(getThis(), "current");
-			return;
+		} else {
+			RETVAL_FALSE;
 		}
-
-		RETURN_FALSE;
+	} else {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the cursor");
 	}
-
-	PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the cursor");
+	zval_ptr_dtor(&count);
 }
 
 /**
@@ -477,11 +478,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, getFirst){
 
 	PHALCON_CALL_METHOD(&valid, getThis(), "valid");
 	if (PHALCON_IS_NOT_FALSE(&valid)) {
-		PHALCON_RETURN_CALL_METHOD(getThis(), "current");
-		return;
+		PHALCON_CALL_METHOD(return_value, getThis(), "current");
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&valid);
 }
 
 /**
@@ -729,22 +730,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 		PHALCON_CALL_METHOD(&record, getThis(), "current");
 
 		array_init(&parameters);
-		phalcon_array_update_long(&parameters, 0, &record, PH_COPY);
+		phalcon_array_update_long(&parameters, 0, &record, 0);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, &parameters);
 		zval_ptr_dtor(&parameters);
-		zval_ptr_dtor(&record);
 
 		/**
 		 * Only add processed records to 'records' if the returned value is an array/object
 		 */
 		if (Z_TYPE(processed_record) != IS_OBJECT) {
 			if (Z_TYPE(processed_record) != IS_ARRAY) {
+				zval_ptr_dtor(&processed_record);
 				continue;
 			}
 		}
 
-		phalcon_array_append(&records, &processed_record, PH_COPY);
+		phalcon_array_append(&records, &processed_record, 0);
 		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 

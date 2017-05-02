@@ -306,6 +306,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 			phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY|PH_READONLY);
 			PHALCON_CALL_METHOD(&row_count, &pdo_statement, "rowcount");
 		}
+		zval_ptr_dtor(&type);
 
 		/**
 		 * We should get the count using a new statement :(
@@ -356,10 +357,9 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		 * Update the value to avoid further calculations
 		 */
 		phalcon_update_property(getThis(), SL("_rowCount"), &row_count);
-		zval_ptr_dtor(&row_count);
 	}
 
-	RETURN_CTOR(&row_count);
+	RETVAL_ZVAL(&row_count, 0, 0);
 }
 
 /**

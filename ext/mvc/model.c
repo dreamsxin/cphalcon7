@@ -2109,28 +2109,34 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
 			zval_ptr_dtor(&key);
 		}
 
-		phalcon_array_append(&where_pk, &pk_condition, PH_COPY);
-		zval_ptr_dtor(&pk_condition);
+		phalcon_array_append(&where_pk, &pk_condition, 0);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&column_map);
+	zval_ptr_dtor(&primary_keys);
+	zval_ptr_dtor(&bind_data_types);
 
 	if (not_empty_num <= 0) {
-			phalcon_update_property_null(getThis(), SL("_uniqueKey"));
-			phalcon_update_property_null(getThis(), SL("_uniqueParams"));
-			phalcon_update_property_null(getThis(), SL("_uniqueTypes"));
+		phalcon_update_property_null(getThis(), SL("_uniqueKey"));
+		phalcon_update_property_null(getThis(), SL("_uniqueParams"));
+		phalcon_update_property_null(getThis(), SL("_uniqueTypes"));
 
-			RETURN_FALSE;
+		RETVAL_FALSE;
+	} else {
+		phalcon_fast_join_str(&join_where, SL(" AND "), &where_pk);
+
+		/**
+		 * The unique key is composed of 3 parts _uniqueKey, uniqueParams, uniqueTypes
+		 */
+		phalcon_update_property(getThis(), SL("_uniqueKey"), &join_where);
+		phalcon_update_property(getThis(), SL("_uniqueParams"), &unique_params);
+		phalcon_update_property(getThis(), SL("_uniqueTypes"), &unique_types);
+
+		RETVAL_TRUE;
 	}
-
-	phalcon_fast_join_str(&join_where, SL(" AND "), &where_pk);
-
-	/**
-	 * The unique key is composed of 3 parts _uniqueKey, uniqueParams, uniqueTypes
-	 */
-	phalcon_update_property(getThis(), SL("_uniqueKey"), &join_where);
-	phalcon_update_property(getThis(), SL("_uniqueParams"), &unique_params);
-	phalcon_update_property(getThis(), SL("_uniqueTypes"), &unique_types);
-
-	RETURN_TRUE;
+	zval_ptr_dtor(&where_pk);
+	zval_ptr_dtor(&join_where);
+	zval_ptr_dtor(&unique_params);
+	zval_ptr_dtor(&unique_types);
 }
 
 /**
@@ -6125,6 +6131,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 		}
 
 		phalcon_update_property_zval_zval(getThis(), property, value);
+		zval_ptr_dtor(&model_name);
+		zval_ptr_dtor(&lower_property);
 		RETURN_CTOR(value);
 	}
 
@@ -6211,6 +6219,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 						zval tmp_referenced_model_name = {};
 						PHALCON_CALL_METHOD(&tmp_referenced_model_name, &relation, "getreferencedmodel");
 						PHALCON_CALL_METHOD(&referenced_model, &manager, "load", &tmp_referenced_model_name, &PHALCON_GLOBAL(z_false));
+						zval_ptr_dtor(&tmp_referenced_model_name);
 						if (Z_TYPE(referenced_model) == IS_OBJECT) {
 							PHALCON_CALL_METHOD(NULL, &referenced_model, "assign", item);
 						}

@@ -1586,6 +1586,7 @@ int phalcon_method_exists(const zval *object, const zval *method_name){
 
 	while (ce) {
 		if (zend_hash_exists(&ce->function_table, lcname)) {
+			zend_string_release(lcname);
 			return SUCCESS;
 		}
 		ce = ce->parent;

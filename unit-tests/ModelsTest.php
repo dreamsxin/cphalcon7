@@ -96,6 +96,7 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
+		$this->_executeTestRawValue($di);
 
 		$this->issue1534($di);
 		$this->issue886($di);
@@ -117,6 +118,7 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
 		$this->_executeTestsDataType($di);
+		$this->_executeTestRawValue($di);
 
 		$this->issue886($di);
 	}
@@ -136,6 +138,7 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 
 		$this->_executeTestsNormal($di);
 		$this->_executeTestsRenamed($di);
+		$this->_executeTestRawValue($di);
 
 		$this->issue886($di);
 	}
@@ -745,7 +748,8 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals($personerData, $personer->toArray());
 	}
 
-	public function testRawValue() {
+	public function _executeTestRawValue($di) {
+		$this->_prepareDb($di->getShared('db'));
 		$parameters = array(
 			'conditions' => ' :rawsql: ',
 			'bind' => array('rawsql' => new Phalcon\Db\RawValue("estado='I'")),

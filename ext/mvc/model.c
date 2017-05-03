@@ -1749,7 +1749,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 			phalcon_array_append(&params, parameters, PH_COPY);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&params, parameters);
+		ZVAL_COPY(&params, parameters);
 	}
 
 	phalcon_get_called_class(&model_name);
@@ -1806,6 +1806,7 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		PHALCON_CALL_METHOD(NULL, &model, "fireevent", &event_name, return_value);
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&params);
 
 	zval_ptr_dtor(&model);
 }

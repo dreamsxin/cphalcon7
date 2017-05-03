@@ -3421,6 +3421,38 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getCache){
 	RETURN_MEMBER(getThis(), "_cache");
 }
 
+static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *value)
+{
+	zval string_wildcard = {}, fixed_value = {}, sql_tmp = {};
+	PHALCON_CONCAT_SVS(&string_wildcard, ":", wildcard, ",");
+	if (!phalcon_memnstr(sql, &string_wildcard)) {
+		zval_ptr_dtor(&string_wildcard);
+		PHALCON_CONCAT_SVS(&string_wildcard, ":", wildcard, " ");
+		if (!phalcon_memnstr(sql, &string_wildcard)) {
+			zval_ptr_dtor(&string_wildcard);
+			PHALCON_CONCAT_SVS(&string_wildcard, ":", wildcard, ")");
+
+			if (!phalcon_memnstr(sql, &string_wildcard)) {
+				zval_ptr_dtor(&string_wildcard);
+				PHALCON_CONCAT_SV(&string_wildcard, ":", wildcard);
+				ZVAL_COPY(&fixed_value, value);
+			} else {
+				PHALCON_CONCAT_VS(&fixed_value, value, ")");
+			}
+		} else {
+			PHALCON_CONCAT_VS(&fixed_value, value, " ");
+		}
+	} else {
+		PHALCON_CONCAT_VS(&fixed_value, value, ",");
+	}
+	PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &fixed_value, sql);
+	zval_ptr_dtor(&string_wildcard);
+	zval_ptr_dtor(&fixed_value);
+	zval_ptr_dtor(sql);
+	ZVAL_STRING(sql, Z_STRVAL(sql_tmp));
+	zval_ptr_dtor(&sql_tmp);
+}
+
 /**
  * Executes the SELECT intermediate representation producing a Phalcon\Mvc\Model\Resultset
  *
@@ -3664,7 +3696,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
+			zval wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -3672,21 +3704,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			}
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-
+				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_select);
+				phalcon_query_sql_replace(&sql_select, &wildcard, &tmp_value);
 				zval_ptr_dtor(&tmp_value);
-				zval_ptr_dtor(&string_wildcard);
-				zval_ptr_dtor(&sql_select);
-
-				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
-				zval_ptr_dtor(&sql_tmp);
-
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
-				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {};
 				array_init(&bind_keys);
 				ZVAL_LONG(&hidden_param, 0);
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
@@ -3705,17 +3729,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_select);
+				phalcon_query_sql_replace(&sql_select, &wildcard, &joined_keys);
 				zval_ptr_dtor(&joined_keys);
-				zval_ptr_dtor(&string_wildcard);
-				zval_ptr_dtor(&sql_select);
-
-				ZVAL_STRING(&sql_select, Z_STRVAL(sql_tmp));
-				zval_ptr_dtor(&sql_tmp);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
+				zval string_wildcard = {};
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
 				zval_ptr_dtor(&string_wildcard);
@@ -3919,7 +3937,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
+			zval wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -3927,20 +3945,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 			}
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-
+				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &sql_insert);
-				zval_ptr_dtor(&sql_insert);
+				phalcon_query_sql_replace(&sql_insert, &wildcard, &tmp_value);
 				zval_ptr_dtor(&tmp_value);
-				zval_ptr_dtor(&string_wildcard);
-				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
-				zval_ptr_dtor(&sql_tmp);
-
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
-				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {};
 				array_init(&bind_keys);
 				ZVAL_LONG(&hidden_param, 0);
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
@@ -3958,15 +3969,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &sql_insert);
+				phalcon_query_sql_replace(&sql_insert, &wildcard, &joined_keys);
 				zval_ptr_dtor(&joined_keys);
-				zval_ptr_dtor(&string_wildcard);
-				zval_ptr_dtor(&sql_insert);
-				ZVAL_STRING(&sql_insert, Z_STRVAL(sql_tmp));
-				zval_ptr_dtor(&sql_tmp);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
+				zval string_wildcard = {};
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
 				zval_ptr_dtor(&string_wildcard);
@@ -4097,7 +4104,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
+			zval wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -4105,17 +4112,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			}
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-
+				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &update_sql);
-
-				ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
-
+				phalcon_query_sql_replace(&update_sql, &wildcard, &tmp_value);
+				zval_ptr_dtor(&tmp_value);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
-				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {};
 				array_init(&bind_keys);
 				ZVAL_LONG(&hidden_param, 0);
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
@@ -4131,10 +4134,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 					phalcon_increment(&hidden_param);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &update_sql);
-				ZVAL_STRING(&update_sql, Z_STRVAL(sql_tmp));
+				zval_ptr_dtor(&bind_keys);
+				phalcon_query_sql_replace(&update_sql, &wildcard, &joined_keys);
+				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
+			} else if (Z_TYPE(wildcard) == IS_LONG) {
+				zval string_wildcard = {};
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
@@ -4239,7 +4247,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 		array_init(&processed);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {}, sql_tmp = {}, tmp_value = {};
+			zval wildcard = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -4247,17 +4255,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			}
 
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-
+				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &tmp_value, &delete_sql);
-
-				ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
-
+				phalcon_query_sql_replace(&delete_sql, &wildcard, &tmp_value);
+				zval_ptr_dtor(&tmp_value);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
-				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {}, sql_tmp = {};
+				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {};
 				array_init(&bind_keys);
 				ZVAL_LONG(&hidden_param, 0);
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(value), v) {
@@ -4273,10 +4277,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 					phalcon_increment(&hidden_param);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &joined_keys, &delete_sql);
-				ZVAL_STRING(&delete_sql, Z_STRVAL(sql_tmp));
+				zval_ptr_dtor(&bind_keys);
+				phalcon_query_sql_replace(&delete_sql, &wildcard, &joined_keys);
+				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
+			} else if (Z_TYPE(wildcard) == IS_LONG) {
+				zval string_wildcard = {};
+				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}

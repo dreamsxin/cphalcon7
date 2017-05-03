@@ -714,6 +714,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_CYCLIC_ROUTING);
 			ZVAL_STRING(&exception_message, "Dispatcher has detected a cyclic routing causing stability problems");
 			PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+			zval_ptr_dtor(&exception_message);
 			break;
 		}
 
@@ -852,6 +853,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			ZVAL_STRING(&exception_message, "Invalid handler returned from the services container");
 
 			PHALCON_CALL_METHOD(&status, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+			zval_ptr_dtor(&exception_message);
 			if (PHALCON_IS_FALSE(&status)) {
 				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
@@ -885,11 +887,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
 				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
+					zval_ptr_dtor(&action_method);
 					continue;
 				}
 
 				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
+					zval_ptr_dtor(&action_method);
 					continue;
 				}
 			}
@@ -1492,7 +1496,6 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 	int ret, ret2;
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
-	PHALCON_SEPARATE_PARAM(eventname);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -1517,6 +1520,7 @@ PHP_METHOD(Phalcon_Dispatcher, fireEvent){
 		zval *params[] = {&event_name, &exception};
 		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
 		zval_ptr_dtor(&event_name);
+		zval_ptr_dtor(&exception);
 		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}

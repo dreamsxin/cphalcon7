@@ -156,6 +156,7 @@ PHP_METHOD(Phalcon_Crypt, setMethod){
 
 	if (Z_TYPE(methods) != IS_ARRAY || !phalcon_fast_in_array(method, &methods)) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_crypt_exception_ce, "Cipher method not available: %s", method);
+		zval_ptr_dtor(&methods);
 		return;
 	}
 
@@ -185,7 +186,6 @@ PHP_METHOD(Phalcon_Crypt, setKey){
 	zval *key;
 
 	phalcon_fetch_params(0, 1, 0, &key);
-	PHALCON_ENSURE_IS_STRING(key);
 
 	phalcon_update_property(getThis(), SL("_key"), key);
 	RETURN_THIS();
@@ -370,7 +370,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	if (Z_TYPE_P(source) != IS_STRING) {
 		phalcon_cast(&text, source, IS_STRING);
 	} else {
-		ZVAL_COPY_VALUE(&text, source);
+		ZVAL_COPY(&text, source);
 	}
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
@@ -396,8 +396,10 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 	if (!phalcon_fast_in_array(&method, &methods)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Cipher algorithm is unknown");
+		zval_ptr_dtor(&methods);
 		return;
 	}
+	zval_ptr_dtor(&methods);
 */
 
 	phalcon_read_property(&padding, getThis(), SL("_padding"), PH_NOISY|PH_READONLY);
@@ -418,15 +420,22 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		if (PHALCON_LE_LONG(&iv_size, 0) && zend_is_true(&cipher)) {
 			PHALCON_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
 		} else {
-			ZVAL_COPY_VALUE(&block_size, &iv_size);
+			ZVAL_COPY(&block_size, &iv_size);
 		}
 		phalcon_crypt_pad_text(&padded, &text, &mode, Z_LVAL(block_size), Z_LVAL(padding));
+		zval_ptr_dtor(&block_size);
 	} else {
-		ZVAL_COPY_VALUE(&padded, &text);
+		ZVAL_COPY(&padded, &text);
 	}
+	zval_ptr_dtor(&cipher);
+	zval_ptr_dtor(&mode);
+	zval_ptr_dtor(&text);
 
 	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &padded, &method, &encrypt_key, &encrypt_options, &iv);
+	zval_ptr_dtor(&padded);
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
+	zval_ptr_dtor(&iv);
+	zval_ptr_dtor(&encrypt);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY|PH_READONLY);
 
@@ -436,8 +445,9 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 		zval_ptr_dtor(&arguments);
+		zval_ptr_dtor(return_value);
 
-		RETURN_CTOR(&value);
+		RETVAL_ZVAL(&value, 0, 0);
 	}
 }
 
@@ -586,16 +596,17 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
 		zval_ptr_dtor(&arguments);
-
-		source = &value;
+	} else {
+		ZVAL_COPY(&value, source);
 	}
 
 	/* Do not use make_printable_zval() here: we need the conversion with type juggling */
-	if (Z_TYPE_P(source) != IS_STRING) {
-		phalcon_cast(&text, source, IS_STRING);
+	if (Z_TYPE(value) != IS_STRING) {
+		phalcon_cast(&text, &value, IS_STRING);
 	} else {
-		ZVAL_COPY_VALUE(&text, source);
+		ZVAL_COPY(&text, &value);
 	}
+	zval_ptr_dtor(&value);
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
 		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
@@ -632,13 +643,16 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 
 	if (Z_LVAL(iv_size) <= 0) {
 		ZVAL_NULL(&iv);
-		ZVAL_COPY_VALUE(&text_to_decipher, &text);
+		ZVAL_COPY(&text_to_decipher, &text);
 	} else {
 		phalcon_substr(&iv, &text, 0, Z_LVAL(iv_size));
 		phalcon_substr(&text_to_decipher, &text, Z_LVAL(iv_size), 0);
 	}
+	zval_ptr_dtor(&text);
 
 	PHALCON_CALL_FUNCTION(&decrypted, "openssl_decrypt", &text_to_decipher, &method, &encrypt_key, &encrypt_options, &iv);
+	zval_ptr_dtor(&text_to_decipher);
+	zval_ptr_dtor(&iv);
 	if (unlikely(Z_TYPE(decrypted) != IS_STRING)) {
 		convert_to_string(&decrypted);
 	}
@@ -647,23 +661,28 @@ PHP_METHOD(Phalcon_Crypt, decrypt){
 		if (PHALCON_LE_LONG(&iv_size, 0) && zend_is_true(&cipher)) {
 			PHALCON_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
 		} else {
-			ZVAL_COPY_VALUE(&block_size, &iv_size);
+			ZVAL_COPY(&block_size, &iv_size);
 		}
 		phalcon_crypt_unpad_text(&unpadded, &decrypted, &mode, Z_LVAL(block_size), Z_LVAL(padding));
+		zval_ptr_dtor(&block_size);
 	} else {
-		ZVAL_COPY_VALUE(&unpadded, &decrypted);
+		ZVAL_COPY(&unpadded, &decrypted);
 	}
+	zval_ptr_dtor(&mode);
+	zval_ptr_dtor(&cipher);
+	zval_ptr_dtor(&decrypted);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterDecrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, &decrypted, PH_COPY);
+		phalcon_array_append(&arguments, &unpadded, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(return_value, &handler, &arguments);
 		zval_ptr_dtor(&arguments);
+		zval_ptr_dtor(&unpadded);
 	} else {
-		RETURN_CTOR(&unpadded);
+		RETVAL_ZVAL(&unpadded, 0, 0);
 	}
 }
 
@@ -691,6 +710,7 @@ PHP_METHOD(Phalcon_Crypt, encryptBase64){
 	PHALCON_CALL_METHOD(&encrypt_value, getThis(), "encrypt", text, key);
 
 	phalcon_base64_encode(return_value, &encrypt_value);
+	zval_ptr_dtor(&encrypt_value);
 	if (zend_is_true(safe)) {
 		php_strtr(Z_STRVAL_P(return_value), Z_STRLEN_P(return_value), "+/", "-_", 2);
 	}
@@ -721,12 +741,14 @@ PHP_METHOD(Phalcon_Crypt, decryptBase64){
 		ZVAL_NEW_STR(&decrypt_text, zend_string_dup(Z_STR_P(text), 0));
 		php_strtr(Z_STRVAL(decrypt_text), Z_STRLEN(decrypt_text), "-_", "+/", 2);
 	} else {
-		ZVAL_COPY_VALUE(&decrypt_text, text);
+		ZVAL_COPY(&decrypt_text, text);
 	}
 
 	phalcon_base64_decode(&decrypt_value, &decrypt_text);
+	zval_ptr_dtor(&decrypt_text);
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "decrypt", &decrypt_value, key);
+	zval_ptr_dtor(&decrypt_value);
 }
 
 /**

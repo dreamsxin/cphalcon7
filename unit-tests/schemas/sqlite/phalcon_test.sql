@@ -6521,6 +6521,17 @@ INSERT INTO "tipo_documento" VALUES(1997,'TIPO 1996');
 INSERT INTO "tipo_documento" VALUES(1998,'TIPO 1997');
 INSERT INTO "tipo_documento" VALUES(1999,'TIPO 1998');
 INSERT INTO "tipo_documento" VALUES(2000,'TIPO 1999');
+
+CREATE TABLE `issue_1534` (
+  `id` INTEGER,
+  `language` varchar(2) NOT NULL DEFAULT 'bb',
+  `name` varchar(255) NOT NULL,
+  `slug` varchar(20) NOT NULL UNIQUE,
+  `brand` varchar(100) DEFAULT NULL,
+  `sort` tinyint(3) NOT NULL DEFAULT '0',
+  PRIMARY KEY (`id`,`language`)
+);
+
 CREATE INDEX `personas_estado` ON `personas` (`estado`);
 CREATE INDEX `personas_ciudad_id` ON `personas` (`ciudad_id`);
 CREATE INDEX `personas_estado_2` ON `personas` (`estado`,`nombres`);

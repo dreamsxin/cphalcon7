@@ -328,7 +328,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			if (PHALCON_IS_NOT_FALSE(&result)) {
 				PHALCON_CALL_METHOD(&number_rows, &result, "numrows");
 				ZVAL_LONG(&count, phalcon_get_intval(&number_rows));
-				zval_ptr_dtor(&number_rows);
 			}
 		} else {
 			/**
@@ -350,7 +349,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 		phalcon_update_property(getThis(), SL("_count"), &count);
 	}
 
-	RETURN_ZVAL(&count, 0, 0);
+	RETURN_CTOR(&count);
 }
 
 /**

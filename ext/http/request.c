@@ -1567,6 +1567,7 @@ PHP_METHOD(Phalcon_Http_Request, getHeaders){
 			zval header = {};
 			ZVAL_STRINGL(&header, ZSTR_VAL(str_key) + 5, ZSTR_LEN(str_key) - 5);
 			phalcon_array_update(return_value, &header, value, PH_COPY);
+			zval_ptr_dtor(&header);
 		}
 	} ZEND_HASH_FOREACH_END();
 }
@@ -1609,24 +1610,28 @@ PHP_METHOD(Phalcon_Http_Request, _getQualityHeader){
 
 	ZVAL_STRING(&pattern, "/,\\s*/");
 	PHALCON_CALL_FUNCTION(&parts, "preg_split", &pattern, &http_server);
+	zval_ptr_dtor(&pattern);
+	zval_ptr_dtor(&http_server);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(parts), part) {
-		zval header_parts = {}, quality_part = {}, quality = {}, header_name = {};
+		zval header_parts = {}, quality_part = {}, quality = {}, qualitys = {}, header_name = {};
 		phalcon_fast_explode_str(&header_parts, SL(";"), part);
 		if (phalcon_array_isset_fetch_long(&quality_part, &header_parts, 1, PH_READONLY)) {
 			phalcon_substr(&quality, &quality_part, 2, 0);
 		} else {
-			ZVAL_COPY_VALUE(&quality, &quality_one);
+			ZVAL_COPY(&quality, &quality_one);
 		}
 
-		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY|PH_READONLY);
+		phalcon_array_fetch_long(&header_name, &header_parts, 0, PH_NOISY|PH_COPY);
+		zval_ptr_dtor(&header_parts);
 
-		array_init_size(&quality_part, 2);
-		phalcon_array_update(&quality_part, name, &header_name, PH_COPY);
-		phalcon_array_update_str(&quality_part, SL("quality"), &quality, PH_COPY);
+		array_init_size(&qualitys, 2);
+		phalcon_array_update(&qualitys, name, &header_name, 0);
+		phalcon_array_update_str(&qualitys, SL("quality"), &quality, 0);
 
-		phalcon_array_append(return_value, &quality_part, PH_COPY);
+		phalcon_array_append(return_value, &qualitys, 0);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&parts);
 }
 
 /**
@@ -1653,11 +1658,12 @@ PHP_METHOD(Phalcon_Http_Request, _getBestQuality){
 		is_smaller_function(&best_quality, &quality, &accept_quality);
 		if (PHALCON_IS_TRUE(&best_quality)) {
 			ZVAL_COPY_VALUE(&quality, &accept_quality);
-			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY|PH_READONLY);
+			zval_ptr_dtor(&selected_name);
+			phalcon_array_fetch(&selected_name, accept, name, PH_NOISY|PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_CTOR(&selected_name);
+	RETVAL_ZVAL(&selected_name, 0, 0);
 }
 
 /**
@@ -1673,6 +1679,8 @@ PHP_METHOD(Phalcon_Http_Request, getAcceptableContent)
 	ZVAL_STRING(&quality_index, "accept");
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &accept_header, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&accept_header);
 }
 
 /**
@@ -1688,6 +1696,8 @@ PHP_METHOD(Phalcon_Http_Request, getBestAccept)
 
 	PHALCON_CALL_METHOD(&acceptable_content, getThis(), "getacceptablecontent");
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &acceptable_content, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&acceptable_content);
 }
 
 /**
@@ -1703,6 +1713,8 @@ PHP_METHOD(Phalcon_Http_Request, getClientCharsets)
 	ZVAL_STRING(&quality_index, "charset");
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &charset_header, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&charset_header);
 }
 
 /**
@@ -1718,6 +1730,8 @@ PHP_METHOD(Phalcon_Http_Request, getBestCharset)
 
 	PHALCON_CALL_METHOD(&client_charsets, getThis(), "getclientcharsets");
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &client_charsets, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&client_charsets);
 }
 
 /**
@@ -1733,6 +1747,8 @@ PHP_METHOD(Phalcon_Http_Request, getLanguages)
 	ZVAL_STRING(&quality_index, "language");
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getqualityheader", &language_header, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&language_header);
 }
 
 /**
@@ -1748,6 +1764,8 @@ PHP_METHOD(Phalcon_Http_Request, getBestLanguage)
 
 	ZVAL_STRING(&quality_index, "language");
 	PHALCON_RETURN_CALL_METHOD(getThis(), "_getbestquality", &languages, &quality_index);
+	zval_ptr_dtor(&quality_index);
+	zval_ptr_dtor(&languages);
 }
 
 /**
@@ -1767,6 +1785,7 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth)
 			ZVAL_STRING(&key, "PHP_AUTH_USER");
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);
+			zval_ptr_dtor(&key);
 			if (value && Z_TYPE_P(value) == IS_STRING) {
 				auth_user = Z_STRVAL_P(value);
 			}
@@ -1774,6 +1793,7 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth)
 			ZVAL_STRING(&key, "PHP_AUTH_PW");
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);
+			zval_ptr_dtor(&key);
 			if (value && Z_TYPE_P(value) == IS_STRING) {
 				auth_password = Z_STRVAL_P(value);
 			}
@@ -1789,8 +1809,8 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth)
 	}
 
 	array_init_size(return_value, 2);
-	phalcon_array_update_str_str(return_value, SL("username"), auth_user, strlen(auth_user), PH_COPY);
-	phalcon_array_update_str_str(return_value, SL("password"), auth_password, strlen(auth_password), PH_COPY);
+	phalcon_array_update_str_str(return_value, SL("username"), auth_user, strlen(auth_user), 0);
+	phalcon_array_update_str_str(return_value, SL("password"), auth_password, strlen(auth_password), 0);
 }
 
 /**
@@ -1809,6 +1829,7 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 			ZVAL_STRING(&key, "PHP_AUTH_DIGEST");
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);
+			zval_ptr_dtor(&key);
 			if (value && Z_TYPE_P(value) == IS_STRING) {
 				auth_digest = Z_STRVAL_P(value);
 			}
@@ -1823,6 +1844,8 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 		ZVAL_MAKE_REF(&matches);
 		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
 		ZVAL_UNREF(&matches);
+		zval_ptr_dtor(&digest);
+		zval_ptr_dtor(&pattern);
 
 		if (zend_is_true(&ret) && Z_TYPE(matches) == IS_ARRAY) {
 			array_init(return_value);
@@ -1837,6 +1860,7 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
 			return;
 		}
+		zval_ptr_dtor(&matches);
 	}
 
 	RETURN_NULL();

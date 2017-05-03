@@ -536,14 +536,13 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 				 * Update the controller path
 				 */
 				phalcon_array_update_str(&route_paths, SL("controller"), &lower_name, 0);
-
 			}
 
 			/**
 			 * Process action name
 			 */
 			if (Z_TYPE(action_name) != IS_NULL) {
-				phalcon_array_update_str(&route_paths, SL("action"), &action_name, 0);
+				phalcon_array_update_str(&route_paths, SL("action"), &action_name, PH_COPY);
 			}
 			zval_ptr_dtor(&parts);
 		} else if (Z_TYPE_P(paths) == IS_ARRAY) {

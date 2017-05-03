@@ -144,7 +144,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	if (!_arguments) {
 		array_init(&arguments);
 	} else {
-		ZVAL_COPY_VALUE(&arguments, _arguments);
+		ZVAL_COPY(&arguments, _arguments);
 	}
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
@@ -161,6 +161,8 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	PHALCON_VERIFY_INTERFACE(&router, phalcon_routerinterface_ce);
 
 	PHALCON_CALL_METHOD(NULL, &router, "handle", &arguments);
+	zval_ptr_dtor(&arguments);
+
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
 	if (zend_is_true(&module_name)) {
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -169,6 +171,8 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
 			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&dependency_injector);
+				zval_ptr_dtor(&module_name);
 				RETURN_FALSE;
 			}
 		}
@@ -177,6 +181,8 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, PH_READONLY)) {
 			PHALCON_CONCAT_SVS(&exception_msg, "Module '", &module_name, "' isn't registered in the console container");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, &exception_msg);
+			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&module_name);
 			return;
 		}
 
@@ -196,50 +202,64 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			}
 		}
 
-		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_READONLY)) {
+		if (!phalcon_array_isset_fetch_str(&class_name, &module, SL("className"), PH_COPY)) {
 			ZVAL_STRING(&class_name, "Module");
 		}
 
 		PHALCON_CALL_METHOD(&module_object, &dependency_injector, "getshared", &class_name);
+		zval_ptr_dtor(&class_name);
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			phalcon_update_property(getThis(), SL("_moduleObject"), &module_object);
 
 			ZVAL_STRING(&event_name, "console:afterStartModule");
-
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
 			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&module_object);
+				zval_ptr_dtor(&dependency_injector);
+				zval_ptr_dtor(&module_name);
 				RETURN_FALSE;
 			}
 		}
-	}
+		zval_ptr_dtor(&module_object);
+	}	
+	zval_ptr_dtor(&module_name);
 
 	PHALCON_CALL_METHOD(&namespace_name, &router, "getnamespacename");
 	PHALCON_CALL_METHOD(&task_name, &router, "gethandlername");
 	PHALCON_CALL_METHOD(&action_name, &router, "getactionname");
 	PHALCON_CALL_METHOD(&params, &router, "getparams");
+	zval_ptr_dtor(&router);
 
 	ZVAL_STR(&service, IS(dispatcher));
 
 	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
+	zval_ptr_dtor(&dependency_injector);
 	PHALCON_VERIFY_INTERFACE(&dispatcher, phalcon_dispatcherinterface_ce);
 
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setnamespacename", &namespace_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "sethandlername", &task_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setactionname", &action_name);
 	PHALCON_CALL_METHOD(NULL, &dispatcher, "setparams", &params);
+	zval_ptr_dtor(&namespace_name);
+	zval_ptr_dtor(&task_name);
+	zval_ptr_dtor(&action_name);
+	zval_ptr_dtor(&params);
+
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "console:beforeHandleTask");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &dispatcher);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&dispatcher);
 			RETURN_FALSE;
 		}
 	}
 
 	PHALCON_CALL_METHOD(&status, &dispatcher, "dispatch");
+	zval_ptr_dtor(&dispatcher);
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "console:afterHandleTask");
@@ -247,5 +267,5 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		zval_ptr_dtor(&event_name);
 	}
 
-	RETURN_CTOR(&status);
+	RETVAL_ZVAL(&status, 0, 0);
 }

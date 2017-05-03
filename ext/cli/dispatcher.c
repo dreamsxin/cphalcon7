@@ -187,6 +187,7 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &exception);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&exception);
 			RETURN_FALSE;
 		}
 	}
@@ -195,6 +196,7 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 	 * Throw the exception if it wasn't handled
 	 */
 	phalcon_throw_exception(&exception);
+	zval_ptr_dtor(&exception);
 }
 
 /**

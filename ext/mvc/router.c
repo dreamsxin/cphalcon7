@@ -255,10 +255,11 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 		zval_ptr_dtor(&longopts);
 
-		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"), PH_READONLY)
-			|| phalcon_array_isset_fetch_str(&url, &options, SL("uri"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&url, &options, SL("url"), PH_COPY)
+			|| phalcon_array_isset_fetch_str(&url, &options, SL("uri"), PH_COPY)) {
 			zval_ptr_dtor(&options);
-			RETURN_CTOR(&url);
+			RETVAL_ZVAL(&url, 0, 0);
+			return;
 		}
 		zval_ptr_dtor(&options);
 	}
@@ -287,10 +288,11 @@ PHP_METHOD(Phalcon_Mvc_Router, getRewriteUri){
 			zval url_parts = {};
 			phalcon_fast_explode_str(&url_parts, SL("?"), &url);
 
-			phalcon_array_fetch_long(&real_uri, &url_parts, 0, PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_long(&real_uri, &url_parts, 0, PH_NOISY|PH_COPY);
 			if (PHALCON_IS_NOT_EMPTY(&real_uri)) {
 				zval_ptr_dtor(&url_parts);
-				RETURN_CTOR(&real_uri);
+				RETVAL_ZVAL(&real_uri, 0, 0);
+				return;
 			}
 			zval_ptr_dtor(&url_parts);
 		}
@@ -527,7 +529,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			 */
 			if (Z_TYPE(current_host_name) == IS_NULL) {
 				zval_ptr_dtor(&hostname);
-				zval_ptr_dtor(&handled_uri);
 				continue;
 			}
 
@@ -546,7 +547,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				zval_ptr_dtor(&regex_host_name);
 
 				if (!zend_is_true(&matched)) {
-					zval_ptr_dtor(&current_host_name);
 					zval_ptr_dtor(&hostname);
 					continue;
 				}
@@ -554,13 +554,13 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				/* FIXME: handle mixed case */
 				is_equal_function(&matched, &current_host_name, &hostname);
 			}
-			zval_ptr_dtor(&current_host_name);
-			zval_ptr_dtor(&hostname);
 
 			if (!zend_is_true(&matched)) {
+				zval_ptr_dtor(&hostname);
 				continue;
 			}
 		}
+		zval_ptr_dtor(&hostname);
 
 		/**
 		 * Look for hostname constraints
@@ -715,13 +715,14 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found Route: ", &pattern);
 				PHALCON_DEBUG_LOG(&debug_message);
 			}
-			zval_ptr_dtor(&pattern);
 		} else {
 			ZVAL_STRING(&event_name, "router:notMatchedRoute");
 			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, route);
 			zval_ptr_dtor(&event_name);
 		}
+		zval_ptr_dtor(&pattern);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&current_host_name);
 	zval_ptr_dtor(&handled_uri);
 	zval_ptr_dtor(&request);
 
@@ -852,6 +853,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				} else {
 					array_init(&params);
 				}
+				zval_ptr_dtor(&str_params);
 			} else {
 				array_init(&params);
 			}

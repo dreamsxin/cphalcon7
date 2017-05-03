@@ -927,9 +927,10 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
 		zval_ptr_dtor(&longopts);
 
-		if (phalcon_array_isset_fetch_str(&host, &options, SL("host"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&host, &options, SL("host"), PH_COPY)) {
 			zval_ptr_dtor(&options);
-			RETURN_CTOR(&host);
+			RETVAL_ZVAL(&host, 0, 0);
+			return;
 		}
 		zval_ptr_dtor(&options);
 	}
@@ -1073,6 +1074,7 @@ static const char* phalcon_http_request_getmethod_helper()
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);
+			zval_ptr_dtor(&key);
 			if (value && Z_TYPE_P(value) == IS_STRING) {
 				return Z_STRVAL_P(value);
 			}
@@ -1097,10 +1099,14 @@ PHP_METHOD(Phalcon_Http_Request, getMethod){
 		array_init(&longopts);
 		phalcon_array_append_str(&longopts, SL("method::"), 0);
 		PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
+		zval_ptr_dtor(&longopts);
 
-		if (phalcon_array_isset_fetch_str(&method, &options, SL("method"), PH_READONLY)) {
-			RETURN_CTOR(&method);
+		if (phalcon_array_isset_fetch_str(&method, &options, SL("method"), PH_COPY)) {
+			zval_ptr_dtor(&options);
+			RETVAL_ZVAL(&method, 0, 0);
+			return;
 		}
+		zval_ptr_dtor(&options);
 	}
 
 	const char *m = phalcon_http_request_getmethod_helper();

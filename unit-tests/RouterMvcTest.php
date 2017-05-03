@@ -204,7 +204,6 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 	public function _testRouterHttp()
 	{
-
 		$tests = array(
 			array(
 				'method' => null,

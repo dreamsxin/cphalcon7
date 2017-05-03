@@ -865,6 +865,11 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		}
 
 		/**
+		 * If the object was recently created in the DI we initialize it
+		 */
+		PHALCON_CALL_METHOD(&was_fresh, &dependency_injector, "wasfreshinstance");
+
+		/**
 		 * Update the active handler making it available for events
 		 */
 		phalcon_update_property(getThis(), SL("_activeHandler"), &handler);
@@ -882,11 +887,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
 				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
+					zval_ptr_dtor(&action_method);
 					continue;
 				}
 
 				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
+					zval_ptr_dtor(&action_method);
 					continue;
 				}
 			}
@@ -946,11 +953,6 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				continue;
 			}
 		}
-
-		/**
-		 * If the object was recently created in the DI we initialize it
-		 */
-		PHALCON_CALL_METHOD(&was_fresh, &dependency_injector, "wasfreshinstance");
 
 		/**
 		 * Call the 'initialize' method just once per request

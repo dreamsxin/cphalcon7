@@ -517,6 +517,7 @@ PHP_METHOD(Phalcon_Di_Injectable, __get){
 
 	if (zend_is_true(&has_service)) {
 		PHALCON_CALL_METHOD(return_value, &dependency_injector, "getshared", property_name);
+		zval_ptr_dtor(&dependency_injector);
 		return;
 	}
 

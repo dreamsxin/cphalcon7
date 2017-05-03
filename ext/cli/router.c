@@ -138,6 +138,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 			phalcon_array_append_str(&longopts, SL("action::"), 0);
 			phalcon_array_append_str(&longopts, SL("params::"), 0);
 			PHALCON_CALL_FUNCTION(&options, "getopt", &PHALCON_GLOBAL(z_null), &longopts);
+			zval_ptr_dtor(&longopts);
 		} else {
 			array_init(&options);
 		}
@@ -154,6 +155,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 		ZVAL_NULL(&module_name);
 	}
 	phalcon_update_property(getThis(), SL("_module"), &module_name);
+	zval_ptr_dtor(&module_name);
 
 	/**
 	 * Check for a namespace
@@ -164,6 +166,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 		ZVAL_NULL(&namespace_name);
 	}
 	phalcon_update_property(getThis(), SL("_namespace"), &namespace_name);
+	zval_ptr_dtor(&namespace_name);
 
 	/**
 	 * Check for a task
@@ -174,6 +177,7 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 		ZVAL_NULL(&task_name);
 	}
 	phalcon_update_property(getThis(), SL("_handler"), &task_name);
+	zval_ptr_dtor(&task_name);
 
 	/**
 	 * Check for an action
@@ -184,6 +188,8 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 		ZVAL_NULL(&action_name);
 	}
 	phalcon_update_property(getThis(), SL("_action"), &action_name);
+	zval_ptr_dtor(&action_name);
 
 	phalcon_update_property(getThis(), SL("_params"), &options);
+	zval_ptr_dtor(&options);
 }

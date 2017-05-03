@@ -61,8 +61,8 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFontSize);
 PHP_METHOD(Phalcon_Chart_Captcha, render);
 PHP_METHOD(Phalcon_Chart_Captcha, save);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_captcha___construct, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, word, IS_STRING, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_captcha___construct, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, word, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, font, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, fontSize, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 1)
@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, setFont){
 /**
  * Sets a font size
  *
- * @param string $fontSize
+ * @param int $fontSize
  * @return boolean
  */
 PHP_METHOD(Phalcon_Chart_Captcha, setFontSize){
@@ -286,7 +286,7 @@ PHP_METHOD(Phalcon_Chart_Captcha, render){
 	}
 	phalcon_read_property(&font, getThis(), SL("_font"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&font)) {
-		PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font);
+		PHALCON_CALL_METHOD(NULL, &draw, "setfont", &font);
 	}
 	phalcon_read_property(&font_size, getThis(), SL("_fontSize"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(NULL, &draw, "setfontsize", &font_size);

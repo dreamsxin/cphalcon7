@@ -264,8 +264,11 @@ PHP_METHOD(Phalcon_Cache_Backend_File, save){
 	}
 	if (PHALCON_IS_FALSE(&status)) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_cache_exception_ce, "Cache directory is not writable: %s", &cache_file);
+		zval_ptr_dtor(&cache_file);
+		zval_ptr_dtor(&cached_content);
 		return;
 	}
+	zval_ptr_dtor(&cache_file);
 
 	PHALCON_CALL_METHOD(&is_buffering, &frontend, "isbuffering");
 	if (!stop_buffer || PHALCON_IS_TRUE(stop_buffer)) {
@@ -302,6 +305,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, delete){
 
 	if (phalcon_file_exists(&cache_file) == SUCCESS) {
 		phalcon_unlink(return_value, &cache_file);
+		zval_ptr_dtor(&cache_file);
 		return;
 	}
 	zval_ptr_dtor(&cache_file);
@@ -330,7 +334,6 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 	 * We use a directory iterator to traverse the cache dir directory
 	 */
 	object_init_ex(&iterator, spl_ce_DirectoryIterator);
-	assert(phalcon_has_constructor(&iterator));
 	PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &cache_dir);
 
 	/* DirectoryIterator implements Iterator */
@@ -356,6 +359,8 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 		if (!EG(exception) && PHALCON_IS_FALSE(&is_directory)) {
 			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
+				zval_ptr_dtor(&is_directory);
+				zval_ptr_dtor(item);
 				break;
 			}
 
@@ -364,11 +369,13 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 			}
 			zval_ptr_dtor(&key);
 		}
+		zval_ptr_dtor(&is_directory);
 
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
+	efree(it);
 	zval_ptr_dtor(&iterator);
 }
 
@@ -637,6 +644,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 	}
 
 	it->funcs->dtor(it);
+	efree(it);
 	zval_ptr_dtor(&iterator);
 
 	RETURN_TRUE;

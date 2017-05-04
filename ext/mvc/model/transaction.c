@@ -224,7 +224,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 	if (!message || !zend_is_true(message)) {
 		ZVAL_STRING(&rollback_message, "Transaction aborted");
 	} else {
-		ZVAL_COPY_VALUE(&rollback_message, message);
+		ZVAL_COPY(&rollback_message, message);
 	}
 
 	if (_rollback_record && Z_TYPE_P(_rollback_record) != IS_OBJECT) {
@@ -251,6 +251,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 		PHALCON_CALL_METHOD(NULL, &i0, "__construct", &rollback_message, &rollback_record, rollback_code);
 		phalcon_throw_exception(&i0);
 	}
+	zval_ptr_dtor(&rollback_message);
 
 	RETURN_CTOR(&success);
 }
@@ -270,6 +271,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, getConnection){
 		if (PG(connection_status) & PHP_CONNECTION_ABORTED) {
 			ZVAL_STRING(&message, "The request was aborted");
 			PHALCON_CALL_METHOD(NULL, getThis(), "rollback", &message);
+			zval_ptr_dtor(&message);
 		}
 	}
 

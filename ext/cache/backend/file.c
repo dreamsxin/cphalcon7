@@ -359,8 +359,6 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 
 		if (!EG(exception) && PHALCON_IS_FALSE(&is_directory)) {
 			if (FAILURE == phalcon_call_method(&key, item, "getfilename", 0, NULL)) {
-				zval_ptr_dtor(&is_directory);
-				zval_ptr_dtor(item);
 				break;
 			}
 
@@ -369,13 +367,12 @@ PHP_METHOD(Phalcon_Cache_Backend_File, queryKeys){
 			}
 			zval_ptr_dtor(&key);
 		}
-		zval_ptr_dtor(&is_directory);
 
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
-	efree(it);
+	//efree(it);
 	zval_ptr_dtor(&iterator);
 }
 
@@ -644,7 +641,7 @@ PHP_METHOD(Phalcon_Cache_Backend_File, flush){
 	}
 
 	it->funcs->dtor(it);
-	efree(it);
+	//efree(it);
 	zval_ptr_dtor(&iterator);
 
 	RETURN_TRUE;

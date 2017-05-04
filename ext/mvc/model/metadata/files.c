@@ -184,11 +184,10 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 		it->funcs->get_current_key(it, &itkey);
 		phalcon_unlink(&dummy, &itkey);
 		it->funcs->move_forward(it);
-		zval_ptr_dtor(&itkey);
 	}
 
 	it->funcs->dtor(it);
-	efree(it);
+	//efree(it);
 	zval_ptr_dtor(&iterator);
 
 	if (!EG(exception)) {

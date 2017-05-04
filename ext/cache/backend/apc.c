@@ -362,6 +362,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 	}
 
 	it->funcs->dtor(it);
+	//efree(it);
 	zval_ptr_dtor(&iterator);
 }
 
@@ -431,23 +432,25 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 
 	it->funcs->rewind(it);
 	while (it->funcs->valid(it) == SUCCESS && !EG(exception)) {
-		zval key = {}, itkey = {};
+		zval itkey = {};
 		int flag;
 
 		it->funcs->get_current_key(it, &itkey);
+		
+		if (EG(exception)) {
+			continue;
+		}
 		if (likely(Z_TYPE(itkey) == IS_STRING)) {
-			ZVAL_STR(&key, Z_STR(itkey));
-			PHALCON_CALL_FUNCTION_FLAG(flag, NULL, "apc_delete", &key);
-			zval_ptr_dtor(&key);
+			PHALCON_CALL_FUNCTION_FLAG(flag, NULL, "apc_delete", &itkey);
 			if (FAILURE == flag) {
 				break;
 			}
 		}
-
 		it->funcs->move_forward(it);
 	}
 
 	it->funcs->dtor(it);
+	//efree(it);
 	zval_ptr_dtor(&iterator);
 	RETURN_TRUE;
 }

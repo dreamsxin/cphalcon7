@@ -207,35 +207,35 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Introspection, getMetaData){
 		 * To get the internal types
 		 */
 		PHALCON_CALL_METHOD(&type, column, "gettype");
-		phalcon_array_update(&field_types, &field_name, &type, PH_COPY);
+		phalcon_array_update(&field_types, &field_name, &type, 0);
 
 		/**
 		 * To get the internal size
 		 */
 		PHALCON_CALL_METHOD(&size, column, "getsize");
-		phalcon_array_update(&field_sizes, &field_name, &size, PH_COPY);
+		phalcon_array_update(&field_sizes, &field_name, &size, 0);
 
 		/**
 		 * To get the internal bytes
 		 */
 		PHALCON_CALL_METHOD(&bytes, column, "getbytes");
-		phalcon_array_update(&field_bytes, &field_name, &bytes, PH_COPY);
+		phalcon_array_update(&field_bytes, &field_name, &bytes, 0);
 
 		/**
 		 * To get the internal scale
 		 */
 		PHALCON_CALL_METHOD(&scale, column, "getscale");
-		phalcon_array_update(&field_scales, &field_name, &scale, PH_COPY);
+		phalcon_array_update(&field_scales, &field_name, &scale, 0);
 
 		/**
 		 * To mark how the fields must be escaped
 		 */
 		PHALCON_CALL_METHOD(&bind_type, column, "getbindtype");
-		phalcon_array_update(&field_bind_types, &field_name, &bind_type, PH_COPY);
+		phalcon_array_update(&field_bind_types, &field_name, &bind_type, 0);
 
 		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) != IS_NULL) {
-			phalcon_array_update(&field_default_values, &field_name, &default_value, PH_COPY);
+			phalcon_array_update(&field_default_values, &field_name, &default_value, 0);
 		}
 	} ZEND_HASH_FOREACH_END();
 	zval_ptr_dtor(&columns);

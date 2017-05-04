@@ -3445,7 +3445,7 @@ static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *va
 	} else {
 		PHALCON_CONCAT_VS(&fixed_value, value, ",");
 	}
-	PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, &fixed_value, sql);
+	phalcon_fast_str_replace(&sql_tmp, &string_wildcard, &fixed_value, sql);
 	zval_ptr_dtor(&string_wildcard);
 	zval_ptr_dtor(&fixed_value);
 	zval_ptr_dtor(sql);

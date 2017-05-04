@@ -208,8 +208,28 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&router, &dependency_injector, "getshared", &service);
 	PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
+	ZVAL_STRING(&event_name, "application:beforeHandleRouter");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &router);
+	zval_ptr_dtor(&event_name);
+
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&router);
+		zval_ptr_dtor(&dependency_injector);
+		RETURN_FALSE;
+	}
+
 	/* Handle the URI pattern (if any) */
 	PHALCON_CALL_METHOD(NULL, &router, "handle", uri);
+
+	ZVAL_STRING(&event_name, "application:afterHandleRouter");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &router);
+	zval_ptr_dtor(&event_name);
+
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&router);
+		zval_ptr_dtor(&dependency_injector);
+		RETURN_FALSE;
+	}
 
 	/* Load module config */
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
@@ -230,6 +250,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		if (PHALCON_IS_FALSE(&status)) {
 			zval_ptr_dtor(&module_name);
 			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&router);
 			RETURN_FALSE;
 		}
 
@@ -242,6 +263,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module %s is not registered in the application container", Z_STRVAL(module_name));
 			zval_ptr_dtor(&module_name);
 			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&router);
 			return;
 		}
 
@@ -252,6 +274,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			zval_ptr_dtor(&module_name);
 			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&router);
 			return;
 		}
 
@@ -288,6 +311,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 						zend_throw_exception_ex(phalcon_mvc_application_exception_ce, 0, "Module definition path '%s' does not exist", Z_STRVAL(path));
 						zval_ptr_dtor(&dependency_injector);
 						zval_ptr_dtor(&module_name);
+						zval_ptr_dtor(&router);
 						return;
 					}
 				}
@@ -326,6 +350,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
 			zval_ptr_dtor(&dependency_injector);
 			zval_ptr_dtor(&module_name);
+			zval_ptr_dtor(&router);
 			return;
 		}
 
@@ -337,6 +362,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		if (PHALCON_IS_FALSE(&status)) {
 			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&router);
 			RETURN_FALSE;
 		}
 	}
@@ -344,6 +370,15 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	/**
 	 * Check whether use implicit views or not
 	 */
+	ZVAL_STRING(&event_name, "application:beforeCheckUseImplicitView");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dependency_injector);
+		zval_ptr_dtor(&router);
+		RETURN_FALSE;
+	}
 	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY|PH_READONLY);
 
 	/*
@@ -358,6 +393,23 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		PHALCON_CALL_METHOD(&view, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);
+
+		/**
+		 * Start the view component (start output buffering)
+		 */
+		PHALCON_CALL_METHOD(NULL, &view, "start");
+	}
+	ZVAL_STRING(&event_name, "application:afterCheckUseImplicitView");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dependency_injector);
+		zval_ptr_dtor(&router);
+		if (f_implicit_view) {
+			zval_ptr_dtor(&view);
+		}
+		RETURN_FALSE;
 	}
 
 	/* We get the parameters from the router and assign them to the dispatcher */
@@ -390,13 +442,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval_ptr_dtor(&exact);
 	zval_ptr_dtor(&action_name);
 	zval_ptr_dtor(&params);
-
-	if (f_implicit_view) {
-		/**
-		 * Start the view component (start output buffering)
-		 */
-		PHALCON_CALL_METHOD(NULL, &view, "start");
-	}
 
 	/* Calling beforeHandleRequest */
 	ZVAL_STRING(&event_name, "application:beforeHandleRequest");

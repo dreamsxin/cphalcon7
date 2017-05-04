@@ -298,6 +298,7 @@ PHP_METHOD(Phalcon_Validation_Message_Group, appendMessages){
 		}
 
 		it->funcs->dtor(it);
+		//efree(it);
 	}
 }
 
@@ -330,12 +331,13 @@ PHP_METHOD(Phalcon_Validation_Message_Group, filter){
 				if (PHALCON_IS_EQUAL(field_name, &field)) {
 					phalcon_array_append(&filtered, message, PH_COPY);
 				}
+				zval_ptr_dtor(&field);
 			}
 		} ZEND_HASH_FOREACH_END();
 
 	}
 
-	RETURN_CTOR(&filtered);
+	RETVAL_ZVAL(&filtered, 0, 0);
 }
 
 /**

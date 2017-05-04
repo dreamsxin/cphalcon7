@@ -279,8 +279,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData){
 			zval_ptr_dtor(&feature);
 		}
 
-		phalcon_array_append(&attributes, &real_property, PH_COPY);
-		zval_ptr_dtor(&real_property);
+		phalcon_array_append(&attributes, &real_property, 0);
 		zval_ptr_dtor(&column_annotation);
 	} ZEND_HASH_FOREACH_END();
 	zval_ptr_dtor(&properties_annotations);

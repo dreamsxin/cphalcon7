@@ -121,6 +121,7 @@ static zend_object_iterator* phalcon_session_bag_get_iterator(zend_class_entry *
 	} else {
 		ret = NULL;
 	}
+	zval_ptr_dtor(&iterator);
 
 	return ret;
 }

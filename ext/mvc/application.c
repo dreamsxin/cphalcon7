@@ -450,6 +450,10 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	if (PHALCON_IS_FALSE(&status)) {
 		zval_ptr_dtor(&dependency_injector);
+		zval_ptr_dtor(&dispatcher);
+		if (f_implicit_view) {
+			zval_ptr_dtor(&view);
+		}
 		RETURN_FALSE;
 	}
 
@@ -462,8 +466,12 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dispatcher);
 		zval_ptr_dtor(&dependency_injector);
 		zval_ptr_dtor(&controller);
+		if (f_implicit_view) {
+			zval_ptr_dtor(&view);
+		}
 		RETURN_FALSE;
 	}
 
@@ -482,16 +490,24 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 			if (PHALCON_IS_FALSE(&possible_response)) {
+				zval_ptr_dtor(&dispatcher);
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&controller);
 				RETVAL_ZVAL(&response, 0, 0);
+				if (f_implicit_view) {
+					zval_ptr_dtor(&view);
+				}
 				return;
 			} else if (Z_TYPE(possible_response) == IS_STRING) {
 				PHALCON_CALL_METHOD(NULL, &response, "setcontent", &possible_response);
+				zval_ptr_dtor(&dispatcher);
 				zval_ptr_dtor(&possible_response);
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&controller);
 				RETVAL_ZVAL(&response, 0, 0);
+				if (f_implicit_view) {
+					zval_ptr_dtor(&view);
+				}
 				return;
 			}
 			ZVAL_FALSE(&returned_response);
@@ -534,15 +550,16 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				zval_ptr_dtor(&controller_name);
 				zval_ptr_dtor(&action_name);
 				zval_ptr_dtor(&params);
-				zval_ptr_dtor(&possible_response);
 			}
 		}
+		zval_ptr_dtor(&possible_response);
 	} else {
 		ZVAL_STR(&service, IS(response));
 
 		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
 		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 	}
+	zval_ptr_dtor(&dispatcher);
 	zval_ptr_dtor(&dependency_injector);
 
 	if (f_implicit_view) {

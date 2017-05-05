@@ -1445,12 +1445,14 @@ void phalcon_remove_extra_slashes(zval *return_value, const zval *str) {
 		i = Z_STRLEN_P(str);
 	}
 
-    if (i <= Z_STRLEN_P(str)) {
-    	removed_str = emalloc(i + 1);
-    	memcpy(removed_str, Z_STRVAL_P(str), i);
-    	removed_str[i] = '\0';
-    	RETURN_STRINGL(removed_str, i);
-    }
+	if (i <= Z_STRLEN_P(str)) {
+		removed_str = emalloc(i + 1);
+		memcpy(removed_str, Z_STRVAL_P(str), i);
+		removed_str[i] = '\0';
+		RETVAL_STRINGL(removed_str, i);
+		efree(removed_str);
+		return;
+	}
 
     RETURN_EMPTY_STRING();
 }

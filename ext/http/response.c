@@ -42,6 +42,8 @@
 #include "kernel/file.h"
 #include "kernel/variables.h"
 
+#include "internal/arginfo.h"
+
 #include "interned-strings.h"
 
 /**
@@ -128,6 +130,7 @@ static const zend_function_entry phalcon_http_response_method_entry[] = {
 	PHP_ME(Phalcon_Http_Response, sendCookies, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, send, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, setFileToSend, arginfo_phalcon_http_responseinterface_setfiletosend, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Http_Response, __toString, getContent, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

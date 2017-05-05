@@ -52,6 +52,8 @@ PHP_METHOD(Phalcon_Router, setDefaultAction);
 PHP_METHOD(Phalcon_Router, getDefaultAction);
 PHP_METHOD(Phalcon_Router, setDefaultParams);
 PHP_METHOD(Phalcon_Router, getDefaultParams);
+PHP_METHOD(Phalcon_Router, setCaseSensitive);
+PHP_METHOD(Phalcon_Router, getCaseSensitive);
 PHP_METHOD(Phalcon_Router, setMode);
 PHP_METHOD(Phalcon_Router, getMode);
 PHP_METHOD(Phalcon_Router, setModuleName);
@@ -76,6 +78,8 @@ static const zend_function_entry phalcon_router_method_entry[] = {
 	PHP_ME(Phalcon_Router, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setDefaultParams, arginfo_phalcon_routerinterface_setdefaultparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, getDefaultParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Router, setCaseSensitive, arginfo_phalcon_routerinterface_setcasesensitive, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Router, getCaseSensitive, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setMode, arginfo_phalcon_routerinterface_setmode, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, getMode, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Router, setModuleName, arginfo_phalcon_routerinterface_setmodulename, ZEND_ACC_PUBLIC)
@@ -108,6 +112,7 @@ PHALCON_INIT_CLASS(Phalcon_Router){
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultHandler"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_router_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_router_ce, SL("_caseSensitive"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_router_ce, SL("_mode"), PHALCON_ROUTER_MODE_DEFAULT, ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_router_ce, SL("MODE_DEFAULT"),   PHALCON_ROUTER_MODE_DEFAULT);
@@ -247,6 +252,32 @@ PHP_METHOD(Phalcon_Router, getDefaultParams){
 
 
 	RETURN_MEMBER(getThis(), "_defaultParams");
+}
+
+/**
+ * Sets the case sensitive
+ * @param boolean $caseSensitive
+ * @return string
+ */
+PHP_METHOD(Phalcon_Router, setCaseSensitive){
+
+	zval *case_sensitive;
+
+	phalcon_fetch_params(0, 1, 0, &case_sensitive);
+
+	phalcon_update_property_bool(getThis(), SL("_caseSensitive"), zend_is_true(case_sensitive));
+
+	RETURN_THIS();
+}
+
+/**
+ * Returns the case sensitive
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Router, getCaseSensitive){
+
+	RETURN_MEMBER(getThis(), "_caseSensitive");
 }
 
 /**

@@ -1103,12 +1103,16 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				if (PHALCON_IS_FALSE(&status)) {
 					phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 					if (PHALCON_IS_FALSE(&finished)) {
+						zval_ptr_dtor(&params);
+						zval_ptr_dtor(&value);
 						continue;
 					}
 				} else {
 					/* Exception was not handled, rethrow it */
 					phalcon_throw_exception(&exception);
-					return;
+					zval_ptr_dtor(&value);
+					zval_ptr_dtor(&params);
+					goto end;
 				}
 			}
 		} else {
@@ -1137,11 +1141,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
 			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&value);
 				continue;
 			}
 
 			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
+				zval_ptr_dtor(&value);
 				continue;
 			}
 
@@ -1159,15 +1165,22 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (phalcon_method_exists_ex(&handler, SL("afterexecuteroute")) == SUCCESS) {
 			PHALCON_CALL_METHOD(&status, &handler, "afterexecuteroute", getThis(), &value);
 			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&value);
 				continue;
 			}
 
 			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
+				zval_ptr_dtor(&value);
 				continue;
 			}
 		}
+		zval_ptr_dtor(&value);
 	} while (number_dispatches <= max_dispatches);
+
+	RETVAL_ZVAL(&handler, 0, 0);
+
+end:
 	zval_ptr_dtor(&dependency_injector);
 	zval_ptr_dtor(&events_manager);
 
@@ -1177,8 +1190,6 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	ZVAL_STRING(&event_name, "dispatch:afterDispatchLoop");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
-
-	RETURN_ZVAL(&handler, 0, 0);
 }
 
 /**

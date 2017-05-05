@@ -188,7 +188,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router_Route){
 	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultAction"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_urlGenerator"), ZEND_ACC_PROTECTED);
-	zend_declare_property_bool(phalcon_mvc_router_route_ce, SL("_caseSensitive"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_router_route_ce, SL("_caseSensitive"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_router_route_ce, SL("_mode"), PHALCON_ROUTER_MODE_DEFAULT, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_router_route_ce, 1, phalcon_mvc_router_routeinterface_ce);

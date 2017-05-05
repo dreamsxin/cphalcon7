@@ -34,6 +34,8 @@ static const zend_function_entry phalcon_routerinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getDefaultAction, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setDefaultParams, arginfo_phalcon_routerinterface_setdefaultparams)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getDefaultParams, NULL)
+	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setCaseSensitive, arginfo_phalcon_routerinterface_setcasesensitive)
+	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getCaseSensitive, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setMode, arginfo_phalcon_routerinterface_setmode)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, getMode, NULL)
 	PHP_ABSTRACT_ME(Phalcon_RouterInterface, setModuleName, arginfo_phalcon_routerinterface_setmodulename)
@@ -116,6 +118,34 @@ PHALCON_DOC_METHOD(Phalcon_RouterInterface, setDefaultParams);
  * @return array
  */
 PHALCON_DOC_METHOD(Phalcon_RouterInterface, getDefaultParams);
+
+/**
+ * Sets the case sensitive
+ *
+ * @param boolean $caseSensitive
+ */
+PHALCON_DOC_METHOD(Phalcon_RouterInterface, setCaseSensitive);
+
+/**
+ * Gets the case sensitive
+ *
+ * @return int
+ */
+PHALCON_DOC_METHOD(Phalcon_RouterInterface, getCaseSensitive);
+
+/**
+ * Sets the mode
+ *
+ * @param int $mode
+ */
+PHALCON_DOC_METHOD(Phalcon_RouterInterface, setMode);
+
+/**
+ * Gets the mode
+ *
+ * @return int
+ */
+PHALCON_DOC_METHOD(Phalcon_RouterInterface, getMode);
 
 /**
  * Sets processed module name

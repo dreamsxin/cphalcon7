@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	zval *uri = NULL, real_uri = {}, removeextraslashes = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, dependency_injector = {}, request = {}, debug_message = {}, event_name = {};
-	zval current_host_name = {}, routes = {}, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
+	zval all_case_sensitive = {}, current_host_name = {}, routes = {}, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
 	zval controller = {}, default_handler = {}, action = {}, default_action = {}, mode = {}, http_method = {}, action_name = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
 	zend_string *str_key;
 	ulong idx;
@@ -496,12 +496,17 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	 */
 	phalcon_read_property(&routes, getThis(), SL("_routes"), PH_NOISY|PH_READONLY);
 
+	PHALCON_CALL_METHOD(&all_case_sensitive, getThis(), "getcasesensitive");
+
 	ZEND_HASH_REVERSE_FOREACH_VAL(Z_ARRVAL(routes), route) {
 		zval case_sensitive = {}, methods = {}, match_method = {}, hostname = {}, prefix = {}, regex_host_name = {}, matched = {};
 		zval pattern = {}, case_pattern = {}, before_match = {}, before_match_params = {}, paths = {};
 		zval converters = {}, *position;
 
 		PHALCON_CALL_METHOD(&case_sensitive, route, "getcasesensitive");
+		if (Z_TYPE(case_sensitive) == IS_NULL) {
+			ZVAL_COPY(&case_sensitive, &all_case_sensitive);
+		}
 
 		/**
 		 * Look for HTTP method constraints

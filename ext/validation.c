@@ -260,9 +260,11 @@ PHP_METHOD(Phalcon_Validation, validate){
 	if (phalcon_method_exists_ex(getThis(), SL("beforevalidation")) == SUCCESS) {
 		PHALCON_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity, &messages);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_CTOR(&status);
+			zval_ptr_dtor(&messages);
+			RETURN_ZVAL(&status, 0, 0);
 		}
 	}
+	zval_ptr_dtor(&messages);
 
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
 		phalcon_update_property(getThis(), SL("_data"), data);
@@ -330,6 +332,7 @@ PHP_METHOD(Phalcon_Validation, add){
 	phalcon_array_append(&scope, attribute, PH_COPY);
 	phalcon_array_append(&scope, validator, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_validators"), &scope);
+	zval_ptr_dtor(&scope);
 
 	RETURN_THIS();
 }
@@ -436,7 +439,7 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_NOISY|PH_COPY);
 	if (Z_TYPE(messages) != IS_OBJECT) {
 	   object_init_ex(&messages, phalcon_validation_message_group_ce);
 	   PHALCON_CALL_METHOD(NULL, &messages, "__construct");
@@ -445,6 +448,7 @@ PHP_METHOD(Phalcon_Validation, appendMessage){
 	}
 
 	PHALCON_CALL_METHOD(NULL, &messages, "appendmessage", message);
+	zval_ptr_dtor(&messages);
 
 	RETURN_THIS();
 }
@@ -493,7 +497,7 @@ PHP_METHOD(Phalcon_Validation, getData){
  */
 PHP_METHOD(Phalcon_Validation, getValue){
 
-	zval *attribute, *_entity = NULL, entity ={}, value = {}, data = {}, values = {}, filters = {}, field_filters = {}, service_name = {}, dependency_injector = {}, filter_service = {};
+	zval *attribute, *_entity = NULL, entity ={}, value = {}, data = {}, values = {}, filters = {}, field_filters = {};
 
 	phalcon_fetch_params(0, 1, 1, &attribute, &_entity);
 
@@ -520,17 +524,24 @@ PHP_METHOD(Phalcon_Validation, getValue){
 			if (phalcon_method_exists_ex(&entity, SL("readattribute")) == SUCCESS) {
 				PHALCON_CALL_METHOD(&value, &entity, "readattribute", attribute);
 			} else {
-				phalcon_read_property_zval(&value, &entity, attribute, PH_READONLY);
+				phalcon_read_property_zval(&value, &entity, attribute, PH_COPY);
 			}
-			RETURN_CTOR(&value);
+			RETURN_ZVAL(&value, 0, 0);
 		} else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no data to validate");
 		}
-	} else {
-		if (Z_TYPE(data) == IS_ARRAY && phalcon_array_isset(&data, attribute)) {
-			phalcon_array_fetch(&value, &data, attribute, PH_NOISY|PH_READONLY);
-		} else if (Z_TYPE(data) == IS_OBJECT && phalcon_isset_property_zval(&data, attribute)) {
-			phalcon_read_property_zval(&value, &data, attribute, PH_READONLY);
+		return;
+	}
+
+	if (Z_TYPE(data) == IS_ARRAY) {
+		 if (!phalcon_array_isset_fetch(&value, &data, attribute, PH_NOISY|PH_COPY)) {
+			ZVAL_NULL(&value);
+		 }
+	} else if (Z_TYPE(data) == IS_OBJECT) {
+		if (phalcon_isset_property_zval(&data, attribute)) {
+			phalcon_read_property_zval(&value, &data, attribute, PH_COPY);
+		} else {
+			ZVAL_NULL(&value);
 		}
 	}
 
@@ -539,7 +550,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		if (Z_TYPE(filters) == IS_ARRAY) {
 			if (phalcon_array_isset_fetch(&field_filters, &filters, attribute, PH_READONLY)) {
 				if (zend_is_true(&field_filters)) {
-					zval filter_value = {};
+					zval filter_value = {}, service_name = {}, dependency_injector = {}, filter_service = {};
 					ZVAL_STR(&service_name, IS(filter));
 
 					PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
@@ -549,6 +560,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 					}
 
 					PHALCON_CALL_METHOD(&filter_service, &dependency_injector, "getshared", &service_name);
+					zval_ptr_dtor(&dependency_injector);
 					if (Z_TYPE(filter_service) != IS_OBJECT) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Returned 'filter' service is invalid");
 						return;
@@ -556,6 +568,8 @@ PHP_METHOD(Phalcon_Validation, getValue){
 
 					PHALCON_VERIFY_INTERFACE(&filter_service, phalcon_filterinterface_ce);
 					PHALCON_CALL_METHOD(&filter_value, &filter_service, "sanitize", &value, &field_filters);
+					zval_ptr_dtor(&filter_service);
+					zval_ptr_dtor(&value);
 					ZVAL_COPY_VALUE(&value, &filter_value);
 				}
 			}
@@ -575,7 +589,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 		phalcon_update_property_array(getThis(), SL("_values"), attribute, &value);
 	}
 
-	RETURN_CTOR(&value);
+	RETURN_ZVAL(&value, 0, 0);
 }
 
 PHP_METHOD(Phalcon_Validation, setDefaultMessages)
@@ -666,7 +680,7 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 			} else if (exists) {
 				PHALCON_CALL_METHOD(&label, &entity, "getlabel", field_param);
 				if (Z_TYPE(label) == IS_STRING) {
-					phalcon_array_append(&label_values, &label, PH_COPY);
+					phalcon_array_append(&label_values, &label, 0);
 				} else {
 					phalcon_array_append(&label_values, field, PH_COPY);
 				}
@@ -676,20 +690,21 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 		} ZEND_HASH_FOREACH_END();
 		phalcon_read_static_property_ce(&delimiter, phalcon_validation_ce, SL("_delimiter"), PH_READONLY);
 		phalcon_fast_join_str(&value, Z_STRVAL(delimiter), Z_STRLEN(delimiter), &label_values);
+		zval_ptr_dtor(&label_values);
 	} else {
 		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(&value, &labels, field_param, PH_READONLY) || Z_TYPE(value) != IS_STRING) {
 			if (exists) {
 				PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
-				if (Z_TYPE(value) != IS_STRING) {
-					ZVAL_COPY_VALUE(&value, field_param);
+				if (Z_TYPE(value) == IS_NULL) {
+					ZVAL_COPY(&value, field_param);
 				}
 			} else {
-				ZVAL_COPY_VALUE(&value, field_param);
+				ZVAL_COPY(&value, field_param);
 			}
 		}
 	}
 
-	RETURN_CTOR(&value);
+	RETURN_ZVAL(&value, 0, 0);
 }
 
 /**

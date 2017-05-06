@@ -625,6 +625,7 @@ PHP_METHOD(Phalcon_Mvc_View, setTemplateAfter){
 		array_init_size(&array_template, 1);
 		phalcon_array_append(&array_template, template_after, PH_COPY);
 		phalcon_update_property(getThis(), SL("_templatesAfter"), &array_template);
+		zval_ptr_dtor(&array_template);
 	} else {
 		phalcon_update_property(getThis(), SL("_templatesAfter"), template_after);
 	}
@@ -706,10 +707,11 @@ PHP_METHOD(Phalcon_Mvc_View, setVars){
 		if (Z_TYPE(view_params) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_params, &view_params, params);
 		} else {
-			ZVAL_COPY_VALUE(&merged_params, params);
+			ZVAL_COPY(&merged_params, params);
 		}
 
 		phalcon_update_property(getThis(), SL("_viewParams"), &merged_params);
+		zval_ptr_dtor(&merged_params);
 	} else {
 		phalcon_update_property(getThis(), SL("_viewParams"), params);
 	}

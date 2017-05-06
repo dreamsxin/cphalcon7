@@ -76,4 +76,5 @@ PHP_METHOD(Phalcon_Assets_Resource_Js, __construct){
 		(filter ? filter : &PHALCON_GLOBAL(z_true)),
 		(attributes ? attributes : &PHALCON_GLOBAL(z_null))
 	);
+	zval_ptr_dtor(&type);
 }

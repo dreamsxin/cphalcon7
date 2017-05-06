@@ -253,6 +253,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }
@@ -300,6 +301,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }
@@ -666,10 +668,11 @@ PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 	 */
 	if (phalcon_file_exists(&complete_path) == SUCCESS) {
 		phalcon_file_realpath(return_value, &complete_path);
+		zval_ptr_dtor(&complete_path);
 		return;
 	}
 
-	RETURN_CTOR(&complete_path);
+	RETURN_ZVAL(&complete_path, 0, 0);
 }
 
 /**

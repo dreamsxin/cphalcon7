@@ -2,6 +2,14 @@
 
 class SecurityTest extends PHPUnit_Framework_TestCase
 {
+
+	public function testSecurity()
+	{
+		$security = new \Phalcon\Security;
+		$security->deriveKey('phalcon', '123');
+		$security->pbkdf2('phalcon', '123');
+	}
+
 	public function testComputeHMAC()
 	{
 		$s = new \Phalcon\Security;

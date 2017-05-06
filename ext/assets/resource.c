@@ -451,6 +451,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		if (phalcon_file_exists(&complete_path) == FAILURE) {
 			PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", &complete_path, "\" cannot be loaded");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
+			zval_ptr_dtor(&complete_path);
 			return;
 		}
 	}
@@ -462,8 +463,10 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 	if (PHALCON_IS_FALSE(return_value)) {
 		PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", &complete_path, "\" cannot be read");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
+		zval_ptr_dtor(&complete_path);
 		return;
 	}
+	zval_ptr_dtor(&complete_path);
 }
 
 /**
@@ -491,7 +494,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 
-	zval *base_path = NULL, source_path = {}, local = {}, complete_path = {};
+	zval *base_path = NULL, source_path = {}, local = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 
@@ -506,6 +509,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 
 	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&local)) {
+		zval complete_path = {};
 		/**
 		 * A base path for resources can be set in the assets manager
 		 */
@@ -515,6 +519,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
 		 * Get the real template path
 		 */
 		phalcon_file_realpath(return_value, &complete_path);
+		zval_ptr_dtor(&complete_path);
 		return;
 	}
 
@@ -529,7 +534,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealSourcePath){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 
-	zval *base_path = NULL, target_path = {}, local = {}, complete_path = {};
+	zval *base_path = NULL, target_path = {}, local = {};
 
 	phalcon_fetch_params(0, 0, 1, &base_path);
 
@@ -544,6 +549,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 
 	phalcon_read_property(&local, getThis(), SL("_local"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&local)) {
+		zval complete_path = {};
 		/**
 		 * A base path for resources can be set in the assets manager
 		 */
@@ -554,10 +560,11 @@ PHP_METHOD(Phalcon_Assets_Resource, getRealTargetPath){
 		 */
 		if (phalcon_file_exists(&complete_path) == SUCCESS) {
 			phalcon_file_realpath(return_value, &complete_path);
+			zval_ptr_dtor(&complete_path);
 			return;
 		}
 
-		RETURN_CTOR(&complete_path);
+		RETURN_ZVAL(&complete_path, 0, 0);
 	}
 
 	RETURN_CTOR(&target_path);

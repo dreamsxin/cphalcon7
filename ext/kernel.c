@@ -330,48 +330,48 @@ PHP_METHOD(Phalcon_Kernel, message){
 	}
 	zval_ptr_dtor(&ext);
 
-	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_READONLY);
+	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_COPY);
 	if (Z_TYPE(messages) != IS_ARRAY) {
 		array_init_size(&validation_messages, 35);
-		phalcon_array_update_str_str(&validation_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Alpha"),             SL("Field :field must contain only letters"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Between"),           SL("Field :field must be within the range of :min to :max"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Confirmation"),      SL("Field :field must be the same as :with"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Digit"),             SL("Field :field must be numeric"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Numericality"),      SL("Field :field does not have a valid numeric format"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Email"),             SL("Field :field must be an email address"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ExclusionIn"),       SL("Field :field must not be a part of list: :domain"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileEmpty"),         SL("Field :field must not be empty"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileIniSize"),       SL("File :field exceeds the maximum file size"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileMaxResolution"), SL("File :field must not exceed :max resolution"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileMinResolution"), SL("File :field must be at least :min resolution"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileSize"),          SL("File :field exceeds the size of :max"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileMaxSize"),       SL("File :field the size must not exceed :max"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileMinSize"),       SL("File :field the size must be at least :min"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileType"),          SL("File :field must be of type: :types"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("FileValid"),         SL("Field :field is not valid"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ImageMaxWidth"),     SL("Image :field the width must not exceed :max"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ImageMinWidth"),     SL("Image :field the width must be at least :min"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ImageMaxHeight"),    SL("Image :field the height must not exceed :max"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ImageMinHeight"),    SL("Image :field the height must be at least :min"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Identical"),         SL("Field :field does not have the expected value"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("InclusionIn"),       SL("Field :field must be a part of list: :domain"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("PresenceOf"),        SL("Field :field is required"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Regex"),             SL("Field :field does not match the required format"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("TooLong"),           SL("Field :field must not exceed :max characters long"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("TooLarge"),          SL("Field :field scale is out of range"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Uniqueness"),        SL("Field :field must be unique"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Url"),               SL("Field :field must be a url"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Json"),              SL("Field :field must be a json"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("Date"),              SL("Field :field is not a valid date"), PH_COPY);
+		phalcon_array_update_str_str(&validation_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Alpha"),             SL("Field :field must contain only letters"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Between"),           SL("Field :field must be within the range of :min to :max"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Confirmation"),      SL("Field :field must be the same as :with"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Digit"),             SL("Field :field must be numeric"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Numericality"),      SL("Field :field does not have a valid numeric format"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Email"),             SL("Field :field must be an email address"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ExclusionIn"),       SL("Field :field must not be a part of list: :domain"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileEmpty"),         SL("Field :field must not be empty"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileIniSize"),       SL("File :field exceeds the maximum file size"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileMaxResolution"), SL("File :field must not exceed :max resolution"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileMinResolution"), SL("File :field must be at least :min resolution"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileSize"),          SL("File :field exceeds the size of :max"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileMaxSize"),       SL("File :field the size must not exceed :max"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileMinSize"),       SL("File :field the size must be at least :min"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileType"),          SL("File :field must be of type: :types"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("FileValid"),         SL("Field :field is not valid"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ImageMaxWidth"),     SL("Image :field the width must not exceed :max"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ImageMinWidth"),     SL("Image :field the width must be at least :min"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ImageMaxHeight"),    SL("Image :field the height must not exceed :max"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ImageMinHeight"),    SL("Image :field the height must be at least :min"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Identical"),         SL("Field :field does not have the expected value"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("InclusionIn"),       SL("Field :field must be a part of list: :domain"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("PresenceOf"),        SL("Field :field is required"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Regex"),             SL("Field :field does not match the required format"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("TooLong"),           SL("Field :field must not exceed :max characters long"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("TooShort"),          SL("Field :field must be at least :min characters long"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("TooLarge"),          SL("Field :field scale is out of range"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Uniqueness"),        SL("Field :field must be unique"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Url"),               SL("Field :field must be a url"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Json"),              SL("Field :field must be a json"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("Date"),              SL("Field :field is not a valid date"), 0);
 
-		phalcon_array_update_str_str(&validation_messages, SL("InvalidCreateAttempt"),	SL("Record cannot be created because it already exists"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("InvalidUpdateAttempt"),	SL("Record cannot be updated because it does not exist"), PH_COPY);
-		phalcon_array_update_str_str(&validation_messages, SL("ConstraintViolation"),	SL("Value of field :field does not exist on referenced table"), PH_COPY);
+		phalcon_array_update_str_str(&validation_messages, SL("InvalidCreateAttempt"),	SL("Record cannot be created because it already exists"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("InvalidUpdateAttempt"),	SL("Record cannot be updated because it does not exist"), 0);
+		phalcon_array_update_str_str(&validation_messages, SL("ConstraintViolation"),	SL("Value of field :field does not exist on referenced table"), 0);
 
 		array_init(&messages);
-		phalcon_array_update_str(&messages, SL("validation"), &validation_messages, PH_COPY);
+		phalcon_array_update_str(&messages, SL("validation"), &validation_messages, 0);
 
 		phalcon_read_static_property_ce(&default_messages, phalcon_kernel_ce, SL("_defaultMessages"), PH_READONLY);
 		if (Z_TYPE(default_messages) == IS_ARRAY) {
@@ -380,22 +380,28 @@ PHP_METHOD(Phalcon_Kernel, message){
 		phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messages"), &messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_READONLY)) {
-		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_COPY)) {
+		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_COPY)) {
 			array_init(&file_messages2);
 		}
 		if (phalcon_require_ret(&file_messages, Z_STRVAL(file_path)) != FAILURE) {
 			if (Z_TYPE(file_messages2) != IS_ARRAY) {
 				zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));
+				zval_ptr_dtor(&file_messages);
+				zval_ptr_dtor(&messages);
+				zval_ptr_dtor(&file_path);
 				return;
 			}
 			phalcon_array_merge_recursive_n(&file_messages2, &file_messages);
-			ZVAL_COPY_VALUE(&file_messages, &file_messages2);
+			zval_ptr_dtor(&file_messages);
+			ZVAL_COPY(&file_messages, &file_messages2);
 		} else {
-			ZVAL_COPY_VALUE(&file_messages, &file_messages2);
+			ZVAL_COPY(&file_messages, &file_messages2);
 		}
 		phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_messages"), &file_path, &file_messages);
 	}
+	zval_ptr_dtor(&file_messages2);
+	zval_ptr_dtor(&messages);
 	zval_ptr_dtor(&file_path);
 
 	if (Z_TYPE_P(path) != IS_NULL) {
@@ -405,21 +411,25 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 		PHALCON_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&dependency_injector);
+		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
+			PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
+		}
 
 		if  (Z_TYPE(file_messages) == IS_ARRAY) {
 			PHALCON_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages, path, default_value);
+		} else {
+			ZVAL_COPY(&value, default_value);
+		}
+		zval_ptr_dtor(&file_messages);
+		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
+			PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
 			zval_ptr_dtor(&value);
 		} else {
-			ZVAL_COPY_VALUE(&value, default_value);
+			RETVAL_ZVAL(&value, 0, 0);
 		}
-		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
-			PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
-			PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
-		} else {
-			RETURN_CTOR(&value);
-		}
+		zval_ptr_dtor(&translate);
 	} else {
-		RETURN_CTOR(&file_messages);
+		RETURN_ZVAL(&file_messages, 0, 0);
 	}
 }
 

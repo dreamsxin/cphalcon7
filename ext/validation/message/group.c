@@ -175,7 +175,6 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetSet){
 	zval *index, *message;
 
 	phalcon_fetch_params(0, 2, 0, &index, &message);
-	Z_TRY_ADDREF_P(message);
 	phalcon_update_property_array(getThis(), SL("_messages"), index, message);
 }
 

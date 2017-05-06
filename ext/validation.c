@@ -171,10 +171,13 @@ PHALCON_INIT_CLASS(Phalcon_Validation){
 int phalcon_validation_getdefaultmessage_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *type)
 {
 	zval t = {}, *params[1];
+	int ret;
 	ZVAL_STRING(&t, type);
 	params[0] = &t;
 
-	return phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
+	ret = phalcon_call_method(retval, this_ptr, "getdefaultmessage", 1, params);
+	zval_ptr_dtor(&t);
+	return ret;
 }
 
 /**
@@ -649,7 +652,7 @@ PHP_METHOD(Phalcon_Validation, setLabels) {
  */
 PHP_METHOD(Phalcon_Validation, getLabel) {
 
-	zval *field_param = NULL, labels = {}, value = {}, entity = {};
+	zval *field_param = NULL, labels = {}, entity = {};
 	int exists = 0;
 
 	phalcon_fetch_params(0, 1, 0, &field_param);
@@ -689,22 +692,20 @@ PHP_METHOD(Phalcon_Validation, getLabel) {
 			}
 		} ZEND_HASH_FOREACH_END();
 		phalcon_read_static_property_ce(&delimiter, phalcon_validation_ce, SL("_delimiter"), PH_READONLY);
-		phalcon_fast_join_str(&value, Z_STRVAL(delimiter), Z_STRLEN(delimiter), &label_values);
+		phalcon_fast_join_str(return_value, Z_STRVAL(delimiter), Z_STRLEN(delimiter), &label_values);
 		zval_ptr_dtor(&label_values);
 	} else {
-		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(&value, &labels, field_param, PH_READONLY) || Z_TYPE(value) != IS_STRING) {
+		if (Z_TYPE(labels) != IS_ARRAY || !phalcon_array_isset_fetch(return_value, &labels, field_param, PH_COPY) || Z_TYPE_P(return_value) == IS_NULL) {
 			if (exists) {
-				PHALCON_CALL_METHOD(&value, &entity, "getlabel", field_param);
-				if (Z_TYPE(value) == IS_NULL) {
-					ZVAL_COPY(&value, field_param);
+				PHALCON_CALL_METHOD(return_value, &entity, "getlabel", field_param);
+				if (Z_TYPE_P(return_value) == IS_NULL) {
+					ZVAL_COPY(return_value, field_param);
 				}
 			} else {
-				ZVAL_COPY(&value, field_param);
+				ZVAL_COPY(return_value, field_param);
 			}
 		}
 	}
-
-	RETURN_ZVAL(&value, 0, 0);
 }
 
 /**

@@ -84,7 +84,7 @@ int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length){
 /**
  * Natural compare with long operandus on right
  */
-int phalcon_compare_strict_long(zval *op1, long op2){
+int phalcon_compare_strict_long(zval *op1, zend_long op2){
 	switch (Z_TYPE_P(op1)) {
 		case IS_LONG:
 			return Z_LVAL_P(op1) == op2;
@@ -114,7 +114,7 @@ int phalcon_compare_strict_double(zval *op1, double op2) {
 
 	switch (Z_TYPE_P(op1)) {
 		case IS_LONG:
-			return Z_LVAL_P(op1) == (long) op2;
+			return Z_LVAL_P(op1) == (zend_long) op2;
 		case IS_DOUBLE:
 			return Z_DVAL_P(op1) == op2;
 		case IS_NULL:
@@ -223,7 +223,7 @@ void phalcon_cast(zval *result, zval *var, uint32_t type){
 /**
  * Returns the long value of a zval
  */
-long phalcon_get_intval_ex(const zval *op) {
+zend_long phalcon_get_intval_ex(const zval *op) {
 
 	switch (Z_TYPE_P(op)) {
         case IS_ARRAY:
@@ -242,9 +242,9 @@ long phalcon_get_intval_ex(const zval *op) {
 		case IS_FALSE:
 			return 0;
 		case IS_DOUBLE:
-			return (long) Z_DVAL_P(op);
+			return (zend_long) Z_DVAL_P(op);
 		case IS_STRING: {
-			long long_value;
+			zend_long long_value;
 			double double_value;
 			zend_uchar type;
 
@@ -285,7 +285,7 @@ double phalcon_get_doubleval_ex(const zval *op) {
 		case IS_DOUBLE:
 			return Z_DVAL_P(op);
 		case IS_STRING: {
-			long long_value;
+			zend_long long_value;
 			double double_value;
 			zend_uchar type;
 
@@ -310,7 +310,7 @@ double phalcon_get_doubleval_ex(const zval *op) {
 zend_bool phalcon_get_boolval_ex(const zval *op) {
 
 	int type;
-	long long_value = 0;
+	zend_long long_value = 0;
 	double double_value = 0;
 
 	switch (Z_TYPE_P(op)) {
@@ -406,7 +406,7 @@ int phalcon_is_equal(zval *op1, zval *op2) {
 /**
  * Check if a zval is equal than a long value
  */
-int phalcon_is_equal_long(zval *op1, long op2) {
+int phalcon_is_equal_long(zval *op1, zend_long op2) {
 	zval op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	return phalcon_is_equal(op1, &op2_zval);
@@ -450,14 +450,14 @@ int phalcon_less_equal(zval *op1, zval *op2) {
 /**
  * Check if a zval is less than a long value
  */
-int phalcon_less_long(zval *op1, long op2) {
+int phalcon_less_long(zval *op1, zend_long op2) {
 	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_function(&result, op1, &op2_zval);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }
 
-int phalcon_less_equal_long(zval *op1, long op2) {
+int phalcon_less_equal_long(zval *op1, zend_long op2) {
 	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_or_equal_function(&result, op1, &op2_zval);
@@ -476,7 +476,7 @@ int phalcon_greater(zval *op1, zval *op2) {
 /**
  * Check if a zval is greater than a long value
  */
-int phalcon_greater_long(zval *op1, long op2) {
+int phalcon_greater_long(zval *op1, zend_long op2) {
 	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_or_equal_function(&result, op1, &op2_zval);
@@ -495,7 +495,7 @@ int phalcon_greater_equal(zval *op1, zval *op2) {
 /**
  * Check for greater/equal
  */
-int phalcon_greater_equal_long(zval *op1, long op2) {
+int phalcon_greater_equal_long(zval *op1, zend_long op2) {
 	zval result = {}, op2_zval = {};
 	ZVAL_LONG(&op2_zval, op2);
 	is_smaller_function(&result, op1, &op2_zval);
@@ -577,7 +577,7 @@ int phalcon_shift_right_function(zval *result, zval *op1, zval *op2){
 /**
  * Do safe divisions between two longs
  */
-double phalcon_safe_div_long_long(long op1, long op2) {
+double phalcon_safe_div_long_long(zend_long op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -588,7 +588,7 @@ double phalcon_safe_div_long_long(long op1, long op2) {
 /**
  * Do safe divisions between two long/double
  */
-double phalcon_safe_div_long_double(long op1, double op2) {
+double phalcon_safe_div_long_double(zend_long op1, double op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -599,7 +599,7 @@ double phalcon_safe_div_long_double(long op1, double op2) {
 /**
  * Do safe divisions between two double/long
  */
-double phalcon_safe_div_double_long(double op1, long op2) {
+double phalcon_safe_div_double_long(double op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -621,7 +621,7 @@ double phalcon_safe_div_double_double(double op1, double op2) {
 /**
  * Do safe divisions between two zval/long
  */
-double phalcon_safe_div_zval_long(zval *op1, long op2) {
+double phalcon_safe_div_zval_long(zval *op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -657,7 +657,7 @@ double phalcon_safe_div_zval_double(zval *op1, double op2) {
 /**
  * Do safe divisions between two long/zval
  */
-double phalcon_safe_div_long_zval(long op1, zval *op2) {
+double phalcon_safe_div_long_zval(zend_long op1, zval *op2) {
 	if (!phalcon_get_numberval(op2)) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -693,7 +693,7 @@ double phalcon_safe_div_double_zval(double op1, zval *op2) {
 /**
  * Do safe divisions between two longs
  */
-long phalcon_safe_mod_long_long(long op1, long op2) {
+zend_long phalcon_safe_mod_long_long(zend_long op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -704,40 +704,40 @@ long phalcon_safe_mod_long_long(long op1, long op2) {
 /**
  * Do safe divisions between two long/double
  */
-long phalcon_safe_mod_long_double(long op1, double op2) {
+zend_long phalcon_safe_mod_long_double(zend_long op1, double op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
 	}
-	return op1 % (long) op2;
+	return op1 % (zend_long) op2;
 }
 
 /**
  * Do safe divisions between two double/long
  */
-long phalcon_safe_mod_double_long(double op1, long op2) {
+zend_long phalcon_safe_mod_double_long(double op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
 	}
-	return (long) op1 % op2;
+	return (zend_long) op1 % op2;
 }
 
 /**
  * Do safe divisions between two doubles
  */
-long phalcon_safe_mod_double_double(double op1, double op2) {
+zend_long phalcon_safe_mod_double_double(double op1, double op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
 	}
-	return (long) op1 % (long) op2;
+	return (zend_long) op1 % (zend_long) op2;
 }
 
 /**
  * Do safe divisions between two zval/long
  */
-long phalcon_safe_mod_zval_long(zval *op1, long op2) {
+zend_long phalcon_safe_mod_zval_long(zval *op1, zend_long op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -749,13 +749,13 @@ long phalcon_safe_mod_zval_long(zval *op1, long op2) {
 			zend_error(E_WARNING, "Unsupported operand types");
 			break;
 	}
-	return ((long) phalcon_get_numberval(op1)) % (long) op2;
+	return ((zend_long) phalcon_get_numberval(op1)) % (zend_long) op2;
 }
 
 /**
  * Do safe divisions between two zval/double
  */
-long phalcon_safe_mod_zval_double(zval *op1, double op2) {
+zend_long phalcon_safe_mod_zval_double(zval *op1, double op2) {
 	if (!op2) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -767,13 +767,13 @@ long phalcon_safe_mod_zval_double(zval *op1, double op2) {
 			zend_error(E_WARNING, "Unsupported operand types");
 			break;
 	}
-	return ((long) phalcon_get_numberval(op1)) % (long) op2;
+	return ((zend_long) phalcon_get_numberval(op1)) % (zend_long) op2;
 }
 
 /**
  * Do safe divisions between two long/zval
  */
-long phalcon_safe_mod_long_zval(long op1, zval *op2) {
+zend_long phalcon_safe_mod_long_zval(zend_long op1, zval *op2) {
 	if (!phalcon_get_numberval(op2)) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -785,13 +785,13 @@ long phalcon_safe_mod_long_zval(long op1, zval *op2) {
 			zend_error(E_WARNING, "Unsupported operand types");
 			break;
 	}
-	return op1 % ((long) phalcon_get_numberval(op2));
+	return op1 % ((zend_long) phalcon_get_numberval(op2));
 }
 
 /**
  * Do safe divisions between two double/zval
  */
-long phalcon_safe_mod_double_zval(double op1, zval *op2) {
+zend_long phalcon_safe_mod_double_zval(double op1, zval *op2) {
 	if (!phalcon_get_numberval(op2)) {
 		zend_error(E_WARNING, "Division by zero");
 		return 0;
@@ -803,7 +803,7 @@ long phalcon_safe_mod_double_zval(double op1, zval *op2) {
 			zend_error(E_WARNING, "Unsupported operand types");
 			break;
 	}
-	return (long) op1 % ((long) phalcon_get_numberval(op2));
+	return (zend_long) op1 % ((zend_long) phalcon_get_numberval(op2));
 }
 
 /**
@@ -827,10 +827,10 @@ int phalcon_is_scalar(zval *var)
 /**
  * Makes fast count on implicit array types
  */
-long int phalcon_fast_count_int(zval *value)
+zend_long phalcon_fast_count_int(zval *value)
 {
 	zval retval = {};
-	long int result = 0;
+	zend_long result = 0;
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		return zend_hash_num_elements(Z_ARRVAL_P(value));
@@ -838,7 +838,7 @@ long int phalcon_fast_count_int(zval *value)
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(value)->count_elements) {
-			long int result;
+			zend_long result;
 			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &result)) {
 				return result;
 			}
@@ -913,7 +913,7 @@ void phalcon_fast_count(zval *result, zval *value)
 int phalcon_fast_count_ev(zval *value)
 {
 	zval retval = {};
-	long count = 0;
+	zend_long count = 0;
 
 	if (Z_TYPE_P(value) == IS_ARRAY) {
 		return (int) zend_hash_num_elements(Z_ARRVAL_P(value)) > 0;

@@ -86,23 +86,27 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 	phalcon_fetch_params(0, 2, 1, &validaton, &attribute, &_allow_empty);
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
-	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&with_attribute, ce, getThis(), "with"));
-
 	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (Z_TYPE(allow_empty) == IS_NULL) {
 		if (_allow_empty && zend_is_true(_allow_empty)) {
-			ZVAL_COPY_VALUE(&allow_empty, _allow_empty);
+			ZVAL_COPY(&allow_empty, _allow_empty);
 		}
 	}
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
+		zval_ptr_dtor(&allow_empty);
+		zval_ptr_dtor(&value);
 		RETURN_TRUE;
 	}
+	zval_ptr_dtor(&allow_empty);
+
+	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&with_attribute, ce, getThis(), "with"));
 
 	PHALCON_CALL_METHOD(&with_value, validaton, "getvalue", &with_attribute);
-
-	PHALCON_CALL_SELF(&valid, "valid", &value, &with_value);
+	PHALCON_CALL_METHOD(&valid, getThis(), "valid", &value, &with_value);
+	zval_ptr_dtor(&value);
+	zval_ptr_dtor(&with_value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
@@ -118,6 +122,8 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		array_init_size(&pairs, 2);
 		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
 		phalcon_array_update_str(&pairs, SL(":with"), &with_label, PH_COPY);
+		zval_ptr_dtor(&label);
+		zval_ptr_dtor(&with_label);
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
@@ -130,14 +136,19 @@ PHP_METHOD(Phalcon_Validation_Validator_Confirmation, validate){
 		}
 
 		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+		zval_ptr_dtor(&message_str);
+		zval_ptr_dtor(&pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "Confirmation", &code);
+		zval_ptr_dtor(&prepared);
 
 		PHALCON_CALL_METHOD(NULL, validaton, "appendmessage", &message);
-		RETURN_FALSE;
+		zval_ptr_dtor(&message);
+		RETVAL_FALSE;
+	} else {
+		RETVAL_TRUE;
 	}
-
-	RETURN_TRUE;
+	zval_ptr_dtor(&with_attribute);
 }
 
 /**

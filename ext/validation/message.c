@@ -102,8 +102,10 @@ void phalcon_validation_message_construct_helper(zval *result, zval *message, zv
 	params[3] = code;
 
 	if (FAILURE == phalcon_call_method(NULL, result, "__construct", 4, params)) {
+		zval_ptr_dtor(result);
 		ZVAL_NULL(result);
 	}
+	zval_ptr_dtor(&tmp);
 }
 
 /**

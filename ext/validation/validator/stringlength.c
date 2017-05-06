@@ -98,12 +98,15 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&allow_empty, ce, getThis(), ISV(allowEmpty)));
 	if (Z_TYPE(allow_empty) == IS_NULL) {
 		if (_allow_empty && zend_is_true(_allow_empty)) {
-			ZVAL_COPY_VALUE(&allow_empty, _allow_empty);
+			ZVAL_COPY(&allow_empty, _allow_empty);
 		}
 	}
 	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
+		zval_ptr_dtor(&allow_empty);
+		zval_ptr_dtor(&value);
 		RETURN_TRUE;
 	}
+	zval_ptr_dtor(&allow_empty);
 
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&maximum, ce, getThis(), "max"));
 	RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&minimum, ce, getThis(), "min"));
@@ -125,6 +128,8 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
 
 		array_init(&pairs);
 		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+		zval_ptr_dtor(&label);
+
 		if (phalcon_compare_strict_string(&type, SL("TooLong"))) {
 			phalcon_array_update_str(&pairs, SL(":max"), &maximum, PH_COPY);
 
@@ -148,12 +153,18 @@ PHP_METHOD(Phalcon_Validation_Validator_StringLength, validate)
 
 			phalcon_validation_message_construct_helper(&message, &prepared, attribute, "TooShort", &code);
 		}
+		zval_ptr_dtor(&message_str);
+		zval_ptr_dtor(&prepared);
+		zval_ptr_dtor(&pairs);
 
 		PHALCON_CALL_METHOD(NULL, validaton, "appendmessage", &message);
-		RETURN_FALSE;
+		zval_ptr_dtor(&message);
+		RETVAL_FALSE;
+	} else {
+		RETVAL_TRUE;
 	}
-
-	RETURN_TRUE;
+	zval_ptr_dtor(&minimum);
+	zval_ptr_dtor(&maximum);
 }
 
 /**

@@ -72,16 +72,14 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Validator){
 
 int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class_entry *ce, zval *this_ptr, const char *option)
 {
-	zval opt = {}, options = {}, value = {};
+	zval opt = {}, options = {};
 	zval *params[1];
+	int ret;
 
 	if (is_phalcon_class(ce)) {
 		phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY|PH_READONLY);
 
-		if (phalcon_array_isset_fetch_str(&value, &options, option, strlen(option), PH_READONLY)) {
-			ZVAL_ZVAL(retval, &value, 1, 0);
-		}
-		else {
+		if (!phalcon_array_isset_fetch_str(retval, &options, option, strlen(option), PH_COPY)) {
 			ZVAL_NULL(retval);
 		}
 
@@ -91,7 +89,10 @@ int phalcon_validation_validator_getoption_helper(zval *retval, const zend_class
 	ZVAL_STRING(&opt, option);
 	params[0] = &opt;
 
-	return phalcon_call_method(retval, this_ptr, "getoption", 1, params);
+	ret = phalcon_call_method(retval, this_ptr, "getoption", 1, params);
+
+	zval_ptr_dtor(&opt);
+	return ret;
 }
 
 /**

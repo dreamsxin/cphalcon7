@@ -86,8 +86,8 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 	PHALCON_VERIFY_INTERFACE_EX(validaton, phalcon_validationinterface_ce, phalcon_validation_exception_ce);
 
 	PHALCON_CALL_METHOD(&value, validaton, "getvalue", attribute);
-
-	PHALCON_CALL_SELF(&valid, "valid", &value);
+	PHALCON_CALL_METHOD(&valid, getThis(), "valid", &value);
+	zval_ptr_dtor(&value);
 
 	if (PHALCON_IS_FALSE(&valid)) {
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&label, ce, getThis(), ISV(label)));
@@ -97,6 +97,7 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 
 		array_init_size(&pairs, 1);
 		phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+		zval_ptr_dtor(&label);
 
 		RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&message_str, ce, getThis(), ISV(message)));
 		if (!zend_is_true(&message_str)) {
@@ -109,10 +110,14 @@ PHP_METHOD(Phalcon_Validation_Validator_PresenceOf, validate){
 		}
 
 		PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+		zval_ptr_dtor(&message_str);
+		zval_ptr_dtor(&pairs);
 
 		phalcon_validation_message_construct_helper(&message, &prepared, attribute, "PresenceOf", &code);
+		zval_ptr_dtor(&prepared);
 
 		PHALCON_CALL_METHOD(NULL, validaton, "appendmessage", &message);
+		zval_ptr_dtor(&message);
 		RETURN_FALSE;
 	}
 

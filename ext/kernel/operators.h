@@ -101,13 +101,13 @@ int phalcon_compare(zval *op1, zval *op2);
 
 /** Strict comparing */
 int phalcon_compare_strict_string(zval *op1, const char *op2, int op2_length);
-int phalcon_compare_strict_long(zval *op1, long op2);
+int phalcon_compare_strict_long(zval *op1, zend_long op2);
 int phalcon_compare_strict_double(zval *op1, double op2);
 int phalcon_compare_strict_bool(zval *op1, zend_bool op2);
 
 void phalcon_cast(zval *result, zval *var, uint32_t type);
 void phalcon_convert_to_object(zval *op);
-long phalcon_get_intval_ex(const zval *op);
+zend_long phalcon_get_intval_ex(const zval *op);
 double phalcon_get_doubleval_ex(const zval *op);
 zend_bool phalcon_get_boolval_ex(const zval *op);
 
@@ -126,7 +126,7 @@ int phalcon_is_long_ex(const zval *op);
 
 int phalcon_is_equal(zval *op1, zval *op2);
 int phalcon_is_identical(zval *op1, zval *op2);
-int phalcon_is_equal_long(zval *op1, long op2);
+int phalcon_is_equal_long(zval *op1, zend_long op2);
 int phalcon_is_equal_object(zval *obj1, zval *obj2);
 
 int phalcon_less(zval *op1, zval *op2);
@@ -153,7 +153,7 @@ zend_long phalcon_safe_mod_double_zval(double op1, zval *op2);
 int phalcon_is_scalar(zval *var);
 
 /* Count */
-long int phalcon_fast_count_int(zval *value);
+zend_long phalcon_fast_count_int(zval *value);
 void phalcon_fast_count(zval *result, zval *array);
 int phalcon_fast_count_ev(zval *array);
 

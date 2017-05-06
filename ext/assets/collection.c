@@ -668,10 +668,11 @@ PHP_METHOD(Phalcon_Assets_Collection, getRealTargetPath){
 	 */
 	if (phalcon_file_exists(&complete_path) == SUCCESS) {
 		phalcon_file_realpath(return_value, &complete_path);
+		zval_ptr_dtor(&complete_path);
 		return;
 	}
 
-	RETURN_CTOR(&complete_path);
+	RETURN_ZVAL(&complete_path, 0, 0);
 }
 
 /**

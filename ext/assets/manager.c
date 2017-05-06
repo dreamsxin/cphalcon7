@@ -33,6 +33,7 @@
 #include "kernel/operators.h"
 #include "kernel/concat.h"
 #include "kernel/file.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Assets\Manager
@@ -255,6 +256,8 @@ PHP_METHOD(Phalcon_Assets_Manager, addCss){
 
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, local, filter, attributes);
 	PHALCON_CALL_METHOD(NULL, getThis(), "addresourcebytype", &type, &resource);
+	zval_ptr_dtor(&type);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }
@@ -297,6 +300,8 @@ PHP_METHOD(Phalcon_Assets_Manager, addJs){
 
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, local, filter, attributes);
 	PHALCON_CALL_METHOD(NULL, getThis(), "addresourcebytype", &type, &resource);
+	zval_ptr_dtor(&type);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }
@@ -319,7 +324,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 	phalcon_fetch_params(0, 2, 0, &type, &resource);
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&collection, &collections, type, PH_READONLY)) {
+	if (!phalcon_array_isset_fetch(&collection, &collections, type, PH_COPY)) {
 		object_init_ex(&collection, phalcon_assets_collection_ce);
 		phalcon_update_property_array(getThis(), SL("_collections"), type, &collection);
 	}
@@ -328,6 +333,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResourceByType){
 	 * Add the resource to the collection
 	 */
 	PHALCON_CALL_METHOD(NULL, &collection, "add", resource);
+	zval_ptr_dtor(&collection);
 
 	RETURN_THIS();
 }
@@ -355,6 +361,7 @@ PHP_METHOD(Phalcon_Assets_Manager, addResource){
 	 * Adds the resource by its type
 	 */
 	PHALCON_CALL_METHOD(NULL, getThis(), "addresourcebytype", &type, resource);
+	zval_ptr_dtor(&type);
 
 	RETURN_THIS();
 }
@@ -416,19 +423,16 @@ PHP_METHOD(Phalcon_Assets_Manager, get){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getCss){
 
-	zval collections = {}, collection = {};
+	zval collections = {};
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("css"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(return_value, &collections, SL("css"), PH_COPY)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
-		return;
 	}
-
-	RETURN_CTOR(&collection);
 }
 
 /**
@@ -438,19 +442,16 @@ PHP_METHOD(Phalcon_Assets_Manager, getCss){
  */
 PHP_METHOD(Phalcon_Assets_Manager, getJs){
 
-	zval collections = {}, collection = {};
+	zval collections = {};
 
 	phalcon_read_property(&collections, getThis(), SL("_collections"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Check if the collection does not exist and create an implicit collection
 	 */
-	if (!phalcon_array_isset_fetch_str(&collection, &collections, SL("js"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(return_value, &collections, SL("js"), PH_COPY)) {
 		object_init_ex(return_value, phalcon_assets_collection_ce);
-		return;
 	}
-
-	RETURN_CTOR(&collection);
 }
 
 /**
@@ -483,14 +484,14 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 PHP_METHOD(Phalcon_Assets_Manager, output){
 
 	zval *collection, *callback, *z_type = NULL, *args = NULL, type = {}, output = {}, use_implicit_output = {}, exception_message = {};
-	zval resources = {}, filters = {}, prefix = {}, type_css = {}, source_base_path = {}, target_base_path = {}, options = {}, collection_source_path = {};
-	zval complete_source_path = {}, collection_target_path = {}, complete_target_path = {}, join = {}, is_directory = {}, local = {};
-	zval *resource, target_uri = {}, prefixed_path = {}, attributes = {}, parameters = {}, filtered_joined_content = {}, html = {};
+	zval resources = {}, filters = {}, prefix = {}, type_css = {}, source_base_path = {}, target_base_path = {};
+	zval complete_source_path = {}, complete_target_path = {}, join = {}, is_directory = {};
+	zval *resource, filtered_joined_content = {};
 
-	phalcon_fetch_params(0, 2, 2, &collection, &callback, &type, &args);
+	phalcon_fetch_params(0, 2, 2, &collection, &callback, &z_type, &args);
 
 	if (z_type) {
-		ZVAL_COPY_VALUE(&type, z_type);
+		ZVAL_COPY(&type, z_type);
 	}
 
 	if (!args) {
@@ -520,6 +521,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	 * Prepare options if the collection must be filtered
 	 */
 	if (Z_TYPE(filters) == IS_ARRAY) {
+		zval options = {}, collection_source_path = {}, collection_target_path = {};
 		phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 		/**
@@ -529,15 +531,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/**
 			 * The source base path is a global location where all resources are located
 			 */
-			if (phalcon_array_isset_str(&options, SL("sourceBasePath"))) {
-				phalcon_array_fetch_str(&source_base_path, &options, SL("sourceBasePath"), PH_NOISY|PH_READONLY);
+			if (!phalcon_array_isset_fetch_str(&source_base_path, &options, SL("sourceBasePath"), PH_NOISY|PH_READONLY)) {
+				ZVAL_NULL(&source_base_path);
 			}
 
 			/**
 			 * The target base path is a global location where all resources are written
 			 */
-			if (phalcon_array_isset_str(&options, SL("targetBasePath"))) {
-				phalcon_array_fetch_str(&target_base_path, &options, SL("targetBasePath"), PH_NOISY|PH_READONLY);
+			if (!phalcon_array_isset_fetch_str(&target_base_path, &options, SL("targetBasePath"), PH_NOISY|PH_READONLY)) {
+				ZVAL_NULL(&source_base_path);
 			}
 		}
 
@@ -552,8 +554,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		if (PHALCON_IS_NOT_EMPTY(&collection_source_path)) {
 			PHALCON_CONCAT_VV(&complete_source_path, &source_base_path, &collection_source_path);
 		} else {
-			ZVAL_COPY_VALUE(&complete_source_path, &source_base_path);
+			ZVAL_COPY(&complete_source_path, &source_base_path);
 		}
+		zval_ptr_dtor(&collection_source_path);
 
 		/**
 		 * Check if the collection have its own target base path
@@ -566,8 +569,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		if (PHALCON_IS_NOT_EMPTY(&collection_target_path)) {
 			PHALCON_CONCAT_VV(&complete_target_path, &target_base_path, &collection_target_path);
 		} else {
-			ZVAL_COPY_VALUE(&complete_target_path, &target_base_path);
+			ZVAL_COPY(&complete_target_path, &target_base_path);
 		}
+		zval_ptr_dtor(&collection_target_path);
 
 		/**
 		 * Check if all the resources in the collection must be joined
@@ -584,7 +588,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (PHALCON_IS_EMPTY(&complete_target_path)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Path '", &complete_target_path, "' is not a valid target path (1)");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-				return;
+				goto end;
 			}
 
 			phalcon_is_dir(&is_directory, &complete_target_path);
@@ -595,17 +599,17 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (PHALCON_IS_TRUE(&is_directory)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Path '", &complete_target_path, "' is not a valid target path (2)");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-				return;
+				goto end;
 			}
 		}
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {
-		zval filter_needed = {}, source_path = {}, target_path = {}, path = {}, content = {}, must_filter = {}, *filter;
+		zval filter_needed = {}, local = {}, must_filter = {}, *filter, target_path = {};
 
 		ZVAL_FALSE(&filter_needed);
 
-		if (Z_TYPE(type) <= IS_NULL) {
+		if (Z_TYPE(type) == IS_NULL) {
 			PHALCON_CALL_METHOD(&type, resource, "gettype");
 		}
 
@@ -618,6 +622,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		 * If the collection must not be joined we must print a HTML for each one
 		 */
 		if (Z_TYPE(filters) == IS_ARRAY) {
+			zval source_path = {};
 			if (zend_is_true(&local)) {
 				/**
 				 * Get the complete path
@@ -632,7 +637,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 
 					PHALCON_CONCAT_SVS(&exception_message, "Resource '", &source_path, "' does not have a valid source path");
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-					return;
+					zval_ptr_dtor(&source_path);
+					zval_ptr_dtor(&type);
+					goto end;
 				}
 			} else {
 				/**
@@ -654,10 +661,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			/**
 			 * We need a valid final target path
 			 */
-			if (PHALCON_IS_EMPTY(&target_path)) {
+			if (!zend_is_true(&target_path)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' does not have a valid target path");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-				return;
+				zval_ptr_dtor(&source_path);
+				zval_ptr_dtor(&type);
+				goto end;
 			}
 
 			if (zend_is_true(&local)) {
@@ -667,7 +676,10 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				if (PHALCON_IS_EQUAL(&target_path, &source_path)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' have the same source and target paths");
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-					return;
+					zval_ptr_dtor(&source_path);
+					zval_ptr_dtor(&target_path);
+					zval_ptr_dtor(&type);
+					goto end;
 				}
 				if (phalcon_file_exists(&target_path) == SUCCESS) {
 					if (phalcon_compare_mtime(&target_path, &source_path)) {
@@ -677,7 +689,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					ZVAL_TRUE(&filter_needed);
 				}
 			}
+			zval_ptr_dtor(&source_path);
 		} else {
+			zval path = {}, prefixed_path = {}, attributes = {}, parameters = {}, html = {};
 			/**
 			 * If there are no filters, just print/buffer the HTML
 			 */
@@ -685,8 +699,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &path);
+				ZVAL_COPY(&prefixed_path, &path);
 			}
+			zval_ptr_dtor(&path);
 
 			/**
 			 * Gets extra HTML attributes in the resource
@@ -704,6 +719,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_array_append(&parameters, &prefixed_path, PH_COPY);
 			}
+			zval_ptr_dtor(&attributes);
+			zval_ptr_dtor(&prefixed_path);
 
 			phalcon_array_append(&parameters, &local, PH_COPY);
 			phalcon_array_append(&parameters, args, PH_COPY);
@@ -712,6 +729,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * Call the callback to generate the HTML
 			 */
 			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, &parameters);
+			zval_ptr_dtor(&parameters);
 
 			/**
 			 * Implicit output prints the content directly
@@ -722,11 +740,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				phalcon_concat_self(&output, &html);
 			}
 
-			zval_ptr_dtor(&parameters);
+			zval_ptr_dtor(&html);
 			continue;
 		}
 
 		if (zend_is_true(&filter_needed)) {
+			zval content = {};
 			/**
 			 * Get the resource's content
 			 */
@@ -748,14 +767,16 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					 */
 					if (Z_TYPE_P(filter) != IS_OBJECT) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_assets_exception_ce, "Filter is invalid");
-						return;
+						goto end;
 					}
 
 					/**
 					 * Calls the method 'filter' which must return a filtered version of the content
 					 */
 					PHALCON_CALL_METHOD(&filtered_content, filter, "filter", &content);
-					ZVAL_COPY_VALUE(&content, &filtered_content);
+					zval_ptr_dtor(&content);
+					ZVAL_COPY(&content, &filtered_content);
+					zval_ptr_dtor(&filtered_content);
 				} ZEND_HASH_FOREACH_END();
 
 				/**
@@ -782,14 +803,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				 */
 				if (zend_is_true(&join)) {
 					if (Z_TYPE(filtered_joined_content) <= IS_NULL) {
-						ZVAL_COPY_VALUE(&filtered_joined_content, &content);
+						ZVAL_COPY(&filtered_joined_content, &content);
 					} else {
 						phalcon_concat_self(&filtered_joined_content, &content);
 					}
 				} else {
-					ZVAL_COPY_VALUE(&filtered_joined_content, &content);
+					ZVAL_COPY(&filtered_joined_content, &content);
 				}
 			}
+			zval_ptr_dtor(&content);
 
 			if (!zend_is_true(&join)) {
 				/**
@@ -799,8 +821,10 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				phalcon_file_put_contents(NULL, &target_path, &filtered_joined_content);
 			}
 		}
+		zval_ptr_dtor(&target_path);
 
 		if (!zend_is_true(&join)) {
+			zval path = {}, prefixed_path = {}, attributes = {}, parameters = {}, html = {};
 			/**
 			 * Generate the HTML using the original path in the resource
 			 */
@@ -808,8 +832,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &path);
+				ZVAL_COPY(&prefixed_path, &path);
 			}
+			zval_ptr_dtor(&path);
 
 			/**
 			 * Gets extra HTML attributes in the resource
@@ -832,6 +857,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_array_append(&parameters, &prefixed_path, PH_COPY);
 			}
+			zval_ptr_dtor(&attributes);
+			zval_ptr_dtor(&prefixed_path);
 
 			phalcon_array_append(&parameters, &local, PH_COPY);
 			phalcon_array_append(&parameters, args, PH_COPY);
@@ -840,6 +867,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			 * Call the callback to generate the HTML
 			 */
 			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, &parameters);
+			zval_ptr_dtor(&parameters);
 
 			/**
 			 * Implicit output prints the content directly
@@ -849,12 +877,13 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_concat_self(&output, &html);
 			}
-			zval_ptr_dtor(&parameters);
+			zval_ptr_dtor(&html);
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	if (Z_TYPE(filters) == IS_ARRAY) {
 		if (zend_is_true(&join)) {
+			zval target_uri = {}, prefixed_path = {}, attributes = {}, local = {}, parameters = {}, html = {};
 			/**
 			 * Write the file using file_put_contents. This respects the openbase-dir also
 			 * writes to streams
@@ -868,8 +897,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (Z_TYPE(prefix) != IS_NULL) {
 				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &target_uri);
 			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &target_uri);
+				ZVAL_COPY(&prefixed_path, &target_uri);
 			}
+			zval_ptr_dtor(&target_uri);
 
 			/**
 			 * Gets extra HTML attributes in the resource
@@ -888,14 +918,18 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_array_append(&parameters, &prefixed_path, PH_COPY);
 			}
+			zval_ptr_dtor(&attributes);
+			zval_ptr_dtor(&prefixed_path);
 
 			phalcon_array_append(&parameters, &local, PH_COPY);
 			phalcon_array_append(&parameters, args, PH_COPY);
+			zval_ptr_dtor(&local);
 
 			/**
 			 * Call the callback to generate the HTML
 			 */
 			PHALCON_CALL_USER_FUNC_ARRAY(&html, callback, &parameters);
+			zval_ptr_dtor(&parameters);
 
 			/**
 			 * Implicit output prints the content directly
@@ -905,11 +939,22 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			} else {
 				phalcon_concat_self(&output, &html);
 			}
-			zval_ptr_dtor(&parameters);
+			zval_ptr_dtor(&html);
 		}
 	}
 
-	RETURN_CTOR(&output);
+	RETVAL_ZVAL(&output, 0, 0);
+end:
+	if (Z_TYPE(filters) == IS_ARRAY) {
+		zval_ptr_dtor(&complete_source_path);
+		zval_ptr_dtor(&complete_target_path);
+		zval_ptr_dtor(&filtered_joined_content);
+	}
+	zval_ptr_dtor(&resources);
+	zval_ptr_dtor(&filters);
+	zval_ptr_dtor(&prefix);
+	zval_ptr_dtor(&type_css);
+	zval_ptr_dtor(&type);
 }
 
 /**
@@ -945,7 +990,9 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 	ZVAL_STRING(&type, "css");
 
 	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	zval_ptr_dtor(&collection);
 	zval_ptr_dtor(&callback);
+	zval_ptr_dtor(&type);
 }
 
 /**
@@ -981,5 +1028,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 	ZVAL_STRING(&type, "js");
 
 	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	zval_ptr_dtor(&collection);
 	zval_ptr_dtor(&callback);
+	zval_ptr_dtor(&type);
 }

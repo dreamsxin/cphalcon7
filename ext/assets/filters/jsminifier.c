@@ -377,6 +377,7 @@ static int phalcon_jsmin_internal(zval *return_value, zval *script, const char *
 	} else {
 		ZVAL_EMPTY_STRING(return_value);
 	}
+	smart_str_free(&minified);
 
 	return SUCCESS;
 }

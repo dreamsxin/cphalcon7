@@ -264,6 +264,7 @@ static int phalcon_cssmin_internal(zval *return_value, zval *style, const char *
 	} else {
 		ZVAL_EMPTY_STRING(return_value);
 	}
+	smart_str_free(&minified);
 
 	*error = parser.error;
 	return SUCCESS;

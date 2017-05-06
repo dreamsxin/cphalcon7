@@ -26,12 +26,12 @@
 #include "kernel/fcall.h"
 #include "kernel/hash.h"
 
-int phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int flags)
+int ZEND_FASTCALL phalcon_array_isset_fetch(zval *fetched, const zval *arr, const zval *index, int flags)
 {
 	return phalcon_array_fetch(fetched, arr, index, flags) == SUCCESS ? 1 : 0;
 }
 
-int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index, int flags)
+int ZEND_FASTCALL phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index, int flags)
 {
 	zval z_index = {};
 	int status;
@@ -41,7 +41,7 @@ int phalcon_array_isset_fetch_long(zval *fetched, const zval *arr, ulong index, 
 	return status;
 }
 
-int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length, int flags)
+int ZEND_FASTCALL phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *index, uint index_length, int flags)
 {
 	zval z_index = {};
 	int status;
@@ -52,7 +52,7 @@ int phalcon_array_isset_fetch_str(zval *fetched, const zval *arr, const char *in
 	return status;
 }
 
-int phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index, int flags)
+int ZEND_FASTCALL phalcon_array_isset_fetch_string(zval *fetched, const zval *arr, zend_string *index, int flags)
 {
 	zval z_index = {};
 	int status;

@@ -361,7 +361,7 @@ static void phalcon_tag_get_escaper(zval *escaper, zval *params)
 
 	if (zend_is_true(&autoescape)) {
 		if (FAILURE == phalcon_call_method_with_params(escaper, NULL, phalcon_tag_ce, phalcon_fcall_ce, SL("getescaperservice"), 0, NULL)) {
-			assert(escaper == NULL);
+			return;
 		}
 	}
 }
@@ -421,6 +421,7 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 		}
 	} ZEND_HASH_FOREACH_END();
 	zval_ptr_dtor(&attrs);
+	zval_ptr_dtor(&escaper);
 }
 
 /**

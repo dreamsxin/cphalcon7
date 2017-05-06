@@ -279,8 +279,10 @@ PHP_METHOD(Phalcon_Session_Adapter, get){
 				zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
 			}
 		}
+		zval_ptr_dtor(&key);
 		return;
 	}
+	zval_ptr_dtor(&key);
 
 	RETURN_CTOR(default_value);
 }

@@ -250,6 +250,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		}
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, &cookie);
+		zval_ptr_dtor(&cookie);
 	} else {
 		/**
 		 * Override any settings in the cookie
@@ -282,7 +283,9 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 		 * request
 		 */
 		PHALCON_CALL_METHOD(NULL, &response, "setcookies", getThis());
+		zval_ptr_dtor(&response);
 	}
+	zval_ptr_dtor(&dependency_injector);
 
 	RETURN_THIS();
 }
@@ -321,6 +324,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 				PHALCON_CALL_METHOD(NULL, return_value, "useencryption", &encryption);
 			}
 		}
+		zval_ptr_dtor(&dependency_injector);
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, return_value);
 	}
@@ -383,6 +387,8 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 		PHALCON_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
 		PHALCON_CALL_METHOD(NULL, &cookie, "restore");
 		PHALCON_CALL_METHOD(NULL, &cookie, "delete");
+		zval_ptr_dtor(&cookie);
+		zval_ptr_dtor(&dependency_injector);
 		RETURN_TRUE;
 	}
 

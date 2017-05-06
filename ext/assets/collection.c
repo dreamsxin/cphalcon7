@@ -253,6 +253,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addCss){
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }
@@ -300,6 +301,7 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
 	PHALCON_CALL_METHOD(NULL, &resource, "__construct", path, &collection_local, filter, &collection_attributes);
 
 	phalcon_update_property_array_append(getThis(), SL("_resources"), &resource);
+	zval_ptr_dtor(&resource);
 
 	RETURN_THIS();
 }

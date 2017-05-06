@@ -509,7 +509,7 @@ PHP_METHOD(Phalcon_Di_Injectable, attachEvent){
  */
 PHP_METHOD(Phalcon_Di_Injectable, __get){
 
-	zval *property_name, dependency_injector = {}, has_service = {}, service = {}, class_name = {}, arguments = {}, result = {};
+	zval *property_name, dependency_injector = {}, has_service = {}, service = {}, class_name = {}, arguments = {};
 
 	phalcon_fetch_params(0, 1, 0, &property_name);
 	PHALCON_ENSURE_IS_STRING(property_name);
@@ -539,14 +539,14 @@ PHP_METHOD(Phalcon_Di_Injectable, __get){
 		add_next_index_zval(&arguments, &class_name);
 
 		ZVAL_STR(&service, IS(sessionBag));
-		PHALCON_CALL_METHOD(&result, &dependency_injector, "get", &service, &arguments);
+		PHALCON_CALL_METHOD(return_value, &dependency_injector, "get", &service, &arguments);
 		zval_ptr_dtor(&arguments);
 		zval_ptr_dtor(&dependency_injector);
 
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), &result);
-		RETVAL_ZVAL(&result, 0, 0);
+		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), return_value);
 		return;
 	}
+	zval_ptr_dtor(&dependency_injector);
 
 	/**
 	 * A notice is shown if the property is not defined or is not a valid service

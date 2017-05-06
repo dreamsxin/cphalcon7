@@ -304,9 +304,10 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
 			 * Return the value without filtering
 			 */
 			RETVAL_ZVAL(&decrypted_value, 0, 0);
+			zval_ptr_dtor(&dependency_injector);
 			return;
 		}
-
+		zval_ptr_dtor(&dependency_injector);
 		RETURN_CTOR(default_value);
 	}
 	zval_ptr_dtor(&dependency_injector);

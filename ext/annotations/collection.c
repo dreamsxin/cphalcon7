@@ -127,7 +127,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, __construct){
 			zval annotation = {};
 			object_init_ex(&annotation, phalcon_annotations_annotation_ce);
 			PHALCON_CALL_METHOD(NULL, &annotation, "__construct", annotation_data);
-			phalcon_array_append(&annotations, &annotation, PH_COPY);
+			phalcon_array_append(&annotations, &annotation, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property(getThis(), SL("_annotations"), &annotations);
@@ -247,8 +247,10 @@ PHP_METHOD(Phalcon_Annotations_Collection, get){
 			zval annotation_name = {};
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, &annotation_name)) {
+				zval_ptr_dtor(&annotation_name);
 				RETURN_CTOR(annotation);
 			}
+			zval_ptr_dtor(&annotation_name);
 		} ZEND_HASH_FOREACH_END();
 
 	}
@@ -279,6 +281,7 @@ PHP_METHOD(Phalcon_Annotations_Collection, getAll){
 			if (PHALCON_IS_EQUAL(name, &annotation_name)) {
 				phalcon_array_append(return_value, annotation, PH_COPY);
 			}
+			zval_ptr_dtor(&annotation_name);
 		} ZEND_HASH_FOREACH_END();
 	}
 }
@@ -301,8 +304,10 @@ PHP_METHOD(Phalcon_Annotations_Collection, has){
 			zval annotation_name = {};
 			PHALCON_CALL_METHOD(&annotation_name, annotation, "getname");
 			if (PHALCON_IS_EQUAL(name, &annotation_name)) {
+				zval_ptr_dtor(&annotation_name);
 				RETURN_TRUE;
 			}
+			zval_ptr_dtor(&annotation_name);
 		} ZEND_HASH_FOREACH_END();
 	}
 

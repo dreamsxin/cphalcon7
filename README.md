@@ -36,9 +36,10 @@ Ubuntu:
 ```bash
 # if enable qrcode
 sudo apt-get install libqrencode-dev libzbar-dev imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev libpng12-dev
+sudo ln -s /usr/include/ImageMagick-6/ /usr/include/ImageMagick
 
 sudo add-apt-repository ppa:ondrej/php
-sudo apt-get install php7.0-dev libpcre3-dev gcc make
+sudo apt-get install php7.1-dev libpcre3-dev gcc make
 
 # or compilation
 ----------------
@@ -70,7 +71,7 @@ Follow these instructions to generate a binary extension for your platform:
 git clone git://github.com/dreamsxin/cphalcon7.git
 cd cphalcon7/ext
 phpize
-./configure
+./configure --enable-chart=yes
 # or debug
 ./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"
 make -j4

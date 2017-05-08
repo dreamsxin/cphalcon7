@@ -1834,7 +1834,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 
 	if (status != FAILURE) {
 		if (parser_status->status == PHANNOT_PARSING_OK) {
-			ZVAL_ZVAL(*result, &parser_status->ret, 1, 1);
+			ZVAL_COPY_VALUE(*result, &parser_status->ret);
 		}
 	}
 

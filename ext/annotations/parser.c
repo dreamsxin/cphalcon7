@@ -1540,7 +1540,7 @@ int phannot_parse_annotations(zval *result, zend_string *comment, const char *fi
 /**
  * Remove comment separators from a docblock
  */
-static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zend_string *comment, uint32_t *start_lines)
+static zend_string* phannot_remove_comment_separators(zend_string *comment, uint32_t *start_lines)
 {
 	int start_mode = 1, j, i, open_parentheses;
 	smart_str processed_str = {0};
@@ -1622,11 +1622,9 @@ static void phannot_remove_comment_separators(char **ret, uint32_t *ret_len, zen
 	smart_str_0(&processed_str);
 
 	if (processed_str.s) {
-		*ret     = processed_str.s->val;
-		*ret_len = processed_str.s->len;
+		return processed_str.s;
 	} else {
-		*ret     = NULL;
-		*ret_len = 0;
+		return NULL;
 	}
 }
 
@@ -1641,8 +1639,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 	int scanner_status, status = SUCCESS;
 	phannot_parser_status *parser_status = NULL;
 	void* phannot_parser;
-	char *processed_comment;
-	uint32_t processed_comment_len;
+	zend_string *processed_comment;
 
 	*error_msg = NULL;
 
@@ -1663,14 +1660,13 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 	/**
 	 * Remove comment separators
 	 */
-	phannot_remove_comment_separators(&processed_comment, &processed_comment_len, comment, &start_lines);
+	processed_comment = phannot_remove_comment_separators(comment, &start_lines);
 
-	if (processed_comment_len < 2) {
+	if (!processed_comment) {
+		return SUCCESS;
+	} else if (processed_comment->len < 2) {
 		ZVAL_BOOL(*result, 0);
-		if (processed_comment) {
-			efree(processed_comment);
-		}
-
+		zend_string_release(processed_comment);
 		return SUCCESS;
 	}
 
@@ -1695,7 +1691,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 	 * Initialize the scanner state
 	 */
 	state->active_token = 0;
-	state->start = processed_comment;
+	state->start = processed_comment->val;
 	state->start_length = 0;
 	state->mode = PHANNOT_MODE_RAW;
 	state->active_file = file_path;
@@ -1718,7 +1714,7 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 
 		state->active_token = token.opcode;
 
-		state->start_length = processed_comment + processed_comment_len - state->start;
+		state->start_length = processed_comment->val + processed_comment->len - state->start;
 
 		switch (token.opcode) {
 
@@ -1839,6 +1835,9 @@ int phannot_internal_parse_annotations(zval **result, zend_string *comment, cons
 	}
 
 	efree(parser_status);
+	if (processed_comment) {
+		zend_string_release(processed_comment);
+	}
 
 	return status;
 }

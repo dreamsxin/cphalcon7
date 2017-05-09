@@ -27,43 +27,43 @@ class IntrusiveRbtreeTest extends PHPUnit_Framework_TestCase
 			$this->markTestSkipped('Class `Phalcon\Intrusive\Rbtree` is not exists');
 			return false;
 		}
-		$avltree = new Phalcon\Intrusive\Rbtree;
-		$node2 = $avltree->insert(2);
-		$node3 = $avltree->insert(3);
-		$node4 = $avltree->insert(4);
-		$node5 = $avltree->insert(5);
-		$node6 = $avltree->insert(6);
+		$rbtree = new Phalcon\Intrusive\Rbtree;
+		$node2 = $rbtree->insert(2);
+		$node3 = $rbtree->insert(3);
+		$node4 = $rbtree->insert(4);
+		$node5 = $rbtree->insert(5);
+		$node6 = $rbtree->insert(6);
 
 		$node1 = new Phalcon\Intrusive\Rbtree\Node(1);
-		$avltree->insert($node1);
+		$rbtree->insert($node1);
 
-		$node = $avltree->find(1);
+		$node = $rbtree->find(1);
 		$this->assertEquals($node->getValue(), 1);
 
-		$node = $avltree->find(6);
+		$node = $rbtree->find(6);
 		$this->assertEquals($node->getValue(), 6);
 
-		$node = $avltree->first();
+		$node = $rbtree->first();
 		$this->assertEquals($node->getValue(), 1);
 
-		$node = $avltree->last();
+		$node = $rbtree->last();
 		$this->assertEquals($node->getValue(), 6);
 
-		$node = $avltree->find(4);
+		$node = $rbtree->find(4);
 		$this->assertEquals($node->getValue(), 4);
 
 		$this->assertEquals($node->prev()->getValue(), 3);
 		$this->assertEquals($node->next()->getValue(), 5);
 
-		$node = $avltree->prev(4);
+		$node = $rbtree->prev(4);
 		$this->assertEquals($node->getValue(), 3);
 
-		$node = $avltree->next(4);
+		$node = $rbtree->next(4);
 		$this->assertEquals($node->getValue(), 5);
 
-		$node = $avltree->replace($node1, $node5);
+		$node = $rbtree->replace($node1, $node5);
 		$this->assertEquals($node, $node5);
 
-		$this->assertFalse($avltree->find(1));
+		$this->assertFalse($rbtree->find(1));
 	}
 }

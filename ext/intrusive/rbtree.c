@@ -89,6 +89,14 @@ static const zend_function_entry phalcon_intrusive_rbtree_method_entry[] = {
 static void phalcon_zvltree_dtor(zend_resource *rsrc)
 {
     struct phalcon_rbtree *rbtree = (struct phalcon_rbtree *) rsrc->ptr;
+	struct phalcon_rbtree_node* node;
+	while ((node = phalcon_rbtree_first(rbtree)) != NULL) {
+		zval obj = {};
+		phalcon_rbtree_remove(node, rbtree);
+		phalcon_intrusive_rbtree_node_object *node_object = phalcon_intrusive_rbtree_node_object_from_node(node);
+		ZVAL_OBJ(&obj, &node_object->std);
+		zval_ptr_dtor(&obj);
+	}
     efree (rbtree);
 }
 
@@ -252,8 +260,11 @@ PHP_METHOD(Phalcon_Intrusive_Rbtree, replace){
 		node_object = phalcon_intrusive_rbtree_node_object_from_obj(Z_OBJ(new_node));
 		phalcon_rbtree_replace(n, &node_object->node, rbtree);
 	} else {
-		Z_TRY_ADDREF_P(new_value);
-		node_object = phalcon_intrusive_rbtree_node_object_from_obj(Z_OBJ_P(new_value));
+		zval v = {}, new_node = {};
+		PHALCON_CALL_METHOD(&v, new_value, "getvalue");
+		object_init_ex(&new_node, phalcon_intrusive_rbtree_node_ce);
+		PHALCON_CALL_METHOD(NULL, &new_node, "__construct", &v);
+		node_object = phalcon_intrusive_rbtree_node_object_from_obj(Z_OBJ(new_node));
 		phalcon_rbtree_replace(n, &node_object->node, rbtree);
 	}
 	old_node_object = phalcon_intrusive_rbtree_node_object_from_node(n);

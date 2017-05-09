@@ -78,6 +78,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_assign, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, columnMap, IS_ARRAY, 1)
 	ZEND_ARG_TYPE_INFO(0, whiteList, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, negate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_cloneresultmap, 0, 0, 4)

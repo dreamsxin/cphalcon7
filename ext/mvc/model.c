@@ -1345,10 +1345,10 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model, assign){
 
-	zval *data, *column_map = NULL, *white_list = NULL, *value, exception_message = {};
+	zval *data, *column_map = NULL, *white_list = NULL, *negate = NULL, *value, exception_message = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 1, 2, &data, &column_map, &white_list);
+	phalcon_fetch_params(0, 1, 3, &data, &column_map, &white_list, &negate);
 
 	if (!column_map) {
 		column_map = &PHALCON_GLOBAL(z_null);
@@ -1358,14 +1358,26 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 		white_list = &PHALCON_GLOBAL(z_null);
 	}
 
+	if (!negate) {
+		negate = &PHALCON_GLOBAL(z_false);
+	}
+
 	if (Z_TYPE_P(column_map) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
 			zval key = {}, attribute = {}, possible_setter = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 
-				if (Z_TYPE_P(white_list) == IS_ARRAY && !phalcon_fast_in_array(&key, white_list)) {
-					continue;
+				if (Z_TYPE_P(white_list) == IS_ARRAY) {
+					if (likely(!zend_is_true(negate))) {
+						if (!phalcon_fast_in_array(&key, white_list)) {
+							continue;
+						}
+					} else {
+						if (phalcon_fast_in_array(&key, white_list)) {
+							continue;
+						}
+					}
 				}
 
 				/**
@@ -6493,18 +6505,21 @@ PHP_METHOD(Phalcon_Mvc_Model, dump){
  */
 PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, attributes = {}, column_map = {}, data = {}, *attribute, exception_message = {}, event_name = {};
+	zval *columns = NULL, *rename_columns = NULL, *negate = NULL, attributes = {}, column_map = {}, data = {}, *attribute, exception_message = {}, event_name = {};
 
-	phalcon_fetch_params(0, 0, 2, &columns, &rename_columns);
+	phalcon_fetch_params(0, 0, 3, &columns, &rename_columns, &negate);
 
 	if (!columns) {
 		columns = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!rename_columns) {
+	if (!rename_columns || Z_TYPE_P(rename_columns) == IS_NULL) {
 		rename_columns = &PHALCON_GLOBAL(z_true);
 	}
 
+	if (!negate) {
+		negate = &PHALCON_GLOBAL(z_false);
+	}
 
 	ZVAL_STRING(&event_name, "beforeToArray");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
@@ -6540,8 +6555,14 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		}
 
 		if (Z_TYPE_P(columns) == IS_ARRAY) {
-			if (!phalcon_fast_in_array(&attribute_field, columns) && !phalcon_fast_in_array(attribute, columns)) {
-				continue;
+			if (likely(!zend_is_true(negate))) {
+				if (!phalcon_fast_in_array(&attribute_field, columns) && !phalcon_fast_in_array(attribute, columns)) {
+					continue;
+				}
+			} else {
+				if (phalcon_fast_in_array(&attribute_field, columns) || phalcon_fast_in_array(attribute, columns)) {
+					continue;
+				}
 			}
 		}
 

@@ -40,7 +40,7 @@
  * $server->on(Phalcon\Websocket\Server::ON_CLOSE, function($server){
  *     echo 'Close'.PHP_EOL;
  * });
- * $server->on(Phalcon\Websocket\Server::ON_DATA, function($server, $conn){
+ * $server->on(Phalcon\Websocket\Server::ON_DATA, function($server, $conn, $data){
  *     echo 'Data'.PHP_EOL;
  * });
  * $server->run();
@@ -154,7 +154,6 @@ static int phalcon_websocket_server_callback(struct lws *wsi, enum lws_callback_
 			connection_object->id = ++intern->next_id;
 			connection_object->wsi = wsi;
 
-			zval_addref_p(connection);
 			add_index_zval(&intern->connections, connection_object->id, connection);
 
 			connection_object->connected = 1;
@@ -319,7 +318,7 @@ void phalcon_websocket_server_object_free_handler(zend_object *object)
 
 	for (i = 0; i < PHP_CB_SERVER_COUNT; ++i) {
 		if (Z_TYPE(intern->callbacks[i]) != IS_NULL) {
-		    Z_TRY_DELREF(intern->callbacks[i]);
+		    zval_ptr_dtor(&intern->callbacks[i]);
 		}
 	}
 
@@ -592,12 +591,6 @@ PHP_METHOD(Phalcon_Websocket_Server, on)
 
 	phalcon_fetch_params(0, 2, 0, &ev, &func);
 
-	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
-			PHALCON_CALL_CE_STATIC(&callback, zend_ce_closure, "bind", func, getThis());
-	} else {
-		ZVAL_COPY_VALUE(&callback, func);
-	}
-
 	event = Z_LVAL_P(ev);
 	if (event < 0 || event >= PHP_CB_SERVER_COUNT) {
 		php_error_docref(NULL, E_WARNING, "Try to add an invalid event callback");
@@ -605,6 +598,11 @@ PHP_METHOD(Phalcon_Websocket_Server, on)
 	}
 
 	intern = phalcon_websocket_server_object_from_obj(Z_OBJ_P(getThis()));
-	ZVAL_COPY(&intern->callbacks[event], &callback);
+
+	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
+		PHALCON_CALL_CE_STATIC(&intern->callbacks[event], zend_ce_closure, "bind", func, getThis());
+	} else {
+		ZVAL_COPY(&intern->callbacks[event], func);
+	}
 	RETURN_TRUE;
 }

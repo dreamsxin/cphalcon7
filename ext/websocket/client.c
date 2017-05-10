@@ -62,17 +62,10 @@ ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 1)
 ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_client_on, 0, 2, _IS_BOOL, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_client_on, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 0)
 	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_websocket_client_on, 0, 2, _IS_BOOL, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, event, IS_LONG, 0)
-	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
-ZEND_END_ARG_INFO()
-#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_client_connect, 0, 0, 0)
 	ZEND_ARG_CALLABLE_INFO(0, accept, 1)
@@ -130,8 +123,8 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 			connection_object = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(connection));
 			connection_object->wsi = wsi;
 
-			Z_TRY_DELREF(intern->connection);
-			ZVAL_COPY(&intern->connection, connection);
+			zval_ptr_dtor(&intern->connection);
+			ZVAL_COPY_VALUE(&intern->connection, connection);
 
 			connection_object->connected = 1;
 
@@ -278,7 +271,7 @@ void phalcon_websocket_client_object_free_handler(zend_object *object)
 
 	for (i = 0; i < PHP_CB_CLIENT_COUNT; ++i) {
 		if (Z_TYPE(intern->callbacks[i]) != IS_NULL) {
-		    Z_TRY_DELREF(intern->callbacks[i]);
+		    zval_ptr_dtor(&intern->callbacks[i]);
 		}
 	}
 
@@ -286,6 +279,8 @@ void phalcon_websocket_client_object_free_handler(zend_object *object)
 		lws_context_destroy(intern->context);
 		intern->context = NULL;
 	}
+
+	zval_ptr_dtor(&intern->connection);
 
 	zend_object_std_dtor(object);
 }
@@ -341,12 +336,6 @@ PHP_METHOD(Phalcon_Websocket_Client, on)
 
 	phalcon_fetch_params(0, 2, 0, &ev, &func);
 
-	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
-		PHALCON_CALL_CE_STATIC(&callback, zend_ce_closure, "bind", func, getThis());
-	} else {
-		ZVAL_COPY_VALUE(&callback, func);
-	}
-
 	event = Z_LVAL_P(ev);
 	if (event < 0 || event >= PHP_CB_CLIENT_COUNT) {
 		php_error_docref(NULL, E_WARNING, "Try to add an invalid event callback");
@@ -354,9 +343,14 @@ PHP_METHOD(Phalcon_Websocket_Client, on)
 	}
 
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
-	ZVAL_COPY(&intern->callbacks[event], &callback);
 
-	RETURN_TRUE;
+	if (Z_TYPE_P(func) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(func), zend_ce_closure, 0)) {
+		PHALCON_CALL_CE_STATIC(&intern->callbacks[event], zend_ce_closure, "bind", func, getThis());
+	} else {
+		ZVAL_COPY(&intern->callbacks[event], func);
+	}
+
+	RETURN_THIS();
 }
 
 /**

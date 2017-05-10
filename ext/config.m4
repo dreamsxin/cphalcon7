@@ -96,14 +96,12 @@ fi
 PHP_ARG_ENABLE(websocket, whether to enable websocket support,
 [  --enable-websocket   Enable websocket support], no, no)
 
-if test "$PHP_SOCKET" = "yes"; then
-	AC_MSG_CHECKING([Include websocket])
-	if test "$PHP_WEBSOCKET" = "yes"; then
-		AC_DEFINE([PHALCON_WEBSOCKET], [1], [Whether websocket are available])
-		AC_MSG_RESULT([yes, websocket])
-	else
-		AC_MSG_RESULT([no])
-	fi
+AC_MSG_CHECKING([Include websocket])
+if test "$PHP_WEBSOCKET" = "yes"; then
+	AC_DEFINE([PHALCON_WEBSOCKET], [1], [Whether websocket are available])
+	AC_MSG_RESULT([yes, websocket])
+else
+	AC_MSG_RESULT([no])
 fi
 
 PHP_ARG_ENABLE(storage-btree, whether to enable storage btree support,
@@ -1056,27 +1054,32 @@ server/exception.c"
 				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
+	fi
 
-		if test "$PHP_WEBSOCKET" = "yes"; then
-			AC_MSG_CHECKING([checking libwebsockets support])
-			for i in /usr/local /usr; do
-				if test -r $i/include/libwebsockets.h; then
-					PHP_ADD_INCLUDE($i/include)
-					PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
-					[
-						PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-						AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
-						phalcon_sources="$phalcon_sources websocket/connection.c websocket/server.c websocket/client.c websocket/eventloopinterface.c "
-					],[
-						AC_MSG_ERROR([Wrong websockets version or library not found])
-					],[
-						-L$i/$PHP_LIBDIR -lm
-					])
-					break
-				else
-					AC_MSG_RESULT([no, found in $i])
-				fi
-			done
+	if test "$PHP_WEBSOCKET" = "yes"; then
+		AC_MSG_CHECKING([checking libwebsockets support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/libwebsockets.h; then
+				WEBSOCKET_DIR=$i
+				PHP_ADD_INCLUDE($i/include)
+				PHP_CHECK_LIBRARY(websockets, lws_callback_on_writable,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(websockets, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_WEBSOCKET, 1, [Have WebSocket support])
+					phalcon_sources="$phalcon_sources websocket/connection.c websocket/server.c websocket/client.c websocket/eventloopinterface.c "
+				],[
+					AC_MSG_ERROR([Wrong websockets version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
+				break
+			else
+				AC_MSG_RESULT([no, found in $i])
+			fi
+		done
+
+		if test -z "$WEBSOCKET_DIR"; then
+			AC_MSG_ERROR([libwebsockets library not found])
 		fi
 	fi
 
@@ -1093,6 +1096,7 @@ server/exception.c"
 		AC_MSG_CHECKING([checking libwiredtiger support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/wiredtiger.h; then
+				WIREDTIGER_DIR=$i
 				PHP_ADD_INCLUDE($i/include)
 				PHP_CHECK_LIBRARY(wiredtiger, wiredtiger_open,
 				[
@@ -1109,6 +1113,10 @@ server/exception.c"
 				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
+
+		if test -z "$WIREDTIGER_DIR"; then
+			AC_MSG_ERROR([wiredtiger library not found])
+		fi
 	fi
 
 	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then

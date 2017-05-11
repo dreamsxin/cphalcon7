@@ -144,7 +144,6 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl copied from Zend Optimizer Plus
 AC_MSG_CHECKING(for sysvipc shared memory support)
 AC_TRY_RUN([
 #include <sys/types.h>
@@ -285,6 +284,25 @@ AC_DEFINE(HAVE_EPOLL, 1, [Define if your have epoll support])
     msg=yes,msg=no,msg=no)
 AC_MSG_RESULT([$msg])
 
+AC_MSG_CHECKING([for kqueue])
+AC_TRY_COMPILE(
+[
+    #include <sys/types.h>
+    #include <sys/event.h>
+    #include <sys/time.h>
+], [
+    int kfd;
+    struct kevent k;
+    kfd = kqueue();
+    /* 0 -> STDIN_FILENO */
+    EV_SET(&k, 0, EVFILT_READ , EV_ADD | EV_CLEAR, 0, 0, NULL);
+], [
+    AC_DEFINE([HAVE_KQUEUE], 1, [do we have kqueue?])
+    AC_MSG_RESULT([yes])
+], [
+    AC_MSG_RESULT([no])
+])
+
 if test "$PHP_PHALCON" = "yes"; then
 	AC_MSG_CHECKING([PHP version])
 
@@ -350,6 +368,16 @@ kernel/iterator.c \
 kernel/math.c \
 kernel/time.c \
 kernel/message/queue.c \
+kernel/io/support.c \
+kernel/io/epoll.c \
+kernel/io/kqueue.c \
+kernel/io/generic.c \
+kernel/io/sockets.c \
+kernel/io/networks.c \
+kernel/io/client.c \
+kernel/io/server.c \
+kernel/io/tasks.c \
+kernel/io/threads.c \
 interned-strings.c \
 logger.c \
 flash.c \

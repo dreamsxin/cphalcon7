@@ -23,11 +23,10 @@
 
 #include "php_phalcon.h"
 
-#include <main/php_network.h>
+#if PHALCON_USE_PHP_SOCKET
 
-#ifdef PHALCON_USE_PHP_SOCKET
-# include <ext/sockets/php_sockets.h>
-#endif
+#include <main/php_network.h>
+#include <ext/sockets/php_sockets.h>
 
 #include <errno.h>
 #include <netinet/in.h>
@@ -79,6 +78,8 @@ static inline int phalcon_socket_set_non_blocking(int fd) {
 
 #define PHALCON_SOCKET_TCP_NODELAY		TCP_NODELAY
 #define PHALCON_SOCKET_TCP_QUICKACK		TCP_QUICKACK
+
+#endif /* PHALCON_USE_PHP_SOCKET */
 
 extern zend_class_entry *phalcon_socket_ce;
 

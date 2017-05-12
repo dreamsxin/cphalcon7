@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,41 +14,34 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          Didier Bertrand <diblibre@gmail.com>                          |
   |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_APPLICATION_H
-#define PHALCON_APPLICATION_H
+#include "kernel/io/generic.h"
 
-#include "php_phalcon.h"
+#if !HAVE_EPOLL && !HAVE_KQUEUE
 
-extern zend_class_entry *phalcon_application_ce;
+phalcon_io_poller_info *phalcon_io_create_poller(void* parent, char* address, int port, char *networks, void (*callback)(phalcon_io_client_info *ci,int op))
+{
+	return NULL;
+}
 
-PHALCON_INIT_CLASS(Phalcon_Application);
+int phalcon_io_start_poller(phalcon_io_poller_info *pi)
+{
+	return PHALCON_IO_FALSE;
+}
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, modules, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
+void *phalcon_io_stop_poller(phalcon_io_poller_info *pi)
+{
+	pi->stop = PHALCON_IO_TRUE;
+	return NULL;
+}
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, defaultModule, IS_STRING, 0)
-ZEND_END_ARG_INFO()
+int phalcon_io_poller_is_alive(phalcon_io_poller_info *pi)
+{
+	return 0;
+}
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-/*
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_phalcon_application_handle, 0, 0, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_application_handle, 0, 0, IS_OBJECT, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
 #endif
-*/
-
-#endif /* PHALCON_APPLICATION_H */

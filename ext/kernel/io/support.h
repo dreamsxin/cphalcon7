@@ -3,7 +3,7 @@
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2015 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -14,41 +14,36 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          Didier Bertrand <diblibre@gmail.com>                          |
   |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_APPLICATION_H
-#define PHALCON_APPLICATION_H
+#ifndef PHALCON_KERNEL_IO_SUPPORT_H
+#define PHALCON_KERNEL_IO_SUPPORT_H
 
-#include "php_phalcon.h"
+#include <stdio.h>
 
-extern zend_class_entry *phalcon_application_ce;
+#define PHALCON_IO_DEBUG_NONE     0
+#define PHALCON_IO_DEBUG_IO       1
+#define PHALCON_IO_DEBUG_CLIENT   2
+#define PHALCON_IO_DEBUG_DETAIL   3
+#define PHALCON_IO_DEBUG_ALWAYS   4
 
-PHALCON_INIT_CLASS(Phalcon_Application);
+void phalcon_io_set_debug_level( int _visualize, int _debugLevel, FILE *_fdlog );
+int  phalcon_io_error_message( const char *fmt, ... );
+int  phalcon_io_debug_message( int level, const char *fmt, ... );
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, modules, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
+void phalcon_io_reset_stats();
+void phalcon_io_adjust_stats();
+void phalcon_io_compute_stats();
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, defaultModule, IS_STRING, 0)
-ZEND_END_ARG_INFO()
+int phalcon_io_get_processors_count();
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-/*
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_phalcon_application_handle, 0, 0, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_application_handle, 0, 0, IS_OBJECT, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
+#if defined(__ARM__) || defined(__X86__)
+unsigned int  add_uint  (unsigned volatile int  *var, int val);
+unsigned long add_ulong (unsigned volatile long *var, int val);
+unsigned long and_ulong (unsigned volatile long *var, int val);
 #endif
-*/
 
-#endif /* PHALCON_APPLICATION_H */
+#endif /* PHALCON_KERNEL_IO_SUPPORT_H */

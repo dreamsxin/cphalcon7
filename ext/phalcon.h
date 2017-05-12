@@ -449,5 +449,6 @@
 #include "server.h"
 #include "server/exception.h"
 #include "server/http.h"
+#include "server/simple.h"
 
 #endif /* PHALCON_H */

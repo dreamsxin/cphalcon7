@@ -135,7 +135,6 @@ PHP_METHOD(Phalcon_Socket, getSocket){
  */
 PHP_METHOD(Phalcon_Socket, getSocketId){
 
-#ifdef PHALCON_USE_PHP_SOCKET
 	zval socket = {};
 	php_socket *php_sock;
 
@@ -147,7 +146,6 @@ PHP_METHOD(Phalcon_Socket, getSocketId){
 	}
 
 	ZVAL_LONG(return_value, php_sock->bsd_socket);
-#endif
 }
 
 /**

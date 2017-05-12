@@ -559,6 +559,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Server);
 	PHALCON_INIT(Phalcon_Server_Http);
 #endif
+	PHALCON_INIT(Phalcon_Server_Simple);
 	return SUCCESS;
 }
 

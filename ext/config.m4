@@ -82,17 +82,6 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_ENABLE(socket, whether to enable socket support,
-[  --enable-socket   Enable socket support], no, no)
-
-AC_MSG_CHECKING([Include socket])
-if test "$PHP_SOCKET" = "yes"; then
-	AC_DEFINE([PHALCON_SOCKET], [1], [Whether socket are available])
-	AC_MSG_RESULT([yes, socket])
-else
-	AC_MSG_RESULT([no])
-fi
-
 PHP_ARG_ENABLE(websocket, whether to enable websocket support,
 [  --enable-websocket   Enable websocket support], no, no)
 
@@ -144,7 +133,6 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-dnl copied from Zend Optimizer Plus
 AC_MSG_CHECKING(for sysvipc shared memory support)
 AC_TRY_RUN([
 #include <sys/types.h>
@@ -285,6 +273,25 @@ AC_DEFINE(HAVE_EPOLL, 1, [Define if your have epoll support])
     msg=yes,msg=no,msg=no)
 AC_MSG_RESULT([$msg])
 
+AC_MSG_CHECKING([for kqueue])
+AC_TRY_COMPILE(
+[
+    #include <sys/types.h>
+    #include <sys/event.h>
+    #include <sys/time.h>
+], [
+    int kfd;
+    struct kevent k;
+    kfd = kqueue();
+    /* 0 -> STDIN_FILENO */
+    EV_SET(&k, 0, EVFILT_READ , EV_ADD | EV_CLEAR, 0, 0, NULL);
+], [
+    AC_DEFINE([HAVE_KQUEUE], 1, [do we have kqueue?])
+    AC_MSG_RESULT([yes])
+], [
+    AC_MSG_RESULT([no])
+])
+
 if test "$PHP_PHALCON" = "yes"; then
 	AC_MSG_CHECKING([PHP version])
 
@@ -350,6 +357,16 @@ kernel/iterator.c \
 kernel/math.c \
 kernel/time.c \
 kernel/message/queue.c \
+kernel/io/support.c \
+kernel/io/epoll.c \
+kernel/io/kqueue.c \
+kernel/io/generic.c \
+kernel/io/sockets.c \
+kernel/io/networks.c \
+kernel/io/client.c \
+kernel/io/server.c \
+kernel/io/tasks.c \
+kernel/io/threads.c \
 interned-strings.c \
 logger.c \
 flash.c \
@@ -726,6 +743,7 @@ chart/exception.c \
 socket/exception.c \
 process/exception.c \
 storage/exception.c \
+server/simple.c \
 server/exception.c"
 
 	if test "$PHP_CACHE_YAC" = "yes"; then
@@ -803,18 +821,23 @@ server/exception.c"
 		AC_MSG_RESULT([no])
 	])
 
-	if test "$PHP_SOCKET" = "yes"; then
-		AC_CHECK_HEADERS(
-			[ext/sockets/php_sockets.h],
-			[
-				PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
-				AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
-	            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
-			],
-			,
-			[[#include "main/php.h"]]
-		)
-	fi
+	AC_CHECK_DECL(
+		[HAVE_PHP_SOCKET],
+		[
+			AC_CHECK_HEADERS(
+				[ext/sockets/php_sockets.h],
+				[
+					PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+					AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+					phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
+				],
+				,
+				[[#include "main/php.h"]]
+			)
+		],
+		,
+		[[#include "php_config.h"]]
+	)
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],

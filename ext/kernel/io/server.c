@@ -30,13 +30,12 @@
 #include "kernel/io/server.h"
 #include "kernel/io/generic.h"
 
-
-int phalcon_io_init_servers ()
+int phalcon_io_init_servers()
 {
-	return phalcon_io_init_sockets ();
+	return phalcon_io_init_sockets();
 }
 
-void *phalcon_io_create_server (void* parent, char* address, int port, char* networks, void (*callback)(phalcon_io_client_info* ci,int op), int worker_threads)
+void *phalcon_io_create_server(void* parent, char* address, int port, char* networks, void (*callback)(phalcon_io_client_info* ci,int op), int worker_threads)
 {
 	if (callback==NULL)
 		return NULL;
@@ -44,35 +43,35 @@ void *phalcon_io_create_server (void* parent, char* address, int port, char* net
 	signal(SIGPIPE, SIG_IGN);
 
 	if (worker_threads > 0)
-		return phalcon_io_create_threads (parent, address, port, networks, callback, worker_threads);
+		return phalcon_io_create_threads(parent, address, port, networks, callback, worker_threads);
 	else
-		return phalcon_io_create_poller (parent, address, port, networks, callback);
+		return phalcon_io_create_poller(parent, address, port, networks, callback);
 }
 
-int phalcon_io_start_server (void* tpi)
+int phalcon_io_start_server(void* tpi)
 {
 	if (((phalcon_io_threads_info *)tpi)->info_type == PHALCON_IO_TP_THREADS)
-		return phalcon_io_start_threads (tpi);
+		return phalcon_io_start_threads(tpi);
 	else
-		return phalcon_io_start_poller (tpi);
+		return phalcon_io_start_poller(tpi);
 }
 
-void *phalcon_io_stop_server (void* tpi)
+void *phalcon_io_stop_server(void* tpi)
 {
 	if (tpi == NULL)
 		return NULL;
 	if (((phalcon_io_threads_info *)tpi)->info_type == PHALCON_IO_TP_THREADS)
-		return phalcon_io_stop_threads ((phalcon_io_threads_info *)tpi);
+		return phalcon_io_stop_threads((phalcon_io_threads_info *)tpi);
 	else
-		return phalcon_io_stop_poller  ((phalcon_io_poller_info *)tpi);
+		return phalcon_io_stop_poller((phalcon_io_poller_info *)tpi);
 }
 
-int phalcon_io_server_is_alive (void* tpi)
+int phalcon_io_server_is_alive(void* tpi)
 {
 	return phalcon_io_poller_is_alive((phalcon_io_poller_info *)tpi) | phalcon_io_threads_are_running((phalcon_io_threads_info *)tpi);
 }
 
-void phalcon_io_set_defaults (void* tpi, int use_write_events, int read_buffer_size, int write_buffer_size, int read_buffer_limit, int write_buffer_limit)
+void phalcon_io_set_defaults(void* tpi, int use_write_events, int read_buffer_size, int write_buffer_size, int read_buffer_limit, int write_buffer_limit)
 {
 	phalcon_io_threads_info *ti = (phalcon_io_threads_info *)tpi;
 	if (use_write_events != PHALCON_IO_DEFAULT)
@@ -87,24 +86,24 @@ void phalcon_io_set_defaults (void* tpi, int use_write_events, int read_buffer_s
 		ti->cc.write_buffer_limit = write_buffer_limit;
 }
 
-int phalcon_io_enqueue_message (phalcon_io_client_info* ci, int operation)
+int phalcon_io_enqueue_message(phalcon_io_client_info* ci, int operation)
 {
 	ci->operation = operation;
-	return phalcon_io_enqueue_task (ci);
+	return phalcon_io_enqueue_task(ci);
 }
 
-int phalcon_io_write_message (phalcon_io_client_info* ci, char* message)
+int phalcon_io_write_message(phalcon_io_client_info* ci, char* message)
 {
 	phalcon_io_append_buffer (ci->wb, message);
-	return phalcon_io_write_internal_buffer (ci);
+	return phalcon_io_write_internal_buffer(ci);
 }
 
-int phalcon_io_write_internal_buffer (phalcon_io_client_info* ci)
+int phalcon_io_write_internal_buffer(phalcon_io_client_info* ci)
 {
-	return phalcon_io_query_write ((phalcon_io_client_info *)ci);
+	return phalcon_io_query_write((phalcon_io_client_info *)ci);
 }
 
-int phalcon_io_write_external_buffer (phalcon_io_client_info* ci, char* buffer, int size)
+int phalcon_io_write_external_buffer(phalcon_io_client_info* ci, char* buffer, int size)
 {
 	ci->eb->buffer = buffer;
 	ci->eb->head = 0;

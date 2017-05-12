@@ -82,17 +82,6 @@ else
 	AC_MSG_RESULT([no])
 fi
 
-PHP_ARG_ENABLE(socket, whether to enable socket support,
-[  --enable-socket   Enable socket support], no, no)
-
-AC_MSG_CHECKING([Include socket])
-if test "$PHP_SOCKET" = "yes"; then
-	AC_DEFINE([PHALCON_SOCKET], [1], [Whether socket are available])
-	AC_MSG_RESULT([yes, socket])
-else
-	AC_MSG_RESULT([no])
-fi
-
 PHP_ARG_ENABLE(websocket, whether to enable websocket support,
 [  --enable-websocket   Enable websocket support], no, no)
 
@@ -754,6 +743,7 @@ chart/exception.c \
 socket/exception.c \
 process/exception.c \
 storage/exception.c \
+server/simple.c \
 server/exception.c"
 
 	if test "$PHP_CACHE_YAC" = "yes"; then
@@ -831,18 +821,23 @@ server/exception.c"
 		AC_MSG_RESULT([no])
 	])
 
-	if test "$PHP_SOCKET" = "yes"; then
-		AC_CHECK_HEADERS(
-			[ext/sockets/php_sockets.h],
-			[
-				PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
-				AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
-	            phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
-			],
-			,
-			[[#include "main/php.h"]]
-		)
-	fi
+	AC_CHECK_DECL(
+		[HAVE_PHP_SOCKET],
+		[
+			AC_CHECK_HEADERS(
+				[ext/sockets/php_sockets.h],
+				[
+					PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+					AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
+					phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
+				],
+				,
+				[[#include "main/php.h"]]
+			)
+		],
+		,
+		[[#include "php_config.h"]]
+	)
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],

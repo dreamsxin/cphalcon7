@@ -106,11 +106,11 @@ struct _phalcon_io_client_info {
 	void *context;				// user defined data
 };
 
-void phalcon_io_preset_client_config (void *tpi);
-phalcon_io_client_info*   phalcon_io_create_client(void *tpi, phalcon_io_socket_t socket);
-phalcon_io_client_info*   phalcon_io_delete_client(phalcon_io_client_info *ci, int want_callback);
-phalcon_io_client_buffer* phalcon_io_create_client_buffer(int size, int limit);
-phalcon_io_client_buffer* phalcon_io_delete_client_buffer();
+void phalcon_io_preset_client_config(void *tpi);
+phalcon_io_client_info *phalcon_io_create_client(void *tpi, phalcon_io_socket_t socket);
+phalcon_io_client_info *phalcon_io_delete_client(phalcon_io_client_info *ci, int want_callback);
+phalcon_io_client_buffer *phalcon_io_create_client_buffer(int size, int limit);
+phalcon_io_client_buffer *phalcon_io_delete_client_buffer();
 int phalcon_io_trim_buffer(phalcon_io_client_buffer *cb);
 char *phalcon_io_realloc_buffer(phalcon_io_client_buffer *cb);
 char *phalcon_io_realloc_buffer_for(phalcon_io_client_buffer* cb, int size);

@@ -39,22 +39,22 @@ int phalcon_io_init_sockets (void)
 	return 0;
 }
 
-phalcon_io_socket_t phalcon_io_create_server_socket (char* address, int port) {
+phalcon_io_socket_t phalcon_io_create_server_socket(char* address, int port) {
 	phalcon_io_socket_t server_socket;
 	if ((server_socket = phalcon_io_create_socket()) == PHALCON_IO_INVALID_SOCKET)
 		return PHALCON_IO_ERROR;
-	if (phalcon_io_bind_socket (server_socket, address, port) < 0) {
-		server_socket = phalcon_io_close_socket (server_socket);
+	if (phalcon_io_bind_socket(server_socket, address, port) < 0) {
+		server_socket = phalcon_io_close_socket(server_socket);
 		return PHALCON_IO_ERROR;
 	}
-	if (phalcon_io_start_listening (server_socket) < 0) {
-		server_socket = phalcon_io_close_socket (server_socket);
+	if (phalcon_io_start_listening(server_socket) < 0) {
+		server_socket = phalcon_io_close_socket(server_socket);
 		return PHALCON_IO_ERROR;
 	}
 	return server_socket;
 }
 
-phalcon_io_socket_t phalcon_io_create_socket ()
+phalcon_io_socket_t phalcon_io_create_socket()
 {
 	phalcon_io_socket_t a_socket;
 	int yes=1;
@@ -68,7 +68,7 @@ phalcon_io_socket_t phalcon_io_create_socket ()
 	return a_socket;
 }
 
-phalcon_io_socket_t phalcon_io_close_socket (phalcon_io_socket_t a_socket)
+phalcon_io_socket_t phalcon_io_close_socket(phalcon_io_socket_t a_socket)
 {
 	// phalcon_io_debug_message(PHALCON_IO_DEBUG_IO, "phalcon_io_close_socket(%d)\n", a_socket);
 	if (a_socket >= 0)

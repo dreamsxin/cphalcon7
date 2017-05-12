@@ -159,7 +159,7 @@ phalcon_io_callback_t phalcon_io_event_loop (void *tpi)
 			else {
 				if (PHALCON_IO_READ_EV(pev)) {
 					if (phalcon_io_do_read (ci) > 0)
-						phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_READ);
+						phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_READ);
 				}
 				if (PHALCON_IO_WRITE_EV(pev)) {		// if use_write_events. in linux, no write event until queue full
 					if (ci->write_pending)
@@ -169,7 +169,7 @@ phalcon_io_callback_t phalcon_io_event_loop (void *tpi)
 				}
 				while (ci->callback_has_written && ci->can_write)
 					if (ci->can_write && ci->step >= 0)
-						phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_WRITE);
+						phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_WRITE);
 			}
 			if (ci->error || ((ci->read_end && PHALCON_IO_CI_GET_DATA_SIZE(ci->rb)==0) /*&& PHALCON_IO_CI_GET_DATA_SIZE(ci->wb)==0*/)) {
 				phalcon_io_debug_message(PHALCON_IO_DEBUG_IO, "close socket=%d, ci=%6x, ev=%s, op=%s\n",
@@ -178,7 +178,7 @@ phalcon_io_callback_t phalcon_io_event_loop (void *tpi)
 				if (PHALCON_IO_TRUE_EOF_EV(pev)) {
 					phalcon_io_debug_message(PHALCON_IO_DEBUG_IO, "phalcon_io_close_socket xxx(ci=%6x,%d)\n", ci, ci->socket);
 					ci->socket = phalcon_io_close_socket (ci->socket);
-					ci = phalcon_io_delete_client (ci, PHALCON_IO_TRUE);
+					ci = phalcon_io_delete_client(ci, PHALCON_IO_TRUE);
 				}
 			}
 		}
@@ -191,11 +191,11 @@ phalcon_io_callback_t phalcon_io_event_loop (void *tpi)
 }
 
 int phalcon_io_create_poll () {
-	return kqueue ();
+	return kqueue();
 }
 
 int phalcon_io_wait_event (phalcon_io_poller_info *pi, phalcon_io_poll_event *events_queue, int events_queue_size) {
-	return kevent (pi->poll_handler, NULL, 0, events_queue, events_queue_size, NULL);
+	return kevent(pi->poll_handler, NULL, 0, events_queue, events_queue_size, NULL);
 }
 
 void phalcon_io_add_server_to_poll (phalcon_io_client_info *ci) {
@@ -206,7 +206,7 @@ void phalcon_io_add_client_to_poll (phalcon_io_client_info *ci) {
 	((phalcon_io_poller_info *)ci->tpi)->actual_connections++;
 	phalcon_io_change_poll (ci, EV_ADD|EV_ENABLE|EV_CLEAR, EVFILT_READ);
 	if (ci->use_write_events)
-		phalcon_io_change_poll (ci, EV_ADD|EV_ENABLE|EV_CLEAR, EVFILT_WRITE);
+		phalcon_io_change_poll(ci, EV_ADD|EV_ENABLE|EV_CLEAR, EVFILT_WRITE);
 }
 
 void phalcon_io_remove_client_from_poll (phalcon_io_client_info *ci) {

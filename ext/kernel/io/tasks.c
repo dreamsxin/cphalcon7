@@ -164,7 +164,7 @@ int phalcon_io_enqueue_task (phalcon_io_client_info *ci)
 	return ntasks;
 }
 
-phalcon_io_callback_t phalcon_io_tasks_thread (void *data)
+phalcon_io_callback_t phalcon_io_tasks_thread(void *data)
 {
 	phalcon_io_client_info *ci;
 
@@ -178,7 +178,7 @@ phalcon_io_callback_t phalcon_io_tasks_thread (void *data)
 				break;
 			}
 		}
-		ci = phalcon_io_pop_task ();
+		ci = phalcon_io_pop_task();
 		if (ci == NULL)					// request to stop thread
 			phalcon_io_delete_thread (pthread_self());
 		pthread_mutex_unlock(&td->lock);
@@ -190,9 +190,9 @@ phalcon_io_callback_t phalcon_io_tasks_thread (void *data)
 
 		phalcon_io_debug_message(PHALCON_IO_DEBUG_CLIENT, "Task pop\n");
 		if (ci->operation == PHALCON_IO_OP_READ)
-			phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_DEFFERED_READ);
+			phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_DEFFERED_READ);
 		else if (ci->operation == PHALCON_IO_OP_WRITE)
-			phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_DEFFERED_WRITE);
+			phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_DEFFERED_WRITE);
 	}
 	return (phalcon_io_callback_t) 0;
 }

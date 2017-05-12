@@ -77,4 +77,9 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 #define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z);
 #define PHALCON_SEPARATE_PARAM(z) SEPARATE_ZVAL_IF_NOT_REF(z)
 
+#define PHALCON_COPY_TO_STACK(a, b) \
+	{ \
+    	memcpy(a, b, sizeof(zval)); \
+	}
+
 #endif /* PHALCON_KERNEL_MEMORY_H */

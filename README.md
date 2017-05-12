@@ -97,8 +97,6 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-btree=yes
 # enable storage wiredtiger
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-wiredtiger=yes
-# enable socket
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-socket=yes
 # enable websocket
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-websocket=yes
 # enable server

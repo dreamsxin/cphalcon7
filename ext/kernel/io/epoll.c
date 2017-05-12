@@ -184,7 +184,7 @@ phalcon_io_callback_t phalcon_io_event_loop(void *tpi)
 			else {
 				if (PHALCON_IO_READ_EV(pev)) {
 					if (phalcon_io_do_read (ci) > 0)
-						phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_READ);
+						phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_READ);
 				}
 				if (PHALCON_IO_WRITE_EV(pev)) {		// if use_write_events. in linux, no write event until queue full
 					if (ci->write_pending)
@@ -194,7 +194,7 @@ phalcon_io_callback_t phalcon_io_event_loop(void *tpi)
 				}
 				while (ci->callback_has_written && ci->can_write)
 					if (ci->can_write && ci->step >= 0)
-						phalcon_io_do_callback (ci, PHALCON_IO_CLIENT_WRITE);
+						phalcon_io_do_callback(ci, PHALCON_IO_CLIENT_WRITE);
 			}
 			if (ci->error || ((ci->read_end && PHALCON_IO_CI_GET_DATA_SIZE(ci->rb)==0) /*&& PHALCON_IO_CI_GET_DATA_SIZE(ci->wb)==0*/)) {
 				phalcon_io_debug_message(PHALCON_IO_DEBUG_IO, "close socket=%d, ci=%6x, ev=%s, op=%s\n",
@@ -202,7 +202,7 @@ phalcon_io_callback_t phalcon_io_event_loop(void *tpi)
 				phalcon_io_remove_client_from_poll (ci);
 				if (PHALCON_IO_TRUE_EOF_EV(pev)) {
 					ci->socket = phalcon_io_close_socket (ci->socket);
-					ci = phalcon_io_delete_client (ci, PHALCON_IO_TRUE);
+					ci = phalcon_io_delete_client(ci, PHALCON_IO_TRUE);
 				}
 			}
 		}

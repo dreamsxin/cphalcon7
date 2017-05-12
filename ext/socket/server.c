@@ -416,7 +416,6 @@ void setkeepalive(int fd) {
 	setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *) &keepCount, sizeof (keepCount));
 }
 
-#ifdef PHALCON_USE_PHP_SOCKET
 struct _phalcon_socket_server {
 	int fd;
 	int ppid;
@@ -528,14 +527,13 @@ static int phalcon_socket_server_startup_workers(zval *object, int max_childs) {
 		}
 	}
 }
-#endif
 
 /**
  * Run the Server
  *
  */
-PHP_METHOD(Phalcon_Socket_Server, run){
-#ifdef PHALCON_USE_PHP_SOCKET
+PHP_METHOD(Phalcon_Socket_Server, run)
+{
 	zval *_onconnection = NULL, *_onrecv = NULL, *_onsend = NULL, *_onclose = NULL, *_onerror = NULL, *_ontimeout = NULL, *timeout = NULL, *usec = NULL;
 	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout, socket = {}, maxlen = {}, event = {};
 	zval daemon = {}, max_children = {};
@@ -1021,7 +1019,4 @@ worker:
 #endif
 
 	phalcon_socket_server_destroy();
-#else
-	PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "Don't support, please reinstall.");
-#endif
 }

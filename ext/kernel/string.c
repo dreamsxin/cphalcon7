@@ -1166,6 +1166,68 @@ void phalcon_fast_str_replace(zval *retval, zval *search, zval *replace, zval *s
 	}
 }
 
+void phalcon_pad_str(zval *return_value, zval *input, int pad_length, const char *pad_str, int pad_type)
+{
+	/* Helper variables */
+	size_t num_pad_chars;
+	size_t pad_str_len = strlen(pad_str);
+	size_t i, left_pad=0, right_pad=0;
+	zend_string *result = NULL;
+
+	if (pad_length < 0  || (size_t)pad_length <= Z_STRLEN_P(input)) {
+		RETURN_CTOR(input);
+	}
+
+	if (pad_str_len == 0) {
+		php_error_docref(NULL, E_WARNING, "Padding string cannot be empty");
+		return;
+	}
+
+	if (pad_type < PHALCON_PDA_LEFT || pad_type > PHALCON_PDA_BOTH) {
+		php_error_docref(NULL, E_WARNING, "Padding type has to be STR_PAD_LEFT, STR_PAD_RIGHT, or STR_PAD_BOTH");
+		return;
+	}
+
+	num_pad_chars = pad_length - Z_STRLEN_P(input);
+
+	result = zend_string_safe_alloc(1, Z_STRLEN_P(input), num_pad_chars, 0);
+	ZSTR_LEN(result) = 0;
+
+	/* We need to figure out the left/right padding lengths. */
+	switch (pad_type) {
+		case PHALCON_PDA_RIGHT:
+			left_pad = 0;
+			right_pad = num_pad_chars;
+			break;
+
+		case PHALCON_PDA_LEFT:
+			left_pad = num_pad_chars;
+			right_pad = 0;
+			break;
+
+		case PHALCON_PDA_BOTH:
+			left_pad = num_pad_chars / 2;
+			right_pad = num_pad_chars - left_pad;
+			break;
+	}
+
+	/* First we pad on the left. */
+	for (i = 0; i < left_pad; i++)
+		ZSTR_VAL(result)[ZSTR_LEN(result)++] = pad_str[i % pad_str_len];
+
+	/* Then we copy the input string. */
+	memcpy(ZSTR_VAL(result) + ZSTR_LEN(result), Z_STRVAL_P(input), Z_STRLEN_P(input));
+	ZSTR_LEN(result) += Z_STRLEN_P(input);
+
+	/* Finally, we pad on the right. */
+	for (i = 0; i < right_pad; i++)
+		ZSTR_VAL(result)[ZSTR_LEN(result)++] = pad_str[i % pad_str_len];
+
+	ZSTR_VAL(result)[ZSTR_LEN(result)] = '\0';
+
+	RETURN_NEW_STR(result);
+}
+
 /**
  * Checks if a zval string starts with a zval string
  */

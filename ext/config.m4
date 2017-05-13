@@ -469,6 +469,8 @@ cli/task.c \
 cli/router/exception.c \
 cli/dispatcher.c \
 cli/console/exception.c \
+cli/options.c \
+cli/options/exception.c \
 mvc/controller.c \
 mvc/dispatcher/exception.c \
 mvc/application/exception.c \

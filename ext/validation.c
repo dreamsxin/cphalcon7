@@ -537,7 +537,7 @@ PHP_METHOD(Phalcon_Validation, getValue){
 	}
 
 	if (Z_TYPE(data) == IS_ARRAY) {
-		 if (!phalcon_array_isset_fetch(&value, &data, attribute, PH_NOISY|PH_COPY)) {
+		 if (!phalcon_array_isset_fetch(&value, &data, attribute, PH_COPY)) {
 			ZVAL_NULL(&value);
 		 }
 	} else if (Z_TYPE(data) == IS_OBJECT) {

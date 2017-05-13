@@ -29,6 +29,10 @@
 #define PHALCON_TRIM_RIGHT 2
 #define PHALCON_TRIM_BOTH  3
 
+#define PHALCON_PDA_LEFT  1
+#define PHALCON_PDA_RIGHT 2
+#define PHALCON_PDA_BOTH  3
+
 #define PHALCON_RANDOM_ALNUM   0
 #define PHALCON_RANDOM_ALPHA   1
 #define PHALCON_RANDOM_HEXDEC  2
@@ -96,6 +100,8 @@ static inline void phalcon_fast_str_replace_str(zval *return_value, const char *
 	zval_ptr_dtor(&s);
 	zval_ptr_dtor(&r);
 }
+
+void phalcon_pad_str(zval *return_value, zval *input, int pad_length, const char *pad_str, int pad_type);
 
 /** Camelize/Uncamelize */
 void phalcon_camelize(zval *return_value, const zval *str);

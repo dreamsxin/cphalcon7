@@ -240,6 +240,8 @@
 #include "cli/router.h"
 #include "cli/router/exception.h"
 #include "cli/task.h"
+#include "cli/options.h"
+#include "cli/options/exception.h"
 
 #include "mvc/application.h"
 #include "mvc/application/exception.h"

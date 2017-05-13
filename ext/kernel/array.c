@@ -359,12 +359,12 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 	int result = SUCCESS, found = 0;
 	ulong uidx = 0;
 	char *sidx = NULL;
-
+/*
 	if (!phalcon_array_isset(arr, index)) {
 		ZVAL_NULL(return_value);
 		return FAILURE;
 	}
-
+*/
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		ht = Z_ARRVAL_P(arr);
 		switch (Z_TYPE_P(index)) {

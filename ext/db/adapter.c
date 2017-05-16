@@ -470,7 +470,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchAll){
 PHP_METHOD(Phalcon_Db_Adapter, insert){
 
 	zval *table, *values, *fields = NULL, *data_types = NULL, exception_message = {}, placeholders = {}, insert_values = {}, bind_data_types = {}, *value;
-	zval escaped_table = {}, joined_values = {}, escaped_fields = {}, *field, joined_fields, insert_sql = {};
+	zval escaped_table = {}, joined_values = {}, escaped_fields = {}, *field, insert_sql = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -520,13 +520,12 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 		}
 		if (Z_TYPE_P(value) == IS_OBJECT) {
 			phalcon_strval(&str_value, value);
-			phalcon_array_append(&placeholders, &str_value, PH_COPY);
-			zval_ptr_dtor(&str_value);
+			phalcon_array_append(&placeholders, &str_value, 0);
 		} else {
 			if (Z_TYPE_P(value) == IS_NULL) {
-				phalcon_array_append_str(&placeholders, SL("null"), PH_READONLY);
+				phalcon_array_append_str(&placeholders, SL("null"), 0);
 			} else {
-				phalcon_array_append_str(&placeholders, SL("?"), PH_READONLY);
+				phalcon_array_append_str(&placeholders, SL("?"), 0);
 				phalcon_array_append(&insert_values, value, PH_COPY);
 				if (Z_TYPE_P(data_types) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, PH_READONLY)) {
@@ -550,15 +549,16 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	 * Build the final SQL INSERT statement
 	 */
 	phalcon_fast_join_str(&joined_values, SL(", "), &placeholders);
+	zval_ptr_dtor(&placeholders);
 	if (Z_TYPE_P(fields) == IS_ARRAY) {
+		zval joined_fields = {};
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			array_init(&escaped_fields);
 
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), field) {
 				zval escaped_field = {};
 				PHALCON_CALL_METHOD(&escaped_field, getThis(), "escapeidentifier", field);
-				phalcon_array_append(&escaped_fields, &escaped_field, PH_COPY);
-				zval_ptr_dtor(&escaped_field);
+				phalcon_array_append(&escaped_fields, &escaped_field, 0);
 			} ZEND_HASH_FOREACH_END();
 
 		} else {
@@ -575,7 +575,6 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	}
 	zval_ptr_dtor(&escaped_table);
 	zval_ptr_dtor(&joined_values);
-	zval_ptr_dtor(&placeholders);
 
 	/**
 	 * Perform the execution via execute

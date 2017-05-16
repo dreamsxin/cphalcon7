@@ -561,11 +561,6 @@ mvc/model/behavior/softdelete.c \
 mvc/model/metadatainterface.c \
 mvc/model/relationinterface.c \
 mvc/model/transactioninterface.c \
-mvc/jsonrpc.c \
-mvc/jsonrpc/exception.c \
-jsonrpc/client.c \
-jsonrpc/client/exception.c \
-jsonrpc/client/response.c \
 config.c \
 config/adapter.c \
 config/adapterinterface.c \

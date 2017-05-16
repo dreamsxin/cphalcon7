@@ -162,8 +162,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Logger_Exception);
 	PHALCON_INIT(Phalcon_Translate_Exception);
 	PHALCON_INIT(Phalcon_Mvc_Micro_Exception);
-	PHALCON_INIT(Phalcon_Mvc_JsonRpc_Exception);
-	PHALCON_INIT(Phalcon_JsonRpc_Client_Exception);
 	PHALCON_INIT(Phalcon_Chart_Exception);
 	PHALCON_INIT(Phalcon_Binary_Exception);
 	PHALCON_INIT(Phalcon_Socket_Exception);
@@ -420,8 +418,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Http_Client_Adapter);
 	PHALCON_INIT(Phalcon_Http_Client_Adapter_Curl);
 	PHALCON_INIT(Phalcon_Http_Client_Adapter_Stream);
-	PHALCON_INIT(Phalcon_JsonRpc_Client);
-	PHALCON_INIT(Phalcon_JsonRpc_Client_Response);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk);
 	PHALCON_INIT(Phalcon_Queue_Beanstalk_Job);
 
@@ -437,7 +433,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cli_Console);
 	PHALCON_INIT(Phalcon_Cli_Dispatcher);
 	PHALCON_INIT(Phalcon_Cli_Options);
-	PHALCON_INIT(Phalcon_Mvc_JsonRpc);
 	PHALCON_INIT(Phalcon_Mvc_Router);
 	PHALCON_INIT(Phalcon_Mvc_View_Engine);
 	PHALCON_INIT(Phalcon_Mvc_View_Model);

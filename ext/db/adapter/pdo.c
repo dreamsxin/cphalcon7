@@ -322,7 +322,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
-	zval *statement, *placeholders, *data_types, *z_one, *value = NULL, profiler = {}, sql_statement = {};
+	zval *statement, *placeholders, *data_types, events_manager = {}, event_name = {}, status = {}, *z_one, *value = NULL, profiler = {}, sql_statement = {};
 	zend_string *str_key;
 	ulong idx;
 	int is_array;
@@ -335,6 +335,18 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
 	if (!data_types) {
 		data_types = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "db:beforeExecutePrepared");
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, statement);
+		zval_ptr_dtor(&event_name);
+		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
+			RETURN_FALSE;
+		}
 	}
 
 	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
@@ -405,13 +417,22 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 	if (Z_TYPE(profiler) == IS_OBJECT) {
 		phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &sql_statement, placeholders, data_types);
-
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
-
 		PHALCON_CALL_METHOD(NULL, &profiler, "stopprofile");
 	} else {
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
 	}
+
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "db:afterExecutePrepared");
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, statement);
+		zval_ptr_dtor(&event_name);
+		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
+			RETURN_FALSE;
+		}
+	}
+	zval_ptr_dtor(&events_manager);
 
 	RETURN_CTOR(statement);
 }
@@ -461,7 +482,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	/**
 	 * Execute the beforeQuery event if a EventsManager is available
@@ -475,32 +496,36 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
 			RETURN_FALSE;
 		}
 	}
 
 	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
-	PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-	zval_ptr_dtor(&statement);
-	ZVAL_COPY_VALUE(&statement, &new_statement);
+	if (Z_TYPE(statement) == IS_OBJECT){
+		PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+		zval_ptr_dtor(&statement);
+		ZVAL_COPY_VALUE(&statement, &new_statement);
+	}
+
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "db:afterQuery");
+		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &new_statement);
+		zval_ptr_dtor(&event_name);
+	}
+	zval_ptr_dtor(&events_manager);
 
 	/**
 	 * Execute the afterQuery event if a EventsManager is available
 	 */
 	if (likely(Z_TYPE(statement) == IS_OBJECT)) {
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "db:afterQuery");
-			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
-			zval_ptr_dtor(&event_name);
-		}
-
 		object_init_ex(return_value, phalcon_db_result_pdo_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", getThis(), &statement, sql_statement, bind_params, bind_types);
 		zval_ptr_dtor(&statement);
 		return;
 	}
 
-	RETURN_CTOR(&statement);
+	RETURN_ZVAL(&statement, 0, 0);
 }
 
 /**
@@ -521,7 +546,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 
 	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, debug_message = {}, events_manager = {}, event_name = {}, status = {}, affected_rows = {};
-	zval pdo = {}, profiler = {}, statement = {}, new_statement = {};
+	zval statement = {}, new_statement = {};
 
 	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
 
@@ -551,7 +576,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	/**
 	 * Execute the beforeQuery event if a EventsManager is available
 	 */
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		phalcon_update_property(getThis(), SL("_sqlStatement"), sql_statement);
 		phalcon_update_property(getThis(), SL("_sqlVariables"), bind_params);
@@ -561,43 +586,34 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), bind_params);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
 			RETURN_FALSE;
 		}
 	}
 
-	if (Z_TYPE_P(bind_params) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
-		if (Z_TYPE(statement) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-			PHALCON_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
-			zval_ptr_dtor(&new_statement);
-		} else {
-			ZVAL_LONG(&affected_rows, 0);
-		}
-		zval_ptr_dtor(&statement);
+	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
+	if (Z_TYPE(statement) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+		PHALCON_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
+		zval_ptr_dtor(&new_statement);
 	} else {
-		phalcon_read_property(&pdo, getThis(), SL("_pdo"), PH_NOISY|PH_READONLY);
-		phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY|PH_READONLY);
-		if (Z_TYPE(profiler) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", sql_statement);
-			PHALCON_CALL_METHOD(&affected_rows, &pdo, "exec", sql_statement);
-			PHALCON_CALL_METHOD(NULL, &profiler, "stopprofile");
-		} else {
-			PHALCON_CALL_METHOD(&affected_rows, &pdo, "exec", sql_statement);
-		}
+		ZVAL_LONG(&affected_rows, 0);
 	}
+	zval_ptr_dtor(&statement);
 
 	/**
 	 * Execute the afterQuery event if a EventsManager is available
 	 */
 	if (Z_TYPE(affected_rows) == IS_LONG) {
 		phalcon_update_property(getThis(), SL("_affectedRows"), &affected_rows);
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "db:afterExecute");
-			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
-			zval_ptr_dtor(&event_name);
-		}
 	}
+
+	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		ZVAL_STRING(&event_name, "db:afterExecute");
+		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), bind_params);
+		zval_ptr_dtor(&event_name);
+	}
+	zval_ptr_dtor(&events_manager);
 
 	RETURN_TRUE;
 }
@@ -796,7 +812,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, lastInsertId){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 
-	zval *nesting = NULL, pdo = {}, transaction_level = {}, events_manager = {}, event_name = {}, ntw_savepoint = {}, savepoint_name = {};
+	zval *nesting = NULL, pdo = {}, transaction_level = {}, event_name = {}, ntw_savepoint = {}, savepoint_name = {};
 	zval debug_message = {};
 
 	phalcon_fetch_params(0, 0, 1, &nesting);
@@ -819,7 +835,6 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	 * Check the transaction nesting level
 	 */
 	phalcon_read_property(&transaction_level, getThis(), SL("_transactionLevel"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "DB BEGIN TRANSACTION LEVEL: ", &transaction_level);
@@ -827,6 +842,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
+		zval events_manager = {};
+		PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 		/**
 		 * Notify the events manager about the started transaction
 		 */
@@ -835,6 +852,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 			zval_ptr_dtor(&event_name);
 		}
+		zval_ptr_dtor(&events_manager);
 
 		PHALCON_CALL_METHOD(return_value, &pdo, "begintransaction");
 		return;
@@ -844,6 +862,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 		if (zend_is_true(nesting)) {
 			PHALCON_CALL_METHOD(&ntw_savepoint, getThis(), "isnestedtransactionswithsavepoints");
 			if (zend_is_true(&ntw_savepoint)) {
+				zval events_manager = {};
+				PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 				PHALCON_CALL_METHOD(&savepoint_name, getThis(), "getnestedtransactionsavepointname");
 
 				/**
@@ -854,6 +874,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 					zval_ptr_dtor(&event_name);
 				}
+				zval_ptr_dtor(&events_manager);
 
 				PHALCON_CALL_METHOD(return_value, getThis(), "createsavepoint", &savepoint_name);
 				zval_ptr_dtor(&savepoint_name);
@@ -901,9 +922,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
-
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
+		PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 		/**
 		 * Notify the events manager about the rollbacked transaction
 		 */
@@ -912,6 +932,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 			zval_ptr_dtor(&event_name);
 		}
+		zval_ptr_dtor(&events_manager);
 
 		/**
 		 * Reduce the transaction nesting level
@@ -925,6 +946,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		if (zend_is_true(nesting)) {
 			PHALCON_CALL_METHOD(&ntw_savepoint, getThis(), "isnestedtransactionswithsavepoints");
 			if (zend_is_true(&ntw_savepoint)) {
+				PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 				PHALCON_CALL_METHOD(&savepoint_name, getThis(), "getnestedtransactionsavepointname");
 
 				/**
@@ -935,6 +957,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 					zval_ptr_dtor(&event_name);
 				}
+				zval_ptr_dtor(&events_manager);
 
 				/**
 				 * Reduce the transaction nesting level
@@ -993,8 +1016,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		PHALCON_DEBUG_LOG(&debug_message);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
+		PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 		/**
 		 * Notify the events manager about the commited transaction
 		 */
@@ -1003,6 +1026,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 			zval_ptr_dtor(&event_name);
 		}
+		zval_ptr_dtor(&events_manager);
 
 		/**
 		 * Reduce the transaction nesting level
@@ -1020,6 +1044,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 			 */
 			PHALCON_CALL_METHOD(&ntw_savepoint, getThis(), "isnestedtransactionswithsavepoints");
 			if (zend_is_true(&ntw_savepoint)) {
+				PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 				PHALCON_CALL_METHOD(&savepoint_name, getThis(), "getnestedtransactionsavepointname");
 
 				/**
@@ -1030,6 +1055,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &savepoint_name);
 					zval_ptr_dtor(&event_name);
 				}
+				zval_ptr_dtor(&events_manager);
 
 				/**
 				 * Reduce the transaction nesting level

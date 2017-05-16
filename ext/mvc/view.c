@@ -1078,7 +1078,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	}
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	/**
 	 * Views are rendered in each engine
@@ -1165,6 +1165,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			return;
 		}
 	}
+	zval_ptr_dtor(&events_manager);
 
 	/**
 	 * Store the data in the cache

@@ -393,7 +393,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		RETURN_TRUE;
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "modelsManager:beforeInitialize");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
@@ -427,6 +427,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&events_manager);
 
 	RETURN_TRUE;
 }
@@ -863,12 +864,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 		/**
 		 * Dispatch events to the global events manager
 		 */
-		phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+		PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &fire_event_name, model);
 			zval_ptr_dtor(&fire_event_name);
 		}
+		zval_ptr_dtor(&events_manager);
 	}
 
 	if (!PHALCON_IS_FALSE(&status)) {
@@ -886,7 +888,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	}
 
 	zval_ptr_dtor(&entity_name);
-	RETURN_CTOR(&status);
+	RETURN_ZVAL(&status, 0, 0);
 }
 
 /**
@@ -930,15 +932,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, missingMethod){
 	/**
 	 * Dispatch events to the global events manager
 	 */
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
 		PHALCON_RETURN_CALL_METHOD(&events_manager, "fire", &fire_event_name, model, data);
 		zval_ptr_dtor(&fire_event_name);
-		return;
+	} else {
+		RETVAL_NULL();
 	}
-
-	RETURN_NULL();
+	zval_ptr_dtor(&events_manager);
 }
 
 /**

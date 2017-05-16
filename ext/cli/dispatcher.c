@@ -181,16 +181,18 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 	object_init_ex(&exception, phalcon_cli_dispatcher_exception_ce);
 	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &exception);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			zval_ptr_dtor(&exception);
+			zval_ptr_dtor(&events_manager);
 			RETURN_FALSE;
 		}
 	}
+	zval_ptr_dtor(&events_manager);
 
 	/**
 	 * Throw the exception if it wasn't handled
@@ -210,15 +212,17 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _handleException){
 
 	phalcon_fetch_params(0, 1, 0, &exception);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "dispatch:beforeException");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), exception);
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
 			RETURN_FALSE;
 		}
 	}
+	zval_ptr_dtor(&events_manager);
 }
 
 /**

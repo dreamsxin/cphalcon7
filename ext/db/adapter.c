@@ -639,6 +639,8 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_RETURN_CALL_METHOD(getThis(), "insert", table, &values, &fields, data_types);
+	zval_ptr_dtor(&values);
+	zval_ptr_dtor(&fields);
 }
 
 /**
@@ -715,7 +717,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 
 		if (Z_TYPE_P(value) == IS_OBJECT) {
 			PHALCON_CONCAT_VSV(&set_clause_part, &escaped_field, " = ", value);
-			phalcon_array_append(&placeholders, &set_clause_part, PH_COPY);
+			phalcon_array_append(&placeholders, &set_clause_part, 0);
 		} else {
 			if (Z_TYPE_P(value) == IS_NULL) {
 				PHALCON_CONCAT_VS(&set_clause_part, &escaped_field, " = null");
@@ -731,9 +733,8 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 					phalcon_array_append(&bind_data_types, &bind_type, PH_COPY);
 				}
 			}
-			phalcon_array_append(&placeholders, &set_clause_part, PH_COPY);
+			phalcon_array_append(&placeholders, &set_clause_part, 0);
 		}
-		zval_ptr_dtor(&set_clause_part);
 		zval_ptr_dtor(&escaped_field);
 	} ZEND_HASH_FOREACH_END();
 

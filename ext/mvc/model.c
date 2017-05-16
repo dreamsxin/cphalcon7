@@ -346,6 +346,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_toarray, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, columns, IS_ARRAY, 1)
 	ZEND_ARG_TYPE_INFO(0, renameColumns, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, negate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_filter, 0, 0, 2)
@@ -1422,7 +1423,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 				/**
 				 * If the white-list is an array check if the attribute is on that list
 				 */
-				if (Z_TYPE_P(white_list) != IS_ARRAY || phalcon_fast_in_array(&key, white_list)) {
+				if (Z_TYPE_P(white_list) != IS_ARRAY) {
 					if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
 						PHALCON_CONCAT_SV(&possible_setter, "set", &key);
 						zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
@@ -1434,6 +1435,38 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 						zval_ptr_dtor(&possible_setter);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &key, value);
+					}
+				} else {
+					if (likely(!zend_is_true(negate))) {
+						if (phalcon_fast_in_array(&key, white_list)) {
+							if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
+								PHALCON_CONCAT_SV(&possible_setter, "set", &key);
+								zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
+								if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+									PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
+								} else {
+									phalcon_update_property_zval_zval(getThis(), &key, value);
+								}
+								zval_ptr_dtor(&possible_setter);
+							} else {
+								phalcon_update_property_zval_zval(getThis(), &key, value);
+							}
+						}
+					} else {
+						if (!phalcon_fast_in_array(&key, white_list)) {
+							if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
+								PHALCON_CONCAT_SV(&possible_setter, "set", &key);
+								zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
+								if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+									PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
+								} else {
+									phalcon_update_property_zval_zval(getThis(), &key, value);
+								}
+								zval_ptr_dtor(&possible_setter);
+							} else {
+								phalcon_update_property_zval_zval(getThis(), &key, value);
+							}
+						}
 					}
 				}
 			}

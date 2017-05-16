@@ -147,7 +147,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		ZVAL_COPY(&arguments, _arguments);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	ZVAL_STR(&service, IS(router));
 
@@ -173,6 +173,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			if (PHALCON_IS_FALSE(&status)) {
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&module_name);
+				zval_ptr_dtor(&events_manager);
 				RETURN_FALSE;
 			}
 		}
@@ -183,6 +184,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, &exception_msg);
 			zval_ptr_dtor(&dependency_injector);
 			zval_ptr_dtor(&module_name);
+			zval_ptr_dtor(&events_manager);
 			return;
 		}
 
@@ -198,6 +200,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 			} else {
 				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL(path));
+				zval_ptr_dtor(&events_manager);
 				return;
 			}
 		}
@@ -220,6 +223,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 				zval_ptr_dtor(&module_object);
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&module_name);
+				zval_ptr_dtor(&events_manager);
 				RETURN_FALSE;
 			}
 		}
@@ -266,6 +270,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &status);
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&events_manager);
 
 	RETVAL_ZVAL(&status, 0, 0);
 }

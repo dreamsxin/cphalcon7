@@ -19,7 +19,7 @@
 
 #include "loader.h"
 #include "loader/exception.h"
-#include "events/eventsawareinterface.h"
+#include "di/injectable.h"
 #include "debug.h"
 
 #include "kernel/main.h"
@@ -64,8 +64,6 @@
 zend_class_entry *phalcon_loader_ce;
 
 PHP_METHOD(Phalcon_Loader, __construct);
-PHP_METHOD(Phalcon_Loader, setEventsManager);
-PHP_METHOD(Phalcon_Loader, getEventsManager);
 PHP_METHOD(Phalcon_Loader, setExtensions);
 PHP_METHOD(Phalcon_Loader, getExtensions);
 PHP_METHOD(Phalcon_Loader, registerNamespaces);
@@ -121,8 +119,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_loader_method_entry[] = {
 	PHP_ME(Phalcon_Loader, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Loader, setEventsManager, arginfo_phalcon_events_eventsawareinterface_seteventsmanager, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Loader, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, setExtensions, arginfo_phalcon_loader_setextensions, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, getExtensions, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, registerNamespaces, arginfo_phalcon_loader_registernamespaces, ZEND_ACC_PUBLIC)
@@ -148,10 +144,9 @@ static const zend_function_entry phalcon_loader_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Loader){
 
-	PHALCON_REGISTER_CLASS(Phalcon, Loader, loader, phalcon_loader_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon, Loader, loader, phalcon_di_injectable_ce, phalcon_loader_method_entry, 0);
 
 	zend_declare_property_null(phalcon_loader_ce, SL("_default"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
-	zend_declare_property_null(phalcon_loader_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_foundPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_checkedPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_prefixes"), ZEND_ACC_PROTECTED);
@@ -160,8 +155,6 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
 	zend_declare_property_null(phalcon_loader_ce, SL("_namespaces"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_directories"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_loader_ce, SL("_registered"), 0, ZEND_ACC_PROTECTED);
-
-	zend_class_implements(phalcon_loader_ce, 1, phalcon_events_eventsawareinterface_ce);
 
 	return SUCCESS;
 }
@@ -183,32 +176,6 @@ PHP_METHOD(Phalcon_Loader, __construct){
 	if (Z_TYPE(default_loader) == IS_NULL) {
 		phalcon_update_static_property_ce(phalcon_loader_ce, SL("_default"), getThis());
 	}
-}
-
-/**
- * Sets the events manager
- *
- * @param Phalcon\Events\ManagerInterface $eventsManager
- */
-PHP_METHOD(Phalcon_Loader, setEventsManager){
-
-	zval *events_manager;
-
-	phalcon_fetch_params(0, 1, 0, &events_manager);
-
-	phalcon_update_property(getThis(), SL("_eventsManager"), events_manager);
-
-}
-
-/**
- * Returns the internal event manager
- *
- * @return Phalcon\Events\ManagerInterface
- */
-PHP_METHOD(Phalcon_Loader, getEventsManager){
-
-
-	RETURN_MEMBER(getThis(), "_eventsManager");
 }
 
 /**
@@ -460,7 +427,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	phalcon_fetch_params(0, 3, 1, &class_name, &directory, &extensions, &ds);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
 		array_init(&directories);
@@ -550,6 +517,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	} ZEND_HASH_FOREACH_END();
 	zval_ptr_dtor(&directories);
 	zval_ptr_dtor(&ds_slash);
+	zval_ptr_dtor(&events_manager);
 }
 
 /**
@@ -570,7 +538,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	ZVAL_FALSE(&found);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:beforeCheckClass");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
@@ -711,6 +679,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&events_manager);
 
 	if (zend_is_true(&found)) {
 		RETURN_TRUE;

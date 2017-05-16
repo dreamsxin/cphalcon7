@@ -334,11 +334,6 @@
 #include "mvc/view/simple.h"
 #include "mvc/view/model.h"
 #include "mvc/view/modelinterface.h"
-#include "mvc/jsonrpc.h"
-#include "mvc/jsonrpc/exception.h"
-#include "jsonrpc/client.h"
-#include "jsonrpc/client/exception.h"
-#include "jsonrpc/client/response.h"
 
 #include "paginator/adapterinterface.h"
 #include "paginator/adapter/model.h"

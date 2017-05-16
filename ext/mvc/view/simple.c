@@ -387,10 +387,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		absolute_path = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		phalcon_update_property(getThis(), SL("_activeRenderPath"), view_path);
-	}
+	phalcon_update_property(getThis(), SL("_activeRenderPath"), view_path);
+
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	/**
 	 * Call beforeRender if there is an events manager
@@ -400,6 +399,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
 			RETURN_NULL();
 		}
 	}
@@ -509,6 +509,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&events_manager);
 }
 
 /**

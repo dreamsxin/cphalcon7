@@ -259,11 +259,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check if the connection must be persistent
 	 */
-	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_COPY)) {
-		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
+	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_READONLY)) {
 		if (zend_is_true(&persistent)) {
-			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, PH_COPY);
+			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, 0);
 		}
+		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
 	}
 
 	zval_ptr_dtor(&descriptor);
@@ -276,6 +276,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	PHALCON_OBJECT_INIT(&pdo, ce);
 	PHALCON_CALL_METHOD(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
 	zval_ptr_dtor(&dsn);
+	zval_ptr_dtor(&username);
+	zval_ptr_dtor(&password);
 	zval_ptr_dtor(&options);
 
 	phalcon_update_property(getThis(), SL("_pdo"), &pdo);

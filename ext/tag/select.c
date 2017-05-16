@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 	PHALCON_CALL_METHOD(NULL, resultset, "rewind");
 
 	while (1) {
-		zval r0 = {}, option = {}, using_zero = {}, using_one = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
+		zval r0 = {}, option = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
 
 		PHALCON_CALL_METHOD(&r0, resultset, "valid");
 		if (PHALCON_IS_NOT_FALSE(&r0)) {
@@ -230,33 +230,67 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		 */
 		PHALCON_CALL_METHOD(&option, resultset, "current");
 		if (Z_TYPE_P(using) == IS_ARRAY) {
+			zval using_zero = {}, using_one = {};
 			if (!phalcon_array_isset_fetch_long(&using_zero, using, 0, PH_READONLY)) {
 				ZVAL_STRING(&using_zero, "id");
 			}
 			if (!phalcon_array_isset_fetch_long(&using_one, using, 1, PH_READONLY)) {
 				ZVAL_COPY_VALUE(&using_one, &using_zero);
 			}
+
 			if (Z_TYPE(option) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(&option, SL("readattribute")) == SUCCESS) {
-					/**
-					 * Read the value attribute from the model
-					 */
-					PHALCON_CALL_METHOD(&option_value, &option, "readattribute", &using_zero);
+					if (Z_TYPE(using_zero) == IS_OBJECT) {
+						array_init(&params);
+						phalcon_array_update_long(&params, 0, &option, PH_COPY);
 
-					/**
-					 * Read the text attribute from the model
-					 */
-					PHALCON_CALL_METHOD(&option_text, &option, "readattribute", &using_one);
+						PHALCON_CALL_USER_FUNC_ARRAY(&option_value, &using_zero, &params);
+						zval_ptr_dtor(&params);
+					} else {
+						/**
+						 * Read the value attribute from the model
+						 */
+						PHALCON_CALL_METHOD(&option_value, &option, "readattribute", &using_zero);
+					}
+
+					if (Z_TYPE(using_one) == IS_OBJECT) {
+						array_init(&params);
+						phalcon_array_update_long(&params, 0, &option, PH_COPY);
+
+						PHALCON_CALL_USER_FUNC_ARRAY(&option_text, &using_one, &params);
+						zval_ptr_dtor(&params);
+					} else {
+						/**
+						 * Read the text attribute from the model
+						 */
+						PHALCON_CALL_METHOD(&option_text, &option, "readattribute", &using_one);
+					}
 				} else {
-					/**
-					 * Read the variable directly from the model/object
-					 */
-					phalcon_read_property_zval(&option_value, &option, &using_zero, PH_READONLY);
+					if (Z_TYPE(using_zero) == IS_OBJECT) {
+						array_init(&params);
+						phalcon_array_update_long(&params, 0, &option, PH_COPY);
 
-					/**
-					 * Read the text directly from the model/object
-					 */
-					phalcon_read_property_zval(&option_text, &option, &using_one, PH_READONLY);
+						PHALCON_CALL_USER_FUNC_ARRAY(&option_value, &using_zero, &params);
+						zval_ptr_dtor(&params);
+					} else {
+						/**
+						 * Read the variable directly from the model/object
+						 */
+						phalcon_read_property_zval(&option_value, &option, &using_zero, PH_READONLY);
+					}
+
+					if (Z_TYPE(using_one) == IS_OBJECT) {
+						array_init(&params);
+						phalcon_array_update_long(&params, 0, &option, PH_COPY);
+
+						PHALCON_CALL_USER_FUNC_ARRAY(&option_text, &using_one, &params);
+						zval_ptr_dtor(&params);
+					} else {
+						/**
+						 * Read the text directly from the model/object
+						 */
+						phalcon_read_property_zval(&option_text, &option, &using_one, PH_READONLY);
+					}
 				}
 			} else {
 				if (Z_TYPE(option) == IS_ARRAY) {
@@ -298,13 +332,12 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 			 * Check if using is a closure
 			 */
 			if (Z_TYPE_P(using) == IS_OBJECT) {
-				if (Z_TYPE(params) <= IS_NULL) {
-					array_init(&params);
-				}
+				array_init(&params);
 				phalcon_array_update_long(&params, 0, &option, PH_COPY);
 
 				PHALCON_CALL_USER_FUNC_ARRAY(&code_option, using, &params);
 				phalcon_concat_self(&code, &code_option);
+				zval_ptr_dtor(&params);
 			}
 		}
 

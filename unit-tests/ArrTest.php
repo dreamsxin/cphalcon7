@@ -107,5 +107,8 @@ class ArrTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(\Phalcon\Arr::overwrite($a1, $a2), array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos'));
 		$this->assertEquals(\Phalcon\Arr::overwrite($a1, $a2, array('name' => 'Phalcon7')), array('name' => 'Phalcon7', 'mood' => 'happy', 'food' => 'tacos'));
+
+		$this->assertEquals(\Phalcon\Arr::toArray($a1, array('name')), array('name' => 'john'));
+		$this->assertEquals(\Phalcon\Arr::toArray($a1, array('name'), NULL, TRUE), array('mood' => 'happy', 'food' => 'bacon'));
 	}
 }

@@ -364,7 +364,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				phalcon_add_function(&parameter, &wildcard, z_one);
 			} else {
 				if (Z_TYPE(wildcard) == IS_STRING) {
-					ZVAL_COPY_VALUE(&parameter, &wildcard);
+					ZVAL_COPY(&parameter, &wildcard);
 				} else {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind parameter");
 					return;
@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 					/**
 					 * The bind type is double so we try to get the double value
 					 */
-					if (phalcon_compare_strict_long(&type, 32)) {
+					if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL)) {
 						phalcon_cast(&cast_value, value, IS_DOUBLE);
 						ZVAL_MAKE_REF(&cast_value);
 						PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, &cast_value);
@@ -386,7 +386,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 						 * 1024 is ignore the bind type
 						 */
 						ZVAL_MAKE_REF(value);
-						if (phalcon_compare_strict_long(&type, 1024)) {
+						if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_SKIP)) {
 							PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
 						} else {
 							PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value, &type);
@@ -409,6 +409,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
 				ZVAL_UNREF(value);
 			}
+			zval_ptr_dtor(&parameter);
 		} ZEND_HASH_FOREACH_END();
 	}
 

@@ -53,7 +53,7 @@ static const zend_function_entry phalcon_db_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getDescriptor, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getConnectionId, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getSQLStatement, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getRealSQLStatement, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getExpectSQLStatement, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getSQLVariables, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getSQLBindTypes, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Db_AdapterInterface, getType, NULL)

@@ -65,6 +65,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, affectedRows);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, close);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeIdentifier);
+PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeValue);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeString);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams);
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, lastInsertId);
@@ -112,6 +113,7 @@ static const zend_function_entry phalcon_db_adapter_pdo_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter_Pdo, affectedRows, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo, close, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo, escapeIdentifier, arginfo_phalcon_db_adapterinterface_escapeidentifier, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter_Pdo, escapeValue, arginfo_phalcon_db_adapterinterface_escapevalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo, escapeString, arginfo_phalcon_db_adapterinterface_escapestring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo, convertBoundParams, arginfo_phalcon_db_adapterinterface_convertboundparams, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter_Pdo, lastInsertId, arginfo_phalcon_db_adapterinterface_lastinsertid, ZEND_ACC_PUBLIC)
@@ -697,6 +699,45 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeIdentifier){
 	}
 
 	PHALCON_CONCAT_SVS(return_value, "\"", identifier, "\"");
+}
+
+/**
+ * Escapes a value to avoid SQL injections according to the active charset in the connection
+ *
+ *<code>
+ *	$escapedValue = $connection->escapeValue('some dangerous value');
+ *</code>
+ *
+ * @param mixed $value
+ * @return string
+ */
+PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeValue){
+
+	zval *value;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	switch(Z_TYPE_P(value)) {
+		case IS_TRUE:
+			ZVAL_STRING(return_value, "TRUE");
+			break;
+		case IS_FALSE:
+			ZVAL_STRING(return_value, "FALSE");
+			break;
+		case IS_LONG:
+		case IS_DOUBLE:
+			ZVAL_COPY(return_value, value);
+			break;
+		case IS_NULL:
+			ZVAL_STRING(return_value, "NULL");
+			break;
+		case IS_ARRAY:
+			PHALCON_CALL_METHOD(return_value, getThis(), "escapearray", value);
+			break;
+		default:
+			PHALCON_CALL_METHOD(return_value, getThis(), "escapestring", value);
+			break;
+	}
 }
 
 /**

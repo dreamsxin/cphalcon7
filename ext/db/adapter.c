@@ -94,7 +94,7 @@ PHP_METHOD(Phalcon_Db_Adapter, useExplicitIdValue);
 PHP_METHOD(Phalcon_Db_Adapter, getDescriptor);
 PHP_METHOD(Phalcon_Db_Adapter, getConnectionId);
 PHP_METHOD(Phalcon_Db_Adapter, getSQLStatement);
-PHP_METHOD(Phalcon_Db_Adapter, getRealSQLStatement);
+PHP_METHOD(Phalcon_Db_Adapter, getExpectSQLStatement);
 PHP_METHOD(Phalcon_Db_Adapter, getSQLVariables);
 PHP_METHOD(Phalcon_Db_Adapter, getSQLBindTypes);
 PHP_METHOD(Phalcon_Db_Adapter, getType);
@@ -163,7 +163,7 @@ static const zend_function_entry phalcon_db_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter, getDescriptor, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getConnectionId, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getSQLStatement, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Adapter, getRealSQLStatement, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter, getExpectSQLStatement, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getSQLVariables, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getSQLBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getType, NULL, ZEND_ACC_PUBLIC)
@@ -1832,14 +1832,45 @@ PHP_METHOD(Phalcon_Db_Adapter, getSQLStatement){
 }
 
 /**
- * Active SQL statement in the object without replace bound paramters
+ * Active SQL statement in the object with replace bound paramters
  *
  * @return string
  */
-PHP_METHOD(Phalcon_Db_Adapter, getRealSQLStatement){
+PHP_METHOD(Phalcon_Db_Adapter, getExpectSQLStatement){
 
+	zval sql_statement = {}, sql_variables = {}, *value;
+	zend_string *str_key;
 
-	RETURN_MEMBER(getThis(), "_sqlStatement");
+	phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&sql_variables, getThis(), SL("_sqlVariables"), PH_NOISY|PH_READONLY);
+
+	if (Z_TYPE(sql_variables) != IS_ARRAY) {
+		RETURN_CTOR(&sql_statement);
+	}
+
+	ZVAL_DUP(return_value, &sql_statement);
+
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(sql_variables), str_key, value) {
+		zval pattern = {}, escaped_value = {}, replaced_str = {};
+
+		if (str_key) {
+			zval wildcard = {}, tmp = {};
+			ZVAL_STR(&wildcard, str_key);
+			phalcon_addslashes(&tmp, &wildcard);
+			PHALCON_CONCAT_SVS(&pattern, "#", &tmp , "#");
+			zval_ptr_dtor(&tmp);
+		} else {
+			ZVAL_STRING(&pattern, "#\?#");
+		}
+
+		PHALCON_CALL_METHOD(&escaped_value, getThis(), "escapevalue", value);
+		
+		PHALCON_CALL_FUNCTION(&replaced_str, "preg_replace", &pattern, &escaped_value, return_value);
+		zval_ptr_dtor(&pattern);
+		zval_ptr_dtor(&escaped_value);
+		zval_ptr_dtor(return_value);
+		ZVAL_COPY_VALUE(return_value, &replaced_str);
+	} ZEND_HASH_FOREACH_END();
 }
 
 /**

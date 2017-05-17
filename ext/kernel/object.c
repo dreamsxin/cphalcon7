@@ -782,13 +782,12 @@ zend_class_entry *phalcon_class_exists_ex(const zval *class_name, int autoload) 
 }
 
 zend_class_entry *phalcon_class_str_exists(const char *class_name, uint32_t class_len, int autoload) {
-
+	zval name = {};
 	zend_class_entry *ce;
 
-	if ((ce = zend_lookup_class_ex(zend_string_init(class_name, class_len, 0), NULL, autoload)) != NULL) {
-		return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
-	}
-
+	ZVAL_STRINGL(&name, class_name, class_len);
+	ce = phalcon_class_exists(&name, autoload);
+	zval_ptr_dtor(&name);
 	return ce;
 }
 

@@ -86,8 +86,8 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_pdo_executeprepared, 0, 0, 1)
 	ZEND_ARG_INFO(0, statement)
-	ZEND_ARG_INFO(0, placeholders)
-	ZEND_ARG_INFO(0, dataTypes)
+	ZEND_ARG_TYPE_INFO(0, placeholders, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, dataTypes, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_pdo_begin, 0, 0, 0)
@@ -322,24 +322,69 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, prepare){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
-	zval *statement, *placeholders, *data_types, events_manager = {}, event_name = {}, status = {}, *z_one, *value = NULL, profiler = {}, sql_statement = {};
+	zval *statement, *_placeholders = NULL, *_data_types = NULL, placeholders = {}, data_types = {}, events_manager = {}, event_name = {}, status = {};
+	zval *value = NULL, profiler = {}, sql_statement = {};
 	zend_string *str_key;
 	ulong idx;
-	int is_array;
 
-	phalcon_fetch_params(0, 1, 2, &statement, &placeholders, &data_types);
+	phalcon_fetch_params(0, 1, 2, &statement, &_placeholders, &_data_types);
 
-	if (!placeholders) {
-		placeholders = &PHALCON_GLOBAL(z_null);
+	if (!_placeholders || Z_TYPE_P(_placeholders) != IS_ARRAY) {
+		ZVAL_NULL(&placeholders);
+	} else {
+		ZVAL_DUP(&placeholders, _placeholders);
 	}
 
-	if (!data_types) {
-		data_types = &PHALCON_GLOBAL(z_null);
+	if (!_data_types || Z_TYPE_P(_data_types) != IS_ARRAY) {
+		ZVAL_NULL(&data_types);
+	} else {
+		ZVAL_DUP(&data_types, _data_types);
 	}
 
 	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
+	if (Z_TYPE(placeholders) == IS_ARRAY) {
+		if (Z_TYPE(data_types) != IS_ARRAY) {
+			array_init(&data_types);
+		}
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(placeholders), idx, str_key, value) {
+			zval wildcard = {}, type = {};
+			if (str_key) {
+				ZVAL_STR(&wildcard, str_key);
+			} else {
+				ZVAL_LONG(&wildcard, idx);
+			}
+
+			if (likely(phalcon_array_isset_fetch(&type, &data_types, &wildcard, PH_READONLY))) {
+				/**
+				 * The bind type is double so we try to get the double value
+				 */
+				if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL)) {
+					if (Z_TYPE_P(value) != IS_DOUBLE) {
+						convert_to_double_ex(value);
+					}
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_STR, 0);
+				}
+			} else {
+				if (Z_TYPE_P(value) == IS_LONG) {
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				} else if (Z_TYPE_P(value) == IS_DOUBLE) {
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+				} else if (PHALCON_IS_BOOL(value)) {
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_BOOL, 0);
+				} else if (Z_TYPE_P(value) == IS_NULL) {
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_NULL, 0);
+				} else {
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_STR, 0);
+				}
+			}
+		} ZEND_HASH_FOREACH_END();
+	}
+
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
+		phalcon_update_property(getThis(), SL("_sqlVariables"), &placeholders);
+		phalcon_update_property(getThis(), SL("_sqlBindTypes"), &data_types);
+
 		ZVAL_STRING(&event_name, "db:beforeExecutePrepared");
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, statement);
 		zval_ptr_dtor(&event_name);
@@ -349,11 +394,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 		}
 	}
 
-	if (Z_TYPE_P(placeholders) == IS_ARRAY) {
-		z_one = &PHALCON_GLOBAL(z_one);
-		is_array = Z_TYPE_P(data_types) == IS_ARRAY ? 1 : 0;
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
-			zval wildcard = {}, parameter = {}, type = {}, cast_value = {};
+	if (Z_TYPE(placeholders) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(placeholders), idx, str_key, value) {
+			zval wildcard = {}, parameter = {}, type = {};
 			if (str_key) {
 				ZVAL_STR(&wildcard, str_key);
 			} else {
@@ -361,49 +404,22 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 			}
 
 			if (Z_TYPE(wildcard) == IS_LONG) {
-				phalcon_add_function(&parameter, &wildcard, z_one);
+				phalcon_add_function(&parameter, &wildcard, &PHALCON_GLOBAL(z_one));
 			} else {
-				if (Z_TYPE(wildcard) == IS_STRING) {
-					ZVAL_COPY(&parameter, &wildcard);
-				} else {
-					PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid bind parameter");
-					return;
-				}
+				ZVAL_COPY(&parameter, &wildcard);
 			}
-
-			if (is_array) {
-				if (likely(phalcon_array_isset_fetch(&type, data_types, &wildcard, 0))) {
-					/**
-					 * The bind type is double so we try to get the double value
-					 */
-					if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL)) {
-						phalcon_cast(&cast_value, value, IS_DOUBLE);
-						ZVAL_MAKE_REF(&cast_value);
-						PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, &cast_value);
-						ZVAL_UNREF(&cast_value);
-					} else {
-						/**
-						 * 1024 is ignore the bind type
-						 */
-						ZVAL_MAKE_REF(value);
-						if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_SKIP)) {
-							PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
-						} else {
-							PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value, &type);
-						}
-						ZVAL_UNREF(value);
-					}
-
+			
+			if (likely(phalcon_array_isset_fetch(&type, &data_types, &wildcard, PH_READONLY))) {
+				/**
+				 * 1024 is ignore the bind type
+				 */
+				ZVAL_MAKE_REF(value);
+				if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_SKIP)) {
+					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
 				} else {
-					if (Z_TYPE_P(value) == IS_LONG) {
-						ZVAL_LONG(&type, PHALCON_DB_COLUMN_BIND_PARAM_INT);
-					} else {
-						ZVAL_LONG(&type, PHALCON_DB_COLUMN_BIND_PARAM_STR);
-					}
-					ZVAL_MAKE_REF(value);
 					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value, &type);
-					ZVAL_UNREF(value);
 				}
+				ZVAL_UNREF(value);
 			} else {
 				ZVAL_MAKE_REF(value);
 				PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
@@ -417,12 +433,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 
 	if (Z_TYPE(profiler) == IS_OBJECT) {
 		phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
-		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &sql_statement, placeholders, data_types);
+		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &sql_statement, &placeholders, &data_types);
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
 		PHALCON_CALL_METHOD(NULL, &profiler, "stopprofile");
 	} else {
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
 	}
+	zval_ptr_dtor(&placeholders);
+	zval_ptr_dtor(&data_types);
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "db:afterExecutePrepared");

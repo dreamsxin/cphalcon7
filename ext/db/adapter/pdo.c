@@ -792,7 +792,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 			zval numeric_place = {}, value = {}, str_place = {};
 
 			phalcon_array_fetch_long(&numeric_place, place_match, 1, PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&value, params, &numeric_place, 0)) {
+			if (!phalcon_array_isset_fetch(&value, params, &numeric_place, PH_READONLY)) {
 				if (phalcon_array_isset_fetch_long(&str_place, place_match, 2, PH_READONLY)) {
 					if (!phalcon_array_isset_fetch(&value, params, &str_place, 0)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");

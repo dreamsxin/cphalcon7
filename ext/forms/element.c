@@ -78,8 +78,8 @@ PHP_METHOD(Phalcon_Forms_Element, render);
 PHP_METHOD(Phalcon_Forms_Element, toArray);
 PHP_METHOD(Phalcon_Forms_Element, __toString);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_element_label, 0, 0, 1)
-	ZEND_ARG_INFO(0, attributes)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_element_label, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, attributes, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_forms_element_method_entry[] = {
@@ -260,7 +260,7 @@ PHP_METHOD(Phalcon_Forms_Element, setFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
-	zval *filter, filters = {}, new_filters = {};
+	zval *filter, filters = {};
 
 	phalcon_fetch_params(0, 1, 0, &filter);
 
@@ -268,6 +268,7 @@ PHP_METHOD(Phalcon_Forms_Element, addFilter){
 	if (Z_TYPE(filters) == IS_ARRAY) {
 		phalcon_update_property_array_append(getThis(), SL("_filters"), filter);
 	} else {
+		zval new_filters = {};
 		array_init_size(&new_filters, 2);
 		if (Z_TYPE(filters) == IS_STRING) {
 			phalcon_array_append(&new_filters, &filters, PH_COPY);
@@ -275,6 +276,7 @@ PHP_METHOD(Phalcon_Forms_Element, addFilter){
 
 		phalcon_array_append(&new_filters, filter, PH_COPY);
 		phalcon_update_property(getThis(), SL("_filters"), &new_filters);
+		zval_ptr_dtor(&new_filters);
 	}
 
 	RETURN_THIS();
@@ -299,7 +301,7 @@ PHP_METHOD(Phalcon_Forms_Element, getFilters){
  */
 PHP_METHOD(Phalcon_Forms_Element, addValidators){
 
-	zval *validators, *merge = NULL, current_validators = {}, merged_validators = {};
+	zval *validators, *merge = NULL, current_validators = {};
 
 	phalcon_fetch_params(0, 1, 1, &validators, &merge);
 
@@ -313,14 +315,18 @@ PHP_METHOD(Phalcon_Forms_Element, addValidators){
 	}
 
 	if (zend_is_true(merge)) {
+		zval merged_validators = {};
 		phalcon_read_property(&current_validators, getThis(), SL("_validators"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(current_validators) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_validators, &current_validators, validators);
 		} else {
-			ZVAL_COPY_VALUE(&merged_validators, validators);
+			ZVAL_COPY(&merged_validators, validators);
 		}
 
 		phalcon_update_property(getThis(), SL("_validators"), &merged_validators);
+		zval_ptr_dtor(&merged_validators);
+	} else {
+		phalcon_update_property(getThis(), SL("_validators"), validators);
 	}
 
 	RETURN_THIS();
@@ -397,7 +403,7 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	if (Z_TYPE(default_attributes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&merged_attributes, &default_attributes, &widget_attributes);
 	} else {
-		ZVAL_COPY_VALUE(&merged_attributes, &widget_attributes);
+		ZVAL_COPY(&merged_attributes, &widget_attributes);
 	}
 
 	/**
@@ -416,23 +422,23 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 			 */
 			if (phalcon_array_isset_fetch_str(&current_value, &merged_attributes, SL("value"), PH_READONLY)) {
 				if (PHALCON_IS_EQUAL(&current_value, &value)) {
-					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), PH_COPY);
+					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), 0);
 				}
 			} else {
 				/**
 				 * Evaluate the current value and mark the check as checked
 				 */
 				if (zend_is_true(&value)) {
-					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), PH_COPY);
+					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), 0);
 				}
-				phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
+				phalcon_array_update_str(&merged_attributes, SL("value"), &value, 0);
 			}
 		} else {
-			phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
+			phalcon_array_update_str(&merged_attributes, SL("value"), &value, 0);
 		}
 	}
 
-	RETURN_CTOR(&merged_attributes);
+	RETURN_ZVAL(&merged_attributes, 0, 0);
 }
 
 /**
@@ -642,18 +648,20 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	phalcon_htmlspecialchars(&escaped, &name, NULL, NULL);
 
 	PHALCON_CONCAT_SVS(&html, "<label for=\"", &escaped, "\"");
+	zval_ptr_dtor(&escaped);
 
 	if (attributes && Z_TYPE_P(attributes) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(attributes), idx, str_key, value) {
-			zval key = {};
+			zval key = {}, escaped_value = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
 			if (Z_TYPE(key) != IS_LONG) {
-				phalcon_htmlspecialchars(&escaped, value, NULL, NULL);
-				PHALCON_SCONCAT_SVSVS(&html, " ", &key, "=\"", &escaped, "\"");
+				phalcon_htmlspecialchars(&escaped_value, value, NULL, NULL);
+				PHALCON_SCONCAT_SVSVS(&html, " ", &key, "=\"", &escaped_value, "\"");
+				zval_ptr_dtor(&escaped_value);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -666,6 +674,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 	} else {
 		PHALCON_CONCAT_VSVS(return_value, &html, ">", &name, "</label>");
 	}
+	zval_ptr_dtor(&html);
 }
 
 /**
@@ -728,10 +737,10 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 	 * Assign the default value if there is no form available
 	 */
 	if (Z_TYPE(value) <= IS_NULL) {
-		 phalcon_read_property(&value, getThis(), SL("_value"), PH_READONLY);
+		 phalcon_read_property(&value, getThis(), SL("_value"), PH_COPY);
 	}
 
-	RETURN_CTOR(&value);
+	RETURN_ZVAL(&value, 0, 0);
 }
 
 /**
@@ -813,7 +822,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 
 	phalcon_fetch_params(0, 1, 0, &message);
 
-	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_READONLY);
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_COPY);
 	if (Z_TYPE(messages) != IS_OBJECT) {
 		object_init_ex(&messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, &messages, "__construct");
@@ -822,6 +831,7 @@ PHP_METHOD(Phalcon_Forms_Element, appendMessage){
 	}
 
 	PHALCON_CALL_METHOD(NULL, &messages, "appendmessage", message);
+	zval_ptr_dtor(&messages);
 
 	RETURN_THIS();
 }

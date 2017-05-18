@@ -133,6 +133,7 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 	}
 
 	phalcon_update_property(getThis(), SL("_activeProfile"), &active_profile);
+	zval_ptr_dtor(&active_profile);
 
 	RETURN_THIS();
 }

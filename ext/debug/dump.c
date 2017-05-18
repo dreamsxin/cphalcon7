@@ -169,9 +169,10 @@ PHP_METHOD(Phalcon_Debug_Dump, all)
 
 	array_init_size(&call_object, 2);
 	phalcon_array_append(&call_object, getThis(), PH_COPY);
-	phalcon_array_append(&call_object, &method_name, PH_COPY);
+	phalcon_array_append(&call_object, &method_name, 0);
 
 	PHALCON_CALL_USER_FUNC_ARGS(return_value, &call_object, args, ZEND_NUM_ARGS());
+	zval_ptr_dtor(&call_object);
 }
 
 /**
@@ -209,6 +210,7 @@ PHP_METHOD(Phalcon_Debug_Dump, setStyles){
 	phalcon_fast_array_merge(&new_styles, &default_styles, styles);
 
 	phalcon_update_property(getThis(), SL("_styles"), &new_styles);
+	zval_ptr_dtor(&new_styles);
 
 	RETURN_THIS();
 }

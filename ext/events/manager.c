@@ -486,6 +486,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					phalcon_array_append(&arguments, &source, PH_COPY);
 					phalcon_array_append(&arguments, &data, PH_COPY);
 
+					if (Z_TYPE(status) >= IS_STRING) {
+						zval_ptr_dtor(&status);
+					}
+
 					/**
 					 * Call the function in the PHP userland
 					 */
@@ -513,6 +517,9 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
+						if (Z_TYPE(status) >= IS_STRING) {
+							zval_ptr_dtor(&status);
+						}
 						/**
 						 * Call the function in the PHP userland
 						 */
@@ -591,6 +598,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					phalcon_array_append(&arguments, &source, PH_COPY);
 					phalcon_array_append(&arguments, &data, PH_COPY);
 
+					if (Z_TYPE(status) >= IS_STRING) {
+						zval_ptr_dtor(&status);
+					}
+
 					/**
 					 * Call the function in the PHP userland
 					 */
@@ -619,6 +630,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
+						if (Z_TYPE(status) >= IS_STRING) {
+							zval_ptr_dtor(&status);
+						}
+
 						/**
 						 * Call the function in the PHP userland
 						 */
@@ -855,16 +870,18 @@ PHP_METHOD(Phalcon_Events_Manager, getListeners){
 
 			PHALCON_CALL_METHOD(&listener0, &iterator, "current");
 			PHALCON_CALL_METHOD(&handler_embeded, &listener0, "getlistener");
+			zval_ptr_dtor(&listener0);
 
-			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
+			phalcon_array_append(return_value, &handler_embeded, 0);
 
 			PHALCON_CALL_METHOD(NULL, &iterator, "next");
 		}
+		zval_ptr_dtor(&iterator);
 	} else {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(queue), listener) {
 			zval handler_embeded = {};
 			PHALCON_CALL_METHOD(&handler_embeded, listener, "getlistener");
-			phalcon_array_append(return_value, &handler_embeded, PH_COPY);
+			phalcon_array_append(return_value, &handler_embeded, 0);
 		} ZEND_HASH_FOREACH_END();
 	}
 }

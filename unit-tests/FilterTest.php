@@ -20,6 +20,26 @@
 
 class FilterTest extends PHPUnit_Framework_TestCase
 {
+	public function testNormal()
+	{
+		$filter = new Phalcon\Filter;
+
+		$ret = $filter->sanitize('1.1111', 'int!');
+		$this->assertTrue(is_int($ret));
+
+		$ret = $filter->sanitize('1.1111', 'float!');
+		$this->assertTrue(is_float($ret));
+
+		$ret = $filter->sanitize('-1.1111', 'abs');
+		$this->assertTrue($ret === 1.1111);
+
+		$ret = $filter->sanitize('D', ['in' => ['A', 'B', 'C']]);
+		$this->assertTrue($ret === NULL);
+
+		$ret = $filter->sanitize('A', ['in' => ['A', 'B', 'C']]);
+		$this->assertTrue($ret === 'A');
+	}
+
 	public function testXSS()
 	{
 		if (!class_exists('DOMDocument')) {
@@ -31,17 +51,7 @@ class FilterTest extends PHPUnit_Framework_TestCase
 		$ret = $filter->sanitize('<strong style="color:blue" onclick="alert(\'clicked\')">Click</strong><div style="color:expression(1+1)">name</div>', 'xssclean');
 		$this->assertEquals($ret, '<strong style="color:blue">Click</strong><div>name</div>');
 
-
 		$ret = $filter->sanitize('<strong style="color:blue" onclick="alert(\'clicked\')">Click</strong><div style="color:expression(1+1)">name</div>', 'xssclean', NULL, array('allowAttributes' => array()));
 		$this->assertEquals($ret, '<strong>Click</strong><div>name</div>');
-
-		$ret = $filter->sanitize('1.1111', 'int!');
-		$this->assertTrue(is_int($ret));
-
-		$ret = $filter->sanitize('1.1111', 'float!');
-		$this->assertTrue(is_float($ret));
-
-		$ret = $filter->sanitize('-1.1111', 'abs');
-		$this->assertTrue($ret === 1.1111);
 	}
 }

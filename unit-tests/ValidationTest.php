@@ -77,6 +77,63 @@ class ValidationTest extends PHPUnit_Framework_TestCase
 		return $di;
 	}
 
+	public function testValidationAddValidation()
+	{
+		$_POST = array();
+
+		$validation = new Phalcon\Validation();
+
+		$validation->add('name', 'PresenceOf');
+		$validation->add('last_name', 'PresenceOf');
+
+		$messages = $validation->validate($_POST);
+
+		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
+			'_messages' => array(
+				0 => Phalcon\Validation\Message::__set_state(array(
+					'_type' => 'PresenceOf',
+					'_message' => 'Field name is required',
+					'_field' => 'name',
+					'_code' => '0',
+				)),
+				1 => Phalcon\Validation\Message::__set_state(array(
+					'_type' => 'PresenceOf',
+					'_message' => 'Field last_name is required',
+					'_field' => 'last_name',
+					'_code' => '0',
+				)),
+			)
+		));
+
+		$this->assertEquals($expectedMessages, $messages);
+
+		$_POST['last_name'] = '';
+
+		$validation = new Phalcon\Validation();
+		$validation->add('last_name', ['PresenceOf', 'StringLength' => ['min' => 10]]);
+	
+		$messages = $validation->validate($_POST);
+
+		$expectedMessages = Phalcon\Validation\Message\Group::__set_state(array(
+			'_messages' => array(
+				0 => Phalcon\Validation\Message::__set_state(array(
+					'_type' => 'PresenceOf',
+					'_message' => 'Field last_name is required',
+					'_field' => 'last_name',
+					'_code' => '0',
+				)),
+				1 => Phalcon\Validation\Message::__set_state(array(
+					'_type' => 'TooShort',
+					'_message' => 'Field last_name must be at least 10 characters long',
+					'_field' => 'last_name',
+					'_code' => '0',
+				))
+			)
+		));
+
+		$this->assertEquals($expectedMessages, $messages);
+	}
+
 	public function testValidationGroup()
 	{
 

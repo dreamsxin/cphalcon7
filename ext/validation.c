@@ -41,6 +41,7 @@
 #include "kernel/operators.h"
 #include "kernel/string.h"
 #include "kernel/require.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -193,7 +194,20 @@ PHP_METHOD(Phalcon_Validation, __construct){
 	phalcon_fetch_params(0, 0, 2, &validators, &options);
 
 	if (validators && Z_TYPE_P(validators) == IS_ARRAY) {
-		phalcon_update_property(getThis(), SL("_validators"), validators);
+		zval *scope;
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), scope) {
+			zval attribute = {}, validator = {};
+
+			if (Z_TYPE_P(scope) != IS_ARRAY) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Validators is invalid");
+				return;
+			}
+
+			phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY|PH_READONLY);
+			PHALCON_CALL_METHOD(NULL, getThis(), "add", &attribute, &validator);
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	/* Check for an 'initialize' method */
@@ -274,7 +288,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
-		zval attribute = {}, validator = {}, must_cancel = {};
+		zval attribute = {}, validator = {}, attribute_validators = {}, *attribute_validator, must_cancel = {};
 		if (Z_TYPE_P(scope) != IS_ARRAY) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The validator scope is not valid");
 			return;
@@ -282,22 +296,36 @@ PHP_METHOD(Phalcon_Validation, validate){
 
 		phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY|PH_READONLY);
 		phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY|PH_READONLY);
-		if (Z_TYPE(validator) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
-			return;
+
+		if (Z_TYPE(validator) != IS_ARRAY) {
+			array_init_size(&attribute_validators, 1);
+			phalcon_array_append(&attribute_validators, &validator, PH_COPY);
+		} else {
+			ZVAL_COPY(&attribute_validators, &validator);
 		}
 
-		PHALCON_CALL_METHOD(&status, &validator, "validate", getThis(), &attribute, &allow_empty);
-
-		/**
-		 * Check if the validation must be canceled if this validator fails
-		 */
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&must_cancel, Z_OBJCE(validator), &validator, "cancelOnFail"));
-
-			if (zend_is_true(&must_cancel)) {
-				break;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attribute_validators), attribute_validator) {
+			if (Z_TYPE_P(attribute_validator) != IS_OBJECT) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
+				return;
 			}
+
+			PHALCON_CALL_METHOD(&status, attribute_validator, "validate", getThis(), &attribute, &allow_empty);
+
+			/**
+			 * Check if the validation must be canceled if this validator fails
+			 */
+			if (PHALCON_IS_FALSE(&status)) {
+				RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&must_cancel, Z_OBJCE_P(attribute_validator), attribute_validator, "cancelOnFail"));
+
+				if (zend_is_true(&must_cancel)) {
+					break;
+				}
+			}
+		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&attribute_validators);
+		if (zend_is_true(&must_cancel)) {
+			break;
 		}
 	} ZEND_HASH_FOREACH_END();
 
@@ -316,24 +344,85 @@ PHP_METHOD(Phalcon_Validation, validate){
  * Adds a validator to a field
  *
  * @param string|array $attribute
- * @param Phalcon\Validation\ValidatorInterface
+ * @param array|Phalcon\Validation\ValidatorInterface
  * @return Phalcon\Validation
  */
 PHP_METHOD(Phalcon_Validation, add){
 
-	zval *attribute, *validator, scope = {};
+	zval *attribute, *_validator, validator = {}, validators = {}, scope = {};
 
-	phalcon_fetch_params(0, 2, 0, &attribute, &validator);
+	phalcon_fetch_params(0, 2, 0, &attribute, &_validator);
+
 	if (Z_TYPE_P(attribute) != IS_STRING && Z_TYPE_P(attribute) != IS_ARRAY) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Field must be passed as array of fields or string");
 		return;
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+	if (Z_TYPE_P(_validator) == IS_STRING) {
+		array_init_size(&validator, 1);
+		phalcon_array_append(&validator, _validator, PH_COPY);
+	} else {
+		ZVAL_COPY(&validator, _validator);
+	}
+
+	array_init(&validators);
+	if (Z_TYPE(validator) == IS_ARRAY) {
+		zval *item;
+		zend_string *item_key;
+
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(validator), item_key, item) {
+			zval name = {}, has = {}, class_name = {}, options = {}, object = {};
+
+			if (!item_key) {
+				if (Z_TYPE_P(item)!= IS_STRING) {
+					PHALCON_VERIFY_INTERFACE_EX(item, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+					phalcon_array_append(&validators, item, PH_COPY);
+					continue;
+				}
+				ZVAL_COPY_VALUE(&name, item);
+				array_init(&options);
+			} else {
+				ZVAL_STR(&name, item_key);
+				array_init_size(&options, 1);
+				phalcon_array_append(&options, item, PH_COPY);
+			}
+
+			PHALCON_CALL_METHOD(&has, getThis(), "hasservice", &name);
+			if (!zend_is_true(&has)) {
+				if (!phalcon_memnstr_str(&name, SL("\\"))) {
+					PHALCON_CONCAT_SV(&class_name, "Phalcon\\Validation\\Validator\\", &name);
+					PHALCON_CALL_METHOD(&has, getThis(), "hasservice", &class_name);
+				} else {
+					ZVAL_COPY(&class_name, &name);
+				}
+			} else {
+				ZVAL_COPY(&class_name, &name);
+			}
+
+			PHALCON_CALL_METHOD(&object, getThis(), "getresolveservice", &class_name, &options);
+			if (Z_TYPE(object) != IS_OBJECT) {
+				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_validation_exception_ce, "Validator %s is invalid", Z_STRVAL(name));
+				zval_ptr_dtor(&object);
+				zval_ptr_dtor(&class_name);
+				zval_ptr_dtor(&options);
+				zval_ptr_dtor(&validator);
+				return;
+			}
+			zval_ptr_dtor(&class_name);
+			zval_ptr_dtor(&options);
+
+			PHALCON_VERIFY_INTERFACE_EX(&object, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+			phalcon_array_append(&validators, &object, 0);
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		PHALCON_VERIFY_INTERFACE_EX(&validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+		phalcon_array_append(&validators, &validator, PH_COPY);
+	}
+	zval_ptr_dtor(&validator);
 
 	array_init_size(&scope, 2);
 	phalcon_array_append(&scope, attribute, PH_COPY);
-	phalcon_array_append(&scope, validator, PH_COPY);
+	phalcon_array_append(&scope, &validators, 0);
 	phalcon_update_property_array_append(getThis(), SL("_validators"), &scope);
 	zval_ptr_dtor(&scope);
 

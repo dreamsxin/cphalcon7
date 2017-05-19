@@ -1063,7 +1063,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 					
 					zval_ptr_dtor(&value_parts);
 					if (error) {
-						goto switchend;
+						return;
 					}
 				} else {
 					phalcon_array_fetch_str(&value, expr, SL("value"), PH_NOISY|PH_READONLY);
@@ -1161,8 +1161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_DISTINCT:
 				assert(0);
 				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Unexpected PHQL_T_DISTINCT - this should not happen");
-				goto switchend;
-				break;
+				return;
 
 			case PHQL_T_BETWEEN:
 				array_init_size(return_value, 4);
@@ -1267,9 +1266,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 				PHALCON_CONCAT_SV(&exception_message, "Unknown expression type ", &expr_type);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 		}
-switchend:
-		zval_ptr_dtor(&left);
-		zval_ptr_dtor(&right);
 		return;
 	}
 

@@ -316,12 +316,15 @@ PHP_METHOD(Phalcon_Http_Request, get)
 	PHALCON_CALL_METHOD(&put, getThis(), "getput");
 
 	phalcon_fast_array_merge(&merged, request, &put);
+	zval_ptr_dtor(&put);
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 
 	phalcon_fast_array_merge(&merged2, &merged, &data);
+	zval_ptr_dtor(&merged);
 
 	PHALCON_RETURN_CALL_SELF("_get", &merged2, name, filters, default_value, not_allow_empty, norecursive);
+	zval_ptr_dtor(&merged2);
 }
 
 /**
@@ -391,8 +394,7 @@ PHP_METHOD(Phalcon_Http_Request, getPost)
  */
 PHP_METHOD(Phalcon_Http_Request, getPut)
 {
-	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, is_put = {}, put = {}, raw = {}, new_put = {};
-	char *tmp;
+	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, is_put = {}, put = {}, new_put = {};
 
 	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
@@ -423,22 +425,26 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 	} else {
 		phalcon_read_property(&put, getThis(), SL("_put"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(put) != IS_ARRAY) {
+			zval raw = {};
+			char *tmp;
 			PHALCON_CALL_METHOD(&raw, getThis(), "getrawbody");
+			PHALCON_ENSURE_IS_STRING(&raw);
 
 			array_init(&new_put);
 
-			PHALCON_ENSURE_IS_STRING(&raw);
 			tmp = estrndup(Z_STRVAL(raw), Z_STRLEN(raw));
-
 			sapi_module.treat_data(PARSE_STRING, tmp, &new_put);
+			efree(tmp);
 
 			phalcon_update_property(getThis(), SL("_put"), &new_put);
+			zval_ptr_dtor(&raw);
 		} else {
-			ZVAL_COPY_VALUE(&new_put, &put);
+			ZVAL_COPY(&new_put, &put);
 		}
 	}
 
 	PHALCON_RETURN_CALL_SELF("_get", &new_put, name, filters, default_value, not_allow_empty, norecursive);
+	zval_ptr_dtor(&new_put);
 }
 
 /**

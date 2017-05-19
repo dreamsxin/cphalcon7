@@ -286,12 +286,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	/* Execute the query an return the requested slice of data */
 	PHALCON_CALL_METHOD(&items, &query, "execute");
+	zval_ptr_dtor(&query);
 
 	/* Remove the 'ORDER BY' clause, PostgreSQL requires this */
 	PHALCON_CALL_METHOD(NULL, &total_builder, "orderby", &PHALCON_GLOBAL(z_null));
 
 	/* Obtain the PHQL for the total query */
 	PHALCON_CALL_METHOD(&total_query, &total_builder, "getquery");
+	zval_ptr_dtor(&total_builder);
 
 	PHALCON_CALL_METHOD(&dependency_injector, &total_query, "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -303,6 +305,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	ZVAL_STR(&service_name, IS(modelsManager));
 
 	PHALCON_CALL_METHOD(&models_manager, &dependency_injector, "getshared", &service_name);
+	zval_ptr_dtor(&dependency_injector);
 	if (Z_TYPE(models_manager) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
 		return;
@@ -311,16 +314,22 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_VERIFY_INTERFACE(&models_manager, phalcon_mvc_model_managerinterface_ce);
 
 	PHALCON_CALL_METHOD(&models, &builder, "getfrom");
+	zval_ptr_dtor(&builder);
 
 	if (Z_TYPE(models) == IS_ARRAY) {
 		phalcon_array_get_current(&model_name, &models);
 	} else {
-		ZVAL_COPY_VALUE(&model_name, &models);
+		ZVAL_COPY(&model_name, &models);
 	}
+	zval_ptr_dtor(&models);
 
 	PHALCON_CALL_METHOD(&model, &models_manager, "load", &model_name);
+	zval_ptr_dtor(&models_manager);
+	zval_ptr_dtor(&model_name);
 	PHALCON_CALL_METHOD(&connection, &model, "getreadconnection");
+	zval_ptr_dtor(&model);
 	PHALCON_CALL_METHOD(&intermediate, &total_query, "parse");
+	PHALCON_SEPARATE(&intermediate);
 
 	phalcon_array_fetch_string(&columns, &intermediate, IS(columns), PH_READONLY);
 
@@ -335,18 +344,22 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		if (PHALCON_IS_STRING(&type, "object")) {
 			ZVAL_STRING(&select_columns, "*");
 
-			phalcon_array_update_string(&intermediate, IS(columns), &select_columns, PH_COPY);
+			phalcon_array_update_string(&intermediate, IS(columns), &select_columns, 0);
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&sql_select, &dialect, "select", &intermediate);
+	zval_ptr_dtor(&dialect);
+	zval_ptr_dtor(&intermediate);
 
 	PHALCON_CALL_METHOD(&bind_params, &total_query, "getbindparams");
 	PHALCON_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
+	zval_ptr_dtor(&total_query);
 
 	PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"rowcount\" FROM (", &sql_select, ") AS T");
+	zval_ptr_dtor(&sql_select);
 
 	/**
 	 * Replace the placeholders
@@ -366,21 +379,25 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 
-				ZVAL_COPY_VALUE(&sql_tmp, &sql);
-				PHALCON_STR_REPLACE(&sql, &string_wildcard, value, &sql_tmp);
+				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql);
+				zval_ptr_dtor(&string_wildcard);
+				zval_ptr_dtor(&sql);
+				ZVAL_COPY_VALUE(&sql, &sql_tmp);
 
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
 				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
 				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+				zval_ptr_dtor(&string_wildcard);
 			} else {
 				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		ZVAL_COPY_VALUE(&processed, &bind_params);
+		ZVAL_COPY(&processed, &bind_params);
 	}
+	zval_ptr_dtor(&bind_params);
 
 	/**
 	 * Replace the bind Types
@@ -403,13 +420,18 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 				phalcon_array_update(&processed_types, &wildcard, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
-
 	} else {
-		ZVAL_COPY_VALUE(&processed_types, &bind_types);
+		ZVAL_COPY(&processed_types, &bind_types);
 	}
+	zval_ptr_dtor(&bind_types);
 
 	PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &processed, &processed_types);
+	zval_ptr_dtor(&connection);
+	zval_ptr_dtor(&sql);
+	zval_ptr_dtor(&processed);
+	zval_ptr_dtor(&processed_types);
 	PHALCON_CALL_METHOD(&row, &result, "fetch");
+	zval_ptr_dtor(&result);
 
 	phalcon_array_fetch_str(&rowcount, &row, SL("rowcount"), PH_NOISY|PH_READONLY);
 
@@ -418,8 +440,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
+	zval_ptr_dtor(&row);
+
 	object_init(return_value);
-	phalcon_update_property(return_value, SL("items"),       &items);
+	phalcon_update_property(return_value, SL("items"),			&items);
+	zval_ptr_dtor(&items);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);

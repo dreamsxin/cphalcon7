@@ -2784,6 +2784,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
 
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+	zval_ptr_dtor(&manager);
 	PHALCON_CALL_METHOD(&source, &model, "getsource");
 	PHALCON_CALL_METHOD(&schema, &model, "getschema");
 
@@ -2792,7 +2793,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 		phalcon_array_append(&table, &source, PH_COPY);
 		phalcon_array_append(&table, &schema, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&table, &source);
+		ZVAL_DUP(&table, &source);
 	}
 
 	array_init(&sql_aliases);
@@ -2847,20 +2848,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 			phalcon_array_append(&sql_fields, &attribute, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, PH_COPY);
+		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, 0);
 	} else {
 		PHALCON_CALL_METHOD(&sql_fields, &model, "getattributes");
 
-		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, PH_COPY);
+		phalcon_array_update_string(&sql_insert, IS(fields), &sql_fields, 0);
 	}
+	zval_ptr_dtor(&model);
+	zval_ptr_dtor(&table);
+	zval_ptr_dtor(&source);
+	zval_ptr_dtor(&schema);
 
-	phalcon_array_update_string(&sql_insert, IS(values), &expr_rows, PH_COPY);
+	phalcon_array_update_string(&sql_insert, IS(values), &expr_rows, 0);
 
 	ZVAL_STRING(&event_name, "query:afterPrepareInsert");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
-	RETURN_CTOR(&sql_insert);
+	RETURN_ZVAL(&sql_insert, 0, 0);
 }
 
 /**
@@ -3003,7 +3008,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		array_init_size(&update_values, 1);
 		phalcon_array_append(&update_values, &values, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&update_values, &values);
+		ZVAL_DUP(&update_values, &values);
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(update_values), update_value) {
@@ -3024,6 +3029,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		phalcon_array_update_str(&value, SL("value"), &expr_value, 0);
 		phalcon_array_append(&sql_values, &value, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&update_values);
 
 	array_init_size(return_value, 7);
 	phalcon_array_update_string(return_value, IS(tables), &sql_tables, PH_COPY);

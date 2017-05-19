@@ -246,12 +246,13 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 	if (!args || Z_TYPE_P(args) == IS_NULL) {
 		array_init(&arguments);
 	} else {
-		ZVAL_COPY_VALUE(&arguments, args);
+		ZVAL_COPY(&arguments, args);
 	}
 
 	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&func, &methods, &method_name, PH_READONLY)) {
 			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
+			zval_ptr_dtor(&arguments);
 			return;
 	}
 
@@ -275,10 +276,8 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		zval_ptr_dtor(&method_name);
-		zval_ptr_dtor(&service_name);
 		return;
 	}
-	zval_ptr_dtor(&service_name);
 
 	if (phalcon_method_exists(&service, &method_name) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");

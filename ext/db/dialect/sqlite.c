@@ -933,5 +933,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Sqlite, getDefaultValue){
 	}
 	ZVAL_STRING(&slash, "\"");
 	PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", default_value, &slash);
+	zval_ptr_dtor(&slash);
 	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
+	zval_ptr_dtor(&value_cslashes);
 }

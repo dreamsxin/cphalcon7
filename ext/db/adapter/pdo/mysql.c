@@ -156,6 +156,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Mysql, describeColumns){
 	 * Get the describe
 	 */
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
 	array_init(return_value);
 

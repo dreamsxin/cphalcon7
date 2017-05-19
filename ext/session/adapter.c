@@ -308,6 +308,7 @@ PHP_METHOD(Phalcon_Session_Adapter, set){
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	phalcon_session_set(&key, value);
+	zval_ptr_dtor(&key);
 }
 
 /**
@@ -361,10 +362,11 @@ PHP_METHOD(Phalcon_Session_Adapter, has){
 	PHALCON_CONCAT_VV(&key, &unique_id, index);
 
 	if(phalcon_session_get(&key)) {
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&key);
 }
 
 /**
@@ -391,6 +393,7 @@ PHP_METHOD(Phalcon_Session_Adapter, remove){
 	if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY) {
 		zend_hash_del(Z_ARRVAL_P(Z_REFVAL(PS(http_session_vars))), Z_STR(key));
 	}
+	zval_ptr_dtor(&key);
 }
 
 /**

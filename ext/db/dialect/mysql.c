@@ -1098,6 +1098,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, describeColumns){
 	}
 
 	PHALCON_CONCAT_SV(return_value, "DESCRIBE ", &table);
+	zval_ptr_dtor(&table);
 
 }
 
@@ -1186,7 +1187,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, describeReferences){
 		PHALCON_SCONCAT_SVS(&sql, "TABLE_NAME = \"", table, "\"");
 	}
 
-	RETURN_CTOR(&sql);
+	RETURN_ZVAL(&sql, 0, 0);
 }
 
 /**
@@ -1209,7 +1210,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, tableOptions){
 		PHALCON_SCONCAT_SVS(&sql, "TABLES.TABLE_NAME = \"", table, "\"");
 	}
 
-	RETURN_CTOR(&sql);
+	RETURN_ZVAL(&sql, 0, 0);
 }
 
 /**
@@ -1254,5 +1255,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getDefaultValue){
 	}
 	ZVAL_STRING(&slash, "\"");
 	PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", default_value, &slash);
+	zval_ptr_dtor(&slash);
 	PHALCON_CONCAT_SVS(return_value, "\"", &value_cslashes, "\"");
+	zval_ptr_dtor(&value_cslashes);
 }

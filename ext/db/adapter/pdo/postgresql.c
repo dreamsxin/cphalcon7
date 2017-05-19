@@ -179,6 +179,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, describeColumns){
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
 	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	zval_ptr_dtor(&sql);
 
 	/**
 	 * 0:name, 1:type, 2:size, 3:numeric size, 4:numeric scale, 5: null, 6: key, 7: extra, 8: position, 9: element type

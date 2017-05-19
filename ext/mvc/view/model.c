@@ -542,7 +542,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	array_init(&child_contents);
 
-	PHALCON_CALL_SELF(&childs, "getchild");
+	PHALCON_CALL_METHOD(&childs, getThis(), "getchild");
 
 	if (Z_TYPE(childs) == IS_ARRAY && phalcon_fast_count_ev(&childs)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(childs), child) {
@@ -571,7 +571,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	phalcon_ob_start();
 
-	phalcon_read_property(&view, getThis(), SL("_view"), PH_READONLY);
+	phalcon_read_property(&view, getThis(), SL("_view"), PH_COPY);
 
 	if (Z_TYPE(view) != IS_OBJECT) {
 		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
@@ -579,6 +579,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		ZVAL_STR(&service, IS(view));
 
 		PHALCON_CALL_METHOD(&view, &dependency_injector, "getshared", &service);
+		zval_ptr_dtor(&dependency_injector);
 	}
 
 	PHALCON_VERIFY_INTERFACE(&view, phalcon_mvc_viewinterface_ce);
@@ -610,8 +611,8 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	zval_ptr_dtor(&base_path);
 
 	PHALCON_CALL_METHOD(&views_dir, &view, "getviewsdir");
-	PHALCON_CALL_SELF(&vars, "getVars");
-	PHALCON_CALL_SELF(&tpl, "gettemplate");
+	PHALCON_CALL_METHOD(&vars, getThis(), "getvars");
+	PHALCON_CALL_METHOD(&tpl, getThis(), "gettemplate");
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render Model View: ", &tpl);
@@ -631,6 +632,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	zval_ptr_dtor(&tpl);
 
 	PHALCON_CALL_METHOD(&engines, &view, "getEngines");
+	zval_ptr_dtor(&view);
 
 	/**
 	 * Views are rendered in each engine
@@ -662,8 +664,8 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 					ZVAL_STRING(&event_name, "view:beforeRenderView");
 					PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
 					zval_ptr_dtor(&event_name);
-					zval_ptr_dtor(&view_engine_path);
 					if (PHALCON_IS_FALSE(&status)) {
+						zval_ptr_dtor(&view_engine_path);
 						continue;
 					}
 				}
@@ -689,6 +691,8 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			zval_ptr_dtor(&view_engine_path);
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
+
+	zval_ptr_dtor(&engines);
 	zval_ptr_dtor(&new_vars);
 	zval_ptr_dtor(&paths);
 

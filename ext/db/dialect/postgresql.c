@@ -118,7 +118,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Dialect_Postgresql){
  */
 PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 
-	zval *column, size = {}, column_type = {}, isautoincrement = {}, column_sql = {}, type_values = {}, *value, value_cslashes = {}, name = {};
+	zval *column, size = {}, column_type = {}, isautoincrement = {}, column_sql = {}, type_values = {}, *value, name = {};
 	int c, i = 0;
 
 	phalcon_fetch_params(0, 1, 0, &column);
@@ -143,6 +143,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 				c = phalcon_fast_count_int(&type_values);
 				phalcon_concat_self_str(&column_sql, SL("("));
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(type_values), value) {
+					zval value_cslashes = {};
 					i++;
 					PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", value, &slash);
 					if (i < c) {
@@ -150,13 +151,15 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, getColumnDefinition){
 					} else {
 						PHALCON_SCONCAT_SVS(&column_sql, "\"", &value_cslashes, "\"");
 					}
+					zval_ptr_dtor(&value_cslashes);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_concat_self_str(&column_sql, SL(")"));
 			} else {
+				zval value_cslashes = {};
 				PHALCON_CALL_FUNCTION(&value_cslashes, "addcslashes", &type_values, &slash);
 				PHALCON_SCONCAT_SVS(&column_sql, "(\"", &value_cslashes, "\")");
+				zval_ptr_dtor(&value_cslashes);
 			}
-			zval_ptr_dtor(&value_cslashes);
 			zval_ptr_dtor(&slash);
 			RETURN_ZVAL(&column_sql, 0, 0);
 		}

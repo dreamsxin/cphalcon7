@@ -4592,10 +4592,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getSingleResult){
 	PHALCON_CALL_METHOD(&result, getThis(), "execute", bind_params, bind_types);
 
 	if (zend_is_true(&unique_row)) {
-		RETURN_CTOR(&result);
+		RETURN_ZVAL(&result, 0, 0);
 	} else {
 		PHALCON_CALL_METHOD(&first_result, &result, "getfirst");
-		RETURN_CTOR(&first_result);
+		zval_ptr_dtor(&result);
+		RETURN_ZVAL(&first_result, 0, 0);
 	}
 }
 

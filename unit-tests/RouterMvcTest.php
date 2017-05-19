@@ -402,33 +402,48 @@ class RouterMvcTest extends PHPUnit_Framework_TestCase
 
 		$router = new Phalcon\Mvc\Router();
 
-		$router->add('/{controller:[a-z\-]+}/{action:[a-z\-]+}/this-is-a-country')
-		->convert('controller', function($controller){
-			return str_replace('-', '', $controller);
-		})
-		->convert('action', function($action){
-			return str_replace('-', '', $action);
-		});
+		$router
+			->add('/{controller:[a-z\-]+}/{action:[a-z\-]+}/this-is-a-country')
+			->convert('controller', function($controller){
+				return str_replace('-', '', $controller);
+			})
+			->convert('action', function($action){
+				return str_replace('-', '', $action);
+			});
 
-		$router->add('/([A-Z]+)/([0-9]+)', array(
-			'controller' => 1,
-			'action' => 'default',
-			'id' => 2,
-		))
-		->convert('controller', function($controller) {
-			return strtolower($controller);
-		})
-		->convert('action', function($action) {
-			if ($action == 'default') {
-				return 'index';
-			}
-			return $action;
-		})
-		->convert('id', function($id) {
-			return strrev($id);
-		});
+		$router
+			->add('/([A-Z]+)/([0-9]+)', array(
+				'controller' => 1,
+				'action' => 'default',
+				'id' => 2,
+			))
+			->convert('controller', function($controller) {
+				return strtolower($controller);
+			})
+			->convert('action', function($action) {
+				if ($action == 'default') {
+					return 'index';
+				}
+				return $action;
+			})
+			->convert('id', function($id) {
+				return strrev($id);
+			});
+
+		$router
+			->add('/my-static', array(
+				'controller' => 'my-static',
+				'action' => 'index'
+			))
+			->convert('controller', function($controller){
+				return str_replace('-', '', $controller);
+			});
 
 		$routes = array(
+			'/my-static' => array(
+				'controller' => 'mystatic',
+				'action' => 'index'
+			),
 			'/some-controller/my-action-name/this-is-a-country' => array(
 				'controller' => 'somecontroller',
 				'action' => 'myactionname',

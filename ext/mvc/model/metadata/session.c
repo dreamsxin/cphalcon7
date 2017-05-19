@@ -116,9 +116,11 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Session, read){
 		if (phalcon_array_isset(&r0, key)) {
 			phalcon_array_fetch(&r1, session, &prefix_key, PH_NOISY|PH_READONLY);
 			phalcon_array_fetch(&meta_data, &r1, key, PH_NOISY|PH_READONLY);
+			zval_ptr_dtor(&prefix_key);
 			RETURN_CTOR(&meta_data);
 		}
 	}
+	zval_ptr_dtor(&prefix_key);
 }
 
 /**

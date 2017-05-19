@@ -546,7 +546,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 	if (Z_TYPE(childs) == IS_ARRAY && phalcon_fast_count_ev(&childs)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(childs), child) {
-			zval isappend = {}, capture = {}, content = {}, child_content = {}, content_append = {};
+			zval isappend = {}, capture = {}, content = {}, child_content = {};
 
 			PHALCON_CALL_METHOD(&isappend, child, "isappend");
 			PHALCON_CALL_METHOD(&capture, child, "getcaptureto");
@@ -554,16 +554,20 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 
 			if (zend_is_true(&isappend)) {
 				if (Z_TYPE(child_contents) == IS_ARRAY && phalcon_array_isset_fetch(&child_content, &child_contents, &capture, PH_READONLY)) {
+					zval content_append = {};
 					PHALCON_CONCAT_VV(&content_append, &child_content, &content);
-					phalcon_array_update(&child_contents, &capture, &content_append, PH_COPY);
+					phalcon_array_update(&child_contents, &capture, &content_append, 0);
 				} else {
 					phalcon_array_update(&child_contents, &capture, &content, PH_COPY);
 				}
 			} else {
 				phalcon_array_update(&child_contents, &capture, &content, PH_COPY);
 			}
+			zval_ptr_dtor(&capture);
+			zval_ptr_dtor(&content);
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&childs);
 
 	phalcon_ob_start();
 
@@ -589,6 +593,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&events_manager);
 			RETURN_NULL();
 		}
 	}
@@ -600,8 +605,9 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		array_init(&paths);
 		phalcon_array_append(&paths, &base_path, PH_COPY);
 	} else {
-		ZVAL_COPY_VALUE(&paths, &base_path);
+		ZVAL_COPY(&paths, &base_path);
 	}
+	zval_ptr_dtor(&base_path);
 
 	PHALCON_CALL_METHOD(&views_dir, &view, "getviewsdir");
 	PHALCON_CALL_SELF(&vars, "getVars");
@@ -615,10 +621,14 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (Z_TYPE(vars) == IS_ARRAY) {
 		phalcon_fast_array_merge(&new_vars, &vars, &child_contents);
 	} else {
-		ZVAL_COPY_VALUE(&new_vars, &child_contents);
+		ZVAL_COPY(&new_vars, &child_contents);
 	}
+	zval_ptr_dtor(&child_contents);
+	zval_ptr_dtor(&vars);
 
 	PHALCON_CONCAT_VV(&views_dir_path, &views_dir, &tpl);
+	zval_ptr_dtor(&views_dir);
+	zval_ptr_dtor(&tpl);
 
 	PHALCON_CALL_METHOD(&engines, &view, "getEngines");
 
@@ -652,6 +662,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 					ZVAL_STRING(&event_name, "view:beforeRenderView");
 					PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
 					zval_ptr_dtor(&event_name);
+					zval_ptr_dtor(&view_engine_path);
 					if (PHALCON_IS_FALSE(&status)) {
 						continue;
 					}
@@ -669,13 +680,17 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 					zval_ptr_dtor(&event_name);
 				}
 
+				zval_ptr_dtor(&view_engine_path);
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
 				PHALCON_DEBUG_LOG(&debug_message);
 			}
+			zval_ptr_dtor(&view_engine_path);
 		} ZEND_HASH_FOREACH_END();
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&new_vars);
+	zval_ptr_dtor(&paths);
 
 	/**
 	 * Always throw an exception if the view does not exist
@@ -683,8 +698,11 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (PHALCON_IS_TRUE(&not_exists)) {
 		PHALCON_CONCAT_SVS(&exception_message, "View '", &views_dir_path, "' was not found in the views directory");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
+		zval_ptr_dtor(&views_dir_path);
+		zval_ptr_dtor(&events_manager);
 		return;
 	}
+	zval_ptr_dtor(&views_dir_path);
 
 	/**
 	 * Call afterRender event
@@ -694,12 +712,13 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 		zval_ptr_dtor(&event_name);
 	}
+	zval_ptr_dtor(&events_manager);
 
 	phalcon_ob_get_contents(&contents);
 
 	phalcon_ob_end_clean();
 
-	RETURN_CTOR(&contents);
+	RETURN_ZVAL(&contents, 0, 0);
 }
 
 /**

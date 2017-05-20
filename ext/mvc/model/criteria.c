@@ -96,6 +96,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, groupBy);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, having);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute);
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, count);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, cache);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, insert);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, update);
@@ -137,6 +138,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_cache, 0, 0, 1)
 	ZEND_ARG_ARRAY_INFO(0, options, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_count, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, column, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_criteria_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Criteria, setModelName, arginfo_phalcon_mvc_model_criteriainterface_setmodelname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, getModelName, NULL, ZEND_ACC_PUBLIC)
@@ -174,6 +179,7 @@ static const zend_function_entry phalcon_mvc_model_criteria_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Criteria, groupBy, arginfo_phalcon_mvc_model_criteria_groupby, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, having, arginfo_phalcon_mvc_model_criteria_having, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, execute, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Criteria, count, arginfo_phalcon_mvc_model_criteria_count, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, cache, arginfo_phalcon_mvc_model_criteria_cache, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, insert, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, update, NULL, ZEND_ACC_PUBLIC)
@@ -1378,7 +1384,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, having) {
 /**
  * Executes a find using the parameters built with the criteria
  *
- * @param boolean $useRawsql
  * @return Phalcon\Mvc\Model\ResultsetInterface
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
@@ -1417,6 +1422,40 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
 	PHALCON_CALL_METHOD(return_value, &query, "execute", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null));
 	zval_ptr_dtor(&query);
+}
+
+
+/**
+ * Auto sets columns and return execute
+ *
+ * @return int
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, count) {
+
+	zval *column = NULL, count_sql = {}, result = {};
+
+	phalcon_fetch_params(0, 0, 1, &column);
+
+	if (column && Z_TYPE_P(column) == IS_STRING) {
+		PHALCON_CONCAT_SVS(&count_sql, "COUNT(", column, ") AS num");
+	} else {
+		ZVAL_STRING(&count_sql, "COUNT(*) AS num");
+	}
+	PHALCON_CALL_METHOD(NULL, getThis(), "columns", &count_sql);
+	zval_ptr_dtor(&count_sql);
+
+	PHALCON_CALL_METHOD(NULL, getThis(), "setuniquerow", &PHALCON_GLOBAL(z_true));
+
+	PHALCON_CALL_METHOD(&result, getThis(), "execute");
+
+	if (Z_TYPE(result) != IS_OBJECT) {
+		RETVAL_ZVAL(&result, 0, 0);
+		return;
+	}
+
+	phalcon_read_property(return_value, &result, SL("num"), PH_NOISY|PH_COPY);
+	convert_to_long(return_value);
+	zval_ptr_dtor(&result);
 }
 
 /**

@@ -80,7 +80,7 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsFromInput($di);
 		$this->_executeTestIssues2131($di);
 		$this->_executeJoinTests($di, "mysql");
-		$this->_executeTestRawSQL($di);
+		$this->_executeTestOther($di);
 	}
 
 	public function testModelsPostgresql()
@@ -103,7 +103,7 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsFromInput($di);
 		$this->_executeTestIssues2131($di);
 		$this->_executeJoinTests($di, "postgresql");
-		$this->_executeTestRawSQL($di);
+		$this->_executeTestOther($di);
 	}
 
 	public function testModelsSQLite()
@@ -126,7 +126,7 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->_executeTestsFromInput($di);
 		$this->_executeTestIssues2131($di);
 		$this->_executeJoinTests($di, "sqlite");
-		$this->_executeTestRawSQL($di);
+		$this->_executeTestOther($di);
 	}
 
 	protected function _executeTestsNormal($di)
@@ -416,20 +416,10 @@ class ModelsCriteriaTest extends PHPUnit_Framework_TestCase
 		$this->assertFalse($personas->isFresh());
 	}
 	
-	public function _executeTestRawSQL($di)
+	public function _executeTestOther($di)
 	{
 		$personas = Personas::query()->where("estado='X'")->execute();
-		$this->assertTrue(count($personas) == 0);
-
-		$ret = Personas::query()->update(array("estado" => "X"))->where("estado='I'")->execute();
-
-		$personas = Personas::query()->where("estado='X'")->execute();
-		$this->assertTrue(count($personas) > 0);
-
-		$ret = Personas::query()->update(array("estado" => "I"))->where("estado='X'")->execute();
-
-		$personas = Personas::query()->where("estado='X'")->execute();
-		$this->assertTrue(count($personas) == 0);
+		$this->assertTrue(count($personas) == Personas::query()->where("estado='X'")->count());
 	}
 
 }

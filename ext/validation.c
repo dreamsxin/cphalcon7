@@ -195,18 +195,24 @@ PHP_METHOD(Phalcon_Validation, __construct){
 
 	if (validators && Z_TYPE_P(validators) == IS_ARRAY) {
 		zval *scope;
+		zend_string *str_key;
 
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(validators), scope) {
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(validators), str_key, scope) {
 			zval attribute = {}, validator = {};
 
-			if (Z_TYPE_P(scope) != IS_ARRAY) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Validators is invalid");
-				return;
-			}
+			if (str_key) {
+				ZVAL_STR(&attribute, str_key);
+				PHALCON_CALL_METHOD(NULL, getThis(), "add", &attribute, scope);
+			} else {
+				if (Z_TYPE_P(scope) != IS_ARRAY) {
+					PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Validators is invalid");
+					return;
+				}
 
-			phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY|PH_READONLY);
-			phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY|PH_READONLY);
-			PHALCON_CALL_METHOD(NULL, getThis(), "add", &attribute, &validator);
+				phalcon_array_fetch_long(&attribute, scope, 0, PH_NOISY|PH_READONLY);
+				phalcon_array_fetch_long(&validator, scope, 1, PH_NOISY|PH_READONLY);
+				PHALCON_CALL_METHOD(NULL, getThis(), "add", &attribute, &validator);
+			}
 		} ZEND_HASH_FOREACH_END();
 	}
 

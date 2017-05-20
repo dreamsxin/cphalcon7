@@ -427,7 +427,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 
 	phalcon_fetch_params(0, 3, 1, &class_name, &directory, &extensions, &ds);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
 		array_init(&directories);
@@ -517,7 +517,6 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	} ZEND_HASH_FOREACH_END();
 	zval_ptr_dtor(&directories);
 	zval_ptr_dtor(&ds_slash);
-	zval_ptr_dtor(&events_manager);
 }
 
 /**
@@ -538,7 +537,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	ZVAL_FALSE(&found);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
 		ZVAL_STRING(&event_name, "loader:beforeCheckClass");
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
@@ -679,7 +678,6 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), class_name);
 		zval_ptr_dtor(&event_name);
 	}
-	zval_ptr_dtor(&events_manager);
 
 	if (zend_is_true(&found)) {
 		RETURN_TRUE;

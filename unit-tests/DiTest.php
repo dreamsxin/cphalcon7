@@ -407,4 +407,24 @@ class DiTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue($di->getService('resolved')->isResolved());
 		$this->assertFalse($di->getService('notresolved')->isResolved());
 	}
+
+	public function testEventManager()
+	{
+		$loader = new Phalcon\Loader();
+
+		$loader->registerDirs(array(
+			"unit-tests/events/listeners"
+		));
+
+		$loader->register();
+		$di = new \Phalcon\DI\FactoryDefault();
+
+		$di->setShared('eventsManager', function() {
+			$eventsManager = new \Phalcon\Events\Manager();
+			$eventsManager->attach('user', new UserEventListener);
+			return $eventsManager;
+		});
+		$this->assertEquals(get_class($di->eventsManager), 'Phalcon\Events\Manager');
+		$loader->unregister();
+	}
 }

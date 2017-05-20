@@ -110,5 +110,8 @@ class ArrTest extends PHPUnit_Framework_TestCase
 
 		$this->assertEquals(\Phalcon\Arr::toArray($a1, array('name')), array('name' => 'john'));
 		$this->assertEquals(\Phalcon\Arr::toArray($a1, array('name'), NULL, TRUE), array('mood' => 'happy', 'food' => 'bacon'));
+
+		$arr = array('name' => ["phalcon", "phalcon7"]);
+		$this->assertEquals(\Phalcon\Arr::first($arr, 'name'), 'phalcon');
 	}
 }

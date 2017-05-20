@@ -132,7 +132,7 @@ PHP_METHOD(Phalcon_Logger_Item, getContext) {
 	phalcon_read_property(&context, getThis(), SL("_context"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(context) == IS_ARRAY) {
-		RETURN_ZVAL(&context, 1, 0);
+		RETURN_CTOR(&context);
 	}
 
 	array_init(return_value);

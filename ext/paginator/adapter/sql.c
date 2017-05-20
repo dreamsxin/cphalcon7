@@ -144,18 +144,20 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 	}
 
 
-	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"), PH_READONLY)) {
+	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"), PH_COPY)) {
 		ZVAL_STRING(&dbname, "db");
 	}
 
 	if (Z_TYPE(dbname) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", &dbname);
 	} else {
-		ZVAL_COPY_VALUE(&db, &dbname);
+		ZVAL_COPY(&db, &dbname);
 	}
+	zval_ptr_dtor(&dbname);
 
 	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
 	phalcon_update_property(getThis(), SL("_db"), &db);
+	zval_ptr_dtor(&db);
 
 	phalcon_update_property(getThis(), SL("_sql"), &sql);
 	phalcon_update_property(getThis(), SL("_total_sql"), &total_sql);
@@ -251,11 +253,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb){
 	if (Z_TYPE_P(dbname) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&db, getThis(), "getresolveservice", dbname);
 	} else {
-		ZVAL_COPY_VALUE(&db, dbname);
+		ZVAL_COPY(&db, dbname);
 	}
 	PHALCON_VERIFY_INTERFACE_EX(&db, phalcon_db_adapterinterface_ce, phalcon_paginator_exception_ce);
 
 	phalcon_update_property(getThis(), SL("_db"), &db);
+	zval_ptr_dtor(&db);
 
 	RETURN_THIS();
 }
@@ -316,7 +319,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	} else {
 		ZVAL_LONG(&number, i_number);
 		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
-		phalcon_array_update_str(&bind, SL("offset"), &number, PH_COPY);
+		phalcon_array_update_str(&bind, SL("offset"), &number, 0);
 	}
 
 	PHALCON_CALL_METHOD(&items, &db, "fetchall", &sql, &fetch_mode, &bind);
@@ -326,8 +329,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
 	i_next        = (i_number_page < i_total_pages) ? (i_number_page + 1) : i_total_pages;
 
+	zval_ptr_dtor(&row);
+
 	object_init(return_value);
 	phalcon_update_property(return_value, SL("items"),       &items);
+	zval_ptr_dtor(&items);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);

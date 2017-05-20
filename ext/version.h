@@ -15,6 +15,7 @@
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   |          Nikolaos Dimopoulos <nikos@niden.net>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -26,7 +27,7 @@
 #define PHALCON_VERSION_ALPHA      1
 #define PHALCON_VERSION_BETA       3
 #define PHALCON_VERSION_RC         0
-#define PHALCON_VERSION_STABLE     0
+#define PHALCON_VERSION_STABLE     1
 
 extern zend_class_entry *phalcon_version_ce;
 

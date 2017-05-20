@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 
 	zval formatter = {};
 
-	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_READONLY);
+	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_COPY);
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
 		PHALCON_CALL_METHOD(NULL, &formatter, "__construct");
@@ -141,7 +141,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, getFormatter){
 		phalcon_update_property(getThis(), SL("_formatter"), &formatter);
 	}
 
-	RETURN_CTOR(&formatter);
+	RETURN_ZVAL(&formatter, 0, 0);
 }
 
 /**
@@ -166,7 +166,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
+	zval_ptr_dtor(&formatter);
 	PHALCON_CALL_FUNCTION(NULL, "fwrite", &file_handler, &applied_format);
+	zval_ptr_dtor(&applied_format);
 }
 
 /**
@@ -206,9 +208,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	}
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&mode, &options, SL("mode"), PH_COPY)) {
 		if (Z_TYPE(mode) != IS_STRING) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Invalid data passed to Phalcon\\Logger\\Adapter\\File::__wakeup()");
+			zval_ptr_dtor(&mode);
 			return;
 		}
 	} else {
@@ -219,5 +222,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __wakeup){
 	 * Re-open the file handler if the logger was serialized
 	 */
 	PHALCON_CALL_FUNCTION(&file_handler, "fopen", &path, &mode);
+	zval_ptr_dtor(&mode);
 	phalcon_update_property(getThis(), SL("_fileHandler"), &file_handler);
+	zval_ptr_dtor(&file_handler);
 }

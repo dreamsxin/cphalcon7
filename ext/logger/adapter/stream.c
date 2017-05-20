@@ -95,9 +95,10 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_COPY)) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Stream must be opened in append or write mode");
+			zval_ptr_dtor(&mode);
 			return;
 		}
 	} else {
@@ -108,11 +109,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, __construct){
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	PHALCON_CALL_FUNCTION(&stream, "fopen", name, &mode);
+	zval_ptr_dtor(&mode);
 	if (Z_TYPE(stream) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open stream '%s'", Z_STRVAL_P(name));
 	} else {
 		phalcon_update_property(getThis(), SL("_stream"), &stream);
 	}
+	zval_ptr_dtor(&stream);
 }
 
 /**
@@ -125,14 +128,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, getFormatter)
 	zval formatter = {};
 
 	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_READONLY);
-	if (Z_TYPE(formatter) != IS_OBJECT) {
-		object_init_ex(&formatter, phalcon_logger_formatter_line_ce);
-		PHALCON_CALL_METHOD(NULL, &formatter, "__construct");
-
-		phalcon_update_property(getThis(), SL("_formatter"), &formatter);
+	if (Z_TYPE(formatter) == IS_OBJECT) {
+		RETURN_CTOR(&formatter);
 	}
+	object_init_ex(return_value, phalcon_logger_formatter_line_ce);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct");
 
-	RETURN_CTOR(&formatter);
+	phalcon_update_property(getThis(), SL("_formatter"), return_value);
 }
 
 /**
@@ -157,7 +159,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Stream, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
+	zval_ptr_dtor(&formatter);
 	PHALCON_CALL_FUNCTION(NULL, "fwrite", &stream, &applied_format);
+	zval_ptr_dtor(&applied_format);
 }
 
 /**

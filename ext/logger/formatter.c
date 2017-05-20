@@ -98,10 +98,11 @@ PHP_METHOD(Phalcon_Logger_Formatter, interpolate)
 				str_length = spprintf(&tmp, 0, "{%ld}", idx);
 				ZVAL_STRINGL(&index, tmp, str_length);
 			}
+			efree(tmp);
 
 			Z_TRY_ADDREF_P(val);
 			zend_hash_add(Z_ARRVAL(replace), Z_STR(index), val);
-			efree(tmp);
+			zval_ptr_dtor(&index);
 		} ZEND_HASH_FOREACH_END();
 
 		PHALCON_RETURN_CALL_FUNCTION("strtr", message, &replace);

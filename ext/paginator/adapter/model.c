@@ -172,7 +172,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 			}
 
 			PHALCON_CALL_METHOD(&current, &items, "current");
-			phalcon_array_append(&page_items, &current, PH_COPY);
+			phalcon_array_append(&page_items, &current, 0);
 
 			if (i >= i_show) {
 				break;
@@ -181,6 +181,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	}
 
 	phalcon_update_property(&page, SL("items"), &page_items);
+	zval_ptr_dtor(&page_items);
 
 	phalcon_add_function(&maximum_pages, &start, &show);
 	if (PHALCON_LT(&maximum_pages, &rowcount)) {
@@ -225,5 +226,5 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	phalcon_update_property(&page, SL("total_pages"), &pages_total);
 	phalcon_update_property(&page, SL("total_items"), &rowcount);
 
-	RETURN_CTOR(&page);
+	RETURN_ZVAL(&page, 0, 0);
 }

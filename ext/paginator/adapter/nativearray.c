@@ -176,6 +176,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
 	object_init(return_value);
 	phalcon_update_property(return_value, SL("items"),       &slice);
+	zval_ptr_dtor(&slice);
 	phalcon_update_property_long(return_value, SL("before"),      i_before);
 	phalcon_update_property_long(return_value, SL("first"),       1);
 	phalcon_update_property_long(return_value, SL("next"),        i_next);

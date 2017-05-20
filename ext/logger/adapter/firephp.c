@@ -88,7 +88,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, getFormatter){
 		return;
 	}
 
-	RETURN_ZVAL(&formatter, 1, 0);
+	RETURN_CTOR(&formatter);
 }
 
 /**
@@ -143,6 +143,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 	}
 
 	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
+	zval_ptr_dtor(&formatter);
 	convert_to_string(&applied_format);
 
 	phalcon_read_static_property_ce(&index, phalcon_logger_adapter_firephp_ce, SL("_index"), PH_READONLY);
@@ -193,6 +194,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal){
 		 */
 		str.s->len = 0;
 	}
+	zval_ptr_dtor(&applied_format);
 
 	if (separate_index) {
 		phalcon_update_static_property_ce(phalcon_logger_adapter_firephp_ce, SL("_index"), &index);

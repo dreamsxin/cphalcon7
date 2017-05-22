@@ -374,7 +374,7 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaults){
 
 	/* Set the default controller */
 	if (phalcon_array_isset_fetch_str(&controller_name, defaults, SL("controller"), PH_READONLY)) {
-		phalcon_update_property(getThis(), SL("_defaultHandle"), &controller_name);
+		phalcon_update_property(getThis(), SL("_defaultHandler"), &controller_name);
 	}
 
 	/* Set the default action */
@@ -406,7 +406,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 
 	phalcon_read_property(&namespace_name, getThis(), SL("_defaultNamespace"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&module_name, getThis(), SL("_defaultModule"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&controller_name, getThis(), SL("_defaultHandle"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&controller_name, getThis(), SL("_defaultHandler"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&params, getThis(), SL("_defaultParams"), PH_NOISY|PH_READONLY);
 
@@ -1364,7 +1364,7 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaultController){
 
 	phalcon_fetch_params(0, 1, 0, &controller_name);
 
-	phalcon_update_property(getThis(), SL("_defaultHandle"), controller_name);
+	phalcon_update_property(getThis(), SL("_defaultHandler"), controller_name);
 	RETURN_THIS();
 }
 
@@ -1376,7 +1376,7 @@ PHP_METHOD(Phalcon_Mvc_Router, setDefaultController){
 PHP_METHOD(Phalcon_Mvc_Router, getDefaultController){
 
 
-	RETURN_MEMBER(getThis(), "_defaultHandle");
+	RETURN_MEMBER(getThis(), "_defaultHandler");
 }
 
 /**

@@ -75,6 +75,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_options___construct, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, program, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, argString, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, desc, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 	ZEND_ARG_INFO(0, dependencyInjector)
 ZEND_END_ARG_INFO()
 
@@ -136,10 +137,10 @@ PHALCON_INIT_CLASS(Phalcon_Cli_Options){
  */
 PHP_METHOD(Phalcon_Cli_Options, __construct){
 
-	zval *title = NULL, *program = NULL, *arg_string = NULL, *desc = NULL, *dependency_injector = NULL;
+	zval *title = NULL, *program = NULL, *arg_string = NULL, *desc = NULL, *options = NULL, *dependency_injector = NULL;
 	zval name = {}, short_name = {};
 
-	phalcon_fetch_params(0, 1, 4, &title, &program, &arg_string, &desc, &dependency_injector);
+	phalcon_fetch_params(0, 1, 5, &title, &program, &arg_string, &desc, &options, &dependency_injector);
 
 	if (title && Z_TYPE_P(title) != IS_NULL) {
 		phalcon_update_property(getThis(), SL("_title"), title);
@@ -171,6 +172,13 @@ PHP_METHOD(Phalcon_Cli_Options, __construct){
 	phalcon_update_property_array(getThis(), SL("_shortNames"), &name, &short_name);
 	zval_ptr_dtor(&name);
 	zval_ptr_dtor(&short_name);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		zval *option;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(options), option) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "add", option);
+		} ZEND_HASH_FOREACH_END();
+	}
 }
 
 /**

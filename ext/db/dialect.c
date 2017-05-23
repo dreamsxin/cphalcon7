@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 */
 	if (PHALCON_IS_STRING(&type, "placeholder")) {
 		phalcon_array_fetch_str(&value, expression, SL("value"), PH_NOISY|PH_COPY);
-
+/*
 		if (phalcon_array_isset_fetch_str(&times, expression, SL("times"), PH_READONLY)) {
 			array_init(&placeholders);
 
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 			i = 0;
 			while (i++ < t) {
 				zval index = {}, placeholder = {};
-				ZVAL_LONG(&index, t);
+				ZVAL_LONG(&index, i);
 
 				PHALCON_CONCAT_VV(&placeholder, &value, &index);
 
@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 			phalcon_fast_join_str(&value, SL(", "), &placeholders);
 			zval_ptr_dtor(&placeholders);
 		}
-
+*/
 		RETVAL_ZVAL(&value, 0, 0);
 		return;
 	}

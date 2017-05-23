@@ -52,7 +52,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query);
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_translate_adapter_gettext___construct, 0, 0, 1)
-	ZEND_ARG_INFO(0, options)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_translate_adapter_gettext_method_entry[] = {
@@ -86,16 +86,11 @@ PHALCON_INIT_CLASS(Phalcon_Translate_Adapter_Gettext){
  */
 PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 
-	zval *options, locale, default_domain = {}, directory = {}, setting = {}, *constant, *value;
+	zval *options, locale, default_domain = {}, directory = {}, setting = {}, category = {}, *constant, *value;
 	zend_string *str_key;
 	ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &options);
-
-	if (Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
-		return;
-	}
 
 	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
@@ -122,16 +117,19 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	PHALCON_CONCAT_SV(&setting, "LANGUAGE=", &locale);
 	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);
 
-	if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
-		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
+	if (!phalcon_array_isset_fetch_str(&category, options, SL("category"), PH_READONLY)) {
+		/*
+		if ((constant = zend_get_constant_str(SL("LC_MESSAGES"))) != NULL) {
+			PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
+		} else
+		*/
+		if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
+			PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
+		}
+	} else {
+		PHALCON_CALL_FUNCTION(NULL, "setlocale", &category, &locale);
 	}
-/*
-	if ((constant = zend_get_constant_str(SL("LC_MESSAGES"))) != NULL) {
-		zval val = {};
-		ZVAL_STRING(&val, "LC_MESSAGES");
-		PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
-	}
-*/
+
 	if (Z_TYPE(directory) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(directory), idx, str_key, value) {
 			zval key = {};

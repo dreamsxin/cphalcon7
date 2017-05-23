@@ -77,6 +77,7 @@ PHALCON_ATTR_NONNULL static inline zend_function *phalcon_fetch_function(zend_st
 /* Fetch Parameters */
 int phalcon_fetch_parameters(int num_args, int required_args, int optional_args, ...);
 
+int phalcon_has_constant(const char *name, size_t name_len);
 int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 
 #define PHALCON_TYPE_P(var)	 (Z_ISREF_P(var) ? Z_TYPE_P(Z_REFVAL_P(var)) : Z_TYPE_P(var))

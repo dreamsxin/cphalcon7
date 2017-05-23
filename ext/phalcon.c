@@ -433,6 +433,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cli_Console);
 	PHALCON_INIT(Phalcon_Cli_Dispatcher);
 	PHALCON_INIT(Phalcon_Cli_Options);
+	PHALCON_INIT(Phalcon_Cli_Color);
 	PHALCON_INIT(Phalcon_Mvc_Router);
 	PHALCON_INIT(Phalcon_Mvc_View_Engine);
 	PHALCON_INIT(Phalcon_Mvc_View_Model);

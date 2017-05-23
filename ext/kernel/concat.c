@@ -108,6 +108,40 @@ void phalcon_concat_svvs(zval *result, const char *op1, uint32_t op1_len, zval *
 	phalcon_concat_vs(result, op3, op4, op4_len, 1);
 }
 
+void phalcon_concat_ss(zval *result, const char *op1, uint32_t op1_len, const char *op2, uint32_t op2_len, int self_var)
+{
+	zval zop1 = {}, zop2 = {};
+	ZVAL_STRINGL(&zop1, op1, op1_len);
+	ZVAL_STRINGL(&zop2, op2, op2_len);
+	if (self_var) {
+		concat_function(result, result, &zop1);
+		concat_function(result, result, &zop2);
+	} else {
+		concat_function(result, &zop1, &zop2);
+	}
+	zval_ptr_dtor(&zop1);
+	zval_ptr_dtor(&zop2);
+}
+
+void phalcon_concat_sss(zval *result, const char *op1, uint32_t op1_len, const char *op2, uint32_t op2_len, const char *op3, uint32_t op3_len, int self_var)
+{
+	zval zop1 = {}, zop2 = {}, zop3 = {};
+	ZVAL_STRINGL(&zop1, op1, op1_len);
+	ZVAL_STRINGL(&zop2, op2, op2_len);
+	ZVAL_STRINGL(&zop3, op3, op3_len);
+	if (self_var) {
+		concat_function(result, result, &zop1);
+		concat_function(result, result, &zop2);
+		concat_function(result, result, &zop3);
+	} else {
+		concat_function(result, &zop1, &zop2);
+		concat_function(result, result, &zop3);
+	}
+	zval_ptr_dtor(&zop1);
+	zval_ptr_dtor(&zop2);
+	zval_ptr_dtor(&zop3);
+}
+
 void phalcon_concat_vs(zval *result, zval *op1, const char *op2, uint32_t op2_len, int self_var){
 	zval zop2 = {};
 	ZVAL_STRINGL(&zop2, op2, op2_len);

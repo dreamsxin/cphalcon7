@@ -280,6 +280,16 @@ void phalcon_clean_and_cache_symbol_table(zend_array *symbol_table)
 	}
 }
 
+int phalcon_has_constant(const char *name, size_t name_len)
+{
+	zval *constant;
+	if ((constant = zend_get_constant_str(name, name_len)) == NULL) {
+		return 0;
+	}
+
+	return 1;
+}
+
 int phalcon_get_constant(zval *retval, const char *name, size_t name_len)
 {
 	zval *constant;

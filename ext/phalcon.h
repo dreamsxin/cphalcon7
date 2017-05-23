@@ -242,6 +242,7 @@
 #include "cli/task.h"
 #include "cli/options.h"
 #include "cli/options/exception.h"
+#include "cli/color.h"
 
 #include "mvc/application.h"
 #include "mvc/application/exception.h"

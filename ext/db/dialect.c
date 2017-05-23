@@ -268,8 +268,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getEscapeChar){
 PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 
 	zval *expression, *_escape_char = NULL, *quoting = NULL, escape_char = {}, type = {}, name = {}, escaped_name = {},  domain = {}, value = {}, expression_value = {}, operator = {};
-	zval times = {}, placeholders = {}, left = {}, right = {}, expression_left = {}, expression_right = {}, sql_items = {}, items = {}, *item, list_expression = {}, exception_message = {};
-	int t, i;
+	zval left = {}, right = {}, expression_left = {}, expression_right = {}, list_expression = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &expression, &_escape_char, &quoting);
 
@@ -382,6 +381,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	if (PHALCON_IS_STRING(&type, "placeholder")) {
 		phalcon_array_fetch_str(&value, expression, SL("value"), PH_NOISY|PH_COPY);
 /*
+		// array array-int
 		if (phalcon_array_isset_fetch_str(&times, expression, SL("times"), PH_READONLY)) {
 			array_init(&placeholders);
 
@@ -429,6 +429,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpression){
 	 * Resolve lists
 	 */
 	if (PHALCON_IS_STRING(&type, "list")) {
+		zval sql_items = {}, items = {}, *item;
 		array_init(&sql_items);
 
 		phalcon_array_fetch_long(&items, expression, 0, PH_NOISY|PH_READONLY);

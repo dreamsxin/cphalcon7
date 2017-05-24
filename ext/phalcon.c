@@ -245,7 +245,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Validation_MessageInterface);
 
 #ifdef PHALCON_USE_WEBSOCKET
-	PHALCON_INIT(Phalcon_Websocket_EventInterface);
+	PHALCON_INIT(Phalcon_Websocket_EventloopInterface);
 #endif
 
 	/* 4. Register everything else */

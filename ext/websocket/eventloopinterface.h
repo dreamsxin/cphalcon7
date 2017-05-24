@@ -27,4 +27,24 @@ extern zend_class_entry *phalcon_websocket_eventloopinterface_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Websocket_EventloopInterface);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_eventloopinterface_add, 0, 0, 2)
+	ZEND_ARG_INFO(0, fd)
+	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_eventloopinterface_delete, 0, 0, 1)
+	ZEND_ARG_INFO(0, fd)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_eventloopinterface_setMode, 0, 0, 2)
+	ZEND_ARG_INFO(0, fd)
+	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_eventloopinterface_lock, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_eventloopinterface_unlock, 0, 0, 0)
+ZEND_END_ARG_INFO()
+
 #endif /* PHALCON_WEBSOCKET_EVENTLOOPINTERFACE_H */

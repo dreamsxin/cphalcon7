@@ -211,6 +211,9 @@ class DbTest extends PHPUnit_Framework_TestCase
 		$success = $connection->update('prueba', array("nombre"), array("LOL 3000"), "estado='X'");
 		$this->assertTrue($success);
 
+		$success = $connection->update('prueba', array("nombre" => "LOL 3000"), NULL, "estado='X'");
+		$this->assertTrue($success);
+
 		$success = $connection->update('prueba', array("nombre"), array(new Phalcon\Db\RawValue('current_date')), "estado='X'");
 		$this->assertTrue($success);
 

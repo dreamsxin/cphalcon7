@@ -668,12 +668,12 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
  */
 PHP_METHOD(Phalcon_Db_Adapter, update){
 
-	zval *table, *fields, *values, *where_condition = NULL, *data_types = NULL, placeholders = {}, update_values = {}, bind_data_types = {}, *value;
+	zval *table, *fields, *_values = NULL, *where_condition = NULL, *data_types = NULL, values = {}, placeholders = {}, update_values = {}, bind_data_types = {}, *value;
 	zval escaped_table = {}, set_clause = {}, update_sql = {}, conditions = {}, where_bind = {}, where_types = {};
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 3, 2, &table, &fields, &values, &where_condition, &data_types);
+	phalcon_fetch_params(0, 2, 3, &table, &fields, &_values, &where_condition, &data_types);
 
 	if (!where_condition) {
 		where_condition = &PHALCON_GLOBAL(z_null);
@@ -681,6 +681,12 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 
 	if (!data_types) {
 		data_types = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!_values || Z_TYPE_P(_values) != IS_ARRAY) {
+		ZVAL_COPY_VALUE(&values, fields);
+	} else {
+		ZVAL_COPY_VALUE(&values, _values);
 	}
 
 	array_init(&placeholders);
@@ -692,21 +698,41 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 		ZVAL_COPY(&bind_data_types, data_types);
 	}
 
-
 	/**
 	 * Objects are casted using __toString, null values are converted to string 'null',
 	 * everything else is passed as '?'
 	 */
-	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(values), idx, str_key, value) {
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(values), idx, str_key, value) {
 		zval position = {}, field = {}, escaped_field = {}, set_clause_part = {}, bind_type = {};
+
+		if (!_values || Z_TYPE_P(_values) != IS_ARRAY) {
+			if (!str_key) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The fields is valid");
+				zval_ptr_dtor(&bind_data_types);
+				zval_ptr_dtor(&update_values);
+				return;
+			}
+		}
+
 		if (str_key) {
 			ZVAL_STR(&position, str_key);
+			ZVAL_STR(&field, str_key);
+			if (_values && Z_TYPE_P(_values) == IS_ARRAY) {
+				if (!phalcon_array_isset(fields, &position)) {
+					PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The key of values in the update is not the same as fields");
+					zval_ptr_dtor(&bind_data_types);
+					zval_ptr_dtor(&update_values);
+					return;
+				}
+			}
 		} else {
 			ZVAL_LONG(&position, idx);
-		}
-		if (!phalcon_array_isset_fetch(&field, fields, &position, PH_READONLY)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The number of values in the update is not the same as fields");
-			return;
+			if (!phalcon_array_isset_fetch(&field, fields, &position, PH_READONLY)) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The number of values in the update is not the same as fields");
+				zval_ptr_dtor(&bind_data_types);
+				zval_ptr_dtor(&update_values);
+				return;
+			}
 		}
 
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
@@ -727,6 +753,10 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 				if (Z_TYPE_P(data_types) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&bind_type, data_types, &position, PH_READONLY)) {
 						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Incomplete number of bind types");
+						zval_ptr_dtor(&bind_data_types);
+						zval_ptr_dtor(&escaped_field);
+						zval_ptr_dtor(&update_values);
+						zval_ptr_dtor(&set_clause_part);
 						return;
 					}
 

@@ -118,8 +118,11 @@ PHP_METHOD(Phalcon_Version, get){
 			break;
 
 	}
+	zval_ptr_dtor(&version);
 	phalcon_concat_self(&result, &suffix);
+	zval_ptr_dtor(&suffix);
 	ZVAL_STR(return_value, phalcon_trim(&result, NULL, PHALCON_TRIM_BOTH));
+	zval_ptr_dtor(&result);
 }
 
 /**
@@ -146,5 +149,10 @@ PHP_METHOD(Phalcon_Version, getId){
 
 	PHALCON_CALL_FUNCTION(&real_medium, "sprintf", &format, &medium);
 	PHALCON_CALL_FUNCTION(&real_minor, "sprintf", &format, &minor);
+	zval_ptr_dtor(&format);
+
 	PHALCON_CONCAT_VVVVV(return_value, &major, &real_medium, &real_minor, &special, &special_number);
+	zval_ptr_dtor(&real_medium);
+	zval_ptr_dtor(&real_minor);
+	zval_ptr_dtor(&version);
 }

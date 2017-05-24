@@ -22,7 +22,7 @@ namespace Phalcon\Commands\Builtin;
 
 use Phalcon\Text;
 use Phalcon\Builder;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 use Phalcon\Commands\Command;
 use Phalcon\Builder\Model as ModelBuilder;
 

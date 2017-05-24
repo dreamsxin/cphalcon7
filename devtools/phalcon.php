@@ -22,7 +22,7 @@
 use Phalcon\Script;
 use Phalcon\Loader;
 use Phalcon\Version;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 use Phalcon\Commands\Builtin\Model;
 use Phalcon\Commands\Builtin\Project;
 use Phalcon\Commands\Builtin\Scaffold;

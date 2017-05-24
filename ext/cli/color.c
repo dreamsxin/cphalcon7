@@ -99,17 +99,18 @@ PHALCON_INIT_CLASS(Phalcon_Cli_Color){
 	/* constraints */
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_BLACK"),			PHALCON_CLI_COLOR_FG_BLACK);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_DARK_GRAY"),		PHALCON_CLI_COLOR_FG_DARK_GRAY);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_BLUE"),			PHALCON_CLI_COLOR_FG_BLUE);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_BLUE"),		PHALCON_CLI_COLOR_FG_LIGHT_BLUE);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_GREEN"),			PHALCON_CLI_COLOR_FG_GREEN);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_GREEN"),	PHALCON_CLI_COLOR_FG_LIGHT_GREEN);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_CYAN"),			PHALCON_CLI_COLOR_FG_CYAN);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_CYAN"),		PHALCON_CLI_COLOR_FG_LIGHT_CYAN);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_RED"),			PHALCON_CLI_COLOR_FG_RED);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_RED"),		PHALCON_CLI_COLOR_FG_LIGHT_RED);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_GREEN"),			PHALCON_CLI_COLOR_FG_GREEN);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_GREEN"),	PHALCON_CLI_COLOR_FG_LIGHT_GREEN);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_BROWN"),			PHALCON_CLI_COLOR_FG_BROWN);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_YELLOW"),			PHALCON_CLI_COLOR_FG_YELLOW);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_BLUE"),			PHALCON_CLI_COLOR_FG_BLUE);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_BLUE"),		PHALCON_CLI_COLOR_FG_LIGHT_BLUE);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_PURPLE"),			PHALCON_CLI_COLOR_FG_PURPLE);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_PURPLE"),	PHALCON_CLI_COLOR_FG_LIGHT_PURPLE);
-	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_YELLOW"),			PHALCON_CLI_COLOR_FG_YELLOW);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_CYAN"),			PHALCON_CLI_COLOR_FG_CYAN);
+	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_CYAN"),		PHALCON_CLI_COLOR_FG_LIGHT_CYAN);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_LIGHT_GRAY"),		PHALCON_CLI_COLOR_FG_LIGHT_GRAY);
 	zend_declare_class_constant_long(phalcon_cli_color_ce, SL("FG_WHITE"),			PHALCON_CLI_COLOR_FG_WHITE);
 

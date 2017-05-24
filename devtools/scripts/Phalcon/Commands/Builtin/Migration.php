@@ -21,7 +21,7 @@
 namespace Phalcon\Commands\Builtin;
 
 use Phalcon\Builder;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 use Phalcon\Commands\Command;
 use Phalcon\Migrations;
 use Phalcon\Config;

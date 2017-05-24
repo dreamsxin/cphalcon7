@@ -24,7 +24,7 @@
 #include "php_phalcon.h"
 
 /* constraints */
-//#define PHALCON_CLI_OPTIONS_TYPE_NONE		0
+#define PHALCON_CLI_OPTIONS_TYPE_ANY		0
 #define PHALCON_CLI_OPTIONS_TYPE_INT		1
 #define PHALCON_CLI_OPTIONS_TYPE_FLOAT		2
 #define PHALCON_CLI_OPTIONS_TYPE_BOOLEAN	3

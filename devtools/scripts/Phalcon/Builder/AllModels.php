@@ -21,7 +21,7 @@
 namespace Phalcon\Builder;
 
 use Phalcon\Utils;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 
 /**
  * AllModels Class

@@ -27,6 +27,7 @@
 
 #include "cli/options.h"
 #include "cli/options/exception.h"
+#include "cli/color.h"
 #include "di/injectable.h"
 
 #include "kernel/main.h"
@@ -118,11 +119,13 @@ PHALCON_INIT_CLASS(Phalcon_Cli_Options){
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_longopts"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_descs"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_helps"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_options_ce, SL("_required"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_defaultValues"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_names"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_shortNames"), ZEND_ACC_PROTECTED);
 
 	/* constraints */
+	zend_declare_class_constant_long(phalcon_cli_options_ce, SL("TYPE_ANY"),		PHALCON_CLI_OPTIONS_TYPE_ANY);
 	zend_declare_class_constant_long(phalcon_cli_options_ce, SL("TYPE_INT"),		PHALCON_CLI_OPTIONS_TYPE_INT);
 	zend_declare_class_constant_long(phalcon_cli_options_ce, SL("TYPE_FLOAT"),		PHALCON_CLI_OPTIONS_TYPE_FLOAT);
 	zend_declare_class_constant_long(phalcon_cli_options_ce, SL("TYPE_BOOLEAN"),	PHALCON_CLI_OPTIONS_TYPE_BOOLEAN);
@@ -265,15 +268,25 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 		return;
 	}
 
-	if (t == PHALCON_CLI_OPTIONS_TYPE_BOOLEAN) {
-		ZVAL_COPY(&key, &name);
-	} else if (zend_is_true(&required)) {
-		PHALCON_CONCAT_VS(&key, &name, ":");
-	} else {
-		PHALCON_CONCAT_VS(&key, &name, "::");
+	switch (t)
+	{
+		case PHALCON_CLI_OPTIONS_TYPE_ANY:
+			PHALCON_CONCAT_VS(&key, &name, ":");
+			break;
+		case PHALCON_CLI_OPTIONS_TYPE_BOOLEAN:
+			ZVAL_COPY(&key, &name);
+			break;
+		default:
+			PHALCON_CONCAT_VS(&key, &name, "::");
+			break;
 	}
+
 	phalcon_update_property_array_append(getThis(), SL("_longopts"), &key);
 	zval_ptr_dtor(&key);
+
+	if (zend_is_true(&required)) {
+		phalcon_update_property_array_append(getThis(), SL("_required"), &name);
+	}
 
 	if (Z_TYPE(short_name) == IS_STRING) {
 		if (Z_STRLEN(short_name) != 1) {
@@ -491,7 +504,7 @@ PHP_METHOD(Phalcon_Cli_Options, help){
 PHP_METHOD(Phalcon_Cli_Options, parse){
 
 	zval *_options = NULL, names = {}, options = {}, longopts = {}, joined_opts = {}, values = {};
-	zval default_values = {}, types = {}, *name;
+	zval default_values = {}, types = {}, required = {}, *name;
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 0, 1, &_options);
@@ -513,7 +526,23 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 
 	phalcon_read_property(&default_values, getThis(), SL("_defaultValues"), PH_READONLY);
 	phalcon_read_property(&types, getThis(), SL("_types"), PH_READONLY);
+	phalcon_read_property(&required, getThis(), SL("_required"), PH_READONLY);
 
+	if (Z_TYPE(required) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(required), name) {
+			if (!phalcon_array_isset(&values, name)) {
+				zval msg = {}, out = {};
+				zval_ptr_dtor(&values);
+				PHALCON_CONCAT_VS(&msg, name, " is required");
+				PHALCON_CALL_CE_STATIC(&out, phalcon_cli_color_ce, "error", &msg);
+				zend_print_zval(&out, 0);
+				zval_ptr_dtor(&msg);
+				zval_ptr_dtor(&out);
+				PHALCON_CALL_METHOD(NULL, getThis(), "help");
+				RETURN_FALSE;
+			}
+		} ZEND_HASH_FOREACH_END();
+	}
 	array_init(return_value);
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(names), str_key, name) {
 		zval short_name = {}, value = {};

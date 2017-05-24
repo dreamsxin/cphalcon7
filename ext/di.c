@@ -629,6 +629,7 @@ PHP_METHOD(Phalcon_Di, __call){
 
 	phalcon_substr(&possible_service, method, 3, 0);
 	phalcon_lcfirst(&name, &possible_service);
+	zval_ptr_dtor(&possible_service);
 
 	/**
 	 * If the magic method starts with "get" we try to get a service with that name
@@ -636,6 +637,7 @@ PHP_METHOD(Phalcon_Di, __call){
 	if (phalcon_start_with_str(method, SL("get"))) {
 		if (phalcon_isset_property_array(getThis(), SL("_services"), &name)) {
 			PHALCON_RETURN_CALL_SELF("get", &name, arguments);
+			zval_ptr_dtor(&name);
 			return;
 		}
 	}
@@ -646,6 +648,7 @@ PHP_METHOD(Phalcon_Di, __call){
 	if (phalcon_start_with_str(method, SL("set"))) {
 		if (phalcon_array_isset_fetch_long(&definition, arguments, 0, PH_READONLY)) {
 			PHALCON_CALL_SELF(NULL, "set", &name, &definition);
+			zval_ptr_dtor(&name);
 			return;
 		}
 	}

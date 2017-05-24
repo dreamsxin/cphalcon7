@@ -69,7 +69,7 @@ PHP_METHOD(Phalcon_Arr, sum);
 PHP_METHOD(Phalcon_Arr, toArray);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_array, 0, 0, 1)

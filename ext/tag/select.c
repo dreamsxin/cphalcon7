@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n2(&params, &default_params, PH_READONLY);
+		phalcon_array_merge_recursive_n(&params, &default_params);
 	}
 
 	if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
@@ -154,9 +154,9 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		 * Create an empty value
 		 */
 		PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &empty_value, "\">", &empty_text, &close_option);
-		zval_ptr_dtor(&empty_value);
-		zval_ptr_dtor(&empty_text);
 	}
+	zval_ptr_dtor(&empty_value);
+	zval_ptr_dtor(&empty_text);
 
 	if (!phalcon_array_isset_fetch_long(&options, &params, 1, PH_READONLY)) {
 		ZVAL_COPY_VALUE(&options, data);
@@ -168,11 +168,18 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		 */
 		if (Z_TYPE(using) < IS_NULL) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "The 'using' parameter is required");
+			zval_ptr_dtor(&params);
+			zval_ptr_dtor(&close_option);
+			zval_ptr_dtor(&value);
 			return;
 		}
 
 		if (Z_TYPE(using) != IS_ARRAY && Z_TYPE(using) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "The 'using' parameter should be an Array");
+			zval_ptr_dtor(&params);
+			zval_ptr_dtor(&close_option);
+			zval_ptr_dtor(&value);
+			zval_ptr_dtor(&using);
 			return;
 		}
 
@@ -193,11 +200,14 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");
 		zval_ptr_dtor(&params);
 		zval_ptr_dtor(&close_option);
+		zval_ptr_dtor(&value);
+		zval_ptr_dtor(&using);
 		return;
 	}
 	zval_ptr_dtor(&params);
 	zval_ptr_dtor(&close_option);
 	zval_ptr_dtor(&value);
+	zval_ptr_dtor(&using);
 
 	phalcon_concat_self_str(&code, SL("</select>"));
 
@@ -214,7 +224,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
  */
 PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 {
-	zval *resultset, *using, *value, *close_option, code = {};
+	zval *resultset, *using, *value, *close_option, using_zero = {}, using_one = {}, code = {};
 
 	phalcon_fetch_params(0, 4, 0, &resultset, &using, &value, &close_option);
 
@@ -223,14 +233,22 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		convert_to_string(value);
 	}
 
+	if (Z_TYPE_P(using) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch_long(&using_zero, using, 0, PH_COPY)) {
+			ZVAL_STRING(&using_zero, "id");
+		}
+		if (!phalcon_array_isset_fetch_long(&using_one, using, 1, PH_READONLY)) {
+			ZVAL_COPY_VALUE(&using_one, &using_zero);
+		}
+	}
+
 	PHALCON_CALL_METHOD(NULL, resultset, "rewind");
 
 	while (1) {
 		zval r0 = {}, option = {}, option_value = {}, option_text = {}, escaped = {}, params = {}, code_option = {};
 
 		PHALCON_CALL_METHOD(&r0, resultset, "valid");
-		if (PHALCON_IS_NOT_FALSE(&r0)) {
-		} else {
+		if (!PHALCON_IS_NOT_FALSE(&r0)) {
 			break;
 		}
 
@@ -239,14 +257,6 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		 */
 		PHALCON_CALL_METHOD(&option, resultset, "current");
 		if (Z_TYPE_P(using) == IS_ARRAY) {
-			zval using_zero = {}, using_one = {};
-			if (!phalcon_array_isset_fetch_long(&using_zero, using, 0, PH_COPY)) {
-				ZVAL_STRING(&using_zero, "id");
-			}
-			if (!phalcon_array_isset_fetch_long(&using_one, using, 1, PH_READONLY)) {
-				ZVAL_COPY_VALUE(&using_one, &using_zero);
-			}
-
 			if (Z_TYPE(option) == IS_OBJECT) {
 				if (phalcon_method_exists_ex(&option, SL("readattribute")) == SUCCESS) {
 					if (Z_TYPE(using_zero) == IS_OBJECT) {
@@ -319,7 +329,6 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 					return;
 				}
 			}
-			zval_ptr_dtor(&using_zero);
 
 			/**
 			 * If the value is equal to the option's value we mark it as selected
@@ -359,6 +368,10 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 		zval_ptr_dtor(&option);
 
 		PHALCON_CALL_METHOD(NULL, resultset, "next");
+	}
+
+	if (Z_TYPE_P(using) == IS_ARRAY) {
+		zval_ptr_dtor(&using_zero);
 	}
 
 	RETURN_ZVAL(&code, 0, 0);

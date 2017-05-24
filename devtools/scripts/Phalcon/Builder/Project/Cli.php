@@ -21,7 +21,7 @@
 
 namespace Phalcon\Builder\Project;
 
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 
 /**
  * Cli

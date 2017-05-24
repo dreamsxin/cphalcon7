@@ -22,7 +22,7 @@
 namespace Phalcon\Commands;
 
 use Phalcon\Script;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 use Phalcon\Events\Manager as EventsManager;
 use Phalcon\Filter;
 use Phalcon\Builder\Path;

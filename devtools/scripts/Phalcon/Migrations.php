@@ -25,7 +25,7 @@ use Phalcon\Db\Index;
 use DirectoryIterator;
 use Phalcon\Db\Column;
 use Phalcon\Db\Adapter;
-use Phalcon\Script\Color;
+use Phalcon\Cli\Color;
 use Phalcon\Db\AdapterInterface;
 use Phalcon\Version\ItemInterface;
 use Phalcon\Script\ScriptException;

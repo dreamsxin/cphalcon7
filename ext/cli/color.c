@@ -144,42 +144,41 @@ PHALCON_INIT_CLASS(Phalcon_Cli_Color){
 PHP_METHOD(Phalcon_Cli_Color, isSupportedShell){
 
 	zval ret = {};
+#ifdef PHP_WIN32
+	zval arg = {};
 
-	if (strncasecmp(PHP_OS, SL("WIN")) == 0) {
-		zval arg = {};
+	ZVAL_STRING(&arg, "ANSICON");
 
-		ZVAL_STRING(&arg, "ANSICON");
+	PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
+	zval_ptr_dtor(&arg);
 
-		PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
-		zval_ptr_dtor(&arg);
-
-		if (!PHALCON_IS_FALSE(&ret)) {
-			RETURN_TRUE;
-		}
-		zval_ptr_dtor(&ret);
-
-		ZVAL_STRING(&arg, "ConEmuANSI");
-
-		PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
-		zval_ptr_dtor(&arg);
-
-		if (PHALCON_IS_STRING(&ret, "ON")) {
-			zval_ptr_dtor(&ret);
-			RETURN_TRUE;
-		}
-		zval_ptr_dtor(&ret);
-
-		ZVAL_STRING(&arg, "TERM");
-
-		PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
-		zval_ptr_dtor(&arg);
-
-		if (PHALCON_IS_STRING(&ret, "xterm")) {
-			zval_ptr_dtor(&ret);
-			RETURN_TRUE;
-		}
-		zval_ptr_dtor(&ret);
+	if (!PHALCON_IS_FALSE(&ret)) {
+		RETURN_TRUE;
 	}
+	zval_ptr_dtor(&ret);
+
+	ZVAL_STRING(&arg, "ConEmuANSI");
+
+	PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
+	zval_ptr_dtor(&arg);
+
+	if (PHALCON_IS_STRING(&ret, "ON")) {
+		zval_ptr_dtor(&ret);
+		RETURN_TRUE;
+	}
+	zval_ptr_dtor(&ret);
+
+	ZVAL_STRING(&arg, "TERM");
+
+	PHALCON_CALL_FUNCTION(&ret, "getenv", &arg);
+	zval_ptr_dtor(&arg);
+
+	if (PHALCON_IS_STRING(&ret, "xterm")) {
+		zval_ptr_dtor(&ret);
+		RETURN_TRUE;
+	}
+	zval_ptr_dtor(&ret);
+#endif
 
 	if (phalcon_has_constant(SL("STDOUT"))) {
 		if (phalcon_function_exists_ex(SL("posix_isatty")) == SUCCESS) {

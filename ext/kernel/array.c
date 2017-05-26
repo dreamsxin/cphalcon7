@@ -442,6 +442,96 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 	return FAILURE;
 }
 
+int phalcon_array_pop(zval *return_value, const zval *stack)
+{
+	zval *val;		/* Value to be popped */
+	uint32_t idx;
+	Bucket *p;
+
+	if (zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
+		ZVAL_NULL(return_value);
+		return FAILURE;
+	}
+
+	/* Get the last value and copy it into the return value */
+	idx = Z_ARRVAL_P(stack)->nNumUsed;
+	while (1) {
+		if (idx == 0) {
+			ZVAL_NULL(return_value);
+			return FAILURE;
+		}
+		idx--;
+		p = Z_ARRVAL_P(stack)->arData + idx;
+		val = &p->val;
+		if (Z_TYPE_P(val) == IS_INDIRECT) {
+			val = Z_INDIRECT_P(val);
+		}
+		if (Z_TYPE_P(val) != IS_UNDEF) {
+			break;
+		}
+	}
+	ZVAL_DEREF(val);
+	ZVAL_COPY(return_value, val);
+
+	if (!p->key && Z_ARRVAL_P(stack)->nNextFreeElement > 0 && p->h >= (zend_ulong)(Z_ARRVAL_P(stack)->nNextFreeElement - 1)) {
+		Z_ARRVAL_P(stack)->nNextFreeElement = Z_ARRVAL_P(stack)->nNextFreeElement - 1;
+	}
+
+	/* Delete the last value */
+	if (p->key) {
+		zend_hash_del(Z_ARRVAL_P(stack), p->key);
+	} else {
+		zend_hash_index_del(Z_ARRVAL_P(stack), p->h);
+	}
+
+	zend_hash_internal_pointer_reset(Z_ARRVAL_P(stack));
+	return SUCCESS;
+}
+
+int phalcon_array_last(zval *return_value, const zval *stack, int flags)
+{
+	zval *val;		/* Value to be popped */
+	uint32_t idx;
+	Bucket *p;
+
+	if (zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
+		ZVAL_NULL(return_value);
+		return FAILURE;
+	}
+
+	/* Get the last value and copy it into the return value */
+	idx = Z_ARRVAL_P(stack)->nNumUsed;
+	while (1) {
+		if (idx == 0) {
+			ZVAL_NULL(return_value);
+			return FAILURE;
+		}
+		idx--;
+		p = Z_ARRVAL_P(stack)->arData + idx;
+		val = &p->val;
+		if (Z_TYPE_P(val) == IS_INDIRECT) {
+			val = Z_INDIRECT_P(val);
+		}
+		if (Z_TYPE_P(val) != IS_UNDEF) {
+			break;
+		}
+	}
+
+	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
+		SEPARATE_ZVAL_IF_NOT_REF(val);
+		ZVAL_COPY_VALUE(return_value, val);
+	} else if ((flags & PH_CTOR) == PH_CTOR) {
+		ZVAL_DUP(return_value, val);
+	} else if ((flags & PH_READONLY) == PH_READONLY) {
+		ZVAL_COPY_VALUE(return_value, val);
+	} else {
+		ZVAL_COPY(return_value, val);
+	}
+
+	zend_hash_internal_pointer_reset(Z_ARRVAL_P(stack));
+	return SUCCESS;
+}
+
 int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *index, uint index_length, int flags){
 
 	zval *zv;

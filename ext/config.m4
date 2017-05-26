@@ -371,6 +371,11 @@ interned-strings.c \
 logger.c \
 flash.c \
 security/exception.c \
+profiler.c \
+profilerinterface.c \
+profiler/item.c \
+profiler/iteminterface.c \
+profiler/exception.c \
 db/dialect/sqlite.c \
 db/dialect/mysql.c \
 db/dialect/postgresql.c \

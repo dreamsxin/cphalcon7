@@ -80,6 +80,12 @@
 #include "cryptinterface.h"
 #include "crypt/exception.h"
 
+#include "profiler.h"
+#include "profilerinterface.h"
+#include "profiler/item.h"
+#include "profiler/iteminterface.h"
+#include "profiler/exception.h"
+
 #include "db.h"
 #include "db/adapter.h"
 #include "db/adapterinterface.h"

@@ -1831,3 +1831,31 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 	}
 	return 1;
 }
+
+int phalcon_property_array_pop(zval *fetched, zval *object, const char *property, size_t property_length)
+{
+	zval property_value = {};
+
+	if (!phalcon_property_isset_fetch(&property_value, object, property, property_length, PH_READONLY)) {
+		return 0;
+	}
+
+	if (!phalcon_array_pop(fetched, &property_value)) {
+		return 0;
+	}
+	return 1;
+}
+
+int phalcon_property_array_last(zval *fetched, zval *object, const char *property, size_t property_length, int flags)
+{
+	zval property_value = {};
+
+	if (!phalcon_property_isset_fetch(&property_value, object, property, property_length, PH_READONLY)) {
+		return 0;
+	}
+
+	if (!phalcon_array_last(fetched, &property_value, flags) == FAILURE) {
+		return 0;
+	}
+	return 1;
+}

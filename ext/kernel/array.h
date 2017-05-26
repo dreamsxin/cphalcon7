@@ -599,6 +599,8 @@ void phalcon_array_update_zval_str_str_multi_3(zval *arr, const zval *index1, co
  * @note @c index will be handled as follows: @c NULL is treated as an empty string, @c double values are cast to @c integer, @c bool or @c resource are treated as @c integer
  */
 int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, int silent);
+int phalcon_array_pop(zval *return_value, const zval *arr);
+int phalcon_array_last(zval *return_value, const zval *arr, int silent);
 
 /**
  * @brief Reads an item from @a arr at position @a index and stores it to @a return_value

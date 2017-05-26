@@ -51,7 +51,11 @@ class DbProfilerListener
 
 	public function beforeQuery($event, $connection)
 	{
-		 $this->_profiler->startProfile($connection->getSQLStatement(), $connection->getSQLVariables(), $connection->getSQLBindTypes());
+		$this->_profiler->startProfile('db', [
+			'sqlStatement' => $connection->getSQLStatement(),
+			'sqlVariables' => $connection->getSQLVariables(),
+			'sqlBindTypes' => $connection->getSQLBindTypes()
+		]);
 	}
 
 	public function afterQuery($event, $connection)

@@ -218,6 +218,8 @@ static inline int phalcon_check_property_access_zval(zval *object, const zval *p
 
 int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, int flags);
 int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, const zval *index, int flags);
+int phalcon_property_array_pop(zval *fetched, zval *object, const char *property, size_t property_length);
+int phalcon_property_array_last(zval *fetched, zval *object, const char *property, size_t property_length, int flags);
 
 static inline int phalcon_property_isset_fetch_zval(zval *fetched, zval *object, zval *property, int flags)
 {

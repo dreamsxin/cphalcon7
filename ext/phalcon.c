@@ -118,6 +118,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
 	PHALCON_INIT(Phalcon_ContinueException);
+	PHALCON_INIT(Phalcon_Profiler_Exception);
 	PHALCON_INIT(Phalcon_Debug_Exception);
 	PHALCON_INIT(Phalcon_Acl_Exception);
 	PHALCON_INIT(Phalcon_Annotations_Exception);
@@ -175,6 +176,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Di_ServiceInterface);
 	PHALCON_INIT(Phalcon_Events_EventInterface);
 	PHALCON_INIT(Phalcon_Events_EventsAwareInterface);
+
+	PHALCON_INIT(Phalcon_ProfilerInterface);
+	PHALCON_INIT(Phalcon_Profiler_ItemInterface);
 
 	PHALCON_INIT(Phalcon_Acl_AdapterInterface);
 	PHALCON_INIT(Phalcon_Acl_ResourceInterface);
@@ -255,6 +259,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Di_FactoryDefault_Cli);
 	PHALCON_INIT(Phalcon_Di_Service);
 	PHALCON_INIT(Phalcon_Di_Service_Builder);
+
+	PHALCON_INIT(Phalcon_Profiler);
+	PHALCON_INIT(Phalcon_Profiler_Item);
+
 	PHALCON_INIT(Phalcon_Forms_Element);
 	PHALCON_INIT(Phalcon_Annotations_Adapter);
 	PHALCON_INIT(Phalcon_Logger_Adapter);

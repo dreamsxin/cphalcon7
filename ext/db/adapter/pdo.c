@@ -39,6 +39,8 @@
 #include "kernel/operators.h"
 #include "kernel/debug.h"
 
+#include "interned-strings.h"
+
 /**
  * Phalcon\Db\Adapter\Pdo
  *
@@ -434,8 +436,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 	phalcon_read_property(&profiler, getThis(), SL("_profiler"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(profiler) == IS_OBJECT) {
+		zval profile_name = {}, profile_data = {};
+		ZVAL_STR(&profile_name, IS(db));
+		array_init(&profile_data);
+
 		phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
-		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &sql_statement, &placeholders, &data_types);
+		phalcon_array_update_str(&profile_data, SL("sqlStatement"), &sql_statement, PH_COPY);
+		phalcon_array_update_str(&profile_data, SL("sqlVariables"), &placeholders, PH_COPY);
+		phalcon_array_update_str(&profile_data, SL("sqlBindTypes"), &data_types, PH_COPY);
+
+		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &profile_name, &profile_data);
+		zval_ptr_dtor(&profile_data);
 		PHALCON_CALL_METHOD(NULL, statement, "execute");
 		PHALCON_CALL_METHOD(NULL, &profiler, "stopprofile");
 	} else {

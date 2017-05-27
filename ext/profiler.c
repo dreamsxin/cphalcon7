@@ -59,6 +59,7 @@
  */
 zend_class_entry *phalcon_profiler_ce;
 
+PHP_METHOD(Phalcon_Profiler, __construct);
 PHP_METHOD(Phalcon_Profiler, startProfile);
 PHP_METHOD(Phalcon_Profiler, stopProfile);
 PHP_METHOD(Phalcon_Profiler, getTotalElapsedSeconds);
@@ -68,7 +69,12 @@ PHP_METHOD(Phalcon_Profiler, getLastProfile);
 PHP_METHOD(Phalcon_Profiler, getCurrentProfile);
 PHP_METHOD(Phalcon_Profiler, reset);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_profiler___construct, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, unique, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_profiler_method_entry[] = {
+	PHP_ME(Phalcon_Profiler, __construct, arginfo_phalcon_profiler___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Profiler, startProfile, arginfo_phalcon_profilerinterface_startprofile, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler, stopProfile, arginfo_phalcon_profilerinterface_stopprofile, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler, getTotalElapsedSeconds, NULL, ZEND_ACC_PUBLIC)
@@ -87,6 +93,7 @@ PHALCON_INIT_CLASS(Phalcon_Profiler){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Profiler, profiler, phalcon_profiler_method_entry, 0);
 
+	zend_declare_property_null(phalcon_profiler_ce, SL("_unique"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_profiler_ce, SL("_queue"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_profiler_ce, SL("_allProfiles"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_profiler_ce, SL("_currentProfile"), ZEND_ACC_PROTECTED);
@@ -100,20 +107,46 @@ PHALCON_INIT_CLASS(Phalcon_Profiler){
 }
 
 /**
+ * Constructor for Phalcon\Profiler\Item
+ *
+ * @param array $data
+ */
+PHP_METHOD(Phalcon_Profiler, __construct){
+
+	zval *unique = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &unique);
+
+	if (!unique) {
+		unique = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_update_property(getThis(), SL("_unique"), unique);
+}
+
+/**
  * Starts the profile
  *
  * @param string $name
  * @param array $data
+ * @param boolean $unique
  * @return Phalcon\Profiler\ItemInterface
  */
 PHP_METHOD(Phalcon_Profiler, startProfile){
 
-	zval *name, *data = NULL, active_profile = {}, memory = {}, time = {};
+	zval *name, *data = NULL, unique = {}, active_profile = {}, memory = {}, time = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &data);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_read_property(&unique, getThis(), SL("_unique"), PH_NOISY|PH_READONLY);
+
+	if (zend_is_true(&unique) && phalcon_isset_property_array(getThis(), SL("_queue"), name)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_profiler_exception_ce, "The name must be unique");
+		return;
 	}
 
 	object_init_ex(&active_profile, phalcon_profiler_item_ce);
@@ -131,7 +164,11 @@ PHP_METHOD(Phalcon_Profiler, startProfile){
 
 	phalcon_update_property(getThis(), SL("_activeProfile"), &active_profile);
 	phalcon_update_property(getThis(), SL("_currentProfile"), &active_profile);
-	phalcon_update_property_array_append(getThis(), SL("_queue"), &active_profile);
+	if (zend_is_true(&unique)) {
+		phalcon_update_property_array(getThis(), SL("_queue"), name, &active_profile);
+	} else {
+		phalcon_update_property_array_append(getThis(), SL("_queue"), &active_profile);
+	}
 	zval_ptr_dtor(&active_profile);
 
 	RETURN_THIS();
@@ -144,31 +181,43 @@ PHP_METHOD(Phalcon_Profiler, startProfile){
  */
 PHP_METHOD(Phalcon_Profiler, stopProfile){
 
-	zval *name = NULL, active_profile = {}, active_name = {}, end_memory = {}, start_memory = {}, difference_memory = {}, total_memory = {}, new_total_memory = {};
+	zval *name = NULL, active_profile = {}, end_memory = {}, start_memory = {}, difference_memory = {}, total_memory = {}, new_total_memory = {};
 	zval final_time = {}, initial_time = {}, difference_time = {}, total_seconds = {}, new_total_seconds = {};
 
 	phalcon_fetch_params(0, 0, 1, &name);
 
-	phalcon_property_array_pop(&active_profile, getThis(), SL("_queue"));
-	if (Z_TYPE(active_profile) != IS_OBJECT) {
-		RETURN_THIS();
-	}
-
 	if (name && Z_TYPE_P(name) == IS_STRING) {
-		do {
-			PHALCON_CALL_METHOD(&active_name, &active_profile, "getname");
-			if (PHALCON_IS_EQUAL(name, &active_name)) {
-				break;
+		if (phalcon_isset_property_array(getThis(), SL("_queue"), name)) {
+			phalcon_read_property_array(&active_profile, getThis(), SL("_queue"), name, PH_COPY);
+			if (Z_TYPE(active_profile) != IS_OBJECT) {
+				zval_ptr_dtor(&active_profile);
+				RETURN_THIS();
 			}
-			zval_ptr_dtor(&active_profile);
-			phalcon_property_array_pop(&active_profile, getThis(), SL("_queue"));
+		} else {
+			while (1) {
+				zval active_name = {};
+				zval_ptr_dtor(&active_profile);
+				phalcon_property_array_pop(&active_profile, getThis(), SL("_queue"));
+				if (Z_TYPE(active_profile) != IS_OBJECT) {
+					zval_ptr_dtor(&active_profile);
+					RETURN_THIS();
+				}
+				PHALCON_CALL_METHOD(&active_name, &active_profile, "getname");
+				if (PHALCON_IS_EQUAL(name, &active_name)) {
+					zval_ptr_dtor(&active_name);
+					break;
+				}
 
+				phalcon_update_property_array_append(getThis(), SL("_allProfiles"), &active_profile);
+				zval_ptr_dtor(&active_name);
+			}
 		}
-		while (Z_TYPE(active_profile) == IS_OBJECT);
-	}
-
-	if (Z_TYPE(active_profile) != IS_OBJECT) {
-		RETURN_THIS();
+	} else {
+		phalcon_property_array_pop(&active_profile, getThis(), SL("_queue"));
+		if (Z_TYPE(active_profile) != IS_OBJECT) {
+			zval_ptr_dtor(&active_profile);
+			RETURN_THIS();
+		}
 	}
 
 	// memory

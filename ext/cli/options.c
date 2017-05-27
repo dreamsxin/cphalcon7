@@ -425,10 +425,11 @@ PHP_METHOD(Phalcon_Cli_Options, help){
 		char *buf = helpbuf;
 		if (str_key->len == 1) {
 			buf += sprintf(buf, " -%c ", str_key->val[0]);
+			//_advance_margin(4)
 		}
 
-		_advance_margin(4)
 		buf += sprintf(buf, " --%s ", Z_STRVAL_P(name));
+		_advance_margin(12);
 
 		if (phalcon_array_isset_fetch(&item_desc, &descs, name, PH_READONLY)) {
 			buf += sprintf(buf, " <%s> ", Z_STRVAL(item_desc));

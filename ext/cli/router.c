@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Cli_Router, getTaskName){
  */
 PHP_METHOD(Phalcon_Cli_Router, handle){
 
-	zval *arguments = NULL, longopts = {}, options = {}, module_name = {}, namespace_name = {}, task_name = {}, action_name = {};
+	zval *arguments = NULL, longopts = {}, options = {}, module_name = {}, namespace_name = {}, task_name = {}, action_name = {}, params = {};
 
 	phalcon_fetch_params(0, 0, 1, &arguments);
 
@@ -190,6 +190,10 @@ PHP_METHOD(Phalcon_Cli_Router, handle){
 	phalcon_update_property(getThis(), SL("_action"), &action_name);
 	zval_ptr_dtor(&action_name);
 
-	phalcon_update_property(getThis(), SL("_params"), &options);
+	if (phalcon_array_isset_fetch_str(&params, &options, SL("params"), PH_READONLY)) {
+		phalcon_update_property(getThis(), SL("_params"), &params);
+	} else {
+		phalcon_update_property(getThis(), SL("_params"), &options);
+	}
 	zval_ptr_dtor(&options);
 }

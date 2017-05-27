@@ -198,7 +198,7 @@ PHP_METHOD(Phalcon_Profiler_Item, getFinalTime){
 /**
  * Returns the total time in seconds spent by the profile
  *
- * @return double
+ * @return double|null
  */
 PHP_METHOD(Phalcon_Profiler_Item, getTotalElapsedSeconds){
 
@@ -206,6 +206,9 @@ PHP_METHOD(Phalcon_Profiler_Item, getTotalElapsedSeconds){
 
 	phalcon_read_property(&final_time, getThis(), SL("_finalTime"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&initial_time, getThis(), SL("_initialTime"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(final_time) == IS_NULL || Z_TYPE(initial_time) == IS_NULL) {
+		RETURN_DOUBLE(0);
+	}
 	phalcon_sub_function(return_value, &final_time, &initial_time);
 }
 
@@ -253,7 +256,7 @@ PHP_METHOD(Phalcon_Profiler_Item, setEndMemory){
 /**
  * Returns the amount of memory allocated on when the profile ended
  *
- * @return double
+ * @return int
  */
 PHP_METHOD(Phalcon_Profiler_Item, getEndMemory){
 
@@ -264,7 +267,7 @@ PHP_METHOD(Phalcon_Profiler_Item, getEndMemory){
 /**
  * Returns the total time in seconds spent by the profile
  *
- * @return double
+ * @return int
  */
 PHP_METHOD(Phalcon_Profiler_Item, getTotalUsageMemory){
 
@@ -272,5 +275,13 @@ PHP_METHOD(Phalcon_Profiler_Item, getTotalUsageMemory){
 
 	phalcon_read_property(&start_memory, getThis(), SL("_startMemory"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&end_memory, getThis(), SL("_endMemory"), PH_NOISY|PH_READONLY);
-	phalcon_sub_function(return_value, &start_memory, &end_memory);
+	if (Z_TYPE(start_memory) == IS_NULL || Z_TYPE(end_memory) == IS_NULL) {
+		RETURN_LONG(0);
+	}
+
+	if (PHALCON_GT(&end_memory, &start_memory)) {
+		phalcon_sub_function(return_value, &end_memory, &start_memory);
+	} else {
+		RETURN_LONG(0);
+	}
 }

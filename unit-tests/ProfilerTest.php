@@ -126,7 +126,7 @@ class ProfilerTest extends PHPUnit_Framework_TestCase
 
 	public function testMulti()
 	{
-		$profiler = new Phalcon\Profiler;
+		$profiler = new Phalcon\Profiler();
 
 		$profiler->startProfile('one');
 
@@ -167,6 +167,52 @@ class ProfilerTest extends PHPUnit_Framework_TestCase
 
 		$profile = $profiler->getLastProfile();
 		$this->assertEquals($profile->getName(), 'two');
+
+		// Test skip
+		$profiler = new Phalcon\Profiler();
+
+		$profiler->startProfile('one');
+		$profiler->startProfile('two');
+		$profiler->startProfile('two');
+
+		$profiler->stopProfile('one');
+
+		$profiles = $profiler->getProfiles();
+		$this->assertEquals(count($profiles), 3);
+
+		$this->assertEquals($profiles[0]->getName(), 'two');
+		$this->assertEquals($profiles[1]->getName(), 'two');
+		$this->assertEquals($profiles[0]->getTotalElapsedSeconds(), 0);
+		$this->assertEquals($profiles[0]->getTotalUsageMemory(), 0);
+		$this->assertNull($profiles[0]->getFinalTime());
+		$this->assertNull($profiles[0]->getEndMemory());
+
+		$this->assertEquals($profiles[2]->getName(), 'one');
+		$this->assertTrue($profiles[2]->getTotalElapsedSeconds() > 0);
+		$this->assertTrue($profiles[2]->getTotalUsageMemory()*1000 >= 0);
+		$this->assertEquals(gettype($profiles[2]->getFinalTime()), 'double');
+		$this->assertEquals(gettype($profiles[2]->getEndMemory()), 'integer');
+
+		$profile = $profiler->getCurrentProfile();
+		$this->assertNull($profile);
+
+		$profile = $profiler->getLastProfile();
+		$this->assertEquals($profile->getName(), 'two');
+
+		// Test unique
+		$profiler = new Phalcon\Profiler(TRUE);
+			
+		try {
+			$profiler->startProfile('one');
+			$profiler->startProfile('one');
+			$this->assertTrue(false);
+		}
+		catch (Phalcon\Profiler\Exception $ex) {
+			$this->assertTrue(true);
+		}
+		catch (Exception $e) {
+			$this->assertTrue(false);
+		}
 	}
 
 }

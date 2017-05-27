@@ -91,11 +91,12 @@ PHALCON_INIT_CLASS(Phalcon_Db_Profiler){
  *
  * @param string $name
  * @param array $data
+ * @param boolean $unique
  * @return Phalcon\Db\Profiler\Item
  */
 PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
-	zval *name, *data = NULL, sql_statement = {}, sql_variables = {}, sql_bindtypes = {}, active_profile = {}, time = {};
+	zval *name, *data = NULL, unique = {}, sql_statement = {}, sql_variables = {}, sql_bindtypes = {}, active_profile = {}, time = {};
 
 	phalcon_fetch_params(0, 1, 1, &name, &data);
 
@@ -106,6 +107,13 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
 	if (!phalcon_array_isset_fetch_str(&sql_statement, data, SL("sqlStatement"), PH_READONLY)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The sqlStatement is required");
+		return;
+	}
+
+	phalcon_read_property(&unique, getThis(), SL("_unique"), PH_NOISY|PH_READONLY);
+
+	if (zend_is_true(&unique) && phalcon_isset_property_array(getThis(), SL("_queue"), name)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The name must be unique");
 		return;
 	}
 
@@ -130,7 +138,11 @@ PHP_METHOD(Phalcon_Db_Profiler, startProfile){
 
 	phalcon_update_property(getThis(), SL("_activeProfile"), &active_profile);
 	phalcon_update_property(getThis(), SL("_currentProfile"), &active_profile);
-	phalcon_update_property_array_append(getThis(), SL("_queue"), &active_profile);
+	if (zend_is_true(&unique)) {
+		phalcon_update_property_array(getThis(), SL("_queue"), name, &active_profile);
+	} else {
+		phalcon_update_property_array_append(getThis(), SL("_queue"), &active_profile);
+	}
 	zval_ptr_dtor(&active_profile);
 
 	RETURN_THIS();

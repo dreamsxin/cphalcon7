@@ -40,11 +40,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_profiler_iteminterface_setfinaltime, 0, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_profiler_iteminterface_setstartmemory, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, startMemory, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, startMemory, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_profiler_iteminterface_setendmemory, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, endMemory, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, endMemory, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_PROFILER_ITEMINTERFACE_H */

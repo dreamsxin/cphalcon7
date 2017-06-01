@@ -1276,7 +1276,7 @@ PHP_METHOD(Phalcon_Arr, sum){
 PHP_METHOD(Phalcon_Arr, toArray){
 
 	zval *object, *properties = NULL, *recursive = NULL, *negate = NULL, *value;
-	zend_string *key;
+	zend_string *str_key;
 	ulong idx;
 
 	phalcon_fetch_params(0, 1, 3, &object, &properties, &recursive, &negate);
@@ -1294,78 +1294,83 @@ PHP_METHOD(Phalcon_Arr, toArray){
 	}
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
-		phalcon_get_object_vars(return_value, object, 1);
+		zval tmp = {};
+		phalcon_get_object_vars(&tmp, object, 1);
 
-		if (properties && Z_TYPE_P(properties) == IS_ARRAY) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
-				zval tmp = {};
-				if (key) {
-					ZVAL_STR(&tmp, key);
-				} else {
-					ZVAL_LONG(&tmp, idx);
-				}
+		array_init(return_value);
+		
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(tmp), idx, str_key, value) {
+			zval key = {};
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
+			} else {
+				ZVAL_LONG(&key, idx);
+			}
+			if (unlikely(Z_TYPE_P(properties) == IS_ARRAY)) {
 				if (likely(!zend_is_true(negate))) {
-					if (!phalcon_fast_in_array(&tmp, properties)) {
-						phalcon_array_unset(return_value, &tmp, 0);
+					if (phalcon_fast_in_array(&key, properties)) {
+						phalcon_array_update(return_value, &key, value, PH_COPY);
 					}
 				} else {
-					if (phalcon_fast_in_array(&tmp, properties)) {
-						phalcon_array_unset(return_value, &tmp, 0);
+					if (!phalcon_fast_in_array(&key, properties)) {
+						phalcon_array_update(return_value, &key, value, PH_COPY);
 					}
 				}
-			} ZEND_HASH_FOREACH_END();
-		}
+			}
+		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&tmp);
+
 		if (zend_is_true(recursive)) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
-				zval tmp = {}, array_value = {};
-				if (key) {
-					ZVAL_STR(&tmp, key);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, str_key, value) {
+				zval key = {}, array_value = {};
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
 				} else {
-					ZVAL_LONG(&tmp, idx);
+					ZVAL_LONG(&key, idx);
 				}
 
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
-					phalcon_array_update(return_value, &tmp, &array_value, 0);
+					phalcon_array_update(return_value, &key, &array_value, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 	} else if (Z_TYPE_P(object) == IS_ARRAY) {
 		array_init(return_value);
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(object), idx, key, value) {
-			zval tmp = {};
-			if (key) {
-				ZVAL_STR(&tmp, key);
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(object), idx, str_key, value) {
+			zval key = {};
+			if (str_key) {
+				ZVAL_STR(&key, str_key);
 			} else {
-				ZVAL_LONG(&tmp, idx);
+				ZVAL_LONG(&key, idx);
 			}
 
 			if (Z_TYPE_P(properties) == IS_ARRAY) {
 				if (likely(!zend_is_true(negate))) {
-					if (phalcon_fast_in_array(&tmp, properties)) {
-						phalcon_array_update(return_value, &tmp, value, PH_COPY);
+					if (phalcon_fast_in_array(&key, properties)) {
+						phalcon_array_update(return_value, &key, value, PH_COPY);
 					}
 				} else {
-					if (!phalcon_fast_in_array(&tmp, properties)) {
-						phalcon_array_update(return_value, &tmp, value, PH_COPY);
+					if (!phalcon_fast_in_array(&key, properties)) {
+						phalcon_array_update(return_value, &key, value, PH_COPY);
 					}
 				}
 			} else {
-				phalcon_array_update(return_value, &tmp, value, PH_COPY);
+				phalcon_array_update(return_value, &key, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 
 		if (!recursive || zend_is_true(recursive)) {
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
-				zval tmp = {}, array_value = {};
-				if (key) {
-					ZVAL_STR(&tmp, key);
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, str_key, value) {
+				zval key = {}, array_value = {};
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
 				} else {
-					ZVAL_LONG(&tmp, idx);
+					ZVAL_LONG(&key, idx);
 				}
 				if (Z_TYPE_P(value) == IS_OBJECT && Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_CE_STATIC(&array_value, phalcon_arr_ce, "toarray", value);
-					phalcon_array_update(return_value, &tmp, &array_value, 0);
+					phalcon_array_update(return_value, &key, &array_value, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}

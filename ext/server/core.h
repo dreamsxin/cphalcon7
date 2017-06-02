@@ -49,7 +49,10 @@
 #include <arpa/inet.h>
 #include <sys/un.h>
 #include <pthread.h>
+
+#if HAVE_EPOLL
 #include <sys/epoll.h>
+#endif
 
 #ifndef PHALCON_USE_THREADPOOL
 # define PHALCON_USE_THREADPOOL	1

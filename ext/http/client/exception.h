@@ -20,6 +20,8 @@
 #ifndef PHALCON_HTTP_CLIENT_EXCEPTION_H
 #define PHALCON_HTTP_CLIENT_EXCEPTION_H
 
+#include "php_phalcon.h"
+
 extern zend_class_entry *phalcon_http_client_exception_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Http_Client_Exception);

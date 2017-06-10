@@ -133,8 +133,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_unshift, 0, 0, 3)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_map, 0, 0, 2)
-	ZEND_ARG_INFO(0, callbacks)
 	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_INFO(0, callbacks)
 	ZEND_ARG_INFO(0, keys)
 ZEND_END_ARG_INFO()
 
@@ -819,23 +819,22 @@ PHP_METHOD(Phalcon_Arr, unshift){
  * callbacks to all elements in an array, including sub-arrays.
  *
  *     // Apply "strip_tags" to every element in the array
- *     $array = \Phalcon\Arr::map('strip_tags', $array);
+ *     $array = \Phalcon\Arr::map($array, 'strip_tags');
  *
  *     // Apply $this->filter to every element in the array
- *     $array = \Phalcon\Arr::map(array(array($this,'filter')), $array);
+ *     $array = \Phalcon\Arr::map($array, array(array($this,'filter')));
  *
- * @param mixed $callbacks
  * @param array $array
- * @param array $keys
+ * @param mixed $callbacks
  * @return array
  */
 PHP_METHOD(Phalcon_Arr, map){
 
-	zval *callbacks, *array, *keys = NULL, *val;
+	zval *array, *callbacks, *keys = NULL, *val;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 2, 1, &callbacks, &array, &keys);
+	phalcon_fetch_params(0, 2, 1, &array, &callbacks, &keys);
 	PHALCON_SEPARATE_PARAM(array);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, val) {
@@ -1234,7 +1233,7 @@ PHP_METHOD(Phalcon_Arr, filter){
  * @param mixed $path
  * @param mixed $default
  * @param string $delimiter
- * @return mixed
+ * @return number
  */
 PHP_METHOD(Phalcon_Arr, sum){
 
@@ -1261,6 +1260,7 @@ PHP_METHOD(Phalcon_Arr, sum){
 		RETVAL_ZVAL(&values, 0, 0);
 	}
 }
+
 /**
  * Converts an object or an array of objects into an array
  *

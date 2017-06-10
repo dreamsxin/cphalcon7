@@ -108,9 +108,9 @@ int _phalcon_storage_btree_page_read(phalcon_storage_btree_db_t *t, _phalcon_sto
     i = 0;
     o = 0;
     while (o < size) {
-        page->keys[i].length = ntohll(*(uint64_t *) (buff + o));
-        page->keys[i].offset = ntohll(*(uint64_t *) (buff + o + 8));
-        page->keys[i].config = ntohll(*(uint64_t *) (buff + o + 16));
+        page->keys[i].length = _phalcon_ntohll(*(uint64_t *) (buff + o));
+        page->keys[i].offset = _phalcon_ntohll(*(uint64_t *) (buff + o + 8));
+        page->keys[i].config = _phalcon_ntohll(*(uint64_t *) (buff + o + 16));
         page->keys[i].value = buff + o + 24;
         page->keys[i].allocated = 0;
 
@@ -169,9 +169,9 @@ int _phalcon_storage_btree_page_save(phalcon_storage_btree_db_t *t, _phalcon_sto
     for (i = 0; i < page->length; i++) {
         assert(o + PHALCON_STORAGE_BTREE__KV_SIZE(page->keys[i]) <= page->byte_size);
 
-        *(uint64_t *) (buff + o) = htonll(page->keys[i].length);
-        *(uint64_t *) (buff + o + 8) = htonll(page->keys[i].offset);
-        *(uint64_t *) (buff + o + 16) = htonll(page->keys[i].config);
+        *(uint64_t *) (buff + o) = _phalcon_htonll(page->keys[i].length);
+        *(uint64_t *) (buff + o + 8) = _phalcon_htonll(page->keys[i].offset);
+        *(uint64_t *) (buff + o + 16) = _phalcon_htonll(page->keys[i].config);
 
         memcpy(buff + o + 24, page->keys[i].value, page->keys[i].length);
 

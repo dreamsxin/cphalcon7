@@ -30,8 +30,8 @@ int _phalcon_storage_btree_value_load(phalcon_storage_btree_db_t *t,
     }
 
     /* first 16 bytes are representing previous value */
-    value->_prev_offset = ntohll(*(uint64_t *) (buff));
-    value->_prev_length = ntohll(*(uint64_t *) (buff + 8));
+    value->_prev_offset = _phalcon_ntohll(*(uint64_t *) (buff));
+    value->_prev_length = _phalcon_ntohll(*(uint64_t *) (buff + 8));
 
     /* copy the rest into result buffer */
     memcpy(value->value, buff + 16, buff_len - 16);
@@ -57,8 +57,8 @@ int _phalcon_storage_btree_value_save(phalcon_storage_btree_db_t *t,
 
     /* insert offset, length of previous value */
     if (previous != NULL) {
-        *(uint64_t *) (buff) = htonll(previous->offset);
-        *(uint64_t *) (buff + 8) = htonll(previous->length);
+        *(uint64_t *) (buff) = _phalcon_htonll(previous->offset);
+        *(uint64_t *) (buff + 8) = _phalcon_htonll(previous->length);
     } else {
         *(uint64_t *) (buff) = 0;
         *(uint64_t *) (buff + 8) = 0;

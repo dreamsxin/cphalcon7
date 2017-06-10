@@ -26,7 +26,7 @@ uint64_t _phalcon_storage_btree_compute_hashl(uint64_t key)
                        _phalcon_storage_btree_compute_hash(keyl);
 }
 
-uint64_t htonll(uint64_t value)
+uint64_t _phalcon_htonll(uint64_t value)
 {
     static const int num = 23;
 
@@ -38,7 +38,7 @@ uint64_t htonll(uint64_t value)
     return ((uint64_t) low_part << 32) | high_part;
 }
 
-uint64_t ntohll(uint64_t value)
+uint64_t _phalcon_ntohll(uint64_t value)
 {
     static const int num = 23;
 

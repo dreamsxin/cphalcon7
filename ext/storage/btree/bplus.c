@@ -425,10 +425,10 @@ int _phalcon_storage_btree_tree_read_head(_phalcon_storage_btree_writer_t *w, vo
     phalcon_storage_btree_db_t *t = (phalcon_storage_btree_db_t *) w;
     _phalcon_storage_btree_tree_head_t* head = (_phalcon_storage_btree_tree_head_t *) data;
 
-    t->head.offset = ntohll(head->offset);
-    t->head.config = ntohll(head->config);
-    t->head.page_size = ntohll(head->page_size);
-    t->head.hash = ntohll(head->hash);
+    t->head.offset = _phalcon_ntohll(head->offset);
+    t->head.config = _phalcon_ntohll(head->config);
+    t->head.page_size = _phalcon_ntohll(head->page_size);
+    t->head.hash = _phalcon_ntohll(head->hash);
 
     /* we've copied all data - efree it */
     efree(data);
@@ -470,10 +470,10 @@ int _phalcon_storage_btree_tree_write_head(_phalcon_storage_btree_writer_t *w, v
     t->head.hash = _phalcon_storage_btree_compute_hashl(t->head.offset);
 
     /* Create temporary head with fields in network byte order */
-    nhead.offset = htonll(t->head.offset);
-    nhead.config = htonll(t->head.config);
-    nhead.page_size = htonll(t->head.page_size);
-    nhead.hash = htonll(t->head.hash);
+    nhead.offset = _phalcon_htonll(t->head.offset);
+    nhead.config = _phalcon_htonll(t->head.config);
+    nhead.page_size = _phalcon_htonll(t->head.page_size);
+    nhead.hash = _phalcon_htonll(t->head.hash);
 
     size = PHALCON_STORAGE_BTREE__HEAD_SIZE;
     ret = _phalcon_storage_btree_writer_write(w,

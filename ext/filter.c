@@ -546,6 +546,16 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
+	if (PHALCON_IS_STRING(filter, "ip")) {
+		ZVAL_LONG(&type, 275); /* FILTER_VALIDATE_IP */
+
+		PHALCON_CALL_FUNCTION(&filtered, "filter_var", value, &type);
+		if (PHALCON_IS_FALSE(&filtered)) {
+			ZVAL_NULL(&filtered);
+		}
+		goto ph_end_0;
+	}
+
 	if (PHALCON_IS_STRING(filter, "in")) {
 		if (Z_TYPE_P(options) != IS_ARRAY || !phalcon_fast_in_array(value, options)) {
 			ZVAL_NULL(&filtered);

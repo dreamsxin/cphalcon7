@@ -6287,6 +6287,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 			}
 		}
 		zval_ptr_dtor(&referenced_model_name);
+	} else {
+		phalcon_update_property_zval_zval(getThis(), property, value);
 	}
 end:
 	zval_ptr_dtor(&lower_property);

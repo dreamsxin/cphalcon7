@@ -1251,8 +1251,9 @@ class CacheTest extends PHPUnit_Framework_TestCase
 
 		$cache->save('data', "1");
 		$cache->save('data2', "2");
-
-		$this->assertEquals($cache->queryKeys(), array('unitdata', 'unitdata2'));
+		$keys = $cache->queryKeys();
+		sort($keys);
+		$this->assertEquals($keys, array('unitdata', 'unitdata2'));
 
 		$this->assertTrue($cache->flush());
 

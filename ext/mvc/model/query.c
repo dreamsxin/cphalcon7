@@ -3210,8 +3210,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	zval *_phql = NULL, event_name = {}, intermediate, phql = {}, ast = {}, type = {}, unique_id = {}, ir_phql_cache = {}, ir_phql = {};
-	zval model_names = {}, exception_message = {}, debug_message = {};
-	zval manager = {}, tables = {}, key_schema = {}, key_source = {}, *model_name;
+	zval model_names = {}, model_name = {}, exception_message = {}, debug_message = {};
+	zval tables = {}, table = {}, key_schema = {}, key_source = {};
 	zend_string *str_key;
 	ulong idx;
 	int i_cache = 1;
@@ -3274,13 +3274,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 				if (Z_TYPE(ir_phql) == IS_ARRAY) {
 					if (phalcon_array_isset_fetch_str(&model_names, &ir_phql, SL("models"), PH_READONLY) 
 						&& phalcon_array_isset_fetch_str(&tables, &ir_phql, SL("tables"), PH_READONLY)) {
+						zval manager = {}, *tmp_model_name;
 						// Obtain the real source including the schema again
 						PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
 
 						ZVAL_LONG(&key_schema, 1);
 						ZVAL_LONG(&key_source, 0);
 
-						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(model_names), idx, str_key, model_name) {
+						ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(model_names), idx, str_key, tmp_model_name) {
 							zval tmp = {}, table = {}, model = {}, source = {}, old_schema = {}, schema = {}, old_source = {};
 							if (str_key) {
 								ZVAL_STR(&tmp, str_key);
@@ -3290,7 +3291,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 							phalcon_array_fetch(&table, &tables, &tmp, PH_NOISY|PH_READONLY);
 
-							PHALCON_CALL_METHOD(&model, &manager, "load", model_name);
+							PHALCON_CALL_METHOD(&model, &manager, "load", tmp_model_name);
 							PHALCON_CALL_METHOD(&source, &model, "getsource");
 							PHALCON_CALL_METHOD(&schema, &model, "getschema");
 
@@ -3325,6 +3326,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 							zval_ptr_dtor(&source);
 							zval_ptr_dtor(&model);
 						} ZEND_HASH_FOREACH_END();
+						zval_ptr_dtor(&manager);
+					} else if (phalcon_array_isset_fetch_str(&model_name, &ir_phql, SL("model"), PH_READONLY) 
+						&& phalcon_array_isset_fetch_str(&table, &ir_phql, SL("table"), PH_READONLY)) {
+						zval manager = {}, model = {}, source = {};
+						// Obtain the real source including the schema again
+						PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
+
+						PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+						PHALCON_CALL_METHOD(&source, &model, "getsource");
+
+						if (!phalcon_is_equal(&table, &source)) {
+							i_cache = 0;
+						}
+						zval_ptr_dtor(&source);
+						zval_ptr_dtor(&model);
 						zval_ptr_dtor(&manager);
 					}
 

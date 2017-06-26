@@ -47,7 +47,6 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 	phalcon_globals->orm.length_validations = 1;
 	phalcon_globals->orm.exception_on_failed_save = 0;
 	phalcon_globals->orm.enable_literals = 1;
-	phalcon_globals->orm.enable_ast_cache = 1;
 	phalcon_globals->orm.cache_level = 3;
 	phalcon_globals->orm.ast_cache = NULL;
 	phalcon_globals->orm.enable_property_method = 1;

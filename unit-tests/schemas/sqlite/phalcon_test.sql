@@ -4500,6 +4500,28 @@ CREATE TABLE `robots` (
 INSERT INTO "robots" VALUES(1,'Robotina','mechanical',1972);
 INSERT INTO "robots" VALUES(2,'Astro Boy','mechanical',1952);
 INSERT INTO "robots" VALUES(3,'Terminator','cyborg',2029);
+
+CREATE TABLE `robots_0` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `name` varchar(70) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `year` int(11) NOT NULL
+);
+
+CREATE TABLE `robots_1` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `name` varchar(70) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `year` int(11) NOT NULL
+);
+
+CREATE TABLE `robots_2` (
+  `id` INTEGER NOT NULL PRIMARY KEY,
+  `name` varchar(70) NOT NULL,
+  `type` varchar(32) NOT NULL,
+  `year` int(11) NOT NULL
+);
+
 CREATE TABLE `robots_parts` (
   `id` INTEGER NOT NULL PRIMARY KEY,
   `robots_id` int(10) NOT NULL,

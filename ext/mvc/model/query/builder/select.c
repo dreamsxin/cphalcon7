@@ -564,7 +564,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getLimit){
  *	$builder->offset(30);
  *</code>
  *
- * @param int $limit
  * @param int $offset
  * @return Phalcon\Mvc\Model\Query\Builder\Select
  */

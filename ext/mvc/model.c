@@ -1930,10 +1930,27 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 				}
 			}
 		} else {
-			ZVAL_COPY(&params, parameters);
+			ZVAL_DUP(&params, parameters);
 		}
 	} else {
-		ZVAL_NULL(&params);
+		array_init(&params);
+	}
+
+	if (!phalcon_array_isset_str(&params, SL("limit"))) {
+		zval key = {}, value = {}, bind_key = {}, bind = {};
+		ZVAL_STRING(&key, "limit");
+		ZVAL_STRING(&value, ":pha_limit:");
+		ZVAL_STRING(&bind_key, "pha_limit");
+
+		phalcon_array_update(&params, &key, &value, 0);
+		zval_ptr_dtor(&key);
+
+		if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_COPY)) {
+			array_init(&bind);
+		}
+		phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), PH_COPY);
+		zval_ptr_dtor(&bind_key);
+		phalcon_array_update_str(&params, SL("bind"), &bind, 0);
 	}
 
 	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", &params);
@@ -1949,7 +1966,7 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	/**
 	 * We only want the first record
 	 */
-	PHALCON_CALL_METHOD(NULL, &builder, "limit", &PHALCON_GLOBAL(z_one));
+	//PHALCON_CALL_METHOD(NULL, &builder, "limit", &PHALCON_GLOBAL(z_one));
 	PHALCON_CALL_METHOD(&query, &builder, "getquery");
 	zval_ptr_dtor(&builder);
 
@@ -6650,8 +6667,8 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model, setup){
 
-	zval *options, disable_events = {}, virtual_foreign_keys = {}, not_null_validations = {}, length_validations = {}, exception_on_failed_save = {}, phql_literals = {};
-	zval phql_cache = {}, property_method = {}, auto_convert = {}, allow_update_primary = {}, enable_strict = {};
+	zval *options, disable_events = {}, virtual_foreign_keys = {}, not_null_validations = {}, length_validations = {}, exception_on_failed_save = {};
+	zval phql_literals = {}, property_method = {}, auto_convert = {}, allow_update_primary = {}, enable_strict = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -6700,13 +6717,6 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	 */
 	if (phalcon_array_isset_fetch_str(&phql_literals, options, SL("phqlLiterals"), PH_READONLY)) {
 		PHALCON_GLOBAL(orm).enable_literals = zend_is_true(&phql_literals);
-	}
-
-	/**
-	 * Enables/Disables AST cache
-	 */
-	if (phalcon_array_isset_fetch_str(&phql_cache, options, SL("astCache"), PH_READONLY)) {
-		PHALCON_GLOBAL(orm).enable_ast_cache = zend_is_true(&phql_cache);
 	}
 
 	/**

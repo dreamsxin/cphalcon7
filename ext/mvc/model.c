@@ -4028,6 +4028,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&attributes);
+	zval_ptr_dtor(&automatic_attributes);
+	zval_ptr_dtor(&not_null_attributes);
+	zval_ptr_dtor(&default_values);
+	zval_ptr_dtor(&data_types);
 
 	/**
 	 * If there is an identity field we add it using "null" or "default"
@@ -4064,6 +4069,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			if (!phalcon_array_isset_fetch(&column_type, &bind_data_types, identity_field, PH_READONLY)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Identity column '", identity_field, "' isn't part of the table columns");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				zval_ptr_dtor(&bind_data_types);
+				zval_ptr_dtor(&column_map);
 				return;
 			}
 
@@ -4079,27 +4086,34 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			phalcon_array_update(&bind_types, &column_name, &bind_skip, PH_COPY);
 		}
 	}
+	zval_ptr_dtor(&bind_data_types);
+	zval_ptr_dtor(&column_map);
 
 	phalcon_get_called_class(&model_name);
 
 	phalcon_fast_join_str(&phql_join_fields, SL(", "), &fields);
 	PHALCON_CONCAT_SVSVS(&phql, "INSERT INTO [", &model_name, "] (", &phql_join_fields ,") VALUES ");
+	zval_ptr_dtor(&model_name);
 	zval_ptr_dtor(&phql_join_fields);
 
 	phalcon_fast_join_str(&phql_join_values, SL(":, :"), &fields);
+	zval_ptr_dtor(&fields);
 	PHALCON_SCONCAT_SVS(&phql, " (:", &phql_join_values, ":) ");
 	zval_ptr_dtor(&phql_join_values);
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	zval_ptr_dtor(&models_manager);
 	zval_ptr_dtor(&phql);
 
 	PHALCON_CALL_METHOD(NULL, &query, "setconnection", connection);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
+	zval_ptr_dtor(&bind_params);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
+	zval_ptr_dtor(&bind_types);
 
 	PHALCON_CALL_METHOD(&status, &query, "execute");
-
+	zval_ptr_dtor(&query);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&success, &status, "success");
@@ -4107,7 +4121,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			phalcon_update_property_zval_zval(getThis(), &column_name, &success);
 		}
 		zval_ptr_dtor(&status);
-		RETURN_CTOR(&success);
+		RETURN_ZVAL(&success, 0, 0);
 	} else {
 		RETURN_FALSE;
 	}

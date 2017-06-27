@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 	}
 	zval_ptr_dtor(&name);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
@@ -249,6 +249,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		 * Send a notification to the events manager
 		 */
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
+		zval_ptr_dtor(&events_manager);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -309,7 +310,8 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 	}
 	zval_ptr_dtor(&name);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
 
@@ -317,6 +319,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		 * Send a notification to the events manager
 		 */
 		PHALCON_CALL_METHOD(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
+		zval_ptr_dtor(&events_manager);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
@@ -368,7 +371,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 	}
 	zval_ptr_dtor(&name);
 
-	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	if (Z_TYPE(events_manager) != IS_NULL) {
 		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
 
@@ -376,6 +379,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 		 * Send a notification to the events manager
 		 */
 		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
+		zval_ptr_dtor(&events_manager);
 	}
 }
 

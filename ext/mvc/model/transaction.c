@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 
 	zval *dependency_injector, *auto_begin = NULL, *s = NULL, service = {}, connection = {};
 
-	phalcon_fetch_params(0, 1, 2, &dependency_injector, &auto_begin, &service);
+	phalcon_fetch_params(0, 1, 2, &dependency_injector, &auto_begin, &s);
 
 	if (!auto_begin) {
 		auto_begin = &PHALCON_GLOBAL(z_false);
@@ -146,7 +146,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	if (!s || Z_TYPE_P(s) != IS_STRING) {
 		ZVAL_STR(&service, IS(db));
 	} else {
-		ZVAL_COPY_VALUE(&service, s);
+		ZVAL_COPY(&service, s);
 	}
 
 	if (Z_TYPE_P(dependency_injector) != IS_OBJECT) {
@@ -155,11 +155,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 
 	PHALCON_CALL_METHOD(&connection, dependency_injector, "get", &service);
+	zval_ptr_dtor(&service);
 
 	phalcon_update_property(getThis(), SL("_connection"), &connection);
 	if (zend_is_true(auto_begin)) {
 		PHALCON_CALL_METHOD(NULL, &connection, "begin");
 	}
+	zval_ptr_dtor(&connection);
 }
 
 /**

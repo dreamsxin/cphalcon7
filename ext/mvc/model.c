@@ -4336,15 +4336,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &merged_types);
 	zval_ptr_dtor(&merged_types);
 
-
 	PHALCON_CALL_METHOD(&status, &query, "execute");
 	zval_ptr_dtor(&query);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(&ret, &status, "success");
+		zval_ptr_dtor(&status);
 		if (zend_is_true(&ret)) {
 			RETURN_TRUE;
 		}
+	} else {
+		zval_ptr_dtor(&status);
 	}
 
 	ZVAL_STRING(&type, "InvalidUpdateAttempt");

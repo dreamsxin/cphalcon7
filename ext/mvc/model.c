@@ -4124,7 +4124,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
 	zval *connection, bind_params = {}, bind_types = {}, models_manager = {}, use_dynamic_update = {}, exception_message = {};
-	zval snapshot = {}, bind_data_types = {}, non_primary = {}, automatic_attributes = {}, data_types = {}, column_map = {}, columns = {};
+	zval snapshot = {}, bind_data_types = {}, automatic_attributes = {}, data_types = {}, column_map = {}, columns = {};
 	zval model_name = {}, phql = {}, phql_updates = {}, phql_join_updates = {}, *field, attribute_field = {}, value = {};
 	zval unique_key = {}, unique_params = {}, unique_types = {}, merged_params = {}, merged_types = {};
 	zval query = {}, status = {}, ret = {}, type = {}, message = {};
@@ -4147,7 +4147,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	}
 
 	PHALCON_CALL_METHOD(&bind_data_types, getThis(), "getbindtypes");
-	PHALCON_CALL_METHOD(&non_primary, getThis(), "getnonprimarykeyattributes");
 	PHALCON_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
 	PHALCON_CALL_METHOD(&data_types, getThis(), "getdatatypes");
 	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
@@ -4159,10 +4158,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	if (PHALCON_GLOBAL(orm).allow_update_primary) {
 		PHALCON_CALL_METHOD(&columns, getThis(), "getattributes");
 	} else {
-		ZVAL_COPY_VALUE(&columns, &non_primary);
+		PHALCON_CALL_METHOD(&columns, getThis(), "getnonprimarykeyattributes");
 	}
-
-	phalcon_get_called_class(&model_name);
 
 	array_init(&phql_updates);
 	array_init(&bind_params);
@@ -4177,6 +4174,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			if (!phalcon_array_isset(&bind_data_types, field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' have not defined a bind data type");
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				zval_ptr_dtor(&models_manager);
 				return;
 			}
 
@@ -4187,6 +4185,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					zval_ptr_dtor(&models_manager);
 					return;
 				}
 			} else {
@@ -4197,7 +4196,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			 * If a field isn't set we pass a null value
 			 */
 			if (phalcon_property_isset_fetch_zval(&value, getThis(), &attribute_field, PH_READONLY)) {
-				ZVAL_COPY_VALUE(&convert_value, &value);
+				ZVAL_COPY(&convert_value, &value);
 				if (PHALCON_GLOBAL(orm).enable_auto_convert) {
 					if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 						if (phalcon_array_isset_fetch(&field_type, &data_types, field, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
@@ -4259,6 +4258,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 						phalcon_array_append(&bind_types, &bind_type, PH_COPY);
 					}
 				}
+				zval_ptr_dtor(&convert_value);
 			} else {
 				PHALCON_CONCAT_VS(&phql_update, &attribute_field, "= NULL");
 				phalcon_array_append(&phql_updates, &phql_update, PH_COPY);
@@ -4266,11 +4266,18 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&snapshot);
+	zval_ptr_dtor(&columns);
+	zval_ptr_dtor(&bind_data_types);
+	zval_ptr_dtor(&automatic_attributes);
+	zval_ptr_dtor(&data_types);
+	zval_ptr_dtor(&column_map);
 
 	/**
 	 * If there is no fields to update we return true
 	 */
 	if (!phalcon_fast_count_ev(&phql_updates)) {
+		zval_ptr_dtor(&models_manager);
 		if (PHALCON_GLOBAL(orm).enable_strict) {
 			RETURN_FALSE;
 		}
@@ -4287,22 +4294,34 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	if (Z_TYPE(unique_params) == IS_ARRAY) {
 		phalcon_add_function(&merged_params, &bind_params, &unique_params);
 	} else {
-		ZVAL_COPY_VALUE(&merged_params, &bind_params);
+		ZVAL_COPY(&merged_params, &bind_params);
 	}
+	zval_ptr_dtor(&bind_params);
+	zval_ptr_dtor(&unique_params);
 
 	if (Z_TYPE(unique_types) == IS_ARRAY) {
 		phalcon_add_function(&merged_types, &bind_types, &unique_types);
 	} else {
-		ZVAL_COPY_VALUE(&merged_types, &bind_types);
+		ZVAL_COPY(&merged_types, &bind_types);
 	}
+	zval_ptr_dtor(&bind_types);
+	zval_ptr_dtor(&unique_types);
 
+	phalcon_get_called_class(&model_name);
 	PHALCON_CONCAT_SVSVSV(&phql, "UPDATE [", &model_name, "] SET ", &phql_join_updates, " WHERE ", &unique_key);
+	zval_ptr_dtor(&model_name);
 	zval_ptr_dtor(&phql_join_updates);
+	zval_ptr_dtor(&unique_key);
 
 	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	zval_ptr_dtor(&models_manager);
+	zval_ptr_dtor(&phql);
 	PHALCON_CALL_METHOD(NULL, &query, "setconnection", connection);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &merged_params);
+	zval_ptr_dtor(&merged_params);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &merged_types);
+	zval_ptr_dtor(&merged_types);
+
 
 	PHALCON_CALL_METHOD(&status, &query, "execute");
 	zval_ptr_dtor(&query);
@@ -4756,6 +4775,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		if (Z_TYPE(related) == IS_ARRAY) {
 			PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 		}
+		zval_ptr_dtor(&write_connection);
 
 		/**
 		 * Throw exceptions on failed saves?
@@ -4773,6 +4793,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			return;
 		}
 
+		zval_ptr_dtor(&identity_field);
 		RETURN_FALSE;
 	}
 
@@ -4829,6 +4850,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
 		PHALCON_CALL_METHOD(&snapshot_data, getThis(), "toarray");
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot_data);
+		zval_ptr_dtor(&snapshot_data);
 
 		if (!zend_is_true(&exists) || PHALCON_GLOBAL(orm).allow_update_primary) {
 				PHALCON_CALL_METHOD(NULL, getThis(), "_rebuild");
@@ -4839,7 +4861,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		zval_ptr_dtor(&event_name);
 	}
 
-	RETURN_CTOR(&new_success);
+	RETURN_ZVAL(&new_success, 0, 0);
 }
 
 /**

@@ -56,6 +56,7 @@ class RandomTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(!empty($random->uuid()));
 
 		// Random number between 0 and $len
-		$this->assertTrue(!empty($random->number(256)));
+		$number = $random->number(256);
+		$this->assertTrue(is_int($number) && $number >= 0 && $number <= 256);
 	}
 }

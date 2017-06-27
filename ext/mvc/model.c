@@ -4384,7 +4384,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 	PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(related), str_key, record) {
-		zval tmp = {}, relation = {}, type = {}, columns = {}, referenced_model = {}, referenced_fields = {}, status = {}, referenced_value = {};
+		zval tmp = {}, relation = {}, type = {}, columns = {}, referenced_fields = {}, status = {}, referenced_value = {};
 		if (str_key) {
 			ZVAL_STR(&tmp, str_key);
 			/**
@@ -4404,15 +4404,16 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 					if (Z_TYPE_P(record) != IS_OBJECT) {
 						PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
 						PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Only objects can be stored as part of belongs-to relations");
+						zval_ptr_dtor(&relation);
 						return;
 					}
 
 					PHALCON_CALL_METHOD(&columns, &relation, "getfields");
-					PHALCON_CALL_METHOD(&referenced_model, &relation, "getreferencedmodel");
-					PHALCON_CALL_METHOD(&referenced_fields, &relation, "getreferencedfields");
 					if (Z_TYPE(columns) == IS_ARRAY) {
 						PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
 						PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not implemented");
+						zval_ptr_dtor(&columns);
+						zval_ptr_dtor(&relation);
 						return;
 					}
 
@@ -4438,16 +4439,22 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSaveRelatedRecords){
 					/**
 					 * Read the attribute from the referenced model and assigns it to the current model
 					 */
+					PHALCON_CALL_METHOD(&referenced_fields, &relation, "getreferencedfields");
 					PHALCON_CALL_METHOD(&referenced_value, record, "readattribute", &referenced_fields);
+					zval_ptr_dtor(&referenced_fields);
 
 					/**
 					 * Assign it to the model
 					 */
 					phalcon_update_property_zval_zval(getThis(), &columns, &referenced_value);
+					zval_ptr_dtor(&columns);
+					zval_ptr_dtor(&referenced_value);
 				}
 			}
+			zval_ptr_dtor(&relation);
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&manager);
 
 	RETURN_TRUE;
 }
@@ -4473,161 +4480,183 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 	PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(related), str_key, record) {
-		zval tmp = {}, relation = {}, type = {}, columns = {}, referenced_model = {}, referenced_fields = {}, related_records = {}, value = {}, is_through = {}, intermediate_model_name = {}, exception_message = {};
+		zval tmp = {}, relation = {}, columns = {}, type = {}, referenced_fields = {}, related_records = {}, value = {}, is_through = {}, intermediate_model_name = {}, exception_message = {};
 		zval intermediate_fields = {}, intermediate_referenced_fields = {}, *record_after;
-		if (str_key){
-			ZVAL_STR(&tmp, str_key);
+		if (!str_key){
+			continue;
+		}
+		ZVAL_STR(&tmp, str_key);
+		/**
+		 * Try to get a relation with the same name
+		 */
+		PHALCON_CALL_METHOD(&relation, &manager, "getrelationbyalias", &class_name, &tmp);
+		if (Z_TYPE(relation) != IS_OBJECT && Z_TYPE_P(record) != IS_ARRAY) {
+			PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+
+			PHALCON_CONCAT_SVSVS(&exception_message, "There are no defined relations for the model \"", &class_name, "\" using alias \"", &tmp, "\"");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+			zval_ptr_dtor(&relation);
+			zval_ptr_dtor(&manager);
+			return;
+		}
+
+		PHALCON_CALL_METHOD(&type, &relation, "gettype");
+
+		/**
+		 * Discard belongsTo relations
+		 */
+		if (PHALCON_IS_LONG(&type, 0)) {
+			zval_ptr_dtor(&relation);
+			continue;
+		}
+
+		if (Z_TYPE_P(record) != IS_OBJECT && Z_TYPE_P(record) != IS_ARRAY) {
+			PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Only objects/arrays can be stored as part of has-many/has-one/has-many-to-many relations");
+			zval_ptr_dtor(&relation);
+			zval_ptr_dtor(&manager);
+			return;
+		}
+
+		PHALCON_CALL_METHOD(&columns, &relation, "getfields");
+
+		if (Z_TYPE(columns) == IS_ARRAY) {
+			PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not implemented");
+			zval_ptr_dtor(&relation);
+			zval_ptr_dtor(&manager);
+			zval_ptr_dtor(&columns);
+			return;
+		}
+		PHALCON_CALL_METHOD(&referenced_fields, &relation, "getreferencedfields");
+
+		/**
+		 * Create an implicit array for has-many/has-one records
+		 */
+		if (Z_TYPE_P(record) == IS_OBJECT) {
+			array_init_size(&related_records, 1);
+			phalcon_array_append(&related_records, record, PH_COPY);
+		} else {
+			ZVAL_COPY(&related_records, record);
+		}
+
+		if (!phalcon_isset_property_zval(getThis(), &columns)) {
+			PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+
+			PHALCON_CONCAT_SVS(&exception_message, "The column '", &columns, "' needs to be present in the model");
+			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+			zval_ptr_dtor(&columns);
+			return;
+		}
+
+		/**
+		 * Get the value of the field from the current model
+		 */
+		phalcon_read_property_zval(&value, getThis(), &columns, PH_READONLY);
+
+		/**
+		 * Check if the relation is a has-many-to-many
+		 */
+		PHALCON_CALL_METHOD(&is_through, &relation, "isthrough");
+
+		/**
+		 * Get the rest of intermediate model info
+		 */
+		if (zend_is_true(&is_through)) {
+			PHALCON_CALL_METHOD(&intermediate_model_name, &relation, "getintermediatemodel");
+			PHALCON_CALL_METHOD(&intermediate_fields, &relation, "getintermediatefields");
+			PHALCON_CALL_METHOD(&intermediate_referenced_fields, &relation, "getintermediatereferencedfields");
+		}
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(related_records), record_after) {
+			zval intermediate_model = {}, intermediate_value = {}, status = {};
 			/**
-			 * Try to get a relation with the same name
+			 * For non has-many-to-many relations just assign the local value in the referenced
+			 * model
 			 */
-			PHALCON_CALL_METHOD(&relation, &manager, "getrelationbyalias", &class_name, &tmp);
-			if (Z_TYPE(relation) == IS_OBJECT) {
-				PHALCON_CALL_METHOD(&type, &relation, "gettype");
-
-				/**
-				 * Discard belongsTo relations
-				 */
-				if (PHALCON_IS_LONG(&type, 0)) {
-					continue;
-				}
-
-				if (Z_TYPE_P(record) != IS_OBJECT && Z_TYPE_P(record) != IS_ARRAY) {
-					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-					PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Only objects/arrays can be stored as part of has-many/has-one/has-many-to-many relations");
-					return;
-				}
-
-				PHALCON_CALL_METHOD(&columns, &relation, "getfields");
-				PHALCON_CALL_METHOD(&referenced_model, &relation, "getreferencedmodel");
-				PHALCON_CALL_METHOD(&referenced_fields, &relation, "getreferencedfields");
-
-				if (Z_TYPE(columns) == IS_ARRAY) {
-					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-					PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not implemented");
-					return;
-				}
-
-				/**
-				 * Create an implicit array for has-many/has-one records
-				 */
-				if (Z_TYPE_P(record) == IS_OBJECT) {
-					array_init_size(&related_records, 1);
-					phalcon_array_append(&related_records, record, PH_COPY);
-				} else {
-					ZVAL_COPY_VALUE(&related_records, record);
-				}
-
-				if (!phalcon_isset_property_zval(getThis(), &columns)) {
-					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-
-					PHALCON_CONCAT_SVS(&exception_message, "The column '", &columns, "' needs to be present in the model");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-					return;
-				}
-
-				/**
-				 * Get the value of the field from the current model
-				 */
-				phalcon_read_property_zval(&value, getThis(), &columns, PH_READONLY);
-
-				/**
-				 * Check if the relation is a has-many-to-many
-				 */
-				PHALCON_CALL_METHOD(&is_through, &relation, "isthrough");
-
-				/**
-				 * Get the rest of intermediate model info
-				 */
-				if (zend_is_true(&is_through)) {
-					PHALCON_CALL_METHOD(&intermediate_model_name, &relation, "getintermediatemodel");
-					PHALCON_CALL_METHOD(&intermediate_fields, &relation, "getintermediatefields");
-					PHALCON_CALL_METHOD(&intermediate_referenced_fields, &relation, "getintermediatereferencedfields");
-				}
-
-				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(related_records), record_after) {
-					zval intermediate_model = {}, intermediate_value = {}, status = {};
-					/**
-					 * For non has-many-to-many relations just assign the local value in the referenced
-					 * model
-					 */
-					if (!zend_is_true(&is_through)) {
-						PHALCON_CALL_METHOD(NULL, record_after, "writeattribute", &referenced_fields, &value);
-					}
-
-					/**
-					 * Save the record and get messages
-					 */
-					PHALCON_CALL_METHOD(&status, record_after, "save");
-					if (!zend_is_true(&status)) {
-						/**
-						 * Get the validation messages generated by the referenced model
-						 */
-						if (phalcon_mvc_model_get_messages_from_model(getThis(), record_after, record) == FAILURE) {
-							return;
-						}
-
-						/**
-						 * Rollback the implicit transaction
-						 */
-						PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-						RETURN_FALSE;
-					}
-
-					if (zend_is_true(&is_through)) {
-						/**
-						 * Create a new instance of the intermediate model
-						 */
-						PHALCON_CALL_METHOD(&intermediate_model, &manager, "load", &intermediate_model_name, &PHALCON_GLOBAL(z_true));
-
-						/**
-						 * Write value in the intermediate model
-						 */
-						PHALCON_CALL_METHOD(NULL, &intermediate_model, "writeattribute", &intermediate_fields, &value);
-
-						/**
-						 * Get the value from the referenced model
-						 */
-						phalcon_read_property_zval(&intermediate_value, record_after, &referenced_fields, PH_READONLY);
-
-						/**
-						 * Write the intermediate value in the intermediate model
-						 */
-						PHALCON_CALL_METHOD(NULL, &intermediate_model, "writeattribute", &intermediate_referenced_fields, &intermediate_value);
-
-						/**
-						 * Save the record and get messages
-						 */
-						PHALCON_CALL_METHOD(&status, &intermediate_model, "save");
-						if (!zend_is_true(&status)) {
-							/**
-							 * Get the validation messages generated by the referenced model
-							 */
-							if (phalcon_mvc_model_get_messages_from_model(getThis(), &intermediate_model, record) == FAILURE) {
-								return;
-							}
-
-							/**
-							 * Rollback the implicit transaction
-							 */
-							PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-							zval_ptr_dtor(&intermediate_model);
-							RETURN_FALSE;
-						}
-						zval_ptr_dtor(&intermediate_model);
-					}
-				} ZEND_HASH_FOREACH_END();
-
-			} else {
-				if (Z_TYPE_P(record) != IS_ARRAY) {
-					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
-
-					PHALCON_CONCAT_SVSVS(&exception_message, "There are no defined relations for the model \"", &class_name, "\" using alias \"", &tmp, "\"");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-					return;
-				}
+			if (!zend_is_true(&is_through)) {
+				PHALCON_CALL_METHOD(NULL, record_after, "writeattribute", &referenced_fields, &value);
 			}
+
+			/**
+			 * Save the record and get messages
+			 */
+			PHALCON_CALL_METHOD(&status, record_after, "save");
+			if (!zend_is_true(&status)) {
+				if (zend_is_true(&is_through)) {
+					zval_ptr_dtor(&intermediate_model_name);
+					zval_ptr_dtor(&intermediate_fields);
+					zval_ptr_dtor(&intermediate_referenced_fields);
+				}
+				/**
+				 * Get the validation messages generated by the referenced model
+				 */
+				if (phalcon_mvc_model_get_messages_from_model(getThis(), record_after, record) == FAILURE) {
+					return;
+				}
+
+				/**
+				 * Rollback the implicit transaction
+				 */
+				PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+				RETURN_FALSE;
+			}
+
+			if (zend_is_true(&is_through)) {
+				/**
+				 * Create a new instance of the intermediate model
+				 */
+				PHALCON_CALL_METHOD(&intermediate_model, &manager, "load", &intermediate_model_name, &PHALCON_GLOBAL(z_true));
+
+				/**
+				 * Write value in the intermediate model
+				 */
+				PHALCON_CALL_METHOD(NULL, &intermediate_model, "writeattribute", &intermediate_fields, &value);
+
+				/**
+				 * Get the value from the referenced model
+				 */
+				phalcon_read_property_zval(&intermediate_value, record_after, &referenced_fields, PH_READONLY);
+
+				/**
+				 * Write the intermediate value in the intermediate model
+				 */
+				PHALCON_CALL_METHOD(NULL, &intermediate_model, "writeattribute", &intermediate_referenced_fields, &intermediate_value);
+
+				/**
+				 * Save the record and get messages
+				 */
+				PHALCON_CALL_METHOD(&status, &intermediate_model, "save");
+				if (!zend_is_true(&status)) {
+					zval_ptr_dtor(&intermediate_model_name);
+					zval_ptr_dtor(&intermediate_fields);
+					zval_ptr_dtor(&intermediate_referenced_fields);
+					/**
+					 * Get the validation messages generated by the referenced model
+					 */
+					if (phalcon_mvc_model_get_messages_from_model(getThis(), &intermediate_model, record) == FAILURE) {
+						return;
+					}
+
+					/**
+					 * Rollback the implicit transaction
+					 */
+					PHALCON_CALL_METHOD(NULL, connection, "rollback", nesting);
+					zval_ptr_dtor(&intermediate_model);
+					RETURN_FALSE;
+				}
+				zval_ptr_dtor(&intermediate_model);
+			}
+		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&columns);
+		zval_ptr_dtor(&referenced_fields);
+		if (zend_is_true(&is_through)) {
+			zval_ptr_dtor(&intermediate_model_name);
+			zval_ptr_dtor(&intermediate_fields);
+			zval_ptr_dtor(&intermediate_referenced_fields);
 		}
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&manager);
 
 	/**
 	 * Commit the implicit transaction

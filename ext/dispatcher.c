@@ -28,6 +28,7 @@
 #include "continueexception.h"
 #include "filterinterface.h"
 #include "user/logic.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -653,14 +654,22 @@ PHP_METHOD(Phalcon_Dispatcher, getReturnedValue){
 PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 	zval dependency_injector = {}, events_manager = {}, event_name = {}, exception_code = {}, exception_message = {}, status = {}, handler = {};
-	zval handler_suffix = {}, action_suffix = {};
+	zval handler_suffix = {}, action_suffix = {}, debug_message = {};
 	int number_dispatches = 0, max_dispatches = 256;
+
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		ZVAL_STRING(&debug_message, "Dispatch: ");
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_NO_DI);
 		ZVAL_STRING(&exception_message, "A dependency injection container is required to access related dispatching services");
 		PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+		zval_ptr_dtor(&dependency_injector);
 		return;
 	}
 
@@ -694,6 +703,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		zend_string *param_key;
 		ulong param_idx;
 		long int count_action_params = 0;
+
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			zval times = {};
+			ZVAL_LONG(&times, number_dispatches);
+			PHALCON_CONCAT_SV(&debug_message, "--number_dispatches: ", &times);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
 
 		/**
 		 * Loop until finished is false
@@ -743,6 +760,18 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		if (!zend_is_true(&action_name)) {
 			phalcon_read_property(&action_name, getThis(), SL("_defaultAction"), PH_READONLY);
 			phalcon_update_property(getThis(), SL("_actionName"), &action_name);
+		}
+
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "--namespace: ", &namespace_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_CONCAT_SV(&debug_message, "--handler name: ", &handler_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_CONCAT_SV(&debug_message, "--action name: ", &action_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 		}
 
 		/**

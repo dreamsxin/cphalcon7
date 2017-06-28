@@ -366,7 +366,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 		zval arguments = {};
 		array_init_size(&arguments, 1);
 		phalcon_array_append(&arguments, data, PH_COPY);
-		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
+		if (Z_TYPE_P(return_value) > IS_NULL) {
+			PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
+		} else {
+			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
+		}
 		zval_ptr_dtor(&arguments);
 	}
 	zval_ptr_dtor(&name);
@@ -378,7 +382,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
+		if (Z_TYPE_P(return_value) > IS_NULL) {
+			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
+		} else {
+			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
+		}
 		zval_ptr_dtor(&events_manager);
 	}
 }

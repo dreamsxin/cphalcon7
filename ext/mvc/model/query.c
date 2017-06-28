@@ -3374,7 +3374,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
 	zval model_name = {}, model = {}, instance = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
-	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {};
+	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {}, tmp = {};
 	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {};
 	zval service_name = {}, has = {}, service_params = {};
 	zend_string *str_key;
@@ -3589,6 +3589,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	phalcon_array_update_str(&intermediate, SL("columns"), &select_columns, PH_COPY);
 	zval_ptr_dtor(&select_columns);
 
+	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
 	/**
 	 * The corresponding SQL dialect generates the SQL statement based accordingly with
 	 * the database system
@@ -3597,6 +3601,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	PHALCON_CALL_METHOD(&sql_select, &dialect, "select", &intermediate);
 	zval_ptr_dtor(&dialect);
 	zval_ptr_dtor(&intermediate);
+
+	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &sql_select);
+	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE(tmp) == IS_STRING) {
+		zval_ptr_dtor(&sql_select);
+		ZVAL_COPY(&sql_select, &tmp);
+		zval_ptr_dtor(&tmp);
+	}
 
 	/**
 	 * Replace the placeholders
@@ -3808,8 +3822,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
-	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, connection = {};
-	zval models_instances = {}, model = {}, dialect = {}, sql_insert = {}, processed = {}, processed_types = {}, *value = NULL;
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, connection = {}, models_instances = {};
+	zval model = {}, dialect = {}, sql_insert = {}, processed = {}, processed_types = {}, *value = NULL, tmp = {};
 	zval success = {}, identity_field = {}, support_sequences = {}, sequence_name = {};
 	zend_string *str_key;
 	ulong idx;
@@ -3834,10 +3848,24 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		zval_ptr_dtor(&manager);
 	}
 
+	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&sql_insert, &dialect, "insert", &intermediate);
 	zval_ptr_dtor(&dialect);
 	zval_ptr_dtor(&intermediate);
+
+	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &sql_insert);
+	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE(tmp) == IS_STRING) {
+		zval_ptr_dtor(&sql_insert);
+		ZVAL_COPY(&sql_insert, &tmp);
+		zval_ptr_dtor(&tmp);
+	}
 
 	/**
 	 * Replace the placeholders
@@ -3988,7 +4016,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, connection = {};
-	zval dialect = {}, success = {}, update_sql = {}, processed = {}, processed_types = {}, *value = NULL;
+	zval dialect = {}, success = {}, update_sql = {}, processed = {}, processed_types = {}, *value = NULL, tmp = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -4003,11 +4031,25 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
 	PHALCON_SEPARATE(&bind_types);
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
-	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 
+	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
+	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&update_sql, &dialect, "update", &intermediate);
 	zval_ptr_dtor(&dialect);
 	zval_ptr_dtor(&intermediate);
+
+	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &update_sql);
+	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE(tmp) == IS_STRING) {
+		zval_ptr_dtor(&update_sql);
+		ZVAL_COPY(&update_sql, &tmp);
+		zval_ptr_dtor(&tmp);
+	}
 
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		array_init(&processed);
@@ -4118,41 +4160,39 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
-	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, models = {}, model_name = {}, models_instances = {}, model = {};
-	zval connection = {}, manager = {}, success = {}, dialect = {}, delete_sql = {}, processed = {}, processed_types = {}, *value;
+	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {};
+	zval connection = {}, success = {}, dialect = {}, delete_sql = {}, processed = {}, processed_types = {}, *value, tmp = {};
 	zend_string *str_key;
 	ulong idx;
 
-	ZVAL_STRING(&event_name, "query:beforeExecuteUpdate");
+	ZVAL_STRING(&event_name, "query:beforeExecuteDelete");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
-	PHALCON_CALL_SELF(&intermediate, "getintermediate");
+	PHALCON_CALL_METHOD(&intermediate, getThis(), "getintermediate");
 	PHALCON_SEPARATE(&intermediate);
-	PHALCON_CALL_SELF(&bind_params, "getmergebindparams");
-	PHALCON_CALL_SELF(&bind_types, "getmergebindtypes");
+	PHALCON_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
+	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
+	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
 
-	phalcon_array_fetch_str(&models, &intermediate, SL("models"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_long(&models, 1)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Delete from several models at the same time is still not supported");
-		return;
-	}
-
-	phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY|PH_READONLY);
-
-	/**
-	 * Load the model from the modelsManager or from the _modelsInstances property
-	 */
-	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
-	if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
-		PHALCON_CALL_SELF(&manager, "getmodelsmanager");
-		PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
-	}
-
-	PHALCON_CALL_SELF(&connection, "getconnection");
+	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_CALL_METHOD(&delete_sql, &dialect, "delete", &intermediate);
+	zval_ptr_dtor(&dialect);
+	zval_ptr_dtor(&intermediate);
+
+	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &delete_sql);
+	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE(tmp) == IS_STRING) {
+		zval_ptr_dtor(&delete_sql);
+		ZVAL_COPY(&delete_sql, &tmp);
+		zval_ptr_dtor(&tmp);
+	}
 
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		array_init(&processed);
@@ -4184,7 +4224,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 
 					PHALCON_CONCAT_SV(&query_key, ":", &k);
 					phalcon_array_append(&bind_keys, &query_key, PH_COPY);
+					zval_ptr_dtor(&query_key);
 					phalcon_array_update(&processed, &k, v, PH_COPY);
+					zval_ptr_dtor(&k);
 					phalcon_increment(&hidden_param);
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
@@ -4231,6 +4273,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	}
 
 	PHALCON_CALL_METHOD(&success, &connection, "execute", &delete_sql, &processed, &processed_types);
+	zval_ptr_dtor(&delete_sql);
 	zval_ptr_dtor(&processed_types);
 	zval_ptr_dtor(&processed);
 
@@ -4239,6 +4282,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			PHALCON_CALL_METHOD(&success, &connection, "affectedrows");
 		}
 	}
+	zval_ptr_dtor(&connection);
 
 	/**
 	 * Create a status to report the deletion status
@@ -4246,7 +4290,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	object_init_ex(return_value, phalcon_mvc_model_query_status_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &success);
 
-	ZVAL_STRING(&event_name, "query:afterExecuteUpdate");
+	ZVAL_STRING(&event_name, "query:afterExecuteDelete");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 }

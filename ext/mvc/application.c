@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Call boot event, this allows the developer to perform initialization actions */
 	ZVAL_STRING(&event_name, "application:boot");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
@@ -209,9 +209,8 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_VERIFY_INTERFACE(&router, phalcon_mvc_routerinterface_ce);
 
 	ZVAL_STRING(&event_name, "application:beforeHandleRouter");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &router);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &router);
 	zval_ptr_dtor(&event_name);
-
 	if (PHALCON_IS_FALSE(&status)) {
 		zval_ptr_dtor(&router);
 		zval_ptr_dtor(&dependency_injector);
@@ -224,7 +223,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&event_name, "application:afterHandleRouter");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &router);
 	zval_ptr_dtor(&event_name);
-
 	if (PHALCON_IS_FALSE(&status)) {
 		zval_ptr_dtor(&router);
 		zval_ptr_dtor(&dependency_injector);
@@ -374,11 +372,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
-	if (PHALCON_IS_FALSE(&status)) {
-		zval_ptr_dtor(&dependency_injector);
-		zval_ptr_dtor(&router);
-		RETURN_FALSE;
-	}
 	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY|PH_READONLY);
 
 	/*
@@ -402,15 +395,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&event_name, "application:afterCheckUseImplicitView");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
-
-	if (PHALCON_IS_FALSE(&status)) {
-		zval_ptr_dtor(&dependency_injector);
-		zval_ptr_dtor(&router);
-		if (f_implicit_view) {
-			zval_ptr_dtor(&view);
-		}
-		RETURN_FALSE;
-	}
 
 	/* We get the parameters from the router and assign them to the dispatcher */
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
@@ -585,12 +569,6 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	ZVAL_STRING(&event_name, "application:beforeSendResponse");
 	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &response);
 	zval_ptr_dtor(&event_name);
-
-	if (PHALCON_IS_FALSE(&status)) {
-		zval_ptr_dtor(&controller);
-		zval_ptr_dtor(&response);
-		RETURN_FALSE;
-	}
 
 	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforesendresponse")) == SUCCESS)) {
 		PHALCON_CALL_METHOD(NULL, &controller, "beforesendresponse", &response);

@@ -202,8 +202,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 
-	zval *params = NULL, *dependency_injector = NULL, conditions = {}, bind_params = {}, bind_types = {}, models = {}, columns = {}, group_clause = {}, joins = {};
-	zval having_clause = {}, order_clause = {}, limit_clause = {}, offset_clause = {}, limit = {}, offset = {}, for_update = {}, shared_lock = {};
+	zval *params = NULL, *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
@@ -215,6 +214,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
+		zval conditions = {}, bind_params = {}, bind_types = {}, models = {}, index = {}, columns = {}, group_clause = {}, joins = {};
+		zval having_clause = {}, order_clause = {}, limit_clause = {}, offset_clause = {}, limit = {}, offset = {}, for_update = {}, shared_lock = {};
+
 		/**
 		 * Process conditions
 		 */
@@ -236,6 +238,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&models, params, SL("models"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "from", &models);
+		}
+
+		if (phalcon_array_isset_fetch_str(&index, params, SL("index"), PH_READONLY)) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "setindex", &index);
 		}
 
 		/**

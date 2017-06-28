@@ -90,6 +90,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, getLimit);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, setUniqueRow);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, getUniqueRow);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, forUpdate);
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, setIndex);
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, getIndex);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, sharedLock);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, getParams);
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, fromInput);
@@ -142,6 +144,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_count, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, column, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_criteria_setindex, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, index, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_criteria_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Criteria, setModelName, arginfo_phalcon_mvc_model_criteriainterface_setmodelname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, getModelName, NULL, ZEND_ACC_PUBLIC)
@@ -173,6 +179,8 @@ static const zend_function_entry phalcon_mvc_model_criteria_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Criteria, setUniqueRow, arginfo_phalcon_mvc_model_criteriainterface_setuniquerow, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, getUniqueRow, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, forUpdate, arginfo_phalcon_mvc_model_criteriainterface_forupdate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Criteria, setIndex, arginfo_phalcon_mvc_model_criteria_setindex, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Criteria, getIndex, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, sharedLock, arginfo_phalcon_mvc_model_criteriainterface_sharedlock, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, getParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Criteria, fromInput, arginfo_phalcon_mvc_model_criteriainterface_frominput, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -211,6 +219,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Criteria) {
 	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_limit"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_offset"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_forUpdate"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_index"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_sharedLock"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_mvc_model_criteria_ce, SL("_hiddenParamNumber"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_criteria_ce, SL("_cacheOptions"), ZEND_ACC_PROTECTED);
@@ -1123,6 +1132,33 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, forUpdate) {
 }
 
 /**
+ * Adds the "index" parameter to the criteria
+ *
+ * @param string $index
+ * @return Phalcon\Mvc\Model\CriteriaInterface
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, setIndex) {
+
+	zval *index;
+
+	phalcon_fetch_params(0, 1, 0, &index);
+
+	phalcon_update_property(getThis(), SL("_index"), index);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the index
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Criteria, getIndex){
+
+
+	RETURN_MEMBER(getThis(), "_index");
+}
+
+/**
  * Adds the "shared_lock" parameter to the criteria
  *
  * @param boolean $sharedLock
@@ -1388,7 +1424,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, having) {
  */
 PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
-	zval phql = {}, dependency_injector = {}, cache_options = {}, unique_row = {};
+	zval phql = {}, dependency_injector = {}, cache_options = {}, unique_row = {}, index = {};
 	zval query = {}, bind_params = {}, bind_types = {};
 
 	PHALCON_CALL_SELF(&phql, "getphql");
@@ -1396,6 +1432,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&unique_row, getThis(), SL("_uniqueRow"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&index, getThis(), SL("_index"), PH_NOISY|PH_READONLY);
 
 	object_init_ex(&query, phalcon_mvc_model_query_ce);
 	PHALCON_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
@@ -1407,6 +1444,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Criteria, execute) {
 
 	if (Z_TYPE(unique_row) != IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, &query, "setuniquerow", &unique_row);
+	}
+
+	if (Z_TYPE(index) != IS_NULL) {
+		PHALCON_CALL_METHOD(NULL, &query, "setindex", &index);
 	}
 
 	phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);

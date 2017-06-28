@@ -128,6 +128,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, setBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setMergeBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getMergeBindTypes);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setIndex);
+PHP_METHOD(Phalcon_Mvc_Model_Query, getIndex);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModels);
@@ -182,6 +184,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setmergebindtypes, 0, 0, 1)
 	ZEND_ARG_INFO(0, bindTypes)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setindex, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, index, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setintermediate, 0, 0, 1)
@@ -241,6 +247,8 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setMergeBindTypes, arginfo_phalcon_mvc_model_query_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getMergeBindTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, setIndex, arginfo_phalcon_mvc_model_query_setindex, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, getIndex, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setIntermediate, arginfo_phalcon_mvc_model_query_setintermediate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getIntermediate, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getModels, NULL, ZEND_ACC_PUBLIC)
@@ -278,7 +286,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query){
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_bindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_mergeBindParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_mergeBindTypes"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_irPhqlCache"), ZEND_ACC_STATIC|ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_index"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_SELECT"), PHQL_T_SELECT);
 	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_INSERT"), PHQL_T_INSERT);
@@ -3589,6 +3597,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	phalcon_array_update_str(&intermediate, SL("columns"), &select_columns, PH_COPY);
 	zval_ptr_dtor(&select_columns);
 
+	PHALCON_CALL_METHOD(&tmp, getThis(), "getindex");
+	if (Z_TYPE(tmp) > IS_NULL) {
+		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+		zval_ptr_dtor(&tmp);
+	}
+
 	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
@@ -3848,6 +3862,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		zval_ptr_dtor(&manager);
 	}
 
+	PHALCON_CALL_METHOD(&tmp, getThis(), "getindex");
+	if (Z_TYPE(tmp) > IS_NULL) {
+		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+		zval_ptr_dtor(&tmp);
+	}
+
 	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
@@ -4032,6 +4052,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	PHALCON_SEPARATE(&bind_types);
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
 
+	PHALCON_CALL_METHOD(&tmp, getThis(), "getindex");
+	if (Z_TYPE(tmp) > IS_NULL) {
+		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+		zval_ptr_dtor(&tmp);
+	}
+
 	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
@@ -4174,6 +4200,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	PHALCON_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
 	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
 	PHALCON_CALL_METHOD(&connection, getThis(), "getconnection");
+
+	PHALCON_CALL_METHOD(&tmp, getThis(), "getindex");
+	if (Z_TYPE(tmp) > IS_NULL) {
+		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+		zval_ptr_dtor(&tmp);
+	}
 
 	ZVAL_STRING(&event_name, "query:beforeGenerateSQLStatement");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
@@ -4666,6 +4698,33 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getMergeBindParams){
 
 
 	RETURN_MEMBER(getThis(), "_mergeBindParams");
+}
+
+/**
+ * Adds the index
+ *
+ * @param string $index
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, setIndex) {
+
+	zval *index;
+
+	phalcon_fetch_params(0, 1, 0, &index);
+
+	phalcon_update_property(getThis(), SL("_index"), index);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the index
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, getIndex){
+
+
+	RETURN_MEMBER(getThis(), "_index");
 }
 
 /**

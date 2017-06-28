@@ -690,7 +690,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
  */
 PHP_METHOD(Phalcon_Db_Dialect, select){
 
-	zval *definition, escape_char = {}, columns = {}, distinct = {}, *column, columns_sql = {}, tables = {}, *table;
+	zval *definition, escape_char = {}, columns = {}, distinct = {}, index = {}, *column, columns_sql = {}, tables = {}, *table;
 	zval tables_sql = {}, sql = {}, joins = {}, *join = NULL, where_conditions = {}, where_expression = {}, group_fields = {};
 	zval having_conditions = {}, having_expression = {}, order_fields = {};
 	zval tmp1 = {}, tmp2 = {}, limit_value = {}, number = {}, offset = {};
@@ -825,6 +825,12 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	PHALCON_SCONCAT_VSV(&sql, &columns_sql, " FROM ", &tables_sql);
 	zval_ptr_dtor(&tables_sql);
 	zval_ptr_dtor(&columns_sql);
+
+	if (phalcon_array_isset_fetch_str(&index, definition, SL("index"), PH_READONLY)) {
+		if (Z_TYPE(index) == IS_STRING) {
+			PHALCON_SCONCAT_SV(&sql, " ", &index);
+		}
+	}
 
 	/**
 	 * Check for joins

@@ -549,6 +549,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				ZVAL_STRING(&debug_message, "Add Route paths: ");
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 				PHALCON_DEBUG_LOG(paths);
 			}
 
@@ -606,6 +607,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		ZVAL_STRING(&debug_message, "Update Route paths: ");
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 		PHALCON_DEBUG_LOG(&route_paths);
 	}
 	zval_ptr_dtor(&route_paths);

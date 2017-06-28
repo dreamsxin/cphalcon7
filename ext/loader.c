@@ -445,6 +445,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Find class: ", class_name);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	RETVAL_FALSE;
@@ -482,6 +483,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &file_path);
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 				}
 
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
@@ -507,6 +509,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 			zval_ptr_dtor(&file_path);
 		} ZEND_HASH_FOREACH_END();

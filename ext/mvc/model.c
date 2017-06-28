@@ -2560,13 +2560,21 @@ PHP_METHOD(Phalcon_Mvc_Model, average){
  * Fires an event, implicitly calls behaviors and listeners in the events manager are notified
  *
  * @param string $eventName
+ * @param mixed $data
  * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {}, lower = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event: ", eventname);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -2602,13 +2610,22 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
  * This method stops if one of the callbacks/listeners returns boolean false
  *
  * @param string $eventName
+ * @param mixed $data
+ * @param boolean $cancelAble
  * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, lower = {}, status = {}, models_manager = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event (Cancel): ", eventname);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);

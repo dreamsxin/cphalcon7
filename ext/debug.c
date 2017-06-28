@@ -28,7 +28,9 @@
 #include "loader.h"
 
 #include <ext/standard/php_string.h>
+#include <ext/standard/php_var.h>
 #include <Zend/zend_builtin_functions.h>
+#include <Zend/zend_execute.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -81,6 +83,7 @@ PHP_METHOD(Phalcon_Debug, getFileLink);
 PHP_METHOD(Phalcon_Debug, enable);
 PHP_METHOD(Phalcon_Debug, disable);
 PHP_METHOD(Phalcon_Debug, log);
+PHP_METHOD(Phalcon_Debug, dumpVar);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_seturi, 0, 0, 1)
 	ZEND_ARG_INFO(0, uri)
@@ -144,6 +147,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_log, 0, 0, 1)
 	ZEND_ARG_INFO(0, context)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_dumpvar, 0, 0, 1)
+	ZEND_ARG_INFO(0, var)
+	ZEND_ARG_TYPE_INFO(0, level, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_debug_method_entry[] = {
 	PHP_ME(Phalcon_Debug, setUri, arginfo_phalcon_debug_seturi, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug, setShowBackTrace, arginfo_phalcon_debug_setshowbacktrace, ZEND_ACC_PUBLIC)
@@ -174,6 +182,7 @@ static const zend_function_entry phalcon_debug_method_entry[] = {
 	PHP_ME(Phalcon_Debug, enable, arginfo_phalcon_debug_enable, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, disable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, log, arginfo_phalcon_debug_log, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Debug, dumpVar, arginfo_phalcon_debug_dumpvar, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -1502,4 +1511,24 @@ PHP_METHOD(Phalcon_Debug, log){
 	} else if (!zend_is_true(&listen)) {
 		phalcon_debug_print_r(message);
 	}
+}
+
+/**
+ * Dumps a string representation of variable to output
+ *
+ * @param mixed $var
+ */
+PHP_METHOD(Phalcon_Debug, dumpVar){
+
+	zval *var, *level = NULL;
+	int lvl = 0;
+
+	phalcon_fetch_params(0, 1, 1, &var, &level);
+
+	if (level && Z_LVAL_P(level) > 0) {
+		lvl = Z_LVAL_P(level);
+	}
+
+	zend_printf("File: %s, Line: %d\n", zend_get_executed_filename(), zend_get_executed_lineno());
+	php_debug_zval_dump(var, lvl);
 }

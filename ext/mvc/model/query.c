@@ -3240,6 +3240,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	/**

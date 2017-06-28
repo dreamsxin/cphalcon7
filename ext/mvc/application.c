@@ -47,6 +47,7 @@
 #include "kernel/file.h"
 #include "kernel/require.h"
 #include "kernel/string.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 

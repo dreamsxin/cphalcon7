@@ -464,6 +464,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Handle the URI: ", &real_uri);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 	zval_ptr_dtor(&real_uri);
 
@@ -591,6 +592,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_CONCAT_SV(&debug_message, "--Route Pattern: ", &pattern);
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 		}
 
 		ZVAL_NULL(&matches);
@@ -650,6 +652,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					ZVAL_STRING(&debug_message, "--Found matches: ");
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 					PHALCON_DEBUG_LOG(&matches);
 				}
 
@@ -662,6 +665,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					ZVAL_STRING(&debug_message, "--Route paths: ");
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 					PHALCON_DEBUG_LOG(&paths);
 				}
 
@@ -747,6 +751,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found Route: ", &pattern);
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 			zval_ptr_dtor(&matches);
 			zval_ptr_dtor(&pattern);
@@ -783,6 +788,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			ZVAL_STRING(&debug_message, "--Route Parts: ");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 			PHALCON_DEBUG_LOG(&parts);
 		}
 
@@ -921,8 +927,9 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		zval_ptr_dtor(&params_merge);
 	} else {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			ZVAL_STRING(&debug_message, "--Use Debug");
+			ZVAL_STRING(&debug_message, "--Use default values");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 		}
 
 		/**

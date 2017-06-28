@@ -193,8 +193,8 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
  *    'limit'      => 20,
  *    'offset'     => 20,
  *    // or 'limit' => array(20, 20),
- *);
- *$queryBuilder = new Phalcon\Mvc\Model\Query\Builder\Select($params);
+ * );
+ * $queryBuilder = new Phalcon\Mvc\Model\Query\Builder\Select($params);
  *</code>
  *
  * @param array $params

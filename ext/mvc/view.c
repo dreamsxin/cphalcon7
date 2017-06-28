@@ -1075,6 +1075,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
@@ -1097,6 +1098,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 				}
 				zval_ptr_dtor(&view_engine_path);
 				continue;
@@ -1106,6 +1108,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 
 			/**

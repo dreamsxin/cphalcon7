@@ -78,6 +78,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getMergeBindParams);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getBindTypes);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getMergeBindTypes);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setIndex);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getIndex);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, compile);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery);
@@ -101,6 +103,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_setbindtypes, 0, 
 	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_setindex, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, index, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_query_builder_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, create, arginfo_phalcon_mvc_model_query_builder_create, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, createSelectBuilder, arginfo_phalcon_mvc_model_query_builder_createselectbuilder, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -114,6 +120,8 @@ static const zend_function_entry phalcon_mvc_model_query_builder_method_entry[] 
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, setBindTypes, arginfo_phalcon_mvc_model_query_builder_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, getBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, getMergeBindTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder, setIndex, arginfo_phalcon_mvc_model_query_builder_setindex, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder, getIndex, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, compile, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, getPhql, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder, getQuery, NULL, ZEND_ACC_PUBLIC)
@@ -134,6 +142,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder){
 	zend_declare_property_null(phalcon_mvc_model_query_builder_ce, SL("_mergeBindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_ce, SL("_phql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_mvc_model_query_builder_ce, SL("_hiddenParamNumber"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_ce, SL("_index"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_query_builder_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 
@@ -487,6 +496,33 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getMergeBindTypes){
 }
 
 /**
+ * Adds the index
+ *
+ * @param string $index
+ * @return Phalcon\Mvc\Model\Query\Builder
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setIndex) {
+
+	zval *index;
+
+	phalcon_fetch_params(0, 1, 0, &index);
+
+	phalcon_update_property(getThis(), SL("_index"), index);
+	RETURN_THIS();
+}
+
+/**
+ * Gets the index
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getIndex){
+
+
+	RETURN_MEMBER(getThis(), "_index");
+}
+
+/**
  * Compile the PHQL query
  *
  * @return Phalcon\Mvc\Model\Query\Builder
@@ -516,7 +552,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
-	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {};
+	zval phql = {}, bind_params = {}, bind_types = {}, index = {}, dependency_injector = {}, service_name = {}, has = {}, args = {};
 
 	/**
 	 * Process the PHQL
@@ -524,6 +560,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	PHALCON_CALL_METHOD(&phql, getThis(), "getphql");
 	PHALCON_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
 	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
+	PHALCON_CALL_METHOD(&index, getThis(), "getindex");
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 
@@ -548,7 +585,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	/**
 	 * Set default bind params
 	 */
-	if (Z_TYPE(bind_params) == IS_ARRAY) {
+	if (Z_TYPE(bind_params) > IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, return_value, "setbindparams", &bind_params);
 		zval_ptr_dtor(&bind_params);
 	}
@@ -556,8 +593,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	/**
 	 * Set default bind params
 	 */
-	if (Z_TYPE(bind_types) == IS_ARRAY) {
+	if (Z_TYPE(bind_types) > IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, return_value, "setbindtypes", &bind_types);
 		zval_ptr_dtor(&bind_types);
+	}
+
+	/**
+	 * Set index
+	 */
+	if (Z_TYPE(index) > IS_NULL) {
+		PHALCON_CALL_METHOD(NULL, return_value, "setindex", &index);
+		zval_ptr_dtor(&index);
 	}
 }

@@ -47,6 +47,7 @@
 #include "kernel/file.h"
 #include "kernel/require.h"
 #include "kernel/string.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -330,6 +331,13 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				 */
 				PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders", &dependency_injector);
 				PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
+			} else {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_application_exception_ce, "Invalid module definition");
+				zval_ptr_dtor(&module_object);
+				zval_ptr_dtor(&dependency_injector);
+				zval_ptr_dtor(&module_name);
+				zval_ptr_dtor(&router);
+				return;
 			}
 			zval_ptr_dtor(&module_object);
 		} else if (Z_TYPE(module) == IS_OBJECT) {
@@ -393,7 +401,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_CALL_METHOD(NULL, &view, "start");
 	}
 	ZVAL_STRING(&event_name, "application:afterCheckUseImplicitView");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
 	/* We get the parameters from the router and assign them to the dispatcher */
@@ -429,7 +437,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeHandleRequest */
 	ZVAL_STRING(&event_name, "application:beforeHandleRequest");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &dispatcher);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &dispatcher);
 	zval_ptr_dtor(&event_name);
 
 	if (PHALCON_IS_FALSE(&status)) {
@@ -567,7 +575,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 	/* Calling beforeSendResponse */
 	ZVAL_STRING(&event_name, "application:beforeSendResponse");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &response);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &response);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforesendresponse")) == SUCCESS)) {

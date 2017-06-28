@@ -407,6 +407,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render Simple View: ", view_path);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	ZVAL_TRUE(&not_exists);
@@ -452,6 +453,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 				}
 
 				/**
@@ -482,6 +484,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 		} ZEND_HASH_FOREACH_END();
 

@@ -23,6 +23,7 @@
 #include "mvc/../dispatcherinterface.h"
 #include "mvc/dispatcher/exception.h"
 #include "http/responseinterface.h"
+#include "mvc/../debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -191,9 +192,15 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 
 	zval *message, *code = NULL, error_handlers = {}, error_handler = {}, previous_namespace_name = {}, previous_controller_name = {};
 	zval previous_action_name = {}, previous_params = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {};
-	zval exception = {}, events_manager = {}, event_name = {}, status = {};
+	zval exception = {}, events_manager = {}, event_name = {}, status = {}, debug_message = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &code);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--exception: ", message);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!code) {
 		code = &PHALCON_GLOBAL(z_zero);

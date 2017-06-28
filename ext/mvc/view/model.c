@@ -617,6 +617,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render Model View: ", &tpl);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	if (Z_TYPE(vars) == IS_ARRAY) {
@@ -655,6 +656,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					PHALCON_CONCAT_SV(&debug_message, "--Found: ", &view_engine_path);
 					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
 				}
 
 				/**
@@ -687,6 +689,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &view_engine_path);
 				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 			zval_ptr_dtor(&view_engine_path);
 		} ZEND_HASH_FOREACH_END();

@@ -105,7 +105,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Delete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, __construct){
 
-	zval *params = NULL, *dependency_injector = NULL, conditions = {}, bind_params = {}, bind_types = {}, table = {};
+	zval *params = NULL, *dependency_injector = NULL;
 
 	phalcon_fetch_params(0, 0, 2, &params, &dependency_injector);
 
@@ -117,7 +117,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
-
+		zval conditions = {}, bind_params = {}, bind_types = {}, table = {}, index = {};
 		/**
 		 * Process conditions
 		 */
@@ -136,6 +136,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, __construct){
 
 		if (phalcon_array_isset_fetch_str(&table, params, SL("table"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "settable", &table);
+		}
+
+		if (phalcon_array_isset_fetch_str(&index, params, SL("index"), PH_READONLY)) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "setindex", &index);
 		}
 	}
 }

@@ -28,6 +28,7 @@
 #include "continueexception.h"
 #include "filterinterface.h"
 #include "user/logic.h"
+#include "debug.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -88,7 +89,6 @@ PHP_METHOD(Phalcon_Dispatcher, camelizeNamespace);
 PHP_METHOD(Phalcon_Dispatcher, camelizeController);
 PHP_METHOD(Phalcon_Dispatcher, setErrorHandler);
 PHP_METHOD(Phalcon_Dispatcher, getErrorHandler);
-PHP_METHOD(Phalcon_Dispatcher, fireEvent);
 PHP_METHOD(Phalcon_Dispatcher, getLastException);
 PHP_METHOD(Phalcon_Dispatcher, getLastHandler);
 PHP_METHOD(Phalcon_Dispatcher, getPreviousNamespaceName);
@@ -144,7 +144,6 @@ static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, camelizeController, arginfo_phalcon_dispatcherinterface_camelizecontroller, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setErrorHandler, arginfo_phalcon_dispatcherinterface_seterrorhandler, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getErrorHandler, arginfo_phalcon_dispatcherinterface_geterrorhandler, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Dispatcher, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getLastException, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getLastHandler, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getPreviousNamespaceName, NULL, ZEND_ACC_PUBLIC)
@@ -655,14 +654,22 @@ PHP_METHOD(Phalcon_Dispatcher, getReturnedValue){
 PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 	zval dependency_injector = {}, events_manager = {}, event_name = {}, exception_code = {}, exception_message = {}, status = {}, handler = {};
-	zval handler_suffix = {}, action_suffix = {};
+	zval handler_suffix = {}, action_suffix = {}, debug_message = {};
 	int number_dispatches = 0, max_dispatches = 256;
+
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		ZVAL_STRING(&debug_message, "Dispatch: ");
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_NO_DI);
 		ZVAL_STRING(&exception_message, "A dependency injection container is required to access related dispatching services");
 		PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+		zval_ptr_dtor(&dependency_injector);
 		return;
 	}
 
@@ -672,7 +679,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 	 * Calling beforeDispatchLoop
 	 */
 	ZVAL_STRING(&event_name, "dispatch:beforeDispatchLoop");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		zval_ptr_dtor(&dependency_injector);
@@ -696,6 +703,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		zend_string *param_key;
 		ulong param_idx;
 		long int count_action_params = 0;
+
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			zval times = {};
+			ZVAL_LONG(&times, number_dispatches);
+			PHALCON_CONCAT_SV(&debug_message, "--number_dispatches: ", &times);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
 
 		/**
 		 * Loop until finished is false
@@ -747,12 +762,24 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			phalcon_update_property(getThis(), SL("_actionName"), &action_name);
 		}
 
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "--namespace: ", &namespace_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_CONCAT_SV(&debug_message, "--handler name: ", &handler_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_CONCAT_SV(&debug_message, "--action name: ", &action_name);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
+
 		/**
 		 * Calling beforeDispatch
 		 */
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "dispatch:beforeDispatch");
-			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
@@ -884,7 +911,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				ZVAL_STRING(&event_name, "dispatch:beforeNotFoundAction");
-				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
 					zval_ptr_dtor(&action_method);
@@ -921,7 +948,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			ZVAL_STRING(&event_name, "dispatch:beforeExecuteRoute");
-			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 			zval_ptr_dtor(&event_name);
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
@@ -967,7 +994,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 */
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				ZVAL_STRING(&event_name, "dispatch:afterInitialize");
-				PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
 					continue;
@@ -1138,12 +1165,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * Call afterExecuteRoute
 			 */
 			ZVAL_STRING(&event_name, "dispatch:afterExecuteRoute");
-			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 			zval_ptr_dtor(&event_name);
-			if (PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&value);
-				continue;
-			}
 
 			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
@@ -1155,7 +1178,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			 * Call afterDispatch
 			 */
 			ZVAL_STRING(&event_name, "dispatch:afterDispatch");
-			PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 			zval_ptr_dtor(&event_name);
 		}
 
@@ -1491,57 +1514,6 @@ PHP_METHOD(Phalcon_Dispatcher, getErrorHandler){
 	}
 
 	RETURN_NULL();
-}
-
-/**
- * Fires an event, implicitly calls behaviors and listeners in the events manager are notified
- *
- * @param string $eventName
- * @param string $data
- * @param string $cancelable
- * @return boolean
- */
-PHP_METHOD(Phalcon_Dispatcher, fireEvent){
-
-	zval *eventname, *data = NULL, *cancelable = NULL, event_name = {}, status = {}, e = {}, exception = {};
-	int ret, ret2;
-
-	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
-
-	if (!data) {
-		data = &PHALCON_GLOBAL(z_null);
-	}
-
-	if (!cancelable) {
-		cancelable = &PHALCON_GLOBAL(z_null);
-	}
-
-	zval *params[] = {eventname, data, cancelable};
-	ret = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 3, params);
-
-	if (EG(exception)) {
-		ZVAL_OBJ(&e, EG(exception));
-		ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
-
-		zend_clear_exception();
-
-		/* Shortcut, save one method call */
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
-
-		zval *params[] = {&event_name, &exception};
-		ret2 = phalcon_call_method_with_params(&status, getThis(), phalcon_dispatcher_ce, phalcon_fcall_parent, SL("fireevent"), 2, params);
-		zval_ptr_dtor(&event_name);
-		zval_ptr_dtor(&exception);
-		if (ret2 == SUCCESS && PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
-		}
-	}
-
-	if (ret == FAILURE || PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
-	}
-
-	RETURN_TRUE;
 }
 
 /**

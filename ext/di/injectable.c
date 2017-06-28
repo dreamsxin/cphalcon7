@@ -26,6 +26,7 @@
 #include "events/eventsawareinterface.h"
 #include "events/managerinterface.h"
 #include "diinterface.h"
+#include "debug.h"
 
 #include <Zend/zend_closures.h>
 
@@ -38,6 +39,7 @@
 #include "kernel/array.h"
 #include "kernel/operators.h"
 #include "kernel/string.h"
+#include "kernel/debug.h"
 
 #include "internal/arginfo.h"
 #include "interned-strings.h"
@@ -202,8 +204,15 @@ PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event: ", eventname);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -268,8 +277,15 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event (Cancel): ", eventname);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -338,8 +354,15 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 
 	zval *eventname, *data = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 1, &eventname, &data);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event (Data): ", eventname);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);

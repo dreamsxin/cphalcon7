@@ -494,14 +494,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
 			ZVAL_STRING(&debug_message, "Bind Params: ");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
 			ZVAL_STRING(&debug_message, "Bind Types: ");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 			PHALCON_DEBUG_LOG(bind_types);
 		}
 	}
@@ -585,14 +588,17 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 		if (bind_params && PHALCON_IS_NOT_EMPTY(bind_params)) {
 			ZVAL_STRING(&debug_message, "Bind Params: ");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 			PHALCON_DEBUG_LOG(bind_params);
 		}
 		if (bind_types && PHALCON_IS_NOT_EMPTY(bind_types)) {
 			ZVAL_STRING(&debug_message, "Bind Types: ");
 			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
 			PHALCON_DEBUG_LOG(bind_types);
 		}
 	}
@@ -910,6 +916,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "DB BEGIN TRANSACTION LEVEL: ", &transaction_level);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
@@ -991,6 +998,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "DB ROLLBACK TRANSACTION LEVEL: ", &transaction_level);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
@@ -1085,6 +1093,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "DB COMMIT TRANSACTION LEVEL: ", &transaction_level);
 		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {

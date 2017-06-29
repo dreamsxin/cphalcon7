@@ -238,7 +238,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	zval original_builder = {}, builder = {}, total_builder = {}, limit = {}, number_page = {}, number = {}, query = {}, items = {}, total_query = {}, result = {}, row = {}, rowcount = {}, dependency_injector = {};
 	zval service_name = {}, models_manager = {}, models = {}, model_name = {}, model = {}, connection = {}, bind_params = {}, bind_types = {}, processed = {}, *value, processed_types = {};
-	zval intermediate = {}, columns = {}, *column, dialect = {}, sql_select = {}, sql = {};
+	zval intermediate = {}, columns = {}, *column, dialect = {}, sql_select = {}, sql = {}, tmp = {};
 	zend_string *str_key;
 	ulong idx;
 	ldiv_t tp;
@@ -330,6 +330,12 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	zval_ptr_dtor(&model);
 	PHALCON_CALL_METHOD(&intermediate, &total_query, "parse");
 	PHALCON_SEPARATE(&intermediate);
+
+	PHALCON_CALL_METHOD(&tmp, &total_query, "getindex");
+	if (Z_TYPE(tmp) > IS_NULL) {
+		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+		zval_ptr_dtor(&tmp);
+	}
 
 	phalcon_array_fetch_string(&columns, &intermediate, IS(columns), PH_READONLY);
 

@@ -373,6 +373,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
+		zval_ptr_dtor(&event_parts);
 	} else {
 		ZVAL_COPY(&name, &lower);
 	}

@@ -354,13 +354,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
-	phalcon_get_class(&class_name, model, 1);
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_CALL_METHOD(&key, model, "getmetadatacachekey");
+	}
 
-	/**
-	 * Unique key for meta-data is created using class-name-schema-table
-	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-	zval_ptr_dtor(&class_name);
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		phalcon_get_class(&class_name, model, 1);
+
+		/**
+		 * Unique key for meta-data is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+		zval_ptr_dtor(&class_name);
+	}
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
@@ -371,6 +377,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 	zval_ptr_dtor(&table);
 
 	if (!phalcon_array_isset_fetch(return_value, &meta_data, &key, PH_COPY)) {
+		zval_ptr_dtor(&key);
 		RETVAL_NULL();
 	}
 	zval_ptr_dtor(&key);
@@ -398,13 +405,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
-	phalcon_get_class(&class_name, model, 1);
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_CALL_METHOD(&key, model, "getmetadatacachekey");
+	}
 
-	/**
-	 * Unique key for meta-data is created using class-name-schema-table
-	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-	zval_ptr_dtor(&class_name);
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		phalcon_get_class(&class_name, model, 1);
+
+		/**
+		 * Unique key for meta-data is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+		zval_ptr_dtor(&class_name);
+	}
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 
@@ -456,13 +469,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
-	phalcon_get_class(&class_name, model, 1);
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_CALL_METHOD(&key, model, "getmetadatacachekey");
+	}
 
-	/**
-	 * Unique key for meta-data is created using class-name-schema-table
-	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-	zval_ptr_dtor(&class_name);
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		phalcon_get_class(&class_name, model, 1);
+
+		/**
+		 * Unique key for meta-data is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+		zval_ptr_dtor(&class_name);
+	}
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
@@ -514,13 +533,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
-	phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_CALL_METHOD(&key, model, "getmetadatacachekey");
+	}
 
-	/**
-	 * Unique key for map is created using class-name-schema-table
-	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-	zval_ptr_dtor(&class_name);
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
+
+		/**
+		 * Unique key for map is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+		zval_ptr_dtor(&class_name);
+	}
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
@@ -557,13 +582,19 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	PHALCON_CALL_METHOD(&table, model, "getsource");
 	PHALCON_CALL_METHOD(&schema, model, "getschema");
 
-	phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_CALL_METHOD(&key, model, "getmetadatacachekey");
+	}
 
-	/**
-	 * Unique key for map is created using class-name-schema-table
-	 */
-	PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-	zval_ptr_dtor(&class_name);
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
+
+		/**
+		 * Unique key for map is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
+		zval_ptr_dtor(&class_name);
+	}
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {

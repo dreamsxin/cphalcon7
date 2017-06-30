@@ -3222,16 +3222,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 
 	phalcon_fetch_params(0, 0, 1, &_phql);
 
-	ZVAL_STRING(&event_name, "query:beforeParse");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-	zval_ptr_dtor(&event_name);
-
 	if (!_phql) {
-		phalcon_read_property(&intermediate, getThis(), SL("_intermediate"), PH_NOISY|PH_READONLY);
-		if (Z_TYPE(intermediate) == IS_ARRAY) {
-			RETURN_CTOR(&intermediate);
-		}
-
 		phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&phql, _phql);
@@ -3241,6 +3232,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 		PHALCON_CONCAT_SV(&debug_message, "Parse PHQL: ", &phql);
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
+	}
+
+	ZVAL_STRING(&event_name, "query:beforeParse");
+	PHALCON_CALL_METHOD(&intermediate, getThis(), "fireeventdata", &event_name, &phql);
+	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE(intermediate) == IS_ARRAY) {
+		RETURN_ZVAL(&intermediate, 0, 0);
+	}
+	zval_ptr_dtor(&intermediate);
+
+	if (!_phql) {
+		phalcon_read_property(&intermediate, getThis(), SL("_intermediate"), PH_NOISY|PH_READONLY);
+		if (Z_TYPE(intermediate) == IS_ARRAY) {
+			RETURN_CTOR(&intermediate);
+		}
 	}
 
 	/**
@@ -3292,13 +3299,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 		return;
 	}
 
-	phalcon_update_property(getThis(), SL("_intermediate"), &ir_phql);
-
 	ZVAL_STRING(&event_name, "query:afterParse");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &ir_phql);
 	zval_ptr_dtor(&event_name);
 
-	RETVAL_ZVAL(&ir_phql, 0, 0);
+	if (Z_TYPE_P(return_value) == IS_ARRAY) {
+		zval_ptr_dtor(&ir_phql);
+		phalcon_update_property(getThis(), SL("_intermediate"), return_value);
+	} else {
+		phalcon_update_property(getThis(), SL("_intermediate"), &ir_phql);
+		RETVAL_ZVAL(&ir_phql, 0, 0);
+	}
 }
 
 /**

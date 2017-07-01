@@ -37,6 +37,7 @@ const phql_token_names phql_tokens[] =
   { SL("ILIKE"),         PHQL_T_ILIKE },
   { SL("DOT"),           PHQL_T_DOT },
   { SL("COLON"),         PHQL_T_COLON },
+  { SL("DOUBLECOLON"),   PHQL_T_DOUBLECOLON },
   { SL("COMMA"),         PHQL_T_COMMA },
   { SL("EQUALS"),        PHQL_T_EQUALS },
   { SL("NOT EQUALS"),    PHQL_T_NOTEQUALS },
@@ -99,6 +100,11 @@ const phql_token_names phql_tokens[] =
   { SL("THEN"),          PHQL_T_THEN },
   { SL("ELSE"),          PHQL_T_ELSE },
   { SL("END"),           PHQL_T_END },
+  { SL("WITH"),          PHQL_T_WITH },
+  { SL("FORCE"),         PHQL_T_FORCE },
+  { SL("IGNORE"),        PHQL_T_IGNORE },
+  { SL("USE"),           PHQL_T_USE },
+  { SL("INDEX"),         PHQL_T_INDEX },
   { NULL, 0, 0 }
 };
 

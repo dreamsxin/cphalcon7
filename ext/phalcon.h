@@ -143,6 +143,7 @@
 
 #include "exception.h"
 #include "continueexception.h"
+#include "exitexception.h"
 
 #include "filter.h"
 #include "filterinterface.h"

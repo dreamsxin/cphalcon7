@@ -622,6 +622,7 @@ acl/adapter.c \
 acl/roleinterface.c \
 exception.c \
 continueexception.c \
+exitexception.c \
 crypt.c \
 filter.c \
 dispatcher.c \

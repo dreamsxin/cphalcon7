@@ -2461,7 +2461,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 	 */
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(selected_models), selected_model) {
 		zval qualified_name = {}, model_name = {}, ns_alias = {}, real_namespace = {}, real_model_name = {};
-		zval model = {}, schema = {}, source = {}, complete_source = {}, alias = {}, phql = {}, exception_message = {};
+		zval model = {}, schema = {}, source = {}, indexs = {}, complete_source = {}, alias = {}, phql = {}, exception_message = {};
 
 		phalcon_array_fetch_str(&qualified_name, selected_model, SL("qualifiedName"), PH_NOISY|PH_READONLY);
 		phalcon_array_fetch_string(&model_name, &qualified_name, IS(name), PH_NOISY|PH_READONLY);
@@ -2546,6 +2546,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			phalcon_array_update(&sql_models_aliases, &model_name, &model_name, PH_COPY);
 			phalcon_array_update(&sql_aliases_models_instances, &model_name, &model, PH_COPY);
 			phalcon_array_update(&models, &model_name, &source, PH_COPY);
+		}
+
+		if (phalcon_array_isset_fetch_str(&indexs, selected_model, SL("indexs"), PH_READONLY)) {
+			phalcon_array_append(&complete_source, &indexs, PH_COPY);
 		}
 
 		phalcon_array_append(&sql_models, &model_name, PH_COPY);

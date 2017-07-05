@@ -18,23 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
-#include "continueexception.h"
+#ifndef PHALCON_EXITEXCEPTION_H
+#define PHALCON_EXITEXCEPTION_H
 
-#include <Zend/zend_exceptions.h>
+#include "php_phalcon.h"
 
-#include "kernel/main.h"
+extern zend_class_entry *phalcon_exitexception_ce;
 
-/**
- * Phalcon\ContinueException
- */
-zend_class_entry *phalcon_continueexception_ce;
+PHALCON_INIT_CLASS(Phalcon_ExitException);
 
-/**
- * Phalcon\ContinueException initializer
- */
-PHALCON_INIT_CLASS(Phalcon_ContinueException){
-
-	PHALCON_REGISTER_CLASS_EX(Phalcon, ContinueException, continueexception, zend_ce_exception, NULL, 0);
-
-	return SUCCESS;
-}
+#endif /* PHALCON_EXITEXCEPTION_H */

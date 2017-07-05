@@ -116,6 +116,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
 	PHALCON_INIT(Phalcon_ContinueException);
+	PHALCON_INIT(Phalcon_ExitException);
 	PHALCON_INIT(Phalcon_Profiler_Exception);
 	PHALCON_INIT(Phalcon_Debug_Exception);
 	PHALCON_INIT(Phalcon_Acl_Exception);

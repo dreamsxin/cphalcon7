@@ -49,8 +49,10 @@
 %left DIVIDE TIMES MOD .
 %left PLUS MINUS .
 %left IS .
+%left DOUBLECOLON .
 %right IN .
 %right NOT BITWISE_NOT .
+%right FORCE USE .
 %left COMMA .
 
 %include {
@@ -292,6 +294,36 @@ static void phql_ret_delete_clause(zval *ret, zval *tables)
 	add_assoc_zval(ret, ISV(tables), tables);
 }
 
+static void phql_ret_index_list(zval *ret, zval *list_left, zval *right_list)
+{
+	HashTable *list;
+
+	array_init(ret);
+
+	if (list_left && Z_TYPE_P(list_left) != IS_UNDEF) {
+		list = Z_ARRVAL_P(list_left);
+		if (zend_hash_index_exists(list, 0)) {
+			zval *item;
+			ZEND_HASH_FOREACH_VAL(list, item) {
+				add_next_index_zval(ret, item);
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			add_next_index_zval(ret, list_left);
+		}
+	}
+
+	if (right_list && Z_TYPE_P(right_list) != IS_UNDEF) {
+		add_next_index_zval(ret, right_list);
+	}
+}
+
+static void phql_ret_index_type(zval *ret, int type, zval *column)
+{
+	array_init(ret);
+	add_assoc_long(ret, ISV(type), type);
+	add_assoc_zval(ret, ISV(column), column);
+}
+
 static void phql_ret_zval_list(zval *ret, zval *list_left, zval *right_list)
 {
 	HashTable *list;
@@ -334,7 +366,7 @@ static void phql_ret_column_item(zval *ret, int type, zval *column, phql_parser_
 	}
 }
 
-static void phql_ret_assoc_name(zval *ret, zval *qualified_name, phql_parser_token *alias)
+static void phql_ret_assoc_name(zval *ret, zval *qualified_name, phql_parser_token *alias, zval *index_list)
 {
 	array_init_size(ret, 2);
 	add_assoc_zval(ret, ISV(qualifiedName), qualified_name);
@@ -343,6 +375,10 @@ static void phql_ret_assoc_name(zval *ret, zval *qualified_name, phql_parser_tok
 		add_assoc_stringl(ret, ISV(alias), alias->token, alias->token_len);
 		efree(alias->token);
 		efree(alias);
+	}
+
+	if (index_list && Z_TYPE_P(index_list) != IS_UNDEF) {
+		add_assoc_zval(ret, "indexs", index_list);
 	}
 }
 
@@ -697,20 +733,48 @@ delete_clause(R) ::= DELETE FROM associated_name(A) . {
 	phql_ret_delete_clause(&R, &A);
 }
 
-associated_name(R) ::= aliased_or_qualified_name(Q) AS IDENTIFIER(I) . {
-	phql_ret_assoc_name(&R, &Q, I);
+associated_name(R) ::= aliased_or_qualified_name(Q) AS IDENTIFIER(I) index_hints_or_null(H) . {
+	phql_ret_assoc_name(&R, &Q, I, &H);
 }
 
-associated_name(R) ::= aliased_or_qualified_name(Q) IDENTIFIER(I) . {
-	phql_ret_assoc_name(&R, &Q, I);
+associated_name(R) ::= aliased_or_qualified_name(Q) IDENTIFIER(I) index_hints_or_null(H) . {
+	phql_ret_assoc_name(&R, &Q, I, &H);
 }
 
-associated_name(R) ::= aliased_or_qualified_name(Q) . {
-	phql_ret_assoc_name(&R, &Q, NULL);
+associated_name(R) ::= aliased_or_qualified_name(Q) index_hints_or_null(H) . {
+	phql_ret_assoc_name(&R, &Q, NULL, &H);
 }
 
 aliased_or_qualified_name(R) ::= qualified_name(Q) . {
 	R = Q;
+}
+
+index_hints_or_null(R) ::= index_hints(L) . {
+	R = L;
+}
+
+index_hints_or_null(R) ::= . {
+	ZVAL_UNDEF(&R);
+}
+
+index_hints(R) ::= index_hints(L) index_hint(I) . {
+	phql_ret_index_list(&R, &L, &I);
+}
+
+index_hints(R) ::= index_hint(I) . {
+	phql_ret_index_list(&R, NULL, &I);
+}
+
+index_hint(R) ::= IGNORE INDEX PARENTHESES_OPEN field_list(F) PARENTHESES_CLOSE . {
+	phql_ret_index_type(&R, PHQL_T_USE, &F);
+}
+
+index_hint(R) ::= USE INDEX PARENTHESES_OPEN field_list(F) PARENTHESES_CLOSE . {
+	phql_ret_index_type(&R, PHQL_T_USE, &F);
+}
+
+index_hint(R) ::= FORCE INDEX PARENTHESES_OPEN field_list(F) PARENTHESES_CLOSE  . {
+	phql_ret_index_type(&R, PHQL_T_FORCE, &F);
 }
 
 where_clause(R) ::= WHERE expr(E) . {
@@ -1047,6 +1111,10 @@ expr(R) ::= expr(E) IS NOT NULL . {
 
 expr(R) ::= expr(E) BETWEEN expr(L) . {
 	phql_ret_expr(&R, PHQL_T_BETWEEN, &E, &L);
+}
+
+expr(R) ::= expr(E) DOUBLECOLON expr(L) . {
+	phql_ret_expr(&R, PHQL_T_DOUBLECOLON, &E, &L);
 }
 
 expr(R) ::= NOT expr(E) . {

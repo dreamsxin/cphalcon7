@@ -367,6 +367,26 @@ int phql_get_token(phql_scanner_state *s, phql_scanner_token *token) {
 			return 0;
 		}
 
+		'FORCE' {
+			token->opcode = PHQL_T_FORCE;
+			return 0;
+		}
+
+		'IGNORE' {
+			token->opcode = PHQL_T_IGNORE;
+			return 0;
+		}
+
+		'USE' {
+			token->opcode = PHQL_T_USE;
+			return 0;
+		}
+
+		'INDEX' {
+			token->opcode = PHQL_T_INDEX;
+			return 0;
+		}
+
 		STRING = (["] ([\\]["]|[\\].|[\001-\377]\[\\"])* ["])|(['] ([\\][']|[\\].|[\001-\377]\[\\'])* [']);
 		STRING {
 			token->opcode = PHQL_T_STRING;
@@ -431,6 +451,11 @@ int phql_get_token(phql_scanner_state *s, phql_scanner_token *token) {
 
 		"." {
 			token->opcode = PHQL_T_DOT;
+			return 0;
+		}
+
+		"::" {
+			token->opcode = PHQL_T_DOUBLECOLON;
 			return 0;
 		}
 

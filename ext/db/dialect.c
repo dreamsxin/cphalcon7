@@ -620,7 +620,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlExpressionFunctionCall){
  */
 PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 
-	zval *table, *escape = NULL, escape_char = {}, table_name = {}, sql_table = {}, schema_name = {}, sql_schema = {}, alias_name = {}, sql_table_alias = {};
+	zval *table, *escape = NULL, escape_char = {};
 
 	phalcon_fetch_params(0, 1, 1, &table, &escape);
 
@@ -631,6 +631,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 	}
 
 	if (Z_TYPE_P(table) == IS_ARRAY) {
+		zval table_name = {}, sql_table = {}, schema_name = {}, sql_schema = {}, alias_name = {}, sql_table_alias = {}, indexs = {};
 		/**
 		 * The index '0' is the table name
 		 */
@@ -669,6 +670,13 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 			ZVAL_COPY(&sql_table_alias, &sql_schema);
 		}
 		zval_ptr_dtor(&sql_schema);
+
+		/**
+		 * The index '3' is the table index
+		 */
+		if (phalcon_array_isset_fetch_long(&indexs, table, 3, PH_READONLY)) {
+
+		}
 
 		RETVAL_ZVAL(&sql_table_alias, 0, 0);
 		return;

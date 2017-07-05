@@ -77,12 +77,12 @@ ZEND_END_ARG_INFO()
 
 
 static const zend_function_entry phalcon_random_method_entry[] = {
-	PHP_ME(Phalcon_Random, alnum, arginfo_phalcon_random_alnum, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Random, alpha, arginfo_phalcon_random_alpha, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Random, hexdec, arginfo_phalcon_random_hexdec, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Random, numeric, arginfo_phalcon_random_numeric, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Random, nozero, arginfo_phalcon_random_nozero, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Random, color, arginfo_phalcon_random_color, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Random, alnum, arginfo_phalcon_random_alnum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Random, alpha, arginfo_phalcon_random_alpha, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Random, hexdec, arginfo_phalcon_random_hexdec, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Random, numeric, arginfo_phalcon_random_numeric, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Random, nozero, arginfo_phalcon_random_nozero, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Random, color, arginfo_phalcon_random_color, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 

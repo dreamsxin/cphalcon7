@@ -227,6 +227,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 
 		if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bind"), PH_READONLY)) {
 			PHALCON_CALL_METHOD(NULL, getThis(), "setbindparams", &bind_params);
+		} else if (phalcon_array_isset_fetch_str(&bind_params, params, SL("bindParams"), PH_READONLY)) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "setbindparams", &bind_params);
 		}
 
 		if (phalcon_array_isset_fetch_str(&bind_types, params, SL("bindTypes"), PH_READONLY)) {
@@ -306,12 +308,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 		 */
 		if (phalcon_array_isset_fetch_str(&for_update, params, SL("for_update"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_forUpdate"), &for_update);
+		} else if (phalcon_array_isset_fetch_str(&for_update, params, SL("forUpdate"), PH_READONLY)) {
+			phalcon_update_property(getThis(), SL("_forUpdate"), &for_update);
 		}
 
 		/**
 		 * Assign SHARED LOCK clause
 		 */
 		if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("shared_lock"), PH_READONLY)) {
+			phalcon_update_property(getThis(), SL("_sharedLock"), &shared_lock);
+		} else if (phalcon_array_isset_fetch_str(&shared_lock, params, SL("sharedLock"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_sharedLock"), &shared_lock);
 		}
 	}

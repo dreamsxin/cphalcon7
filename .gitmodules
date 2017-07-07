@@ -22,3 +22,6 @@
 [submodule "deps/wiredtiger"]
 	path = deps/wiredtiger
 	url = https://github.com/dreamsxin/wiredtiger.git
+[submodule "deps/mongoose"]
+	path = deps/mongoose
+	url = https://github.com/dreamsxin/mongoose.git

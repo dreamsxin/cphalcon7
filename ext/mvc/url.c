@@ -66,6 +66,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getBasePath);
 PHP_METHOD(Phalcon_Mvc_Url, get);
 PHP_METHOD(Phalcon_Mvc_Url, getStatic);
 PHP_METHOD(Phalcon_Mvc_Url, path);
+PHP_METHOD(Phalcon_Mvc_Url, isLocal);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_url_setstaticbaseuri, 0, 0, 1)
 	ZEND_ARG_INFO(0, staticBaseUri)
@@ -73,6 +74,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_url_getstatic, 0, 0, 0)
 	ZEND_ARG_INFO(0, uri)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_url_islocal, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_url_method_entry[] = {
@@ -85,6 +90,7 @@ static const zend_function_entry phalcon_mvc_url_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Url, get, arginfo_phalcon_mvc_urlinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Url, getStatic, arginfo_phalcon_mvc_url_getstatic, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Url, path, arginfo_phalcon_mvc_urlinterface_path, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Url, isLocal, arginfo_phalcon_mvc_url_islocal, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -493,4 +499,27 @@ PHP_METHOD(Phalcon_Mvc_Url, path){
 
 	phalcon_read_property(&base_path, getThis(), SL("_basePath"), PH_NOISY|PH_READONLY);
 	PHALCON_CONCAT_VV(return_value, &base_path, path);
+}
+
+/**
+ * Check whether the URI is local
+ *
+ * @param string $uri
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Mvc_Url, isLocal){
+
+	zval *uri, regexp = {}, matched = {};
+
+	phalcon_fetch_params(0, 1, 0, &uri);
+
+	ZVAL_TRUE(return_value);
+	if (strstr(Z_STRVAL_P(uri), ":")) {
+		ZVAL_STRING(&regexp, "/^[^:\\/?#]++:/");
+		RETURN_ON_FAILURE(phalcon_preg_match(&matched, &regexp, uri, NULL));
+		zval_ptr_dtor(&regexp);
+		if (zend_is_true(&matched)) {
+			ZVAL_FALSE(return_value);
+		}
+	}
 }

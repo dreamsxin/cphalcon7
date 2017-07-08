@@ -25,3 +25,6 @@
 [submodule "deps/mongoose"]
 	path = deps/mongoose
 	url = https://github.com/dreamsxin/mongoose.git
+[submodule "deps/libdeep"]
+	path = deps/libdeep
+	url = https://github.com/dreamsxin/libdeep.git

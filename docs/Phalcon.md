@@ -185,3 +185,14 @@ Any class Inherited from `Phalcon\Di\Injectable`.
 	3.Gets the query - Phalcon\Mvc\Model\Query\Builder::getQuery
 	4.Execute the query
 	5.Fire event - model:afterQuery
+
+## Design pattern
+
+	1.Factory Method - Phalcon\Mvc\Model\Manager::createBuilder
+	2.Prototype - Models Clone
+	3.Adapter - DB, Image etc
+	4.Bridge - DI
+	5.Strategy
+	6.Template Method
+	7.Observer - Events
+	8.Iterator

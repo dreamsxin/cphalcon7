@@ -150,10 +150,11 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 			ZVAL_MAKE_REF(&params);
 			PHALCON_CALL_FUNCTION(NULL, "parse_str", &query, &params);
 			ZVAL_UNREF(&params);
-			phalcon_array_update_str(&parts, SL("query"), &params, PH_COPY);
+			phalcon_array_update_str(&parts, SL("query"), &params, 0);
 		}
 
 		phalcon_update_property(getThis(), SL("_parts"), &parts);
+		zval_ptr_dtor(&parts);
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
 		phalcon_update_property(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
@@ -308,13 +309,14 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&query)) {
 		phalcon_http_build_query(&tmp, &query, "&");
 		PHALCON_SCONCAT_SV(&uri, "?", &tmp);
+		zval_ptr_dtor(&tmp);
 	}
 
 	if (phalcon_array_isset_fetch_str(&fragment, &parts, SL("fragment"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&fragment)) {
 		PHALCON_SCONCAT_SV(&uri, "#", &fragment);
 	}
 
-	RETURN_CTOR(&uri);
+	RETURN_ZVAL(&uri, 0, 0);
 }
 
 PHP_METHOD(Phalcon_Http_Uri, resolve)
@@ -327,29 +329,33 @@ PHP_METHOD(Phalcon_Http_Uri, resolve)
 	PHALCON_CALL_METHOD(NULL, &self, "__construct", getThis());
 	PHALCON_CALL_METHOD(NULL, &self, "extend", uri);
 
-	RETURN_CTOR(&self);
+	RETURN_ZVAL(&self, 0, 0);
 }
 
 PHP_METHOD(Phalcon_Http_Uri, extend)
 {
-	zval *uri, parts = {}, self = {}, parts2 = {};
+	zval *uri, parts = {}, parts2 = {};
 
 	phalcon_fetch_params(0, 1, 0, &uri);
 
-	PHALCON_CALL_SELF(&parts, "getParts");
+	PHALCON_CALL_METHOD(&parts, getThis(), "getParts");
 
 	if (Z_TYPE_P(uri) != IS_OBJECT || Z_OBJCE_P(uri) != phalcon_http_uri_ce) {
+		zval self = {};
 		object_init_ex(&self, phalcon_http_uri_ce);
 		PHALCON_CALL_METHOD(NULL, &self, "__construct", uri);
 
 		PHALCON_CALL_METHOD(&parts2, &self, "getParts");
+		zval_ptr_dtor(&self);
 	} else {
-		PHALCON_CALL_METHOD(&parts2, &self, "getParts");
+		PHALCON_CALL_METHOD(&parts2, uri, "getParts");
 	}
 
 	phalcon_array_merge_recursive_n(&parts, &parts2);
+	zval_ptr_dtor(&parts2);
 
 	phalcon_update_property(getThis(), SL("_parts"), &parts);
+	zval_ptr_dtor(&parts);
 
 	RETURN_THIS();
 }

@@ -28,8 +28,8 @@ extern zend_class_entry *phalcon_http_client_adapterinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_Http_Client_AdapterInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface___construct, 0, 0, 2)
-	ZEND_ARG_INFO(0, uri)
-	ZEND_ARG_INFO(0, method)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, method, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setuseragent, 0, 0, 1)
@@ -45,7 +45,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setauth, 0, 
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setheader, 0, 0, 2)
-	ZEND_ARG_INFO(0, name)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
@@ -63,48 +63,48 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setfiles, 0,
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_get, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_head, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_post, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_put, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_delete, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setbaseuri, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_seturi, 0, 0, 1)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_settimeout, 0, 0, 1)
-	ZEND_ARG_INFO(0, time)
+	ZEND_ARG_TYPE_INFO(0, time, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_setmethod, 0, 0, 1)
-	ZEND_ARG_INFO(0, method)
+	ZEND_ARG_TYPE_INFO(0, method, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_client_adapterinterface_send, 0, 0, 0)
-	ZEND_ARG_INFO(0, uri)
+	ZEND_ARG_TYPE_INFO(0, uri, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_HTTP_CLIENT_ADAPTERINTERFACE_H */

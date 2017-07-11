@@ -100,13 +100,14 @@ PHP_METHOD(Phalcon_Http_Client_Response, __construct){
 	PHALCON_CALL_METHOD(NULL, &header, "__construct");
 
 	phalcon_update_property(getThis(), SL("_header"), &header);
+	zval_ptr_dtor(&header);
 
 	if (headers) {
-		PHALCON_CALL_SELF(NULL, "setheader", headers);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setheader", headers);
 	}
 
 	if (body) {
-		PHALCON_CALL_SELF(NULL, "setbody", body);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setbody", body);
 	}
 }
 
@@ -160,6 +161,7 @@ PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
 	} else {
 		ZVAL_NULL(return_value);
 	}
+	zval_ptr_dtor(&body);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){

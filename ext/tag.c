@@ -667,7 +667,7 @@ PHP_METHOD(Phalcon_Tag, getValue){
 
 	phalcon_fetch_params(0, 1, 1, &name, &params);
 
-	if (!params || !phalcon_array_isset_fetch_str(&value, params, SL("value"), PH_READONLY)) {
+	if (!params || !phalcon_array_isset_fetch_str(&value, params, SL("value"), PH_READONLY) || Z_TYPE(value) == IS_NULL) {
 		phalcon_read_static_property_ce(&display_values, phalcon_tag_ce, SL("_displayValues"), PH_READONLY);
 
 		/**

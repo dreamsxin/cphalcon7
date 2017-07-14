@@ -120,6 +120,9 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 	} else {
 		phalcon_array_unset_str(&params, SL("value"), 0);
+		if (Z_TYPE(value) == IS_NULL) {
+			PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
+		}
 	}
 
 	if (phalcon_array_isset_fetch_str(&use_empty, &params, SL("useEmpty"), PH_READONLY) && zend_is_true(&use_empty)) {

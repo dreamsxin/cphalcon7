@@ -113,5 +113,8 @@ class ArrTest extends PHPUnit_Framework_TestCase
 
 		$arr = array('name' => ["phalcon", "phalcon7"]);
 		$this->assertEquals(\Phalcon\Arr::first($arr, 'name'), 'phalcon');
+
+		$arr = [['name'=>"It's Phalcon"],['name'=>"It's Phalcon7"]];
+		$this->assertEquals(\Phalcon\Arr::map($arr, 'addslashes'), [['name'=>"It\'s Phalcon"],['name'=>"It\'s Phalcon7"]]);
 	}
 }

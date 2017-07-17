@@ -77,7 +77,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_array, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_path, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, path)
 	ZEND_ARG_INFO(0, default_value)
 	ZEND_ARG_INFO(0, delimiter)
@@ -97,55 +97,55 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_range, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_get, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, default_value)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_first, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, default_value)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_choice, 0, 0, 3)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, value1)
 	ZEND_ARG_INFO(0, value2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_extract, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, paths)
 	ZEND_ARG_INFO(0, default_value)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_pluck, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_unshift, 0, 0, 3)
-	ZEND_ARG_INFO(1, array)
+	ZEND_ARG_TYPE_INFO(1, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, val)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_map, 0, 0, 2)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, callbacks)
 	ZEND_ARG_INFO(0, keys)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_merge, 0, 0, 2)
-	ZEND_ARG_INFO(0, array1)
-	ZEND_ARG_INFO(0, array2)
+	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_overwrite, 0, 0, 2)
-	ZEND_ARG_INFO(0, array1)
-	ZEND_ARG_INFO(0, array2)
+	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_callback, 0, 0, 1)
@@ -153,7 +153,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_callback, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_flatten, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_arrayobject, 0, 0, 1)
@@ -161,17 +161,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_arrayobject, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_key, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, postion)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_filter, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, callback)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sum, 0, 0, 1)
-	ZEND_ARG_INFO(0, array)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, path)
 ZEND_END_ARG_INFO()
 
@@ -845,7 +845,7 @@ PHP_METHOD(Phalcon_Arr, map){
 			ZVAL_LONG(&key, idx);
 		}
 		if (Z_TYPE_P(val) == IS_ARRAY) {
-			PHALCON_CALL_SELF(&value, "map", callbacks, val);
+			PHALCON_CALL_SELF(&value, "map", val, callbacks);
 			phalcon_array_update(array, &key, &value, 0);
 		} else if (!keys || Z_TYPE_P(keys) != IS_ARRAY || phalcon_fast_in_array(&key, keys)) {
 			if (Z_TYPE_P(callbacks) == IS_ARRAY) {

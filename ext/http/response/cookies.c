@@ -87,7 +87,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Response_Cookies){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http\\Response, Cookies, http_response_cookies, phalcon_di_injectable_ce, phalcon_http_response_cookies_method_entry, 0);
 
 	zend_declare_property_bool(phalcon_http_response_cookies_ce, SL("_registered"), 0, ZEND_ACC_PROTECTED);
-	zend_declare_property_bool(phalcon_http_response_cookies_ce, SL("_useEncryption"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_http_response_cookies_ce, SL("_useEncryption"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_response_cookies_ce, SL("_cookies"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_response_cookies_ce, SL("_expire"), ZEND_ACC_PROTECTED);
 	zend_declare_property_string(phalcon_http_response_cookies_ce, SL("_path"), "/", ZEND_ACC_PROTECTED);

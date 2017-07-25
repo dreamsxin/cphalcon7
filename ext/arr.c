@@ -1316,6 +1316,8 @@ PHP_METHOD(Phalcon_Arr, toArray){
 						phalcon_array_update(return_value, &key, value, PH_COPY);
 					}
 				}
+			} else {
+				phalcon_array_update(return_value, &key, value, PH_COPY);
 			}
 		} ZEND_HASH_FOREACH_END();
 		zval_ptr_dtor(&tmp);

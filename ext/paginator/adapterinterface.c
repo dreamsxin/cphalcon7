@@ -24,6 +24,9 @@ zend_class_entry *phalcon_paginator_adapterinterface_ce;
 
 static const zend_function_entry phalcon_paginator_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage)
+	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getCurrentPage, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, setLimit, arginfo_phalcon_paginator_adapterinterface_setlimit)
+	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getLimit, NULL)
 	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getPaginate, arginfo_phalcon_paginator_adapterinterface_getpaginate)
 	PHP_FE_END
 };
@@ -45,6 +48,27 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_AdapterInterface){
  * @param int $page
  */
 PHALCON_DOC_METHOD(Phalcon_Paginator_AdapterInterface, setCurrentPage);
+
+/**
+ * Get the current page number
+ *
+ * @return int
+ */
+PHALCON_DOC_METHOD(Phalcon_Paginator_AdapterInterface, getCurrentPage);
+
+/**
+ * Set current rows limit
+ *
+ * @param int $limit
+ */
+PHALCON_DOC_METHOD(Phalcon_Paginator_AdapterInterface, setLimit);
+
+/**
+ * Get the current rows limit
+ *
+ * @return int
+ */
+PHALCON_DOC_METHOD(Phalcon_Paginator_AdapterInterface, getLimit);
 
 /**
  * Returns a slice of the resultset to show in the pagination

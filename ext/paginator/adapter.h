@@ -14,27 +14,17 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_PAGINATOR_ADAPTERINTERFACE_H
-#define PHALCON_PAGINATOR_ADAPTERINTERFACE_H
+#ifndef PHALCON_PAGINATOR_ADAPTER_H
+#define PHALCON_PAGINATOR_ADAPTER_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_paginator_adapterinterface_ce;
+extern zend_class_entry *phalcon_paginator_adapter_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Paginator_AdapterInterface);
+PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapterinterface_setcurrentpage, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, page, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapterinterface_setlimit, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, limit, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapterinterface_getpaginate, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_PAGINATOR_ADAPTERINTERFACE_H */
+#endif /* PHALCON_PAGINATOR_ADAPTER_H */

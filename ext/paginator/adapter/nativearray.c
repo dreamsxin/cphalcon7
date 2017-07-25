@@ -14,10 +14,12 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "paginator/adapter/nativearray.h"
+#include "paginator/adapter.h"
 #include "paginator/adapterinterface.h"
 #include "paginator/exception.h"
 
@@ -54,7 +56,6 @@
 zend_class_entry *phalcon_paginator_adapter_nativearray_ce;
 
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct);
-PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage);
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapter_nativearray___construct, 0, 0, 1)
@@ -63,7 +64,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_paginator_adapter_nativearray_method_entry[] = {
 	PHP_ME(Phalcon_Paginator_Adapter_NativeArray, __construct, arginfo_phalcon_paginator_adapter_nativearray___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Paginator_Adapter_NativeArray, getPaginate, arginfo_phalcon_paginator_adapterinterface_getpaginate, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -73,11 +73,9 @@ static const zend_function_entry phalcon_paginator_adapter_nativearray_method_en
  */
 PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_NativeArray){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Paginator\\Adapter, NativeArray, paginator_adapter_nativearray, phalcon_paginator_adapter_nativearray_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, NativeArray, paginator_adapter_nativearray, phalcon_paginator_adapter_ce, phalcon_paginator_adapter_nativearray_method_entry, 0);
 
-	zend_declare_property_null(phalcon_paginator_adapter_nativearray_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_nativearray_ce, SL("_data"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_paginator_adapter_nativearray_ce, SL("_page"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_nativearray_ce, 1, phalcon_paginator_adapterinterface_ce);
 
@@ -115,32 +113,20 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, __construct){
 }
 
 /**
- * Set the current page number
- *
- * @param int $page
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, setCurrentPage){
-
-	zval *current_page;
-
-	phalcon_fetch_params(0, 1, 0, &current_page);
-	PHALCON_ENSURE_IS_LONG(current_page);
-
-	phalcon_update_property(getThis(), SL("_page"), current_page);
-	RETURN_THIS();
-}
-
-/**
  * Returns a slice of the resultset to show in the pagination
  *
  * @return \stdClass
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
-	zval items = {}, limit = {}, number_page = {}, start = {}, lim = {}, slice = {};
+	zval event_name = {}, items = {}, limit = {}, number_page = {}, start = {}, lim = {}, slice = {}, page = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
+
+	ZVAL_STRING(&event_name, "query:beforeGetPaginate");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	phalcon_read_property(&items, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
 	if (UNEXPECTED(Z_TYPE(items) != IS_ARRAY)) {
@@ -174,14 +160,25 @@ PHP_METHOD(Phalcon_Paginator_Adapter_NativeArray, getPaginate){
 
 	PHALCON_CALL_FUNCTION(&slice, "array_slice", &items, &start, &lim);
 
-	object_init(return_value);
-	phalcon_update_property(return_value, SL("items"),       &slice);
+	object_init(&page);
+	phalcon_update_property(&page, SL("items"),            &slice);
 	zval_ptr_dtor(&slice);
-	phalcon_update_property_long(return_value, SL("before"),      i_before);
-	phalcon_update_property_long(return_value, SL("first"),       1);
-	phalcon_update_property_long(return_value, SL("next"),        i_next);
-	phalcon_update_property_long(return_value, SL("last"),        i_total_pages);
-	phalcon_update_property_long(return_value, SL("current"),     i_number_page);
-	phalcon_update_property_long(return_value, SL("total_pages"), i_total_pages);
-	phalcon_update_property_long(return_value, SL("total_items"), i_rowcount);
+	phalcon_update_property_long(&page, SL("before"),      i_before);
+	phalcon_update_property_long(&page, SL("first"),       1);
+	phalcon_update_property_long(&page, SL("next"),        i_next);
+	phalcon_update_property_long(&page, SL("last"),        i_total_pages);
+	phalcon_update_property_long(&page, SL("current"),     i_number_page);
+	phalcon_update_property_long(&page, SL("total_pages"), i_total_pages);
+	phalcon_update_property_long(&page, SL("total_items"), i_rowcount);
+
+	ZVAL_STRING(&event_name, "query:afterGetPaginate");
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &page);
+	zval_ptr_dtor(&event_name);
+
+	if (zend_is_true(return_value)) {
+		zval_ptr_dtor(&page);
+	} else {
+		zval_ptr_dtor(return_value);
+		RETURN_ZVAL(&page, 0, 0);
+	}
 }

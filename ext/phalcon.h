@@ -344,6 +344,7 @@
 #include "mvc/view/modelinterface.h"
 
 #include "paginator/adapterinterface.h"
+#include "paginator/adapter.h"
 #include "paginator/adapter/model.h"
 #include "paginator/adapter/nativearray.h"
 #include "paginator/adapter/querybuilder.h"

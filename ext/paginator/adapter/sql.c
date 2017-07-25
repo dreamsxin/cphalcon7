@@ -14,14 +14,15 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "paginator/adapter/sql.h"
+#include "paginator/adapter.h"
 #include "paginator/adapterinterface.h"
 #include "paginator/exception.h"
 #include "db/adapterinterface.h"
-#include "di/injectable.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 
@@ -82,10 +83,6 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_paginator_adapter_sql_method_entry[] = {
 	PHP_ME(Phalcon_Paginator_Adapter_Sql, __construct, arginfo_phalcon_paginator_adapter_sql___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Paginator_Adapter_Sql, getPaginate, arginfo_phalcon_paginator_adapterinterface_getpaginate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter_Sql, setLimit, arginfo_phalcon_paginator_adapter_sql_setlimit, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter_Sql, getLimit, arginfo_empty, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter_Sql, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter_Sql, getCurrentPage, arginfo_phalcon_paginator_adapterinterface_getcurrentpage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Paginator_Adapter_Sql, setDb, arginfo_phalcon_paginator_adapter_sql_setdb, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Paginator_Adapter_Sql, getDb, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -96,14 +93,12 @@ static const zend_function_entry phalcon_paginator_adapter_sql_method_entry[] = 
  */
 PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
 
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, Sql, paginator_adapter_sql, phalcon_di_injectable_ce, phalcon_paginator_adapter_sql_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, Sql, paginator_adapter_sql, phalcon_paginator_adapter_ce, phalcon_paginator_adapter_sql_method_entry, 0);
 
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_db"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_sql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_total_sql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_bind"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_paginator_adapter_sql_ce, SL("_page"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_paginator_adapter_sql_ce, SL("_fetchMode"), PDO_FETCH_OBJ, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_sql_ce, 1, phalcon_paginator_adapterinterface_ce);
@@ -185,60 +180,6 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 }
 
 /**
- * Set current page number
- *
- * @param int $page
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setCurrentPage){
-
-	zval *current_page;
-
-	phalcon_fetch_params(0, 1, 0, &current_page);
-	PHALCON_ENSURE_IS_LONG(current_page);
-
-	phalcon_update_property(getThis(), SL("_page"), current_page);
-	RETURN_THIS();
-}
-
-/**
- * Get current page number
- *
- * @param int $page
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getCurrentPage){
-
-	RETURN_MEMBER(getThis(), "_page");
-}
-
-/**
- * Set current rows limit
- *
- * @param int $limit
- *
- * @return Phalcon\Paginator\Adapter\Sql $this Fluent interface
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setLimit){
-
-	zval *current_limit;
-
-	phalcon_fetch_params(0, 1, 0, &current_limit);
-	PHALCON_ENSURE_IS_LONG(current_limit);
-
-	phalcon_update_property(getThis(), SL("_limitRows"), current_limit);
-	RETURN_THIS();
-}
-
-/**
- * Get current rows limit
- *
- * @return int $limit
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getLimit){
-
-	RETURN_MEMBER(getThis(), "_limitRows");
-}
-
-/**
  * Set query builder object
  *
  * @param Phalcon\Db\AdapterInterface $db
@@ -280,10 +221,15 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getDb){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
-	zval db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, number_page = {}, number = {}, fetch_mode = {}, items = {}, row = {}, rowcount = {};
+	zval event_name = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, number_page = {}, number = {}, fetch_mode = {}, items = {};
+	zval row = {}, rowcount = {}, page = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 	ldiv_t tp;
+
+	ZVAL_STRING(&event_name, "query:beforeGetPaginate");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	phalcon_read_property(&db, getThis(), SL("_db"), PH_READONLY);
 	phalcon_read_property(&sql, getThis(), SL("_sql"), PH_READONLY);
@@ -331,14 +277,25 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
 	zval_ptr_dtor(&row);
 
-	object_init(return_value);
-	phalcon_update_property(return_value, SL("items"),       &items);
+	object_init(&page);
+	phalcon_update_property(&page, SL("items"),       &items);
 	zval_ptr_dtor(&items);
-	phalcon_update_property_long(return_value, SL("before"),      i_before);
-	phalcon_update_property_long(return_value, SL("first"),       1);
-	phalcon_update_property_long(return_value, SL("next"),        i_next);
-	phalcon_update_property_long(return_value, SL("last"),        i_total_pages);
-	phalcon_update_property_long(return_value, SL("current"),     i_number_page);
-	phalcon_update_property_long(return_value, SL("total_pages"), i_total_pages);
-	phalcon_update_property_long(return_value, SL("total_items"), i_rowcount);
+	phalcon_update_property_long(&page, SL("before"),      i_before);
+	phalcon_update_property_long(&page, SL("first"),       1);
+	phalcon_update_property_long(&page, SL("next"),        i_next);
+	phalcon_update_property_long(&page, SL("last"),        i_total_pages);
+	phalcon_update_property_long(&page, SL("current"),     i_number_page);
+	phalcon_update_property_long(&page, SL("total_pages"), i_total_pages);
+	phalcon_update_property_long(&page, SL("total_items"), i_rowcount);
+
+	ZVAL_STRING(&event_name, "query:afterGetPaginate");
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &page);
+	zval_ptr_dtor(&event_name);
+
+	if (zend_is_true(return_value)) {
+		zval_ptr_dtor(&page);
+	} else {
+		zval_ptr_dtor(return_value);
+		RETURN_ZVAL(&page, 0, 0);
+	}
 }

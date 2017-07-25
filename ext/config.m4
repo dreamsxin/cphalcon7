@@ -668,6 +668,7 @@ validation.c \
 version.c \
 flashinterface.c \
 kernel.c \
+paginator/adapter.c \
 paginator/adapter/model.c \
 paginator/adapter/nativearray.c \
 paginator/adapter/querybuilder.c \

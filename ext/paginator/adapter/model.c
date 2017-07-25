@@ -18,6 +18,7 @@
 */
 
 #include "paginator/adapter/model.h"
+#include "paginator/adapter.h"
 #include "paginator/adapterinterface.h"
 #include "paginator/exception.h"
 
@@ -48,7 +49,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_paginator_adapter_model_method_entry[] = {
 	PHP_ME(Phalcon_Paginator_Adapter_Model, __construct, arginfo_phalcon_paginator_adapter_model___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Paginator_Adapter_Model, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Paginator_Adapter_Model, getPaginate, arginfo_phalcon_paginator_adapterinterface_getpaginate, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -58,11 +58,9 @@ static const zend_function_entry phalcon_paginator_adapter_model_method_entry[] 
  */
 PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Model){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Paginator\\Adapter, Model, paginator_adapter_model, phalcon_paginator_adapter_model_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, Model, paginator_adapter_model, phalcon_paginator_adapter_ce, phalcon_paginator_adapter_model_method_entry, 0);
 
-	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_config"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_paginator_adapter_model_ce, SL("_page"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_model_ce, 1, phalcon_paginator_adapterinterface_ce);
 
@@ -92,30 +90,20 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 }
 
 /**
- * Set the current page number
- *
- * @param int $page
- */
-PHP_METHOD(Phalcon_Paginator_Adapter_Model, setCurrentPage){
-
-	zval *page;
-
-	phalcon_fetch_params(0, 1, 0, &page);
-
-	phalcon_update_property(getThis(), SL("_page"), page);
-	RETURN_THIS();
-}
-
-/**
  * Returns a slice of the resultset to show in the pagination
  *
  * @return \stdClass
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
-	zval show = {}, config = {}, items = {}, page_number = {}, rowcount = {}, page = {}, last_show_page = {}, start = {}, possible_pages = {}, total_pages = {};
-	zval page_items = {}, maximum_pages = {}, next = {}, additional_page = {}, before = {}, remainder = {}, pages_total = {};
+	zval event_name = {}, show = {}, config = {}, items = {}, page_number = {}, rowcount = {}, page = {}, last_show_page = {}, start = {};
+	zval possible_pages = {}, total_pages = {}, page_items = {}, maximum_pages = {}, next = {}, additional_page = {}, before = {}, remainder = {};
+	zval pages_total = {};
 	long int i, i_show;
+
+	ZVAL_STRING(&event_name, "query:beforeGetPaginate");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 
 	phalcon_read_property(&show, getThis(), SL("_limitRows"), PH_READONLY);
 	phalcon_read_property(&config, getThis(), SL("_config"), PH_READONLY);
@@ -197,14 +185,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 	}
 
 	if (PHALCON_GT(&next, &total_pages)) {
-		ZVAL_COPY_VALUE(&next, &total_pages);
+		ZVAL_COPY(&next, &total_pages);
 	}
 
 	phalcon_update_property(&page, SL("next"), &next);
 	if (PHALCON_GT(&page_number, &PHALCON_GLOBAL(z_one))) {
 		phalcon_sub_function(&before, &page_number, &PHALCON_GLOBAL(z_one));
 	} else {
-		ZVAL_COPY_VALUE(&before, &PHALCON_GLOBAL(z_one));
+		ZVAL_COPY(&before, &PHALCON_GLOBAL(z_one));
 	}
 
 	phalcon_update_property(&page, SL("first"), &PHALCON_GLOBAL(z_one));
@@ -219,12 +207,21 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
 		ZVAL_LONG(&pages_total, phalcon_get_intval(&next));
 	} else {
-		ZVAL_COPY_VALUE(&pages_total, &possible_pages);
+		ZVAL_COPY(&pages_total, &possible_pages);
 	}
 
 	phalcon_update_property(&page, SL("last"), &pages_total);
 	phalcon_update_property(&page, SL("total_pages"), &pages_total);
 	phalcon_update_property(&page, SL("total_items"), &rowcount);
 
-	RETURN_ZVAL(&page, 0, 0);
+	ZVAL_STRING(&event_name, "query:afterGetPaginate");
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &page);
+	zval_ptr_dtor(&event_name);
+
+	if (zend_is_true(return_value)) {
+		zval_ptr_dtor(&page);
+	} else {
+		zval_ptr_dtor(return_value);
+		RETURN_ZVAL(&page, 0, 0);
+	}
 }

@@ -82,4 +82,7 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
     	memcpy(a, b, sizeof(zval)); \
 	}
 
+#define PHALCON_MM_GROW()       phalcon_gc_list* gc_list = phalcon_gc_list_init();
+#define PHALCON_MM_RESTORE()    phalcon_gc_list_destroy(gc_list);
+
 #endif /* PHALCON_KERNEL_MEMORY_H */

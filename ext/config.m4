@@ -367,6 +367,7 @@ kernel/io/client.c \
 kernel/io/server.c \
 kernel/io/tasks.c \
 kernel/io/threads.c \
+kernel/gc.c \
 interned-strings.c \
 logger.c \
 flash.c \

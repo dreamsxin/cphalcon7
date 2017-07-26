@@ -114,6 +114,12 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		return;            \
 	}
 
+#define RETURN_MM_ON_FAILURE(what) \
+	if (FAILURE == what) { \
+		phalcon_gc_list_destroy(gc_list); \
+		return; \
+	}
+
 /** Return empty array */
 #define RETURN_EMPTY_ARRAY() array_init(return_value); return;
 

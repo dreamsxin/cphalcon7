@@ -1688,7 +1688,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	 * If the developer pass an array of variables we create a new virtual symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
-		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
+		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_COPY);
 
 		/**
 		 * Merge or assign the new params as parameters
@@ -1732,6 +1732,7 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		 * Restore the original view params
 		 */
 		phalcon_update_property(getThis(), SL("_viewParams"), &view_params);
+		zval_ptr_dtor(&view_params);
 	}
 
 	if (!PHALCON_IS_TRUE(autorender)) {

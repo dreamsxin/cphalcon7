@@ -106,6 +106,7 @@ PHALCON_INIT_CLASS(Phalcon_Math_Num_Array){
 
 	zend_declare_property_null(phalcon_math_num_array_ce, SL("_data"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_math_num_array_ce, SL("_shape"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_math_num_array_ce, SL("_type"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }

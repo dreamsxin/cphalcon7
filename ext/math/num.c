@@ -37,6 +37,8 @@ zend_class_entry *phalcon_math_num_ce;
 PHP_METHOD(Phalcon_Math_Num, array);
 PHP_METHOD(Phalcon_Math_Num, resize);
 PHP_METHOD(Phalcon_Math_Num, arange);
+PHP_METHOD(Phalcon_Math_Num, zeros);
+PHP_METHOD(Phalcon_Math_Num, ones);
 PHP_METHOD(Phalcon_Math_Num, amin);
 PHP_METHOD(Phalcon_Math_Num, amax);
 PHP_METHOD(Phalcon_Math_Num, unique);
@@ -55,6 +57,7 @@ PHP_METHOD(Phalcon_Math_Num, fabs);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_resize, 0, 0, 2)
@@ -66,6 +69,25 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_arange, 0, 0, 1)
 	ZEND_ARG_INFO(0, start)
 	ZEND_ARG_INFO(0, stop)
 	ZEND_ARG_INFO(0, step)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_zeros, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, rows, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, cols, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_ones, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, rows, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, cols, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_eye, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, n, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, m, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, k, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
@@ -142,6 +164,9 @@ static const zend_function_entry phalcon_math_num_method_entry[] = {
 	PHP_ME(Phalcon_Math_Num, array, arginfo_phalcon_math_num_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, resize, arginfo_phalcon_math_num_resize, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, arange, arginfo_phalcon_math_num_arange, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num, zeros, arginfo_phalcon_math_num_zeros, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num, ones, arginfo_phalcon_math_num_ones, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num, eye, arginfo_phalcon_math_num_eye, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, amin, arginfo_phalcon_math_num_amin, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, amax, arginfo_phalcon_math_num_amax, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, unique, arginfo_phalcon_math_num_unique, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -189,7 +214,8 @@ PHP_METHOD(Phalcon_Math_Num, array){
 /**
  * Return a new array with the specified shape
  *
- * @param int $type
+ * @param int $rows
+ * @param int $cols
  * @return Phalcon\Math\Num\Array
  */
 PHP_METHOD(Phalcon_Math_Num, resize){
@@ -207,6 +233,46 @@ PHP_METHOD(Phalcon_Math_Num, resize){
  * @return Phalcon\Math\Num\Array
  */
 PHP_METHOD(Phalcon_Math_Num, arange){
+
+
+}
+
+/**
+ * Return a new array of given shape and type, filled with zeros
+ *
+ * @param int $rows
+ * @param int $cols
+ * @param int $type
+ * @return Phalcon\Math\Num\Array
+ */
+PHP_METHOD(Phalcon_Math_Num, zeros){
+
+
+}
+
+/**
+ * Return a new array of given shape and type, filled with ones
+ *
+ * @param int $rows
+ * @param int $cols
+ * @param int $type
+ * @return Phalcon\Math\Num\Array
+ */
+PHP_METHOD(Phalcon_Math_Num, ones){
+
+
+}
+
+/**
+ * Return a 2-D array with ones on the diagonal and zeros elsewhere
+ *
+ * @param int $n
+ * @param int $m
+ * @param int $k
+ * @param int $type
+ * @return Phalcon\Math\Num\Array
+ */
+PHP_METHOD(Phalcon_Math_Num, eye){
 
 
 }

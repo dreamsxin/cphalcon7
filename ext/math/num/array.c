@@ -36,6 +36,8 @@ zend_class_entry *phalcon_math_num_array_ce;
 PHP_METHOD(Phalcon_Math_Num_Array, __construct);
 PHP_METHOD(Phalcon_Math_Num_Array, __toString);
 PHP_METHOD(Phalcon_Math_Num_Array, valid);
+PHP_METHOD(Phalcon_Math_Num_Array, astype);
+PHP_METHOD(Phalcon_Math_Num_Array, reshape);
 PHP_METHOD(Phalcon_Math_Num_Array, getData);
 PHP_METHOD(Phalcon_Math_Num_Array, getShape);
 PHP_METHOD(Phalcon_Math_Num_Array, getNdim);
@@ -51,6 +53,15 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_valid, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_astype, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_reshape, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, data, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, data, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_add, 0, 0, 1)
@@ -73,6 +84,8 @@ static const zend_function_entry phalcon_math_num_array_method_entry[] = {
 	PHP_ME(Phalcon_Math_Num_Array, __construct, arginfo_phalcon_math_num_array___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Math_Num_Array, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, valid, arginfo_phalcon_math_num_array_valid, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num_Array, astype, arginfo_phalcon_math_num_array_astype, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num_Array, reshape, arginfo_phalcon_math_num_array_reshape, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num_Array, getData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, getNdim, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, getSize, NULL, ZEND_ACC_PUBLIC)
@@ -317,6 +330,29 @@ PHP_METHOD(Phalcon_Math_Num_Array, __toString){
 PHP_METHOD(Phalcon_Math_Num_Array, valid){
 
 	RETURN_TRUE;
+}
+
+/**
+ * Copy of the array, cast to a specified type
+ *
+ * @param int $type
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, astype){
+
+
+}
+
+/**
+ * Returns an array containing the same data with a new shape.
+ *
+ * @param int $rows
+ * @param int $cols
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, reshape){
+
+
 }
 
 /**

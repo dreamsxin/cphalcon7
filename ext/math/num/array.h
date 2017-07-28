@@ -23,6 +23,19 @@
 
 #include "php_phalcon.h"
 
+typedef struct _phalcon_math_num_array_object {
+	void* data;
+	zend_object std;
+} phalcon_math_num_array_object;
+
+static inline phalcon_math_num_array_object *phalcon_math_num_array_object_from_obj(zend_object *obj) {
+	return (phalcon_math_num_array_object*)((char*)(obj) - XtOffsetOf(phalcon_math_num_array_object, std));
+}
+
+static inline phalcon_math_num_array_object *phalcon_math_num_array_object_from_ctx(struct phalcon_math_num_array_context *ctx) {
+	return (phalcon_math_num_array_object*)((char*)(ctx) - XtOffsetOf(phalcon_math_num_array_object, ctx));
+}
+
 zval* phalcon_math_num_array_calc_shape(zval* data, zval* shape, zend_long dimension);
 zend_string *phalcon_math_num_array_to_string(zval* data, zend_long level);
 

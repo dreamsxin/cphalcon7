@@ -54,6 +54,7 @@ PHP_METHOD(Phalcon_Math_Num, tan);
 PHP_METHOD(Phalcon_Math_Num, ceil);
 PHP_METHOD(Phalcon_Math_Num, floor);
 PHP_METHOD(Phalcon_Math_Num, fabs);
+PHP_METHOD(Phalcon_Math_Num, dot);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
@@ -160,6 +161,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_fabs, 0, 0, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_dot, 0, 0, 2)
+	ZEND_ARG_INFO(0, data)
+	ZEND_ARG_INFO(0, data2)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_math_num_method_entry[] = {
 	PHP_ME(Phalcon_Math_Num, array, arginfo_phalcon_math_num_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, resize, arginfo_phalcon_math_num_resize, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -183,6 +189,7 @@ static const zend_function_entry phalcon_math_num_method_entry[] = {
 	PHP_ME(Phalcon_Math_Num, ceil, arginfo_phalcon_math_num_ceil, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, floor, arginfo_phalcon_math_num_floor, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Math_Num, fabs, arginfo_phalcon_math_num_fabs, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num, dot, arginfo_phalcon_math_num_dot, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -445,4 +452,17 @@ PHP_METHOD(Phalcon_Math_Num, floor){
 PHP_METHOD(Phalcon_Math_Num, fabs){
 
 	PHALCON_CALL_CE_STATIC(&valid, phalcon_math_num_array_ce, "valid", data);
+}
+
+/**
+ * Dot product of two arrays
+ *
+ * @param mixed $data
+ * @param mixed $data2
+ * @return Phalcon\Math\Num\Array
+ */
+PHP_METHOD(Phalcon_Math_Num, dot){
+
+	PHALCON_CALL_CE_STATIC(&valid, phalcon_math_num_array_ce, "valid", data);
+	PHALCON_CALL_CE_STATIC(&valid, phalcon_math_num_array_ce, "valid", data2);
 }

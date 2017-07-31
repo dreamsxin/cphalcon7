@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-#include "math/num.array.h"
+#include "math/num/array.h"
 
 #include "kernel/main.h"
 #include "kernel/exception.h"
@@ -36,6 +36,10 @@ zend_class_entry *phalcon_math_num_array_ce;
 PHP_METHOD(Phalcon_Math_Num_Array, __construct);
 PHP_METHOD(Phalcon_Math_Num_Array, __toString);
 PHP_METHOD(Phalcon_Math_Num_Array, valid);
+PHP_METHOD(Phalcon_Math_Num_Array, astype);
+PHP_METHOD(Phalcon_Math_Num_Array, reshape);
+PHP_METHOD(Phalcon_Math_Num_Array, sort);
+PHP_METHOD(Phalcon_Math_Num_Array, transpose);
 PHP_METHOD(Phalcon_Math_Num_Array, getData);
 PHP_METHOD(Phalcon_Math_Num_Array, getShape);
 PHP_METHOD(Phalcon_Math_Num_Array, getNdim);
@@ -51,6 +55,19 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_valid, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_astype, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_reshape, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, data, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, data, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_sort, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, axis, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_math_num_array_add, 0, 0, 1)
@@ -73,6 +90,10 @@ static const zend_function_entry phalcon_math_num_array_method_entry[] = {
 	PHP_ME(Phalcon_Math_Num_Array, __construct, arginfo_phalcon_math_num_array___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Math_Num_Array, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, valid, arginfo_phalcon_math_num_array_valid, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Math_Num_Array, astype, arginfo_phalcon_math_num_array_astype, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Math_Num_Array, reshape, arginfo_phalcon_math_num_array_reshape, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Math_Num_Array, sort, arginfo_phalcon_math_num_array_sort, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Math_Num_Array, transpose, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, getData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, getNdim, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Math_Num_Array, getSize, NULL, ZEND_ACC_PUBLIC)
@@ -83,16 +104,104 @@ static const zend_function_entry phalcon_math_num_array_method_entry[] = {
 	PHP_FE_END
 };
 
+zend_object_handlers phalcon_math_num_array_object_handlers;
+zend_object* phalcon_math_num_array_object_create_handler(zend_class_entry *ce)
+{
+	phalcon_math_num_array_object *intern = ecalloc(1, sizeof(phalcon_math_num_array_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
+
+	zend_object_std_init(&intern->std, ce);
+	object_properties_init(&intern->std, ce);
+	intern->std.handlers = &phalcon_math_num_array_object_handlers;
+
+	memset(&intern->ctx, 0, sizeof(struct phalcon_math_num_array_context));
+	intern->ctx.start_cpu = 0;
+	intern->ctx.la_num = 1;
+
+	return &intern->std;
+}
+
+void phalcon_math_num_array_object_free_handler(zend_object *object)
+{
+	phalcon_math_num_array_object *intern = phalcon_math_num_array_object_from_obj(object);
+
+	if (intern->ctx.log_path) {
+		zend_string_release(intern->ctx.log_path);
+	}
+}
+
+static int phalcon_math_num_array_object_do_operation_ex(zend_uchar opcode, zval *result, zval *op1, zval *op2)
+{
+	switch (opcode) {
+		case ZEND_ADD:
+		case ZEND_SUB:
+		case ZEND_MUL:
+		case ZEND_POW:
+			return SUCCESS;
+		case ZEND_DIV:
+		case ZEND_MOD:
+		case ZEND_SL:
+			return SUCCESS;
+		case ZEND_SR:
+			return SUCCESS;
+		case ZEND_BW_OR:
+		case ZEND_BW_AND:
+		case ZEND_BW_XOR:
+		case ZEND_BW_NOT:
+
+		default:
+			return FAILURE;
+	}
+}
+/* }}} */
+
+static int phalcon_math_num_array_object_do_operation(zend_uchar opcode, zval *result, zval *op1, zval *op2) /* {{{ */
+{
+	zval op1_copy;
+	int retval;
+
+	if (result == op1) {
+		ZVAL_COPY_VALUE(&op1_copy, op1);
+		op1 = &op1_copy;
+	}
+
+	retval = phalcon_math_num_array_object_do_operation_ex(opcode, result, op1, op2);
+
+	if (retval == SUCCESS && op1 == &op1_copy) {
+		zval_dtor(op1);
+	}
+
+	return retval;
+}
+
+static int phalcon_math_num_array_object_compare_handler(zval *result, zval *op1, zval *op2)
+{
+	gmp_cmp(result, op1, op2);
+	if (Z_TYPE_P(result) == IS_FALSE) {
+		ZVAL_LONG(result, 1);
+	}
+	return SUCCESS;
+}
 
 /**
  * Phalcon\Math\Num\Array initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Math_Num_Array){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Math\\Num, Array, math_num_array, phalcon_math_num_array_method_entry, 0);
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Math\\Num, Array, math_num_array, phalcon_math_num_array_method_entry, 0);
 
-	zend_declare_property_null(phalcon_math_num_array_ce, SL("_data"), ZEND_ACC_PROTECTED);
+	// memcpy(phalcon_math_num_array_object_handlers, zend_get_std_object_handlers(), sizeof(zend_object_handlers));
+	// phalcon_math_num_array_object_handlers.offset
+	// phalcon_math_num_array_object_handlers.free_obj
+	// phalcon_math_num_array_object_handlers.cast_object
+	// phalcon_math_num_array_object_handlers.get_debug_info
+	// phalcon_math_num_array_object_handlers.clone_obj
+	phalcon_math_num_array_object_handlers.do_operation = phalcon_math_num_array_object_do_operation;
+	phalcon_math_num_array_object_handlers.compare = phalcon_math_num_array_object_compare_handler;
+
+	// zend_declare_property_null(phalcon_math_num_array_ce, SL("_data"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_math_num_array_ce, SL("_shape"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_math_num_array_ce, SL("_type"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -317,6 +426,51 @@ PHP_METHOD(Phalcon_Math_Num_Array, __toString){
 PHP_METHOD(Phalcon_Math_Num_Array, valid){
 
 	RETURN_TRUE;
+}
+
+/**
+ * Copy of the array, cast to a specified type
+ *
+ * @param int $type
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, astype){
+
+
+}
+
+/**
+ * Returns an array containing the same data with a new shape
+ *
+ * @param int $rows
+ * @param int $cols
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, reshape){
+
+
+}
+
+/**
+ * Return a sorted copy of an array
+ *
+ * @param int $axis
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, sort){
+
+
+}
+
+/**
+ * Permute the dimensions of an array
+ *
+ * @param array $axes
+ * @return array
+ */
+PHP_METHOD(Phalcon_Math_Num_Array, transpose){
+
+
 }
 
 /**

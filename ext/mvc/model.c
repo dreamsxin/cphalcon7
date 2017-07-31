@@ -5288,7 +5288,7 @@ PHP_METHOD(Phalcon_Mvc_Model, writeAttribute){
  */
 PHP_METHOD(Phalcon_Mvc_Model, skipAttributes){
 
-	zval *attributes, *replace = NULL, keys_attributes = {}, *attribute, meta_data = {};
+	zval *attributes, *replace = NULL, reverse_column_map = {}, keys_attributes = {}, *attribute, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 1, &attributes, &replace);
 
@@ -5296,11 +5296,19 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributes){
 		replace = &PHALCON_GLOBAL(z_false);
 	}
 
+	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap");
+
 	array_init(&keys_attributes);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
-		phalcon_array_update(&keys_attributes, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
+		zval real_attribute = {};
+		if (!phalcon_array_isset_fetch(&real_attribute, &reverse_column_map, attribute, PH_NOISY|PH_READONLY)) {
+			ZVAL_COPY_VALUE(&real_attribute, attribute);
+		}
+		phalcon_array_update(&keys_attributes, &real_attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
 	} ZEND_HASH_FOREACH_END();
+
+	zval_ptr_dtor(&reverse_column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, &meta_data, "setautomaticcreateattributes", getThis(), &keys_attributes, replace);
@@ -5330,7 +5338,7 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributes){
  */
 PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnCreate){
 
-	zval *attributes, *replace = NULL, keys_attributes = {}, *attribute, meta_data = {};
+	zval *attributes, *replace = NULL, reverse_column_map = {}, keys_attributes = {}, *attribute, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 1, &attributes, &replace);
 
@@ -5338,11 +5346,19 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnCreate){
 		replace = &PHALCON_GLOBAL(z_false);
 	}
 
+	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap");
+
 	array_init(&keys_attributes);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
-		phalcon_array_update(&keys_attributes, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
+		zval real_attribute = {};
+		if (!phalcon_array_isset_fetch(&real_attribute, &reverse_column_map, attribute, PH_NOISY|PH_READONLY)) {
+			ZVAL_COPY_VALUE(&real_attribute, attribute);
+		}
+		phalcon_array_update(&keys_attributes, &real_attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
 	} ZEND_HASH_FOREACH_END();
+
+	zval_ptr_dtor(&reverse_column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, &meta_data, "setautomaticcreateattributes", getThis(), &keys_attributes, replace);
@@ -5390,7 +5406,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getSkipAttributesOnCreate){
  */
 PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnUpdate){
 
-	zval *attributes, *replace = NULL, keys_attributes = {}, *attribute, meta_data = {};
+	zval *attributes, *replace = NULL, reverse_column_map = {}, keys_attributes = {}, *attribute, meta_data = {};
 
 	phalcon_fetch_params(0, 1, 1, &attributes, &replace);
 
@@ -5398,11 +5414,19 @@ PHP_METHOD(Phalcon_Mvc_Model, skipAttributesOnUpdate){
 		replace = &PHALCON_GLOBAL(z_false);
 	}
 
+	PHALCON_CALL_METHOD(&reverse_column_map, getThis(), "getreversecolumnmap");
+
 	array_init(&keys_attributes);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(attributes), attribute) {
-		phalcon_array_update(&keys_attributes, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
+		zval real_attribute = {};
+		if (!phalcon_array_isset_fetch(&real_attribute, &reverse_column_map, attribute, PH_NOISY|PH_READONLY)) {
+			ZVAL_COPY_VALUE(&real_attribute, attribute);
+		}
+		phalcon_array_update(&keys_attributes, &real_attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
 	} ZEND_HASH_FOREACH_END();
+
+	zval_ptr_dtor(&reverse_column_map);
 
 	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
 	PHALCON_CALL_METHOD(NULL, &meta_data, "setautomaticupdateattributes", getThis(), &keys_attributes, replace);

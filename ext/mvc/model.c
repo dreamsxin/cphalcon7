@@ -155,7 +155,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getUniqueKey);
 PHP_METHOD(Phalcon_Mvc_Model, getUniqueParams);
 PHP_METHOD(Phalcon_Mvc_Model, getUniqueTypes);
 PHP_METHOD(Phalcon_Mvc_Model, _reBuild);
-PHP_METHOD(Phalcon_Mvc_Model, _exists);
+PHP_METHOD(Phalcon_Mvc_Model, exists);
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult);
 PHP_METHOD(Phalcon_Mvc_Model, count);
 PHP_METHOD(Phalcon_Mvc_Model, sum);
@@ -410,8 +410,8 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, getUniqueKey, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getUniqueParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getUniqueTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, exists, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, _reBuild, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Mvc_Model, _exists, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model, _groupResult, NULL, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, count, arginfo_phalcon_mvc_modelinterface_count, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, sum, arginfo_phalcon_mvc_modelinterface_sum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -2210,10 +2210,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
  * @param Phalcon\Db\AdapterInterface $connection
  * @return boolean
  */
-PHP_METHOD(Phalcon_Mvc_Model, _exists){
+PHP_METHOD(Phalcon_Mvc_Model, exists){
 
 	zval *force = NULL, build = {}, dirty_state = {}, unique_key = {}, unique_params = {}, unique_types = {};
-	zval model_name = {}, phql = {}, models_manager = {}, query = {}, model = {}, snapshot = {};
+	zval model_name = {}, phql = {}, models_manager = {}, query = {}, write_connection = {}, model = {}, snapshot = {};
 
 	phalcon_fetch_params(0, 0, 1, &force);
 
@@ -2247,24 +2247,34 @@ PHP_METHOD(Phalcon_Mvc_Model, _exists){
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	zval_ptr_dtor(&models_manager);
 	zval_ptr_dtor(&phql);
 
+	/**
+	 * Create/Get the current database connection
+	 */
+	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
+
+	PHALCON_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
+	zval_ptr_dtor(&write_connection);
 	PHALCON_CALL_METHOD(NULL, &query, "setuniquerow", &PHALCON_GLOBAL(z_true));
 	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
 
 	PHALCON_CALL_METHOD(&model, &query, "execute");
+	zval_ptr_dtor(&query);
 
 	if (Z_TYPE(model) == IS_OBJECT) {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
 		PHALCON_CALL_METHOD(&snapshot, &model, "getsnapshotdata");
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot);
-		RETURN_TRUE;
+		zval_ptr_dtor(&snapshot);
+		RETVAL_TRUE;
+	} else {
+		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
+		RETVAL_FALSE;
 	}
-
-	phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&model);
 }
 
 /**
@@ -4762,10 +4772,10 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	 * We need to check if the record exists
 	 */
 	if (!_exists) {
-		PHALCON_CALL_METHOD(&exists, getThis(), "_exists");
+		PHALCON_CALL_METHOD(&exists, getThis(), "exists");
 	} else {
 		if (zend_is_true(exists_check)) {
-			PHALCON_CALL_METHOD(&exists, getThis(), "_exists");
+			PHALCON_CALL_METHOD(&exists, getThis(), "exists");
 			if (!zend_is_true(&exists)) {
 				if (zend_is_true(&exists)) {
 					ZVAL_STRING(&type, "InvalidCreateAttempt");
@@ -4967,7 +4977,7 @@ PHP_METHOD(Phalcon_Mvc_Model, create){
 	}
 
 	if (!exists_check) {
-		exists_check = &PHALCON_GLOBAL(z_true);
+		exists_check = &PHALCON_GLOBAL(z_false);
 	}
 
 	/**
@@ -5007,7 +5017,7 @@ PHP_METHOD(Phalcon_Mvc_Model, update){
 	}
 
 	if (!exists_check) {
-		exists_check = &PHALCON_GLOBAL(z_true);
+		exists_check = &PHALCON_GLOBAL(z_false);
 	}
 
 	/**
@@ -5182,7 +5192,7 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&exists, getThis(), "_exists", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * We need to check if the record exists

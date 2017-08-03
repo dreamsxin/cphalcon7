@@ -1506,6 +1506,12 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		dirty_state = &PHALCON_GLOBAL(z_zero);
 	}
 
+	if (Z_TYPE_P(base) != IS_OBJECT) {
+		ZVAL_STRING(&exception_message, "The base must be object");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		return;
+	}
+
 	if (phalcon_clone(return_value, base) == FAILURE) {
 		return;
 	}
@@ -1711,13 +1717,19 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 
-	zval *base, *data, *dirty_state = NULL, *value = NULL;
+	zval *base, *data, *dirty_state = NULL, *value = NULL, exception_message = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 2, 1, &base, &data, &dirty_state);
 
 	if (!dirty_state) {
 		dirty_state = &PHALCON_GLOBAL(z_zero);
+	}
+
+	if (Z_TYPE_P(base) != IS_OBJECT) {
+		ZVAL_STRING(&exception_message, "The base must be object");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		return;
 	}
 
 	/**

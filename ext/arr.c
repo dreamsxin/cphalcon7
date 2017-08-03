@@ -1043,7 +1043,11 @@ PHP_METHOD(Phalcon_Arr, callback){
 				RETURN_FALSE;
 			}
 			pce->refcount++;
+#if PHP_VERSION_ID >= 70200
+			php_pcre_split_impl(pce, Z_STR(match), &split, -1, 0);
+#else
 			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &split, -1, 0);
+#endif
 			pce->refcount--;
 
 			ZVAL_STRING(&search, "\\,");

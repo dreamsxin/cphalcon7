@@ -1576,29 +1576,27 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		zval_ptr_dtor(&connection);
 	}
 
-	if (Z_TYPE_P(return_value) == IS_OBJECT) {
-		if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
-			PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
-			PHALCON_CALL_METHOD(NULL, return_value, "build");
-		}
+	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
+		PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
+		PHALCON_CALL_METHOD(NULL, return_value, "build");
+	}
 
-		/**
-		 * Call afterFetch, this allows the developer to execute actions after a record is
-		 * fetched from the database
-		 */
-		if (phalcon_method_exists_ex(return_value, SL("afterfetch")) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, return_value, "afterfetch");
-		}
+	/**
+	 * Call afterFetch, this allows the developer to execute actions after a record is
+	 * fetched from the database
+	 */
+	if (phalcon_method_exists_ex(return_value, SL("afterfetch")) == SUCCESS) {
+		PHALCON_CALL_METHOD(NULL, return_value, "afterfetch");
 	}
 }
 
 /**
  * Returns an hydrated result based on the data and the column map
  *
- * @param Phalcon\Mvc\Model $sourceModel
  * @param array $data
  * @param array $columnMap
  * @param int $hydrationMode
+ * @param Phalcon\Mvc\Model $sourceModel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){

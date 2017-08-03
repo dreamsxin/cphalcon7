@@ -1506,6 +1506,12 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		dirty_state = &PHALCON_GLOBAL(z_zero);
 	}
 
+	if (Z_TYPE_P(base) != IS_OBJECT) {
+		ZVAL_STRING(&exception_message, "The base must be object");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		return;
+	}
+
 	if (phalcon_clone(return_value, base) == FAILURE) {
 		return;
 	}
@@ -1576,29 +1582,27 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		zval_ptr_dtor(&connection);
 	}
 
-	if (Z_TYPE_P(return_value) == IS_OBJECT) {
-		if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
-			PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
-			PHALCON_CALL_METHOD(NULL, return_value, "build");
-		}
+	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
+		PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
+		PHALCON_CALL_METHOD(NULL, return_value, "build");
+	}
 
-		/**
-		 * Call afterFetch, this allows the developer to execute actions after a record is
-		 * fetched from the database
-		 */
-		if (phalcon_method_exists_ex(return_value, SL("afterfetch")) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, return_value, "afterfetch");
-		}
+	/**
+	 * Call afterFetch, this allows the developer to execute actions after a record is
+	 * fetched from the database
+	 */
+	if (phalcon_method_exists_ex(return_value, SL("afterfetch")) == SUCCESS) {
+		PHALCON_CALL_METHOD(NULL, return_value, "afterfetch");
 	}
 }
 
 /**
  * Returns an hydrated result based on the data and the column map
  *
- * @param Phalcon\Mvc\Model $sourceModel
  * @param array $data
  * @param array $columnMap
  * @param int $hydrationMode
+ * @param Phalcon\Mvc\Model $sourceModel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
@@ -1713,13 +1717,19 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
  */
 PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 
-	zval *base, *data, *dirty_state = NULL, *value = NULL;
+	zval *base, *data, *dirty_state = NULL, *value = NULL, exception_message = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 2, 1, &base, &data, &dirty_state);
 
 	if (!dirty_state) {
 		dirty_state = &PHALCON_GLOBAL(z_zero);
+	}
+
+	if (Z_TYPE_P(base) != IS_OBJECT) {
+		ZVAL_STRING(&exception_message, "The base must be object");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		return;
 	}
 
 	/**

@@ -1854,7 +1854,7 @@ int phalcon_property_array_last(zval *fetched, zval *object, const char *propert
 		return 0;
 	}
 
-	if (!phalcon_array_last(fetched, &property_value, flags) == FAILURE) {
+	if (phalcon_array_last(fetched, &property_value, flags) == FAILURE) {
 		return 0;
 	}
 	return 1;

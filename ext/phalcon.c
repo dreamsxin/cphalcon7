@@ -565,6 +565,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Storage_Bloomfilter);
 #endif
 
+#ifdef PHALCON_USE_DATRIE
+	PHALCON_INIT(Phalcon_Storage_Datrie);
+#endif
+
 #if PHALCON_USE_SERVER
 	PHALCON_INIT(Phalcon_Server);
 	PHALCON_INIT(Phalcon_Server_Http);

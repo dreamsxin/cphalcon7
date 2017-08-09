@@ -123,6 +123,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-datrie, whether to enable storage datrie support,
+[  --enable-storage-datrie   Enable storage datrie support], no, no)
+
+if test "$PHP_STORAGE_DATRIE" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_DATRIE], [1], [Whether storage datrie are available])
+	AC_MSG_RESULT([yes, storage datrie])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(server, whether to enable server support,
 [  --enable-server   Enable server support], no, no)
 
@@ -345,6 +355,13 @@ kernel/mpool.c \
 kernel/avltree.c \
 kernel/rbtree.c \
 kernel/bloomfilter.c \
+kernel/datrie/trie.c \
+kernel/datrie/alpha-map.c \
+kernel/datrie/darray.c \
+kernel/datrie/dstring.c \
+kernel/datrie/fileutils.c \
+kernel/datrie/tail.c \
+kernel/datrie/trie-string.c \
 kernel/list.c \
 kernel/session.c \
 kernel/variables.c \
@@ -1151,6 +1168,11 @@ server/exception.c"
 	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then
 		AC_DEFINE(PHALCON_USE_BLOOMFILTER, 1, [Have bloomfilter support])
 		phalcon_sources="$phalcon_sources storage/bloomfilter.c "
+	fi
+
+	if test "$PHP_STORAGE_DATRIE" = "yes"; then
+		AC_DEFINE(PHALCON_USE_DATRIE, 1, [Have datrie support])
+		phalcon_sources="$phalcon_sources storage/datrie.c "
 	fi
 
 	if test "$PHP_SERVER" = "yes"; then

@@ -216,14 +216,20 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		ZVAL_STRING(&key, "Content-Type");
 
 		if (PHALCON_IS_EMPTY(&type)) {
-			ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
+			PHALCON_CALL_METHOD(&key_value, &header, "get", &key);
+			if (PHALCON_IS_EMPTY(&key_value)) {
+				zval_ptr_dtor(&key_value);
+				ZVAL_STRING(&key_value, "application/x-www-form-urlencoded");
+				PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
+			}
+			zval_ptr_dtor(&key_value);
 		} else {
 			ZVAL_COPY(&key_value, &type);
+			PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
+			zval_ptr_dtor(&key_value);
 		}
 
-		PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
 		zval_ptr_dtor(&key);
-		zval_ptr_dtor(&key_value);
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
 			PHALCON_CALL_FUNCTION(NULL, "curl_setopt", &curl, constant, &data);

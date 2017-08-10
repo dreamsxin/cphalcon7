@@ -170,6 +170,7 @@ static int phalcon_storage_datrie_search(zval *return_value, Trie *trie, const A
 	TrieState *s;
 	const AlphaChar *p;
 	const AlphaChar *base;
+	int ret = 0;
 
 	base = text;
 	if (! (s = trie_root(trie))) {
@@ -192,8 +193,9 @@ static int phalcon_storage_datrie_search(zval *return_value, Trie *trie, const A
 				add_next_index_long(&word, text - base);
 				add_next_index_long(&word, p - text);
 				add_next_index_zval(return_value, &word);
+				ret++;
 				if (!all) {
-					return 0;
+					return ret;
 				}
 			}		
 		}
@@ -202,7 +204,7 @@ static int phalcon_storage_datrie_search(zval *return_value, Trie *trie, const A
 	}
 	trie_state_free(s);
 
-	return 0;
+	return ret;
 }
 
 /**
@@ -243,7 +245,7 @@ PHP_METHOD(Phalcon_Storage_Datrie, search)
 
 	ret = phalcon_storage_datrie_search(return_value, intern->trie, alpha_text, zend_is_true(all));
 	efree(alpha_text);
-	if (ret != 0) {
+	if (ret <= 0) {
 		zval_ptr_dtor(return_value);
 		RETURN_FALSE;
 	}

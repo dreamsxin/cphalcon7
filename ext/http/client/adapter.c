@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setData){
 
 	phalcon_update_property(getThis(), SL("_data"), data);
 
-	if (type) {
+	if (type &&  Z_TYPE_P(type) != IS_NULL) {
 		if (Z_TYPE_P(type) != IS_STRING) {
 			convert_to_string(type);
 			phalcon_update_property(getThis(), SL("_type"), type);
@@ -315,16 +315,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, getPath){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, get){
 
-	zval *uri = NULL, *data = NULL;
+	zval *uri = NULL, *data = NULL, *type = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &uri, &data);
+	phalcon_fetch_params(0, 0, 3, &uri, &data, &type);
 
-	if (uri) {
+	if (uri && PHALCON_IS_NOT_EMPTY(uri)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
+		if (!type) {
+			type = &PHALCON_GLOBAL(z_null);
+		}
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data, type);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("GET"));
@@ -341,16 +344,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, get){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, head){
 
-	zval *uri = NULL, *data = NULL;
+	zval *uri = NULL, *data = NULL, *type = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &uri, &data);
+	phalcon_fetch_params(0, 0, 3, &uri, &data, &type);
 
-	if (uri) {
+	if (uri && PHALCON_IS_NOT_EMPTY(uri)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
+		if (!type) {
+			type = &PHALCON_GLOBAL(z_null);
+		}
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data, type);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("HEAD"));
@@ -367,16 +373,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, head){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, post){
 
-	zval *uri = NULL, *data = NULL;
+	zval *uri = NULL, *data = NULL, *type = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &uri, &data);
+	phalcon_fetch_params(0, 0, 3, &uri, &data, &type);
 
-	if (uri) {
+	if (uri && PHALCON_IS_NOT_EMPTY(uri)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
+		if (!type) {
+			type = &PHALCON_GLOBAL(z_null);
+		}
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data, type);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("POST"));
@@ -393,16 +402,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, post){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, put){
 
-	zval *uri = NULL, *data = NULL;
+	zval *uri = NULL, *data = NULL, *type = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &uri, &data);
+	phalcon_fetch_params(0, 0, 3, &uri, &data, &type);
 
-	if (uri) {
+	if (uri && PHALCON_IS_NOT_EMPTY(uri)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
+		if (!type) {
+			type = &PHALCON_GLOBAL(z_null);
+		}
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data, type);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("PUT"));
@@ -419,16 +431,19 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, put){
  */
 PHP_METHOD(Phalcon_Http_Client_Adapter, delete){
 
-	zval *uri = NULL, *data = NULL;
+	zval *uri = NULL, *data = NULL, *type = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &uri, &data);
+	phalcon_fetch_params(0, 0, 3, &uri, &data, &type);
 
-	if (uri) {
+	if (uri && PHALCON_IS_NOT_EMPTY(uri)) {
 		PHALCON_CALL_METHOD(NULL, getThis(), "seturi", uri);
 	}
 
 	if (data) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data);
+		if (!type) {
+			type = &PHALCON_GLOBAL(z_null);
+		}
+		PHALCON_CALL_METHOD(NULL, getThis(), "setdata", data, type);
 	}
 
 	phalcon_update_property_str(getThis(), SL("_method"), SL("DELETE"));
@@ -452,7 +467,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter, setUri){
 
 	if (Z_TYPE(base_uri) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, &base_uri, "extend", uri);
-		phalcon_update_property(getThis(), SL("_base_uri"), &base_uri);
 	} else {
 		PHALCON_CALL_METHOD(NULL, getThis(), "setbaseuri", uri);
 	}

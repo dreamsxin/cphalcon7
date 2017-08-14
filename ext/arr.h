@@ -22,6 +22,51 @@
 #define PHALCON_ARR_H
 
 #include "php_phalcon.h"
+             
+#define PHALCON_ARR_AGGR_FIRST		1
+#define PHALCON_ARR_AGGR_LAST		2
+#define PHALCON_ARR_AGGR_COUNT		3  
+#define PHALCON_ARR_AGGR_AVG		4
+#define PHALCON_ARR_AGGR_SUM		5
+#define PHALCON_ARR_AGGR_GROUP		6
+#define PHALCON_ARR_AGGR_MIN		7
+#define PHALCON_ARR_AGGR_MAX		8
+
+#define PHALCON_ARR_TYPE_BOOLEAN	1
+#define PHALCON_ARR_TYPE_LONG		2
+#define PHALCON_ARR_TYPE_DOUBLE		3
+#define PHALCON_ARR_TYPE_STRING		4
+
+#define PHALCON_ARR_HASH_ADD_NEW(ht, num_idx, str_idx, val) \
+      (str_idx) \
+      ? zend_hash_add_new(ht, str_idx, val) \
+      : zend_hash_index_add_new(ht, num_idx, val)
+
+#define PHALCON_ARR_HASH_UPDATE(ht, num_idx, str_idx, val) \
+      (str_idx) \
+      ? zend_hash_update(ht, str_idx, val) \
+      : zend_hash_index_update(ht, num_idx, val)
+
+#define PHALCON_ARR_HASH_FIND(ht, num_idx, str_idx) \
+      (str_idx) \
+      ? zend_hash_find(ht, str_idx) \
+: zend_hash_index_find(ht, num_idx)
+
+typedef struct _phalcon_arr_aggregator {
+
+  zend_string *alias;
+  zend_string *selector;
+  ulong num_alias;
+  ulong num_selector;
+
+  zend_bool is_callable;
+  uint isa;
+
+  zval *type; // could be a constant or a function call.
+  zend_fcall_info fci;
+  zend_fcall_info_cache fci_cache;
+
+} phalcon_arr_aggregator;
 
 extern zend_class_entry *phalcon_arr_ce;
 

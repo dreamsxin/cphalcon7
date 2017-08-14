@@ -117,4 +117,113 @@ class ArrTest extends PHPUnit_Framework_TestCase
 		$arr = [['name'=>"It's Phalcon"],['name'=>"It's Phalcon7"]];
 		$this->assertEquals(\Phalcon\Arr::map($arr, 'addslashes'), [['name'=>"It\'s Phalcon"],['name'=>"It\'s Phalcon7"]]);
 	}
+
+	public function testaAdvanced() {
+		$rows = [
+			['category' => 'Food', 'type' => 'Pasta', 'amount' => 1],
+			['category' => 'Food', 'type' => 'Pasta', 'amount' => 2],
+			['category' => 'Food', 'type' => 'Dumpling', 'amount' => 2],
+			['category' => 'Food', 'type' => 'Dumpling', 'amount' => 3],
+			['category' => 'Food', 'type' => 'Steamed buns', 'amount' => 3],
+			['category' => 'Food', 'type' => 'Steamed buns', 'amount' => 4],
+			['category' => 'Food', 'type' => 'Juice', 'amount' => 4 ],
+			['category' => 'Food', 'type' => 'Juice', 'amount' => 5 ],
+			['category' => 'Book', 'type' => 'Programming', 'amount' => 5],
+			['category' => 'Book', 'type' => 'Programming', 'amount' => 6],
+			['category' => 'Book', 'type' => 'Designing', 'amount' => 6],
+			['category' => 'Book', 'type' => 'Designing', 'amount' => 7],
+			['category' => 'Book', 'type' => 'Cooking', 'amount' => 7],
+			['category' => 'Book', 'type' => 'Cooking', 'amount' => 8],
+		];
+
+		$result = Phalcon\Arr::group($rows, ['category', 'type'], [
+			'max_amount' => [
+				'selector' => 'amount',
+				'aggregator' => Phalcon\Arr::AGGR_MAX,
+			],
+			'count_amount' => [
+				'selector' => 'amount',
+				'aggregator' => Phalcon\Arr::AGGR_COUNT,
+			],
+			'group_amount' => [
+				'selector' => 'amount',
+				'aggregator' => Phalcon\Arr::AGGR_GROUP,
+			],
+			'amount' => Phalcon\Arr::AGGR_SUM,
+		]);
+	
+		$data = [
+			[
+				'category' => 'Food',
+				'type' => 'Pasta',
+				'max_amount' => 2,
+				'count_amount' => 2,
+				'group_amount' => [1, 2],
+				'amount' => 3,
+			],
+			[
+				'category' => 'Food',
+				'type' => 'Dumpling',
+				'max_amount' => 3,
+				'count_amount' => 2,
+				'group_amount' => [2, 3],
+				'amount' => 5,
+			],
+			[
+				'category' => 'Food',
+				'type' => 'Steamed buns',
+				'max_amount' => 4,
+				'count_amount' => 2,
+				'group_amount' => [3, 4],
+				'amount' => 7,
+			],
+			[
+				'category' => 'Food',
+				'type' => 'Juice',
+				'max_amount' => 5,
+				'count_amount' => 2,
+				'group_amount' => [4, 5],
+				'amount' => 9,
+			],
+			[
+				'category' => 'Book',
+				'type' => 'Programming',
+				'max_amount' => 6,
+				'count_amount' => 2,
+				'group_amount' => [5, 6],
+				'amount' => 11,
+			],
+			[
+				'category' => 'Book',
+				'type' => 'Designing',
+				'max_amount' => 7,
+				'count_amount' => 2,
+				'group_amount' => [6, 7],
+				'amount' => 13,
+			],
+			[
+				'category' => 'Book',
+				'type' => 'Cooking',
+				'max_amount' => 8,
+				'count_amount' => 2,
+				'group_amount' => [7, 8],
+				'amount' => 15,
+			],
+		];
+		$this->assertEquals($result, $data);
+
+		$result = Phalcon\Arr::aggr($rows, [
+			'total_amount' => [
+				'selector' => 'amount',
+				'aggregator' => Phalcon\Arr::AGGR_SUM,
+			],
+			'amount' => Phalcon\Arr::AGGR_COUNT,
+		]);
+
+		$data = [
+			'total_amount' => 63,
+			'amount' => 14,
+		];
+		$this->assertEquals($result, $data);
+	}
 }

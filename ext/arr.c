@@ -67,6 +67,8 @@ PHP_METHOD(Phalcon_Arr, key);
 PHP_METHOD(Phalcon_Arr, filter);
 PHP_METHOD(Phalcon_Arr, sum);
 PHP_METHOD(Phalcon_Arr, toArray);
+PHP_METHOD(Phalcon_Arr, aggr);
+PHP_METHOD(Phalcon_Arr, group);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
@@ -182,6 +184,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_toarray, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, negate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_aggr, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, rows, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, aggregators, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_group, 0, 0, 3)
+	ZEND_ARG_TYPE_INFO(0, rows, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, fields, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, aggregators, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, is_assoc, arginfo_phalcon_arr_is_assoc, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, is_array, arginfo_phalcon_arr_is_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -204,6 +217,8 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, filter, arginfo_phalcon_arr_filter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, sum, arginfo_phalcon_arr_sum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, toArray, arginfo_phalcon_arr_toarray, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, aggr, arginfo_phalcon_arr_aggr, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, group, arginfo_phalcon_arr_group, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -217,14 +232,30 @@ PHALCON_INIT_CLASS(Phalcon_Arr){
 	// zend_declare_class_constant_stringl(phalcon_arr_ce, SL("delimiter"), SL("."));
 	zend_declare_property_string(phalcon_arr_ce, SL("delimiter"), ".", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("TYPE_BOOLEAN"),	PHALCON_ARR_TYPE_BOOLEAN);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("TYPE_LONG"),		PHALCON_ARR_TYPE_LONG);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("TYPE_DOUBLE"),		PHALCON_ARR_TYPE_DOUBLE);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("TYPE_STRING"),		PHALCON_ARR_TYPE_STRING);
+
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_SUM"),		PHALCON_ARR_AGGR_SUM);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_AVG"),		PHALCON_ARR_AGGR_AVG);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_COUNT"),	PHALCON_ARR_AGGR_COUNT);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_FIRST"),	PHALCON_ARR_AGGR_FIRST);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_LAST"),	PHALCON_ARR_AGGR_LAST);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_MIN"),		PHALCON_ARR_AGGR_MIN);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_MAX"),		PHALCON_ARR_AGGR_MAX);
+	zend_declare_class_constant_long(phalcon_arr_ce, SL("AGGR_GROUP"),	PHALCON_ARR_AGGR_GROUP);
+
 	return SUCCESS;
 }
 
 /**
  * Tests if an array is associative or not.
  *
- *     // Returns TRUE
- *     \Phalcon\Arr::is_assoc(array('username' => 'john.doe'))
+ *<code>
+ *	// Returns TRUE
+ *	\Phalcon\Arr::is_assoc(array('username' => 'john.doe'))
+ *</code>
  *
  * @param array $array
  * @return boolean
@@ -245,8 +276,10 @@ PHP_METHOD(Phalcon_Arr, is_assoc){
 /**
  * Test if a value is an array with an additional check for array-like objects.
  *
- *     // Returns TRUE
- *     \Phalcon\Arr::is_array(array());
+ *<code>
+ *	// Returns TRUE
+ *	\Phalcon\Arr::is_array(array());
+ *</code>
  *
  * @param mixed $value
  * @return boolean
@@ -261,22 +294,26 @@ PHP_METHOD(Phalcon_Arr, is_array){
 		RETURN_TRUE;
 	}
 
-	 RETURN_BOOL(Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), zend_ce_traversable, 1));
+	RETURN_BOOL(Z_TYPE_P(value) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(value), zend_ce_traversable, 1));
 }
 
 /**
  * Gets a value from an array using a dot separated path.
  *
- *     // Get the value of $array['foo']['bar']
- *     $value = \Phalcon\Arr::path($array, 'foo.bar');
+ *<code>
+ *	// Get the value of $array['foo']['bar']
+ *	$value = \Phalcon\Arr::path($array, 'foo.bar');
+ *</code>
  *
  * Using a wildcard "*" will search intermediate arrays and return an array.
  *
- *     // Get the values of "color" in theme
- *     $colors = \Phalcon\Arr::path($array, 'theme.*.color');
+ *<code>
+ *	// Get the values of "color" in theme
+ *	$colors = \Phalcon\Arr::path($array, 'theme.*.color');
  *
- *     // Using an array of keys
- *     $colors = \Phalcon\Arr::path($array, array('theme', '*', 'color'));
+ *	// Using an array of keys
+ *	$colors = \Phalcon\Arr::path($array, array('theme', '*', 'color'));
+ *</code>
  *
  * @param array $array
  * @param mixed $path
@@ -384,10 +421,12 @@ end:
  *
  * Using a wildcard "*" will search intermediate arrays and return an array.
  *
- *     // Set the values of "color" in theme
- *     $array = array('theme' => array('one' => array('color' => 'green'), 'two' => array('size' => 11));
- *     \Phalcon\Arr::set_path($array, 'theme.*.color', 'red');
- *     // Result: array('theme' => array('one' => array('color' => 'red'), 'two' => array('size' => 11, 'color' => 'red'));
+ *<code>
+ *	// Set the values of "color" in theme
+ *	$array = array('theme' => array('one' => array('color' => 'green'), 'two' => array('size' => 11));
+ *	\Phalcon\Arr::set_path($array, 'theme.*.color', 'red');
+ *	// Result: array('theme' => array('one' => array('color' => 'red'), 'two' => array('size' => 11, 'color' => 'red'));
+ *</code>
  *
  * @param array $array
  * @param string $path
@@ -420,7 +459,7 @@ PHP_METHOD(Phalcon_Arr, set_path){
 
 	ZVAL_COPY_VALUE(&cpy_array, array);
 
-	// Set current $array to inner-most array  path
+	// Set current $array to inner-most array	path
 	while ((int) zend_hash_num_elements(Z_ARRVAL(keys)) > 1) {
 		zval key = {};
 		ZVAL_MAKE_REF(&keys);
@@ -487,8 +526,10 @@ PHP_METHOD(Phalcon_Arr, set_path){
 /**
  * Fill an array with a range of numbers.
  *
- *     // Fill an array with values 5, 10, 15, 20
- *     $values = \Phalcon\Arr::range(5, 20);
+ *<code>
+ *	// Fill an array with values 5, 10, 15, 20
+ *	$values = \Phalcon\Arr::range(5, 20);
+ *</code>
  *
  * @param integer $step
  * @param integer $max
@@ -536,8 +577,10 @@ PHP_METHOD(Phalcon_Arr, range){
  * Retrieve a single key from an array. If the key does not exist in the
  * array, the default value will be returned instead.
  *
- *     // Get the value "username" from $_POST, if it exists
- *     $username = \Phalcon\Arr::get($_POST, 'username');
+ *<code>
+ *	// Get the value "username" from $_POST, if it exists
+ *	$username = \Phalcon\Arr::get($_POST, 'username');
+ *</code>
  *
  * @param array $array
  * @param string|array|\Closure $key
@@ -698,8 +741,8 @@ PHP_METHOD(Phalcon_Arr, first){
 /**
  * Choice one value, If the key does not exist in the array, the value2 will be returned instead.
  *
- *     // Choice the "value1", if exists the value "email" of $_POST
- *     $username = \Phalcon\Arr::choice($_POST, 'email', 'value1', 'value2');
+ *	// Choice the "value1", if exists the value "email" of $_POST
+ *	$username = \Phalcon\Arr::choice($_POST, 'email', 'value1', 'value2');
  *
  * @param array $array
  * @param string $key
@@ -728,12 +771,12 @@ PHP_METHOD(Phalcon_Arr, choice){
  * Retrieves multiple paths from an array. If the path does not exist in the
  * array, the default value will be added instead.
  *
- *     // Get the values "username", "password" from $_POST
- *     $auth = \Phalcon\Arr::extract($_POST, array('username', 'password'));
+ *	// Get the values "username", "password" from $_POST
+ *	$auth = \Phalcon\Arr::extract($_POST, array('username', 'password'));
  *
- *     // Get the value "level1.level2a" from $data
- *     $data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
- *     \Phalcon\Arr::extract($data, array('level1.level2a', 'password'));
+ *	// Get the value "level1.level2a" from $data
+ *	$data = array('level1' => array('level2a' => 'value 1', 'level2b' => 'value 2'));
+ *	\Phalcon\Arr::extract($data, array('level1.level2a', 'password'));
  *
  * @param array $array
  * @param array $paths
@@ -766,8 +809,8 @@ PHP_METHOD(Phalcon_Arr, extract){
 /**
  * Retrieves muliple single-key values from a list of arrays.
  *
- *     // Get all of the "id" values from a result
- *     $ids = \Phalcon\Arr::pluck($result, 'id');
+ *	// Get all of the "id" values from a result
+ *	$ids = \Phalcon\Arr::pluck($result, 'id');
  *
  * @param array $array
  * @param string $key
@@ -792,8 +835,8 @@ PHP_METHOD(Phalcon_Arr, pluck){
 /**
  * Adds a value to the beginning of an associative array.
  *
- *     // Add an empty value to the start of a select list
- *     \Phalcon\Arr::unshift($array, 'none', 'Select a value');
+ *	// Add an empty value to the start of a select list
+ *	\Phalcon\Arr::unshift($array, 'none', 'Select a value');
  *
  * @param array $array
  * @param string $key
@@ -818,11 +861,11 @@ PHP_METHOD(Phalcon_Arr, unshift){
  * Recursive version of [array_map](http://php.net/array_map), applies one or more
  * callbacks to all elements in an array, including sub-arrays.
  *
- *     // Apply "strip_tags" to every element in the array
- *     $array = \Phalcon\Arr::map($array, 'strip_tags');
+ *	// Apply "strip_tags" to every element in the array
+ *	$array = \Phalcon\Arr::map($array, 'strip_tags');
  *
- *     // Apply $this->filter to every element in the array
- *     $array = \Phalcon\Arr::map($array, array(array($this,'filter')));
+ *	// Apply $this->filter to every element in the array
+ *	$array = \Phalcon\Arr::map($array, array(array($this,'filter')));
  *
  * @param array $array
  * @param mixed $callbacks
@@ -878,14 +921,14 @@ PHP_METHOD(Phalcon_Arr, map){
  *
  * Note that this does not work the same as [array_merge_recursive](http://php.net/array_merge_recursive)!
  *
- *     $john = array('name' => 'john', 'children' => array('fred', 'paul', 'sally', 'jane'));
- *     $mary = array('name' => 'mary', 'children' => array('jane'));
+ *	$john = array('name' => 'john', 'children' => array('fred', 'paul', 'sally', 'jane'));
+ *	$mary = array('name' => 'mary', 'children' => array('jane'));
  *
- *     // John and Mary are married, merge them together
- *     $john = \Phalcon\Arr::merge($john, $mary);
+ *	// John and Mary are married, merge them together
+ *	$john = \Phalcon\Arr::merge($john, $mary);
  *
- *     // The output of $john will now be:
- *     array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'))
+ *	// The output of $john will now be:
+ *	array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'))
  *
  * @param array $array1
  * @param array $array2,...
@@ -950,14 +993,14 @@ PHP_METHOD(Phalcon_Arr, merge){
  * Overwrites an array with values from input arrays.
  * Keys that do not exist in the first array will not be added!
  *
- *     $a1 = array('name' => 'john', 'mood' => 'happy', 'food' => 'bacon');
- *     $a2 = array('name' => 'jack', 'food' => 'tacos', 'drink' => 'beer');
+ *	$a1 = array('name' => 'john', 'mood' => 'happy', 'food' => 'bacon');
+ *	$a2 = array('name' => 'jack', 'food' => 'tacos', 'drink' => 'beer');
  *
- *     // Overwrite the values of $a1 with $a2
- *     $array = \Phalcon\Arr::overwrite($a1, $a2);
+ *	// Overwrite the values of $a1 with $a2
+ *	$array = \Phalcon\Arr::overwrite($a1, $a2);
  *
- *     // The output of $array will now be:
- *     array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos')
+ *	// The output of $array will now be:
+ *	array('name' => 'jack', 'mood' => 'happy', 'food' => 'tacos')
  *
  * @param array $array1
  * @param array $array2
@@ -1010,11 +1053,11 @@ PHP_METHOD(Phalcon_Arr, overwrite){
  * Creates a callable function and parameter list from a string representation.
  * Note that this function does not validate the callback string.
  *
- *     // Get the callback function and parameters
- *     list($func, $params) = \Phalcon\Arr::callback('Foo::bar(apple,orange)');
+ *	// Get the callback function and parameters
+ *	list($func, $params) = \Phalcon\Arr::callback('Foo::bar(apple,orange)');
  *
- *     // Get the result of the callback
- *     $result = call_user_func_array($func, $params);
+ *	// Get the result of the callback
+ *	$result = call_user_func_array($func, $params);
  *
  * @param string $str
  * @return array function, params
@@ -1082,13 +1125,13 @@ PHP_METHOD(Phalcon_Arr, callback){
 /**
  * Convert a multi-dimensional array into a single-dimensional array.
  *
- *     $array = array('set' => array('one' => 'something'), 'two' => 'other');
+ *	$array = array('set' => array('one' => 'something'), 'two' => 'other');
  *
- *     // Flatten the array
- *     $array = \Phalcon\Arr::flatten($array);
+ *	// Flatten the array
+ *	$array = \Phalcon\Arr::flatten($array);
  *
- *     // The array will now be
- *     array('one' => 'something', 'two' => 'other');
+ *	// The array will now be
+ *	array('one' => 'something', 'two' => 'other');
  *
  * @param array $array
  * @return array
@@ -1129,9 +1172,9 @@ PHP_METHOD(Phalcon_Arr, flatten){
 /**
  * Convert a array to a array object.
  *
- *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *	$array = array('name' => 'Phalcon7', 'version' => '1.0.x');
  *
- *     $arrayobject = \Phalcon\Arr::arrayobject($array);
+ *	$arrayobject = \Phalcon\Arr::arrayobject($array);
  *
  * @param array $array
  * @return ArrayObject
@@ -1151,9 +1194,9 @@ PHP_METHOD(Phalcon_Arr, arrayobject){
 /**
  * Gets array key of the postion
  *
- *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *	$array = array('name' => 'Phalcon7', 'version' => '1.0.x');
  *
- *     $key = \Phalcon\Arr::key($array, 1);
+ *	$key = \Phalcon\Arr::key($array, 1);
  *
  * @param array $array
  * @param int $postion
@@ -1187,9 +1230,9 @@ PHP_METHOD(Phalcon_Arr, key){
 /**
  * Filters elements of an array using a the filter
  *
- *     $array = array('name' => 'Phalcon7', 'version' => '1.0.x');
+ *	$array = array('name' => 'Phalcon7', 'version' => '1.0.x');
  *
- *     $key = \Phalcon\Arr::filter($array, 'int');
+ *	$key = \Phalcon\Arr::filter($array, 'int');
  *
  * @param array $array
  * @param mixed $filters
@@ -1384,4 +1427,543 @@ PHP_METHOD(Phalcon_Arr, toArray){
 		array_init_size(return_value, 1);
 		phalcon_array_append(return_value, object, PH_COPY);
 	}
+}
+
+zend_always_inline static uint isa_cast(phalcon_arr_aggregator *agt, zval *val)
+{
+	if ((Z_TYPE_P(val) == IS_LONG && Z_TYPE_P(val) == IS_DOUBLE)) {
+		return 1;
+	}
+	switch (agt->isa) {
+		case PHALCON_ARR_TYPE_LONG:
+		convert_to_long(val);
+		return 1;
+
+		case PHALCON_ARR_TYPE_DOUBLE:
+		convert_to_double(val);
+		return 1;
+
+		case PHALCON_ARR_TYPE_BOOLEAN:
+		convert_to_boolean(val);
+		return 1;
+
+		default:
+		return 0;
+	}
+	return 1;
+}
+
+zend_always_inline static void phalcon_arr_compile_aggregator_selector_default(phalcon_arr_aggregator *agt, zend_long num_alias, zend_string * alias)
+{
+	if (alias) {
+		agt->alias = alias;
+		agt->selector = alias;
+	} else {
+		agt->alias = NULL;
+		agt->selector = NULL;
+		agt->num_alias = num_alias;
+		agt->num_selector = num_alias;
+	}
+}
+
+zend_always_inline static int phalcon_arr_compile_aggregator_selector(phalcon_arr_aggregator *agt, zval * agt_def, zend_long num_alias, zend_string * alias)
+{
+	zval * sel = zend_hash_str_find(Z_ARRVAL_P(agt_def), "selector", sizeof("selector") -1);
+	if (sel) {
+		ZVAL_DEREF(sel);
+
+		if (Z_TYPE_P(sel) == IS_STRING) { 
+
+			agt->selector = Z_STR_P(sel);
+
+		} else if (Z_TYPE_P(sel) == IS_LONG) {
+
+			agt->num_selector = Z_LVAL_P(sel);
+
+		} else {
+			php_error_docref(NULL, E_USER_ERROR, "Invalid selector type.");
+			return -1;
+		}
+
+		if (alias) {
+			agt->alias = alias;
+		} else {
+			agt->num_alias = num_alias;
+		}
+	} else {
+		if (alias) {
+			agt->selector = alias;
+			agt->alias = alias;
+		} else {
+			agt->selector = NULL;
+			agt->num_selector = num_alias;
+			agt->alias = NULL;
+			agt->num_alias = num_alias;
+		}
+	}
+	return 0;
+}
+
+static zend_always_inline int phalcon_arr_compile_aggregator_isa(phalcon_arr_aggregator *agt, zval * agt_def)
+{
+	zval * isa = zend_hash_str_find(Z_ARRVAL_P(agt_def), "isa", sizeof("isa")-1);
+	if (!isa) {
+		agt->isa = PHALCON_ARR_TYPE_LONG;
+		return 0;
+	}
+
+	switch (Z_TYPE_P(isa)) {
+	case IS_LONG:
+		agt->isa = Z_LVAL_P(isa);
+		break;
+
+	case IS_STRING:
+		if (strncasecmp(Z_STRVAL_P(isa), "int", sizeof("int")-1) == 0) {
+			agt->isa = PHALCON_ARR_TYPE_LONG;
+		} else if (strncasecmp(Z_STRVAL_P(isa), "double", sizeof("double")-1) == 0) {
+			agt->isa = PHALCON_ARR_TYPE_DOUBLE;
+		} else if (strncasecmp(Z_STRVAL_P(isa), "boolean", sizeof("boolean")-1) == 0) {
+			agt->isa = PHALCON_ARR_TYPE_BOOLEAN;
+		} else {
+			php_error_docref(NULL, E_USER_ERROR, "Unsupported aggregator typename.");
+			return -1;
+		}
+		break;
+
+	default:
+		php_error_docref(NULL, E_USER_ERROR, "Unsupported aggregator data type.");
+		return -1;
+	}
+	return 0;
+}
+
+static zend_always_inline int phalcon_arr_compile_aggregator_function_callable(phalcon_arr_aggregator *agt, zval *type)
+{
+	agt->is_callable = 1;
+	agt->type = type;
+
+	// fetch fci
+	agt->fci = empty_fcall_info;
+	agt->fci_cache = empty_fcall_info_cache;
+
+	char *errstr = NULL;
+	if (zend_fcall_info_init(type, 0, &agt->fci, &agt->fci_cache, NULL, &errstr) == FAILURE) {
+		php_error_docref(NULL, E_USER_ERROR, "Error setting converter callback: %s", errstr);
+		efree(errstr);
+		return -1;
+	}
+
+	// shared fci configuration
+	agt->fci.param_count = 2;
+	agt->fci.no_separation = 0;
+	return 0;
+}
+
+
+static zend_always_inline int phalcon_arr_compile_aggregator_function(phalcon_arr_aggregator *agt, zval *agt_def)
+{
+	zval *fun;
+	fun = zend_hash_str_find(Z_ARRVAL_P(agt_def), "aggregator", sizeof("aggregator") - 1);
+	if (fun == NULL) {
+		php_error_docref(NULL, E_USER_ERROR, "Aggregator is not defined.");
+		return -1;
+	}
+	ZVAL_DEREF(fun);
+
+	if (Z_TYPE_P(fun) == IS_LONG) {
+		agt->is_callable = 0;
+		agt->type = fun;
+	} else if (zend_is_callable(fun, IS_CALLABLE_CHECK_NO_ACCESS, NULL)) {
+		return phalcon_arr_compile_aggregator_function_callable(agt, fun);
+	} else {
+		php_error_docref(NULL, E_USER_ERROR, "Invalid aggregator function.");
+		return -1;
+	}
+	return 0;
+}
+
+static zend_always_inline int phalcon_arr_compile_aggregator(phalcon_arr_aggregator *agt, zval *agt_def, ulong num_alias, zend_string *alias)
+{
+	if (Z_TYPE_P(agt_def) == IS_LONG) {
+		agt->is_callable = 0;
+		agt->type = agt_def;
+		agt->isa = PHALCON_ARR_TYPE_LONG;
+		phalcon_arr_compile_aggregator_selector_default(agt, num_alias, alias);
+	} else if (zend_is_callable(agt_def, IS_CALLABLE_CHECK_NO_ACCESS, NULL)) {
+		if (phalcon_arr_compile_aggregator_function_callable(agt, agt_def) != 0) {
+			return -1;
+		}
+		agt->isa = PHALCON_ARR_TYPE_LONG;
+		phalcon_arr_compile_aggregator_selector_default(agt, num_alias, alias);
+	} else if (Z_TYPE_P(agt_def) == IS_ARRAY) {
+		if (phalcon_arr_compile_aggregator_function(agt, agt_def) != 0) {
+			return -1;
+		}
+		if (phalcon_arr_compile_aggregator_selector(agt, agt_def, num_alias, alias) != 0) {
+			return -1;
+		}
+		if (phalcon_arr_compile_aggregator_isa(agt, agt_def) != 0) {
+			return -1;
+		}
+	} else {
+		php_error_docref(NULL, E_USER_ERROR, "Unsupported aggregator");
+		return -1;
+	}
+	
+	return 0;
+}
+
+static zend_always_inline int phalcon_arr_compile_aggregators(phalcon_arr_aggregator *agts, zval *aggregators)
+{
+	uint agt_idx = 0;
+	ulong num_alias;
+	zend_string *alias;
+	zval *arg;
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(aggregators), num_alias, alias, arg) {
+		if (phalcon_arr_compile_aggregator(&agts[agt_idx++], arg, num_alias, alias) != 0) {
+			return -1;
+		}
+	} ZEND_HASH_FOREACH_END();
+	return 0;
+}
+
+
+static zend_always_inline int phalcon_arr_aggregate(zval *result, zval* rows, zval* fields, phalcon_arr_aggregator* agts, uint agts_cnt)
+{
+	zval *row, *carry_val, *current_val, *first, *field;
+
+	uint agt_idx;
+	phalcon_arr_aggregator *current_agt;
+
+	array_init(result);
+
+	HashTable *ht = Z_ARRVAL_P(rows);
+	HashTable *result_ht = Z_ARRVAL_P(result);
+	zend_long cnt = zend_array_count(ht);
+
+	zend_hash_internal_pointer_reset(ht);
+
+	if (fields && (first = zend_hash_get_current_data(ht)) != NULL) {
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(fields), field) {
+
+			if (Z_TYPE_P(field) == IS_STRING) {
+				if ((carry_val = zend_hash_find(Z_ARRVAL_P(first), Z_STR_P(field))) != NULL) {
+					zend_hash_add_new(result_ht, Z_STR_P(field), carry_val);
+				}
+			} else if (Z_TYPE_P(field) == IS_LONG) {
+				if ((carry_val = zend_hash_index_find(Z_ARRVAL_P(first), Z_LVAL_P(field))) != NULL) {
+					zend_hash_index_add_new(result_ht, Z_LVAL_P(field), carry_val);
+				}
+			} else {
+				php_error_docref(NULL, E_USER_ERROR, "Unsupported field value type.");
+				return -1;
+			}
+
+		} ZEND_HASH_FOREACH_END();
+
+		// TODO: Aggregate value from the first row.
+		for (agt_idx = 0; agt_idx < agts_cnt ; agt_idx++) {
+			current_agt = &agts[agt_idx];
+			if (Z_TYPE_P(current_agt->type) == IS_LONG) {
+				carry_val = PHALCON_ARR_HASH_FIND(result_ht, current_agt->num_alias, current_agt->alias);
+			}
+		}
+	}
+
+	// Iterate the rows and aggregate the result.
+	ZEND_HASH_FOREACH_VAL(ht, row) {
+		if (Z_TYPE_P(row) != IS_ARRAY) {
+			php_error_docref(NULL, E_USER_ERROR, "input row is not an array.");
+			return -1;
+		}
+
+		for (agt_idx = 0; agt_idx < agts_cnt ; agt_idx++) {
+			current_agt = &agts[agt_idx];
+
+			// get the carried value, and then use aggregator to reduce the values.
+			current_val = PHALCON_ARR_HASH_FIND(Z_ARRVAL_P(row), current_agt->num_selector, current_agt->selector);
+
+			if (current_val == NULL) {
+				continue;
+			}
+
+			carry_val = PHALCON_ARR_HASH_FIND(result_ht, current_agt->num_alias, current_agt->alias);
+
+			if (current_agt->is_callable) {
+				zval retval;
+				zval args[2];
+
+				if (carry_val == NULL) {
+					zval tmp;
+					ZVAL_LONG(&tmp, 0);
+					carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &tmp);
+				}
+
+				ZVAL_COPY_VALUE(&args[0], carry_val);
+				ZVAL_COPY_VALUE(&args[1], current_val);
+
+				current_agt->fci.retval = &retval;
+				current_agt->fci.params = args;
+
+				zend_call_function(&current_agt->fci, &current_agt->fci_cache);
+				ZVAL_COPY_VALUE(carry_val, &retval);
+
+			} else if (Z_TYPE_P(current_agt->type) == IS_LONG) {
+
+				switch (Z_LVAL_P(current_agt->type)) {
+					case PHALCON_ARR_AGGR_MIN:
+
+						if (isa_cast(current_agt, current_val) == 0) {
+							continue;
+						}
+
+						if (carry_val == NULL) {
+							zval tmp;
+							ZVAL_DEREF(current_val);
+							ZVAL_COPY(&tmp, current_val);
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &tmp);
+
+						} else {
+							switch (Z_TYPE_P(carry_val) ) {
+								case IS_LONG:
+									if (Z_LVAL_P(current_val) < Z_LVAL_P(carry_val)) {
+										Z_LVAL_P(carry_val) = Z_LVAL_P(current_val);
+									}
+								break;
+								case IS_DOUBLE:
+									if (Z_DVAL_P(current_val) < Z_DVAL_P(carry_val)) {
+										Z_DVAL_P(carry_val) = Z_DVAL_P(current_val);
+									}
+								break;
+							}
+						}
+						break;
+					case PHALCON_ARR_AGGR_MAX:
+						if ((Z_TYPE_P(current_val) != IS_LONG && Z_TYPE_P(current_val) != IS_DOUBLE)) {
+							continue;
+						}
+						if (carry_val == NULL) {
+							zval tmp;
+							ZVAL_DEREF(current_val);
+							ZVAL_COPY(&tmp, current_val);
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &tmp);
+						} else {
+							switch (Z_TYPE_P(carry_val) ) {
+								case IS_LONG:
+									if (Z_LVAL_P(current_val) > Z_LVAL_P(carry_val)) {
+										Z_LVAL_P(carry_val) = Z_LVAL_P(current_val);
+									}
+								break;
+								case IS_DOUBLE:
+									if (Z_DVAL_P(current_val) > Z_DVAL_P(carry_val)) {
+										Z_DVAL_P(carry_val) = Z_DVAL_P(current_val);
+									}
+								break;
+							}
+						}
+						break;
+					case PHALCON_ARR_AGGR_AVG:
+					case PHALCON_ARR_AGGR_SUM:
+						if (isa_cast(current_agt, current_val) == 0) {
+							continue;
+						}
+						if (carry_val == NULL) {
+							zval tmp;
+							ZVAL_DEREF(current_val);
+							ZVAL_COPY(&tmp, current_val);
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &tmp);
+						} else {
+							switch (Z_TYPE_P(carry_val)) {
+								case IS_LONG:
+									Z_LVAL_P(carry_val) += Z_LVAL_P(current_val);
+								break;
+								case IS_DOUBLE:
+									Z_DVAL_P(carry_val) += Z_DVAL_P(current_val);
+								break;
+							}
+						}
+						break;
+					case PHALCON_ARR_AGGR_COUNT:
+						if (carry_val == NULL) {
+							zval tmp;
+							ZVAL_LONG(&tmp, 1);
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &tmp);
+						} else {
+							Z_LVAL_P(carry_val)++;
+						}
+						break;
+					case PHALCON_ARR_AGGR_LAST:
+						carry_val = PHALCON_ARR_HASH_UPDATE(result_ht, current_agt->num_alias, current_agt->alias, current_val);
+						break;
+					case PHALCON_ARR_AGGR_FIRST:
+						if (carry_val == NULL) {
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, current_val);
+						}
+						break;
+					case PHALCON_ARR_AGGR_GROUP:
+						if (carry_val == NULL) {
+							zval group;
+							array_init(&group);
+							add_next_index_zval(&group, current_val);
+							carry_val = PHALCON_ARR_HASH_ADD_NEW(result_ht, current_agt->num_alias, current_agt->alias, &group);
+						} else {
+							add_next_index_zval(carry_val, current_val);
+						}
+						break;
+				}
+			}
+		}
+
+	} ZEND_HASH_FOREACH_END();
+
+	for (agt_idx = 0; agt_idx < agts_cnt ; agt_idx++) {
+		current_agt = &agts[agt_idx];
+		if (Z_TYPE_P(current_agt->type) == IS_LONG) {
+			carry_val = PHALCON_ARR_HASH_FIND(result_ht, current_agt->num_alias, current_agt->alias);
+			if (carry_val != NULL) {
+				switch (Z_LVAL_P(current_agt->type)) {
+				case PHALCON_ARR_AGGR_AVG:
+					convert_to_double(carry_val);
+					Z_DVAL_P(carry_val) /= cnt;
+					break;
+				}
+			}
+		}
+	}
+	return 0;
+}
+
+static zend_always_inline void phalcon_arr_group_items(zval *groups_array, zval* rows, zend_string* field)
+{
+	zval *row, *category_key, *group;
+	HashTable * groups_ht;
+
+	// Allocate the group array for the current aggregation
+	array_init(groups_array);
+	groups_ht = Z_ARRVAL_P(groups_array);
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(rows), row) {
+		if ((category_key = zend_hash_find(Z_ARRVAL_P(row), field)) != NULL) {
+			if (Z_TYPE_P(category_key) == IS_STRING) {
+				if ((group = zend_hash_find(groups_ht, Z_STR_P(category_key))) == NULL) {
+					// Allocate a new group array
+					zval new_group = {};
+					array_init(&new_group);
+
+					// Set the group array into the groups array.
+					group = zend_hash_update(groups_ht, Z_STR_P(category_key), &new_group);
+				}
+			} else if (Z_TYPE_P(category_key) == IS_LONG) {
+				if ((group = zend_hash_index_find(groups_ht, Z_LVAL_P(category_key))) == NULL) {
+					// Allocate a new group array
+					zval new_group = {};
+					array_init(&new_group);
+
+					// Set the group array into the groups array.
+					group = zend_hash_index_update(groups_ht, Z_LVAL_P(category_key), &new_group);
+				}
+			}
+
+			// Append the row into the group array
+			if (Z_REFCOUNTED_P(row)) {
+				Z_ADDREF_P(row);
+			}
+			add_next_index_zval(group, row);
+		}
+	} ZEND_HASH_FOREACH_END();
+}
+
+static zend_always_inline void phalcon_arr_group_groups(zval *groups, zval* fields) {
+
+	zval *field, *tmp_group, *group;
+
+	ZEND_HASH_FOREACH_VAL(HASH_OF(fields), field) {
+
+		zval tmp_collection = {};
+		array_init(&tmp_collection);
+
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(groups), group) {
+			zval tmp_groups = {};
+			phalcon_arr_group_items(&tmp_groups, group, Z_STR_P(field));
+
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(tmp_groups), tmp_group) {
+				Z_ADDREF_P(tmp_group);
+				add_next_index_zval(&tmp_collection, tmp_group);
+			} ZEND_HASH_FOREACH_END();
+			zval_ptr_dtor(&tmp_groups);
+
+		} ZEND_HASH_FOREACH_END();
+
+		zval_ptr_dtor(groups);
+
+		ZVAL_COPY_VALUE(groups, &tmp_collection);
+
+	} ZEND_HASH_FOREACH_END();
+}
+
+/**
+ * group input rows into group arrays.
+ */
+static zend_always_inline void phalcon_arr_group_rows(zval *groups, zval* rows, zval* fields) {
+	array_init(groups);
+
+	Z_ADDREF_P(rows);
+	add_next_index_zval(groups, rows);
+	phalcon_arr_group_groups(groups, fields);
+}
+
+PHP_METHOD(Phalcon_Arr, aggr){
+
+	zval *rows, *aggregators;
+	phalcon_arr_aggregator *agts;
+	zend_long agts_cnt;
+
+	phalcon_fetch_params(0, 2, 0, &rows, &aggregators);
+
+	agts_cnt = zend_array_count(Z_ARRVAL_P(aggregators));
+	agts = (phalcon_arr_aggregator *)safe_emalloc(agts_cnt, sizeof(phalcon_arr_aggregator), 0);
+
+	if (phalcon_arr_compile_aggregators(agts, aggregators) == 0) {
+		if (phalcon_arr_aggregate(return_value, rows, NULL, agts, agts_cnt) != 0) {
+			zval_ptr_dtor(return_value);
+			RETVAL_FALSE;
+		}
+	} else {
+		RETVAL_FALSE;
+	}
+
+	efree(agts);
+}
+
+PHP_METHOD(Phalcon_Arr, group){
+
+	zval *rows, *fields, *aggregators, groups = {}, *group;
+	phalcon_arr_aggregator *agts;
+	zend_long agts_cnt;
+
+	phalcon_fetch_params(0, 3, 0, &rows, &fields, &aggregators);
+
+	phalcon_arr_group_rows(&groups, rows, fields);
+
+	agts_cnt = zend_array_count(Z_ARRVAL_P(aggregators));
+	agts = (phalcon_arr_aggregator *)safe_emalloc(agts_cnt, sizeof(phalcon_arr_aggregator), 0);
+	if (phalcon_arr_compile_aggregators(agts, aggregators) == 0) {
+		// push folded result into return_value array.
+		array_init(return_value);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(groups), group) {
+			zval res = {};
+			if (phalcon_arr_aggregate(&res, group, fields, agts, agts_cnt) != 0) {
+				zval_ptr_dtor(return_value);
+				RETVAL_FALSE;
+				break;
+			}
+			add_next_index_zval(return_value, &res);
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		RETVAL_FALSE;
+	}
+
+	zval_ptr_dtor(&groups);
+	efree(agts);
 }

@@ -57,6 +57,7 @@ PHP_METHOD(Phalcon_Session_Adapter, has);
 PHP_METHOD(Phalcon_Session_Adapter, remove);
 PHP_METHOD(Phalcon_Session_Adapter, getId);
 PHP_METHOD(Phalcon_Session_Adapter, isStarted);
+PHP_METHOD(Phalcon_Session_Adapter, regenerate);
 PHP_METHOD(Phalcon_Session_Adapter, destroy);
 PHP_METHOD(Phalcon_Session_Adapter, __get);
 PHP_METHOD(Phalcon_Session_Adapter, count);
@@ -76,6 +77,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_setid, 0, 0, 1)
 	ZEND_ARG_INFO(0, sid)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapter_regenerate, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, delete_old_session, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_session_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Session_Adapter, __construct, arginfo_phalcon_session_adapter___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Session_Adapter, __destruct, arginfo___destruct, ZEND_ACC_PUBLIC | ZEND_ACC_DTOR)
@@ -89,6 +94,7 @@ static const zend_function_entry phalcon_session_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Session_Adapter, remove, arginfo_phalcon_session_adapterinterface_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter, getId, arginfo_phalcon_session_adapterinterface_getid, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter, isStarted, arginfo_phalcon_session_adapterinterface_isstarted, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter, regenerate, arginfo_phalcon_session_adapter_regenerate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter, destroy, arginfo_phalcon_session_adapterinterface_destroy, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Session_Adapter, __set, set, arginfo___set, ZEND_ACC_PUBLIC)
@@ -426,6 +432,27 @@ PHP_METHOD(Phalcon_Session_Adapter, isStarted){
 }
 
 /**
+ * Update the current session id with a newly generated one 
+ *
+ *<code>
+ *	var_dump($session->regenerate());
+ *</code>
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Session_Adapter, regenerate){
+
+	zval *delete_old_session = NULL;
+	zend_bool del;
+
+	phalcon_fetch_params(0, 0, 1, &delete_old_session);
+
+	del = delete_old_session ? zend_is_true(delete_old_session) : 1;
+	RETURN_ON_FAILURE(phalcon_session_regenerate_id(del));
+	RETURN_TRUE;
+}
+
+/**
  * Destroys the active session
  *
  *<code>
@@ -436,8 +463,17 @@ PHP_METHOD(Phalcon_Session_Adapter, isStarted){
  */
 PHP_METHOD(Phalcon_Session_Adapter, destroy){
 
+	zval *regenerate = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &regenerate);
+
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
-	RETURN_ON_FAILURE(phalcon_session_destroy());
+
+	if (regenerate && zend_is_true(regenerate)) {
+		RETURN_ON_FAILURE(phalcon_session_regenerate_id(1));
+	} else {
+		RETURN_ON_FAILURE(phalcon_session_destroy());
+	}
 	RETURN_TRUE;
 }
 

@@ -1913,6 +1913,13 @@ static zend_always_inline void phalcon_arr_group_rows(zval *groups, zval* rows, 
 	phalcon_arr_group_groups(groups, fields);
 }
 
+/**
+ * Aggregating
+ *
+ * @param array $rows
+ * @param array $aggregators
+ * @return array
+ */
 PHP_METHOD(Phalcon_Arr, aggr){
 
 	zval *rows, *aggregators;
@@ -1936,6 +1943,14 @@ PHP_METHOD(Phalcon_Arr, aggr){
 	efree(agts);
 }
 
+/**
+ * Aggregating
+ *
+ * @param array $rows
+ * @param array $fields
+ * @param array $aggregators
+ * @return array
+ */
 PHP_METHOD(Phalcon_Arr, group){
 
 	zval *rows, *fields, *aggregators, groups = {}, *group;

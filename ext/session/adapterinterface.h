@@ -41,7 +41,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_write, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_destroy, 0, 0, 0)
-        ZEND_ARG_INFO(0, sessionId)
+		ZEND_ARG_TYPE_INFO(0, regenerate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_session_adapterinterface_gc, 0, 0, 0)

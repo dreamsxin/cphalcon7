@@ -1,3 +1,4 @@
+
 /*
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
@@ -13,31 +14,29 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          Vladimir Kolesnikov <vladimir@extrememember.com>              |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_KERNEL_SESSION_H
-#define PHALCON_KERNEL_SESSION_H
+#ifndef PHALCON_STORAGE_LMDB_H
+#define PHALCON_STORAGE_LMDB_H
 
 #include "php_phalcon.h"
+#include "storage/lmdb/lmdb.h"
 
-#define IF_SESSION_VARS() \
-	if (Z_ISREF_P(&PS(http_session_vars)) && Z_TYPE_P(Z_REFVAL(PS(http_session_vars))) == IS_ARRAY)
+typedef struct {
+	MDB_env *env;
+	MDB_dbi dbi;
+	MDB_txn *txn;
+	zend_object std;
+} phalcon_storage_lmdb_object;
 
-#define SESSION_CHECK_ACTIVE_STATE	\
-	if (PS(session_status) == php_session_active) {	\
-		php_error_docref(NULL, E_WARNING, "A session is active. You cannot change the session module's ini settings at this time");	\
-		return FAILURE;	\
-	}
+static inline phalcon_storage_lmdb_object *phalcon_storage_lmdb_object_from_obj(zend_object *obj) {
+	return (phalcon_storage_lmdb_object*)((char*)(obj) - XtOffsetOf(phalcon_storage_lmdb_object, std));
+}
 
-int phalcon_session_start() PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_session_regenerate_id(zend_bool delete_old_session) PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_session_destroy() PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_get_session_id(zval *return_value) PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_set_session_id(zval *sid) PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_session_write_close() PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_session_set(zval *name, zval *val);
-zval* phalcon_session_get(zval *name);
+extern zend_class_entry *phalcon_storage_lmdb_ce;
 
-#endif /* PHALCON_KERNEL_SESSION_H */
+PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb);
+
+#endif /* PHALCON_STORAGE_LMDB_H */

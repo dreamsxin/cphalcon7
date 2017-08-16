@@ -101,6 +101,8 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-bloomfilter=yes
 # enable storage datrie
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-datrie=yes
+# enable storage LMDB
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-lmdb=yes
 # enable websocket
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-websocket=yes
 # enable server

@@ -452,6 +452,7 @@
 #include "storage/wiredtiger/cursor.h"
 #include "storage/bloomfilter.h"
 #include "storage/datrie.h"
+#include "storage/lmdb.h"
 
 #include "server.h"
 #include "server/exception.h"

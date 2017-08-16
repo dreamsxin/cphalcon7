@@ -41,13 +41,17 @@ int phalcon_session_start()
 	return ret;
 }
 
+int phalcon_session_regenerate_id(zend_bool delete_old_session)
+{
+	zval *tmp = delete_old_session ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
+	zval *params[] = { tmp };
+
+	return phalcon_call_function_with_params(NULL, SL("session_regenerate_id"), 1, params);
+}
+
 int phalcon_session_destroy()
 {
-//#ifdef PHALCON_USE_PHP_SESSION
-//	return php_session_destroy();
-//#else
 	return phalcon_call_function_with_params(NULL, SL("session_destroy"), 0, NULL);
-//#endif
 }
 
 int phalcon_get_session_id(zval *retval)

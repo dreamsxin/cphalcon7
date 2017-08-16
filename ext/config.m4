@@ -113,6 +113,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-lmdb, whether to enable storage lmdb support,
+[  --enable-storage-lmdb   Enable storage lmdb support], no, no)
+
+if test "$PHP_STORAGE_LMDB" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_LMDB], [1], [Whether storage lmdb are available])
+	AC_MSG_RESULT([yes, storage lmdb])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(storage-bloomfilter, whether to enable storage bloomfilter support,
 [  --enable-storage-bloomfilter   Enable storage bloomfilter support], no, no)
 
@@ -1163,6 +1173,11 @@ server/exception.c"
 		if test -z "$WIREDTIGER_DIR"; then
 			AC_MSG_ERROR([wiredtiger library not found])
 		fi
+	fi
+
+	if test "$PHP_STORAGE_LMDB" = "yes"; then
+		AC_DEFINE(PHALCON_USE_LMDB, 1, [Have lmdb support])
+		phalcon_sources="$phalcon_sources storage/lmdb.c storage/lmdb/mdb.c storage/lmdb/midl.c "
 	fi
 
 	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then

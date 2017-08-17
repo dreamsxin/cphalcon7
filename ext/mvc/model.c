@@ -6490,7 +6490,8 @@ end:
  */
 PHP_METHOD(Phalcon_Mvc_Model, __get){
 
-	zval *property, has = {}, possible_getter = {}, model_name = {}, manager = {}, lower_property = {}, related_result = {}, relation = {}, call_args = {}, call_object = {}, result = {};
+	zval *property, has = {}, possible_getter = {}, model_name = {}, manager = {}, lower_property = {};
+	zval related = {}, related_result = {}, relation = {}, call_args = {}, call_object = {}, result = {};
 
 	phalcon_fetch_params(0, 1, 0, &property);
 	PHALCON_ENSURE_IS_STRING(property);
@@ -6514,7 +6515,13 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 		RETURN_NULL();
 	}
 
-	phalcon_get_class(&model_name, getThis(), 0);
+	phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
+	if (Z_TYPE(related) == IS_ARRAY) {
+		if (phalcon_array_isset_fetch(&result, &related, &lower_property, PH_READONLY)) {
+			zval_ptr_dtor(&lower_property);
+			RETURN_CTOR(&result);
+		}
+	}
 
 	phalcon_read_property(&related_result, getThis(), SL("_relatedResult"), PH_READONLY);
 	if (Z_TYPE(related_result) == IS_ARRAY) {
@@ -6523,6 +6530,8 @@ PHP_METHOD(Phalcon_Mvc_Model, __get){
 			RETURN_CTOR(&result);
 		}
 	}
+
+	phalcon_get_class(&model_name, getThis(), 0);
 
 	PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(&relation, &manager, "getrelationbyalias", &model_name, &lower_property);

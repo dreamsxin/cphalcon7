@@ -37,7 +37,6 @@
 /**
  * Phalcon\Storage\Lmdb
  *
- * It can be used to replace APC or local memstoraged.
  */
 zend_class_entry *phalcon_storage_lmdb_ce;
 

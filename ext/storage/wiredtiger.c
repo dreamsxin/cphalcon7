@@ -297,6 +297,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, create)
  *
  * @param string $uri
  * @param string $config
+ * @return Phalcon\Storage\Wiredtiger\Cursor
  */
 PHP_METHOD(Phalcon_Storage_Wiredtiger, open)
 {

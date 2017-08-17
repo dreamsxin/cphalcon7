@@ -453,6 +453,7 @@
 #include "storage/bloomfilter.h"
 #include "storage/datrie.h"
 #include "storage/lmdb.h"
+#include "storage/lmdb/cursor.h"
 
 #include "server.h"
 #include "server/exception.h"

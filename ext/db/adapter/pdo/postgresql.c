@@ -587,6 +587,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 }
 
 void pg_text_array_parse(zval *return_value, zval* v) {
+	if (Z_TYPE_P(v) != IS_STRING) {
+		ZVAL_NULL(return_value);
+		return;
+	}
 	smart_str str = {0};
 	if (Z_STRLEN_P(v)) {
 		long len = Z_STRLEN_P(v);

@@ -272,12 +272,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 						 * Columns are supposed to be in the form _table_field
 						 */
 						PHALCON_CONCAT_VVVV(&column_alias, &underscore, &source, &underscore, attribute);
-						/*
+
 						if (!phalcon_array_isset_fetch(&column_value, &row, &column_alias, PH_NOISY|PH_READONLY)) {
 							ZVAL_NULL(&column_value);
 						}
-						*/
-						phalcon_array_fetch(&column_value, &row, &column_alias, PH_NOISY|PH_READONLY);
+
 						phalcon_array_update(&row_model, attribute, &column_value, PH_COPY);
 						zval_ptr_dtor(&column_alias);
 					} ZEND_HASH_FOREACH_END();

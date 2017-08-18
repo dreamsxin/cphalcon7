@@ -123,6 +123,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-leveldb, whether to enable storage leveldb support,
+[  --enable-storage-leveldb   Enable storage leveldb support], no, no)
+
+if test "$PHP_STORAGE_LEVELDB" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_LEVELDB], [1], [Whether storage leveldb are available])
+	AC_MSG_RESULT([yes, storage leveldb])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(storage-bloomfilter, whether to enable storage bloomfilter support,
 [  --enable-storage-bloomfilter   Enable storage bloomfilter support], no, no)
 
@@ -1178,6 +1188,33 @@ server/exception.c"
 	if test "$PHP_STORAGE_LMDB" = "yes"; then
 		AC_DEFINE(PHALCON_USE_LMDB, 1, [Have lmdb support])
 		phalcon_sources="$phalcon_sources storage/lmdb.c storage/lmdb/cursor.c storage/lmdb/mdb.c storage/lmdb/midl.c "
+	fi
+
+	if test "$PHP_STORAGE_LEVELDB" = "yes"; then
+		AC_MSG_CHECKING([checking libleveldb support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/leveldb/c.h; then
+				LEVELDB_DIR=$i
+				PHP_ADD_INCLUDE($i/include)
+				PHP_CHECK_LIBRARY(leveldb, leveldb_open,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(leveldb, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_LEVELDB, 1, [Have leveldb support])
+					phalcon_sources="$phalcon_sources storage/leveldb.c storage/leveldb/writebatch.c storage/leveldb/iterator.c "
+				],[
+					AC_MSG_ERROR([Wrong leveldb version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR -lm
+				])
+				break
+			else
+				AC_MSG_RESULT([no, found in $i])
+			fi
+		done
+
+		if test -z "$LEVELDB_DIR"; then
+			AC_MSG_ERROR([leveldb library not found])
+		fi
 	fi
 
 	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then

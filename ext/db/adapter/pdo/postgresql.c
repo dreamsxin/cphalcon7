@@ -573,6 +573,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 
 	phalcon_fetch_params(0, 1, 1, &value, &type);
 
+	if (Z_TYPE_P(value) == IS_NULL) {
+		RETURN_NULL();
+	}
+
 	RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, 1));
 
 	array_init_size(&search, 2);

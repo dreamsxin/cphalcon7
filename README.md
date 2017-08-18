@@ -103,6 +103,8 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-datrie=yes
 # enable storage LMDB
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-lmdb=yes
+# enable storage leveldb
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-leveldb=yes
 # enable websocket
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-websocket=yes
 # enable server

@@ -566,6 +566,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Storage_Lmdb_Cursor);
 #endif
 
+#if PHALCON_USE_LEVELDB
+	PHALCON_INIT(Phalcon_Storage_Leveldb);
+	PHALCON_INIT(Phalcon_Storage_Leveldb_Iterator);
+	PHALCON_INIT(Phalcon_Storage_Leveldb_Writebatch);
+#endif
+
 #if PHALCON_USE_BLOOMFILTER
 	PHALCON_INIT(Phalcon_Storage_Bloomfilter);
 #endif

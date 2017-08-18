@@ -98,6 +98,8 @@ static const zend_function_entry phalcon_storage_lmdb_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Lmdb, del, arginfo_phalcon_storage_lmdb_del, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, cursor, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, copy, arginfo_phalcon_storage_lmdb_copy, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Storage_Lmdb, set, put, arginfo_phalcon_storage_lmdb_put, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Storage_Lmdb, delete, del, arginfo_phalcon_storage_lmdb_del, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

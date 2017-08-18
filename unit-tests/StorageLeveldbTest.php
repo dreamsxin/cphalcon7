@@ -19,27 +19,33 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageLmdbTest extends PHPUnit_Framework_TestCase
+class StorageLeveldbTest extends PHPUnit_Framework_TestCase
 {
 	public function testNormal()
 	{
-		if (!class_exists('Phalcon\Storage\Lmdb')) {
-			$this->markTestSkipped('Class `Phalcon\Storage\Lmdb` is not exists');
+		if (!class_exists('Phalcon\Storage\Leveldb')) {
+			$this->markTestSkipped('Class `Phalcon\Storage\Leveldb` is not exists');
 			return false;
 		}
-		$db = new Phalcon\Storage\Lmdb('unit-tests/cache/lmdb');
-		$db->begin();
+
+		$db = new Phalcon\Storage\Leveldb('unit-tests/cache/leveldb');
 		$this->assertTrue($db->put('key1', 'value1'));
 		$this->assertTrue($db->put('key2', 'value2'));
+		$this->assertTrue($db->put('key4', 'value4'));
 		$this->assertEquals($db->get("key1"), "value1");
 		$this->assertEquals($db->get("key2"), "value2");
-		$this->assertEquals($db->getAll(), array('key1' => 'value1', 'key2' => 'value2'));
+		$this->assertTrue($db->delete("key1"));
+		$this->assertFalse($db->get("key1"));
+		
+		$batch = new Phalcon\Storage\Leveldb\Writebatch();
+		$this->assertTrue($batch->put("key3", "value3"));
+		$this->assertTrue($batch->delete("key4"));
+		$this->assertTrue($db->write($batch));
 
 		$ret = [];
-		foreach($db->cursor() as $key => $value) {
+		foreach($db->iterator() as $key => $value) {
 			$ret[$key] = $value;
 		}
-		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
-		$db->commit();
+		$this->assertEquals($ret, ['key2' => 'value2', 'key3' => 'value3']);
 	}
 }

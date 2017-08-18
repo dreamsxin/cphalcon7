@@ -1,10 +1,9 @@
-<?php
 
 /*
   +------------------------------------------------------------------------+
   | Phalcon Framework                                                      |
   +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2012 Phalcon Team (http://www.phalconphp.com)       |
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
   +------------------------------------------------------------------------+
   | This source file is subject to the New BSD License that is bundled     |
   | with this package in the file docs/LICENSE.txt.                        |
@@ -19,27 +18,23 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageLmdbTest extends PHPUnit_Framework_TestCase
-{
-	public function testNormal()
-	{
-		if (!class_exists('Phalcon\Storage\Lmdb')) {
-			$this->markTestSkipped('Class `Phalcon\Storage\Lmdb` is not exists');
-			return false;
-		}
-		$db = new Phalcon\Storage\Lmdb('unit-tests/cache/lmdb');
-		$db->begin();
-		$this->assertTrue($db->put('key1', 'value1'));
-		$this->assertTrue($db->put('key2', 'value2'));
-		$this->assertEquals($db->get("key1"), "value1");
-		$this->assertEquals($db->get("key2"), "value2");
-		$this->assertEquals($db->getAll(), array('key1' => 'value1', 'key2' => 'value2'));
+#ifndef PHALCON_STORAGE_LEVELDB_H
+#define PHALCON_STORAGE_LEVELDB_H
 
-		$ret = [];
-		foreach($db->cursor() as $key => $value) {
-			$ret[$key] = $value;
-		}
-		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
-		$db->commit();
-	}
+#include "php_phalcon.h"
+#include <leveldb/c.h>
+
+typedef struct {
+	leveldb_t *db;
+	zend_object std;
+} phalcon_storage_leveldb_object;
+
+static inline phalcon_storage_leveldb_object *phalcon_storage_leveldb_object_from_obj(zend_object *obj) {
+	return (phalcon_storage_leveldb_object*)((char*)(obj) - XtOffsetOf(phalcon_storage_leveldb_object, std));
 }
+
+extern zend_class_entry *phalcon_storage_leveldb_ce;
+
+PHALCON_INIT_CLASS(Phalcon_Storage_Leveldb);
+
+#endif /* PHALCON_STORAGE_LEVELDB_H */

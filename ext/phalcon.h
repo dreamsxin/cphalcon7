@@ -454,6 +454,9 @@
 #include "storage/datrie.h"
 #include "storage/lmdb.h"
 #include "storage/lmdb/cursor.h"
+#include "storage/leveldb.h"
+#include "storage/leveldb/iterator.h"
+#include "storage/leveldb/writebatch.h"
 
 #include "server.h"
 #include "server/exception.h"

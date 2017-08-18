@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -84,7 +85,7 @@ void phalcon_storage_lmdb_cursor_object_free_handler(zend_object *object)
  */
 PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb_Cursor){
 
-	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage, Lmdb_Cursor, storage_lmdb_cursor, phalcon_storage_lmdb_cursor_method_entry, 0);
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage\\Lmdb, Cursor, storage_lmdb_cursor, phalcon_storage_lmdb_cursor_method_entry, 0);
 
 	zend_class_implements(phalcon_storage_lmdb_cursor_ce, 1, zend_ce_iterator);
 
@@ -245,9 +246,9 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, last)
 }
 
 /**
- * Check whether has rows to fetch
+ * Checks if current position is valid
  *
- * @return mixed
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, valid)
 {

@@ -157,6 +157,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getUniqueTypes);
 PHP_METHOD(Phalcon_Mvc_Model, _reBuild);
 PHP_METHOD(Phalcon_Mvc_Model, exists);
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult);
+PHP_METHOD(Phalcon_Mvc_Model, group);
 PHP_METHOD(Phalcon_Mvc_Model, count);
 PHP_METHOD(Phalcon_Mvc_Model, sum);
 PHP_METHOD(Phalcon_Mvc_Model, maximum);
@@ -239,6 +240,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_setdirtystate, 0, 0, 1)
 	ZEND_ARG_INFO(0, dirtyState)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_group, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, params, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_validate, 0, 0, 1)
@@ -413,6 +418,7 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, exists, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, _reBuild, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model, _groupResult, NULL, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Mvc_Model, group, arginfo_phalcon_mvc_model_group, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, count, arginfo_phalcon_mvc_modelinterface_count, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, sum, arginfo_phalcon_mvc_modelinterface_sum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, maximum, arginfo_phalcon_mvc_modelinterface_maximum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -2293,7 +2299,7 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
  * @param string $function
  * @param string $alias
  * @param array $parameters
- * @return Phalcon\Mvc\Model\ResultsetInterface
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
@@ -2394,6 +2400,109 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
 	phalcon_read_property_zval(return_value, &first_row, alias, PH_COPY);
 	zval_ptr_dtor(&first_row);
+}
+
+/**
+ * Generate a PHQL SELECT statement for an aggregate
+ *
+ *<code>
+ *
+ *	Robots::group(['aggregators' => array(array('column' => 'id', 'aggregator' => 'sum'), 'sumatory' => array('column' => 'price', 'aggregator' => 'sum'))]);
+ *
+ *</code>
+ *
+ * @param array $parameters
+ * @return Phalcon\Mvc\Model\ResultsetInterface
+ */
+PHP_METHOD(Phalcon_Mvc_Model, group){
+
+	zval *params, aggregators = {}, dependency_injector = {}, *aggregator, columns = {}, joined_columns = {}, service_name = {};
+	zval manager = {}, model_name = {}, model = {}, builder = {}, query = {};
+	zend_string *item_key;
+
+	phalcon_fetch_params(0, 1, 0, &params);
+
+	if (!phalcon_array_isset_fetch_str(&aggregators, params, SL("aggregators"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index 'aggregators' is required in the parameters array");
+		return;
+	}
+
+	if (Z_TYPE(aggregators) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The aggregators must be array");
+		return;
+	}
+
+	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		return;
+	}
+
+	array_init(&columns);
+	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(aggregators), item_key, aggregator) {
+		zval function = {}, column = {}, alias = {}, distinct = {}, group_column = {};
+		if (Z_TYPE_P(aggregator) != IS_ARRAY) {
+			continue;
+		}
+		if (!phalcon_array_isset_fetch_str(&function, aggregator, SL("aggregator"), PH_READONLY)) {
+			continue;
+		}
+
+		if (!phalcon_array_isset_fetch_str(&column, aggregator, SL("column"), PH_READONLY)) {
+			continue;
+		}
+
+		if (!item_key) {
+			ZVAL_COPY_VALUE(&alias, &function);
+		} else {
+			ZVAL_STR(&alias, item_key);
+		}
+
+		/**
+		 * Builds the columns to query according to the received parameters
+		 */
+		if (phalcon_array_isset_fetch_str(&distinct, aggregator, SL("distinct"), PH_READONLY) && zend_is_true(&distinct)) {
+			PHALCON_CONCAT_VSVSV(&group_column, &function, "(DISTINCT ", &column, ") AS ", &alias);
+		} else {
+			PHALCON_CONCAT_VSVSV(&group_column, &function, "(", &column, ") AS ", &alias);
+		}
+
+		phalcon_array_append(&columns, &group_column, 0);
+	} ZEND_HASH_FOREACH_END();
+
+	phalcon_fast_join_str(&joined_columns, SL(", "), &columns);
+	zval_ptr_dtor(&columns);
+
+	ZVAL_STR(&service_name, IS(modelsManager));
+
+	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
+	zval_ptr_dtor(&dependency_injector);
+
+	phalcon_get_called_class(&model_name);
+	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", params);
+	zval_ptr_dtor(&manager);
+
+	PHALCON_CALL_METHOD(NULL, &builder, "columns", &joined_columns);
+	zval_ptr_dtor(&joined_columns);
+
+	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
+	zval_ptr_dtor(&model_name);
+
+	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
+		PHALCON_CALL_METHOD(NULL, &model, "beforequery", &builder);
+	}
+	zval_ptr_dtor(&model);
+
+	PHALCON_CALL_METHOD(&query, &builder, "getquery");
+	zval_ptr_dtor(&builder);
+
+	/**
+	 * Execute the query
+	 */
+	PHALCON_CALL_METHOD(return_value, &query, "execute");
+	zval_ptr_dtor(&query);
 }
 
 /**

@@ -22,6 +22,7 @@
 #define PHALCON_STORAGE_LEVELDB_ITERATOR_H
 
 #include "php_phalcon.h"
+# if PHALCON_USE_LEVELDB
 #include <leveldb/c.h>
 
 typedef struct {
@@ -36,5 +37,5 @@ static inline phalcon_storage_leveldb_iterator_object *phalcon_storage_leveldb_i
 extern zend_class_entry *phalcon_storage_leveldb_iterator_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Storage_Leveldb_Iterator);
-
+# endif
 #endif /* PHALCON_STORAGE_LEVELDB_ITERATOR_H */

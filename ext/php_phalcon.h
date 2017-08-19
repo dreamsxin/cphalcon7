@@ -29,12 +29,12 @@
 #include <TSRM/TSRM.h>
 #endif
 
-#define PHP_PHALCON_VERSION "Phalcon7(Dao7)-1.3.0"
+#define PHP_PHALCON_VERSION "Phalcon7(Dao7)-1.3.1"
 #define PHP_PHALCON_VERSION_MAJOR           1
 #define PHP_PHALCON_VERSION_MED             3
-#define PHP_PHALCON_VERSION_MIN             0
+#define PHP_PHALCON_VERSION_MIN             1
 #define PHP_PHALCON_VERSION_RELEASE         PHALCON_VERSION_STABLE
-#define PHP_PHALCON_VERSION_RELEASE_VERSION 2
+#define PHP_PHALCON_VERSION_RELEASE_VERSION 0
 #define PHP_PHALCON_EXTNAME "phalcon7"
 
 /** DEBUG options */

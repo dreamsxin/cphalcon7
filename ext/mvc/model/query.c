@@ -2469,7 +2469,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		/**
 		 * Check if the table have a namespace alias
 		 */
-		if (phalcon_array_isset_fetch_str(&ns_alias, &qualified_name, SL("ns-alias"), PH_READONLY)) {
+		if (phalcon_memnstr_str(&model_name, SL(":"))) {
+			zval parts = {}, name = {};
+			phalcon_fast_explode_str(&parts, SL(":"), &model_name);
+			phalcon_array_fetch_long(&ns_alias, &parts, 0, PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_long(&name, &parts, 1, PH_NOISY|PH_READONLY);
+
 			/**
 			 * Get the real namespace alias
 			 */
@@ -2478,8 +2483,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 			/**
 			 * Create the real namespaced name
 			 */
-			PHALCON_CONCAT_VSV(&real_model_name, &real_namespace, "\\", &model_name);
+			PHALCON_CONCAT_VSV(&real_model_name, &real_namespace, "\\", &name);
 			zval_ptr_dtor(&real_namespace);
+			zval_ptr_dtor(&parts);
 		} else {
 			ZVAL_COPY(&real_model_name, &model_name);
 		}

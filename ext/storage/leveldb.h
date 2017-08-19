@@ -22,6 +22,7 @@
 #define PHALCON_STORAGE_LEVELDB_H
 
 #include "php_phalcon.h"
+# if PHALCON_USE_LEVELDB
 #include <leveldb/c.h>
 
 typedef struct {
@@ -37,4 +38,5 @@ extern zend_class_entry *phalcon_storage_leveldb_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Storage_Leveldb);
 
+# endif
 #endif /* PHALCON_STORAGE_LEVELDB_H */

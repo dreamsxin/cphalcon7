@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	}
 
 	if (phalcon_file_exists(path) == FAILURE) {
-		php_mkdir(Z_STRVAL_P(path), 0775);
+		php_stream_mkdir(Z_STRVAL_P(path), 0775, PHP_STREAM_MKDIR_RECURSIVE | REPORT_ERRORS, php_stream_context_from_zval(NULL, 0));
 	}
 
 	phalcon_update_property(getThis(), SL("_path"), path);
@@ -520,7 +520,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, copy)
 	phalcon_fetch_params(0, 1, 1, &path, &_flags);
 
 	if (phalcon_file_exists(path) == FAILURE) {
-		php_mkdir(Z_STRVAL_P(path), 0775);
+		php_stream_mkdir(Z_STRVAL_P(path), 0775, PHP_STREAM_MKDIR_RECURSIVE | REPORT_ERRORS, php_stream_context_from_zval(NULL, 0));
 	}
 
 	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {

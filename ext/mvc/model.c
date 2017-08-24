@@ -2416,21 +2416,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
  */
 PHP_METHOD(Phalcon_Mvc_Model, group){
 
-	zval *params, aggregators = {}, dependency_injector = {}, *aggregator, columns = {}, joined_columns = {}, service_name = {};
+	zval *params, dependency_injector = {}, columns = {}, aggregators = {}, service_name = {};
 	zval manager = {}, model_name = {}, model = {}, builder = {}, query = {};
 	zend_string *item_key;
 
 	phalcon_fetch_params(0, 1, 0, &params);
-
-	if (!phalcon_array_isset_fetch_str(&aggregators, params, SL("aggregators"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index 'aggregators' is required in the parameters array");
-		return;
-	}
-
-	if (Z_TYPE(aggregators) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The aggregators must be array");
-		return;
-	}
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
@@ -2439,40 +2429,64 @@ PHP_METHOD(Phalcon_Mvc_Model, group){
 		return;
 	}
 
-	array_init(&columns);
-	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(aggregators), item_key, aggregator) {
-		zval function = {}, column = {}, alias = {}, distinct = {}, group_column = {};
-		if (Z_TYPE_P(aggregator) != IS_ARRAY) {
-			continue;
-		}
-		if (!phalcon_array_isset_fetch_str(&function, aggregator, SL("aggregator"), PH_READONLY)) {
-			continue;
+	if (phalcon_array_isset_fetch_str(&aggregators, params, SL("aggregators"), PH_READONLY)) {
+		zval *aggregator, joined_columns = {}, group_columns = {};
+		if (Z_TYPE(aggregators) != IS_ARRAY) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The aggregators must be array");
+			return;
 		}
 
-		if (!phalcon_array_isset_fetch_str(&column, aggregator, SL("column"), PH_READONLY)) {
-			continue;
-		}
+		array_init(&columns);
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(aggregators), item_key, aggregator) {
+			zval function = {}, column = {}, alias = {}, distinct = {}, group_column = {};
+			if (Z_TYPE_P(aggregator) != IS_ARRAY) {
+				continue;
+			}
+			if (!phalcon_array_isset_fetch_str(&function, aggregator, SL("aggregator"), PH_READONLY)) {
+				continue;
+			}
 
-		if (!item_key) {
-			ZVAL_COPY_VALUE(&alias, &function);
+			if (!phalcon_array_isset_fetch_str(&column, aggregator, SL("column"), PH_READONLY)) {
+				continue;
+			}
+
+			if (!item_key) {
+				ZVAL_COPY_VALUE(&alias, &function);
+			} else {
+				ZVAL_STR(&alias, item_key);
+			}
+
+			/**
+			 * Builds the columns to query according to the received parameters
+			 */
+			if (phalcon_array_isset_fetch_str(&distinct, aggregator, SL("distinct"), PH_READONLY) && zend_is_true(&distinct)) {
+				PHALCON_CONCAT_VSVSV(&group_column, &function, "(DISTINCT ", &column, ") AS ", &alias);
+			} else {
+				PHALCON_CONCAT_VSVSV(&group_column, &function, "(", &column, ") AS ", &alias);
+			}
+
+			phalcon_array_append(&columns, &group_column, 0);
+		} ZEND_HASH_FOREACH_END();
+
+		phalcon_fast_join_str(&joined_columns, SL(", "), &columns);
+		zval_ptr_dtor(&columns);
+
+		if (phalcon_array_isset_fetch_str(&group_columns, params, SL("group"), PH_READONLY)) {
+			PHALCON_CONCAT_VSV(&columns, &group_columns, ", ", &joined_columns);
 		} else {
-			ZVAL_STR(&alias, item_key);
+			ZVAL_COPY(&columns, &joined_columns);
 		}
-
-		/**
-		 * Builds the columns to query according to the received parameters
-		 */
-		if (phalcon_array_isset_fetch_str(&distinct, aggregator, SL("distinct"), PH_READONLY) && zend_is_true(&distinct)) {
-			PHALCON_CONCAT_VSVSV(&group_column, &function, "(DISTINCT ", &column, ") AS ", &alias);
+		zval_ptr_dtor(&joined_columns);
+	} else {
+		zval distinct_column = {}, group_columns = {};
+		if (phalcon_array_isset_fetch_str(&distinct_column, params, SL("distinct"), PH_READONLY)) {
+			PHALCON_CONCAT_SV(&columns, "DISTINCT ", &distinct_column);
+		} else if (phalcon_array_isset_fetch_str(&group_columns, params, SL("group"), PH_READONLY)) {
+			ZVAL_COPY(&columns, &group_columns);
 		} else {
-			PHALCON_CONCAT_VSVSV(&group_column, &function, "(", &column, ") AS ", &alias);
+			ZVAL_STRING(&columns, "*");
 		}
-
-		phalcon_array_append(&columns, &group_column, 0);
-	} ZEND_HASH_FOREACH_END();
-
-	phalcon_fast_join_str(&joined_columns, SL(", "), &columns);
-	zval_ptr_dtor(&columns);
+	}
 
 	ZVAL_STR(&service_name, IS(modelsManager));
 
@@ -2484,8 +2498,8 @@ PHP_METHOD(Phalcon_Mvc_Model, group){
 	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", params);
 	zval_ptr_dtor(&manager);
 
-	PHALCON_CALL_METHOD(NULL, &builder, "columns", &joined_columns);
-	zval_ptr_dtor(&joined_columns);
+	PHALCON_CALL_METHOD(NULL, &builder, "columns", &columns);
+	zval_ptr_dtor(&columns);
 
 	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
 	zval_ptr_dtor(&model_name);

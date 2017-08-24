@@ -234,7 +234,7 @@ PHP_METHOD(Phalcon_Storage_Wiredtiger, __construct)
 
 	/* Create home directory */
 	if (phalcon_file_exists(home) == FAILURE) {
-		php_mkdir(Z_STRVAL_P(home), mode);
+		php_stream_mkdir(Z_STRVAL_P(home), (int)mode, PHP_STREAM_MKDIR_RECURSIVE | REPORT_ERRORS, php_stream_context_from_zval(NULL, 0));
 	}
 
 	phalcon_update_property(getThis(), SL("_home"), home);

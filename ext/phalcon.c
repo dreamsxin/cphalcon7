@@ -168,6 +168,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Process_Exception);
 	PHALCON_INIT(Phalcon_Storage_Exception);
 	PHALCON_INIT(Phalcon_Server_Exception);
+#if PHALCON_USE_SHM_OPEN
+	PHALCON_INIT(Phalcon_Sync_Exception);
+#endif
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -524,6 +527,15 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 
 	PHALCON_INIT(Phalcon_Async);
+
+#if PHALCON_USE_SHM_OPEN
+	PHALCON_INIT(Phalcon_Sync_Mutex);
+	PHALCON_INIT(Phalcon_Sync_Readerwriter);
+	PHALCON_INIT(Phalcon_Sync_Event);
+	PHALCON_INIT(Phalcon_Sync_Semaphore);
+	PHALCON_INIT(Phalcon_Sync_Sharedmemory);
+#endif
+
 	PHALCON_INIT(Phalcon_Binary);
 	PHALCON_INIT(Phalcon_Binary_Reader);
 	PHALCON_INIT(Phalcon_Binary_Writer);
@@ -657,8 +669,12 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Socket", "enabled");
 #endif
 
-#ifdef PHALCON_USE_WEBSOCKET
+#if PHALCON_USE_WEBSOCKET
 	php_info_print_table_row(2, "Websocket", "enabled");
+#endif
+
+#if PHALCON_USE_SHM_OPEN
+	php_info_print_table_row(2, "Sync", "enabled");
 #endif
 
 #ifdef PHALCON_INTRUSIVE
@@ -673,8 +689,20 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Storage Wiredtiger", "enabled");
 #endif
 
+#if PHALCON_USE_LEVELDB
+	php_info_print_table_row(2, "Storage Leveldb", "enabled");
+#endif
+
+#if PHALCON_USE_LMDB
+	php_info_print_table_row(2, "Storage Lmdb", "enabled");
+#endif
+
 #if PHALCON_USE_BLOOMFILTER
 	php_info_print_table_row(2, "Storage Bloomfilter", "enabled");
+#endif
+
+#if PHALCON_USE_DATRIE
+	php_info_print_table_row(2, "Storage Datrie", "enabled");
 #endif
 
 #if PHALCON_USE_SERVER

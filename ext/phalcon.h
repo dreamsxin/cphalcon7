@@ -443,6 +443,13 @@
 
 #include "async.h"
 
+#include "sync/exception.h"
+#include "sync/mutex.h"
+#include "sync/readerwriter.h"
+#include "sync/semaphore.h"
+#include "sync/event.h"
+#include "sync/sharedmemory.h"
+
 #include "process/proc.h"
 #include "process/exception.h"
 

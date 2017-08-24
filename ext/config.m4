@@ -1261,6 +1261,23 @@ server/exception.c"
 		])
 	fi
 
+	LIBS="$LIBS -pthread -lrt"
+
+	AC_MSG_CHECKING([for shm_open in -pthread -lrt])
+	AC_TRY_LINK([
+		#include <fcntl.h>
+		#include <sys/mman.h>
+	], [
+		int fp = shm_open("", O_RDWR | O_CREAT | O_EXCL, 0666);
+	], [
+		AC_DEFINE([PHALCON_USE_SHM_OPEN], 1, [Have shm_open support])
+		AC_MSG_RESULT([yes])
+
+		phalcon_sources="$phalcon_sources sync/exception.c sync/mutex.c sync/readerwriter.c sync/event.c sync/semaphore.c sync/sharedmemory.c"
+	], [
+		AC_MSG_RESULT([shm_open() is not available on this platform])
+	])
+
 	AC_CHECK_LIB(c, accept4, AC_DEFINE(HAVE_ACCEPT4, 1, [have accept4]))
 	AC_CHECK_LIB(c, signalfd, AC_DEFINE(HAVE_SIGNALFD, 1, [have signalfd]))
 	AC_CHECK_LIB(c, poll, AC_DEFINE(HAVE_POLL, 1, [have poll]))
@@ -1271,6 +1288,7 @@ server/exception.c"
     AC_CHECK_LIB(pthread, pthread_barrier_init, AC_DEFINE(HAVE_PTHREAD_BARRIER, 1, [have pthread_barrier_init]))
 
 	PHP_ADD_LIBRARY(pthread)
+	PHP_ADD_LIBRARY(rt,,PHALCON_SHARED_LIBADD)
 
 	PHP_SUBST(PHALCON_SHARED_LIBADD)
 

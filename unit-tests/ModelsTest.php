@@ -430,6 +430,9 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$group = People::count(array("group" => "estado"));
 		$this->assertEquals(count($group), 3);
 
+		$group = People::group(array("group" => "estado"));
+		$this->assertEquals(count($group), 3);
+
 		//Deleting
 		$before = People::count();
 		$this->assertTrue($persona->delete());

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Sync_Sharedmemory, read){
 	if (start + length > intern->MxSize) {
 		length = intern->MxSize - start;
 	}
-zend_printf("\nstart:%d,length:%d,MxSize:%d\n",start, length, intern->MxSize);
+
 	RETURN_STRINGL(intern->MxMem + start, length);
 }
 

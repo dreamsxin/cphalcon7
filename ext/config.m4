@@ -783,6 +783,7 @@ image/adapter/imagick.c \
 registry.c \
 async.c \
 chart/exception.c \
+chart/captcha/tiny.c \
 socket/exception.c \
 process/exception.c \
 storage/exception.c \

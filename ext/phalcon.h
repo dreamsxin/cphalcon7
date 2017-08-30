@@ -439,6 +439,7 @@
 
 #include "chart/qrcode.h"
 #include "chart/captcha.h"
+#include "chart/captcha/tiny.h"
 #include "chart/exception.h"
 
 #include "async.h"

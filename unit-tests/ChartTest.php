@@ -38,6 +38,15 @@ class ChartTest extends PHPUnit_Framework_TestCase
 		$this->assertTrue(file_exists('unit-tests/assets/captcha.png'));
 	}
 
+	public function testTinyCaptcha()
+	{
+		@unlink('unit-tests/assets/captcha-tiny.gif');
+		$tiny = new \Phalcon\Chart\Captcha\Tiny;
+		$ret = $tiny->render('unit-tests/assets/captcha-tiny.gif');
+		$this->assertTrue(!empty($ret));
+		$this->assertTrue(file_exists('unit-tests/assets/captcha-tiny.gif'));
+	}
+
 	public function testQRencode()
 	{
 		if (!class_exists('Phalcon\Chart\QRcode')) {

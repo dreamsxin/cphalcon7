@@ -522,6 +522,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_CHART
 	PHALCON_INIT(Phalcon_Chart_Captcha);
 #endif
+
+	PHALCON_INIT(Phalcon_Chart_Captcha_Tiny);
+
 #if PHALCON_USE_QRENCODE
 	PHALCON_INIT(Phalcon_Chart_QRcode);
 #endif

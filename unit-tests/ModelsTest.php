@@ -15,6 +15,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -160,6 +161,17 @@ class ModelsTest extends PHPUnit_Framework_TestCase
 		$this->assertEquals(1, Issue_1534::count());
 
 		$entry = Issue_1534::findFirst();
+		$this->assertEquals('bb', $entry->language);
+		$this->assertEquals('0', $entry->sort);
+		$this->assertTrue($entry->brand === NULL);
+
+		// Core dump
+		$entry = Issue_1534::findFirst(array('language = :lang:', 'bind' => array('lang' => 'bb')));
+		$this->assertEquals('bb', $entry->language);
+		$this->assertEquals('0', $entry->sort);
+		$this->assertTrue($entry->brand === NULL);
+
+		$entry = Issue_1534::findFirst(array('language = :lang:', 'bind' => array('lang' => 'bb')));
 		$this->assertEquals('bb', $entry->language);
 		$this->assertEquals('0', $entry->sort);
 		$this->assertTrue($entry->brand === NULL);

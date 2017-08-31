@@ -43,7 +43,15 @@ class ChartTest extends PHPUnit_Framework_TestCase
 		@unlink('unit-tests/assets/captcha-tiny.gif');
 		$tiny = new \Phalcon\Chart\Captcha\Tiny;
 		$ret = $tiny->render('unit-tests/assets/captcha-tiny.gif');
+		$this->assertTrue(!empty($tiny->getValue()));
 		$this->assertTrue(!empty($ret));
+		$this->assertTrue(file_exists('unit-tests/assets/captcha-tiny.gif'));
+
+		@unlink('unit-tests/assets/captcha-tiny.gif');
+		$tiny = new \Phalcon\Chart\Captcha\Tiny;
+		$ret = $tiny->render();
+		$this->assertFalse(file_exists('unit-tests/assets/captcha-tiny.gif'));
+		$this->assertTrue($tiny->save('unit-tests/assets/captcha-tiny.gif'));
 		$this->assertTrue(file_exists('unit-tests/assets/captcha-tiny.gif'));
 	}
 

@@ -32,6 +32,11 @@
 #define PHALCON_DEBUG_SIMPLE() zend_printf("\nFile:%s, Line:%d\n", __FILE__, __LINE__)
 #define PHALCON_DEBUG_SIMPLE_ZVAL(v) zend_printf("\nVar:%s, Refcount:%d, File:%s, Line:%d\n", #v, Z_REFCOUNT_P(v), __FILE__, __LINE__)
 
+#define PHALCON_DEBUG_PRINT_ADDR(var) printf("Addr:  0x%p  \'"#var"\'\n",&(var))
+#define PHALCON_DEBUG_PRINT_SIZE(var) printf("Size of \'"#var"\': %dByte\n",(int)sizeof(var))
+#define PHALCON_DEBUG_PRINT_VALUE_F(var, format) printf("Value: "#format"  \'"#var"\'\n",var)
+#define PHALCON_DEBUG_PRINT_VALUE(var) PHALCON_DEBUG_PRINT_VALUE_F(var, 0x%p)
+
 typedef struct _phalcon_debug_entry {
 	struct _phalcon_debug_entry *prev;
 	struct _phalcon_debug_entry *next;

@@ -559,14 +559,15 @@ static void dots(unsigned char im[70*200], uint32_t dr[NDOTS]) {
 		uint32_t v=dr[n];
 		unsigned char *i=im+v%(200*67);
 		
-		i[0]=0xff;
-		i[1]=0xff;
-		i[2]=0xff;
-		i[200]=0xff;
-		i[201]=0xff;
-		i[202]=0xff;
+		i[0]=0;
+		i[1]=0;
+		i[2]=0;
+		i[200]=0;
+		i[201]=0;
+		i[202]=0;
 	}
 }
+
 static void blur(unsigned char im[70*200]) {
 	unsigned char *i=im;
 	int x,y;

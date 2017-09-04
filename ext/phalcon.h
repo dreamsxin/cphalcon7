@@ -471,4 +471,10 @@
 #include "server/http.h"
 #include "server/simple.h"
 
+#include "py/common.h"
+#include "py.h"
+#include "py/object.h"
+#include "py/exception.h"
+#include "py/matplot.h"
+
 #endif /* PHALCON_H */

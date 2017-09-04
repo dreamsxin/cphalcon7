@@ -109,6 +109,8 @@ Custom php path:
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-websocket=yes
 # enable server
 ./configure --with-php-config=/usr/local/php/bin/php-config --enable-server=yes
+# enable python
+./configure --with-php-config=/usr/local/php/bin/php-config --enable-python=yes
 make -j4
 sudo make install
 ```

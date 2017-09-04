@@ -28,6 +28,8 @@
 #include "cache/yac/storage.h"
 #include "cache/yac/allocator.h"
 
+#include "py.h"
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -113,6 +115,17 @@ static PHP_MINIT_FUNCTION(phalcon)
 	mongoc_init();
 #endif
 
+#if PHALCON_USE_PYTHON
+	Py_SetProgramName("Phalcon7");
+	Py_InitializeEx(0); // Py_Initialize();
+	PyEval_InitThreads();
+	python_streams_init();
+	PyThreadState_Swap(NULL);
+	PyEval_ReleaseLock();
+
+	PHALCON_GLOBAL(python).isInitialized = Py_IsInitialized();
+#endif
+
 	/* 1. Register exceptions */
 	PHALCON_INIT(Phalcon_Exception);
 	PHALCON_INIT(Phalcon_ContinueException);
@@ -170,6 +183,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Server_Exception);
 #if PHALCON_USE_SHM_OPEN
 	PHALCON_INIT(Phalcon_Sync_Exception);
+#endif
+#if PHALCON_USE_PYTHON
+	PHALCON_INIT(Phalcon_Py_Exception);
 #endif
 
 	/* 2. Register interfaces */
@@ -600,6 +616,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Server_Http);
 #endif
 	PHALCON_INIT(Phalcon_Server_Simple);
+
+#if PHALCON_USE_PYTHON
+	PHALCON_INIT(Phalcon_Py);
+	PHALCON_INIT(Phalcon_Py_Object);
+	PHALCON_INIT(Phalcon_Py_Matplot);
+#endif
 	return SUCCESS;
 }
 
@@ -618,6 +640,13 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	mongoc_cleanup();
 #endif
 
+#if PHALCON_USE_PYTHON
+	PHALCON_GLOBAL(python).tstate = Py_NewInterpreter();
+	Py_Finalize();
+	PyThreadState_Swap(NULL);
+	PyEval_ReleaseLock();
+#endif
+
 	UNREGISTER_INI_ENTRIES();
 
 	return SUCCESS;
@@ -632,6 +661,16 @@ static PHP_RINIT_FUNCTION(phalcon){
 
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
+#if PHALCON_USE_PYTHON
+	PyEval_AcquireLock();
+	PHALCON_GLOBAL(python).tstate = Py_NewInterpreter();
+	if (PHALCON_GLOBAL(python).tstate) {
+		python_streams_intercept();
+		python_php_init();
+		PyThreadState_Swap(NULL);
+		PyEval_ReleaseLock();
+	}
+#endif
 	return SUCCESS;
 }
 
@@ -639,6 +678,10 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	phalcon_deinitialize_memory();
 	phalcon_release_interned_strings();
 
+#if PHALCON_USE_PYTHON
+	PyEval_AcquireThread(PHALCON_GLOBAL(python).tstate);
+	Py_EndInterpreter(PHALCON_GLOBAL(python).tstate);
+#endif
 	return SUCCESS;
 }
 
@@ -711,6 +754,11 @@ static PHP_MINFO_FUNCTION(phalcon)
 #if PHALCON_USE_SERVER
 	php_info_print_table_row(2, "Server", "enabled");
 #endif
+
+#if PHALCON_USE_PYTHON
+	php_info_print_table_row(2, "Python", "enabled");
+#endif
+
 	php_info_print_table_end();
 
 	DISPLAY_INI_ENTRIES();

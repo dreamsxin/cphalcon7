@@ -163,6 +163,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(python, for python support,
+[  --with-python   Include python support], no, no)
+
+if test "$PHP_PYTHON" = "yes"; then
+	AC_DEFINE([PHALCON_PYTHON], [1], [Whether python are available])
+	AC_MSG_RESULT([yes, python])
+else
+	AC_MSG_RESULT([no])
+fi
+
 AC_MSG_CHECKING(for sysvipc shared memory support)
 AC_TRY_RUN([
 #include <sys/types.h>
@@ -1232,7 +1242,7 @@ server/exception.c"
 		AC_MSG_CHECKING([for epoll support])
 		AC_TRY_COMPILE(
 		[
-				#include <sys/epoll.h>
+			#include <sys/epoll.h>
 		], [
 			int epollfd;
 			struct epoll_event e;
@@ -1289,7 +1299,57 @@ server/exception.c"
     AC_CHECK_LIB(pthread, pthread_barrier_init, AC_DEFINE(HAVE_PTHREAD_BARRIER, 1, [have pthread_barrier_init]))
 
 	PHP_ADD_LIBRARY(pthread)
+	PHP_ADD_LIBRARY(dl)
 	PHP_ADD_LIBRARY(rt,,PHALCON_SHARED_LIBADD)
+
+	if test "$PHP_PYTHON" == "yes"; then
+		AC_MSG_CHECKING([for python-config support])
+		if test "$ext_shared" = "shared" || test "$ext_shared" = "yes"; then
+			AC_PATH_PROG([PYTHON_CONFIG],[python-config])
+		else
+			AC_PATH_PROG([PYTHON_CONFIG],[python-shared-config])
+		fi
+
+		if test -z "$PYTHON_CONFIG"; then
+			AC_MSG_RESULT(no)
+			AC_MSG_ERROR([Cannot find python-config in your system path])
+		else
+			AC_MSG_RESULT(yes)
+		fi
+
+		PYTHON_CFLAGS=`$PYTHON_CONFIG --includes`
+		PYTHON_LDFLAGS=`$PYTHON_CONFIG --ldflags`
+
+		CPPFLAGS="${CPPFLAGS} ${PYTHON_CFLAGS}"
+		EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${PYTHON_LDFLAGS}"
+
+		AC_MSG_CHECKING([for python support])
+
+		LIBS="$LIBS ${PYTHON_LDFLAGS}"
+
+		AC_TRY_LINK([
+            #include <Python.h>
+		],[
+			Py_Initialize();
+		],[
+			AC_DEFINE([PHALCON_USE_PYTHON], 1, [Have python support])
+			AC_MSG_RESULT([yes])
+
+			phalcon_sources="$phalcon_sources py/common.c py.c py/object.c py/exception.c py/matplot.c"
+		],[
+			AC_MSG_ERROR([no])
+		])
+
+		AC_CHECK_HEADERS(
+			[numpy/arrayobject.h],
+			[
+				AC_DEFINE([PHALCON_USE_PYTHON_NUMPY], [1], [Have python numpy support])
+			],
+			,
+			[[#include <Python.h>]]
+		)
+
+	fi
 
 	PHP_SUBST(PHALCON_SHARED_LIBADD)
 

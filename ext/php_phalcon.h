@@ -24,6 +24,10 @@
 #include "config.h"
 #endif
 
+#if PHALCON_USE_PYTHON
+#include <Python.h>
+#endif
+
 #include <main/php.h>
 #ifdef ZTS
 #include <TSRM/TSRM.h>
@@ -89,6 +93,14 @@ typedef struct _phalcon_cache_options {
 	size_t yac_values_size;
 } phalcon_cache_options;
 
+#if PHALCON_USE_PYTHON
+/** Python options */
+typedef struct _phalcon_python_options {
+    zend_bool isInitialized;
+    PyThreadState *tstate;
+} phalcon_python_options;
+#endif
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -122,6 +134,11 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/** Cache */
 	phalcon_cache_options cache;
+
+#if PHALCON_USE_PYTHON
+	/** Python */
+	phalcon_python_options python;
+#endif
 
 ZEND_END_MODULE_GLOBALS(phalcon)
 

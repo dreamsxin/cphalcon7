@@ -174,6 +174,14 @@ static inline int phalcon_array_append_long(zval *arr, long value, int flags)
 	return phalcon_array_append(arr, &zvalue, flags);
 }
 
+static inline int phalcon_array_append_double(zval *arr, double value)
+{
+	zval zvalue;
+	ZVAL_DOUBLE(&zvalue, value);
+
+	return phalcon_array_append(arr, &zvalue, 0);
+}
+
 /**
  * @brief Appends a string @a value to @a arr
  * @param arr Array

@@ -271,6 +271,10 @@ PyObject* pip_zval_to_pyobject(zval *val)
 		return NULL;
 	}
 
+	if (Z_TYPE_P(val) == IS_INDIRECT) {
+		val = Z_INDIRECT_P(val);
+	}
+
 	switch (Z_TYPE_P(val)) {
 	case IS_TRUE:
 		ret = PyBool_FromLong(1);
@@ -721,9 +725,6 @@ static PyObject *php_var(PyObject *self, PyObject *args)
 	if ((v = zend_hash_str_find(&EG(symbol_table), name, len)) == NULL) {
 		PyErr_Format(PyExc_NameError, "Undefined variable: %s", name);
 		return NULL;
-	}
-	if (Z_TYPE_P(v) == IS_INDIRECT) {
-		v = Z_INDIRECT_P(v);
 	}
 
 	return pip_zval_to_pyobject(v);

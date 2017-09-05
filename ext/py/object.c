@@ -70,7 +70,9 @@ void phalcon_py_object_object_free_handler(zend_object *object)
 	intern = phalcon_py_object_object_from_obj(object);
 
 	PHP_PYTHON_THREAD_ACQUIRE();
-	Py_XDECREF(intern->obj);
+	if (intern->obj) {
+		Py_XDECREF(intern->obj);
+	}
 	PHP_PYTHON_THREAD_RELEASE();
 }
 

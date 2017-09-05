@@ -24,6 +24,7 @@
 
 #include "kernel/main.h"
 #include "kernel/exception.h"
+#include "kernel/object.h"
 
 /**
  * Phalcon\Py
@@ -44,12 +45,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_import, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_construct, 0, 0, 2)
-	ZEND_ARG_OBJ_INFO(0, moduleName, IS_STRING, 0)
+	ZEND_ARG_INFO(0, moduleName)
 	ZEND_ARG_TYPE_INFO(0, className, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_callfunction, 0, 0, 2)
-	ZEND_ARG_OBJ_INFO(0, moduleName, IS_STRING, 0)
+	ZEND_ARG_INFO(0, moduleName)
 	ZEND_ARG_TYPE_INFO(0, functionName, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
@@ -97,18 +98,28 @@ PHP_METHOD(Phalcon_Py, import){
 
 	zval *name;
 	PyObject *modulename;
-	PyObject *lib;
+	PyObject *module;
 
 	phalcon_fetch_params(0, 1, 0, &name);
 
+	PHP_PYTHON_THREAD_ACQUIRE();
 	modulename = PyString_FromString(Z_STRVAL_P(name));
-	lib = PyImport_Import(modulename);
-	Py_DECREF(modulename);
-	if (!lib) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_py_exception_ce, "Error import module %s!", Z_STRVAL_P(name));
+	if (!modulename) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_py_exception_ce, "Could't create string %s!", Z_STRVAL_P(name));		
+		PHP_PYTHON_THREAD_RELEASE();
 		return;
 	}
-	pip_pyobject_to_zval(lib, return_value);
+	module = PyImport_Import(modulename);
+	Py_DECREF(modulename);
+	if (!module) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_py_exception_ce, "Error import module %s!", Z_STRVAL_P(name));		
+		PHP_PYTHON_THREAD_RELEASE();
+		return;
+	}
+	pip_pyobject_to_zval(module, return_value);
+	Py_DECREF(module);
+
+	PHP_PYTHON_THREAD_RELEASE();
 }
 
 /**
@@ -120,13 +131,25 @@ PHP_METHOD(Phalcon_Py, import){
 PHP_METHOD(Phalcon_Py, construct){
 
 	zval *module_name, *class_name;
+	phalcon_py_object_object* intern;
 	PyObject *module;
 
 	phalcon_fetch_params(0, 2, 0, &module_name, &class_name);
 
 	PHP_PYTHON_THREAD_ACQUIRE();
 
-	module = PyImport_ImportModule(Z_STRVAL_P(module_name));
+	if (Z_TYPE_P(module_name) == IS_OBJECT && phalcon_instance_of_ev(module_name, phalcon_py_object_ce)) {
+		intern = phalcon_py_object_object_from_obj(Z_OBJ_P(module_name));
+		module = intern->obj;
+		Py_INCREF(module);
+	} else if (Z_TYPE_P(module_name) == IS_STRING) {
+		module = PyImport_ImportModule(Z_STRVAL_P(module_name));
+	} else {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_py_exception_ce, "The module paramerter must be string or Phalcon\\Py\\Object");
+		PHP_PYTHON_THREAD_RELEASE();
+		return;
+	}
+
 	if (module) {
 		PyObject *dict, *class;
 
@@ -187,6 +210,7 @@ PHP_METHOD(Phalcon_Py, construct){
 PHP_METHOD(Phalcon_Py, callFunction){
 
 	zval *module_name, *function_name;
+	phalcon_py_object_object* intern;
 	PyObject *module;
 
 	phalcon_fetch_params(0, 2, 0, &module_name, &function_name);
@@ -194,7 +218,17 @@ PHP_METHOD(Phalcon_Py, callFunction){
 	PHP_PYTHON_THREAD_ACQUIRE();
 
 	/* Attempt to import the requested module. */
-	module = PyImport_ImportModule(Z_STRVAL_P(module_name));
+	if (Z_TYPE_P(module_name) == IS_OBJECT && phalcon_instance_of_ev(module_name, phalcon_py_object_ce)) {
+		intern = phalcon_py_object_object_from_obj(Z_OBJ_P(module_name));
+		module = intern->obj;
+		Py_INCREF(module);
+	} else if (Z_TYPE_P(module_name) == IS_STRING) {
+		module = PyImport_ImportModule(Z_STRVAL_P(module_name));
+	} else {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_py_exception_ce, "The module paramerter must be string or Phalcon\\Py\\Object");
+		return;
+	}
+
 	if (module) {
 		PyObject *dict, *function;
 

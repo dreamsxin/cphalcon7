@@ -22,13 +22,14 @@
 #include "storage/exception.h"
 
 #include "kernel/main.h"
+#include "kernel/exception.h"
 #include "kernel/memory.h"
 #include "kernel/array.h"
 #include "kernel/object.h"
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/file.h"
-#include "kernel/exception.h"
+#include "kernel/variables.h"
 
 #include "internal/arginfo.h"
 
@@ -119,7 +120,9 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, current)
 	}
 
 	if (intern->rc == MDB_SUCCESS) {
-		ZVAL_STRINGL(return_value, (char *) intern->v.mv_data, (int) intern->v.mv_size);
+		zval s = {};
+		ZVAL_STRINGL(&s, (char *) intern->v.mv_data, (int) intern->v.mv_size);
+		phalcon_unserialize(return_value, &s);
 	} else if (intern->rc == MDB_NOTFOUND) {
 		RETVAL_FALSE;
 	} else {

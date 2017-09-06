@@ -203,6 +203,9 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 				PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
 			}
 			zval_ptr_dtor(&cached_content);
+		} else {
+			phalcon_unlink(return_value, &cache_file);
+			ZVAL_NULL(return_value);
 		}
 	} else {
 		ZVAL_NULL(return_value);

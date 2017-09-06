@@ -38,6 +38,10 @@ PHP_METHOD(Phalcon_Py, callFunction);
 PHP_METHOD(Phalcon_Py, callMethod);
 PHP_METHOD(Phalcon_Py, eval);
 PHP_METHOD(Phalcon_Py, exec);
+PHP_METHOD(Phalcon_Py, list);
+PHP_METHOD(Phalcon_Py, tuple);
+PHP_METHOD(Phalcon_Py, dict);
+PHP_METHOD(Phalcon_Py, val);
 PHP_METHOD(Phalcon_Py, version);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_import, 0, 0, 1)
@@ -68,6 +72,22 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_exec, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, command, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_list, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, val, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_tuple, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, val, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_dict, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, val, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_val, 0, 0, 1)
+	ZEND_ARG_INFO(0, val)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_py_method_entry[] = {
 	PHP_ME(Phalcon_Py, import, arginfo_phalcon_py_import, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, construct, arginfo_phalcon_py_construct, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -75,6 +95,10 @@ static const zend_function_entry phalcon_py_method_entry[] = {
 	PHP_ME(Phalcon_Py, callMethod, arginfo_phalcon_py_callmethod, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, eval, arginfo_phalcon_py_eval, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, exec, arginfo_phalcon_py_exec, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Py, list, arginfo_phalcon_py_list, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Py, tuple, arginfo_phalcon_py_tuple, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Py, dict, arginfo_phalcon_py_dict, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Py, val, arginfo_phalcon_py_val, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, version, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -277,9 +301,10 @@ PHP_METHOD(Phalcon_Py, callMethod){
 	zval *object, *name;
 	phalcon_py_object_object* intern;
 	PyObject *methodname, *callable, *args, *retval;
-    va_list vargs;
 
 	phalcon_fetch_params(0, 2, 0, &object, &name);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
 
 	intern = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
 	methodname = PyString_FromString(Z_STRVAL_P(name));
@@ -306,6 +331,8 @@ PHP_METHOD(Phalcon_Py, callMethod){
 	}
 
 	Py_DECREF(callable);
+
+	PHP_PYTHON_THREAD_RELEASE();
 }
 
 /**
@@ -405,6 +432,90 @@ PHP_METHOD(Phalcon_Py, exec){
 	PHP_PYTHON_THREAD_RELEASE();
 
 	RETURN_TRUE;
+}
+
+/**
+ * PHP array to Python list
+ *
+ * @param array $val
+ */
+PHP_METHOD(Phalcon_Py, list){
+
+	zval *val;
+	PyObject *v;
+
+	phalcon_fetch_params(0, 1, 0, &val);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	v = pip_hash_to_list(val);
+	pip_pyobject_to_zval(v, return_value);
+	Py_DECREF(v);
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+/**
+ * PHP array to Python tuple
+ *
+ * @param array $val
+ */
+PHP_METHOD(Phalcon_Py, tuple){
+
+	zval *val;
+	PyObject *v;
+
+	phalcon_fetch_params(0, 1, 0, &val);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	v = pip_hash_to_tuple(val);
+	pip_pyobject_to_zval(v, return_value);
+	Py_DECREF(v);
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+/**
+ * PHP array to Python dict
+ *
+ * @param array $val
+ */
+PHP_METHOD(Phalcon_Py, dict){
+
+	zval *val;
+	PyObject *v;
+
+	phalcon_fetch_params(0, 1, 0, &val);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	v = pip_hash_to_dict(val);
+	pip_pyobject_to_zval(v, return_value);
+	Py_DECREF(v);
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+/**
+ * PHP val to Python val
+ *
+ * @param mixed $val
+ */
+PHP_METHOD(Phalcon_Py, val){
+
+	zval *val;
+	PyObject *v;
+
+	phalcon_fetch_params(0, 1, 0, &val);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	v = pip_zval_to_pyobject(val);
+	pip_pyobject_to_zval(v, return_value);
+	Py_DECREF(v);
+
+	PHP_PYTHON_THREAD_RELEASE();
 }
 
 /**

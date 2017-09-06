@@ -484,10 +484,12 @@ static HashTable *python_get_properties(zval *object)
 
 	if (!pip->std.properties) {
 		rebuild_object_properties(&pip->std);
+	} else {
+		zend_hash_clean(pip->std.properties);
 	}
 
-	if (zend_hash_num_elements(pip->std.properties) == 0)
-		get_properties(pip->obj, pip->std.properties);
+	//if (zend_hash_num_elements(pip->std.properties) == 0)
+	get_properties(pip->obj, pip->std.properties);
 
 	PHP_PYTHON_THREAD_RELEASE();
 
@@ -577,13 +579,13 @@ static int python_call_method(zend_string *method_name, zend_object *object, INT
 
 	return ret;
 }
-
+/*
 static union _zend_function *python_constructor_get(zval *object)
 {
 	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
 	return pip->std.ce->constructor;
 }
-
+*/
 static zend_string* python_get_class_name(const zend_object *object)
 {
 	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj((zend_object*)object);

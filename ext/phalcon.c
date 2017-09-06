@@ -320,6 +320,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 #if PHALCON_USE_WIREDTIGER
 	PHALCON_INIT(Phalcon_Cache_Backend_Wiredtiger);
 #endif
+#if PHALCON_USE_LMDB
+	PHALCON_INIT(Phalcon_Cache_Backend_Lmdb);
+#endif
+
 	PHALCON_INIT(Phalcon_Cache_Frontend_Json);
 	PHALCON_INIT(Phalcon_Cache_Frontend_Output);
 	PHALCON_INIT(Phalcon_Cache_Frontend_None);

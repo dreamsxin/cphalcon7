@@ -18,11 +18,11 @@
   +------------------------------------------------------------------------+
 */
 
-#include "cache/backend/wiredtiger.h"
+#include "cache/backend/lmdb.h"
 #include "cache/backend.h"
 #include "cache/backendinterface.h"
 #include "cache/exception.h"
-#include "storage/wiredtiger.h"
+#include "storage/lmdb.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -38,11 +38,11 @@
 #include "internal/arginfo.h"
 
 /**
- * Phalcon\Cache\Backend\Wiredtiger
+ * Phalcon\Cache\Backend\Lmdb
  *
- * Allows to cache output fragments, PHP data or raw data to a wiredtiger backend
+ * Allows to cache output fragments, PHP data or raw data to a lmdb backend
  *
- * This adapter uses the special wiredtigerd key "_PHCY" to store all the keys internally used by the adapter
+ * This adapter uses the special lmdbd key "_PHCY" to store all the keys internally used by the adapter
  *
  *<code>
  *
@@ -51,76 +51,80 @@
  *    "lifetime" => 172800
  * ));
  *
- * //Create the Cache setting wiredtigerd connection options
- * $cache = new Phalcon\Cache\Backend\Wiredtiger($frontCache, array(
- * 	'home' => __DIR__.'/wiredtiger'
- *	'table' => 'phalcon_test'
+ * // Create the Cache setting lmdb connection options
+ * $cache = new Phalcon\Cache\Backend\Lmdb($frontCache, array(
+ * 	'path' => __DIR__.'/lmdb',
+ *	'name' => 'phalcon_test'
  *));
  *
- * //Cache arbitrary data
+ * // Or
+ * $cache = new Phalcon\Cache\Backend\Lmdb($frontCache, array(
+ *		'lmdb' => new Phalcon\Storage\Lmdb(__DIR__.'/lmdb')
+ * ));
+ *
+ * // Cache arbitrary data
  * $cache->save('my-data', array(1, 2, 3, 4, 5));
  *
- * //Get data
+ * // Get data
  * $data = $cache->get('my-data');
  *
  *</code>
  */
-zend_class_entry *phalcon_cache_backend_wiredtiger_ce;
+zend_class_entry *phalcon_cache_backend_lmdb_ce;
 
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, __construct);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, get);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, delete);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, queryKeys);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, exists);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, increment);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, decrement);
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, flush);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, __construct);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, save);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, delete);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, queryKeys);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, exists);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, increment);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, decrement);
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, flush);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_wiredtiger___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_lmdb___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
-static const zend_function_entry phalcon_cache_backend_wiredtiger_method_entry[] = {
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, __construct, arginfo_phalcon_cache_backend_wiredtiger___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, queryKeys, arginfo_phalcon_cache_backendinterface_querykeys, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, flush, NULL, ZEND_ACC_PUBLIC)
+static const zend_function_entry phalcon_cache_backend_lmdb_method_entry[] = {
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, __construct, arginfo_phalcon_cache_backend_lmdb___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, queryKeys, arginfo_phalcon_cache_backendinterface_querykeys, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, flush, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
 /**
- * Phalcon\Cache\Backend\Wiredtiger initializer
+ * Phalcon\Cache\Backend\Lmdb initializer
  */
-PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Wiredtiger)
+PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Lmdb)
 {
-	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Wiredtiger, cache_backend_wiredtiger, phalcon_cache_backend_ce, phalcon_cache_backend_wiredtiger_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Cache\\Backend, Lmdb, cache_backend_lmdb, phalcon_cache_backend_ce, phalcon_cache_backend_lmdb_method_entry, 0);
 
-	zend_declare_property_null(phalcon_cache_backend_wiredtiger_ce, SL("_table"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_cache_backend_wiredtiger_ce, SL("_config"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_cache_backend_wiredtiger_ce, SL("_wiredtiger"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_cache_backend_wiredtiger_ce, SL("_cursor"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_lmdb_ce, SL("_config"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_lmdb_ce, SL("_lmdb"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cache_backend_lmdb_ce, SL("_lmdb"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_cache_backend_wiredtiger_ce, 1, phalcon_cache_backendinterface_ce);
+	zend_class_implements(phalcon_cache_backend_lmdb_ce, 1, phalcon_cache_backendinterface_ce);
 
 	return SUCCESS;
 }
 
 /**
- * Phalcon\Cache\Backend\Wiredtiger constructor
+ * Phalcon\Cache\Backend\Lmdb constructor
  *
  * @param Phalcon\Cache\FrontendInterface $frontend
  * @param array $options
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, __construct){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, __construct){
 
-	zval *frontend, *options = NULL, home = {}, table = {}, prefixed_table = {}, config = {}, wiredtiger = {}, cursor = {};
+	zval *frontend, *options = NULL, path = {}, name = {}, lmdb = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &options);
 
@@ -129,35 +133,26 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, __construct){
 		return;
 	}
 
-	if (!phalcon_array_isset_fetch_str(&home, options, SL("home"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'home' is required");
-		return;
+	if (!phalcon_array_isset_fetch_str(&lmdb, options, SL("lmdb"), PH_COPY)) {
+		if (!phalcon_array_isset_fetch_str(&path, options, SL("path"), PH_READONLY)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'path' is required");
+			return;
+		}
+
+		if (!phalcon_array_isset_fetch_str(&name, options, SL("name"), PH_READONLY)) {
+			ZVAL_NULL(&name);
+		}
+
+		object_init_ex(&lmdb, phalcon_storage_lmdb_ce);
+		PHALCON_CALL_METHOD(NULL, &lmdb, "__construct", &path, &name);
+	} else {
+		PHALCON_VERIFY_CLASS(&lmdb, phalcon_storage_lmdb_ce);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&table, options, SL("table"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "The parameter 'table' is required");
-		return;
-	}
+	phalcon_update_property(getThis(), SL("_lmdb"), &lmdb);
+	zval_ptr_dtor(&lmdb);
 
-	PHALCON_CONCAT_SV(&prefixed_table, "table:", &table);
-	ZVAL_STRING(&config, "key_format=S,value_format=Si");
-
-	phalcon_update_property(getThis(), SL("_table"), &prefixed_table);
-	phalcon_update_property(getThis(), SL("_config"), &config);
-
-	object_init_ex(&wiredtiger, phalcon_storage_wiredtiger_ce);
-	PHALCON_CALL_METHOD(NULL, &wiredtiger, "__construct", &home);
-	PHALCON_CALL_METHOD(NULL, &wiredtiger, "create", &prefixed_table, &config);
-	PHALCON_CALL_METHOD(&cursor, &wiredtiger, "open", &prefixed_table);
-
-	phalcon_update_property(getThis(), SL("_wiredtiger"), &wiredtiger);
-	phalcon_update_property(getThis(), SL("_cursor"), &cursor);
-	zval_ptr_dtor(&wiredtiger);
-	zval_ptr_dtor(&cursor);
-
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_wiredtiger_ce, getThis(), "__construct", frontend, options);
-	zval_ptr_dtor(&prefixed_table);
-	zval_ptr_dtor(&config);
+	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_lmdb_ce, getThis(), "__construct", frontend, options);
 }
 
 /**
@@ -166,16 +161,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, __construct){
  * @param int|string $keyName
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, get){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get){
 
-	zval *key_name, cursor = {}, frontend = {}, cached_content = {}, val = {}, expired = {};
+	zval *key_name, lmdb = {}, frontend = {}, cached_content = {}, val = {}, expired = {};
 	long int now;
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
-	PHALCON_CALL_METHOD(&cached_content, &cursor, "get", key_name);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+	PHALCON_CALL_METHOD(&cached_content, &lmdb, "get", key_name);
 	if (Z_TYPE(cached_content) != IS_ARRAY) {
 		RETURN_NULL();
 	}
@@ -188,9 +184,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, get){
 
 	if (phalcon_array_isset_fetch_long(&expired, &cached_content, 1, PH_READONLY)) {
 		if (phalcon_get_intval(&expired) < now) {
-			PHALCON_CALL_METHOD(NULL, &cursor, "delete", key_name);
+			PHALCON_CALL_METHOD(NULL, &lmdb, "delete", key_name);
 		}
 	}
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 	zval_ptr_dtor(&cached_content);
 
 	if (PHALCON_IS_NOT_EMPTY(&val)) {
@@ -203,17 +200,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, get){
 }
 
 /**
- * Stores cached content into the Wiredtigerd backend and stops the frontend
+ * Stores cached content into the Lmdbd backend and stops the frontend
  *
  * @param int|string $keyName
  * @param string $content
  * @param long $lifetime
  * @param boolean $stopBuffer
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, key = {}, expired = {}, val = {}, prepared_val = {}, cached_content = {}, success = {};
-	zval ttl = {}, is_buffering = {}, frontend = {}, cursor = {};
+	zval ttl = {}, is_buffering = {}, frontend = {}, lmdb = {};
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -240,7 +237,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save){
 	/**
 	 * Check if a connection is created or make a new one
 	 */
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
 	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
@@ -259,11 +256,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save){
 	phalcon_array_append(&cached_content, &prepared_val, PH_READONLY);
 	phalcon_array_append(&cached_content, &expired, PH_READONLY);
 
-	PHALCON_CALL_METHOD(&success, &cursor, "set", key_name, &cached_content);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+	PHALCON_CALL_METHOD(&success, &lmdb, "put", key_name, &cached_content);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 
 	if (!zend_is_true(&success)) {
 		zval_ptr_dtor(&cached_content);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Failed to store data in wiredtiger");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Failed to store data in lmdb");
 		return;
 	}
 
@@ -289,15 +288,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save){
  * @param int|string $keyName
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, delete){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, delete){
 
-	zval *key_name, cursor = {};
+	zval *key_name, lmdb = {};
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
-	PHALCON_CALL_METHOD(return_value, &cursor, "delete", key_name);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+	PHALCON_CALL_METHOD(return_value, &lmdb, "delete", key_name);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 }
 
 /**
@@ -305,17 +306,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, delete){
  *
  * @return array
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, queryKeys){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, queryKeys){
 
-	zval *prefix = NULL, cursor = {};
+	zval *prefix = NULL, lmdb = {}, cursor = {};
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
+
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+	PHALCON_CALL_METHOD(&cursor, &lmdb, "cursor");
 
 	array_init(return_value);
 
-	/* Get the key from wiredtigerd */
 	PHALCON_CALL_METHOD(NULL, &cursor, "rewind");
 	while (1) {
 		zval r0 = {}, key = {};
@@ -330,6 +333,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, queryKeys){
 		}
 		PHALCON_CALL_METHOD(NULL, &cursor, "next");
 	}
+	zval_ptr_dtor(&cursor);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 }
 
 /**
@@ -339,16 +344,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, queryKeys){
  * @param  long $lifetime
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, exists){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, exists){
 
-	zval *key_name, cursor = {}, cached_content = {}, expired = {};
+	zval *key_name, lmdb = {}, cached_content = {}, expired = {};
 	long int now;
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
-	PHALCON_CALL_METHOD(&cached_content, &cursor, "get", key_name);
+	PHALCON_CALL_METHOD(&cached_content, &lmdb, "get", key_name);
 	if (Z_TYPE(cached_content) != IS_ARRAY) {
 		RETURN_FALSE;
 	}
@@ -357,7 +362,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, exists){
 
 	if (phalcon_array_isset_fetch_long(&expired, &cached_content, 1, PH_READONLY)) {
 		if (phalcon_get_intval(&expired) < now) {
-			PHALCON_CALL_METHOD(NULL, &cursor, "delete", key_name);
+			PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+			PHALCON_CALL_METHOD(NULL, &lmdb, "delete", key_name);
+			PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 			RETURN_FALSE;
 		}
 	}
@@ -372,7 +379,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, exists){
  * @param long $value
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, increment){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, increment){
 
 	zval *key_name, *value = NULL, val = {}, tmp = {};
 
@@ -387,8 +394,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, increment){
 
 	PHALCON_CALL_METHOD(&val, getThis(), "get", key_name);
 	phalcon_add_function(&tmp, &val, value);
+	zval_ptr_dtor(&val);
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "save", key_name, &tmp);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "put", key_name, &tmp);
+	zval_ptr_dtor(&tmp);
 }
 
 /**
@@ -398,7 +407,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, increment){
  * @param  long $value
  * @return mixed
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, decrement){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, decrement){
 
 	zval *key_name, *value = NULL, val = {}, tmp = {};
 
@@ -413,8 +422,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, decrement){
 
 	PHALCON_CALL_METHOD(&val, getThis(), "get", key_name);
 	phalcon_sub_function(&tmp, &val, value);
+	zval_ptr_dtor(&val);
 
-	PHALCON_RETURN_CALL_METHOD(getThis(), "save", key_name, &tmp);
+	PHALCON_RETURN_CALL_METHOD(getThis(), "put", key_name, &tmp);
+	zval_ptr_dtor(&tmp);
 }
 
 /**
@@ -422,23 +433,15 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, decrement){
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, flush){
+PHP_METHOD(Phalcon_Cache_Backend_Lmdb, flush){
 
-	zval table = {}, config = {}, wiredtiger = {}, cursor = {};
+	zval lmdb = {};
 
-	phalcon_read_property(&table, getThis(), SL("_table"), PH_READONLY);
-	phalcon_read_property(&config, getThis(), SL("_config"), PH_READONLY);
+	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
-	phalcon_read_property(&wiredtiger, getThis(), SL("_wiredtiger"), PH_READONLY);
-	phalcon_read_property(&cursor, getThis(), SL("_cursor"), PH_READONLY);
-
-	PHALCON_CALL_METHOD(NULL, &cursor, "close");
-	PHALCON_CALL_METHOD(return_value, &wiredtiger, "drop", &table);
-
-	PHALCON_CALL_METHOD(NULL, &wiredtiger, "create", &table, &config);
-	PHALCON_CALL_METHOD(&cursor, &wiredtiger, "open", &table);
-
-	phalcon_update_property(getThis(), SL("_cursor"), &cursor);
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
+	PHALCON_CALL_METHOD(return_value, &lmdb, "drop");
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 
 	RETURN_TRUE;
 }

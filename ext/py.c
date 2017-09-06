@@ -305,6 +305,8 @@ PHP_METHOD(Phalcon_Py, callMethod){
 
 	phalcon_fetch_params(0, 2, 0, &object, &name);
 
+	PHP_PYTHON_THREAD_ACQUIRE();
+
 	intern = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
 	methodname = PyString_FromString(Z_STRVAL_P(name));
 
@@ -330,6 +332,8 @@ PHP_METHOD(Phalcon_Py, callMethod){
 	}
 
 	Py_DECREF(callable);
+
+	PHP_PYTHON_THREAD_RELEASE();
 }
 
 /**

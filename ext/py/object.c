@@ -484,10 +484,12 @@ static HashTable *python_get_properties(zval *object)
 
 	if (!pip->std.properties) {
 		rebuild_object_properties(&pip->std);
+	} else {
+		zend_hash_clean(pip->std.properties);
 	}
 
-	if (zend_hash_num_elements(pip->std.properties) == 0)
-		get_properties(pip->obj, pip->std.properties);
+	//if (zend_hash_num_elements(pip->std.properties) == 0)
+	get_properties(pip->obj, pip->std.properties);
 
 	PHP_PYTHON_THREAD_RELEASE();
 

@@ -301,7 +301,6 @@ PHP_METHOD(Phalcon_Py, callMethod){
 	zval *object, *name;
 	phalcon_py_object_object* intern;
 	PyObject *methodname, *callable, *args, *retval;
-    va_list vargs;
 
 	phalcon_fetch_params(0, 2, 0, &object, &name);
 

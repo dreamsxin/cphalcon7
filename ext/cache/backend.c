@@ -223,10 +223,10 @@ PHP_METHOD(Phalcon_Cache_Backend, getLifetime){
 
 	zval lifetime = {}, frontend = {};
 
-	phalcon_read_property(&lifetime, getThis(), SL("_lastLifetime"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&lifetime, getThis(), SL("_lastLifetime"), PH_NOISY|PH_COPY);
 	if (Z_TYPE(lifetime) != IS_LONG) {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(&lifetime, &frontend, "getlifetime");
 	}
-	RETURN_CTOR(&lifetime);
+	RETURN_ZVAL(&lifetime, 0, 0);
 }

@@ -1198,7 +1198,7 @@ server/exception.c"
 
 	if test "$PHP_STORAGE_LMDB" = "yes"; then
 		AC_DEFINE(PHALCON_USE_LMDB, 1, [Have lmdb support])
-		phalcon_sources="$phalcon_sources storage/lmdb.c storage/lmdb/cursor.c storage/lmdb/mdb.c storage/lmdb/midl.c "
+		phalcon_sources="$phalcon_sources storage/lmdb.c storage/lmdb/cursor.c storage/lmdb/mdb.c storage/lmdb/midl.c cache/backend/lmdb.c "
 	fi
 
 	if test "$PHP_STORAGE_LEVELDB" = "yes"; then

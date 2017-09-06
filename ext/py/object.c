@@ -579,13 +579,13 @@ static int python_call_method(zend_string *method_name, zend_object *object, INT
 
 	return ret;
 }
-
+/*
 static union _zend_function *python_constructor_get(zval *object)
 {
 	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
 	return pip->std.ce->constructor;
 }
-
+*/
 static zend_string* python_get_class_name(const zend_object *object)
 {
 	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj((zend_object*)object);

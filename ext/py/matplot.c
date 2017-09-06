@@ -198,9 +198,6 @@ zend_object* phalcon_py_matplot_object_create_handler(zend_class_entry *ce)
 
 void phalcon_py_matplot_object_free_handler(zend_object *object)
 {
-	phalcon_py_matplot_object *intern;
-
-	intern = phalcon_py_matplot_object_from_obj(object);
 }
 
 /**
@@ -468,7 +465,6 @@ PHP_METHOD(Phalcon_Py_Matplot, fillBetween){
 	zval *x, *y1, *y2, *keywords;
 	phalcon_py_matplot_object *intern;
 	PyObject *xarray, *y1array, *y2array, *args, *kwargs, *res;
-	int size = 0;
 
 	phalcon_fetch_params(0, 4, 0, &x, &y1, &y2, &keywords);
 

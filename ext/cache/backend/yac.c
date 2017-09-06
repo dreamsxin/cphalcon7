@@ -53,7 +53,7 @@
  *
  * //Create the Cache setting yacd connection options
  * $cache = new Phalcon\Cache\Backend\Yac($frontCache, array(
- *		'yac' => new Yac("myproduct_")
+ *		'prefix' => "myproduct_"
  * ));
  *
  * //Cache arbitrary data

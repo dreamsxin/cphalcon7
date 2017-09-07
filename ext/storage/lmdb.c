@@ -44,7 +44,6 @@ zend_class_entry *phalcon_storage_lmdb_ce;
 PHP_METHOD(Phalcon_Storage_Lmdb, __construct);
 PHP_METHOD(Phalcon_Storage_Lmdb, begin);
 PHP_METHOD(Phalcon_Storage_Lmdb, commit);
-PHP_METHOD(Phalcon_Storage_Lmdb, abort);
 PHP_METHOD(Phalcon_Storage_Lmdb, renew);
 PHP_METHOD(Phalcon_Storage_Lmdb, reset);
 PHP_METHOD(Phalcon_Storage_Lmdb, getAll);
@@ -65,7 +64,6 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_begin, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_get, 0, 0, 1)
@@ -95,7 +93,6 @@ static const zend_function_entry phalcon_storage_lmdb_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Lmdb, __construct, arginfo_phalcon_storage_lmdb___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Storage_Lmdb, begin, arginfo_phalcon_storage_lmdb_begin, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, commit, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Lmdb, abort, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, renew, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, reset, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, getAll, NULL, ZEND_ACC_PUBLIC)
@@ -128,12 +125,12 @@ void phalcon_storage_lmdb_object_free_handler(zend_object *object)
 	phalcon_storage_lmdb_object *intern;
 
 	intern = phalcon_storage_lmdb_object_from_obj(object);
-	/*
-	if (intern->txn) {
-		mdb_txn_abort(intern->txn);
-		intern->txn = NULL;
+
+	if (intern->dbi) {
+		mdb_dbi_close(intern->env, intern->dbi);
+		intern->dbi = 0;
 	}
-	*/
+
 	if (intern->env) {
 		mdb_env_close(intern->env);
 		intern->env = NULL;
@@ -231,6 +228,10 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 
 	phalcon_fetch_params(0, 1, 4, &path, &name, &readers, &mapsize, &_flags);
 
+	if (!name) {
+		name = &PHALCON_GLOBAL(z_null);
+	}
+
 	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
 		flags = Z_LVAL_P(_flags);
 	}
@@ -240,10 +241,6 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	}
 
 	phalcon_update_property(getThis(), SL("_path"), path);
-
-	if (name && Z_TYPE_P(name) == IS_STRING) {
-		phalcon_update_property(getThis(), SL("_name"), name);
-	}
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
 
@@ -268,6 +265,31 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", Z_STRVAL_P(path));
 		return;
 	}
+
+	rc = mdb_txn_begin(intern->env, NULL, 0, &intern->txn);
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a transaction for use with the environment (%s)", mdb_strerror(rc));
+		return;
+	}
+
+	if (Z_TYPE_P(name) == IS_STRING) {
+		phalcon_update_property(getThis(), SL("_name"), name);
+		rc = mdb_dbi_open(intern->txn, Z_STRVAL_P(name), MDB_CREATE, &intern->dbi);
+	} else {
+		rc = mdb_dbi_open(intern->txn, NULL, 0, &intern->dbi);
+	}
+
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open a database in the environment (%s)", mdb_strerror(rc));
+		return;
+	}
+
+	rc = mdb_txn_commit(intern->txn);
+
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdb_strerror(rc));
+		return;
+	}
 }
 
 /**
@@ -276,11 +298,11 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, begin)
 {
-	zval *flags = NULL, *_name = NULL, name = {};
+	zval *flags = NULL;
 	phalcon_storage_lmdb_object *intern;
 	int rc;
 
-	phalcon_fetch_params(0, 0, 2, &flags, &_name);
+	phalcon_fetch_params(0, 0, 1, &flags);
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
 	if (flags && Z_TYPE_P(flags) == IS_LONG) {
@@ -292,21 +314,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, begin)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a transaction for use with the environment (%s)", mdb_strerror(rc));
 		return;
 	}
-
-	if (_name && Z_TYPE_P(_name) == IS_STRING) {
-		ZVAL_COPY_VALUE(&name, _name);
-	} else {
-		phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
-	}
-	if (Z_TYPE(name) == IS_STRING) {
-		rc = mdb_dbi_open(intern->txn, Z_STRVAL(name), MDB_CREATE, &intern->dbi);
-	} else {
-		rc = mdb_dbi_open(intern->txn, NULL, 0, &intern->dbi);
-	}
-	if (rc != MDB_SUCCESS) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open a database in the environment (%s)", mdb_strerror(rc));
-		return;
-	}
+	RETURN_TRUE;
 }
 
 /**
@@ -325,20 +333,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, commit)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdb_strerror(rc));
 		return;
 	}
-}
-
-/**
- * Abandon all the operations of the transaction instead of saving them
- *
- */
-PHP_METHOD(Phalcon_Storage_Lmdb, abort)
-{
-	phalcon_storage_lmdb_object *intern;
-
-	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
-
-	mdb_dbi_close(intern->env, intern->dbi);
-	mdb_txn_abort(intern->txn);
+	RETURN_TRUE;
 }
 
 /**

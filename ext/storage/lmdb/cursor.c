@@ -82,7 +82,7 @@ void phalcon_storage_lmdb_cursor_object_free_handler(zend_object *object)
 }
 
 /**
- * Phalcon\Storage\Lmdb_Cursor initializer
+ * Phalcon\Storage\Lmdb\Cursor initializer
  */
 PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb_Cursor){
 

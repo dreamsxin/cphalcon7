@@ -463,6 +463,8 @@
 #include "storage/datrie.h"
 #include "storage/lmdb.h"
 #include "storage/lmdb/cursor.h"
+#include "storage/libmdbx.h"
+#include "storage/libmdbx/cursor.h"
 #include "storage/leveldb.h"
 #include "storage/leveldb/iterator.h"
 #include "storage/leveldb/writebatch.h"

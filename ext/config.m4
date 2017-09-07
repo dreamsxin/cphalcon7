@@ -123,6 +123,16 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(storage-libmdbx, whether to enable storage libmdbx support,
+[  --enable-storage-libmdbx   Enable storage libmdbx support], no, no)
+
+if test "$PHP_STORAGE_LIBMDBX" = "yes"; then
+	AC_DEFINE([PHALCON_STORAGE_LIBMDBX], [1], [Whether storage libmdbx are available])
+	AC_MSG_RESULT([yes, storage libmdbx])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(storage-leveldb, whether to enable storage leveldb support,
 [  --enable-storage-leveldb   Enable storage leveldb support], no, no)
 
@@ -1199,6 +1209,11 @@ server/exception.c"
 	if test "$PHP_STORAGE_LMDB" = "yes"; then
 		AC_DEFINE(PHALCON_USE_LMDB, 1, [Have lmdb support])
 		phalcon_sources="$phalcon_sources storage/lmdb.c storage/lmdb/cursor.c storage/lmdb/mdb.c storage/lmdb/midl.c cache/backend/lmdb.c "
+	fi
+
+	if test "$PHP_STORAGE_LIBMDBX" = "yes"; then
+		AC_DEFINE(PHALCON_USE_LIBMDBX, 1, [Have libmdbx support])
+		phalcon_sources="$phalcon_sources storage/libmdbx.c storage/libmdbx/cursor.c storage/libmdbx/mdbx.c storage/libmdbx/osal.c storage/libmdbx/lck.c storage/libmdbx/version.c "
 	fi
 
 	if test "$PHP_STORAGE_LEVELDB" = "yes"; then

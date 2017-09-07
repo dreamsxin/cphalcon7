@@ -600,6 +600,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Storage_Lmdb);
 	PHALCON_INIT(Phalcon_Storage_Lmdb_Cursor);
 #endif
+#if PHALCON_USE_LIBMDBX
+	PHALCON_INIT(Phalcon_Storage_Libmdbx);
+	PHALCON_INIT(Phalcon_Storage_Libmdbx_Cursor);
+#endif
 
 #if PHALCON_USE_LEVELDB
 	PHALCON_INIT(Phalcon_Storage_Leveldb);
@@ -745,6 +749,10 @@ static PHP_MINFO_FUNCTION(phalcon)
 
 #if PHALCON_USE_LMDB
 	php_info_print_table_row(2, "Storage Lmdb", "enabled");
+#endif
+
+#if PHALCON_USE_LIBMDBX
+	php_info_print_table_row(2, "Storage Libmdbx", "enabled");
 #endif
 
 #if PHALCON_USE_BLOOMFILTER

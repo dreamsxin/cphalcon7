@@ -173,6 +173,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get){
 	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
 	PHALCON_CALL_METHOD(&cached_content, &lmdb, "get", key_name);
 	if (Z_TYPE(cached_content) != IS_ARRAY) {
+		PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 		RETURN_NULL();
 	}
 
@@ -353,23 +354,25 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, exists){
 
 	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
+	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
 	PHALCON_CALL_METHOD(&cached_content, &lmdb, "get", key_name);
 	if (Z_TYPE(cached_content) != IS_ARRAY) {
+		PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 		RETURN_FALSE;
 	}
+
+	RETVAL_TRUE;
 
 	now = (long int)time(NULL);
 
 	if (phalcon_array_isset_fetch_long(&expired, &cached_content, 1, PH_READONLY)) {
 		if (phalcon_get_intval(&expired) < now) {
-			PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
 			PHALCON_CALL_METHOD(NULL, &lmdb, "delete", key_name);
-			PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
-			RETURN_FALSE;
+			RETVAL_FALSE;
 		}
 	}
 
-	RETURN_TRUE;
+	PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
 }
 
 /**

@@ -71,46 +71,26 @@ Follow these instructions to generate a binary extension for your platform:
 git clone git://github.com/dreamsxin/cphalcon7.git
 cd cphalcon7/ext
 phpize
+
 ./configure --enable-chart=yes
+
+# or custom php path
+./configure --with-php-config=/usr/local/php/bin/php-config
+
 # or debug
 ./configure CFLAGS="-g3 -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"
+
 make -j4
 sudo make install
 ```
 
-Custom php path:
+Other options:
 ```shell
-# or
-/usr/local/php/bin/phpize
-./configure --with-php-config=/usr/local/php/bin/php-config
-# enable chart
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-chart=yes
-# disable qrcode
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-qrcode=no
-# enable process
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-process=yes
-# enable intrusive
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-intrusive=yes
-# enable yac cache
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-cache-yac=yes
-# enable storage btree
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-btree=yes
-# enable storage wiredtiger
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-wiredtiger=yes
-# enable storage bloomfilter
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-bloomfilter=yes
-# enable storage datrie
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-datrie=yes
-# enable storage LMDB
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-lmdb=yes
-# enable storage leveldb
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-storage-leveldb=yes
-# enable websocket
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-websocket=yes
-# enable server
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-server=yes
-# enable python
-./configure --with-php-config=/usr/local/php/bin/php-config --enable-python=yes
+./configure --enable-chart=yes --enable-qrcode=no --enable-process=yes \
+--enable-intrusive=yes --enable-cache-yac=yes --enable-storage-btree=yes \
+--enable-storage-wiredtiger=yes --enable-storage-bloomfilter=yes --enable-storage-datrie=yes \
+--enable-storage-lmdb=yes --enable-storage-leveldb=yes --enable-websocket=yes \
+--enable-server=yes --enable-python=yes
 make -j4
 sudo make install
 ```

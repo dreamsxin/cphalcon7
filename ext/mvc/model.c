@@ -1962,13 +1962,11 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		phalcon_array_update(&params, &key, &value, 0);
 		zval_ptr_dtor(&key);
 
-		if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_READONLY)) {
+		if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_CTOR) || Z_TYPE(bind) != IS_ARRAY) {
 			array_init(&bind);
-			phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
-			phalcon_array_update_str(&params, SL("bind"), &bind, 0);
-		} else {
-			phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
 		}
+		phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
+		phalcon_array_update_str(&params, SL("bind"), &bind, 0);
 		zval_ptr_dtor(&bind_key);
 	}
 

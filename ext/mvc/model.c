@@ -1541,7 +1541,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 					switch(Z_LVAL(field_type)) {
 						case PHALCON_DB_COLUMN_TYPE_JSON:
-							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 0));
+							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
 							break;
 						case PHALCON_DB_COLUMN_TYPE_BYTEA:
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);

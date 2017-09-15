@@ -1457,8 +1457,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getTable){
 
 	if (phalcon_array_isset_fetch_str(&model_name, qualified_name, SL("name"), PH_READONLY)) {
 		PHALCON_CALL_METHOD(&model, manager, "load", &model_name);
-		PHALCON_CALL_METHOD(&source, &model, "getsource");
-		PHALCON_CALL_METHOD(&schema, &model, "getschema");
+		PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
+		PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
 		zval_ptr_dtor(&model);
 		if (zend_is_true(&schema)) {
 			array_init_size(return_value, 2);
@@ -1491,8 +1491,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoin){
 			phalcon_array_fetch_string(&model_name, &qualified, IS(name), PH_NOISY|PH_READONLY);
 
 			PHALCON_CALL_METHOD(&model, manager, "load", &model_name);
-			PHALCON_CALL_METHOD(&source, &model, "getsource");
-			PHALCON_CALL_METHOD(&schema, &model, "getschema");
+			PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
+			PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
 
 			array_init_size(return_value, 4);
 			phalcon_array_update_str(return_value, SL("schema"), &schema, 0);
@@ -1734,7 +1734,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getMultiJoin){
 	/**
 	 * Source of the related model
 	 */
-	PHALCON_CALL_METHOD(&intermediate_source, &intermediate_model, "getsource");
+	PHALCON_CALL_METHOD(&intermediate_source, &intermediate_model, "getsource", getThis());
 
 	/**
 	 * Update the internal sqlAliases to set up the intermediate model
@@ -2498,8 +2498,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 		/**
 		 * Define a complete schema/source
 		 */
-		PHALCON_CALL_METHOD(&schema, &model, "getschema");
-		PHALCON_CALL_METHOD(&source, &model, "getsource");
+		PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
+		PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
 
 		/**
 		 * Obtain the real source including the schema
@@ -2810,8 +2810,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareInsert){
 
 	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
 	zval_ptr_dtor(&manager);
-	PHALCON_CALL_METHOD(&source, &model, "getsource");
-	PHALCON_CALL_METHOD(&schema, &model, "getschema");
+	PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
+	PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
 
 	if (zend_is_true(&schema)) {
 		array_init_size(&table, 2);
@@ -2973,8 +2973,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareUpdate){
 		 */
 		PHALCON_CALL_METHOD(&model, &manager, "load", &real_model_name);
 		zval_ptr_dtor(&real_model_name);
-		PHALCON_CALL_METHOD(&source, &model, "getsource");
-		PHALCON_CALL_METHOD(&schema, &model, "getschema");
+		PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
+		PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
 
 		/**
 		 * Create a full source representation including schema
@@ -3156,8 +3156,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareDelete){
 		 */
 		PHALCON_CALL_METHOD(&model, &manager, "load", &real_model_name);
 		zval_ptr_dtor(&real_model_name);
-		PHALCON_CALL_METHOD(&source, &model, "getsource");
-		PHALCON_CALL_METHOD(&schema, &model, "getschema");
+		PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
+		PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
 
 		array_init(&complete_source);
 		phalcon_array_append(&complete_source, &source, 0);
@@ -4014,8 +4014,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				PHALCON_CALL_METHOD(&sequence_name, &model, "getsequencename");
 			} else {
 				zval schema = {}, source = {};
-				PHALCON_CALL_METHOD(&schema, &model, "getschema");
-				PHALCON_CALL_METHOD(&source, &model, "getsource");
+				PHALCON_CALL_METHOD(&schema, &model, "getschema", getThis());
+				PHALCON_CALL_METHOD(&source, &model, "getsource", getThis());
 
 				if (PHALCON_IS_EMPTY(&schema)) {
 					PHALCON_CONCAT_VSVS(&sequence_name, &source, "_", &identity_field, "_seq");
@@ -4960,9 +4960,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 		}
 
 		if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", &intermediate, bind_params, bind_types);
+			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
 		} else {
-			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", &intermediate, bind_params, bind_types);
+			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
 		}
 
 		zval_ptr_dtor(&models_instances);
@@ -4981,9 +4981,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 		}
 
 		if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", &intermediate, bind_params, bind_types);
+			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
 		} else {
-			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", &intermediate, bind_params, bind_types);
+			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
 		}
 	} else {
 		array_init(&connections);
@@ -4996,9 +4996,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 			}
 
 			if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-				PHALCON_CALL_METHOD(&tmp_conn, &model, "getreadconnection");
+				PHALCON_CALL_METHOD(&tmp_conn, &model, "getreadconnection", getThis());
 			} else {
-				PHALCON_CALL_METHOD(&tmp_conn, &model, "getwriteconnection");
+				PHALCON_CALL_METHOD(&tmp_conn, &model, "getwriteconnection", getThis());
 			}
 
 			if (Z_TYPE(connection) != IS_OBJECT) {

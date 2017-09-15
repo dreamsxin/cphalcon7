@@ -69,6 +69,7 @@ PHP_METHOD(Phalcon_Config, offsetUnset);
 PHP_METHOD(Phalcon_Config, merge);
 PHP_METHOD(Phalcon_Config, toArray);
 PHP_METHOD(Phalcon_Config, count);
+PHP_METHOD(Phalcon_Config, setup);
 PHP_METHOD(Phalcon_Config, __wakeup);
 PHP_METHOD(Phalcon_Config, __set_state);
 
@@ -92,6 +93,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_toarray, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_setup, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config___wakeup, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
@@ -106,6 +111,7 @@ static const zend_function_entry phalcon_config_method_entry[] = {
 	PHP_ME(Phalcon_Config, merge, arginfo_phalcon_config_merge, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, toArray, arginfo_phalcon_config_toarray, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, count, arginfo_countable_count, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Config, setup, arginfo_phalcon_config_setup, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Config, __wakeup, arginfo_phalcon_config___wakeup, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Config, __set_state, arginfo___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_MALIAS(Phalcon_Config, __get, offsetGet, arginfo___get, ZEND_ACC_PUBLIC)
@@ -121,6 +127,8 @@ static const zend_function_entry phalcon_config_method_entry[] = {
 PHALCON_INIT_CLASS(Phalcon_Config){
 
 	PHALCON_REGISTER_CLASS(Phalcon, Config, config, phalcon_config_method_entry, 0);
+
+	zend_declare_property_bool(phalcon_config_ce, SL("_recursive"), 1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_config_ce, 2, zend_ce_arrayaccess, spl_ce_Countable);
 
@@ -150,11 +158,13 @@ PHP_METHOD(Phalcon_Config, __construct){
  */
 PHP_METHOD(Phalcon_Config, val){
 
-	zval *array_config, *value;
+	zval *array_config, *value, recursive = {};
 	zend_string *str_key;
 	ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &array_config);
+
+	phalcon_read_static_property_ce(&recursive, phalcon_config_ce, SL("_recursive"), PH_READONLY);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array_config), idx, str_key, value) {
 		zval key = {}, instance = {};
@@ -164,7 +174,7 @@ PHP_METHOD(Phalcon_Config, val){
 			ZVAL_LONG(&key, idx);
 		}
 
-		if (Z_TYPE_P(value) == IS_ARRAY) {
+		if (Z_TYPE_P(value) == IS_ARRAY && zend_is_true(&recursive)) {
 			object_init_ex(&instance, phalcon_config_ce);
 			PHALCON_CALL_METHOD(NULL, &instance, "__construct", value);
 			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, &instance);
@@ -387,6 +397,17 @@ PHP_METHOD(Phalcon_Config, count)
 	phalcon_get_object_vars(&arr, getThis(), 0);
 	RETVAL_LONG(phalcon_fast_count_int(&arr));
 	zval_ptr_dtor(&arr);
+}
+
+PHP_METHOD(Phalcon_Config, setup)
+{
+	zval *options, recursive = {};
+
+	phalcon_fetch_params(0, 1, 0, &options);
+
+	if (phalcon_array_isset_fetch_str(&recursive, options, SL("recursive"), PH_READONLY)) {
+		phalcon_update_static_property_ce(phalcon_config_ce, SL("_recursive"), &recursive);
+	}
 }
 
 PHP_METHOD(Phalcon_Config, __wakeup)

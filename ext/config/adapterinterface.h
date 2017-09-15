@@ -35,6 +35,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_config_adapterinterface_load, 0, 0, 1)
 	ZEND_ARG_INFO(0, filePath)
 	ZEND_ARG_INFO(0, absolutePath)
+	ZEND_ARG_INFO(0, recursive)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_CONFIG_ADAPTERINTERFACE_H */

@@ -754,11 +754,26 @@ PHP_METHOD(Phalcon_Mvc_Model, setSource){
 /**
  * Returns table name mapped in the model
  *
+ * @param Phalcon\Mvc\Model\Query $query
  * @return string
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSource){
 
-	zval models_manager = {};
+	zval *query = NULL, models_manager = {};
+
+	phalcon_fetch_params(0, 0, 1, &query);
+
+	if (!query) {
+		query = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (phalcon_method_exists_ex(getThis(), SL("selectsource")) == SUCCESS) {
+		PHALCON_CALL_METHOD(return_value, getThis(), "selectsource", query);
+		if (Z_TYPE_P(return_value) != IS_STRING) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSource' didn't returned a valid source");
+		}
+		return;
+	}
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelsource", getThis());
@@ -786,11 +801,26 @@ PHP_METHOD(Phalcon_Mvc_Model, setSchema){
 /**
  * Returns schema name where table mapped is located
  *
+ * @param Phalcon\Mvc\Model\Query $query
  * @return string
  */
 PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
-	zval models_manager = {};
+	zval *query = NULL, models_manager = {};
+
+	phalcon_fetch_params(0, 0, 1, &query);
+
+	if (!query) {
+		query = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (phalcon_method_exists_ex(getThis(), SL("selectschema")) == SUCCESS) {
+		PHALCON_CALL_METHOD(return_value, getThis(), "selectschema", query);
+		if (Z_TYPE_P(return_value) != IS_STRING) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSchema' didn't returned a valid schema");
+		}
+		return;
+	}
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelschema", getThis());
@@ -1239,6 +1269,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getDirtyState){
 /**
  * Gets the connection used to read data for the model
  *
+ * @param Phalcon\Mvc\Model\Query $query
  * @param array $intermediate
  * @param array $bindParams
  * @param array $bindTypes
@@ -1246,9 +1277,13 @@ PHP_METHOD(Phalcon_Mvc_Model, getDirtyState){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 
-	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, transaction = {}, models_manager = {};
+	zval *query = NULL, *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, transaction = {}, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 3, &intermediate, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 0, 4, &query, &intermediate, &bind_params, &bind_types);
+
+	if (!query) {
+		query = &PHALCON_GLOBAL(z_null);
+	}
 
 	if (!intermediate) {
 		intermediate = &PHALCON_GLOBAL(z_null);
@@ -1273,7 +1308,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "selectreadconnection", intermediate, bind_params, bind_types);
+		PHALCON_CALL_METHOD(return_value, getThis(), "selectreadconnection", query, intermediate, bind_params, bind_types);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectReadConnection' didn't returned a valid connection");
 		}
@@ -1288,6 +1323,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 /**
  * Gets the connection used to write data to the model
  *
+ * @param Phalcon\Mvc\Model\Query $query
  * @param array $intermediate
  * @param array $bindParams
  * @param array $bindTypes
@@ -1295,9 +1331,13 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 
-	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, transaction = {}, models_manager = {};
+	zval *query = NULL, *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, transaction = {}, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 3, &intermediate, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 0, 4, &query, &intermediate, &bind_params, &bind_types);
+
+	if (!query) {
+		query = &PHALCON_GLOBAL(z_null);
+	}
 
 	if (!intermediate) {
 		intermediate = &PHALCON_GLOBAL(z_null);
@@ -1323,7 +1363,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "selectwriteconnection", intermediate, bind_params, bind_types);
+		PHALCON_CALL_METHOD(return_value, getThis(), "selectwriteconnection", query, intermediate, bind_params, bind_types);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectWriteConnection' didn't returned a valid connection");
 		}

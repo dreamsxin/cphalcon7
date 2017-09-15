@@ -90,6 +90,18 @@ class ConfigTest extends PHPUnit_Framework_TestCase
 		);
 		$config = new Phalcon\Config\Adapter\Ini('unit-tests/config/config2.ini');
 		$this->assertTrue($this->_compareConfig($data, $config));
+
+		$data = array(
+			'phalcon7' => array(
+				'core' => array(
+					array('version' => 1, 'debug' => 1)
+				)
+			)
+		);
+		Phalcon\Config::setup(array('recursive' => false));
+		$config = new Phalcon\Config\Adapter\Ini('unit-tests/config/config2.ini');
+		Phalcon\Config::setup(array('recursive' => true));
+		$this->assertEquals($data, $config->toArray());
 	}
 
 	public function testStandardConfig()

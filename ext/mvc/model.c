@@ -1581,7 +1581,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 					switch(Z_LVAL(field_type)) {
 						case PHALCON_DB_COLUMN_TYPE_JSON:
-							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 0));
+							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
 							break;
 						case PHALCON_DB_COLUMN_TYPE_BYTEA:
 							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);
@@ -1838,7 +1838,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
  */
 PHP_METHOD(Phalcon_Mvc_Model, find){
 
-	zval *parameters = NULL, model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {};
+	zval *parameters = NULL, dependency_injector = {}, model_name = {}, service_name = {}, manager = {}, model = {};
 	zval params = {}, builder = {}, event_name = {}, query = {}, cache = {}, hydration = {};
 
 	phalcon_fetch_params(0, 0, 1, &parameters);
@@ -1851,10 +1851,8 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 			phalcon_array_append(&params, parameters, PH_COPY);
 		}
 	} else {
-		ZVAL_COPY(&params, parameters);
+		ZVAL_DUP(&params, parameters);
 	}
-
-	phalcon_get_called_class(&model_name);
 
 	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 
@@ -1862,6 +1860,8 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
+
+	phalcon_get_called_class(&model_name);
 
 	ZVAL_STR(&service_name, IS(modelsManager));
 
@@ -2002,13 +2002,11 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 		phalcon_array_update(&params, &key, &value, 0);
 		zval_ptr_dtor(&key);
 
-		if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_READONLY)) {
+		if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_CTOR) || Z_TYPE(bind) != IS_ARRAY) {
 			array_init(&bind);
-			phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
-			phalcon_array_update_str(&params, SL("bind"), &bind, 0);
-		} else {
-			phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
 		}
+		phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
+		phalcon_array_update_str(&params, SL("bind"), &bind, 0);
 		zval_ptr_dtor(&bind_key);
 	}
 

@@ -419,8 +419,9 @@ PHP_METHOD(Phalcon_Py_Matplot, plot){
 	size = zend_hash_num_elements(Z_ARRVAL_P(_x));
 
 	if (!_y || Z_TYPE_P(_y) == IS_NULL) {
+		int i;
 		xarray = PyList_New(size);
-		for (int i = 0; i < size; i++) {
+		for (i = 0; i < size; i++) {
 			PyList_SetItem(xarray, (Py_ssize_t)i, PyInt_FromLong(i));
 		}
 		yarray = pip_hash_to_list(_x);

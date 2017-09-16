@@ -79,7 +79,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_array, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_path, 0, 0, 2)
-	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
+	ZEND_ARG_INFO(0, array)
 	ZEND_ARG_INFO(0, path)
 	ZEND_ARG_INFO(0, default_value)
 	ZEND_ARG_INFO(0, delimiter)
@@ -99,7 +99,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_range, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_get, 0, 0, 2)
-	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
+	ZEND_ARG_INFO(0, array)
 	ZEND_ARG_INFO(0, key)
 	ZEND_ARG_INFO(0, default_value)
 ZEND_END_ARG_INFO()
@@ -323,22 +323,24 @@ PHP_METHOD(Phalcon_Arr, is_array){
  */
 PHP_METHOD(Phalcon_Arr, path){
 
-	zval *array, *path, *default_value = NULL, *_delimiter = NULL, delimiter = {}, is_array = {}, keys = {};
+	zval *array, *path, *default_value = NULL, *_delimiter = NULL, delimiter = {}, keys = {};
 	zval values = {};
 
 	phalcon_fetch_params(0, 2, 2, &array, &path, &default_value, &_delimiter);
+
+	if (!default_value) {
+		default_value = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(array) != IS_ARRAY) {
+		RETURN_CTOR(default_value);
+	}
 	PHALCON_SEPARATE_PARAM(array);
 
 	if (!_delimiter || Z_TYPE_P(_delimiter) == IS_NULL) {
 		phalcon_read_static_property_ce(&delimiter, phalcon_arr_ce, SL("delimiter"), PH_READONLY);
 	} else {
 		ZVAL_COPY_VALUE(&delimiter, _delimiter);
-	}
-
-	PHALCON_CALL_SELF(&is_array, "is_array", array);
-
-	if (!zend_is_true(&is_array)) {
-		goto end;
 	}
 
 	if (Z_TYPE_P(path) == IS_ARRAY) {
@@ -363,8 +365,7 @@ PHP_METHOD(Phalcon_Arr, path){
 
 		if (phalcon_array_isset_fetch(&values, array, &key, PH_READONLY)) {
 			if (phalcon_fast_count_ev(&keys) > 0) {
-				PHALCON_CALL_SELF(&is_array, "is_array", &values);
-				if (zend_is_true(&is_array)) {
+				if (Z_TYPE(values) == IS_ARRAY) {
 					array = &values;
 				} else {
 					// Unable to dig deeper
@@ -383,10 +384,12 @@ PHP_METHOD(Phalcon_Arr, path){
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), arr) {
 				zval value = {};
 
-				PHALCON_CALL_SELF(&value, "path", arr, &keys);
+				if (Z_TYPE_P(arr) == IS_ARRAY) {
+					PHALCON_CALL_SELF(&value, "path", arr, &keys);
 
-				if (Z_TYPE(value) != IS_NULL) {
-					phalcon_array_append(return_value, &value, 0);
+					if (Z_TYPE(value) != IS_NULL) {
+						phalcon_array_append(return_value, &value, 0);
+					}
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -408,12 +411,7 @@ PHP_METHOD(Phalcon_Arr, path){
 	} while (phalcon_fast_count_ev(&keys));
 	zval_ptr_dtor(&keys);
 
-end:
-	if (default_value) {
-		RETURN_CTOR(default_value);
-	}
-
-	RETURN_NULL();
+	RETURN_CTOR(default_value);
 }
 
 /**
@@ -582,7 +580,7 @@ PHP_METHOD(Phalcon_Arr, range){
  *	$username = \Phalcon\Arr::get($_POST, 'username');
  *</code>
  *
- * @param array $array
+ * @param array|object $array
  * @param string|array|\Closure $key
  * @param mixed $default_value
  * @return mixed
@@ -623,20 +621,45 @@ PHP_METHOD(Phalcon_Arr, get){
 			RETURN_CTOR(&value);
 		}
 	} else if (Z_TYPE_P(array) == IS_OBJECT) {
-		if (Z_TYPE_P(keys) == IS_ARRAY) {
-			array_init(return_value);
+		if (phalcon_instance_of_ev(array, zend_ce_arrayaccess)) {
+			if (Z_TYPE_P(keys) == IS_ARRAY) {
+				array_init(return_value);
 
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
-				zval value0 = {};
-				if (phalcon_property_isset_fetch_zval(&value0, array, key, PH_READONLY)) {
-					phalcon_array_update(return_value, key, &value0, PH_COPY);
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
+					zval exists = {}, value0 = {};
+					PHALCON_CALL_METHOD(&exists, array, "offsetexists", key);
+					if (zend_is_true(&exists)) {
+						PHALCON_CALL_METHOD(&value0, array, "offsetget", key);
+						phalcon_array_update(return_value, key, &value0, 0);
+					}
+				} ZEND_HASH_FOREACH_END();
+				if (phalcon_fast_count_ev(return_value)) {
+					return;
 				}
-			} ZEND_HASH_FOREACH_END();
-			if (phalcon_fast_count_ev(return_value)) {
-				return;
+			} else {
+				zval exists = {};
+				PHALCON_CALL_METHOD(&exists, array, "offsetexists", keys);
+				if (zend_is_true(&exists)) {
+					PHALCON_CALL_METHOD(return_value, array, "offsetget", keys);
+					return;
+				}
 			}
-		} else if (phalcon_property_isset_fetch_zval(&value, array, keys, PH_READONLY)) {
-			RETURN_CTOR(&value);
+		} else {
+			if (Z_TYPE_P(keys) == IS_ARRAY) {
+				array_init(return_value);
+
+				ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(keys), key) {
+					zval value0 = {};
+					if (phalcon_property_isset_fetch_zval(&value0, array, key, PH_READONLY)) {
+						phalcon_array_update(return_value, key, &value0, PH_COPY);
+					}
+				} ZEND_HASH_FOREACH_END();
+				if (phalcon_fast_count_ev(return_value)) {
+					return;
+				}
+			} else if (phalcon_property_isset_fetch_zval(&value, array, keys, PH_READONLY)) {
+				RETURN_CTOR(&value);
+			}
 		}
 	}
 

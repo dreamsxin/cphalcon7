@@ -569,7 +569,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeBytea){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 
-	zval *value, *type = NULL, ret = {}, search = {}, replace = {};
+	zval *value, *type = NULL, *constant, ret = {}, search = {}, replace = {};
 
 	phalcon_fetch_params(0, 1, 1, &value, &type);
 
@@ -577,7 +577,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 		RETURN_NULL();
 	}
 
-	RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, 1));
+	if ((constant = zend_get_constant_str(SL("JSON_UNESCAPED_UNICODE"))) != NULL) {
+		RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, Z_LVAL_P(constant)));
+	} else {
+		RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, 0));
+	}
 
 	array_init_size(&search, 2);
 	phalcon_array_append_str(&search, SL("["), 0);

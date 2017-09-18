@@ -247,9 +247,10 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 
 	zval *record, *values, *excepts = NULL, conditions = {}, bind_params = {};
-	zval tmp_condition = {}, number = {}, *value = NULL, join_conditions = {}, params = {};
+	zval tmp_condition = {}, number = {}, *value = NULL, join_conditions = {}, cache = {}, params = {};
 	zend_string *str_key;
 	ulong idx;
+	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
 	phalcon_fetch_params(0, 2, 1, &record, &values, &excepts);
 
@@ -320,11 +321,13 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 	/**
 	 * We don't trust the user, so we pass the parameters as bound parameters
 	 */
-	array_init_size(&params, 2);
+	array_init(&params);
 	phalcon_array_update_str(&params, SL("conditions"), &join_conditions, PH_COPY);
 	phalcon_array_update_str(&params, SL("bind"), &bind_params, PH_COPY);
+	if (phalcon_validation_validator_getoption_helper(&cache, ce, getThis(), "cache") == SUCCESS) {
+		phalcon_array_update_str(&params, SL("cache"), &cache, 0);
+	}
 	zval_ptr_dtor(&join_conditions);
-
 	/**
 	 * Check using a standard count
 	 */

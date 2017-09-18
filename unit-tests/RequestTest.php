@@ -309,25 +309,29 @@ class RequestTest extends PHPUnit_Framework_TestCase
 		);
 
 		// get
+		$this->assertEquals($request->get('string', 'string', NULL, TRUE, FALSE), 'hello');
 		$this->assertEquals($request->get('string', 'string'), 'hello');
-		$this->assertEquals($request->get('string', 'string', NULL, TRUE, TRUE), 'hello');
 
-		$this->assertEquals($request->get('array', 'string'), array('string' => 'world'));
-		$this->assertEquals($request->get('array', 'string', NULL, TRUE, TRUE), NULL);
+		$this->assertEquals($request->get('array', 'string', NULL, TRUE, FALSE), array('string' => 'world'));
+		$this->assertEquals($request->get('array', 'string'), NULL);
 
 		// getQuery
+		$this->assertEquals($request->getQuery('string', 'string', NULL, TRUE, FALSE), 'hello');
 		$this->assertEquals($request->getQuery('string', 'string'), 'hello');
-		$this->assertEquals($request->getQuery('string', 'string', NULL, TRUE, TRUE), 'hello');
 
-		$this->assertEquals($request->getQuery('array', 'string'), array('string' => 'world'));
-		$this->assertEquals($request->getQuery('array', 'string', NULL, TRUE, TRUE), NULL);
+		$this->assertEquals($request->getQuery('array', 'string', NULL, TRUE, FALSE), array('string' => 'world'));
+		$this->assertEquals($request->getQuery('array', 'string'), NULL);
 
 		// getPost
+		$this->assertEquals($request->getPost('string', 'string', NULL, TRUE, FALSE), 'hello');
 		$this->assertEquals($request->getPost('string', 'string'), 'hello');
-		$this->assertEquals($request->getPost('string', 'string', NULL, TRUE, TRUE), 'hello');
 
-		$this->assertEquals($request->getPost('array', 'string'), array('string' => 'world'));
-		$this->assertEquals($request->getPost('array', 'string', NULL, TRUE, TRUE), NULL);
+		$this->assertEquals($request->getPost('array', 'string', NULL, TRUE, FALSE), array('string' => 'world'));
+		$this->assertEquals($request->getPost('array', 'string'), NULL);
+
+		// get all
+		$this->assertEquals($request->get(NULL, 'string'), array('string' => 'hello', 'array' => FALSE));
+		$this->assertEquals($request->get(NULL, 'string', NULL, TRUE, TRUE), NULL);
 	}
 
 	/**

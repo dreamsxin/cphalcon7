@@ -308,7 +308,11 @@ PHP_METHOD(Phalcon_Http_Request, get)
 	}
 
 	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+		if (zend_is_true(name)) {
+			norecursive = &PHALCON_GLOBAL(z_true);
+		} else {
+			norecursive = &PHALCON_GLOBAL(z_false);
+		}
 	}
 
 	request = phalcon_get_global_str(SL("_REQUEST"));
@@ -369,7 +373,11 @@ PHP_METHOD(Phalcon_Http_Request, getPost)
 	}
 
 	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+		if (zend_is_true(name)) {
+			norecursive = &PHALCON_GLOBAL(z_true);
+		} else {
+			norecursive = &PHALCON_GLOBAL(z_false);
+		}
 	}
 
 	post = phalcon_get_global_str(SL("_POST"));
@@ -415,7 +423,11 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 	}
 
 	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+		if (zend_is_true(name)) {
+			norecursive = &PHALCON_GLOBAL(z_true);
+		} else {
+			norecursive = &PHALCON_GLOBAL(z_false);
+		}
 	}
 
 	PHALCON_CALL_METHOD(&is_put, getThis(), "isput");
@@ -492,7 +504,11 @@ PHP_METHOD(Phalcon_Http_Request, getQuery){
 	}
 
 	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+		if (zend_is_true(name)) {
+			norecursive = &PHALCON_GLOBAL(z_true);
+		} else {
+			norecursive = &PHALCON_GLOBAL(z_false);
+		}
 	}
 
 	get = phalcon_get_global_str(SL("_GET"));

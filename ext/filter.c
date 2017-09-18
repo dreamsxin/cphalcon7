@@ -99,6 +99,7 @@ PHALCON_INIT_CLASS(Phalcon_Filter){
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_LOWER"), "lower", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_UPPER"), "upper", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_XSS"), "xss", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
+	zend_declare_property_string(phalcon_filter_ce, SL("FILTER_ARRAY"), "array", ZEND_ACC_PUBLIC|ZEND_ACC_STATIC);
 
 	zend_class_implements(phalcon_filter_ce, 1, phalcon_filterinterface_ce);
 
@@ -258,7 +259,11 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 							ZVAL_COPY(&real_options, filter);
 						}
 					} else {
-						ZVAL_DUP(&real_options, options);
+						if (Z_TYPE_P(options) == IS_ARRAY) {
+							ZVAL_DUP(&real_options, options);
+						} else {
+							array_init(&real_options);
+						}
 						phalcon_array_update(&real_options, &real_filter, filter, PH_COPY);
 					}
 				} else {
@@ -330,6 +335,10 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	zval allow_fraction = {}, allow_tags = {}, allow_attributes = {}, format = {}, exception_message = {};
 
 	phalcon_fetch_params(0, 2, 1, &value, &filter, &options);
+
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
+	}
 
 	if (Z_TYPE_P(filter) == IS_OBJECT || phalcon_is_callable(filter)) {
 		if (Z_TYPE_P(filter) == IS_OBJECT && instanceof_function(Z_OBJCE_P(filter), zend_ce_closure)) {
@@ -559,6 +568,21 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	if (PHALCON_IS_STRING(filter, "in")) {
 		if (Z_TYPE_P(options) != IS_ARRAY || !phalcon_fast_in_array(value, options)) {
 			ZVAL_NULL(&filtered);
+		} else {
+			ZVAL_COPY(&filtered, value);
+		}
+
+		goto ph_end_0;
+	}
+
+	if (PHALCON_IS_STRING(filter, "array")) {
+		convert_to_array(value);
+		if (zend_is_true(options)) {
+			if (phalcon_is_callable(options)) {
+				PHALCON_CALL_FUNCTION(&filtered, "array_filter", value, options);
+			} else {
+				PHALCON_CALL_FUNCTION(&filtered, "array_filter", value);
+			}
 		} else {
 			ZVAL_COPY(&filtered, value);
 		}

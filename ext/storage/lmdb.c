@@ -251,6 +251,8 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	}
 	if (readers && Z_TYPE_P(readers) == IS_LONG) {
 		mdb_env_set_maxreaders(intern->env, Z_LVAL_P(readers));
+	} else {
+		mdb_env_set_maxreaders(intern->env, 1024);
 	}
 	if (mapsize && Z_TYPE_P(mapsize) == IS_LONG) {
 		mdb_env_set_mapsize(intern->env, Z_LVAL_P(mapsize));

@@ -1867,7 +1867,7 @@ static zend_always_inline void phalcon_arr_group_items(zval *groups_array, zval*
 	groups_ht = Z_ARRVAL_P(groups_array);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(rows), row) {
-		if ((category_key = zend_hash_find(Z_ARRVAL_P(row), field)) != NULL) {
+		if (Z_TYPE_P(row) == IS_ARRAY && (category_key = zend_hash_find(Z_ARRVAL_P(row), field)) != NULL) {
 			if (Z_TYPE_P(category_key) == IS_STRING) {
 				if ((group = zend_hash_find(groups_ht, Z_STR_P(category_key))) == NULL) {
 					// Allocate a new group array
@@ -1903,6 +1903,9 @@ static zend_always_inline void phalcon_arr_group_groups(zval *groups, zval* fiel
 
 	ZEND_HASH_FOREACH_VAL(HASH_OF(fields), field) {
 
+		if (!field) {
+			continue;
+		}
 		zval tmp_collection = {};
 		array_init(&tmp_collection);
 

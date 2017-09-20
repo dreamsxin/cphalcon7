@@ -75,7 +75,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_where_setconditio
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_where_where, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, conditions, IS_STRING, 0)
+	ZEND_ARG_INFO(0, conditions)
 	ZEND_ARG_TYPE_INFO(0, bindParams, IS_ARRAY, 1)
 	ZEND_ARG_TYPE_INFO(0, bindTypes, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
@@ -149,17 +149,21 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Where){
 /**
  * Gets the type of PHQL queries
  *
- *
+ * @param string|array $conditions
+ * @param array $bindParams
+ * @param array $bindTypes
+ * @param boolean $type
+ * @param boolean $grouping
  * @return int
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 
-	zval *conditions, *bind_params = NULL, *bind_types = NULL, *type = NULL, merge = {}, merged_conditions = {}, merged_bind_params = {}, merged_bind_types;
+	zval *conditions, *bind_params = NULL, *bind_types = NULL, *type = NULL, *grouping = NULL, merge = {}, merged_conditions = {}, merged_bind_params = {}, merged_bind_types;
 	zval joind_condition = {}, *single_condition_array = NULL;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 3, &conditions, &bind_params, &bind_types, &type);
+	phalcon_fetch_params(0, 1, 4, &conditions, &bind_params, &bind_types, &type, &grouping);
 
 	if (!bind_params) {
 		bind_params = &PHALCON_GLOBAL(z_null);
@@ -226,7 +230,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 			}
 		} ZEND_HASH_FOREACH_END();
 
-		phalcon_fast_join_str(&joind_condition, SL(" AND "), &merged_conditions);
+		if (Z_TYPE_P(type) == IS_NULL || zend_is_true(type)) {
+			phalcon_fast_join_str(&joind_condition, SL(" AND "), &merged_conditions);
+		} else {
+			phalcon_fast_join_str(&joind_condition, SL(" OR "), &merged_conditions);
+		}
 		zval_ptr_dtor(&merged_conditions);
 
 		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
@@ -255,13 +263,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 			 * Nest the condition to current ones or set as unique
 			 */
 			if (zend_is_true(&current_conditions)) {
-				PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") AND (", &joind_condition, ")");
+				if (zend_is_true(grouping)) {
+					PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") AND (", &joind_condition, ")");
+				} else {
+					PHALCON_CONCAT_VSV(&new_conditions, &current_conditions, " AND ", &joind_condition);
+				}
 			} else {
 				ZVAL_COPY(&new_conditions, &joind_condition);
 			}
 		} else {
 			if (zend_is_true(&current_conditions)) {
-				PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") OR (", &joind_condition, ")");
+				if (zend_is_true(grouping)) {
+					PHALCON_CONCAT_SVSVS(&new_conditions, "(", &current_conditions, ") OR (", &joind_condition, ")");
+				} else {
+					PHALCON_CONCAT_VSV(&new_conditions, &current_conditions, " OR ", &joind_condition);
+				}
 			} else {
 				ZVAL_COPY(&new_conditions, &joind_condition);
 			}
@@ -404,6 +420,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
  * @param string|array $conditions
  * @param array $bindParams
  * @param array $bindTypes
+ * @param boolean $grouping
  * @return Phalcon\Mvc\Model\Query\Builder
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, where){
@@ -436,13 +453,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, where){
  * @param string|array $conditions
  * @param array $bindParams
  * @param array $bindTypes
+ * @param boolean $grouping
  * @return Phalcon\Mvc\Model\Query\Builder
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, andWhere){
 
-	zval *conditions, *bind_params = NULL, *bind_types = NULL;
+	zval *conditions, *bind_params = NULL, *bind_types = NULL, *grouping = NULL;
 
-	phalcon_fetch_params(0, 1, 2, &conditions, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 1, 3, &conditions, &bind_params, &bind_types, &grouping);
 
 	if (!bind_params) {
 		bind_params = &PHALCON_GLOBAL(z_null);
@@ -452,7 +470,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, andWhere){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_SELF(NULL, "setconditions", conditions, bind_params, bind_types, &PHALCON_GLOBAL(z_true));
+	if (!grouping) {
+		grouping = &PHALCON_GLOBAL(z_true);
+	}
+
+	PHALCON_CALL_SELF(NULL, "setconditions", conditions, bind_params, bind_types, &PHALCON_GLOBAL(z_true), grouping);
 
 	RETURN_THIS();
 }
@@ -472,9 +494,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, andWhere){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, orWhere){
 
-	zval *conditions, *bind_params = NULL, *bind_types = NULL;
+	zval *conditions, *bind_params = NULL, *bind_types = NULL, *grouping = NULL;
 
-	phalcon_fetch_params(0, 1, 2, &conditions, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 1, 3, &conditions, &bind_params, &bind_types, &grouping);
 
 	if (!bind_params) {
 		bind_params = &PHALCON_GLOBAL(z_null);
@@ -484,8 +506,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, orWhere){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
+	if (!grouping) {
+		grouping = &PHALCON_GLOBAL(z_true);
+	}
 
-	PHALCON_CALL_SELF(NULL, "setconditions", conditions, bind_params, bind_types, &PHALCON_GLOBAL(z_false));
+	PHALCON_CALL_SELF(NULL, "setconditions", conditions, bind_params, bind_types, &PHALCON_GLOBAL(z_false), grouping);
 
 	RETURN_THIS();
 }

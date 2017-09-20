@@ -171,9 +171,25 @@ class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
 		$phql = $builder->setDi($di)
 						->from('Robots')
 						->where('Robots.name = "Voltron"')
+						->andWhere('Robots.id > 100', NULL, NULL, FALSE)
+						->getPhql();
+		$this->assertEquals($phql, 'SELECT [Robots].* FROM [Robots] WHERE Robots.name = "Voltron" AND Robots.id > 100');
+
+		$builder = new SelectBuilder();
+		$phql = $builder->setDi($di)
+						->from('Robots')
+						->where('Robots.name = "Voltron"')
 						->orWhere('Robots.id > 100')
 						->getPhql();
 		$this->assertEquals($phql, 'SELECT [Robots].* FROM [Robots] WHERE (Robots.name = "Voltron") OR (Robots.id > 100)');
+
+		$builder = new SelectBuilder();
+		$phql = $builder->setDi($di)
+						->from('Robots')
+						->where('Robots.name = "Voltron"')
+						->orWhere('Robots.id > 100', NULL, NULL, FALSE)
+						->getPhql();
+		$this->assertEquals($phql, 'SELECT [Robots].* FROM [Robots] WHERE Robots.name = "Voltron" OR Robots.id > 100');
 
 		$builder = new SelectBuilder();
 		$phql = $builder->setDi($di)

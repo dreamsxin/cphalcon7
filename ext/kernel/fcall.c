@@ -180,7 +180,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, *arguments = NULL, *param;
 	int params_count = 0, i, status;
 
-	if (params && Z_TYPE_P(params) != IS_ARRAY) {
+	if (params && Z_TYPE_P(params) != IS_ARRAY && Z_TYPE_P(params) > IS_NULL) {
 		status = FAILURE;
 		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
 		return status;

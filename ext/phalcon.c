@@ -187,6 +187,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #if PHALCON_USE_PYTHON
 	PHALCON_INIT(Phalcon_Py_Exception);
 #endif
+	PHALCON_INIT(Phalcon_Thread_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -551,6 +552,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 
 	PHALCON_INIT(Phalcon_Async);
+
+	PHALCON_INIT(Phalcon_Thread_Pool);
 
 #if PHALCON_USE_SHM_OPEN
 	PHALCON_INIT(Phalcon_Sync_Mutex);

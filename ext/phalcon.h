@@ -446,6 +446,9 @@
 
 #include "async.h"
 
+#include "thread/exception.h"
+#include "thread/pool.h"
+
 #include "sync/exception.h"
 #include "sync/mutex.h"
 #include "sync/readerwriter.h"

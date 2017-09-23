@@ -425,6 +425,7 @@ kernel/io/server.c \
 kernel/io/tasks.c \
 kernel/io/threads.c \
 kernel/gc.c \
+kernel/thread/pool.c \
 interned-strings.c \
 logger.c \
 flash.c \
@@ -803,6 +804,8 @@ image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
 async.c \
+thread/exception.c \
+thread/pool.c \
 chart/exception.c \
 chart/captcha/tiny.c \
 socket/exception.c \

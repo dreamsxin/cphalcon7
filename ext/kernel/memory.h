@@ -85,7 +85,7 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 #define PHALCON_ZVAL_DUP(z, p) \
 	do { \
 		if (Z_TYPE_P(p) == IS_ARRAY) { \
-			ZVAL_ARR(z, zend_array_dup(P)); \
+			ZVAL_ARR(z, zend_array_dup(Z_ARRVAL_P(p))); \
 		} else {\
 			ZVAL_DUP(z, p); \
 		} \

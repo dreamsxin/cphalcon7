@@ -30,6 +30,7 @@
 #include "kernel/concat.h"
 #include "kernel/object.h"
 #include "kernel/exception.h"
+#include "kernel/debug.h"
 
 #include "kernel/thread/pool.h"
 #include "kernel/thread/pool.h"
@@ -103,6 +104,7 @@ void phalcon_thread_pool_object_free_handler(zend_object *object)
 
 	if (intern->pool) {
 		phalcon_thread_pool_destroy(intern->pool, 1);
+		intern->pool = NULL;
 	}
 	zend_object_std_dtor(object);
 }
@@ -232,7 +234,6 @@ PHP_METHOD(Phalcon_Thread_Pool, add){
 	phalcon_fetch_params(0, 1, 1, &work, &args);
 
 	intern = phalcon_thread_pool_object_from_obj(Z_OBJ_P(getThis()));
-
 	phalcon_thread_pool_add_work(intern->pool, work, args);
 }
 
@@ -247,6 +248,7 @@ PHP_METHOD(Phalcon_Thread_Pool, wait){
 	intern = phalcon_thread_pool_object_from_obj(Z_OBJ_P(getThis()));
 
 	phalcon_thread_pool_destroy(intern->pool, 1);
+	intern->pool = NULL;
 }
 
 /**
@@ -260,4 +262,5 @@ PHP_METHOD(Phalcon_Thread_Pool, destroy){
 	intern = phalcon_thread_pool_object_from_obj(Z_OBJ_P(getThis()));
 
 	phalcon_thread_pool_destroy(intern->pool, 0);
+	intern->pool = NULL;
 }

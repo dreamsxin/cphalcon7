@@ -90,6 +90,19 @@ static phalcon_thread_pool_work_t *get_work_concurrently(phalcon_thread_pool_thr
 	return work;
 }
 
+static void format_wait_time(int microseconds, struct timespec *abstime)
+{
+	struct timeval now;
+	long long absmsec;
+
+	gettimeofday(&now, NULL);
+	absmsec = now.tv_sec * 1000ll + now.tv_usec / 1000ll;
+	absmsec += microseconds;
+
+	abstime->tv_sec = absmsec / 1000ll;
+	abstime->tv_nsec = absmsec % 1000ll * 1000000ll;
+}
+
 static void *phalcon_thread_pool_thread_start_routine(void *arg)
 {
 	phalcon_thread_pool_thread_t *thread = arg;
@@ -98,11 +111,13 @@ static void *phalcon_thread_pool_thread_start_routine(void *arg)
 
 	__sync_fetch_and_add(&pool->num_threads, 1);
 
-	while (1) {
-		
+	while (1) {		
 		while (phalcon_thread_pool_queue_empty(thread) && !thread->shutdown) {
+			struct timespec abstime;
+			format_wait_time(1000, &abstime);
+
 			pthread_mutex_lock(&thread->lock);
-			pthread_cond_wait(&thread->cond, &thread->lock);
+			pthread_cond_timedwait(&thread->cond, &thread->lock, &abstime);
 			pthread_mutex_unlock(&thread->lock);
 		}
 
@@ -130,7 +145,7 @@ static void *phalcon_thread_pool_thread_start_routine(void *arg)
 #endif
 		}
 		pthread_cond_signal(&pool->cond);
-		sched_yield();
+		//sched_yield();
 	}
 }
 
@@ -194,9 +209,9 @@ static int dispatch_work2thread(phalcon_thread_pool_t *pool, phalcon_thread_pool
 	work = &thread->work_queue[phalcon_thread_pool_queue_offset(thread->in)];
 	zval_ptr_dtor(&work->routine);
 	zval_ptr_dtor(&work->args);
-	PHALCON_ZVAL_DUP(&work->routine, routine);
+	ZVAL_COPY(&work->routine, routine);
 	if (args) {
-		PHALCON_ZVAL_DUP(&work->args, args);
+		ZVAL_COPY(&work->args, args);
 	} else {
 		ZVAL_NULL(&work->args);
 	}
@@ -211,7 +226,7 @@ static int dispatch_work2thread(phalcon_thread_pool_t *pool, phalcon_thread_pool
 	}
 	*/
 	thread->in++;
-	if (phalcon_thread_pool_queue_len(thread) == 1) {
+	if (phalcon_thread_pool_queue_len(thread) > 0) {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			zend_error(E_NOTICE, "Signal has task!");
 		}
@@ -400,8 +415,11 @@ void phalcon_thread_pool_destroy(phalcon_thread_pool_t *pool, int finish)
 		}
 
 		while (!phalcon_thread_pool_empty(pool)) {
+			struct timespec abstime;
+			format_wait_time(1000, &abstime);
+
 			pthread_mutex_lock(&pool->lock);
-			pthread_cond_wait(&pool->cond, &pool->lock);
+			pthread_cond_timedwait(&pool->cond, &pool->lock, &abstime);
 			pthread_mutex_unlock(&pool->lock);
 		}
 	}

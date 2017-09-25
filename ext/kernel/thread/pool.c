@@ -158,7 +158,7 @@ phalcon_thread_pool_t *phalcon_thread_pool_init(int num_threads)
 		zend_error(E_ERROR, "Too many threads!");
 		return NULL;
 	}
-	pool = emalloc(sizeof(phalcon_thread_pool_t));
+	pool = malloc(sizeof(phalcon_thread_pool_t));
 	if (pool == NULL) {
 		zend_error(E_ERROR, "Malloc failed!");
 		return NULL;
@@ -435,5 +435,5 @@ void phalcon_thread_pool_destroy(phalcon_thread_pool_t *pool, int finish)
 	}
 	pthread_cond_destroy(&pool->cond);
 	pthread_mutex_destroy(&pool->lock);
-	efree(pool);
+	free(pool);
 }

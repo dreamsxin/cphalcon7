@@ -20,23 +20,28 @@
 
 #include "kernel/thread/pool.h"
 #include "kernel/fcall.h"
+#include "kernel/debug.h"
 
 static int phalcon_thread_pool_empty(phalcon_thread_pool_t *pool)
 {
 	int i;
-
-	for (i = 0; i < pool->num_threads; i++)
+	for (i = 0; i < pool->num_threads; i++) {
 		if (!phalcon_thread_pool_queue_empty(&pool->threads[i]))
 			return 0;
+	}
 	return 1;
 }
 
 static phalcon_thread_pool_thread_t* round_robin_schedule(phalcon_thread_pool_t *pool)
 {
 	static int cur_thread_index = -1;
-
+	phalcon_thread_pool_thread_t *thread;
 	assert(pool && pool->num_threads > 0);
-	cur_thread_index = (cur_thread_index + 1) % pool->num_threads ;
+	do {
+		cur_thread_index = (cur_thread_index + 1) % pool->num_threads ;
+		thread = &pool->threads[cur_thread_index];
+	} while(thread->shutdown && cur_thread_index < pool->num_threads - 1);
+
 	return &pool->threads[cur_thread_index];
 }
 
@@ -66,16 +71,6 @@ void phalcon_thread_pool_schedule_algorithm(phalcon_thread_pool_t *pool, enum ph
 	pool->schedule_thread = schedule_alogrithms[type];
 }
 
-static void sig_send(pthread_t tid, int signo)
-{
-	pthread_kill(tid, signo);
-}
-
-static void sig_do_nothing(int signo)
-{
-	return;
-}
-
 static phalcon_thread_pool_work_t *get_work_concurrently(phalcon_thread_pool_thread_t *thread)
 {
 	phalcon_thread_pool_work_t *work = NULL;
@@ -88,6 +83,9 @@ static phalcon_thread_pool_work_t *get_work_concurrently(phalcon_thread_pool_thr
 		tmp = thread->out;
 		//prefetch work
 		work = &thread->work_queue[phalcon_thread_pool_queue_offset(tmp)];
+
+		//printf("\nget_work_concurrently:%p,i:%d\n", (void*)thread->id, phalcon_thread_pool_queue_offset(tmp));
+		//zend_print_zval_r(&work->args, 0);
 	} while (!__sync_bool_compare_and_swap(&thread->out, tmp, tmp + 1));
 	return work;
 }
@@ -97,38 +95,15 @@ static void *phalcon_thread_pool_thread_start_routine(void *arg)
 	phalcon_thread_pool_thread_t *thread = arg;
 	phalcon_thread_pool_t *pool = thread->pool;
 	phalcon_thread_pool_work_t *work = NULL;
-	sigset_t signal_mask, oldmask;
-	int rc, sig_caught;
 
-	/* SIGUSR1 handler has been set in phalcon_thread_pool_init */
 	__sync_fetch_and_add(&pool->num_threads, 1);
-	sig_send(pool->main_thread, SIGUSR1);
-
-	sigemptyset(&oldmask);
-	sigemptyset(&signal_mask);
-	sigaddset(&signal_mask, SIGUSR1);
 
 	while (1) {
-		rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
-		if (rc != 0) {
-			zend_error(E_NOTICE, "SIG_BLOCK failed!");
-			pthread_exit(NULL);
-		}
+		
 		while (phalcon_thread_pool_queue_empty(thread) && !thread->shutdown) {
-			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_THREAD_POOL_DEBUG("I'm sleep");
-			}
-			rc = sigwait (&signal_mask, &sig_caught);
-			if (rc != 0) {
-				zend_error(E_NOTICE, "Sigwait failed!");
-				pthread_exit(NULL);
-			}
-		}
-
-		rc = pthread_sigmask(SIG_SETMASK, &oldmask, NULL);
-		if (rc != 0) {
-			zend_error(E_NOTICE, "SIG_SETMASK failed!");
-			pthread_exit(NULL);
+			pthread_mutex_lock(&thread->lock);
+			pthread_cond_wait(&thread->cond, &thread->lock);
+			pthread_mutex_unlock(&thread->lock);
 		}
 
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -136,29 +111,26 @@ static void *phalcon_thread_pool_thread_start_routine(void *arg)
 		}
 
 		if (thread->shutdown) {
+			pthread_cond_signal(&pool->cond);
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_THREAD_POOL_DEBUG("exit! %ld: %d\n", thread->id, thread->num_works_done);
 			}
-			
-			while (!phalcon_thread_pool_queue_empty(thread)) {
-				work = get_work_concurrently(thread);
-				zval_ptr_dtor(&work->routine);
-				zval_ptr_dtor(&work->args);
-			}
 			pthread_exit(NULL);
 		}
+
 		work = get_work_concurrently(thread);
 		if (work) {
+			//PHALCON_THREAD_POOL_DEBUG("call task");
+			//zend_print_zval_r(&work->args, 0);
 			phalcon_call_user_func_array(NULL, &work->routine, &work->args);
-			zval_ptr_dtor(&work->routine);
-			zval_ptr_dtor(&work->args);
+			//zval_ptr_dtor(&work->routine);
+			//zval_ptr_dtor(&work->args);
 #ifdef PHALCON_DEBUG
 			thread->num_works_done++;
 #endif
 		}
-		if (phalcon_thread_pool_queue_empty(thread)) {
-			sig_send(pool->main_thread, SIGUSR1);
-		}
+		pthread_cond_signal(&pool->cond);
+		sched_yield();
 	}
 }
 
@@ -166,37 +138,10 @@ static int spawn_new_thread(phalcon_thread_pool_t *pool, int index)
 {
 	memset(&pool->threads[index], 0, sizeof(phalcon_thread_pool_thread_t));
 	pool->threads[index].pool = pool;
+	pthread_mutex_init(&pool->threads[index].lock, NULL);
+	pthread_cond_init(&pool->threads[index].cond, NULL);
 	if (pthread_create(&pool->threads[index].id, NULL, phalcon_thread_pool_thread_start_routine, (void *)(&pool->threads[index])) != 0) {
 		zend_error(E_ERROR, "Create pthread failed!");
-		return -1;
-	}
-	return 0;
-}
-
-static int wait_for_thread_registration(phalcon_thread_pool_t *pool, int num_expected)
-{
-	sigset_t signal_mask, oldmask;
-	int rc, sig_caught;
-
-	sigemptyset (&oldmask);
-	sigemptyset (&signal_mask);
-	sigaddset (&signal_mask, SIGUSR1);
-	rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
-	if (rc != 0) {
-		zend_error(E_NOTICE, "SIG_BLOCK failed!");
-		return -1;
-	}
-
-	while (pool->num_threads < num_expected) {
-		rc = sigwait (&signal_mask, &sig_caught);
-		if (rc != 0) {
-			zend_error(E_NOTICE, "Sigwait failed!");
-			return -1;
-		}
-	}
-	rc = pthread_sigmask(SIG_SETMASK, &oldmask, NULL);
-	if (rc != 0) {
-		zend_error(E_NOTICE, "SIG_SETMASK failed!");
 		return -1;
 	}
 	return 0;
@@ -220,25 +165,19 @@ phalcon_thread_pool_t *phalcon_thread_pool_init(int num_threads)
 	}
 
 	memset(pool, 0, sizeof(phalcon_thread_pool_t));
-	pool->num_threads = num_threads;
+	pool->num_threads = 0;
 	pool->schedule_thread = round_robin_schedule;
-	/* all threads are set SIGUSR1 with sig_do_nothing */
-	if (signal(SIGUSR1, sig_do_nothing) == SIG_ERR) {
-		zend_error(E_ERROR, "Signal failed!");
-		return NULL;
-	}
+
+	pthread_mutex_init(&pool->lock, NULL);
+	pthread_cond_init(&pool->cond, NULL);
+
 	pool->main_thread = pthread_self();
-	for (i = 0; i < pool->num_threads; i++) {
+	for (i = 0; i < num_threads; i++) {
 		if (spawn_new_thread(pool, i) < 0) {
 			//exit(-1);
 			phalcon_thread_pool_destroy(pool, 0);
 			return NULL;
 		}
-	}
-	if (wait_for_thread_registration(pool, pool->num_threads) < 0) {
-		//pthread_exit(NULL);
-		phalcon_thread_pool_destroy(pool, 0);
-		return NULL;
 	}
 
 	return pool;
@@ -253,17 +192,30 @@ static int dispatch_work2thread(phalcon_thread_pool_t *pool, phalcon_thread_pool
 		return -1;
 	}
 	work = &thread->work_queue[phalcon_thread_pool_queue_offset(thread->in)];
-	ZVAL_COPY(&work->routine, routine);
+	zval_ptr_dtor(&work->routine);
+	zval_ptr_dtor(&work->args);
+	PHALCON_ZVAL_DUP(&work->routine, routine);
 	if (args) {
-		ZVAL_COPY(&work->args, args);
+		PHALCON_ZVAL_DUP(&work->args, args);
+	} else {
+		ZVAL_NULL(&work->args);
 	}
 	work->next = NULL;
+	/*
+	int i;
+	printf("\ndispatch_work2thread:%p\n", (void*)thread->id);
+	for (i =0; i <= thread->in; i++) {
+		printf("\ni:%d\n", phalcon_thread_pool_queue_offset(i));
+		work = &thread->work_queue[phalcon_thread_pool_queue_offset(i)];
+		zend_print_zval_r(&work->args, 0);
+	}
+	*/
 	thread->in++;
 	if (phalcon_thread_pool_queue_len(thread) == 1) {
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			zend_error(E_NOTICE, "Signal has task!");
 		}
-		sig_send(thread->id, SIGUSR1);
+		pthread_cond_signal(&thread->cond);
 	}
 	return 0;
 }
@@ -394,12 +346,8 @@ int phalcon_thread_pool_inc_threads(phalcon_thread_pool_t *pool, int num_inc)
 			//exit(-1);
 			return -1;
 		}
+		pthread_mutex_unlock(&pool->lock);
 	}
-	if (wait_for_thread_registration(pool, num_threads) < 0) {
-		zend_error(E_ERROR, "thread registration fail!");
-		pthread_exit(NULL);
-	}
-	pool->num_threads = num_threads;
 	balance_thread_load(pool);
 	return 0;
 }
@@ -413,12 +361,11 @@ int phalcon_thread_pool_dec_threads(phalcon_thread_pool_t *pool, int num_dec)
 		num_dec = pool->num_threads;
 	}
 	num_threads = pool->num_threads;
-	pool->num_threads -= num_dec;
-	for (i = pool->num_threads; i < num_threads; i++) {
+	for (i = num_threads; i > num_threads - num_dec; i--) {
 		pool->threads[i].shutdown = 1;
-		sig_send(pool->threads[i].id, SIGUSR1);
+		pthread_cond_signal(&pool->threads[i].cond);
 	}
-	for (i = pool->num_threads; i < num_threads; i++) {
+	for (i = num_threads; i > num_threads - num_dec; i--) {
 		pthread_join(pool->threads[i].id, NULL);
 		/* migrate remaining work to other threads */
 		if (migrate_thread_work(pool, &pool->threads[i]) < 0) {
@@ -428,6 +375,7 @@ int phalcon_thread_pool_dec_threads(phalcon_thread_pool_t *pool, int num_dec)
 	if (pool->num_threads == 0 && !phalcon_thread_pool_empty(pool)) {
 		zend_error(E_NOTICE, "No thread in pool with work unfinished!");
 	}
+	pool->num_threads = num_threads - num_dec;
 	return 0;
 }
 
@@ -447,45 +395,45 @@ void phalcon_thread_pool_destroy(phalcon_thread_pool_t *pool, int finish)
 
 	assert(pool);
 	if (finish == 1) {
-		sigset_t signal_mask, oldmask;
-		int rc, sig_caught;
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			PHALCON_THREAD_POOL_DEBUG("Wait all work done");
 		}
-		sigemptyset (&oldmask);
-		sigemptyset (&signal_mask);
-		sigaddset (&signal_mask, SIGUSR1);
-		rc = pthread_sigmask(SIG_BLOCK, &signal_mask, NULL);
-		if (rc != 0) {
-			zend_error(E_NOTICE, "SIG_BLOCK failed!");
-			pthread_exit(NULL);
-		}
 
 		while (!phalcon_thread_pool_empty(pool)) {
-			rc = sigwait(&signal_mask, &sig_caught);
-			if (rc != 0) {
-				zend_error(E_NOTICE, "Sigwait failed!");
-				pthread_exit(NULL);
-			}
-		}
-
-		rc = pthread_sigmask(SIG_SETMASK, &oldmask, NULL);
-		if (rc != 0) {
-			zend_error(E_NOTICE, "SIG_SETMASK failed!");
-			pthread_exit(NULL);
+			pthread_mutex_lock(&pool->lock);
+			pthread_cond_wait(&pool->cond, &pool->lock);
+			pthread_mutex_unlock(&pool->lock);
 		}
 	}
+
 	/* shutdown all threads */
 	for (i = 0; i < pool->num_threads; i++) {
 		pool->threads[i].shutdown = 1;
 		/* wake up thread */
-		if (pool->threads[i].id) sig_send(pool->threads[i].id, SIGUSR1);
+		if (pool->threads[i].id) {
+			pthread_cond_signal(&pool->threads[i].cond);
+		}
 	}
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_THREAD_POOL_DEBUG("wait worker thread exit");
 	}
 	for (i = 0; i < pool->num_threads; i++) {
-		if (pool->threads[i].id) pthread_join(pool->threads[i].id, NULL);
+		phalcon_thread_pool_thread_t *thread = &pool->threads[i];
+		if (pool->threads[i].id) {
+			pthread_join(pool->threads[i].id, NULL);
+		}
+		pthread_cond_destroy(&thread->cond);
+		pthread_mutex_destroy(&thread->lock);
+
+		while (!phalcon_thread_pool_queue_empty(thread)) {
+			phalcon_thread_pool_work_t *work = get_work_concurrently(thread);
+			if (work) {
+				zval_ptr_dtor(&work->routine);
+				zval_ptr_dtor(&work->args);
+			}
+		}
 	}
+	pthread_cond_destroy(&pool->cond);
+	pthread_mutex_destroy(&pool->lock);
 	efree(pool);
 }

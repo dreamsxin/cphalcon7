@@ -83,6 +83,8 @@ typedef struct phalcon_thread_pool_work {
 typedef struct {
 	phalcon_thread_pool_t *pool;
 	pthread_t id;
+	pthread_mutex_t lock;
+	pthread_cond_t cond;
 	int shutdown;
 	int num_works_done;
 	unsigned int in;	/* offset from start of work_queue where to put work next */
@@ -93,6 +95,8 @@ typedef struct {
 typedef phalcon_thread_pool_thread_t* (*phalcon_thread_pool_schedule_func)(phalcon_thread_pool_t *pool);
 struct phalcon_thread_pool {
 	pthread_t main_thread;
+	pthread_mutex_t lock;
+	pthread_cond_t cond;
 	int num_threads;
 	phalcon_thread_pool_thread_t threads[PHALCON_THREAD_POOL_MAX_NUM];
 	phalcon_thread_pool_schedule_func schedule_thread;

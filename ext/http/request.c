@@ -1036,7 +1036,7 @@ PHP_METHOD(Phalcon_Http_Request, getHttpHost)
  */
 PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
-	zval *trust_forwarded_header = NULL, *_SERVER, address = {}, addresses = {}, first = {};
+	zval *trust_forwarded_header = NULL, *_SERVER, address = {};
 
 	phalcon_fetch_params(0, 0, 1, &trust_forwarded_header);
 
@@ -1061,13 +1061,15 @@ PHP_METHOD(Phalcon_Http_Request, getClientAddress){
 
 	if (Z_TYPE(address) == IS_STRING) {
 		if (phalcon_memnstr_str(&address, SL(","))) {
+			zval addresses = {};
 			/**
 			 * The client address has multiples parts, only return the first part
 			 */
 			phalcon_fast_explode_str(&addresses, SL(","), &address);
 
-			phalcon_array_fetch_long(&first, &addresses, 0, PH_NOISY|PH_READONLY);
-			RETURN_CTOR(&first);
+			phalcon_array_fetch_long(return_value, &addresses, 0, PH_NOISY|PH_COPY);
+			zval_ptr_dtor(&addresses);
+			return;
 		}
 
 		RETURN_CTOR(&address);

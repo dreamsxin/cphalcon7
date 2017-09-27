@@ -155,7 +155,11 @@ int phalcon_call_user_func_params(zval *retval, zval *handler, int param_count, 
 
 	i = 0;
 	while(i < param_count) {
-		ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		if (params[i]) {
+			ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		} else {
+			ZVAL_NULL(&arguments[i]);
+		}
 		i++;
 	}
 
@@ -284,7 +288,11 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		if (params[i]) {
+			ZVAL_COPY_VALUE(&arguments[i], params[i]);
+		} else {
+			ZVAL_NULL(&arguments[i]);
+		}
 		i++;
 	}
 

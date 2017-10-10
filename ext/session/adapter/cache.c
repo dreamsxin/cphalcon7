@@ -42,16 +42,19 @@
  * This adapter store sessions in cache
  *
  *<code>
+ * $frontCache = new Phalcon\Cache\Frontend\Data(array(
+ *    "lifetime" => 3600
+ * ));
+ *
+ * $cache = new Phalcon\Cache\Backend\Redis($frontCache, array(
+ *		'host' => 'localhost',
+ *		'port' => 6379,
+ *		'auth' => 'foobared',
+ *  	'persistent' => false
+ * ));
+ *
  * $session = new Phalcon\Session\Adapter\Cache(array(
- *     'servers' => array(
- *         array('host' => 'localhost', 'port' => 11211, 'weight' => 1),
- *     ),
- *     'client' => array(
- *         Memcached::OPT_HASH => Memcached::HASH_MD5,
- *         Memcached::OPT_PREFIX_KEY => 'prefix.',
- *     ),
- *    'lifetime' => 3600,
- *    'prefix' => 'my_'
+ *     'service' => $cache // or service name
  * ));
  *
  * $session->start();

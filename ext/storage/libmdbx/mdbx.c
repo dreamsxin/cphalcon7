@@ -1452,8 +1452,6 @@ static __inline bool mdbx_meta_ot(const enum meta_choise_mode mode,
   mdbx_jitter4testing(true);
   txnid_t txnid_a = mdbx_meta_txnid_fluid(env, a);
   txnid_t txnid_b = mdbx_meta_txnid_fluid(env, b);
-  if (txnid_a == txnid_b)
-    return META_IS_STEADY(b) || (META_IS_WEAK(a) && !META_IS_WEAK(a));
 
   mdbx_jitter4testing(true);
   switch (mode) {
@@ -1470,6 +1468,8 @@ static __inline bool mdbx_meta_ot(const enum meta_choise_mode mode,
   /* fall through */
   case prefer_last:
     mdbx_jitter4testing(true);
+    if (txnid_a == txnid_b)
+      return META_IS_STEADY(b) || (META_IS_WEAK(a) && !META_IS_WEAK(a));
     return txnid_a < txnid_b;
   }
 }
@@ -3076,11 +3076,11 @@ again_on_freelist_change:
 
     mdbx_tassert(txn, mdbx_pnl_check(env->me_reclaimed_pglist));
     if (txn->mt_loose_pages) {
+      MDBX_page *mp;
       /* Return loose page numbers to me_reclaimed_pglist,
        * though usually none are left at this point.
        * The pages themselves remain in dirtylist. */
       if (unlikely(!env->me_reclaimed_pglist) && !(lifo && env->me_last_reclaimed > 1)) {
-        MDBX_page *mp;
         /* Put loose page numbers in mt_free_pages,
          * since unable to return them to me_reclaimed_pglist. */
         if (unlikely((rc = mdbx_pnl_need(&txn->mt_befree_pages, txn->mt_loose_count)) != 0))
@@ -3096,7 +3096,6 @@ again_on_freelist_change:
                          MDBX_PNL_ALLOCLEN(env->me_reclaimed_pglist) -
                          txn->mt_loose_count;
         unsigned count = 0;
-		MDBX_page *mp;
         for (mp = txn->mt_loose_pages; mp; mp = NEXT_LOOSE_PAGE(mp))
           loose[++count] = mp->mp_pgno;
         loose[0] = count;
@@ -3105,7 +3104,7 @@ again_on_freelist_change:
       }
 
       MDBX_ID2L dl = txn->mt_rw_dirtylist;
-      for (MDBX_page *mp = txn->mt_loose_pages; mp;) {
+      for (mp = txn->mt_loose_pages; mp;) {
         mdbx_tassert(txn, mp->mp_pgno < txn->mt_next_pgno);
         mdbx_ensure(env, mp->mp_pgno >= NUM_METAS);
 
@@ -3819,7 +3818,7 @@ static int __cold mdbx_read_header(MDBX_env *env, MDBX_meta *meta) {
     }
 
     if (page.mp_meta.mm_magic_and_version != MDBX_DATA_MAGIC) {
-      mdbx_error("meta[%u] has invalid magic/version", meta_number);
+      mdbx_error("meta[%u] has invalid magic/version MDBX_DEVEL=%d", meta_number, MDBX_DEVEL);
       return ((page.mp_meta.mm_magic_and_version >> 8) != MDBX_MAGIC)
                  ? MDBX_INVALID
                  : MDBX_VERSION_MISMATCH;
@@ -3973,7 +3972,7 @@ static int __cold mdbx_read_header(MDBX_env *env, MDBX_meta *meta) {
       continue;
     }
 
-    if (mdbx_meta_ot(prefer_steady, env, meta, &page.mp_meta)) {
+    if (mdbx_meta_ot(prefer_noweak, env, meta, &page.mp_meta)) {
       *meta = page.mp_meta;
       if (META_IS_WEAK(meta))
         loop_limit += 1; /* LY: should re-read to hush race with update */
@@ -4752,9 +4751,11 @@ static int __cold mdbx_setup_dxb(MDBX_env *env, int lck_rc) {
       || lck_rc != MDBX_RESULT_TRUE /* not exclusive */) {
     /* use present params from db */
     err = mdbx_env_set_geometry(
-        env, meta.mm_geo.lower * meta.mm_psize, meta.mm_geo.now * meta.mm_psize,
-        meta.mm_geo.upper * meta.mm_psize, meta.mm_geo.grow * meta.mm_psize,
-        meta.mm_geo.shrink * meta.mm_psize, meta.mm_psize);
+        env, meta.mm_geo.lower * (uint64_t)meta.mm_psize,
+        meta.mm_geo.now * (uint64_t)meta.mm_psize,
+        meta.mm_geo.upper * (uint64_t)meta.mm_psize,
+        meta.mm_geo.grow * (uint64_t)meta.mm_psize,
+        meta.mm_geo.shrink * (uint64_t)meta.mm_psize, meta.mm_psize);
     if (unlikely(err != MDBX_SUCCESS)) {
       mdbx_error("could not use present dbsize-params from db");
       return MDBX_INCOMPATIBLE;

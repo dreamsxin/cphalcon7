@@ -3702,7 +3702,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		ZVAL_COPY(&processed, &bind_params);
+		PHALCON_ZVAL_DUP(&processed, &bind_params);
 	}
 	zval_ptr_dtor(&bind_params);
 
@@ -3962,7 +3962,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		ZVAL_COPY(&processed, &bind_params);
+		PHALCON_ZVAL_DUP(&processed, &bind_params);
 	}
 	zval_ptr_dtor(&bind_params);
 
@@ -4148,7 +4148,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		ZVAL_COPY(&processed, &bind_params);
+		PHALCON_ZVAL_DUP(&processed, &bind_params);
 	}
 	zval_ptr_dtor(&bind_params);
 
@@ -4298,7 +4298,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		ZVAL_COPY(&processed, &bind_params);
+		PHALCON_ZVAL_DUP(&processed, &bind_params);
 	}
 
 	/**
@@ -4358,7 +4358,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
-	zval *bind_params = NULL, *bind_types = NULL, event_name = {}, unique_row = {}, type = {};
+	zval *bind_params = NULL, *bind_types = NULL, event_name = {}, unique_row = {}, type = {}, debug_message = {};
 	zval cache_options = {}, cache_key = {}, lifetime = {}, cache_service = {}, cache = {}, frontend = {}, result = {}, is_fresh = {};
 	zval default_bind_params = {}, merged_params = {}, default_bind_types = {}, merged_types = {}, exception_message = {}, *value;
 	zend_string *str_key;
@@ -4441,6 +4441,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			}
 
 			PHALCON_CALL_METHOD(&result, &cache, "get", &cache_key, &lifetime);
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_CONCAT_SV(&debug_message, "Get model query cache: ", &cache_key);
+				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
+			}
 			if (Z_TYPE(result) != IS_NULL) {
 				if (Z_TYPE(result) != IS_OBJECT) {
 					PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache didn't return a valid resultset");
@@ -4461,6 +4466,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				zval_ptr_dtor(&result);
 				zval_ptr_dtor(&cache);
 				return;
+			}
+
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_CONCAT_SV(&debug_message, "Model query Cache is null: ", &cache_key);
+				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
 			}
 
 			phalcon_update_property(getThis(), SL("_cache"), &cache);
@@ -4496,10 +4507,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				phalcon_array_update(&merged_params, &tmp, value, PH_COPY);
 			} ZEND_HASH_FOREACH_END();
 		} else {
-			ZVAL_COPY(&merged_params, &default_bind_params);
+			PHALCON_ZVAL_DUP(&merged_params, &default_bind_params);
 		}
 	} else {
-		ZVAL_COPY(&merged_params, bind_params);
+		PHALCON_ZVAL_DUP(&merged_params, bind_params);
 	}
 
 	phalcon_update_property(getThis(), SL("_mergeBindParams"), &merged_params);
@@ -4513,10 +4524,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		if (Z_TYPE_P(bind_types) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_types, &default_bind_types, bind_types);
 		} else {
-			ZVAL_COPY(&merged_types, &default_bind_types);
+			PHALCON_ZVAL_DUP(&merged_types, &default_bind_types);
 		}
 	} else {
-		ZVAL_COPY(&merged_types, bind_types);
+		PHALCON_ZVAL_DUP(&merged_types, bind_types);
 	}
 
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &merged_types);

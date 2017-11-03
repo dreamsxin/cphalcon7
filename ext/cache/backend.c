@@ -125,17 +125,19 @@ PHP_METHOD(Phalcon_Cache_Backend, __construct){
  */
 PHP_METHOD(Phalcon_Cache_Backend, start){
 
-	zval *key_name, *lifetime = NULL, *fresh = NULL, frontend = {};
+	zval *key_name, *lifetime = NULL, *nobuffer = NULL, *fresh = NULL, frontend = {};
 
-	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
+	phalcon_fetch_params(0, 1, 2, &key_name, &lifetime, &nobuffer);
 
 	phalcon_update_property(getThis(), SL("_lastKey"), key_name);
 
 	if (lifetime && Z_TYPE_P(lifetime) == IS_LONG) {
 		phalcon_update_property(getThis(), SL("_lastLifetime"), lifetime);
-		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name, lifetime);
-	} else {
-		PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name);
+	}
+	PHALCON_CALL_METHOD(return_value, getThis(), "get", key_name);
+
+	if (nobuffer && Z_TYPE_P(nobuffer) == IS_TRUE) {
+		return;
 	}
 
 	if (Z_TYPE_P(return_value) == IS_NULL) {

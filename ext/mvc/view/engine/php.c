@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	ulong idx;
 	int clean = 0;
 
-	phalcon_fetch_params(0, 2, 1, &path, &params, &must_clean, &partial);
+	phalcon_fetch_params(0, 2, 2, &path, &params, &must_clean, &partial);
 
 	PHALCON_ENSURE_IS_STRING(path);
 
@@ -88,6 +88,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			phalcon_ob_flush();
 		}
+
 		phalcon_ob_clean();
 	}
 
@@ -119,9 +120,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	if (clean) {
 		phalcon_ob_get_contents(&contents);
-		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			phalcon_ob_clean();
-		}
+		phalcon_ob_clean();
 
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY|PH_READONLY);
 		PHALCON_CALL_METHOD(NULL, &view, "setcontent", &contents);

@@ -29,6 +29,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_BackendInterface);
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backendinterface_start, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, keyName, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, lifetime, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, nobuffer, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backendinterface_stop, 0, 0, 0)
@@ -37,6 +38,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backendinterface_get, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, keyName, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, lifetime, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backendinterface_save, 0, 0, 0)

@@ -525,7 +525,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 
 	zval *path, *params = NULL, *absolute_path = NULL, cache = {}, is_started = {}, key = {}, lifetime = {}, cache_options = {}, content = {}, view_params = {};
-	zval merged_params = {}, is_fresh = {};
+	zval merged_params = {};
 
 	phalcon_fetch_params(0, 1, 1, &path, &params, &absolute_path);
 
@@ -543,8 +543,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 	PHALCON_CALL_METHOD(&cache, getThis(), "getcache");
 	if (Z_TYPE(cache) == IS_OBJECT) {
 		/**
-		 * Check if the cache is started, the first time a cache is started we start the
-		 * cache
+		 * Check if the cache is started, the first time a cache is started we start the cache
 		 */
 		PHALCON_CALL_METHOD(&is_started, &cache, "isstarted");
 		if (PHALCON_IS_FALSE(&is_started)) {
@@ -574,7 +573,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			/**
 			 * We start the cache using the key set
 			 */
-			PHALCON_CALL_METHOD(&content, &cache, "start", &key, &lifetime);
+			PHALCON_CALL_METHOD(&content, &cache, "start", &key, &lifetime, &PHALCON_GLOBAL(z_true));
 			zval_ptr_dtor(&key);
 			if (Z_TYPE(content) != IS_NULL) {
 				phalcon_update_property(getThis(), SL("_content"), &content);
@@ -584,8 +583,6 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 			}
 		}
 	}
-
-	phalcon_ob_start();
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
@@ -602,35 +599,27 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, render){
 		ZVAL_COPY(&merged_params, &view_params);
 	}
 
+	phalcon_ob_start();
+
 	/**
 	 * internalRender is also reused by partials
 	 */
 	PHALCON_CALL_METHOD(NULL, getThis(), "_internalrender", path, &merged_params, absolute_path);
 	zval_ptr_dtor(&merged_params);
 
+	phalcon_ob_end_clean();
+
+	PHALCON_CALL_METHOD(&content, getThis(), "getcontent");
+
 	/**
 	 * Store the data in output into the cache
 	 */
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&is_started, &cache, "isstarted");
-		if (PHALCON_IS_TRUE(&is_started)) {
-			PHALCON_CALL_METHOD(&is_fresh, &cache, "isfresh");
-			if (PHALCON_IS_TRUE(&is_fresh)) {
-				PHALCON_CALL_METHOD(NULL, &cache, "save");
-			} else {
-				PHALCON_CALL_METHOD(NULL, &cache, "stop");
-			}
-		} else {
-			PHALCON_CALL_METHOD(NULL, &cache, "stop");
-		}
+		PHALCON_CALL_METHOD(NULL, &cache, "save", &PHALCON_GLOBAL(z_null), &content);
+		zval_ptr_dtor(&cache);
 	}
-	zval_ptr_dtor(&cache);
 
-	phalcon_ob_end_clean();
-
-	phalcon_read_property(&content, getThis(), SL("_content"), PH_READONLY);
-
-	RETURN_CTOR(&content);
+	RETURN_ZVAL(&content, 0, 0);
 }
 
 /**

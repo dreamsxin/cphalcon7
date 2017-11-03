@@ -1061,8 +1061,13 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		/**
 		 * We start the cache using the key set
 		 */
-		phalcon_ob_clean();
-		PHALCON_CALL_METHOD(&cached_view, &cache, "start", &key, &lifetime);
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "--Get view cache: ", &key);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
+
+		PHALCON_CALL_METHOD(&cached_view, &cache, "start", &key, &lifetime, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&key);
 		if (Z_TYPE(cached_view) != IS_NULL) {
 			phalcon_update_property(getThis(), SL("_content"), &cached_view);
@@ -1148,10 +1153,15 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	zval_ptr_dtor(&views_dir_paths);
 
 	if (PHALCON_IS_TRUE(&not_exists)) {
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			ZVAL_STRING(&debug_message, "--Not Found View");
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
+
 		zval contents = {};
 		phalcon_ob_get_contents(&contents);
-
-		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&contents);
 
 		/**
@@ -1174,8 +1184,16 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	 * Store the data in the cache
 	 */
 	if (Z_TYPE(cache) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, &cache, "save");
+		zval contents = {};
+		PHALCON_CALL_METHOD(&contents, getThis(), "getcontent");
+		PHALCON_CALL_METHOD(NULL, &cache, "save", &PHALCON_GLOBAL(z_null), &contents);
+		zval_ptr_dtor(&contents);
 		zval_ptr_dtor(&cache);
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			ZVAL_STRING(&debug_message, "--Save view cache");
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
 	}
 }
 
@@ -1322,7 +1340,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_read_property(&disabled, getThis(), SL("_disabled"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_FALSE(&disabled)) {
 		phalcon_ob_get_contents(&contents);
-		phalcon_update_property(getThis(), SL("_content"), &contents);
+		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&contents);
 		RETURN_FALSE;
 	}
@@ -1465,7 +1483,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 * Get the current content in the buffer maybe some output from the controller
 	 */
 	phalcon_ob_get_contents(&contents);
-	phalcon_update_property(getThis(), SL("_content"), &contents);
+	PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 	zval_ptr_dtor(&contents);
 
 	ZVAL_TRUE(&silence);
@@ -1992,15 +2010,24 @@ PHP_METHOD(Phalcon_Mvc_View, cache){
  */
 PHP_METHOD(Phalcon_Mvc_View, setContent){
 
-	zval *content;
+	zval *content, *append = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &content);
+	phalcon_fetch_params(0, 1, 1, &content, &append);
 
 	if (Z_TYPE_P(content) != IS_STRING) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Content must be a string");
 		return;
 	}
-	phalcon_update_property(getThis(), SL("_content"), content);
+
+	if (append && Z_TYPE_P(append) == IS_TRUE) {
+		zval old_content = {}, new_content = {};
+		phalcon_read_property(&old_content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
+		PHALCON_CONCAT_VV(&new_content, &old_content, content);
+		phalcon_update_property(getThis(), SL("_content"), &new_content);
+		zval_ptr_dtor(&new_content);
+	} else {
+		phalcon_update_property(getThis(), SL("_content"), content);
+	}
 
 	RETURN_THIS();
 }

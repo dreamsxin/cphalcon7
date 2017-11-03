@@ -672,7 +672,7 @@ PHP_METHOD(Phalcon_Mvc_View_Model, render){
 					}
 				}
 
-				PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, &new_vars, &PHALCON_GLOBAL(z_true));
+				PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, &new_vars, &PHALCON_GLOBAL(z_false));
 
 				/**
 				 * Call afterRenderView if there is a events manager available

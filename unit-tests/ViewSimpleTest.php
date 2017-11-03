@@ -174,7 +174,7 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 		$view->setDI($this->_getDI());
 		$view->cache(array('key' => 'view_simple_cache'));
 		$this->assertEquals("<p>$timeNow</p>", $view->render('test3/coolVar'));
-
+		sleep(3);
 		// Cache should expire
 		$this->assertEquals("<p></p>", @$view->render('test3/coolVar'));
 	}

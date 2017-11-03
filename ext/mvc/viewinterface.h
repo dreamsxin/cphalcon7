@@ -135,6 +135,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_viewinterface_setcontent, 0, 0, 1)
 	ZEND_ARG_INFO(0, content)
+	ZEND_ARG_TYPE_INFO(0, append, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_viewinterface_startsection, 0, 0, 1)

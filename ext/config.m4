@@ -381,6 +381,7 @@ kernel/backtrace.c \
 kernel/object.c \
 kernel/array.c \
 kernel/hash.c \
+kernel/murmurhash.c \
 kernel/string.c \
 kernel/mbstring.c \
 kernel/filter.c \
@@ -395,6 +396,7 @@ kernel/mpool.c \
 kernel/avltree.c \
 kernel/rbtree.c \
 kernel/bloomfilter.c \
+kernel/countingbloomfilter.c \
 kernel/datrie/trie.c \
 kernel/datrie/alpha-map.c \
 kernel/datrie/darray.c \

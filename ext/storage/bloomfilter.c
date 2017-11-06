@@ -22,7 +22,6 @@
 #include "storage/exception.h"
 
 #include "kernel/main.h"
-#include "kernel/bloomfilter.h"
 #include "kernel/exception.h"
 #include "kernel/object.h"
 #include "kernel/fcall.h"

@@ -1251,7 +1251,7 @@ server/exception.c"
 
 	if test "$PHP_STORAGE_BLOOMFILTER" = "yes"; then
 		AC_DEFINE(PHALCON_USE_BLOOMFILTER, 1, [Have bloomfilter support])
-		phalcon_sources="$phalcon_sources storage/bloomfilter.c "
+		phalcon_sources="$phalcon_sources storage/bloomfilter.c storage/bloomfilter/counting.c "
 	fi
 
 	if test "$PHP_STORAGE_DATRIE" = "yes"; then

@@ -617,6 +617,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 #if PHALCON_USE_BLOOMFILTER
 	PHALCON_INIT(Phalcon_Storage_Bloomfilter);
+# ifdef ZEND_ENABLE_ZVAL_LONG64
+	PHALCON_INIT(Phalcon_Storage_Bloomfilter_Counting);
+# endif
 #endif
 
 #ifdef PHALCON_USE_DATRIE

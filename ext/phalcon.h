@@ -464,6 +464,7 @@
 #include "storage/wiredtiger.h"
 #include "storage/wiredtiger/cursor.h"
 #include "storage/bloomfilter.h"
+#include "storage/bloomfilter/counting.h"
 #include "storage/datrie.h"
 #include "storage/lmdb.h"
 #include "storage/lmdb/cursor.h"

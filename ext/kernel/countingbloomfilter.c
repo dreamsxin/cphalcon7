@@ -19,22 +19,9 @@
   +------------------------------------------------------------------------+
 */
 
-#ifdef ZEND_ENABLE_ZVAL_LONG64
-
-#include <sys/stat.h>
-#include <stdint.h>
-#include <stdio.h>
-#include <stdarg.h>
-#include <stdlib.h>
-#include <fcntl.h>
-#include <math.h>
-#include <string.h>
-#include <sys/mman.h>
-#include <unistd.h>
-#include <errno.h>
-
-#include "kernel/murmurhash.h"
 #include "kernel/countingbloomfilter.h"
+
+#ifdef ZEND_ENABLE_ZVAL_LONG64
 
 #define ERROR_TIGHTENING_RATIO 0.5
 #define SALT_CONSTANT 0x97c29b3a
@@ -392,6 +379,42 @@ counting_bloom_t *new_counting_bloom_from_file(unsigned int capacity, double err
         fprintf(stderr, "Error, Actual filesize and expected filesize are not equal\n");
         return NULL;
     }
+    if ((bloom->bitmap = new_bitmap(fd, size)) == NULL) {
+        fprintf(stderr, "Error, Could not create bitmap with file\n");
+        free_counting_bloom(bloom);
+        return NULL;
+    }
+    
+    bloom->header = (counting_bloom_header_t *)(bloom->bitmap->array);
+    
+    return bloom;
+}
+
+counting_bloom_t *autocreate_counting_bloom_from_file(unsigned int capacity, double error_rate, const char *filename)
+{
+    int fd;
+    off_t size;
+    
+    counting_bloom_t *bloom;
+    
+    if ((fd = open(filename, O_RDWR | O_CREAT, (mode_t)0600)) < 0) {
+        fprintf(stderr, "Error, Could not open file %s: %s\n", filename, strerror(errno));
+        return NULL;
+    }
+
+    bloom = counting_bloom_init(capacity, error_rate, 0);
+    if ((size = lseek(fd, 0, SEEK_END)) <= 0) {
+        bloom->bitmap = new_bitmap(fd, bloom->num_bytes);
+        bloom->header = (counting_bloom_header_t *)(bloom->bitmap->array);
+        return bloom;
+    }
+    
+    if (size != bloom->num_bytes) {
+        free_counting_bloom(bloom);
+        fprintf(stderr, "Error, Actual filesize and expected filesize are not equal\n");
+        return NULL;
+    }
+
     if ((bloom->bitmap = new_bitmap(fd, size)) == NULL) {
         fprintf(stderr, "Error, Could not create bitmap with file\n");
         free_counting_bloom(bloom);

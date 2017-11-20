@@ -17,5 +17,5 @@
 * 李垒 50RMB
 * 张昭明 100RMB
 * 晓光 50RMB
-* 王杰新 @Vikin 66RMB
+* 王杰新 66RMB https://github.com/viest
 * 戴训星 100RMB https://github.com/daixunxing

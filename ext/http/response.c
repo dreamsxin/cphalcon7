@@ -41,6 +41,7 @@
 #include "kernel/string.h"
 #include "kernel/file.h"
 #include "kernel/variables.h"
+#include "kernel/debug.h"
 
 #include "internal/arginfo.h"
 
@@ -762,39 +763,120 @@ PHP_METHOD(Phalcon_Http_Response, sendCookies){
  */
 PHP_METHOD(Phalcon_Http_Response, send){
 
-	zval sent = {}, headers = {}, cookies = {}, content = {}, file = {};
+	zval sent = {}, headers = {}, content = {}, file = {};
 
 	phalcon_read_property(&sent, getThis(), SL("_sent"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_FALSE(&sent)) {
-		/* Send headers */
-		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
-		if (Z_TYPE(headers) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, &headers, "send");
-		}
-
-		phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
-		if (Z_TYPE(cookies) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, &cookies, "send");
-		}
-
 		/* Output the response body */
 		phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(content) != IS_NULL) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
 			zend_print_zval(&content, 0);
-		} else {
-			phalcon_read_property(&file, getThis(), SL("_file"), PH_NOISY|PH_READONLY);
-
-			if (Z_TYPE(file) == IS_STRING && Z_STRLEN(file)) {
-				php_stream *stream;
-
-				stream = php_stream_open_wrapper(Z_STRVAL(file), "rb", REPORT_ERRORS, NULL);
-				if (stream != NULL) {
-					php_stream_passthru(stream);
-					php_stream_close(stream);
-				}
-			}
+			goto gotoend;
 		}
 
+		phalcon_read_property(&file, getThis(), SL("_file"), PH_NOISY|PH_READONLY);
+
+		if (Z_TYPE(file) == IS_STRING && Z_STRLEN(file)) {
+			php_stream *stream;
+			zval *_SERVER, http_range = {}, filesize = {}, content_length = {};
+
+			stream = php_stream_open_wrapper(Z_STRVAL(file), "rb", REPORT_ERRORS, NULL);
+			if (stream == NULL) {
+				goto gotoend;
+			}
+			PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
+			PHALCON_CALL_FUNCTION(&filesize, "filesize", &file);
+			_SERVER = phalcon_get_global_str(SL("_SERVER"));
+			if (phalcon_array_isset_fetch_str(&http_range, _SERVER, SL("HTTP_RANGE"), PH_READONLY)) {
+				zval pattern = {}, matched = {}, matches = {};
+				ZVAL_STRING(&pattern, "#bytes=(\\d+)-(\\d+)?#i");
+				ZVAL_MAKE_REF(&matches);
+				RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, &http_range, &matches));
+				ZVAL_UNREF(&matches);
+				zval_ptr_dtor(&pattern);
+				if (zend_is_true(&matched)) {
+					zval match_one = {}, match_two = {}, status = {}, message = {}, content_range = {}, length = {};
+					zend_long max, start = 0, end = 0, len = 0;
+
+					ZVAL_LONG(&status, 206);
+					ZVAL_STRING(&message, "Partial Content");
+					PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", &status, &message);
+					zval_ptr_dtor(&message);
+
+					max = Z_LVAL(filesize) - 1;
+					phalcon_array_fetch_long(&match_one, &matches, 1, PH_COPY);
+					convert_to_long(&match_one);
+					start = Z_LVAL(match_one);
+					start = start > max ? max : start;
+					ZVAL_LONG(&match_one, start);
+					if (!phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_COPY)) {
+						end = max - 1;
+					} else {
+						convert_to_long(&match_two);
+						end = Z_LVAL(match_two);
+					}
+					end = end < start ? start : end;
+					end = end > max ? max : end;
+					ZVAL_LONG(&match_two, end);
+					zval_ptr_dtor(&matches);
+
+					len = end - start + 1;
+					ZVAL_LONG(&length, len);
+		
+					PHALCON_CONCAT_SVSVSV(&content_range, "Content-Range: bytes ", &match_one, "-", &match_two, "/", &filesize);
+					zval_ptr_dtor(&match_one);
+					zval_ptr_dtor(&match_two);
+					zval_ptr_dtor(&filesize);
+					PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_range);
+					zval_ptr_dtor(&content_range);
+
+					PHALCON_CONCAT_SV(&content_length, "Content-Length: ", &length);
+					PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_length);
+					zval_ptr_dtor(&content_length);
+					
+					PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
+					PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+
+					if (php_stream_seek(stream, start, 0) != -1) {
+						char buf[8192];
+						while (len > 0) {
+							int r;
+							do {
+								r = php_stream_read(stream, buf, len > 8192 ? 8192 : len);
+								if (r > 0) {
+									PHPWRITE(buf, r);
+								}
+							} while ((r == -1) && (errno == EINTR));
+
+							if (r == -1) {
+								break;
+							} else if (r == 0) {
+								errno = EPROTO;
+								break;
+							}
+
+							len -= r;
+						}
+					}
+					php_stream_close(stream);
+					zval_ptr_dtor(&headers);
+					goto gotoend;
+				}
+			}
+
+			PHALCON_CONCAT_SV(&content_length, "Content-Length: ", &filesize);
+			PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_length);
+			zval_ptr_dtor(&content_length);
+					
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+			php_stream_passthru(stream);
+			php_stream_close(stream);
+			zval_ptr_dtor(&headers);
+		}
+gotoend:
 		phalcon_update_property_bool(getThis(), SL("_sent"), 1);
 
 		RETURN_THIS();
@@ -811,7 +893,7 @@ PHP_METHOD(Phalcon_Http_Response, send){
  */
 PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 
-	zval *file_path, *attachment_name = NULL, *attachment = NULL, base_path = {}, headers = {}, content_description = {}, content_disposition = {}, content_transfer = {};
+	zval *file_path, *attachment_name = NULL, *attachment = NULL, base_path = {};
 
 	phalcon_fetch_params(0, 1, 2, &file_path, &attachment_name, &attachment);
 
@@ -830,16 +912,38 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 	}
 
 	if (zend_is_true(attachment)) {
+		zval headers = {}, content_description = {}, content_disposition = {}, content_transfer = {};
+		zval mtime = {}, format = {}, format_time = {}, last_modified = {}, accept_ranges = {};
+
 		PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
 
 		ZVAL_STRING(&content_description, "Content-Description: File Transfer");
 		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_description);
+		zval_ptr_dtor(&content_description);
 
 		PHALCON_CONCAT_SV(&content_disposition, "Content-Disposition: attachment; filename=", &base_path);
 		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_disposition);
+		zval_ptr_dtor(&content_disposition);
 
 		ZVAL_STRING(&content_transfer, "Content-Transfer-Encoding: binary");
 		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_transfer);
+		zval_ptr_dtor(&content_transfer);
+
+		PHALCON_CALL_FUNCTION(&mtime, "filemtime", file_path);
+		ZVAL_STRING(&format, "r");
+		PHALCON_CALL_FUNCTION(&format_time, "date", &format , &mtime);
+		zval_ptr_dtor(&format);
+		zval_ptr_dtor(&mtime);
+
+		PHALCON_CONCAT_SV(&last_modified, "Last-Modified: ", &format_time);
+		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &last_modified);
+		zval_ptr_dtor(&last_modified);
+
+		ZVAL_STRING(&accept_ranges, "Accept-Ranges: bytes");
+		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &accept_ranges);
+		zval_ptr_dtor(&accept_ranges);
+
+		zval_ptr_dtor(&headers);
 	}
 
 	phalcon_update_property(getThis(), SL("_file"), file_path);

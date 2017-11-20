@@ -18,4 +18,4 @@
 * 张昭明 100RMB
 * 晓光 50RMB
 * 王杰新 @Vikin 66RMB
-* 戴训星 100RMB
+* 戴训星 100RMB https://github.com/daixunxing

@@ -129,7 +129,6 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Redis)
 PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 	zval *frontend, *_options = NULL, options = {}, redis = {}, special_key = {};
-	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
@@ -141,7 +140,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
-  }
+	}
 
 	if (!phalcon_array_isset_fetch_str(&redis, &options, SL("redis"), PH_READONLY)) {
 		if (!phalcon_array_isset_str(&options, SL("host"))) {
@@ -160,9 +159,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 			phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
 		}
 	} else {
+		zend_class_entry *ce0;
 		ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
-		PHALCON_VERIFY_CLASS(&redis, ce0);
-		phalcon_update_property(getThis(), SL("_redis"), &redis);
+		if (Z_TYPE(redis) == IS_STRING) {
+			zval service = {};
+			PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &redis);
+			PHALCON_VERIFY_CLASS(&service, ce0);
+			phalcon_update_property(getThis(), SL("_redis"), &service);
+			zval_ptr_dtor(&service);
+		} else {
+			PHALCON_VERIFY_CLASS(&redis, ce0);
+			phalcon_update_property(getThis(), SL("_redis"), &redis);
+		}
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
@@ -217,7 +225,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	}
 
 	phalcon_update_property(getThis(), SL("_redis"), &redis);
-	RETURN_CTOR(&redis);
+	RETURN_ZVAL(&redis, 1, 0);
 }
 
 /**

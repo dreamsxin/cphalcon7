@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageLeveldbTest extends PHPUnit_Framework_TestCase
+class StorageLeveldbTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

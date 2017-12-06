@@ -19,7 +19,7 @@
 	+------------------------------------------------------------------------+
 */
 
-class AysncTest extends PHPUnit_Framework_TestCase
+class AysncTest extends PHPUnit\Framework\TestCase
 {
 	public function test()
 	{

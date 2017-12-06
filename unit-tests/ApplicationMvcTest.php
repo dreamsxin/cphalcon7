@@ -27,7 +27,7 @@ class CustomResponse extends Phalcon\Http\Response {
 	}
 }
 
-class ApplicationMvcTest extends PHPUnit_Framework_TestCase
+class ApplicationMvcTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testApplicationSingleModule()

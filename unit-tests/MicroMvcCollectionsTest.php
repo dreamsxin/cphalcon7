@@ -58,7 +58,7 @@ class PersonasLazyController
 	}
 }
 
-class MicroMvcCollectionsTest extends PHPUnit_Framework_TestCase
+class MicroMvcCollectionsTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testMicroCollections()

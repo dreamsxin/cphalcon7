@@ -23,16 +23,16 @@ function sqlite_now()
 	return date('Y-m-d H:i:s');
 }
 
-class ModelsValidatorsTest extends PHPUnit_Framework_TestCase
+class ModelsValidatorsTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		date_default_timezone_set('UTC');
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

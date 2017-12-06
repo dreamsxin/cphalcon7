@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageDatrieTest extends PHPUnit_Framework_TestCase
+class StorageDatrieTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class DbDescribeTest extends PHPUnit_Framework_TestCase
+class DbDescribeTest extends PHPUnit\Framework\TestCase
 {
 
 	public function getExpectedColumnsMysql()

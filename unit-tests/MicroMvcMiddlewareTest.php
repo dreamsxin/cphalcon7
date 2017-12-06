@@ -49,7 +49,7 @@ class MyMiddlewareStop implements Phalcon\Mvc\Micro\MiddlewareInterface
 	}
 }
 
-class MicroMvcMiddlewareTest extends PHPUnit_Framework_TestCase
+class MicroMvcMiddlewareTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testMicroMiddlewareSimple()

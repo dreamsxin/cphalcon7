@@ -26,7 +26,7 @@ use Phalcon\Cache\Frontend\Output as FrontendCache;
 use Phalcon\Cache\Backend\File as BackendCache;
 use Phalcon\Cache\BackendInterface;
 
-class ViewSimpleTest extends PHPUnit_Framework_TestCase
+class ViewSimpleTest extends PHPUnit\Framework\TestCase
 {
 	private $level;
 
@@ -95,10 +95,13 @@ class ViewSimpleTest extends PHPUnit_Framework_TestCase
 
 	public function testMissingView()
 	{
-		$this->setExpectedException('Phalcon\Mvc\View\Exception');
-		$view = new View;
-		$view->setViewsDir('unit-tests/views/');
-		$view->render('test1/index');
+		try {
+			$view = new View;
+			$view->setViewsDir('unit-tests/views/');
+			$view->render('test1/index');
+			$this->assertTrue(false);
+		} catch (\Phalcon\Mvc\View\Exception $e) {
+		}
 	}
 
 	public function testRenderStandard()

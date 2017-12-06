@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-class InitTest extends PHPUnit_Framework_TestCase
+class InitTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testExtensionLoaded()

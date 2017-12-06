@@ -19,24 +19,24 @@
   +------------------------------------------------------------------------+
 */
 
-class ConsoleCliTest extends PHPUnit_Framework_TestCase
+class ConsoleCliTest extends PHPUnit\Framework\TestCase
 {
+
+	public function setUp()
+	{
+		spl_autoload_register(array($this, 'dispatcherAutoloader'));
+	}
+
+	public function tearDown()
+	{
+		spl_autoload_unregister(array($this, 'dispatcherAutoloader'));
+	}
 
 	public function dispatcherAutoloader($className)
 	{
 		if (file_exists('unit-tests/tasks/'.$className.'.php')) {
 			require 'unit-tests/tasks/'.$className.'.php';
 		}
-	}
-
-	public function __construct()
-	{
-		spl_autoload_register(array($this, 'dispatcherAutoloader'));
-	}
-
-	public function __destruct()
-	{
-		spl_autoload_unregister(array($this, 'dispatcherAutoloader'));
 	}
 
 	public function testConsoles()

@@ -25,21 +25,17 @@ class Issue_1534 extends \Phalcon\Mvc\Model
 {
 }
 
-class ModelsTest extends PHPUnit_Framework_TestCase
+class ModelsTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
-	{
-		spl_autoload_unregister(array($this, 'modelsAutoloader'));
-	}
-
 	public function tearDown()
 	{
+		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 		Phalcon\Mvc\Model::setup(array(
 			'phqlLiterals' => true,
 		));

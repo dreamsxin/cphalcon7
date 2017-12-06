@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class IntrusiveRbtreeTest extends PHPUnit_Framework_TestCase
+class IntrusiveRbtreeTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

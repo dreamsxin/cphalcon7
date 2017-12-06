@@ -20,7 +20,7 @@
 
 require_once 'annotations/TestClass.php';
 
-class AnnotationsTest extends PHPUnit_Framework_TestCase
+class AnnotationsTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testParser()

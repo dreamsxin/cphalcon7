@@ -18,15 +18,21 @@
   +------------------------------------------------------------------------+
 */
 
-class ModelsResultsetCacheStaticTest extends PHPUnit_Framework_TestCase
+class ModelsResultsetCacheStaticTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
+		$iterator = new DirectoryIterator('unit-tests/cache/');
+		foreach ($iterator as $item) {
+			if (!$item->isDir()) {
+				unlink($item->getPathname());
+			}
+		}
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}
@@ -36,16 +42,6 @@ class ModelsResultsetCacheStaticTest extends PHPUnit_Framework_TestCase
 		$className = str_replace('\\', '/', $className);
 		if (file_exists('unit-tests/models/'.$className.'.php')) {
 			require 'unit-tests/models/'.$className.'.php';
-		}
-	}
-
-	public function setUp()
-	{
-		$iterator = new DirectoryIterator('unit-tests/cache/');
-		foreach ($iterator as $item) {
-			if (!$item->isDir()) {
-				unlink($item->getPathname());
-			}
 		}
 	}
 

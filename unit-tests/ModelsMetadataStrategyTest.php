@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
+class ModelsMetadataStrategyTest extends PHPUnit\Framework\TestCase
 {
 
 	protected $_expectedMeta = array(
@@ -82,12 +82,12 @@ class ModelsMetadataStrategyTest extends PHPUnit_Framework_TestCase
 		),
 	);
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

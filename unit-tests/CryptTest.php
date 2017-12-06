@@ -18,7 +18,7 @@
 	+------------------------------------------------------------------------+
 */
 
-class CryptTest extends PHPUnit_Framework_TestCase
+class CryptTest extends PHPUnit\Framework\TestCase
 {
 
 	/**

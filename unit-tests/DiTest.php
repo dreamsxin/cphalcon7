@@ -61,7 +61,7 @@ class Service1242
 {
 }
 
-class DiTest extends PHPUnit_Framework_TestCase
+class DiTest extends PHPUnit\Framework\TestCase
 {
 
 	protected $_di;

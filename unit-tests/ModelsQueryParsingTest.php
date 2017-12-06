@@ -20,15 +20,15 @@
 
 use Phalcon\Mvc\Model\Query as Query;
 
-class ModelsQueryParsingTest extends PHPUnit_Framework_TestCase
+class ModelsQueryParsingTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

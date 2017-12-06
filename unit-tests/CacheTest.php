@@ -20,7 +20,7 @@
 
 require_once 'helpers/xcache.php';
 
-class CacheTest extends PHPUnit_Framework_TestCase
+class CacheTest extends PHPUnit\Framework\TestCase
 {
 
 	public function setUp()

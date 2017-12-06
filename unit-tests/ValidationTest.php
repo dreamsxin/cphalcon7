@@ -32,16 +32,16 @@ use Phalcon\Validation\Validator\PresenceOf,
 	Phalcon\Validation\Validator\Json,
 	Phalcon\Validation\Validator\Uniqueness;
 
-class ValidationTest extends PHPUnit_Framework_TestCase
+class ValidationTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		date_default_timezone_set('UTC');
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class TranslateTest extends PHPUnit_Framework_TestCase
+class TranslateTest extends PHPUnit\Framework\TestCase
 {
 	public function testBasic()
 	{

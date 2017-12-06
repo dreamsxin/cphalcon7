@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageWiredtigerTest extends PHPUnit_Framework_TestCase
+class StorageWiredtigerTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

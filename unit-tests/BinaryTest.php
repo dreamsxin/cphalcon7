@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class BinaryTest extends PHPUnit_Framework_TestCase
+class BinaryTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testNormal()

@@ -18,7 +18,7 @@
 	+------------------------------------------------------------------------+
 */
 
-class FilterTest extends PHPUnit_Framework_TestCase
+class FilterTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

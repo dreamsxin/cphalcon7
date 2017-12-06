@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class BeanstalkTest extends PHPUnit_Framework_TestCase
+class BeanstalkTest extends PHPUnit\Framework\TestCase
 {
 	public function testBasic()
 	{

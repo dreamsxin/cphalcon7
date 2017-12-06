@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class IntrusiveAvltreeTest extends PHPUnit_Framework_TestCase
+class IntrusiveAvltreeTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

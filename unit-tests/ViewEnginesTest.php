@@ -87,7 +87,7 @@ class My_Twig_Engine extends \Phalcon\Mvc\View\Engine implements \Phalcon\Mvc\Vi
 
 }
 
-class ViewEnginesTest extends PHPUnit_Framework_TestCase
+class ViewEnginesTest extends PHPUnit\Framework\TestCase
 {
 
 	protected function _loadMustache()

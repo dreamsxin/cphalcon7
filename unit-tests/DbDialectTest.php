@@ -23,7 +23,7 @@ use Phalcon\Db\Column as Column;
 use Phalcon\Db\Index as Index;
 use Phalcon\Db\Reference as Reference;
 
-class DbDialectTest extends PHPUnit_Framework_TestCase
+class DbDialectTest extends PHPUnit\Framework\TestCase
 {
 
 	private function getColumns()

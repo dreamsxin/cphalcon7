@@ -24,7 +24,7 @@ if (function_exists('xhprof_enable')) {
 	xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
 }
 
-class PHPUnit_Framework_TestCase
+class PHPUnit\Framework\TestCase
 {
 
 	public function assertInstanceOf($className, $object)
@@ -165,7 +165,7 @@ try {
 				throw new Exception("class-name plz");
 			}
 		}
-		PHPUnit_Framework_TestCase::main($className);
+		PHPUnit\Framework\TestCase::main($className);
 	} else {
 		$xml = simplexml_load_file('unit-tests/phpunit.xml');
 		foreach ($xml->testsuites as $suite) {
@@ -173,7 +173,7 @@ try {
 				$fileName = (string) $file;
 				if (preg_match('#/([a-zA-Z0-9]+)\.php$#', $fileName, $matches)) {
 					require $fileName;
-					PHPUnit_Framework_TestCase::main($matches[1]);
+					PHPUnit\Framework\TestCase::main($matches[1]);
 				} else {
 					throw new Exception("$file plz");
 				}

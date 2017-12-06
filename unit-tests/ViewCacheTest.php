@@ -24,7 +24,7 @@ use Phalcon\Cache\Frontend\Output as FrontendCache;
 use Phalcon\Cache\Backend\File as BackendCache;
 use Phalcon\Mvc\View;
 
-class ViewCacheTest extends PHPUnit_Framework_TestCase
+class ViewCacheTest extends PHPUnit\Framework\TestCase
 {
 
 	public function setUp()

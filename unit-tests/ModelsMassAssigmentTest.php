@@ -18,15 +18,15 @@
   +------------------------------------------------------------------------+
 */
 
-class ModelsMassAssigmentTest extends PHPUnit_Framework_TestCase
+class ModelsMassAssigmentTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

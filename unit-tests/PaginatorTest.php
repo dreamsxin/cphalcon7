@@ -22,15 +22,15 @@ use Phalcon\Logger\Adapter\File as FileLogger,
     Phalcon\Db\Adapter\Pdo\Mysql as DbAdapter,
     Phalcon\Events\Manager as EventsManager;
 
-class PaginatorTest extends PHPUnit_Framework_TestCase
+class PaginatorTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

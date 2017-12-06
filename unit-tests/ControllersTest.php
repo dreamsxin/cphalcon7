@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-class ControllersTest extends PHPUnit_Framework_TestCase
+class ControllersTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testControllers()

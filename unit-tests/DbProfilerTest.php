@@ -69,7 +69,7 @@ class DbProfilerListener
 
 }
 
-class DbProfilerTest extends PHPUnit_Framework_TestCase
+class DbProfilerTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testDbMysql()

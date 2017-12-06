@@ -28,15 +28,15 @@ class Issue_2019 extends \Phalcon\Mvc\Model
 	}
 }
 
-class ModelsQueryExecuteTest extends PHPUnit_Framework_TestCase
+class ModelsQueryExecuteTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

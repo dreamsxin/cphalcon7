@@ -21,15 +21,15 @@
 use Phalcon\Mvc\Model\Query\Builder as Builder;
 use Phalcon\Mvc\Model\Query\Builder\Select as SelectBuilder;
 
-class ModelsQuerySelectBuilderTest extends PHPUnit_Framework_TestCase
+class ModelsQuerySelectBuilderTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

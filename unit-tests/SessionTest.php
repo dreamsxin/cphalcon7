@@ -18,13 +18,18 @@
 	+------------------------------------------------------------------------+
 */
 
-class SessionTest extends PHPUnit_Framework_TestCase
+class SessionTest extends PHPUnit\Framework\TestCase
 {
 	public function setUp()
 	{
 		if (PHP_SESSION_ACTIVE == session_status()) {
 			session_destroy();
 		}
+	}
+
+	public function tearDown()
+	{
+		@session_destroy();
 	}
 
 	public function testSessionFiles()
@@ -43,8 +48,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		// Automatically deleted after reading
 		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
 		$this->assertFalse($session->has('some'));
-
-		@session_destroy();
 	}
 
 	public function testSessionMemcached()
@@ -75,8 +78,6 @@ class SessionTest extends PHPUnit_Framework_TestCase
 		// Automatically deleted after reading
 		$this->assertEquals($session->get('some', NULL, TRUE), 'value');
 		$this->assertFalse($session->has('some'));
-
-		@session_destroy();
 	}
 
 }

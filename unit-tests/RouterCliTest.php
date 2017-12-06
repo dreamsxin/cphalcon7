@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class RouterCliTest extends PHPUnit_Framework_TestCase
+class RouterCliTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testRouters()

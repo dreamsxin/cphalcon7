@@ -18,15 +18,21 @@
   +------------------------------------------------------------------------+
 */
 
-class ModelsResultsetCacheTest extends PHPUnit_Framework_TestCase
+class ModelsResultsetCacheTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
+		$iterator = new DirectoryIterator('unit-tests/cache/');
+		foreach ($iterator as $item) {
+			if (!$item->isDir()) {
+				unlink($item->getPathname());
+			}
+		}
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}
@@ -58,16 +64,6 @@ class ModelsResultsetCacheTest extends PHPUnit_Framework_TestCase
 		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
 
 		return $di;
-	}
-
-	public function setUp()
-	{
-		$iterator = new DirectoryIterator('unit-tests/cache/');
-		foreach ($iterator as $item) {
-			if (!$item->isDir()) {
-				unlink($item->getPathname());
-			}
-		}
 	}
 
 	private function _prepareTestMysql()

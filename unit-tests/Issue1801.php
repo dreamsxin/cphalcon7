@@ -22,17 +22,18 @@
 /**
  * This test has to be in a separate file and cannot be combined with ModelsTest
  */
-class Issue1801 extends PHPUnit_Framework_TestCase
+class Issue1801 extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
+		Phalcon\Mvc\Model::setup(array('columnRenaming' => true));
 	}
 
 	public function modelsAutoloader($className)
@@ -40,12 +41,6 @@ class Issue1801 extends PHPUnit_Framework_TestCase
 		if (file_exists('unit-tests/models/'.$className.'.php')) {
 			require 'unit-tests/models/'.$className.'.php';
 		}
-	}
-
-	public function tearDown()
-	{
-		Phalcon\Mvc\Model::setup(array('columnRenaming' => true));
-		parent::tearDown();
 	}
 
 	protected function _getDI($dbService)

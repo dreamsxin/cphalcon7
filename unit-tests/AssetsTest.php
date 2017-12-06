@@ -34,7 +34,7 @@ class UppercaseFilter implements \Phalcon\Assets\FilterInterface
 	}
 }
 
-class AssetsTest extends PHPUnit_Framework_TestCase
+class AssetsTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testResource()

@@ -80,8 +80,10 @@ PHP_METHOD(Phalcon_Debug, setLinesBeforeContext);
 PHP_METHOD(Phalcon_Debug, getLinesAfterContext);
 PHP_METHOD(Phalcon_Debug, setLinesAfterContext);
 PHP_METHOD(Phalcon_Debug, getFileLink);
+PHP_METHOD(Phalcon_Debug, setLogger);
 PHP_METHOD(Phalcon_Debug, enable);
 PHP_METHOD(Phalcon_Debug, disable);
+PHP_METHOD(Phalcon_Debug, isEnable);
 PHP_METHOD(Phalcon_Debug, log);
 PHP_METHOD(Phalcon_Debug, dumpVar);
 
@@ -137,6 +139,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_getfilelink, 0, 0, 3)
 	ZEND_ARG_INFO(0, format)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_setlogger, 0, 0, 1)
+	ZEND_ARG_INFO(0, logger)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_enable, 0, 0, 0)
 	ZEND_ARG_INFO(0, logger)
 ZEND_END_ARG_INFO()
@@ -179,8 +185,10 @@ static const zend_function_entry phalcon_debug_method_entry[] = {
 	PHP_ME(Phalcon_Debug, getLinesAfterContext, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug, setLinesAfterContext, arginfo_phalcon_debug_setlines, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug, getFileLink, arginfo_phalcon_debug_getfilelink, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Debug, setLogger, arginfo_phalcon_debug_setlogger, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, enable, arginfo_phalcon_debug_enable, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, disable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Debug, isEnable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, log, arginfo_phalcon_debug_log, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Debug, dumpVar, arginfo_phalcon_debug_dumpvar, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
@@ -1441,6 +1449,25 @@ PHP_METHOD(Phalcon_Debug, setLinesAfterContext) {
 }
 
 /**
+ * Sets logger
+ *
+ * @param Phalcon\Logger\AdapterInterface $logger
+ */
+PHP_METHOD(Phalcon_Debug, setLogger){
+
+	zval *logger;
+
+	phalcon_fetch_params(0, 1, 0, &logger);
+	if (logger) {
+		PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
+	} else {
+		logger = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_logger"), logger);
+}
+
+/**
  * Enable simple debug mode
  *
  * @param Phalcon\Logger\AdapterInterface $logger
@@ -1452,12 +1479,10 @@ PHP_METHOD(Phalcon_Debug, enable){
 	phalcon_fetch_params(0, 0, 1, &logger);
 	if (logger) {
 		PHALCON_VERIFY_INTERFACE_EX(logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
-	} else {
-		logger = &PHALCON_GLOBAL(z_null);
+		phalcon_update_static_property_ce(phalcon_debug_ce, SL("_logger"), logger);
 	}
 
 	PHALCON_GLOBAL(debug).enable_debug = 1;
-	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_logger"), logger);
 }
 
 /**
@@ -1467,7 +1492,16 @@ PHP_METHOD(Phalcon_Debug, enable){
 PHP_METHOD(Phalcon_Debug, disable){
 
 	PHALCON_GLOBAL(debug).enable_debug = 0;
-	phalcon_update_static_property_ce(phalcon_debug_ce, SL("_logger"), &PHALCON_GLOBAL(z_null));
+}
+
+/**
+ * Check if debug mode
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Debug, isEnable){
+
+	RETURN_BOOL(PHALCON_GLOBAL(debug).enable_debug);
 }
 
 /**

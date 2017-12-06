@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class PHPTTestSuite extends PHPUnit_Framework_TestCase
+class PHPTTestSuite extends PHPUnit\Framework\TestCase
 {
 	public static function suite()
 	{

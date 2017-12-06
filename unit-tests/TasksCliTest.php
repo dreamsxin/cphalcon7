@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class TasksCliTest extends PHPUnit_Framework_TestCase
+class TasksCliTest extends PHPUnit\Framework\TestCase
 {
 
 	public function dispatcherAutoloader($className)
@@ -29,12 +29,12 @@ class TasksCliTest extends PHPUnit_Framework_TestCase
 		}
 	}
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'dispatcherAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'dispatcherAutoloader'));
 	}

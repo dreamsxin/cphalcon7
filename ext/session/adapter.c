@@ -210,6 +210,13 @@ PHP_METHOD(Phalcon_Session_Adapter, __destruct) {
  */
 PHP_METHOD(Phalcon_Session_Adapter, start){
 
+	zval started = {};
+
+	phalcon_read_property(&started, getThis(), SL("_started"), PH_NOISY|PH_READONLY);
+	if (zend_is_true(&started)) {
+		RETURN_FALSE;
+	}
+
 	if (!SG(headers_sent)) {
 		RETURN_ON_FAILURE(phalcon_session_start());
 		phalcon_update_property_bool(getThis(), SL("_started"), 1);

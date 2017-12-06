@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class KernelAliasTest extends PHPUnit_Framework_TestCase
+class KernelAliasTest extends PHPUnit\Framework\TestCase
 {
 	public function testAlias()
 	{

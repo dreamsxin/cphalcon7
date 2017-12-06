@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageBloomfilterTest extends PHPUnit_Framework_TestCase
+class StorageBloomfilterTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

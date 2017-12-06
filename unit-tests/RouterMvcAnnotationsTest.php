@@ -100,7 +100,7 @@ class MainController
 
 }
 
-class RouterMvcAnnotationsTest extends PHPUnit_Framework_TestCase
+class RouterMvcAnnotationsTest extends PHPUnit\Framework\TestCase
 {
 	public function _getDI()
 	{

@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class KernelMessageTest extends PHPUnit_Framework_TestCase
+class KernelMessageTest extends PHPUnit\Framework\TestCase
 {
 	public function testMessages()
 	{

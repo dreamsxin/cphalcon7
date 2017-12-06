@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageLmdbTest extends PHPUnit_Framework_TestCase
+class StorageLmdbTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

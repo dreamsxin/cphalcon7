@@ -19,7 +19,7 @@
   +------------------------------------------------------------------------+
 */
 
-class StorageBtreeTest extends PHPUnit_Framework_TestCase
+class StorageBtreeTest extends PHPUnit\Framework\TestCase
 {
 	public function testNormal()
 	{

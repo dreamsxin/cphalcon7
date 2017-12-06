@@ -59,7 +59,7 @@ class ContactFormSettersGetters
 	}
 }
 
-class FormsTest extends PHPUnit_Framework_TestCase
+class FormsTest extends PHPUnit\Framework\TestCase
 {
 
 	public function setUp()

@@ -18,7 +18,7 @@
   +------------------------------------------------------------------------+
 */
 
-class MicroMvcEventsTest extends PHPUnit_Framework_TestCase
+class MicroMvcEventsTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testMicroBeforeHandlers()

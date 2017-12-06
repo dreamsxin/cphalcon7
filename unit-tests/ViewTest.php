@@ -45,7 +45,7 @@ class ViewAfterRenderListener
 	}
 }
 
-class ViewTest extends PHPUnit_Framework_TestCase
+class ViewTest extends PHPUnit\Framework\TestCase
 {
 	private $level;
 
@@ -279,15 +279,17 @@ class ViewTest extends PHPUnit_Framework_TestCase
 
 	public function testMissingPartial()
 	{
-		$this->setExpectedException('Phalcon\Mvc\View\Exception');
+		try {
+			$view = new View();
+			$view->setBasePath(__DIR__.'/../');
+			$view->setViewsDir('unit-tests/views/');
 
-		$view = new View();
-		$view->setBasePath(__DIR__.'/../');
-		$view->setViewsDir('unit-tests/views/');
-
-		$view->start();
-		$view->render('test5', 'missing');
-		$view->finish();
+			$view->start();
+			$view->render('test5', 'missing');
+			$view->finish();
+			$this->assertTrue(false);
+		} catch (\Phalcon\Mvc\View\Exception $e) {
+		}
 	}
 
 	public function testGetRender()

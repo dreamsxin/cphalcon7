@@ -55,7 +55,7 @@ class RestHandler
 
 }
 
-class MicroMvcTest extends PHPUnit_Framework_TestCase
+class MicroMvcTest extends PHPUnit\Framework\TestCase
 {
 
 	public function testMicroClass()

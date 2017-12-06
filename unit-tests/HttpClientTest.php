@@ -19,7 +19,7 @@
 	+------------------------------------------------------------------------+
 */
 
-class HttpClientTest extends PHPUnit_Framework_TestCase
+class HttpClientTest extends PHPUnit\Framework\TestCase
 {
 	public function testHeader()
 	{

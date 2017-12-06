@@ -22,7 +22,7 @@
 use Phalcon\Mvc\View as View,
 	Phalcon\Mvc\View\Model as ViewModel;
 
-class ViewModelTest extends PHPUnit_Framework_TestCase
+class ViewModelTest extends PHPUnit\Framework\TestCase
 {
 	private $level;
 

@@ -24,15 +24,15 @@ class MyRow extends Phalcon\Mvc\Model\Row {
 	}
 }
 
-class ModelsHydrationTest extends PHPUnit_Framework_TestCase
+class ModelsHydrationTest extends PHPUnit\Framework\TestCase
 {
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

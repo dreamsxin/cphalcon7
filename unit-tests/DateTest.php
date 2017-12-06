@@ -20,9 +20,9 @@
   +------------------------------------------------------------------------+
 */
 
-class DateTest extends PHPUnit_Framework_TestCase
+class DateTest extends PHPUnit\Framework\TestCase
 {
-	public function __construct()
+	public function setUp()
 	{
 		date_default_timezone_set('America/Chicago');
 	}

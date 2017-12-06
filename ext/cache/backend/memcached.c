@@ -132,7 +132,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Memcached){
  */
 PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 
-	zval *frontend, *opts = NULL, options = {}, server = {}, servers = {}, special_key = {};
+	zval *frontend, *opts = NULL, options = {}, memcached = {}, server = {}, servers = {}, special_key = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &opts);
 
@@ -142,17 +142,32 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 		ZVAL_DUP(&options, opts);
 	}
 
-	if (!phalcon_array_isset_str(&options, SL("servers"))) {
-		array_init_size(&server, 3);
+	if (!phalcon_array_isset_fetch_str(&memcached, &options, SL("memcached"), PH_READONLY)) {
+		if (!phalcon_array_isset_str(&options, SL("servers"))) {
+			array_init_size(&server, 3);
 
-		phalcon_array_update_str_str(&server, SL("host"), SL("127.0.0.1"), PH_COPY);
-		phalcon_array_update_str_long(&server, SL("port"), 11211, PH_COPY);
-		phalcon_array_update_str_long(&server, SL("weight"), 1, PH_COPY);
+			phalcon_array_update_str_str(&server, SL("host"), SL("127.0.0.1"), PH_COPY);
+			phalcon_array_update_str_long(&server, SL("port"), 11211, PH_COPY);
+			phalcon_array_update_str_long(&server, SL("weight"), 1, PH_COPY);
 
-		array_init_size(&servers, 1);
-		phalcon_array_append(&servers, &server, 0);
+			array_init_size(&servers, 1);
+			phalcon_array_append(&servers, &server, 0);
 
-		phalcon_array_update_str(&options, SL("servers"), &servers, 0);
+			phalcon_array_update_str(&options, SL("servers"), &servers, 0);
+		}
+	} else {
+		zend_class_entry *ce0;
+		ce0 = phalcon_fetch_str_class(SL("Memcached"), ZEND_FETCH_CLASS_AUTO);
+		if (Z_TYPE(memcached) == IS_STRING) {
+			zval service = {};
+			PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &memcached);
+			PHALCON_VERIFY_CLASS(&service, ce0);
+			phalcon_update_property(getThis(), SL("_memcache"), &service);
+			zval_ptr_dtor(&service);
+		} else {
+			PHALCON_VERIFY_CLASS(&memcached, ce0);
+			phalcon_update_property(getThis(), SL("_memcache"), &memcached);
+		}
 	}
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {

@@ -20,7 +20,7 @@
 
 require_once 'helpers/xcache.php';
 
-class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
+class ModelsMetadataAdaptersTest extends PHPUnit\Framework\TestCase
 {
 
 	private $_data = array(
@@ -100,12 +100,12 @@ class ModelsMetadataAdaptersTest extends PHPUnit_Framework_TestCase
 		)
 	);
 
-	public function __construct()
+	public function setUp()
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function __destruct()
+	public function tearDown()
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

@@ -799,14 +799,15 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 /**
  * Builds generic INPUT tags
  *
- * @param   string $type
+ * @param string $type
  * @param array $parameters
- * @param 	boolean $asValue
+ * @param boolean $asValue
  * @return string
  */
 PHP_METHOD(Phalcon_Tag, _inputField){
 
 	zval *type, *parameters, *as_value = NULL, params = {}, default_params = {}, value = {}, id = {}, name = {}, code = {}, doctype = {};
+	zval label = {};
 
 	phalcon_fetch_params(0, 2, 1, &type, &parameters, &as_value);
 
@@ -832,12 +833,14 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 			phalcon_array_update_long(&params, 0, &id, PH_COPY);
 		}
 
-		if (phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_COPY)) {
 			if (!zend_is_true(&name)) {
-				phalcon_array_update_string(&params, IS(name), &id, PH_COPY);
+				ZVAL_COPY(&name, &id);
+				phalcon_array_update_string(&params, IS(name), &name, 0);
 			}
 		} else {
-			phalcon_array_update_string(&params, IS(name), &id, PH_COPY);
+			ZVAL_COPY(&name, &id);
+			phalcon_array_update_string(&params, IS(name), &name, 0);
 		}
 
 		/**
@@ -851,6 +854,20 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 
 		PHALCON_CALL_SELF(&value, "getvalue", &id, &params);
 		phalcon_array_update_string(&params, IS(value), &value, 0);
+
+		if (phalcon_array_isset_fetch_str(&label, &params, SL("label"), PH_READONLY) && zend_is_true(&label)) {
+			zval label_text = {};
+			if (PHALCON_IS_NOT_EMPTY_STRING(&label)) {
+				ZVAL_COPY_VALUE(&label_text, &label);
+			} else {
+				ZVAL_COPY_VALUE(&label_text, &name);
+			}
+			if (zend_is_true(&id)) {
+				PHALCON_CONCAT_SVSVS(&code, "<label for=\"", &id, "\">", &label_text, "</label>");
+			} else {
+				PHALCON_CONCAT_SVS(&code, "<label>", &label_text, "</label>");
+			}
+		}
 	} else {
 		/**
 		 * Use the 'id' as value if the user hadn't set it
@@ -864,7 +881,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 
 	phalcon_array_update_string(&params, IS(type), type, PH_COPY);
 
-	ZVAL_STRING(&code, "<input");
+	PHALCON_SCONCAT_STR(&code, "<input");
 
 	phalcon_tag_render_attributes(&code, &params);
 	zval_ptr_dtor(&params);

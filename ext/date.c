@@ -149,6 +149,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_filter, 0, 0, 1)
 	ZEND_ARG_INFO(0, date)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, delimiter, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_valid, 0, 0, 1)
@@ -1186,37 +1187,67 @@ PHP_METHOD(Phalcon_Date, createDateTimeZone){
  *
  * @param string $date_str
  * @param string $date_format
- * @return string
+ * @param string $delimiter
+ * @return string|array
  */
 PHP_METHOD(Phalcon_Date, filter){
 
-	zval *date = NULL, *format = NULL, date_format = {}, format_date = {}, errors = {}, warning_count = {}, error_count = {};
+	zval *date = NULL, *format = NULL, *delimiter = NULL, date_format = {}, format_date = {}, errors = {}, warning_count = {}, error_count = {};
 	zend_class_entry *ce0;
 
-	phalcon_fetch_params(0, 1, 1, &date, &format);
+	phalcon_fetch_params(0, 1, 2, &date, &format, &delimiter);
 
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
 		ZVAL_STRING(&date_format, "Y-m-d");
 	} else {
-		ZVAL_COPY_VALUE(&date_format, format);
+		ZVAL_COPY(&date_format, format);
 	}
 
 	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
-	PHALCON_CALL_CE_STATIC(&format_date, ce0, "createfromformat", &date_format, date);
-	PHALCON_CALL_CE_STATIC(&errors, ce0, "getlasterrors");
+	if (delimiter && Z_STRLEN_P(delimiter) > 0) {
+		zval dates = {}, *str;
+		phalcon_fast_explode(&dates, delimiter, date);
 
-	if (Z_TYPE(errors) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count"), PH_READONLY)
-			&& PHALCON_GT_LONG(&warning_count, 0)) {
-			RETURN_NULL();
+		array_init(return_value);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(dates), str) {
+			zval value = {};
+
+			if (PHALCON_IS_NOT_EMPTY_STRING(str)) {
+				PHALCON_CALL_CE_STATIC(&value, ce0, "createfromformat", &date_format, str);
+				if (Z_TYPE(value) != IS_OBJECT) {
+					phalcon_array_append(return_value, &PHALCON_GLOBAL(z_null), 0);
+				} else {
+					zval d = {};
+					PHALCON_CALL_METHOD(&d, &value, "format", &date_format);
+					phalcon_array_append(return_value, &d, 0);
+				}
+				zval_ptr_dtor(&value);
+
+			}
+		} ZEND_HASH_FOREACH_END();
+
+	} else {
+		PHALCON_CALL_CE_STATIC(&format_date, ce0, "createfromformat", &date_format, date);
+		PHALCON_CALL_CE_STATIC(&errors, ce0, "getlasterrors");
+
+		if (Z_TYPE(errors) == IS_ARRAY) {
+			if (phalcon_array_isset_fetch_str(&warning_count, &errors, SL("warning_count"), PH_READONLY)
+				&& PHALCON_GT_LONG(&warning_count, 0)) {
+				zval_ptr_dtor(&errors);
+				zval_ptr_dtor(&date_format);
+				RETURN_NULL();
+			}
+			if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count"), PH_READONLY) && PHALCON_GT_LONG(&error_count, 0)) {
+				zval_ptr_dtor(&errors);
+				zval_ptr_dtor(&date_format);
+				RETURN_NULL();
+			}
 		}
-		if (phalcon_array_isset_fetch_str(&error_count, &errors, SL("error_count"), PH_READONLY) && PHALCON_GT_LONG(&error_count, 0)) {
-			RETURN_NULL();
-		}
+
+		PHALCON_CALL_METHOD(return_value, &format_date, "format", &date_format);
 	}
-
-	PHALCON_CALL_METHOD(return_value, &format_date, "format", &date_format);
+	zval_ptr_dtor(&date_format);
 }
 
 /**

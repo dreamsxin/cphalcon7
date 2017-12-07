@@ -869,12 +869,15 @@ PHP_METHOD(Phalcon_Http_Response, send){
 			PHALCON_CONCAT_SV(&content_length, "Content-Length: ", &filesize);
 			PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_length);
 			zval_ptr_dtor(&content_length);
-					
+
 			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
 			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
 			php_stream_passthru(stream);
 			php_stream_close(stream);
 			zval_ptr_dtor(&headers);
+		} else {
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
 		}
 gotoend:
 		phalcon_update_property_bool(getThis(), SL("_sent"), 1);

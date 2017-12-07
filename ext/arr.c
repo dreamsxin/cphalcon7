@@ -170,6 +170,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_filter, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, callback)
+	ZEND_ARG_INFO(0, strict)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sum, 0, 0, 1)
@@ -1263,14 +1264,36 @@ PHP_METHOD(Phalcon_Arr, key){
  */
 PHP_METHOD(Phalcon_Arr, filter){
 
-	zval *array, *filters = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
+	zval *array, *filters = NULL, *strict = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &array, &filters);
+	phalcon_fetch_params(0, 1, 2, &array, &filters, &strict);
+
+	if (!strict) {
+		strict = &PHALCON_GLOBAL(z_false);
+	}
+
+	array_init(return_value);
+	if (zend_hash_num_elements(Z_ARRVAL_P(array)) == 0) {
+		return;
+	}
 
 	if (!filters || Z_TYPE_P(filters) == IS_NULL) {
-		PHALCON_RETURN_CALL_FUNCTION("array_filter", array);
+		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(array), idx, str_key, value) {
+			if (strict && PHALCON_IS_EMPTY(value)) {
+				continue;
+			} else if (!zend_is_true(value)) {
+				continue;
+			}
+
+			if (str_key) {
+				value = zend_hash_update(Z_ARRVAL_P(return_value), str_key, value);
+			} else {
+				value = zend_hash_index_update(Z_ARRVAL_P(return_value), idx, value);
+			}
+			zval_add_ref(value);
+		} ZEND_HASH_FOREACH_END();
 		return;
 	}
 
@@ -1282,11 +1305,14 @@ PHP_METHOD(Phalcon_Arr, filter){
 	zval_ptr_dtor(&dependency_injector);
 	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
 
-	array_init(return_value);
-
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, value) {
 		zval filter_value = {};
 		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", value, filters);
+		if (strict && PHALCON_IS_EMPTY(&filter_value)) {
+			continue;
+		} else if (!zend_is_true(&filter_value)) {
+			continue;
+		}
 		if (str_key) {
 			phalcon_array_update_string(return_value, str_key, &filter_value, 0);
 		} else {

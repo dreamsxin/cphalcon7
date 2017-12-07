@@ -74,7 +74,7 @@ PHALCON_INIT_CLASS(Phalcon_Tag_Select){
 PHP_METHOD(Phalcon_Tag_Select, selectField)
 {
 	zval *parameters, *data = NULL, params = {}, default_params = {}, id = {}, name = {}, value = {}, use_empty = {}, empty_value = {};
-	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, resultset_options = {}, array_options = {};
+	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, label = {}, resultset_options = {}, array_options = {};
 
 	phalcon_fetch_params(0, 1, 1, &parameters, &data);
 
@@ -100,10 +100,12 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 	}
 
 	if (!phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_READONLY)) {
-		phalcon_array_update_str(&params, SL("name"), &id, PH_COPY);
+		ZVAL_COPY(&name, &id);
+		phalcon_array_update_str(&params, SL("name"), &name, 0);
 	} else {
 		if (!zend_is_true(&name)) {
-			phalcon_array_update_str(&params, SL("name"), &id, PH_COPY);
+			ZVAL_COPY(&name, &id);
+			phalcon_array_update_str(&params, SL("name"), &name, 0);
 		}
 	}
 
@@ -146,7 +148,28 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		ZVAL_NULL(&using);
 	}
 
-	ZVAL_STRING(&code, "<select");
+	if (phalcon_array_isset_fetch_str(&label, &params, SL("label"), PH_READONLY) && zend_is_true(&label)) {
+		zval label_text = {};
+		if (PHALCON_IS_NOT_EMPTY_STRING(&label)) {
+			ZVAL_COPY_VALUE(&label_text, &label);
+		} else {
+			ZVAL_COPY_VALUE(&label_text, &name);
+		}
+
+		if (Z_TYPE(label) == IS_ARRAY) {
+			PHALCON_SCONCAT_STR(&code, "<label");
+			phalcon_tag_render_attributes(&code, &label);
+			PHALCON_SCONCAT_SVS(&code, ">", &label_text, "</label>");
+		} else {
+			if (zend_is_true(&id)) {
+				PHALCON_CONCAT_SVSVS(&code, "<label for=\"", &id, "\">", &label_text, "</label>");
+			} else {
+				PHALCON_CONCAT_SVS(&code, "<label>", &label_text, "</label>");
+			}
+		}
+	}
+
+	PHALCON_SCONCAT_STR(&code, "<select");
 
 	phalcon_tag_render_attributes(&code, &params);
 

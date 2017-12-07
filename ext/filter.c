@@ -535,6 +535,24 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
+	if (PHALCON_IS_STRING(filter, "daterange")) {
+		zval format = {}, delimiter = {};
+		if (Z_TYPE_P(options) == IS_ARRAY) {
+			if (!phalcon_array_isset_fetch_str(&format, options, SL("format"), PH_READONLY)) {
+				ZVAL_NULL(&format);
+			}
+			if (!phalcon_array_isset_fetch_str(&delimiter, options, SL("delimiter"), PH_COPY)) {
+				ZVAL_STRING(&delimiter, " - ");
+			}
+		} else {
+			ZVAL_NULL(&format);
+			ZVAL_STRING(&delimiter, " - ");
+		}
+		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value, &format, &delimiter);
+		zval_ptr_dtor(&delimiter);
+		goto ph_end_0;
+	}
+
 	if (PHALCON_IS_STRING(filter, "date")) {
 		PHALCON_CALL_CE_STATIC(&filtered, phalcon_date_ce, "filter", value);
 		goto ph_end_0;

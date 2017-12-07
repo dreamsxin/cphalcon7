@@ -314,6 +314,8 @@ class ImageTest extends PHPUnit\Framework\TestCase
 
 	public function testFilter()
 	{
+		$this->markTestSkipped("Skipped");
+		return;
 		// \Phalcon\Image\Adapter\Imagick::setResourceLimit(6, 4);
 
 		// $image = new \Phalcon\Image\Adapter\Imagick('unit-tests/assets/phalconphp.jpg');
@@ -332,6 +334,7 @@ class ImageTest extends PHPUnit\Framework\TestCase
 	public function testIssues2259()
 	{
 		if (!function_exists('gd_info')) {
+			$this->markTestSkipped("Skipped");
 			return;
 		}
 

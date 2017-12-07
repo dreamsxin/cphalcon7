@@ -8,6 +8,8 @@ class SecurityTest extends PHPUnit\Framework\TestCase
 		$security = new \Phalcon\Security;
 		$security->deriveKey('phalcon', '123');
 		$security->pbkdf2('phalcon', '123');
+		$this->markTestSkipped("Skipped");
+		return;
 	}
 
 	public function testComputeHMAC()

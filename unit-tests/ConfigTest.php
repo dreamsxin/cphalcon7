@@ -257,7 +257,8 @@ class ConfigTest extends PHPUnit\Framework\TestCase
 	public function testYamlConfig()
 	{
 		if (!function_exists("yaml_parse_file")) {
-			return false;
+			$this->markTestSkipped("Skipped");
+			return;
 		}
 		$config = new Phalcon\Config\Adapter\Yaml('unit-tests/config/config.yml');
 		$this->assertTrue($this->_compareConfig($this->_config, $config));

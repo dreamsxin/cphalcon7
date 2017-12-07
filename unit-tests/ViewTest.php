@@ -289,6 +289,7 @@ class ViewTest extends PHPUnit\Framework\TestCase
 			$view->finish();
 			$this->assertTrue(false);
 		} catch (\Phalcon\Mvc\View\Exception $e) {
+			$this->assertTrue(true);
 		}
 	}
 

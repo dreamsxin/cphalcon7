@@ -101,6 +101,7 @@ class ViewSimpleTest extends PHPUnit\Framework\TestCase
 			$view->render('test1/index');
 			$this->assertTrue(false);
 		} catch (\Phalcon\Mvc\View\Exception $e) {
+			$this->assertTrue(true);
 		}
 	}
 

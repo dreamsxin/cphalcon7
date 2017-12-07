@@ -212,7 +212,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		return;
 	}
 
-	if (phalcon_array_isset_fetch_str(&auth, &options, SL("auth"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&auth, &options, SL("auth"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&auth)) {
 		PHALCON_CALL_METHOD(&success, &redis, "auth", &auth);
 		if (!zend_is_true(&success)) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Redisd server is authentication failed");

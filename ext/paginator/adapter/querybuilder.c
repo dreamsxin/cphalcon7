@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	zval total_query = {}, result = {}, row = {}, rowcount = {}, dependency_injector = {};
 	zval service_name = {}, models_manager = {}, models = {}, model_name = {}, model = {}, connection = {}, bind_params = {}, bind_types = {};
 	zval processed = {}, *value, processed_types = {};
-	zval intermediate = {}, columns = {}, *column, dialect = {}, sql_select = {}, sql = {}, tmp = {}, page = {};
+	zval intermediate = {}, dialect = {}, sql = {}, tmp = {}, page = {};
 	zend_string *str_key;
 	ulong idx;
 	ldiv_t tp;
@@ -277,35 +277,14 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		zval_ptr_dtor(&tmp);
 	}
 
-	phalcon_array_fetch_string(&columns, &intermediate, IS(columns), PH_READONLY);
-
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
-		zval type = {}, select_columns = {};
-
-		phalcon_array_fetch_string(&type, column, IS(type), PH_NOISY|PH_READONLY);
-
-		/**
-		 * Complete objects are treated in a different way
-		 */
-		if (PHALCON_IS_STRING(&type, "object")) {
-			ZVAL_STRING(&select_columns, "*");
-
-			phalcon_array_update_string(&intermediate, IS(columns), &select_columns, 0);
-			break;
-		}
-	} ZEND_HASH_FOREACH_END();
-
 	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
-	PHALCON_CALL_METHOD(&sql_select, &dialect, "select", &intermediate);
+	PHALCON_CALL_METHOD(&sql, &dialect, "select", &intermediate, &PHALCON_GLOBAL(z_true));
 	zval_ptr_dtor(&dialect);
 	zval_ptr_dtor(&intermediate);
 
 	PHALCON_CALL_METHOD(&bind_params, &total_query, "getbindparams");
 	PHALCON_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
 	zval_ptr_dtor(&total_query);
-
-	PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"rowcount\" FROM (", &sql_select, ") AS T");
-	zval_ptr_dtor(&sql_select);
 
 	/**
 	 * Replace the placeholders

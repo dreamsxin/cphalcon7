@@ -4892,7 +4892,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 	zval *data = NULL, *white_list = NULL, *_exists = NULL, *exists_check = NULL, exists = {}, attributes = {}, bind_params = {}, *attribute;
 	zval type = {}, message = {}, event_name = {}, status = {}, write_connection = {}, related = {}, identity_field = {};
-	zval error_messages = {}, exception = {}, success = {}, new_success = {}, snapshot_data = {};
+	zval success = {}, new_success = {}, snapshot_data = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -4995,6 +4995,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	if (Z_TYPE(related) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(&status, getThis(), "_presaverelatedrecords", &write_connection, &related);
 		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&write_connection);
 			RETURN_FALSE;
 		}
 	}
@@ -5026,6 +5027,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		 * Throw exceptions on failed saves?
 		 */
 		if (unlikely(PHALCON_GLOBAL(orm).exception_on_failed_save)) {
+			zval error_messages = {}, exception = {};
 			phalcon_read_property(&error_messages, getThis(), SL("_errorMessages"), PH_READONLY);
 
 			/**
@@ -5063,6 +5065,23 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		 */
 		if (PHALCON_IS_FALSE(&new_success)) {
 			PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+			zval_ptr_dtor(&write_connection);
+			/**
+			 * Throw exceptions on failed saves?
+			 */
+			if (unlikely(PHALCON_GLOBAL(orm).exception_on_failed_save)) {
+				zval error_messages = {}, exception = {};
+				phalcon_read_property(&error_messages, getThis(), SL("_errorMessages"), PH_READONLY);
+
+				/**
+				 * Launch a Phalcon\Mvc\Model\ValidationFailed to notify that the save failed
+				 */
+				object_init_ex(&exception, phalcon_mvc_model_validationfailed_ce);
+				PHALCON_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
+
+				phalcon_throw_exception(&exception);
+				return;
+			}
 			RETURN_FALSE;
 		}
 
@@ -5104,8 +5123,24 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		ZVAL_STRING(&event_name, "afterOperation");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
-	}
+	} else {
+		/**
+		 * Throw exceptions on failed saves?
+		 */
+		if (unlikely(PHALCON_GLOBAL(orm).exception_on_failed_save)) {
+			zval error_messages = {}, exception = {};
+			phalcon_read_property(&error_messages, getThis(), SL("_errorMessages"), PH_READONLY);
 
+			/**
+			 * Launch a Phalcon\Mvc\Model\ValidationFailed to notify that the save failed
+			 */
+			object_init_ex(&exception, phalcon_mvc_model_validationfailed_ce);
+			PHALCON_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
+
+			phalcon_throw_exception(&exception);
+			return;
+		}
+	}
 	RETURN_ZVAL(&new_success, 0, 0);
 }
 

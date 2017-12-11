@@ -174,7 +174,7 @@ else
 fi
 
 PHP_ARG_ENABLE(python, for python support,
-[  --with-python   Include python support], no, no)
+[  --enable-python   Include python support], no, no)
 
 if test "$PHP_PYTHON" = "yes"; then
 	AC_DEFINE([PHALCON_PYTHON], [1], [Whether python are available])

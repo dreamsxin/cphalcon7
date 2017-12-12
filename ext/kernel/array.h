@@ -707,7 +707,7 @@ void phalcon_array_values(zval *return_value, zval *arr);
  */
 int phalcon_array_key_exists(zval *arr, zval *key);
 
-int phalcon_array_is_associative(zval *arr);
+int phalcon_array_is_associative(zval *arr, int flags);
 
 void phalcon_array_update_multi_ex(zval *arr, zval *value, const char *types, int types_length, int types_count, va_list ap);
 int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);

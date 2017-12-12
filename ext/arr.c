@@ -267,7 +267,7 @@ PHP_METHOD(Phalcon_Arr, is_assoc){
 
 	phalcon_fetch_params(0, 1, 0, &array);
 
-	if (phalcon_array_is_associative(array)) {
+	if (phalcon_array_is_associative(array, 0)) {
 		RETURN_TRUE;
 	} else {
 		RETURN_FALSE;
@@ -968,7 +968,7 @@ PHP_METHOD(Phalcon_Arr, merge){
 	phalcon_fetch_params(0, 2, 0, &array1, &array2);
 	ZVAL_DUP(return_value, array1);
 
-	if (phalcon_array_is_associative(array2)) {
+	if (phalcon_array_is_associative(array2, 0)) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array2), idx, str_key, value) {
 			zval tmp = {}, arr = {}, value1 = {};
 			if (str_key) {

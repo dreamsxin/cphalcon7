@@ -1154,17 +1154,28 @@ int phalcon_array_key_exists(zval *arr, zval *key)
 	return 0;
 }
 
-int phalcon_array_is_associative(zval *arr) {
+int phalcon_array_is_associative(zval *arr, int flags) {
 
-	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
-		zend_string *str_key;
+	zend_string *str_key;
 
+	if (unlikely(Z_TYPE_P(arr) != IS_ARRAY) || !zend_hash_num_elements(Z_ARRVAL_P(arr))) {
+		return 0;
+	}
+
+	if (flags) {
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(arr), str_key) {
-			if (str_key) {
-				return 1;
+			if (!str_key) {
+				return 0;
 			}
 		} ZEND_HASH_FOREACH_END();
+		return 1;
 	}
+
+	ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL_P(arr), str_key) {
+		if (str_key) {
+			return 1;
+		}
+	} ZEND_HASH_FOREACH_END();
 
 	return 0;
 }

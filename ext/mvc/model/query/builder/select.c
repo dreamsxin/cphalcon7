@@ -818,8 +818,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile){
 	 */
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
-		zval_ptr_dtor(&conditions);
 	}
+	zval_ptr_dtor(&conditions);
 
 	/**
 	 * Process group parameters

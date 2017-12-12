@@ -257,9 +257,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 		phalcon_array_append(&update_columns, &update_column, PH_COPY);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&table);
 
 	phalcon_fast_join_str(&joined_columns, SL(", "), &update_columns);
+	zval_ptr_dtor(&update_columns);
 	phalcon_concat_self(&phql, &joined_columns);
+	zval_ptr_dtor(&joined_columns);
 
 	/**
 	 * Only append conditions if it's string
@@ -267,11 +270,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
 	}
+	zval_ptr_dtor(&conditions);
 
 	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
+	zval_ptr_dtor(&bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
+	zval_ptr_dtor(&bind_types);
 
 	phalcon_update_property(getThis(), SL("_phql"), &phql);
+	zval_ptr_dtor(&phql);
 }

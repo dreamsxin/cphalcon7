@@ -185,6 +185,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, _compile){
 	PHALCON_CALL_SELF(&conditions, "getconditions");
 
 	PHALCON_CONCAT_SVS(&phql, "DELETE FROM [", &table, "]");
+	zval_ptr_dtor(&table);
 
 	/**
 	 * Only append conditions if it's string
@@ -192,12 +193,16 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Delete, _compile){
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
 	}
+	zval_ptr_dtor(&conditions);
 
 	PHALCON_CALL_SELF(&bind_params, "getbindparams");
 	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
+	zval_ptr_dtor(&bind_params);
 
 	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
+	zval_ptr_dtor(&bind_types);
 
 	phalcon_update_property(getThis(), SL("_phql"), &phql);
+	zval_ptr_dtor(&phql);
 }

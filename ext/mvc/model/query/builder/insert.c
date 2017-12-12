@@ -313,10 +313,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 	}
 
 	PHALCON_CONCAT_SVS(&phql, "INSERT INTO [", &table, "]");
+	zval_ptr_dtor(&table);
 
 	phalcon_fast_join_str(&joined_columns, SL("], ["), &columns);
 
 	PHALCON_SCONCAT_SVS(&phql, " ([", &joined_columns, "]) VALUES ");
+	zval_ptr_dtor(&joined_columns);
 
 	phalcon_read_property(&hidden_param, getThis(), SL("_hiddenParamNumber"), PH_READONLY);
 	phalcon_read_property(&use_columnname, getThis(), SL("_useColumnName"), PH_READONLY);
@@ -372,6 +374,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile){
 			phalcon_array_append(&insert_rows, &joined_values, 0);
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&columns);
+	zval_ptr_dtor(&values);
 
 	phalcon_fast_join_str(&joined_rows, SL("), ("), &insert_rows);
 

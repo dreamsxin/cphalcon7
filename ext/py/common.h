@@ -63,6 +63,29 @@ int python_streams_intercept();
 /* Python Modules */
 int python_php_init(); 
 
+static inline PyThreadState *interpreter_python_init_thread()
+{
+	PyInterpreterState *interp = NULL;
+	PyThreadState *new_thread_state;
+
+	// create a new interpreter 
+	PyEval_AcquireLock();
+	new_thread_state = Py_NewInterpreter();
+	assert(new_thread_state != NULL);
+	python_php_init();
+	python_streams_intercept();
+	PyEval_ReleaseThread(new_thread_state);
+	return new_thread_state;
+}
+
+static inline void interpreter_python_shutdown_thread(PyThreadState *thread_state)
+{
+	// release the interpreter 
+	PyEval_AcquireThread(thread_state);
+	Py_EndInterpreter(thread_state);
+	PyEval_ReleaseLock();
+}
+
 #endif
 
 #endif /* PHALCON_PY_COMMON_H */

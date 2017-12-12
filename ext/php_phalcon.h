@@ -97,6 +97,7 @@ typedef struct _phalcon_cache_options {
 /** Python options */
 typedef struct _phalcon_python_options {
     zend_bool isInitialized;
+    PyThreadState *mtstate;
     PyThreadState *tstate;
 } phalcon_python_options;
 #endif

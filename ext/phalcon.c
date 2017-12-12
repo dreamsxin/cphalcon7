@@ -120,10 +120,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	Py_InitializeEx(0); // Py_Initialize();
 	PyEval_InitThreads();
 	python_streams_init();
-	PyThreadState_Swap(NULL);
-	PyEval_ReleaseLock();
-
+	PHALCON_GLOBAL(python).mtstate = PyEval_SaveThread();
 	PHALCON_GLOBAL(python).isInitialized = Py_IsInitialized();
+	PyEval_ReleaseLock();
 #endif
 
 	/* 1. Register exceptions */
@@ -656,10 +655,8 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 #endif
 
 #if PHALCON_USE_PYTHON
-	PHALCON_GLOBAL(python).tstate = Py_NewInterpreter();
+	PyEval_RestoreThread(PHALCON_GLOBAL(python).mtstate);
 	Py_Finalize();
-	PyThreadState_Swap(NULL);
-	PyEval_ReleaseLock();
 #endif
 
 	UNREGISTER_INI_ENTRIES();
@@ -677,14 +674,7 @@ static PHP_RINIT_FUNCTION(phalcon){
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
 #if PHALCON_USE_PYTHON
-	PyEval_AcquireLock();
-	PHALCON_GLOBAL(python).tstate = Py_NewInterpreter();
-	if (PHALCON_GLOBAL(python).tstate) {
-		python_streams_intercept();
-		python_php_init();
-		PyThreadState_Swap(NULL);
-		PyEval_ReleaseLock();
-	}
+	PHALCON_GLOBAL(python).tstate = interpreter_python_init_thread();
 #endif
 	return SUCCESS;
 }
@@ -694,8 +684,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	phalcon_release_interned_strings();
 
 #if PHALCON_USE_PYTHON
-	PyEval_AcquireThread(PHALCON_GLOBAL(python).tstate);
-	Py_EndInterpreter(PHALCON_GLOBAL(python).tstate);
+	interpreter_python_shutdown_thread(PHALCON_GLOBAL(python).tstate);
 #endif
 	return SUCCESS;
 }

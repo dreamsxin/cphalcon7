@@ -125,7 +125,7 @@ PHP_METHOD(Phalcon_Storage_Bloomfilter, __construct){
 
 	intern = phalcon_storage_bloomfilter_object_from_obj(Z_OBJ_P(getThis()));
 
-	PHALCON_CPY_WRT_CTOR(&intern->filename, filename);
+	PHALCON_ZVAL_DUP(&intern->filename, filename);
 
 	if (phalcon_bloomfilter_init(&intern->bloomfilter, seed, max_items, false_positive) != 0) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Create bloom filter failed");

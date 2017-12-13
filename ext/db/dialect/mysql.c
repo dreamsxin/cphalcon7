@@ -128,7 +128,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 	PHALCON_CALL_METHOD(&column_type, column, "gettype");
 
 	if (Z_TYPE(column_type) == IS_STRING) {
-		PHALCON_CPY_WRT_CTOR(&column_sql, &column_type);
+		PHALCON_ZVAL_DUP(&column_sql, &column_type);
 		PHALCON_CALL_METHOD(&type_values, column, "gettypevalues");
 		if (PHALCON_IS_NOT_EMPTY(&type_values)) {
 			ZVAL_STRING(&slash, "\"");

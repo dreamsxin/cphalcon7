@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Storage_Bloomfilter_Counting, __construct){
 
 	intern = phalcon_storage_bloomfilter_counting_object_from_obj(Z_OBJ_P(getThis()));
 
-	PHALCON_CPY_WRT_CTOR(&intern->filename, filename);
+	PHALCON_ZVAL_DUP(&intern->filename, filename);
 
 	intern->bloomfilter = autocreate_counting_bloom_from_file(capacity, error_rate, Z_STRVAL_P(filename));
 	if (!intern->bloomfilter) {

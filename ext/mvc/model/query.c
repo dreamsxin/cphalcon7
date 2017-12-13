@@ -1928,7 +1928,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 	phalcon_read_property(&sql_aliases_models_instances, getThis(), SL("_sqlAliasesModelsInstances"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CPY_WRT_CTOR(&from_models, &models);
+	PHALCON_ZVAL_DUP(&from_models, &models);
 
 	array_init(&sql_joins);
 	array_init(&join_models);
@@ -1944,7 +1944,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 		array_init_size(&select_joins, 1);
 		phalcon_array_append(&select_joins, &joins, PH_COPY);
 	} else {
-		PHALCON_CPY_WRT_CTOR(&select_joins, &joins);
+		PHALCON_ZVAL_DUP(&select_joins, &joins);
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(select_joins), join_item) {

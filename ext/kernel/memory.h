@@ -73,23 +73,44 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 		PHALCON_INIT_VAR(z); \
 	} while (0)
 
-#define PHALCON_CPY_WRT_CTOR(d, v) ZVAL_DUP(d, v);
+#define PHALCON_ZVAL_DUP(d, v) ZVAL_DUP(d, v);
+#define PHALCON_MM_ZVAL_DUP(d, v) \
+	do { \
+		ZVAL_DUP(d, v); \
+		phalcon_array_append(&phalcon_memory_entry, d, 0); \
+	} while (0)
+
+#define PHALCON_ZVAL_COPY(d, v) ZVAL_COPY(d, v);
+#define PHALCON_MM_ZVAL_COPY(d, v) \
+	do { \
+		ZVAL_COPY(d, v); \
+		phalcon_array_append(&phalcon_memory_entry, d, 0); \
+	} while (0)
+
 #define PHALCON_SEPARATE(z) SEPARATE_ZVAL(z);
-#define PHALCON_SEPARATE_PARAM(z) SEPARATE_ZVAL_IF_NOT_REF(z)
+#define PHALCON_MM_SEPARATE(z) \
+	do { \
+		SEPARATE_ZVAL(z); \
+		phalcon_array_append(&phalcon_memory_entry, z, 0); \
+	} while (0)
+
+#define PHALCON_SEPARATE_PARAM(z) \
+	do { \
+		ZVAL_DEREF(z); \
+		SEPARATE_ZVAL_IF_NOT_REF(z); \
+	} while (0)
+
+#define PHALCON_MM_SEPARATE_PARAM(z) \
+	do { \
+		ZVAL_DEREF(z); \
+		SEPARATE_ZVAL_IF_NOT_REF(z);\
+		phalcon_array_append(&phalcon_memory_entry, z, 0); \
+	} while (0)
 
 #define PHALCON_COPY_TO_STACK(a, b) \
 	{ \
     	memcpy(a, b, sizeof(zval)); \
 	}
-
-#define PHALCON_ZVAL_DUP(z, p) \
-	do { \
-		if (Z_TYPE_P(p) == IS_ARRAY) { \
-			ZVAL_ARR(z, zend_array_dup(Z_ARRVAL_P(p))); \
-		} else {\
-			ZVAL_DUP(z, p); \
-		} \
-	} while (0)
 
 #define PHALCON_MM_GROW()       phalcon_gc_list* gc_list = phalcon_gc_list_init();
 #define PHALCON_MM_RESTORE()    phalcon_gc_list_destroy(gc_list);

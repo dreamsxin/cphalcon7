@@ -72,9 +72,10 @@ git clone git://github.com/dreamsxin/cphalcon7.git
 cd cphalcon7/ext
 phpize
 
-./configure --enable-chart=yes
+./configure
 
 # or custom php path
+/usr/local/php/bin/phpize
 ./configure --with-php-config=/usr/local/php/bin/php-config
 
 # or debug

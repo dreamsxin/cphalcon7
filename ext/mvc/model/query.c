@@ -4557,7 +4557,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			return;
 	}
 
-
 	ZVAL_STRING(&event_name, "query:afterExecute");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &result);
 	zval_ptr_dtor(&event_name);

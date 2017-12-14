@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -86,6 +87,12 @@ int phalcon_get_constant(zval *retval, const char *name, size_t name_len);
 void phalcon_gettype(zval *return_value, zval *arg);
 
 #define PHALCON_MM_ADD_ENTRY(var) phalcon_array_append(&phalcon_memory_entry, var, 0);
+
+#define PHALCON_MM_ZVAL_STRING(z, s) \
+	do { \
+		ZVAL_STRING(z, s); \
+		phalcon_array_append(&phalcon_memory_entry, z, 0); \
+	} while (0)
 
 /** Return zval with always not ctor */
 #define RETURN_NCTOR(var) { \
@@ -167,8 +174,8 @@ void phalcon_gettype(zval *return_value, zval *arg);
 #define RETURN_MM_NULL() RETVAL_NULL(); RETURN_MM();
 
 /** Return bool restoring memory frame */
-#define RETURN_MM_FALSE RETVAL_FALSE(); RETURN_MM();
-#define RETURN_MM_TRUE RETVAL_TRUE(); RETURN_MM();
+#define RETURN_MM_FALSE RETVAL_FALSE; RETURN_MM();
+#define RETURN_MM_TRUE RETVAL_TRUE; RETURN_MM();
 
 /** Return empty array */
 #define RETURN_EMPTY_ARRAY() array_init(return_value); return;

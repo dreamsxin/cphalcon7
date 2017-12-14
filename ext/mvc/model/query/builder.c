@@ -552,7 +552,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getPhql){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 
-	zval phql = {}, bind_params = {}, bind_types = {}, index = {}, dependency_injector = {}, service_name = {}, has = {}, args = {};
+	zval phql = {}, bind_params = {}, bind_types = {}, index = {}, dependency_injector = {}, service_name = {};
+	zval cache = {}, has = {}, args = {};
 
 	/**
 	 * Process the PHQL
@@ -581,6 +582,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, getQuery){
 	}
 	zval_ptr_dtor(&phql);
 	zval_ptr_dtor(&dependency_injector);
+
+	if (phalcon_property_isset_fetch(&cache, getThis(), SL("_cache"), PH_READONLY)) {
+		PHALCON_CALL_METHOD(NULL, return_value, "cache", &cache);
+	}
 
 	/**
 	 * Set default bind params

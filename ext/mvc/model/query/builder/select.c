@@ -166,6 +166,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Select){
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_forUpdate"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_sharedLock"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_distinct"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_select_ce, SL("_cache"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_query_builder_select_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 
@@ -214,8 +215,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, __construct){
 	}
 
 	if (params && Z_TYPE_P(params) == IS_ARRAY) {
-		zval conditions = {}, bind_params = {}, bind_types = {}, models = {}, index = {}, columns = {}, group_clause = {}, joins = {};
+		zval cache = {}, conditions = {}, bind_params = {}, bind_types = {}, models = {}, index = {}, columns = {}, group_clause = {}, joins = {};
 		zval having_clause = {}, order_clause = {}, limit_clause = {}, offset_clause = {}, limit = {}, offset = {}, for_update = {}, shared_lock = {};
+
+		if (phalcon_array_isset_fetch_str(&cache, params, SL("cache"), PH_READONLY)) {
+			phalcon_update_property(getThis(), SL("_cache"), &cache);
+		}
 
 		/**
 		 * Process conditions

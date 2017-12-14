@@ -141,16 +141,17 @@ PHP_METHOD(Phalcon_Cache_Backend_File, __construct){
  * Returns a cached content
  *
  * @param string $keyName
+ * @param int $lifetime
  * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend_File, get){
 
-	zval *key_name, prefix = {}, prefixed_key = {}, cache_dir = {}, cache_file = {}, frontend = {}, lifetime = {};
+	zval *key_name, *lifetime = NULL, prefix = {}, prefixed_key = {}, cache_dir = {}, cache_file = {}, frontend = {};
 	zval modified_time = {}, cached_content = {}, exception_message = {};
 	long int now, ttl, mtime, diff;
 	int expired;
 
-	phalcon_fetch_params(0, 1, 0, &key_name);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
 	phalcon_read_property(&prefix, getThis(), SL("_prefix"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&cache_dir, getThis(), SL("_cacheDir"), PH_NOISY|PH_READONLY);
@@ -167,13 +168,18 @@ PHP_METHOD(Phalcon_Cache_Backend_File, get){
 		 */
 		now = (long int)time(NULL);
 
-		PHALCON_CALL_METHOD(&lifetime, getThis(), "getlifetime");
-		ttl = phalcon_get_intval(&lifetime);
-		zval_ptr_dtor(&lifetime);
-
 		phalcon_filemtime(&modified_time, &cache_file);
 		if (unlikely(Z_TYPE(modified_time) != IS_LONG)) {
 			convert_to_long(&modified_time);
+		}
+
+		if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
+			zval tmp = {};
+			PHALCON_CALL_METHOD(&tmp, getThis(), "getlifetime");
+			ttl = phalcon_get_intval(&tmp);
+			zval_ptr_dtor(&tmp);
+		} else {
+			ttl = phalcon_get_intval(lifetime);
 		}
 
 		mtime   = Z_LVAL(modified_time);

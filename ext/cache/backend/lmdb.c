@@ -159,14 +159,15 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, __construct){
  * Returns a cached content
  *
  * @param int|string $keyName
+ * @param int $lifetime
  * @return mixed
  */
 PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get){
 
-	zval *key_name, lmdb = {}, frontend = {}, cached_content = {}, val = {}, expired = {};
-	long int now;
+	zval *key_name, *lifetime = NULL, lmdb = {}, save_time = {}, frontend = {}, cached_content = {}, val = {}, expired = {};
+	long now;
 
-	phalcon_fetch_params(0, 1, 0, &key_name);
+	phalcon_fetch_params(0, 1, 1, &key_name, &lifetime);
 
 	phalcon_read_property(&lmdb, getThis(), SL("_lmdb"), PH_READONLY);
 
@@ -174,14 +175,24 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get){
 	PHALCON_CALL_METHOD(&cached_content, &lmdb, "get", key_name);
 	if (Z_TYPE(cached_content) != IS_ARRAY) {
 		PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
+		zval_ptr_dtor(&cached_content);
 		RETURN_NULL();
 	}
 
-	if (!phalcon_array_isset_fetch_long(&val, &cached_content, 0, PH_COPY)) {
-		ZVAL_NULL(&val);
+	if (!phalcon_array_isset_fetch_long(&val, &cached_content, 0, PH_READONLY)) {
+		zval_ptr_dtor(&cached_content);
+		RETURN_NULL();
 	}
 
-	now = (long int)time(NULL);
+	now = (long)time(NULL);
+	
+	if (lifetime && phalcon_array_isset_fetch_long(&save_time, &cached_content, 2, PH_READONLY)) {
+		if ((now - phalcon_get_intval(&save_time)) > phalcon_get_intval(lifetime)) {
+			PHALCON_CALL_METHOD(NULL, &lmdb, "commit");
+			zval_ptr_dtor(&cached_content);
+			RETURN_NULL();
+		}
+	}
 
 	if (phalcon_array_isset_fetch_long(&expired, &cached_content, 1, PH_READONLY)) {
 		if (phalcon_get_intval(&expired) < now) {
@@ -194,9 +205,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, get){
 	if (PHALCON_IS_NOT_EMPTY(&val)) {
 		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 		PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &val);
-		zval_ptr_dtor(&val);
 	} else {
-		RETURN_ZVAL(&val, 0, 0);
+		RETURN_CTOR(&val);
 	}
 }
 
@@ -212,6 +222,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, save){
 
 	zval *key_name = NULL, *content = NULL, *lifetime = NULL, *stop_buffer = NULL, key = {}, expired = {}, val = {}, prepared_val = {}, cached_content = {}, success = {};
 	zval ttl = {}, is_buffering = {}, frontend = {}, lmdb = {};
+	long now_time;
 
 	phalcon_fetch_params(0, 0, 4, &key_name, &content, &lifetime, &stop_buffer);
 
@@ -233,8 +244,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, save){
 	} else {
 		ZVAL_COPY_VALUE(&ttl, lifetime);
 	}
-	ZVAL_LONG(&expired, (time(NULL) + phalcon_get_intval(&ttl)));
-
+	now_time = (long)time(NULL);
+	ZVAL_LONG(&expired, (now_time + phalcon_get_intval(&ttl)));
+	
 	/**
 	 * Check if a connection is created or make a new one
 	 */
@@ -253,9 +265,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Lmdb, save){
 	PHALCON_CALL_METHOD(&prepared_val, &frontend, "beforestore", &val);
 	zval_ptr_dtor(&val);
 
-	array_init_size(&cached_content, 2);
+	array_init_size(&cached_content, 3);
 	phalcon_array_append(&cached_content, &prepared_val, PH_READONLY);
 	phalcon_array_append(&cached_content, &expired, PH_READONLY);
+	phalcon_array_append_long(&cached_content, now_time, PH_READONLY);
 
 	PHALCON_CALL_METHOD(NULL, &lmdb, "begin");
 	PHALCON_CALL_METHOD(&success, &lmdb, "put", key_name, &cached_content);

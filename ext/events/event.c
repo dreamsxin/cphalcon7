@@ -35,6 +35,8 @@
 zend_class_entry *phalcon_events_event_ce;
 
 PHP_METHOD(Phalcon_Events_Event, __construct);
+PHP_METHOD(Phalcon_Events_Event, setName);
+PHP_METHOD(Phalcon_Events_Event, getName);
 PHP_METHOD(Phalcon_Events_Event, setType);
 PHP_METHOD(Phalcon_Events_Event, getType);
 PHP_METHOD(Phalcon_Events_Event, setSource);
@@ -43,6 +45,7 @@ PHP_METHOD(Phalcon_Events_Event, setData);
 PHP_METHOD(Phalcon_Events_Event, getData);
 PHP_METHOD(Phalcon_Events_Event, setCancelable);
 PHP_METHOD(Phalcon_Events_Event, isCancelable);
+PHP_METHOD(Phalcon_Events_Event, getFlag);
 PHP_METHOD(Phalcon_Events_Event, stop);
 PHP_METHOD(Phalcon_Events_Event, isStopped);
 
@@ -51,10 +54,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_events_event___construct, 0, 0, 2)
 	ZEND_ARG_INFO(0, source)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, cancelable)
+	ZEND_ARG_INFO(0, flag)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_events_event_method_entry[] = {
 	PHP_ME(Phalcon_Events_Event, __construct, arginfo_phalcon_events_event___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Events_Event, setName, arginfo_phalcon_events_eventinterface_setname, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Events_Event, getName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, setType, arginfo_phalcon_events_eventinterface_settype, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, getType, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, setSource, arginfo_phalcon_events_eventinterface_setsource, ZEND_ACC_PUBLIC)
@@ -63,6 +69,7 @@ static const zend_function_entry phalcon_events_event_method_entry[] = {
 	PHP_ME(Phalcon_Events_Event, getData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, setCancelable, arginfo_phalcon_events_eventinterface_setcancelable, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, isCancelable, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Events_Event, getFlag, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, stop, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Event, isStopped, NULL, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Events_Event, getCancelable, isCancelable, NULL, ZEND_ACC_PUBLIC)
@@ -76,11 +83,13 @@ PHALCON_INIT_CLASS(Phalcon_Events_Event){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Events, Event, events_event, phalcon_events_event_method_entry, 0);
 
+	zend_declare_property_null(phalcon_events_event_ce, SL("_name"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_events_event_ce, SL("_type"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_events_event_ce, SL("_source"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_events_event_ce, SL("_data"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_events_event_ce, SL("_stopped"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_events_event_ce, SL("_cancelable"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_events_event_ce, SL("_flag"), 0, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_events_event_ce, 1, phalcon_events_eventinterface_ce);
 
@@ -97,9 +106,9 @@ PHALCON_INIT_CLASS(Phalcon_Events_Event){
  */
 PHP_METHOD(Phalcon_Events_Event, __construct){
 
-	zval *type, *source, *data = NULL, *cancelable = NULL;
+	zval *type, *source, *data = NULL, *cancelable = NULL, *flag = NULL;
 
-	phalcon_fetch_params(0, 2, 2, &type, &source, &data, &cancelable);
+	phalcon_fetch_params(0, 2, 3, &type, &source, &data, &cancelable, &flag);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -107,6 +116,10 @@ PHP_METHOD(Phalcon_Events_Event, __construct){
 
 	if (!cancelable) {
 		cancelable = &PHALCON_GLOBAL(z_true);
+	}
+
+	if (!flag) {
+		flag = &PHALCON_GLOBAL(z_false);
 	}
 
 	phalcon_update_property(getThis(), SL("_type"), type);
@@ -118,6 +131,35 @@ PHP_METHOD(Phalcon_Events_Event, __construct){
 	if (PHALCON_IS_NOT_TRUE(cancelable)) {
 		phalcon_update_property(getThis(), SL("_cancelable"), cancelable);
 	}
+	if (PHALCON_IS_TRUE(flag)) {
+		phalcon_update_property(getThis(), SL("_flag"), flag);
+	}
+}
+
+/**
+ * Set the event's name
+ *
+ * @param string $eventName
+ */
+PHP_METHOD(Phalcon_Events_Event, setName){
+
+	zval *event_name;
+
+	phalcon_fetch_params(0, 1, 0, &event_name);
+
+	phalcon_update_property(getThis(), SL("_name"), event_name);
+
+}
+
+/**
+ * Returns the event's name
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Events_Event, getName){
+
+
+	RETURN_MEMBER(getThis(), "_name");
 }
 
 /**
@@ -220,6 +262,17 @@ PHP_METHOD(Phalcon_Events_Event, isCancelable){
 
 
 	RETURN_MEMBER(getThis(), "_cancelable");
+}
+
+/**
+ * Returns the event's flag
+ *
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Events_Event, getFlag){
+
+
+	RETURN_MEMBER(getThis(), "_flag");
 }
 
 /**

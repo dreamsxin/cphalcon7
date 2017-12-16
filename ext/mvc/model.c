@@ -633,6 +633,9 @@ PHP_METHOD(Phalcon_Mvc_Model, getEventsManager){
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getcustomeventsmanager", getThis());
 	zval_ptr_dtor(&models_manager);
+	if (Z_TYPE_P(return_value) == IS_NULL) {
+		PHALCON_CALL_PARENT(return_value, phalcon_mvc_model_ce, getThis(), "geteventsmanager");
+	}
 }
 
 /**
@@ -1905,7 +1908,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
  */
 PHP_METHOD(Phalcon_Mvc_Model, find){
 
-	zval *parameters = NULL, dependency_injector = {}, model_name = {}, mothed_name = {}, service_name = {}, manager = {}, model = {};
+	zval *parameters = NULL, dependency_injector = {}, model_name = {}, service_name = {}, manager = {}, model = {};
 	zval params = {}, builder = {}, event_name = {}, query = {}, hydration = {};
 
 	phalcon_fetch_params(1, 0, 1, &parameters);
@@ -1940,21 +1943,16 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name);
 	PHALCON_MM_ADD_ENTRY(&model);
 
-	PHALCON_MM_ZVAL_STRING(&mothed_name, "find");
-	if (phalcon_method_exists_ex(&model, SL("getcache")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(return_value, &model, "getcache", &params, &mothed_name);
-		if (zend_is_true(return_value)) {
-			RETURN_MM();
-		}
-	}
-
 	PHALCON_MM_CALL_METHOD(&builder, &manager, "createbuilder", &params);
 	PHALCON_MM_ADD_ENTRY(&builder);
 
 	PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &model_name);
 
 	PHALCON_MM_ZVAL_STRING(&event_name, "beforeQuery");
-	PHALCON_MM_CALL_METHOD(NULL, &model, "fireevent", &event_name, &builder);
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &builder);
+	if (Z_TYPE_P(return_value) >= IS_STRING) {
+		RETURN_MM();
+	}
 
 	PHALCON_MM_CALL_METHOD(&query, &builder, "getquery");
 	PHALCON_MM_ADD_ENTRY(&query);
@@ -1968,16 +1966,18 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
 	 * Define an hydration mode
 	 */
 	if (Z_TYPE_P(return_value) == IS_OBJECT) {
+		zval resultset = {};
 		if (phalcon_array_isset_fetch_str(&hydration, &params, SL("hydration"), PH_READONLY)) {
 			PHALCON_MM_CALL_METHOD(NULL, return_value, "sethydratemode", &hydration);
 		}
 
 		PHALCON_MM_ZVAL_STRING(&event_name, "afterQuery");
-		PHALCON_MM_CALL_METHOD(NULL, &model, "fireevent", &event_name, return_value);
-
-		if (phalcon_method_exists_ex(&model, SL("setcache")) == SUCCESS) {
-			PHALCON_MM_CALL_METHOD(NULL, &model, "setcache", return_value, &params, &mothed_name);
+		PHALCON_MM_CALL_METHOD(&resultset, &model, "fireevent", &event_name, return_value);
+		if (Z_TYPE(resultset) >= IS_ARRAY) {
+			zval_ptr_dtor(return_value);
+			RETURN_MM_NCTOR(&resultset);
 		}
+		zval_ptr_dtor(&resultset);
 	}
 	RETURN_MM();
 }
@@ -2007,8 +2007,8 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
  */
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
-	zval *parameters = NULL, *auto_create = NULL, dependency_injector = {}, model_name = {}, mothed_name = {}, service_name = {}, has = {}, manager = {}, model = {};
-	zval identityfield = {}, id_condition = {}, params = {}, builder = {}, query = {}, cache = {}, event_name = {}, hydration = {};
+	zval *parameters = NULL, *auto_create = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {}, model = {};
+	zval identityfield = {}, id_condition = {}, params = {}, builder = {}, query = {}, event_name = {}, hydration = {}, resultset = {};
 
 	phalcon_fetch_params(1, 0, 2, &parameters, &auto_create);
 
@@ -2042,8 +2042,6 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 	PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
 	PHALCON_MM_ADD_ENTRY(&model);
-
-	PHALCON_MM_ZVAL_STRING(&mothed_name, "findFirst");
 
 	if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
 		array_init(&params);
@@ -2086,30 +2084,19 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	}
 	PHALCON_MM_ADD_ENTRY(&params);
 
-	if (phalcon_method_exists_ex(&model, SL("getcache")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(return_value, &model, "getcache", &params, &mothed_name);
-		if (zend_is_true(return_value)) {
-			RETURN_MM();
-		}
-	}
-
 	PHALCON_MM_CALL_METHOD(&builder, &manager, "createbuilder", &params);
 	PHALCON_MM_ADD_ENTRY(&builder);
 
 	PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &model_name);
 
 	PHALCON_MM_ZVAL_STRING(&event_name, "beforeQuery");
-	PHALCON_MM_CALL_METHOD(NULL, &model, "fireevent", &event_name, &builder);
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &builder);
+	if (Z_TYPE_P(return_value) >= IS_STRING) {
+		RETURN_MM();
+	}
 
 	PHALCON_MM_CALL_METHOD(&query, &builder, "getquery");
 	PHALCON_MM_ADD_ENTRY(&query);
-
-	/**
-	 * Pass the cache options to the query
-	 */
-	if (phalcon_array_isset_fetch_str(&cache, &params, SL("cache"), PH_READONLY)) {
-		PHALCON_MM_CALL_METHOD(NULL, &query, "cache", &cache);
-	}
 
 	/**
 	 * Return only the first row
@@ -2119,29 +2106,28 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	/**
 	 * Execute the query passing the bind-params and casting-types
 	 */
-	PHALCON_MM_CALL_METHOD(return_value, &query, "execute");
-
-	if (zend_is_true(return_value)) {
-		PHALCON_MM_ZVAL_STRING(&event_name, "afterQuery");
-		PHALCON_MM_CALL_METHOD(NULL, &model, "fireevent", &event_name, return_value);
-
+	PHALCON_MM_CALL_METHOD(&resultset, &query, "execute");
+	PHALCON_MM_ADD_ENTRY(&resultset);
+	if (!zend_is_true(&resultset)) {
+		if (zend_is_true(auto_create)) {
+			PHALCON_MM_ZVAL_COPY(&resultset, &model);
+		}
+	} else {
 		/**
 		 * Define an hydration mode
 		 */
 		if (phalcon_array_isset_fetch_str(&hydration, &params, SL("hydration"), PH_READONLY)) {
-			PHALCON_MM_CALL_METHOD(NULL, return_value, "sethydratemode", &hydration);
-		}
-
-		if (phalcon_method_exists_ex(&model, SL("setcache")) == SUCCESS) {
-			PHALCON_MM_CALL_METHOD(NULL, &model, "setcache", return_value, &params, &mothed_name);
-		}
-		RETURN_MM();
+			PHALCON_MM_CALL_METHOD(NULL, &resultset, "sethydratemode", &hydration);
+		}	
 	}
-
-	if (zend_is_true(auto_create)) {
-		RETURN_MM_NCTOR(&model);
+	zval_ptr_dtor(return_value);
+	PHALCON_MM_ZVAL_STRING(&event_name, "afterQuery");
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &resultset);
+	if (Z_TYPE_P(return_value) >= IS_ARRAY) {
+		RETURN_MM();
 	} else {
-		RETURN_MM_TRUE;
+		zval_ptr_dtor(return_value);
+		RETURN_MM_CTOR(&resultset);
 	}
 }
 
@@ -2417,7 +2403,7 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
 PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 
 	zval *function, *alias, *parameters, params = {}, group_column = {}, distinct_column = {}, columns = {}, group_columns = {};
-	zval model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {}, builder = {}, query = {};
+	zval event_name = {}, model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {}, builder = {}, query = {};
 	zval resultset = {}, first_row = {};
 
 	phalcon_fetch_params(1, 3, 0, &function, &alias, &parameters);
@@ -2452,13 +2438,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name);
 	PHALCON_MM_ADD_ENTRY(&model);
 
-	if (phalcon_method_exists_ex(&model, SL("getcache")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(return_value, &model, "getcache", &params, function);
-		if (zend_is_true(return_value)) {
-			RETURN_MM();
-		}
-	}
-
 	if (!phalcon_array_isset_fetch_str(&group_column, &params, SL("column"), PH_COPY)) {
 		ZVAL_STRING(&group_column, "*");
 	}
@@ -2484,8 +2463,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	PHALCON_MM_CALL_METHOD(NULL, &builder, "columns", &columns);
 	PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &model_name);
 
-	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(NULL, &model, "beforequery", &builder);
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeQuery");
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &builder);
+	if (Z_TYPE_P(return_value) >= IS_STRING) {
+		RETURN_MM();
 	}
 
 	PHALCON_MM_CALL_METHOD(&query, &builder, "getquery");
@@ -2501,8 +2482,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	 * Return the full resultset if the query is grouped
 	 */
 	if (phalcon_array_isset_str(&params, SL("group"))) {
-		if (phalcon_method_exists_ex(&model, SL("setcache")) == SUCCESS) {
-			PHALCON_MM_CALL_METHOD(NULL, &model, "setcache", &resultset, &params, function);
+		PHALCON_MM_ZVAL_STRING(&event_name, "afterQuery");
+		PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &resultset);
+		if (Z_TYPE_P(return_value) >= IS_ARRAY) {
+			RETURN_MM();
 		}
 
 		RETURN_MM_CTOR(&resultset);
@@ -2513,12 +2496,15 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 	 */
 	PHALCON_MM_CALL_METHOD(&first_row, &resultset, "getfirst");
 
-	phalcon_read_property_zval(return_value, &first_row, alias, PH_COPY);
+	phalcon_read_property_zval(&resultset, &first_row, alias, PH_COPY);
 	zval_ptr_dtor(&first_row);
-	if (phalcon_method_exists_ex(&model, SL("setcache")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(NULL, &model, "setcache", return_value, &params, function);
+	PHALCON_MM_ADD_ENTRY(&resultset);
+	PHALCON_MM_ZVAL_STRING(&event_name, "afterQuery");
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &resultset);
+	if (Z_TYPE_P(return_value) >= IS_ARRAY) {
+		RETURN_MM();
 	}
-	RETURN_MM();
+	RETURN_MM_CTOR(&resultset);
 }
 
 /**
@@ -2823,11 +2809,11 @@ PHP_METHOD(Phalcon_Mvc_Model, average){
  *
  * @param string $eventName
  * @param mixed $data
- * @return boolean
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {}, lower = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {};
 	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
@@ -2847,16 +2833,6 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 	}
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
-		phalcon_fast_strtolower(&lower, eventname);
-
-		/**
-		 * Check if there is a method with the same name of the event
-		 */
-		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(lower), data);
-		}
-		zval_ptr_dtor(&lower);
-
 		PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 
 		/**
@@ -2864,6 +2840,15 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 		 */
 		PHALCON_CALL_METHOD(return_value, &models_manager, "notifyevent", eventname, getThis());
 		zval_ptr_dtor(&models_manager);
+
+		if (!PHALCON_IS_FALSE(return_value)) {
+			zval fire_event_name = {};
+			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
+			PHALCON_CALL_PARENT(return_value, phalcon_mvc_model_ce, getThis(), "fireevent", &fire_event_name, data, cancelable);
+			zval_ptr_dtor(&fire_event_name);
+		}
+	} else {
+		RETURN_TRUE;
 	}
 }
 
@@ -2878,7 +2863,7 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
  */
 PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, lower = {}, status = {}, models_manager = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {};
 	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
@@ -2898,32 +2883,23 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 	}
 
 	if (likely(PHALCON_GLOBAL(orm).events)) {
-		phalcon_fast_strtolower(&lower, eventname);
-
-		/**
-		 * Check if there is a method with the same name of the event
-		 */
-		if (phalcon_method_exists(getThis(), &lower) == SUCCESS) {
-			PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL(lower), data);
-			if (PHALCON_IS_FALSE(&status)) {
-				RETURN_FALSE;
-			}
-		}
-		zval_ptr_dtor(&lower);
-
 		PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, &models_manager, "notifyevent", eventname, getThis());
+		PHALCON_CALL_METHOD(return_value, &models_manager, "notifyevent", eventname, getThis());
 		zval_ptr_dtor(&models_manager);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
-		}
-	}
 
-	RETURN_TRUE;
+		if (!PHALCON_IS_FALSE(return_value)) {
+			zval fire_event_name = {};
+			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
+			PHALCON_CALL_PARENT(return_value, phalcon_mvc_model_ce, getThis(), "fireeventcancel", &fire_event_name, data, cancelable);
+			zval_ptr_dtor(&fire_event_name);
+		}
+	} else {
+		RETURN_TRUE;
+	}
 }
 
 /**
@@ -7103,10 +7079,11 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	zval_ptr_dtor(&column_map);
 
 	ZVAL_STRING(&event_name, "afterToArray");
-	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &data);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &data);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE_P(return_value) != IS_ARRAY) {
+		zval_ptr_dtor(return_value);
 		RETVAL_ZVAL(&data, 0, 0);
 		return;
 	}

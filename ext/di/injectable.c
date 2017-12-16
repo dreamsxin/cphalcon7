@@ -25,6 +25,7 @@
 #include "di.h"
 #include "events/eventsawareinterface.h"
 #include "events/managerinterface.h"
+#include "events/event.h"
 #include "diinterface.h"
 #include "debug.h"
 
@@ -58,7 +59,6 @@ PHP_METHOD(Phalcon_Di_Injectable, setEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, getEventsManager);
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent);
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel);
-PHP_METHOD(Phalcon_Di_Injectable, fireEventData);
 PHP_METHOD(Phalcon_Di_Injectable, hasService);
 PHP_METHOD(Phalcon_Di_Injectable, setService);
 PHP_METHOD(Phalcon_Di_Injectable, getService);
@@ -80,7 +80,6 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEvent, arginfo_phalcon_di_injectable_fireevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, fireEventCancel, arginfo_phalcon_di_injectable_fireeventcancel, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di_Injectable, fireEventData, arginfo_phalcon_di_injectable_fireeventdata, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, hasService, arginfo_phalcon_di_injectable_hasservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, setService, arginfo_phalcon_di_injectable_setservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, getService, arginfo_phalcon_di_injectable_getservice, ZEND_ACC_PUBLIC)
@@ -199,12 +198,13 @@ PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
  * Fires an event, implicitly calls behaviors and listeners in the events manager are notified
  *
  * @param string $eventName
+ * @param mixed $data
  * @return boolean
  */
 PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {}, status = {};
-	zval debug_message = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, *flag = NULL, eventtype = {}, callback = {}, events_manager = {}, event = {};
+	zval is_stopped = {}, lower = {}, event_parts = {}, name = {}, status = {}, debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 
@@ -222,32 +222,28 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 
+	if (!flag) {
+		flag = &PHALCON_GLOBAL(z_false);
+	}
+
+	ZVAL_TRUE(return_value);
+
 	phalcon_fast_strtolower(&lower, eventname);
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
 		zval_ptr_dtor(&event_parts);
+		ZVAL_COPY(&eventtype, eventname);
 	} else {
+		zval class_name = {};
 		ZVAL_COPY(&name, &lower);
+
+		phalcon_get_called_class(&class_name);
+		PHALCON_CONCAT_VSV(&eventtype, &class_name, ":", eventname);
+		zval_ptr_dtor(&class_name);
 	}
 	zval_ptr_dtor(&lower);
-
-	/**
-	 * Check if there is a method with the same name of the event
-	 */
-	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(name), data);
-	}
-
-	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
-		zval arguments = {};
-		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, data, PH_COPY);
-		PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
-		zval_ptr_dtor(&arguments);
-	}
-	zval_ptr_dtor(&name);
 
 	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
@@ -257,27 +253,68 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		/**
 		 * Send a notification to the events manager
 		 */
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &eventtype, getThis(), data, cancelable);
+		PHALCON_CALL_METHOD(&event, &events_manager, "getcurrentevent");
 		zval_ptr_dtor(&events_manager);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+		if (Z_TYPE(event) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(&is_stopped, &event, "isstopped");
+			if (zend_is_true(&is_stopped)) {
+				zval_ptr_dtor(&event);
+				zval_ptr_dtor(&name);
+				zval_ptr_dtor(&eventtype);
+				RETURN_NCTOR(&status);
+			}
+		}
+	} else {
+		ZVAL_NULL(&event);
+	}
+
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
+		zval arguments = {};
+		array_init_size(&arguments, 3);
+		phalcon_array_append(&arguments, &event, PH_COPY);
+		phalcon_array_append(&arguments, data, PH_COPY);
+		phalcon_array_append(&arguments, &status, 0);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
+		zval_ptr_dtor(&arguments);
+		if (Z_TYPE(event) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(&is_stopped, &event, "isstopped");
+			if (zend_is_true(&is_stopped)) {
+				zval_ptr_dtor(&event);
+				zval_ptr_dtor(&name);
+				zval_ptr_dtor(&eventtype);
+				RETURN_NCTOR(&status);
+			}
 		}
 	}
 
-	RETURN_TRUE;
+	/**
+	 * Check if there is a method with the same name of the event
+	 */
+	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
+		zval prev_data = {};
+		ZVAL_COPY_VALUE(&prev_data, &status);
+		PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL(name), &event, data, &prev_data);
+		zval_ptr_dtor(&prev_data);
+	}
+
+	zval_ptr_dtor(&event);
+	zval_ptr_dtor(&name);
+	zval_ptr_dtor(&eventtype);
+	RETURN_NCTOR(&status);
 }
 
 /**
- * Fires an event, implicitly calls behaviors and listeners in the events manager are notified
- * This method stops if one of the callbacks/listeners returns boolean false
+ * Fires an event, can stop the event by returning to the false
  *
  * @param string $eventName
- * @return boolean
+ * @param mixed $data
+ * @return mixed
  */
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, status = {}, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
-	zval debug_message = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, eventtype = {}, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+	zval event = {}, is_stopped = {}, status = {}, debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 
@@ -295,124 +332,90 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 
+	ZVAL_NULL(&status);
+
 	phalcon_fast_strtolower(&lower, eventname);
 
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
 		zval_ptr_dtor(&event_parts);
+		ZVAL_COPY(&eventtype, eventname);
 	} else {
+		zval class_name = {};
 		ZVAL_COPY(&name, &lower);
+
+		phalcon_get_called_class(&class_name);
+		PHALCON_CONCAT_VSV(&eventtype, &class_name, ":", eventname);
+		zval_ptr_dtor(&class_name);
 	}
 	zval_ptr_dtor(&lower);
+
+	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+	if (Z_TYPE(events_manager) != IS_NULL) {
+		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
+
+		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &eventtype, getThis(), data, cancelable, &PHALCON_GLOBAL(z_true));
+		if (PHALCON_IS_FALSE(&status)){
+			zval_ptr_dtor(&events_manager);
+			zval_ptr_dtor(&name);
+			RETURN_FALSE;
+		}
+		PHALCON_CALL_METHOD(&event, &events_manager, "getcurrentevent");
+		zval_ptr_dtor(&events_manager);
+		if (Z_TYPE(event) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(&is_stopped, &event, "isstopped");
+			if (zend_is_true(&is_stopped)) {
+				zval_ptr_dtor(&event);
+				zval_ptr_dtor(&name);
+				RETURN_NCTOR(&status);
+			}
+		}
+	} else {
+		ZVAL_NULL(&event);
+	}
+
+	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
+		zval arguments = {};
+		array_init_size(&arguments, 2);
+		phalcon_array_append(&arguments, &event, PH_COPY);
+		phalcon_array_append(&arguments, data, PH_COPY);
+		phalcon_array_append(&arguments, &status, 0);
+		PHALCON_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
+		zval_ptr_dtor(&arguments);
+		if (PHALCON_IS_FALSE(&status)){
+			zval_ptr_dtor(&event);
+			zval_ptr_dtor(&name);
+			RETURN_FALSE;
+		}
+		if (Z_TYPE(event) == IS_OBJECT) {
+			PHALCON_CALL_METHOD(&is_stopped, &event, "isstopped");
+			if (zend_is_true(&is_stopped)) {
+				zval_ptr_dtor(&event);
+				zval_ptr_dtor(&name);
+				RETURN_NCTOR(&status);
+			}
+		}
+	}
 
 	/**
 	 * Check if there is a method with the same name of the event
 	 */
 	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
-		PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL(name), data);
-		if (PHALCON_IS_FALSE(&status)) {
+		zval prev_data = {};
+		ZVAL_COPY_VALUE(&prev_data, &status);
+		PHALCON_CALL_METHOD(&status, getThis(), Z_STRVAL(name), &event, data, &prev_data);
+		zval_ptr_dtor(&prev_data);
+		if (PHALCON_IS_FALSE(&status)){
+			zval_ptr_dtor(&event);
 			zval_ptr_dtor(&name);
 			RETURN_FALSE;
 		}
 	}
-
-	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
-		zval arguments = {};
-		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, data, PH_COPY);
-		PHALCON_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
-		zval_ptr_dtor(&arguments);
-	}
+	zval_ptr_dtor(&event);
 	zval_ptr_dtor(&name);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-
-	if (Z_TYPE(events_manager) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
-
-		/**
-		 * Send a notification to the events manager
-		 */
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", eventname, getThis(), data, cancelable);
-		zval_ptr_dtor(&events_manager);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
-		}
-	}
-
-	RETURN_TRUE;
-}
-
-/**
- * Fires an event, return data
- *
- * @param string $eventName
- * @param mixed $data
- * @return mixed
- */
-PHP_METHOD(Phalcon_Di_Injectable, fireEventData){
-
-	zval *eventname, *data = NULL, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
-	zval debug_message = {};
-
-	phalcon_fetch_params(0, 1, 1, &eventname, &data);
-
-	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "--Event (Data): ", eventname);
-		PHALCON_DEBUG_LOG(&debug_message);
-		zval_ptr_dtor(&debug_message);
-	}
-
-	if (!data) {
-		data = &PHALCON_GLOBAL(z_null);
-	}
-
-	phalcon_fast_strtolower(&lower, eventname);
-
-	if (phalcon_memnstr_str(&lower, SL(":"))) {
-		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
-		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
-		zval_ptr_dtor(&event_parts);
-	} else {
-		ZVAL_COPY(&name, &lower);
-	}
-	zval_ptr_dtor(&lower);
-
-	/**
-	 * Check if there is a method with the same name of the event
-	 */
-	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), Z_STRVAL(name), data);
-	}
-
-	if (phalcon_property_array_isset_fetch(&callback, getThis(), SL("_eventCallbacks"), &name, PH_READONLY)) {
-		zval arguments = {};
-		array_init_size(&arguments, 1);
-		phalcon_array_append(&arguments, data, PH_COPY);
-		if (Z_TYPE_P(return_value) > IS_NULL) {
-			PHALCON_CALL_USER_FUNC_ARRAY(NULL, &callback, &arguments);
-		} else {
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
-		}
-		zval_ptr_dtor(&arguments);
-	}
-	zval_ptr_dtor(&name);
-
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-	if (Z_TYPE(events_manager) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(&events_manager, phalcon_events_managerinterface_ce, phalcon_di_exception_ce);
-
-		/**
-		 * Send a notification to the events manager
-		 */
-		if (Z_TYPE_P(return_value) > IS_NULL) {
-			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
-		} else {
-			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", eventname, getThis(), data);
-		}
-		zval_ptr_dtor(&events_manager);
-	}
+	RETURN_NCTOR(&status);
 }
 
 /**

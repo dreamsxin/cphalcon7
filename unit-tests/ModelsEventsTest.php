@@ -38,7 +38,7 @@ class ModelsEventsTest extends PHPUnit\Framework\TestCase
 		}
 	}
 
-	protected function _prepareDI(&$trace)
+	protected function _prepareDI(&$trace, $sqlite = FALSE)
 	{
 		Phalcon\Di::reset();
 
@@ -49,6 +49,14 @@ class ModelsEventsTest extends PHPUnit\Framework\TestCase
 				$trace[$event->getType()][get_class($model)] = 1;
 			} else {
 				$trace[$event->getType()][get_class($model)]++;
+			}
+			switch($event->getType()) {
+				case 'beforeCreate':
+				case 'beforeDelete':
+				case 'notSaved':
+					return false;
+				default:
+					return;
 			}
 		});
 
@@ -71,23 +79,44 @@ class ModelsEventsTest extends PHPUnit\Framework\TestCase
 		$di->set('modelsQueryBuilder', 'Phalcon\Mvc\Model\Query\Builder');
 		$di->set('modelsCriteria', 'Phalcon\\Mvc\\Model\\Criteria');
 
-		$di->set('db', function(){
+		$di->set('db', function() use (&$sqlite) {
 			require 'unit-tests/config.db.php';
-			return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+			if (!$sqlite) {
+				return new Phalcon\Db\Adapter\Pdo\Mysql($configMysql);
+			} else {
+				return new Phalcon\Db\Adapter\Pdo\Sqlite($configSqlite);
+			}
 		}, true);
 	}
 
-	public function testEventsCreate()
+	public function testValidatorsMysql()
+	{
+		$this->_testEventsCreate();
+		$this->_testEventsDelete();
+	}
+
+	public function testValidatorsSqlite()
+	{
+		$this->_testEventsCreate(true);
+		$this->_testEventsDelete(true);
+	}
+
+	public function _testEventsCreate($sqlite = FALSE)
 	{
 		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
+		if ($sqlite) {
+			if (empty($configSqlite)) {
+				$this->markTestSkipped("Skipped");
+				return;
+			}
+		} else if (empty($configMysql)) {
 			$this->markTestSkipped('Test skipped');
 			return;
 		}
 
 		$trace = array();
 
-		$this->_prepareDI($trace);
+		$this->_prepareDI($trace, $sqlite);
 
 		$robot = new GossipRobots();
 
@@ -129,7 +158,7 @@ class ModelsEventsTest extends PHPUnit\Framework\TestCase
 	}
 
 
-	public function testEventsDelete()
+	public function _testEventsDelete()
 	{
 		require 'unit-tests/config.db.php';
 		if (empty($configMysql)) {

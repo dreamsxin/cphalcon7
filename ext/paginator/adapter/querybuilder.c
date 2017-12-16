@@ -379,13 +379,13 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	phalcon_update_property_long(&page, SL("total_items"), i_rowcount);
 
 	ZVAL_STRING(&event_name, "query:afterGetPaginate");
-	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &page);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &page);
 	zval_ptr_dtor(&event_name);
 
-	if (zend_is_true(return_value)) {
+	if (Z_TYPE_P(return_value) >= IS_ARRAY) {
 		zval_ptr_dtor(&page);
 	} else {
 		zval_ptr_dtor(return_value);
-		RETURN_ZVAL(&page, 0, 0);
+		RETURN_NCTOR(&page);
 	}
 }

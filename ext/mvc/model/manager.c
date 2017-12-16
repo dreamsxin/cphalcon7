@@ -40,6 +40,7 @@
 #include "kernel/operators.h"
 #include "kernel/hash.h"
 #include "kernel/framework/orm.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -380,7 +381,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
 		zval_ptr_dtor(&class_name);
 	}
 
-	RETURN_NULL();
+	PHALCON_CALL_PARENT(return_value, phalcon_mvc_model_manager_ce, getThis(), "geteventsmanager");
 }
 
 /**
@@ -442,7 +443,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		zval_ptr_dtor(&event_name);
 	}
 	zval_ptr_dtor(&events_manager);
-
 	RETURN_TRUE;
 }
 
@@ -886,7 +886,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 
-	zval *eventname, *model, entity_name = {}, status = {}, behaviors = {}, models_behaviors = {}, *behavior, events_manager = {}, fire_event_name = {}, custom_events_manager = {};
+	zval *eventname, *model, entity_name = {}, behaviors = {}, models_behaviors = {};
 
 	phalcon_fetch_params(0, 2, 0, &eventname, &model);
 
@@ -896,50 +896,21 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, notifyEvent){
 	 * Dispatch events to the global events manager
 	 */
 	phalcon_read_property(&behaviors, getThis(), SL("_behaviors"), PH_NOISY|PH_READONLY);
-	if (Z_TYPE(behaviors) == IS_ARRAY) {
-		if (phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_READONLY)) {
-
-			/**
-			 * Notify all the events on the behavior
-			 */
-			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
-				PHALCON_CALL_METHOD(&status, behavior, "notify", eventname, model);
-				if (PHALCON_IS_FALSE(&status)) {
-					break;
-				}
-			} ZEND_HASH_FOREACH_END();
-		}
-	}
-
-	if (!PHALCON_IS_FALSE(&status)) {
+	ZVAL_TRUE(return_value);
+	if (Z_TYPE(behaviors) == IS_ARRAY && phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_READONLY)) {
+		zval *behavior;
 		/**
-		 * Dispatch events to the global events manager
+		 * Notify all the events on the behavior
 		 */
-		PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &fire_event_name, model);
-			zval_ptr_dtor(&fire_event_name);
-		}
-		zval_ptr_dtor(&events_manager);
-	}
-
-	if (!PHALCON_IS_FALSE(&status)) {
-		/**
-		 * A model can has a specific events manager for it
-		 */
-		phalcon_read_property(&custom_events_manager, getThis(), SL("_customEventsManager"), PH_NOISY|PH_READONLY);
-		if (Z_TYPE(custom_events_manager) == IS_ARRAY) {
-			if (phalcon_array_isset_fetch(&events_manager, &custom_events_manager, &entity_name, PH_READONLY)) {
-				PHALCON_CONCAT_SV(&fire_event_name, "model:", eventname);
-				PHALCON_CALL_METHOD(&status, &events_manager, "fire", &fire_event_name, model);
-				zval_ptr_dtor(&fire_event_name);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models_behaviors), behavior) {
+			PHALCON_CALL_METHOD(return_value, behavior, "notify", eventname, model);
+			if (PHALCON_IS_FALSE(return_value)) {
+				break;
 			}
-		}
+		} ZEND_HASH_FOREACH_END();
 	}
 
 	zval_ptr_dtor(&entity_name);
-	RETURN_ZVAL(&status, 0, 0);
 }
 
 /**

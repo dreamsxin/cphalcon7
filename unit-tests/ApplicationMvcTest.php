@@ -297,7 +297,7 @@ class ApplicationMvcTest extends PHPUnit\Framework\TestCase
 
 		$application = new Phalcon\Mvc\Application();
 		$application->setDi($di);
-		$application->attachEvent('afterSendResponse', function($response){
+		$application->attachEvent('afterSendResponse', function($event, $response){
 			$response->setContent($response->getContent().'Response');
 		});
 		$this->assertEquals($application->handle()->getContent(), "<html>Continue afterExecuteRoute</html>".PHP_EOL."Response");

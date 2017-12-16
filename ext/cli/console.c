@@ -258,6 +258,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		zval_ptr_dtor(&event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			zval_ptr_dtor(&dispatcher);
+			zval_ptr_dtor(&events_manager);
 			RETURN_FALSE;
 		}
 	}

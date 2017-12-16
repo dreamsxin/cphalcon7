@@ -3245,7 +3245,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	}
 
 	ZVAL_STRING(&event_name, "query:beforeParse");
-	PHALCON_CALL_METHOD(&intermediate, getThis(), "fireeventdata", &event_name, &phql);
+	PHALCON_CALL_METHOD(&intermediate, getThis(), "fireevent", &event_name, &phql);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(intermediate) == IS_ARRAY) {
@@ -3310,13 +3310,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse){
 	}
 
 	ZVAL_STRING(&event_name, "query:afterParse");
-	PHALCON_CALL_METHOD(return_value, getThis(), "fireeventdata", &event_name, &ir_phql);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &ir_phql);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE_P(return_value) == IS_ARRAY) {
 		zval_ptr_dtor(&ir_phql);
 		phalcon_update_property(getThis(), SL("_intermediate"), return_value);
 	} else {
+		zval_ptr_dtor(return_value);
 		phalcon_update_property(getThis(), SL("_intermediate"), &ir_phql);
 		RETVAL_ZVAL(&ir_phql, 0, 0);
 	}
@@ -3639,14 +3640,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval_ptr_dtor(&intermediate);
 
 	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
-	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &sql_select);
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireevent", &event_name, &sql_select);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(tmp) == IS_STRING) {
 		zval_ptr_dtor(&sql_select);
 		ZVAL_COPY(&sql_select, &tmp);
-		zval_ptr_dtor(&tmp);
 	}
+	zval_ptr_dtor(&tmp);
 
 	/**
 	 * Replace the placeholders
@@ -3900,14 +3901,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	zval_ptr_dtor(&intermediate);
 
 	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
-	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &sql_insert);
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireevent", &event_name, &sql_insert);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(tmp) == IS_STRING) {
 		zval_ptr_dtor(&sql_insert);
 		ZVAL_COPY(&sql_insert, &tmp);
-		zval_ptr_dtor(&tmp);
 	}
+	zval_ptr_dtor(&tmp);
 
 	/**
 	 * Replace the placeholders
@@ -4090,14 +4091,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	zval_ptr_dtor(&intermediate);
 
 	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
-	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &update_sql);
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireevent", &event_name, &update_sql);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(tmp) == IS_STRING) {
 		zval_ptr_dtor(&update_sql);
 		ZVAL_COPY(&update_sql, &tmp);
-		zval_ptr_dtor(&tmp);
 	}
+	zval_ptr_dtor(&tmp);
 
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		array_init(&processed);
@@ -4239,14 +4240,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	zval_ptr_dtor(&intermediate);
 
 	ZVAL_STRING(&event_name, "query:afterGenerateSQLStatement");
-	PHALCON_CALL_METHOD(&tmp, getThis(), "fireeventdata", &event_name, &delete_sql);
+	PHALCON_CALL_METHOD(&tmp, getThis(), "fireevent", &event_name, &delete_sql);
 	zval_ptr_dtor(&event_name);
 
 	if (Z_TYPE(tmp) == IS_STRING) {
 		zval_ptr_dtor(&delete_sql);
 		ZVAL_COPY(&delete_sql, &tmp);
-		zval_ptr_dtor(&tmp);
 	}
+	zval_ptr_dtor(&tmp);
 
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
 		array_init(&processed);
@@ -4376,8 +4377,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	}
 
 	ZVAL_STRING(&event_name, "query:beforeExecute");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
+
+	if (Z_TYPE_P(return_value) >= IS_ARRAY) {
+		return;
+	} else {
+		zval_ptr_dtor(return_value);
+	}
 
 	phalcon_read_property(&cache_options, getThis(), SL("_cacheOptions"), PH_NOISY|PH_READONLY);
 	cache_options_is_not_null = (Z_TYPE(cache_options) != IS_NULL); /* to keep scan-build happy */
@@ -4390,7 +4397,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	PHALCON_CALL_METHOD(NULL, getThis(), "parse");
 
 	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
-
+	ZVAL_NULL(&cache);
 	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
 		if (cache_options_is_not_null) {
 			zval dependency_injector = {};
@@ -4554,12 +4561,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 		default:
 			PHALCON_CONCAT_SV(&exception_message, "Unknown statement ", &type);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			zval_ptr_dtor(&exception_message);
 			return;
 	}
-
-	ZVAL_STRING(&event_name, "query:afterExecute");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &result);
-	zval_ptr_dtor(&event_name);
 
 	/**
 	 * We store the resultset in the cache if any
@@ -4567,23 +4571,31 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
 		if (cache_options_is_not_null) {
 			PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
-			zval_ptr_dtor(&cache);
+		}
+	}
+	zval_ptr_dtor(&cache);
+
+	if (Z_TYPE(result) == IS_OBJECT) {
+		/**
+		 * Check if only the first row must be returned
+		 */
+		if (zend_is_true(&unique_row)) {
+			PHALCON_CALL_METHOD(return_value, &result, "getfirst");
+			zval_ptr_dtor(&result);
+			ZVAL_COPY(&result, return_value);
+			zval_ptr_dtor(return_value);
 		}
 	}
 
-	if (Z_TYPE(result) != IS_OBJECT) {
-		RETVAL_ZVAL(&result, 0, 0);
-		return;
-	}
+	ZVAL_STRING(&event_name, "query:afterExecute");
+	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &result);
+	zval_ptr_dtor(&event_name);
 
-	/**
-	 * Check if only the first row must be returned
-	 */
-	if (zend_is_true(&unique_row)) {
-		PHALCON_CALL_METHOD(return_value, &result, "getfirst");
+	if (Z_TYPE_P(return_value) >= IS_ARRAY) {
 		zval_ptr_dtor(&result);
 	} else {
-		RETVAL_ZVAL(&result, 0, 0);
+		zval_ptr_dtor(return_value);
+		RETURN_NCTOR(&result);
 	}
 }
 

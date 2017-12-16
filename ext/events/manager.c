@@ -371,7 +371,7 @@ PHP_METHOD(Phalcon_Events_Manager, detachAll){
  */
 PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 
-	zval *queue, *event, *flag = NULL, *_prev_data = NULL, prev_data = {}, event_name = {}, source = {}, data = {}, cancelable = {}, collect = {}, iterator = {}, *listener;
+	zval *queue, *event, *flag = NULL, *_prev_data = NULL, event_name = {}, source = {}, data = {}, cancelable = {}, collect = {}, iterator = {}, *listener;
 	zval status = {};
 	zend_class_entry *ce, *weakref_ce;
 
@@ -382,11 +382,10 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	}
 
 	if (_prev_data) {
-		ZVAL_COPY(&prev_data, _prev_data);
+		ZVAL_COPY(&status, _prev_data);
 	} else {
-		ZVAL_NULL(&prev_data);
+		ZVAL_NULL(&status);
 	}
-	ZVAL_NULL(&status);
 
 	if (unlikely(Z_TYPE_P(queue) != IS_ARRAY)) {
 		if (Z_TYPE_P(queue) == IS_OBJECT) {
@@ -501,9 +500,8 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					phalcon_array_append(&arguments, event, PH_COPY);
 					phalcon_array_append(&arguments, &source, PH_COPY);
 					phalcon_array_append(&arguments, &data, PH_COPY);
-					phalcon_array_append(&arguments, &prev_data, PH_COPY);
+					phalcon_array_append(&arguments, &status, 0);
 
-					zval_ptr_dtor(&status);
 					/**
 					 * Call the function in the PHP userland
 					 */
@@ -534,13 +532,14 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
-						zval_ptr_dtor(&prev_data);
+						zval prev_data = {};
 						ZVAL_COPY(&prev_data, &status);
 						zval_ptr_dtor(&status);
 						/**
 						 * Call the function in the PHP userland
 						 */
 						PHALCON_CALL_METHOD(&status, &handler, Z_STRVAL(event_name), event, &source, &data, &prev_data);
+						zval_ptr_dtor(&prev_data);
 						if (zend_is_true(flag) && PHALCON_IS_FALSE(&status)){
 							break;
 						}
@@ -617,9 +616,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					phalcon_array_append(&arguments, event, PH_COPY);
 					phalcon_array_append(&arguments, &source, PH_COPY);
 					phalcon_array_append(&arguments, &data, PH_COPY);
-					phalcon_array_append(&arguments, &prev_data, PH_COPY);
-
-					zval_ptr_dtor(&status);
+					phalcon_array_append(&arguments, &status, 0);
 
 					/**
 					 * Call the function in the PHP userland
@@ -652,13 +649,14 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					 * Check if the listener has implemented an event with the same name
 					 */
 					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
-						zval_ptr_dtor(&prev_data);
+						zval prev_data = {};
 						ZVAL_COPY(&prev_data, &status);
 						zval_ptr_dtor(&status);
 						/**
 						 * Call the function in the PHP userland
 						 */
 						PHALCON_CALL_METHOD(&status, &handler, Z_STRVAL(event_name), event, &source, &data, &prev_data);
+						zval_ptr_dtor(&prev_data);
 						if (zend_is_true(flag) && PHALCON_IS_FALSE(&status)){
 							break;
 						}
@@ -689,7 +687,6 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 	zval_ptr_dtor(&event_name);
 	zval_ptr_dtor(&source);
 	zval_ptr_dtor(&data);
-	zval_ptr_dtor(&prev_data);
 	zval_ptr_dtor(&cancelable);
 	RETURN_NCTOR(&status);
 }

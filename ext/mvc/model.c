@@ -2814,15 +2814,8 @@ PHP_METHOD(Phalcon_Mvc_Model, average){
 PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {};
-	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
-
-	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "--Event: ", eventname);
-		PHALCON_DEBUG_LOG(&debug_message);
-		zval_ptr_dtor(&debug_message);
-	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -2864,15 +2857,8 @@ PHP_METHOD(Phalcon_Mvc_Model, fireEvent){
 PHP_METHOD(Phalcon_Mvc_Model, fireEventCancel){
 
 	zval *eventname, *data = NULL, *cancelable = NULL, models_manager = {};
-	zval debug_message = {};
 
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
-
-	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "--Event (Cancel): ", eventname);
-		PHALCON_DEBUG_LOG(&debug_message);
-		zval_ptr_dtor(&debug_message);
-	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);

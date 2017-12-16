@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 	phalcon_fetch_params(0, 1, 2, &eventname, &data, &cancelable);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "--Event (Cancel): ", eventname);
+		PHALCON_CONCAT_SV(&debug_message, "--Event(Cancel): ", eventname);
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
 	}

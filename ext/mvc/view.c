@@ -1473,11 +1473,12 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 * Call beforeRender if there is an events manager
 	 */
 	ZVAL_STRING(&event_name, "view:beforeRender");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/**
 	 * Get the current content in the buffer maybe some output from the controller

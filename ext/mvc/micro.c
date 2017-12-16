@@ -672,6 +672,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/**
 	 * Handling routing information
@@ -718,6 +719,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		} else {
 			phalcon_read_property(&handler, getThis(), SL("_activeHandler"), PH_READONLY);
 		}
+		zval_ptr_dtor(&status);
 
 		phalcon_read_property(&before_handlers, getThis(), SL("_beforeHandlers"), PH_READONLY);
 		if (Z_TYPE(before_handlers) == IS_ARRAY) {
@@ -850,6 +852,7 @@ PHP_METHOD(Phalcon_Mvc_Micro, handle){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		/**
 		 * Check if a notfoundhandler is defined and it's callable

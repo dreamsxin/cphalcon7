@@ -195,6 +195,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
@@ -217,18 +218,20 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		zval_ptr_dtor(&dependency_injector);
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/* Handle the URI pattern (if any) */
 	PHALCON_CALL_METHOD(NULL, &router, "handle", uri);
 
 	ZVAL_STRING(&event_name, "application:afterHandleRouter");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &router);
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &router);
 	zval_ptr_dtor(&event_name);
 	if (PHALCON_IS_FALSE(&status)) {
 		zval_ptr_dtor(&router);
 		zval_ptr_dtor(&dependency_injector);
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/* Load module config */
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
@@ -243,7 +246,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	 */
 	if (zend_is_true(&module_name)) {
 		ZVAL_STRING(&event_name, "application:beforeStartModule");
-		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &module_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &module_name);
 		zval_ptr_dtor(&event_name);
 
 		if (PHALCON_IS_FALSE(&status)) {
@@ -252,6 +255,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			zval_ptr_dtor(&router);
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		/**
 		 * Check if the module passed by the router is registered in the modules container
@@ -362,7 +366,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 		/* Calling afterStartModule event */
 		ZVAL_STRING(&event_name, "application:afterStartModule");
-		PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name, &module_name);
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &module_name);
 		zval_ptr_dtor(&event_name);
 		zval_ptr_dtor(&module_name);
 
@@ -371,13 +375,14 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 			zval_ptr_dtor(&router);
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 	}
 
 	/**
 	 * Check whether use implicit views or not
 	 */
 	ZVAL_STRING(&event_name, "application:beforeCheckUseImplicitView");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireevent", &event_name);
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
 	phalcon_read_property(&implicit_view, getThis(), SL("_implicitView"), PH_NOISY|PH_READONLY);
@@ -448,6 +453,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/* The dispatcher must return an object */
 	PHALCON_CALL_METHOD(&controller, &dispatcher, "dispatch");
@@ -466,6 +472,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		}
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	if (f_implicit_view) {
 		/* Get the latest value returned by an action */
@@ -515,14 +522,18 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 
 			if (Z_TYPE(controller) == IS_OBJECT && unlikely(phalcon_method_exists_ex(&controller, SL("beforerenderview")) == SUCCESS)) {
 				if (likely(PHALCON_IS_NOT_FALSE(&status))) {
+					zval_ptr_dtor(&status);
 					PHALCON_CALL_METHOD(&status, &controller, "beforerenderview", &view);
 				} else {
 					PHALCON_CALL_METHOD(NULL, &controller, "beforerenderview", &view);
 				}
+			} else {
+				zval_ptr_dtor(&status);
 			}
 
 			/* Check if the view process has been treated by the developer */
 			if (PHALCON_IS_NOT_FALSE(&status)) {
+				zval_ptr_dtor(&status);
 				PHALCON_CALL_METHOD(&namespace_name, &dispatcher, "getnamespacename");
 				PHALCON_CALL_METHOD(&controller_name, &dispatcher, "getcontrollername");
 				PHALCON_CALL_METHOD(&action_name, &dispatcher, "getactionname");

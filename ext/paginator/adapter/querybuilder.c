@@ -181,7 +181,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
 
-	ZVAL_STRING(&event_name, "query:beforeGetPaginate");
+	ZVAL_STRING(&event_name, "pagination:beforeGetPaginate");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
@@ -378,7 +378,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	phalcon_update_property_long(&page, SL("total_pages"), i_total_pages);
 	phalcon_update_property_long(&page, SL("total_items"), i_rowcount);
 
-	ZVAL_STRING(&event_name, "query:afterGetPaginate");
+	ZVAL_STRING(&event_name, "pagination:afterGetPaginate");
 	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &page);
 	zval_ptr_dtor(&event_name);
 

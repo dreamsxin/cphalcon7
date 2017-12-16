@@ -784,6 +784,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
+			zval_ptr_dtor(&status);
 
 			/**
 			 * Check if the user made a forward in the listener
@@ -917,6 +918,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					zval_ptr_dtor(&action_method);
 					continue;
 				}
+				zval_ptr_dtor(&status);
 
 				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 				if (PHALCON_IS_FALSE(&finished)) {
@@ -953,6 +955,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			if (PHALCON_IS_FALSE(&status)) {
 				continue;
 			}
+			zval_ptr_dtor(&status);
 
 			/**
 			 * Check if the user made a forward in the listener
@@ -985,6 +988,27 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 * Call the 'initialize' method just once per request
 		 */
 		if (PHALCON_IS_TRUE(&was_fresh)) {
+			/**
+			 * Calling afterInitialize
+			 */
+			if (unlikely(Z_TYPE(events_manager) == IS_OBJECT)) {
+				ZVAL_STRING(&event_name, "dispatch:beforeInitialize");
+				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+				zval_ptr_dtor(&event_name);
+				if (PHALCON_IS_FALSE(&status)) {
+					continue;
+				}
+				zval_ptr_dtor(&status);
+
+				/**
+				 * Check if the user made a forward in the listener
+				 */
+				phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
+				if (PHALCON_IS_FALSE(&finished)) {
+					continue;
+				}
+			}
+
 			if (phalcon_method_exists_ex(&handler, SL("initialize")) == SUCCESS) {
 				PHALCON_CALL_METHOD(NULL, &handler, "initialize");
 			}
@@ -992,13 +1016,14 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			/**
 			 * Calling afterInitialize
 			 */
-			if (Z_TYPE(events_manager) == IS_OBJECT) {
+			if (unlikely(Z_TYPE(events_manager) == IS_OBJECT)) {
 				ZVAL_STRING(&event_name, "dispatch:afterInitialize");
 				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 				zval_ptr_dtor(&event_name);
 				if (PHALCON_IS_FALSE(&status)) {
 					continue;
 				}
+				zval_ptr_dtor(&status);
 
 				/**
 				 * Check if the user made a forward in the listener

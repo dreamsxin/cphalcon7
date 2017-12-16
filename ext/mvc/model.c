@@ -3746,6 +3746,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		if (!zend_is_true(exists)) {
 			ZVAL_STRING(&event_name, "beforeValidationOnCreate");
@@ -3761,6 +3762,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 	}
 
 	/**
@@ -3805,6 +3807,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	if (phalcon_method_exists_ex(getThis(), SL("getlabel")) == SUCCESS) {
 		method_exists = 1;
@@ -4082,6 +4085,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		ZVAL_STRING(&event_name, "afterValidation");
 		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
@@ -4089,6 +4093,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		/**
 		 * Run Before Callbacks
@@ -4099,6 +4104,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		if (zend_is_true(exists)) {
 			ZVAL_STRING(&event_name, "beforeUpdate");
@@ -4116,6 +4122,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		/**
 		 * Always return true if the operation is skipped
@@ -4159,8 +4166,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
 			RETURN_TRUE;
 		}
 
-		ZVAL_STRING(&event_name, "notSave");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
 		zval_ptr_dtor(&event_name);
 		RETURN_FALSE;
@@ -5178,10 +5183,6 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		ZVAL_STRING(&event_name, "afterOperation");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
-
-		if (phalcon_method_exists_ex(getThis(), SL("updatecache")) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, getThis(), "updatecache");
-		}
 	} else {
 		/**
 		 * Throw exceptions on failed saves?
@@ -5325,6 +5326,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/**
 	 * Check if deleting the record violates a virtual foreign key
@@ -5350,7 +5352,6 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 
 	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection");
 
-
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
 
 	/**
@@ -5362,6 +5363,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	} else {
+		zval_ptr_dtor(&status);
 		/**
 		 * The operation can be skipped
 		 */
@@ -5422,10 +5424,6 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		ZVAL_STRING(&event_name, "afterOperation");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
-
-		if (phalcon_method_exists_ex(getThis(), SL("deletecache")) == SUCCESS) {
-			PHALCON_CALL_METHOD(NULL, getThis(), "deletecache");
-		}
 	}
 
 	RETURN_CTOR(&success);

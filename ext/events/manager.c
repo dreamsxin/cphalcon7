@@ -22,6 +22,7 @@
 #include "events/eventinterface.h"
 #include "events/listener.h"
 #include "events/exception.h"
+#include "events/../debug.h"
 
 #include <Zend/zend_closures.h>
 #include <ext/spl/spl_heap.h>
@@ -36,6 +37,7 @@
 #include "kernel/concat.h"
 #include "kernel/operators.h"
 #include "kernel/hash.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Events\Manager
@@ -756,10 +758,16 @@ PHP_METHOD(Phalcon_Events_Manager, createEvent){
  */
 PHP_METHOD(Phalcon_Events_Manager, fire){
 
-	zval *_event_type, *source, *data = NULL, *cancelable = NULL, *flag = NULL, event_type = {}, events = {};
-	zval name = {}, type = {}, status = {}, collect = {}, any_type = {}, event = {}, fire_events = {};
+	zval *_event_type, *source, *data = NULL, *cancelable = NULL, *flag = NULL, debug_message = {};
+	zval event_type = {}, events = {}, name = {}, type = {}, status = {}, collect = {}, any_type = {}, event = {}, fire_events = {};
 
 	phalcon_fetch_params(0, 2, 3, &_event_type, &source, &data, &cancelable, &flag);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		PHALCON_CONCAT_SV(&debug_message, "--Event(fire): ", _event_type);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);

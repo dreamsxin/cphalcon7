@@ -27,12 +27,12 @@ extern zend_class_entry *phalcon_di_injectionawareinterface_ce;
 PHALCON_INIT_CLASS(Phalcon_Di_InjectionAwareInterface);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_getdi, 0, 0, 0)
-	ZEND_ARG_INFO(0, error)
-	ZEND_ARG_INFO(0, notUseDefault)
+	ZEND_ARG_TYPE_INFO(0, error, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, notUseDefault, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_injectionawareinterface_setdi, 0, 0, 1)
-	ZEND_ARG_INFO(0, dependencyInjector)
+	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 0)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_DI_INJECTIONAWAREINTERFACE_H */

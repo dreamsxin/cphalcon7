@@ -27,9 +27,9 @@ extern zend_class_entry *phalcon_di_service_builder_ce;
 PHALCON_INIT_CLASS(Phalcon_Di_Service_Builder);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_di_service_builder_build, 0, 0, 2)
-	ZEND_ARG_INFO(0, dependencyInjector)
-	ZEND_ARG_INFO(0, definition)
-	ZEND_ARG_INFO(0, parameters)
+	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 0)
+	ZEND_ARG_TYPE_INFO(0, definition, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, parameters, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_DI_SERVICE_BUILDER_H */

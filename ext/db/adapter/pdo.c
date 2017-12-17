@@ -895,11 +895,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 	}
 
 	if (PHALCON_IS_LONG(&transaction_level, 1)) {
-		ZVAL_STRING(&event_name, "db:beginTransaction");
+		ZVAL_STRING(&event_name, "db:beforeBeginTransaction");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
 
 		PHALCON_CALL_METHOD(return_value, &pdo, "begintransaction");
+
+		ZVAL_STRING(&event_name, "db:afterBeginTransaction");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+		zval_ptr_dtor(&event_name);
 		return;
 	}
 
@@ -912,11 +916,15 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, begin){
 				/**
 				 * Notify the events manager about the created savepoint
 				 */
-				ZVAL_STRING(&event_name, "db:createSavepoint");
+				ZVAL_STRING(&event_name, "db:beforeCreateSavepoint");
 				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
 				zval_ptr_dtor(&event_name);
 
 				PHALCON_CALL_METHOD(return_value, getThis(), "createsavepoint", &savepoint_name);
+
+				ZVAL_STRING(&event_name, "db:afterCreateSavepoint");
+				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
+				zval_ptr_dtor(&event_name);
 				zval_ptr_dtor(&savepoint_name);
 				return;
 			}
@@ -967,7 +975,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		/**
 		 * Notify the events manager about the rollbacked transaction
 		 */
-		ZVAL_STRING(&event_name, "db:rollbackTransaction");
+		ZVAL_STRING(&event_name, "db:beforeRollbackTransaction");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
 
@@ -976,6 +984,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 		 */
 		phalcon_property_decr(getThis(), SL("_transactionLevel"));
 		PHALCON_RETURN_CALL_METHOD(&pdo, "rollback");
+
+		ZVAL_STRING(&event_name, "db:afterRollbackTransaction");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+		zval_ptr_dtor(&event_name);
 		return;
 	}
 
@@ -988,7 +1000,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 				/**
 				 * Notify the events manager about the rollbacked savepoint
 				 */
-				ZVAL_STRING(&event_name, "db:rollbackSavepoint");
+				ZVAL_STRING(&event_name, "db:beforeRollbackSavepoint");
 				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
 				zval_ptr_dtor(&event_name);
 
@@ -997,6 +1009,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, rollback){
 				 */
 				phalcon_property_decr(getThis(), SL("_transactionLevel"));
 				PHALCON_CALL_METHOD(return_value, getThis(), "rollbacksavepoint", &savepoint_name);
+
+				ZVAL_STRING(&event_name, "db:afterRollbackSavepoint");
+				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
+				zval_ptr_dtor(&event_name);
 				zval_ptr_dtor(&savepoint_name);
 				return;
 			}
@@ -1054,7 +1070,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		/**
 		 * Notify the events manager about the commited transaction
 		 */
-		ZVAL_STRING(&event_name, "db:commitTransaction");
+		ZVAL_STRING(&event_name, "db:beforeCommitTransaction");
 		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 		zval_ptr_dtor(&event_name);
 
@@ -1063,6 +1079,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 		 */
 		phalcon_property_decr(getThis(), SL("_transactionLevel"));
 		PHALCON_RETURN_CALL_METHOD(&pdo, "commit");
+
+		ZVAL_STRING(&event_name, "db:afterCommitTransaction");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+		zval_ptr_dtor(&event_name);
+
 		return;
 	}
 
@@ -1079,7 +1100,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 				/**
 				 * Notify the events manager about the commited savepoint
 				 */
-				ZVAL_STRING(&event_name, "db:releaseSavepoint");
+				ZVAL_STRING(&event_name, "db:beforeReleaseSavepoint");
 				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
 				zval_ptr_dtor(&event_name);
 
@@ -1088,6 +1109,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, commit){
 				 */
 				phalcon_property_decr(getThis(), SL("_transactionLevel"));
 				PHALCON_CALL_METHOD(return_value, getThis(), "releasesavepoint", &savepoint_name);
+
+				ZVAL_STRING(&event_name, "db:afterReleaseSavepoint");
+				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &savepoint_name);
+				zval_ptr_dtor(&event_name);
 				zval_ptr_dtor(&savepoint_name);
 				return;
 			}

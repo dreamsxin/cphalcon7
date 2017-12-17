@@ -765,11 +765,11 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 		data = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!cancelable) {
+	if (!cancelable || Z_TYPE_P(cancelable) == IS_NULL) {
 		cancelable = &PHALCON_GLOBAL(z_true);
 	}
 
-	if (!flag) {
+	if (!flag || Z_TYPE_P(flag) == IS_NULL) {
 		flag = &PHALCON_GLOBAL(z_false);
 	}
 

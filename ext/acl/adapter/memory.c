@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -744,7 +745,7 @@ static int phalcon_role_adapter_memory_check_inheritance(zval *role, zval *resou
  */
 PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 
-	zval *role, *resource, *access, *data = NULL, role_name = {}, resource_name ={}, star = {}, events_manager = {}, event_name = {}, status = {}, default_access = {}, roles_names = {}, access_list = {};
+	zval *role, *resource, *access, *data = NULL, role_name = {}, resource_name ={}, star = {}, event_name = {}, status = {}, default_access = {}, roles_names = {}, access_list = {};
 	zval access_key = {}, have_access = {}, role_inherits = {}, funcs = {}, func = {}, arguments = {}, ret = {};
 	int allow_access;
 
@@ -782,17 +783,13 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	phalcon_update_property(getThis(), SL("_activeResource"), &resource_name);
 	phalcon_update_property(getThis(), SL("_activeAccess"), access);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
-
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
-		zval_ptr_dtor(&event_name);
-		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&events_manager);
-			RETURN_ZVAL(&status, 0, 0);
-		}
+	ZVAL_STRING(&event_name, "acl:beforeCheckAccess");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+	zval_ptr_dtor(&event_name);
+	if (PHALCON_IS_FALSE(&status)) {
+		RETURN_ZVAL(&status, 0, 0);
 	}
+	zval_ptr_dtor(&status);
 
 	phalcon_read_property(&default_access, getThis(), SL("_defaultAccess"), PH_NOISY|PH_READONLY);
 
@@ -877,12 +874,10 @@ PHP_METHOD(Phalcon_Acl_Adapter_Memory, isAllowed){
 	}
 
 	phalcon_update_property(getThis(), SL("_accessGranted"), return_value);
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "acl:afterCheckAccess");
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), return_value);
-		zval_ptr_dtor(&event_name);
-	}
-	zval_ptr_dtor(&events_manager);
+
+	ZVAL_STRING(&event_name, "acl:afterCheckAccess");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, return_value);
+	zval_ptr_dtor(&event_name);
 }
 
 /**

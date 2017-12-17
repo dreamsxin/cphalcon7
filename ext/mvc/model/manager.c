@@ -392,7 +392,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getCustomEventsManager){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 
-	zval *model, class_name = {}, initialized = {}, events_manager = {}, event_name = {};
+	zval *model, class_name = {}, initialized = {}, event_name = {};
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
@@ -408,12 +408,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 		RETURN_TRUE;
 	}
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "modelsManager:beforeInitialize");
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
-		zval_ptr_dtor(&event_name);
-	}
+	ZVAL_STRING(&event_name, "modelsManager:beforeInitialize");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, model);
+	zval_ptr_dtor(&event_name);
 
 	/**
 	 * Update the model as initialized, this avoid cyclic initializations
@@ -437,12 +434,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, initialize){
 	/**
 	 * If an EventsManager is available we pass to it every initialized model
 	 */
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), model);
-		zval_ptr_dtor(&event_name);
-	}
-	zval_ptr_dtor(&events_manager);
+	ZVAL_STRING(&event_name, "modelsManager:afterInitialize");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, model);
+	zval_ptr_dtor(&event_name);
 	RETURN_TRUE;
 }
 

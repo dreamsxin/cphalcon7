@@ -376,7 +376,7 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
-	zval *view_path, *params, *absolute_path = NULL, events_manager = {}, event_name = {}, status = {}, debug_message = {};
+	zval *view_path, *params, *absolute_path = NULL, event_name = {}, status = {}, debug_message = {};
 	zval not_exists = {}, views_dir = {}, views_dir_paths = {}, *path = NULL, engines = {}, *engine, exception_message = {};
 	zend_string *str_key;
 	ulong idx;
@@ -389,20 +389,16 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 
 	phalcon_update_property(getThis(), SL("_activeRenderPath"), view_path);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-
 	/**
 	 * Call beforeRender if there is an events manager
 	 */
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:beforeRender");
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis());
-		zval_ptr_dtor(&event_name);
-		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&events_manager);
-			RETURN_NULL();
-		}
+	ZVAL_STRING(&event_name, "view:beforeRender");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+	zval_ptr_dtor(&event_name);
+	if (PHALCON_IS_FALSE(&status)) {
+		RETURN_NULL();
 	}
+	zval_ptr_dtor(&status);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render Simple View: ", view_path);
@@ -459,14 +455,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 				/**
 				 * Call beforeRenderView if there is a events manager available
 				 */
-				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					ZVAL_STRING(&event_name, "view:beforeRenderView");
-					PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
-					zval_ptr_dtor(&event_name);
-					if (PHALCON_IS_FALSE(&status)) {
-						continue;
-					}
+				 ZVAL_STRING(&event_name, "view:beforeRenderView");
+				PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view_engine_path);
+				zval_ptr_dtor(&event_name);
+				if (PHALCON_IS_FALSE(&status)) {
+					continue;
 				}
+				zval_ptr_dtor(&status);
 
 				PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, params, &PHALCON_GLOBAL(z_true));
 
@@ -474,11 +469,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 				 * Call afterRenderView if there is a events manager available
 				 */
 				ZVAL_FALSE(&not_exists);
-				if (Z_TYPE(events_manager) == IS_OBJECT) {
-					ZVAL_STRING(&event_name, "view:afterRenderView");
-					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
-					zval_ptr_dtor(&event_name);
-				}
+				ZVAL_STRING(&event_name, "view:afterRenderView");
+				PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+				zval_ptr_dtor(&event_name);
 
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -507,12 +500,9 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, _internalRender){
 	/**
 	 * Call afterRender event
 	 */
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "view:afterRender");
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
-		zval_ptr_dtor(&event_name);
-	}
-	zval_ptr_dtor(&events_manager);
+	ZVAL_STRING(&event_name, "view:afterRender");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
 }
 
 /**

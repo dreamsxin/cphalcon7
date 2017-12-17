@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskName){
  */
 PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 
-	zval *message, *exception_code = NULL, exception = {}, events_manager = {}, event_name = {}, status = {};
+	zval *message, *exception_code = NULL, exception = {}, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 1, &message, &exception_code);
 
@@ -181,18 +181,14 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 	object_init_ex(&exception, phalcon_cli_dispatcher_exception_ce);
 	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &exception);
-		zval_ptr_dtor(&event_name);
-		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&exception);
-			zval_ptr_dtor(&events_manager);
-			RETURN_FALSE;
-		}
+	ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &exception);
+	zval_ptr_dtor(&event_name);
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&exception);
+		RETURN_FALSE;
 	}
-	zval_ptr_dtor(&events_manager);
+	zval_ptr_dtor(&status);
 
 	/**
 	 * Throw the exception if it wasn't handled
@@ -208,21 +204,17 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
  */
 PHP_METHOD(Phalcon_Cli_Dispatcher, _handleException){
 
-	zval *exception, events_manager = {}, event_name = {}, status = {};
+	zval *exception, event_name = {}, status = {};
 
 	phalcon_fetch_params(0, 1, 0, &exception);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "dispatch:beforeException");
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), exception);
-		zval_ptr_dtor(&event_name);
-		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&events_manager);
-			RETURN_FALSE;
-		}
+	ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, exception);
+	zval_ptr_dtor(&event_name);
+	if (PHALCON_IS_FALSE(&status)) {
+		RETURN_FALSE;
 	}
-	zval_ptr_dtor(&events_manager);
+	zval_ptr_dtor(&status);
 }
 
 /**

@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, debug_message = {}, render_level = {}, cache_level = {};
 	zval cache_mode = {}, cache = {}, not_exists = {}, views_dir_paths = {}, base_path = {}, views_dir = {}, *path;
 	zval key = {}, lifetime = {}, view_options = {}, cache_options = {}, cached_view = {};
-	zval view_params = {}, events_manager = {}, *engine, event_name = {}, status = {}, exception_message = {};
+	zval view_params = {}, *engine, event_name = {}, status = {}, exception_message = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 4, 1, &engines, &view_path, &silence, &must_clean, &absolute_path);
@@ -1084,7 +1084,6 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 	}
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	/**
 	 * Views are rendered in each engine
@@ -1119,16 +1118,15 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			/**
 			 * Call beforeRenderView if there is a events manager available
 			 */
-			if (Z_TYPE(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:beforeRenderView");
-				PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &view_engine_path);
-				zval_ptr_dtor(&event_name);
+			ZVAL_STRING(&event_name, "view:beforeRenderView");
+			PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &view_engine_path);
+			zval_ptr_dtor(&event_name);
 
-				if (PHALCON_IS_FALSE(&status)) {
-					zval_ptr_dtor(&view_engine_path);
-					continue;
-				}
+			if (PHALCON_IS_FALSE(&status)) {
+				zval_ptr_dtor(&view_engine_path);
+				continue;
 			}
+			zval_ptr_dtor(&status);
 
 			PHALCON_CALL_METHOD(NULL, engine, "render", &view_engine_path, &view_params, must_clean);
 			zval_ptr_dtor(&view_engine_path);
@@ -1138,11 +1136,9 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			 */
 			ZVAL_FALSE(&not_exists);
 
-			if (Z_TYPE(events_manager) == IS_OBJECT) {
-				ZVAL_STRING(&event_name, "view:afterRenderView");
-				PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
-				zval_ptr_dtor(&event_name);
-			}
+			ZVAL_STRING(&event_name, "view:afterRenderView");
+			PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+			zval_ptr_dtor(&event_name);
 			break;
 		} ZEND_HASH_FOREACH_END();
 
@@ -1167,18 +1163,16 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		/**
 		 * Notify about not found views
 		 */
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "view:notFoundView");
-			PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
-			zval_ptr_dtor(&event_name);
-		}
+		ZVAL_STRING(&event_name, "view:notFoundView");
+		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+		zval_ptr_dtor(&event_name);
+
 		if (!zend_is_true(silence)) {
 			PHALCON_CONCAT_SVS(&exception_message, "View '", view_path, "' was not found in the views directory");
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 			return;
 		}
 	}
-	zval_ptr_dtor(&events_manager);
 
 	/**
 	 * Store the data in the cache

@@ -83,7 +83,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_getbelongstore
 	ZEND_ARG_INFO(0, modelName)
 	ZEND_ARG_INFO(0, modelRelation)
 	ZEND_ARG_INFO(0, record)
-	ZEND_ARG_INFO(0, parameters)
+	ZEND_ARG_TYPE_INFO(0, parameters, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_gethasmanyrecords, 0, 0, 4)
@@ -91,7 +91,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_gethasmanyreco
 	ZEND_ARG_INFO(0, modelName)
 	ZEND_ARG_INFO(0, modelRelation)
 	ZEND_ARG_INFO(0, record)
-	ZEND_ARG_INFO(0, parameters)
+	ZEND_ARG_TYPE_INFO(0, parameters, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_gethasonerecords, 0, 0, 4)
@@ -99,7 +99,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_gethasonerecor
 	ZEND_ARG_INFO(0, modelName)
 	ZEND_ARG_INFO(0, modelRelation)
 	ZEND_ARG_INFO(0, record)
-	ZEND_ARG_INFO(0, parameters)
+	ZEND_ARG_TYPE_INFO(0, parameters, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_managerinterface_getbelongsto, 0, 0, 1)

@@ -1368,6 +1368,10 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 
 	phalcon_update_property(getThis(), SL("_finished"), &PHALCON_GLOBAL(z_false));
 	phalcon_update_property(getThis(), SL("_forwarded"), &PHALCON_GLOBAL(z_true));
+
+	ZVAL_STRING(&event_name, "dispatch:afterForward");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, forward);
+	zval_ptr_dtor(&event_name);
 }
 
 /**

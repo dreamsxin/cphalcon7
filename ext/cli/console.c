@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Cli_Console, addModules){
  */
 PHP_METHOD(Phalcon_Cli_Console, handle){
 
-	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, events_manager = {}, event_name = {}, service = {}, router = {}, module_name = {};
+	zval *_arguments = NULL, arguments = {}, dependency_injector = {}, event_name = {}, service = {}, router = {}, module_name = {};
 	zval status = {}, modules = {}, exception_msg = {}, module = {}, path = {}, class_name = {}, module_object = {};
 	zval namespace_name = {}, task_name = {}, action_name = {}, params = {}, dispatcher = {};
 
@@ -146,8 +146,6 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	} else {
 		ZVAL_COPY(&arguments, _arguments);
 	}
-
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 
 	ZVAL_STR(&service, IS(router));
 
@@ -165,18 +163,15 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 
 	PHALCON_CALL_METHOD(&module_name, &router, "getmodulename");
 	if (zend_is_true(&module_name)) {
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			ZVAL_STRING(&event_name, "console:beforeStartModule");
-
-			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
-			zval_ptr_dtor(&event_name);
-			if (PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&dependency_injector);
-				zval_ptr_dtor(&module_name);
-				zval_ptr_dtor(&events_manager);
-				RETURN_FALSE;
-			}
+		ZVAL_STRING(&event_name, "console:beforeStartModule");
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &module_name);
+		zval_ptr_dtor(&event_name);
+		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&module_name);
+			RETURN_FALSE;
 		}
+		zval_ptr_dtor(&status);
 
 		phalcon_read_property(&modules, getThis(), SL("_modules"), PH_NOISY|PH_READONLY);
 		if (!phalcon_array_isset_fetch(&module, &modules, &module_name, PH_READONLY)) {
@@ -184,7 +179,6 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_cli_console_exception_ce, &exception_msg);
 			zval_ptr_dtor(&dependency_injector);
 			zval_ptr_dtor(&module_name);
-			zval_ptr_dtor(&events_manager);
 			return;
 		}
 
@@ -200,7 +194,6 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(path)));
 			} else {
 				zend_throw_exception_ex(phalcon_cli_console_exception_ce, 0, "Modules definition path '%s' does not exist", Z_STRVAL(path));
-				zval_ptr_dtor(&events_manager);
 				return;
 			}
 		}
@@ -213,19 +206,16 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 		zval_ptr_dtor(&class_name);
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerautoloaders");
 		PHALCON_CALL_METHOD(NULL, &module_object, "registerservices", &dependency_injector);
-		if (Z_TYPE(events_manager) == IS_OBJECT) {
-			phalcon_update_property(getThis(), SL("_moduleObject"), &module_object);
+		phalcon_update_property(getThis(), SL("_moduleObject"), &module_object);
 
-			ZVAL_STRING(&event_name, "console:afterStartModule");
-			PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &module_name);
-			zval_ptr_dtor(&event_name);
-			if (PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&module_object);
-				zval_ptr_dtor(&dependency_injector);
-				zval_ptr_dtor(&module_name);
-				zval_ptr_dtor(&events_manager);
-				RETURN_FALSE;
-			}
+		ZVAL_STRING(&event_name, "console:afterStartModule");
+		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &module_name);
+		zval_ptr_dtor(&event_name);
+		if (PHALCON_IS_FALSE(&status)) {
+			zval_ptr_dtor(&module_object);
+			zval_ptr_dtor(&dependency_injector);
+			zval_ptr_dtor(&module_name);
+			RETURN_FALSE;
 		}
 		zval_ptr_dtor(&module_object);
 	}	
@@ -252,26 +242,20 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	zval_ptr_dtor(&action_name);
 	zval_ptr_dtor(&params);
 
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "console:beforeHandleTask");
-		PHALCON_CALL_METHOD(&status, &events_manager, "fire", &event_name, getThis(), &dispatcher);
-		zval_ptr_dtor(&event_name);
-		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&dispatcher);
-			zval_ptr_dtor(&events_manager);
-			RETURN_FALSE;
-		}
+	ZVAL_STRING(&event_name, "console:beforeHandleTask");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &dispatcher);
+	zval_ptr_dtor(&event_name);
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&dispatcher);
+		RETURN_FALSE;
 	}
 
 	PHALCON_CALL_METHOD(&status, &dispatcher, "dispatch");
 	zval_ptr_dtor(&dispatcher);
 
-	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "console:afterHandleTask");
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &status);
-		zval_ptr_dtor(&event_name);
-	}
-	zval_ptr_dtor(&events_manager);
+	ZVAL_STRING(&event_name, "console:afterHandleTask");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &status);
+	zval_ptr_dtor(&event_name);
 
 	RETVAL_ZVAL(&status, 0, 0);
 }

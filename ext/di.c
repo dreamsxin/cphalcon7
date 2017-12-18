@@ -433,7 +433,7 @@ PHP_METHOD(Phalcon_Di, get){
 	zval *name, *parameters = NULL, *noerror = NULL, events_manager = {}, event_name = {}, event_data = {}, service = {};
 	zend_class_entry *ce;
 
-	phalcon_fetch_params(0, 1, 2, &name, &parameters, &noerror);
+	phalcon_fetch_params(1, 1, 2, &name, &parameters, &noerror);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -445,18 +445,18 @@ PHP_METHOD(Phalcon_Di, get){
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_READONLY);
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "di:beforeServiceResolve");
+		PHALCON_MM_ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
 		array_init(&event_data);
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ADD_ENTRY(&event_data);
+		PHALCON_MM_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
 	}
 
 	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name, PH_READONLY)) {
-		PHALCON_CALL_METHOD(return_value, &service, "resolve", parameters, getThis());
+		PHALCON_MM_CALL_METHOD(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
@@ -468,26 +468,27 @@ PHP_METHOD(Phalcon_Di, get){
 			if(!zend_is_true(noerror)) {
 				zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
 			}
-			RETURN_NULL();
+			RETURN_MM_NULL();
 		}
 	}
 
 	/* Pass the DI itself if the instance implements Phalcon\Di\InjectionAwareInterface */
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
-		PHALCON_CALL_METHOD(NULL, return_value, "setdi", getThis());
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "setdi", getThis());
 	}
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {
-		ZVAL_STRING(&event_name, "di:afterServiceResolve");
+		PHALCON_MM_ZVAL_STRING(&event_name, "di:afterServiceResolve");
 
 		array_init(&event_data);
 		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 
-		PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ADD_ENTRY(&event_data);
+		PHALCON_MM_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
 	}
+	RETURN_MM();
 }
 
 /**

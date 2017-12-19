@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -194,7 +195,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	zval previous_action_name = {}, previous_params = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {};
 	zval exception = {}, event_name = {}, status = {}, debug_message = {};
 
-	phalcon_fetch_params(0, 1, 1, &message, &code);
+	phalcon_fetch_params(1, 1, 1, &message, &code);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "--exception: ", message);
@@ -229,7 +230,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 				!PHALCON_IS_EQUAL(&previous_action_name, &action_name) ||
 				!PHALCON_IS_EQUAL(&previous_params, &params)
 			) {
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 
 		}
@@ -239,19 +240,22 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _throwDispatchException){
 	 * Create the real exception
 	 */
 	object_init_ex(&exception, phalcon_mvc_dispatcher_exception_ce);
-	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, code);
+	PHALCON_MM_ADD_ENTRY(&exception);
+	PHALCON_MM_CALL_METHOD(NULL, &exception, "__construct", message, code);
 
-	ZVAL_STRING(&event_name, "dispatch:beforeException");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &exception);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &exception);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
+	zval_ptr_dtor(&status);
 
 	/**
 	 * Throw the exception if it wasn't handled
 	 */
 	phalcon_throw_exception(&exception);
+	RETURN_MM();
 }
 
 /**
@@ -266,11 +270,12 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, _handleException)
 {
 	zval *exception, event_name = {};
 
-	phalcon_fetch_params(0, 1, 0, &exception);
+	phalcon_fetch_params(1, 1, 0, &exception);
 
-	ZVAL_STRING(&event_name, "dispatch:beforeException");
-	PHALCON_RETURN_CALL_METHOD(getThis(), "fireevent", &event_name, exception);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, exception);
+
+	RETURN_MM();
 }
 
 /**

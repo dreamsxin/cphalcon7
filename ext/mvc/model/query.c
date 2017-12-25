@@ -135,6 +135,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getIntermediate);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getModels);
 PHP_METHOD(Phalcon_Mvc_Model_Query, setConnection);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection);
+PHP_METHOD(Phalcon_Mvc_Model_Query, setConflict);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, phql)
@@ -198,6 +199,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setconnection, 0, 0, 1)
 	ZEND_ARG_INFO(0, connection)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_setconflict, 0, 0, 1)
+	ZEND_ARG_INFO(0, conflict)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, __construct, arginfo_phalcon_mvc_model_query___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query, setPhql, arginfo_phalcon_mvc_model_query_setphql, ZEND_ACC_PUBLIC)
@@ -254,6 +259,7 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, getModels, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, setConnection, arginfo_phalcon_mvc_model_query_setconnection, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getConnection, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, setConflict, arginfo_phalcon_mvc_model_query_setconflict, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -5052,4 +5058,20 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 	zval_ptr_dtor(&manager);
 	zval_ptr_dtor(&intermediate);
 	RETVAL_ZVAL(&connection, 0, 0);
+}
+
+/**
+ * Sets conflict
+ *
+ * @param array $conflict
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, setConflict){
+
+	zval *conflict;
+
+	phalcon_fetch_params(0, 1, 0, &conflict);
+
+	phalcon_update_property(getThis(), SL("_conflict"), conflict);
+	RETURN_THIS();
 }

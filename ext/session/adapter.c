@@ -14,11 +14,13 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "session/adapter.h"
 #include "session/adapterinterface.h"
+#include "di/injectable.h"
 #include "internal/arginfo.h"
 
 #include <main/SAPI.h>
@@ -115,7 +117,7 @@ static const zend_function_entry phalcon_session_adapter_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Session, Adapter, session_adapter, phalcon_session_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Session, Adapter, session_adapter, phalcon_di_injectable_ce, phalcon_session_adapter_method_entry, ZEND_ACC_EXPLICIT_ABSTRACT_CLASS);
 
 	zend_declare_property_null(phalcon_session_adapter_ce, SL("_uniqueId"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_session_adapter_ce, SL("_started"), 0, ZEND_ACC_PROTECTED);

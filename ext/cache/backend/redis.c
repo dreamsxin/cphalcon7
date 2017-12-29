@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -128,7 +129,7 @@ PHALCON_INIT_CLASS(Phalcon_Cache_Backend_Redis)
  */
 PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
-	zval *frontend, *_options = NULL, options = {}, redis = {}, special_key = {};
+	zval *frontend, *_options = NULL, options = {}, special_key = {}, redis = {};
 
 	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
 
@@ -138,7 +139,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 		ZVAL_DUP(&options, _options);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || Z_TYPE(special_key) == IS_TRUE) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
 	}
 
@@ -153,10 +154,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 		if (!phalcon_array_isset_str(&options, SL("persistent"))) {
 			phalcon_array_update_str_bool(&options, SL("persistent"), 0, 0);
-		}
-
-		if (!phalcon_array_isset_str(&options, SL("statsKey"))) {
-			phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
 		}
 	} else {
 		zend_class_entry *ce0;
@@ -174,6 +171,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
+	zval_ptr_dtor(&options);
 }
 
 /**
@@ -185,12 +183,6 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	zend_class_entry *ce0;
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
-	ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
-
-	object_init_ex(&redis, ce0);
-	if (phalcon_has_constructor(&redis)) {
-		PHALCON_CALL_METHOD(NULL, &redis, "__construct");
-	}
 
 	if (
 		   !phalcon_array_isset_fetch_str(&host, &options, SL("host"), PH_READONLY)
@@ -201,6 +193,13 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		return;
 	}
 
+	ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
+
+	object_init_ex(&redis, ce0);
+	if (phalcon_has_constructor(&redis)) {
+		PHALCON_CALL_METHOD(NULL, &redis, "__construct");
+	}
+
 	if (zend_is_true(&persistent)) {
 		PHALCON_CALL_METHOD(&success, &redis, "pconnect", &host, &port);
 	} else {
@@ -208,6 +207,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	}
 
 	if (!zend_is_true(&success)) {
+		zval_ptr_dtor(&redis);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Cannot connect to Redisd server");
 		return;
 	}
@@ -215,6 +215,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	if (phalcon_array_isset_fetch_str(&auth, &options, SL("auth"), PH_READONLY) && PHALCON_IS_NOT_EMPTY(&auth)) {
 		PHALCON_CALL_METHOD(&success, &redis, "auth", &auth);
 		if (!zend_is_true(&success)) {
+			zval_ptr_dtor(&redis);
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Redisd server is authentication failed");
 			return;
 		}
@@ -240,7 +241,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_READONLY);
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_COPY);
 	if (Z_TYPE(redis) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
 	}
@@ -251,15 +252,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, get){
 	PHALCON_CONCAT_SVV(&last_key, "_PHCR", &prefix, key_name);
 
 	PHALCON_CALL_METHOD(&cached_content, &redis, "get", &last_key);
+	zval_ptr_dtor(&last_key);
+	zval_ptr_dtor(&redis);
 	if (PHALCON_IS_FALSE(&cached_content)) {
 		RETURN_NULL();
 	}
 
 	if (phalcon_is_numeric(&cached_content)) {
-		RETURN_CTOR(&cached_content);
+		RETURN_NCTOR(&cached_content);
 	}
 
 	PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
+	zval_ptr_dtor(&cached_content);
 }
 
 /**

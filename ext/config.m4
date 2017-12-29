@@ -583,7 +583,6 @@ mvc/model/metadata/files.c \
 mvc/model/metadata/strategy/introspection.c \
 mvc/model/metadata/strategy/annotations.c \
 mvc/model/metadata/apc.c \
-mvc/model/metadata/xcache.c \
 mvc/model/metadata/memory.c \
 mvc/model/metadata/session.c \
 mvc/model/metadata/memcached.c \
@@ -697,7 +696,6 @@ cache/frontend/data.c \
 cache/frontend/output.c \
 cache/backend/file.c \
 cache/backend/apc.c \
-cache/backend/xcache.c \
 cache/backend/memcached.c \
 cache/backend/memory.c \
 cache/backend/redis.c \
@@ -753,7 +751,6 @@ annotations/annotation.c \
 annotations/readerinterface.c \
 annotations/adapter/files.c \
 annotations/adapter/apc.c \
-annotations/adapter/xcache.c \
 annotations/adapter/memory.c \
 annotations/adapter/cache.c \
 annotations/exception.c \

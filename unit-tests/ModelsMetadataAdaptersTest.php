@@ -18,8 +18,6 @@
   +------------------------------------------------------------------------+
 */
 
-require_once 'helpers/xcache.php';
-
 class ModelsMetadataAdaptersTest extends PHPUnit\Framework\TestCase
 {
 
@@ -231,49 +229,6 @@ class ModelsMetadataAdaptersTest extends PHPUnit\Framework\TestCase
 
 		$di->set('modelsMetadata', function(){
 			return new Phalcon\Mvc\Model\Metadata\Apc(array(
-				'prefix' => 'my-local-app',
-				'lifetime' => 60
-			));
-		});
-
-		$metaData = $di->getShared('modelsMetadata');
-
-		$metaData->reset();
-
-		$this->assertTrue($metaData->isEmpty());
-
-		Robots::findFirst();
-
-		$this->assertEquals(apc_fetch('$PMM$my-local-appmeta-robots-robots'), $this->_data['meta-robots-robots']);
-		$this->assertEquals(apc_fetch('$PMM$my-local-appmap-robots-robots'), $this->_data['map-robots-robots']);
-
-		$this->assertFalse($metaData->isEmpty());
-
-		$metaData->reset();
-		$this->assertTrue($metaData->isEmpty());
-
-		Robots::findFirst();
-	}
-
-	public function testMetadataXcache()
-	{
-		require 'unit-tests/config.db.php';
-		if (empty($configMysql)) {
-			$this->markTestSkipped('Test skipped');
-			return;
-		}
-
-		if (!function_exists('xcache_get')) {
-			$this->markTestSkipped('xcache extension is not loaded');
-			return false;
-		}
-
-		xcache_unset('$PMM$my-local-app');
-
-		$di = $this->_getDI();
-
-		$di->set('modelsMetadata', function(){
-			return new Phalcon\Mvc\Model\Metadata\Xcache(array(
 				'prefix' => 'my-local-app',
 				'lifetime' => 60
 			));

@@ -256,8 +256,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Wiredtiger, save){
 	zval_ptr_dtor(&val);
 
 	array_init_size(&cached_content, 2);
-	phalcon_array_append(&cached_content, &prepared_val, PH_READONLY);
-	phalcon_array_append(&cached_content, &expired, PH_READONLY);
+	phalcon_array_append(&cached_content, &prepared_val, 0);
+	phalcon_array_append(&cached_content, &expired, 0);
 
 	PHALCON_CALL_METHOD(&success, &cursor, "set", key_name, &cached_content);
 

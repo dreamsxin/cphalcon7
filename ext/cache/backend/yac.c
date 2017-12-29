@@ -136,11 +136,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, __construct){
 		ZVAL_DUP(&options, _options);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || PHALCON_IS_EMPTY_STRING(&special_key)) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || Z_TYPE(special_key) == IS_TRUE) {
 		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCY"), PH_COPY);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_yac_ce, getThis(), "__construct", frontend, &options);
+	zval_ptr_dtor(&options);
 }
 
 /**
@@ -171,7 +172,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, _connect)
 	}
 
 	phalcon_update_property(getThis(), SL("_yac"), &yac);
-	RETURN_CTOR(&yac);
+	RETURN_NCTOR(&yac);
 }
 
 /**
@@ -186,7 +187,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, get){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
@@ -196,15 +197,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, get){
 	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_READONLY);
 
 	PHALCON_CALL_METHOD(&cached_content, &yac, "get", &last_key);
+	zval_ptr_dtor(&last_key);
+	zval_ptr_dtor(&yac);
 	if (PHALCON_IS_FALSE(&cached_content)) {
 		RETURN_NULL();
 	}
 
 	if (phalcon_is_numeric(&cached_content)) {
-		RETURN_CTOR(&cached_content);
+		RETURN_NCTOR(&cached_content);
 	}
 
 	PHALCON_RETURN_CALL_METHOD(&frontend, "afterretrieve", &cached_content);
+	zval_ptr_dtor(&cached_content);
 }
 
 /**
@@ -238,7 +242,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_CALL_METHOD(&ttl, getThis(), "getlifetime");
 	} else {
-		ZVAL_COPY_VALUE(&ttl, lifetime);
+		ZVAL_COPY(&ttl, lifetime);
 	}
 
 	PHALCON_CONCAT_SV(&last_key, "_PHCY", key_name);
@@ -246,7 +250,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	/**
 	 * Check if a connection is created or make a new one
 	 */
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
@@ -255,19 +259,21 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	if (!content || Z_TYPE_P(content) == IS_NULL) {
 		PHALCON_CALL_METHOD(&cached_content, &frontend, "getcontent");
 	} else {
-		ZVAL_COPY_VALUE(&cached_content, content);
+		ZVAL_COPY(&cached_content, content);
 	}
 
 	/**
 	 * Prepare the content in the frontend
 	 */
-	PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 
 	if (phalcon_is_numeric(&cached_content)) {
 		PHALCON_CALL_METHOD(&success, &yac, "set", &last_key, &cached_content, &ttl);
 	} else {
+		PHALCON_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 		PHALCON_CALL_METHOD(&success, &yac, "set", &last_key, &prepared_content, &ttl);
+		zval_ptr_dtor(&prepared_content);
 	}
+	zval_ptr_dtor(&last_key);
 
 	if (!zend_is_true(&success)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Failed to store data in yac");
@@ -283,24 +289,23 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, save){
 	if (PHALCON_IS_TRUE(&is_buffering)) {
 		zend_print_zval(&cached_content, 0);
 	}
+	zval_ptr_dtor(&cached_content);
 
 	phalcon_update_property_bool(getThis(), SL("_started"), 0);
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
-		return;
+	if (phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) && PHALCON_IS_NOT_EMPTY_STRING(&special_key)) {
+		PHALCON_CALL_METHOD(&keys, &yac, "get", &special_key);
+		if (Z_TYPE(keys) != IS_ARRAY) {
+			array_init(&keys);
+		}
+
+		phalcon_array_update(&keys, key_name, &ttl, PH_COPY);
+		PHALCON_CALL_METHOD(&success, &yac, "set", &special_key, &keys);
+		zval_ptr_dtor(&keys);
 	}
-
-	PHALCON_CALL_METHOD(&keys, &yac, "get", &special_key);
-	if (Z_TYPE(keys) != IS_ARRAY) {
-		array_init(&keys);
-	}
-
-	phalcon_array_update(&keys, key_name, &ttl, PH_COPY);
-	PHALCON_CALL_METHOD(&success, &yac, "set", &special_key, &keys);
-
+	zval_ptr_dtor(&yac);
 	RETURN_TRUE;
 }
 
@@ -316,7 +321,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, delete){
 
 	phalcon_fetch_params(0, 1, 0, &key_name);
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
@@ -325,23 +330,23 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, delete){
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
-		return;
-	}
-
 	/* Delete the key from yacd */
 	PHALCON_CALL_METHOD(&ret, &yac, "delete", &last_key);
+	zval_ptr_dtor(&last_key);
 	if (zend_is_true(&ret)) {
-		PHALCON_CALL_METHOD(&keys, &yac, "get", &special_key);
-		if (Z_TYPE(keys) == IS_ARRAY) {
-			phalcon_array_unset(&keys, key_name, 0);
-			PHALCON_CALL_METHOD(return_value, &yac, "set", &special_key, &keys);
+		if (phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) && PHALCON_IS_NOT_EMPTY_STRING(&special_key)) {
+			PHALCON_CALL_METHOD(&keys, &yac, "get", &special_key);
+			if (Z_TYPE(keys) == IS_ARRAY) {
+				phalcon_array_unset(&keys, key_name, 0);
+				PHALCON_CALL_METHOD(return_value, &yac, "set", &special_key, &keys);
+			}
+			zval_ptr_dtor(&keys);
 		}
-		RETURN_TRUE;
+		RETVAL_TRUE;
+	} else {
+		RETVAL_FALSE;
 	}
-
-	RETURN_FALSE;
+	zval_ptr_dtor(&yac);
 }
 
 /**
@@ -358,12 +363,12 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, queryKeys){
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || !PHALCON_IS_NOT_EMPTY_STRING(&special_key)) {
 		zend_throw_exception_ex(phalcon_cache_exception_ce, 0, "Unexpected inconsistency in options");
 		return;
 	}
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
@@ -386,6 +391,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, queryKeys){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	zval_ptr_dtor(&keys);
+	zval_ptr_dtor(&yac);
 }
 
 /**
@@ -403,13 +410,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, exists){
 
 	PHALCON_CONCAT_SV(&last_key, "_PHCY", key_name);
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
 
 	PHALCON_CALL_METHOD(&value, &yac, "get", &last_key);
+	zval_ptr_dtor(&last_key);
+	zval_ptr_dtor(&yac);
 	RETVAL_BOOL(PHALCON_IS_NOT_FALSE(&value));
+	zval_ptr_dtor(&value);
 }
 
 /**
@@ -434,15 +444,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, increment){
 		convert_to_long_ex(value);
 	}
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
 
 	PHALCON_CALL_METHOD(&cached_content, &yac, "get", &last_key);
 	phalcon_add_function(&tmp, &cached_content, value);
+	zval_ptr_dtor(&cached_content);
 
 	PHALCON_RETURN_CALL_METHOD(&yac, "set", &last_key, &tmp);
+	zval_ptr_dtor(&last_key);
+	zval_ptr_dtor(&yac);
 }
 
 /**
@@ -467,15 +480,17 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, decrement){
 		convert_to_long_ex(value);
 	}
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
 
 	PHALCON_CALL_METHOD(&cached_content, &yac, "get", &last_key);
 	phalcon_sub_function(&tmp, &cached_content, value);
+	zval_ptr_dtor(&cached_content);
 
 	PHALCON_RETURN_CALL_METHOD(&yac, "set", &last_key, &tmp);
+	zval_ptr_dtor(&yac);
 }
 
 /**
@@ -489,18 +504,19 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, flush){
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	if (unlikely(!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY))) {
+	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || !PHALCON_IS_NOT_EMPTY_STRING(&special_key)) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
-	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_READONLY);
+	phalcon_read_property(&yac, getThis(), SL("_yac"), PH_COPY);
 	if (Z_TYPE(yac) != IS_OBJECT) {
 		PHALCON_CALL_METHOD(&yac, getThis(), "_connect");
 	}
 
 	/* Get the key from yacd */
 	PHALCON_CALL_METHOD(return_value, &yac, "flush");
+	zval_ptr_dtor(&yac);
 }
 
 PHP_METHOD(Phalcon_Cache_Backend_Yac, getTrackingKey)

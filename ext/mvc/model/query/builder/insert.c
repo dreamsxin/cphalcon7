@@ -66,6 +66,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, columns);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, values);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getValues);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, setConflict);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert___construct, 0, 0, 0)
@@ -84,6 +85,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert_values, 0,
 	ZEND_ARG_TYPE_INFO(0, values, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_insert_setconflict, 0, 0, 1)
+	ZEND_ARG_INFO(0, conflict)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_query_builder_insert_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, __construct, arginfo_phalcon_mvc_model_query_builder_insert___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, table, arginfo_phalcon_mvc_model_query_builder_insert_table, ZEND_ACC_PUBLIC)
@@ -92,6 +97,7 @@ static const zend_function_entry phalcon_mvc_model_query_builder_insert_method_e
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, values, arginfo_phalcon_mvc_model_query_builder_insert_values, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getValues, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, setConflict, arginfo_phalcon_mvc_model_query_builder_insert_setconflict, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, _compile, NULL, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
@@ -109,6 +115,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Insert){
 	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_flipColumns"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_values"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_model_query_builder_insert_ce, SL("_useColumnName"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_insert_ce, SL("_conflict"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_query_builder_insert_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 
@@ -272,6 +279,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, values){
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, getValues){
 
 	RETURN_MEMBER(getThis(), "_values");
+}
+
+/**
+ * Sets conflict
+ *
+ * @param array $conflict
+ * @return Phalcon\Mvc\Model\Query\Builder\Insert
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Insert, setConflict){
+
+	zval *conflict;
+
+	phalcon_fetch_params(0, 1, 0, &conflict);
+
+	phalcon_update_property(getThis(), SL("_conflict"), conflict);
+	RETURN_THIS();
 }
 
 /**

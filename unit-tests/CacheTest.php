@@ -18,8 +18,6 @@
   +------------------------------------------------------------------------+
 */
 
-require_once 'helpers/xcache.php';
-
 class CacheTest extends PHPUnit\Framework\TestCase
 {
 
@@ -650,155 +648,6 @@ class CacheTest extends PHPUnit\Framework\TestCase
 		$this->assertEquals(1, $cache->decrement('foo', 88));
 	}
 
-	protected function _prepareXcache()
-	{
-		if (function_exists('xcache_emulation')) {
-			return true;
-		}
-
-		if (!extension_loaded('xcache') || 'cli' == PHP_SAPI) {
-			$this->markTestSkipped('xcache extension is not loaded');
-			return false;
-		}
-
-		return true;
-	}
-
-	public function testOutputXcache()
-	{
-
-		$ready = $this->_prepareXcache();
-		if (!$ready) {
-			return false;
-		}
-
-		xcache_unset('_PHCXtest-output');
-
-		$time = date('H:i:s');
-
-		$frontCache = new Phalcon\Cache\Frontend\Output(array(
-			'lifetime' => 2
-		));
-
-		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
-
-		ob_start();
-
-		//First time cache
-		$content = $cache->start('test-output');
-		if ($content !== null) {
-			$this->assertTrue(false);
-		}
-
-		echo $time;
-
-		$cache->save();
-
-		$obContent = ob_get_contents();
-		ob_end_clean();
-
-		$this->assertEquals($time, $obContent);
-		$this->assertEquals($time, xcache_get('_PHCXtest-output'));
-
-		//Expect same cache
-		$content = $cache->start('test-output');
-		if ($content === null) {
-			$this->assertTrue(false);
-		}
-
-		$this->assertEquals($content, $obContent);
-		$this->assertEquals($content, xcache_get('_PHCXtest-output'));
-
-		//Query keys
-		$keys = $cache->queryKeys();
-		$this->assertEquals($keys, array(
-			0 => 'test-output',
-		));
-
-		//Delete entry from cache
-		$this->assertTrue($cache->delete('test-output'));
-		$keys = $cache->queryKeys();
-		$this->assertEquals($keys, array());
-	}
-
-	public function testDataXcache()
-	{
-		$ready = $this->_prepareXcache();
-		if (!$ready) {
-			return false;
-		}
-
-		xcache_unset('_PHCXtest-data');
-
-		$frontCache = new Phalcon\Cache\Frontend\Data();
-
-		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
-
-		$data = array(1, 2, 3, 4, 5);
-
-		$cache->save('test-data', $data);
-
-		$cachedContent = $cache->get('test-data');
-		$this->assertEquals($cachedContent, $data);
-
-		$cache->save('test-data', "sure, nothing interesting");
-
-		$cachedContent = $cache->get('test-data');
-		$this->assertEquals($cachedContent, "sure, nothing interesting");
-
-		$this->assertTrue($cache->delete('test-data'));
-	}
-
-	public function testXcacheIncrement()
-	{
-		$ready = $this->_prepareXcache();
-		if (!$ready) {
-			return false;
-		}
-
-		$frontCache = new Phalcon\Cache\Frontend\Output(array(
-			'lifetime' => 20
-		));
-
-		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
-		$cache->delete('foo');
-
-		$cache->save('foo', 1);
-		$newValue = $cache->increment('foo');
-		$this->assertEquals('2', $newValue);
-
-		$newValue = $cache->increment('foo');
-		$this->assertEquals('3', $newValue);
-
-		$newValue = $cache->increment('foo', 4);
-		$this->assertEquals('7', $newValue);
-	}
-
-	public function testXcacheDecr()
-	{
-		$ready = $this->_prepareXcache();
-		if (!$ready) {
-			return false;
-		}
-
-		$frontCache = new Phalcon\Cache\Frontend\Output(array(
-			'lifetime' => 20
-		));
-
-		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
-		$cache->delete('foo');
-
-		$cache->save('foo', 20);
-		$newValue = $cache->decrement('foo');
-		$this->assertEquals('19', $newValue);
-
-		$newValue = $cache->decrement('foo');
-		$this->assertEquals('18', $newValue);
-
-		$newValue = $cache->decrement('foo', 4);
-		$this->assertEquals('14', $newValue);
-	}
-
 	private function _prepareMemcached()
 	{
 
@@ -1325,33 +1174,6 @@ class CacheTest extends PHPUnit\Framework\TestCase
 			'db' => 'phalcon_test',
 			'collection' => 'caches'
 		));
-
-		$this->assertTrue($cache->flush());
-
-		$cache->save('data', "1");
-		$cache->save('data2', "2");
-
-		$this->assertEquals($cache->queryKeys(), array('data', 'data2'));
-
-		$this->assertTrue($cache->flush());
-
-		$this->assertEquals($cache->queryKeys(), array());
-
-		$this->assertFalse($cache->exists('data'));
-		$this->assertFalse($cache->exists('data2'));
-	}
-
-	public function testCacheXcacheFlush()
-	{
-		$frontCache = new Phalcon\Cache\Frontend\Data(array('lifetime' => 10));
-
-		// Xcache
-		$ready = $this->_prepareXcache();
-		if (!$ready) {
-			return false;
-		}
-
-		$cache = new Phalcon\Cache\Backend\Xcache($frontCache);
 
 		$this->assertTrue($cache->flush());
 

@@ -63,6 +63,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, table);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getTable);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, set);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getSet);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, setConflict);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update___construct, 0, 0, 0)
@@ -77,12 +78,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_set, 0, 0,
 	ZEND_ARG_TYPE_INFO(0, set, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_update_setconflict, 0, 0, 1)
+	ZEND_ARG_INFO(0, conflict)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_query_builder_update_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, __construct, arginfo_phalcon_mvc_model_query_builder_update___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, table, arginfo_phalcon_mvc_model_query_builder_update_table, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, getTable, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, set, arginfo_phalcon_mvc_model_query_builder_update_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, getSet, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, setConflict, arginfo_phalcon_mvc_model_query_builder_update_setconflict, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Update, _compile, NULL, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
@@ -97,6 +103,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query_Builder_Update){
 	zend_declare_property_long(phalcon_mvc_model_query_builder_update_ce, SL("_type"), PHQL_T_UPDATE, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_update_ce, SL("_table"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_builder_update_ce, SL("_set"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_builder_update_ce, SL("_conflict"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_mvc_model_query_builder_update_ce, 1, phalcon_mvc_model_query_builderinterface_ce);
 
@@ -210,6 +217,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, getSet){
 
 
 	RETURN_MEMBER(getThis(), "_set");
+}
+
+/**
+ * Sets conflict
+ *
+ * @param array $conflict
+ * @return Phalcon\Mvc\Model\Query\Builder\Update
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, setConflict){
+
+	zval *conflict;
+
+	phalcon_fetch_params(0, 1, 0, &conflict);
+
+	phalcon_update_property(getThis(), SL("_conflict"), conflict);
+	RETURN_THIS();
 }
 
 /**

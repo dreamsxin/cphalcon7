@@ -310,7 +310,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Backend_Apc);
 	PHALCON_INIT(Phalcon_Cache_Backend_File);
 	PHALCON_INIT(Phalcon_Cache_Backend_Memory);
-	PHALCON_INIT(Phalcon_Cache_Backend_Xcache);
 #ifdef PHALCON_USE_MONGOC
 	PHALCON_INIT(Phalcon_Cache_Backend_Mongo);
 #endif
@@ -397,7 +396,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Apc);
 	PHALCON_INIT(Phalcon_Annotations_Collection);
 	PHALCON_INIT(Phalcon_Annotations_Reflection);
-	PHALCON_INIT(Phalcon_Annotations_Adapter_Xcache);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Files);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Memory);
 	PHALCON_INIT(Phalcon_Annotations_Adapter_Cache);
@@ -511,7 +509,6 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Cache);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Memory);
-	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Xcache);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Annotations);
 	PHALCON_INIT(Phalcon_Mvc_Model_MetaData_Strategy_Introspection);
 	PHALCON_INIT(Phalcon_Mvc_Model_Transaction);
@@ -824,7 +821,6 @@ static const zend_module_dep phalcon_deps[] = {
 #endif
 	ZEND_MOD_OPTIONAL("apc")
 	ZEND_MOD_OPTIONAL("apcu")
-	ZEND_MOD_OPTIONAL("XCache")
 	ZEND_MOD_OPTIONAL("memcached")
 	ZEND_MOD_OPTIONAL("filter")
 	ZEND_MOD_OPTIONAL("iconv")

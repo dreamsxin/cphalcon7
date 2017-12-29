@@ -434,7 +434,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
  */
 PHP_METHOD(Phalcon_Mvc_Router, handle){
 
-	zval *uri = NULL, real_uri = {}, removeextraslashes = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, dependency_injector = {}, request = {}, debug_message = {}, event_name = {};
+	zval *uri = NULL, real_uri = {}, status = {}, removeextraslashes = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, dependency_injector = {}, request = {}, debug_message = {}, event_name = {};
 	zval all_case_sensitive = {}, current_host_name = {}, routes = {}, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
 	zval controller = {}, default_handler = {}, action = {}, default_action = {}, mode = {}, http_method = {}, action_name = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
 	zend_string *str_key;
@@ -449,6 +449,15 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		PHALCON_CALL_METHOD(&real_uri, getThis(), "getrewriteuri");
 	} else {
 		ZVAL_COPY(&real_uri, uri);
+	}
+
+	ZVAL_STRING(&event_name, "router:beforeHandle");
+	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &real_uri);
+	zval_ptr_dtor(&event_name);
+
+	if (PHALCON_IS_FALSE(&status)) {
+		zval_ptr_dtor(&real_uri);
+		RETURN_FALSE;
 	}
 
 	/**
@@ -965,6 +974,10 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	ZVAL_STRING(&event_name, "router:afterCheckRoutes");
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+	zval_ptr_dtor(&event_name);
+
+	ZVAL_STRING(&event_name, "router:afterHandle");
+	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &route_found);
 	zval_ptr_dtor(&event_name);
 
 	if (zend_is_true(&route_found)) {

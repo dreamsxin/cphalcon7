@@ -230,6 +230,21 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	}
 
 	/**
+	 * Default options
+	 */
+	phalcon_array_update_long_long(&options, PDO_ATTR_ERRMODE, PDO_ERRMODE_EXCEPTION, PH_COPY);
+
+	/**
+	 * Check if the connection must be persistent
+	 */
+	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_READONLY)) {
+		if (zend_is_true(&persistent)) {
+			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, 0);
+		}
+		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
+	}
+
+	/**
 	 * Check if the user has defined a custom dsn
 	 */
 	if (!phalcon_array_isset_fetch_str(&dsn_attributes, &descriptor, SL("dsn"), PH_COPY)) {
@@ -250,27 +265,12 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 		zval_ptr_dtor(&dsn_parts);
 	}
 
+	zval_ptr_dtor(&descriptor);
+
 	phalcon_read_property(&pdo_type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VSV(&dsn, &pdo_type, ":", &dsn_attributes);
 	zval_ptr_dtor(&dsn_attributes);
-
-	/**
-	 * Default options
-	 */
-	phalcon_array_update_long_long(&options, PDO_ATTR_ERRMODE, PDO_ERRMODE_EXCEPTION, PH_COPY);
-
-	/**
-	 * Check if the connection must be persistent
-	 */
-	if (phalcon_array_isset_fetch_str(&persistent, &descriptor, SL("persistent"), PH_READONLY)) {
-		if (zend_is_true(&persistent)) {
-			phalcon_array_update_long_bool(&options, PDO_ATTR_PERSISTENT, 1, 0);
-		}
-		phalcon_array_unset_str(&descriptor, SL("persistent"), 0);
-	}
-
-	zval_ptr_dtor(&descriptor);
 
 	/**
 	 * Create the connection using PDO

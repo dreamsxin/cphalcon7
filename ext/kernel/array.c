@@ -449,7 +449,7 @@ int phalcon_array_pop(zval *return_value, const zval *stack)
 	uint32_t idx;
 	Bucket *p;
 
-	if (zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
+	if (Z_TYPE_P(stack) != IS_ARRAY || zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
 		ZVAL_NULL(return_value);
 		return FAILURE;
 	}
@@ -495,7 +495,7 @@ int phalcon_array_last(zval *return_value, const zval *stack, int flags)
 	uint32_t idx;
 	Bucket *p;
 
-	if (zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
+	if (Z_TYPE_P(stack) != IS_ARRAY || zend_hash_num_elements(Z_ARRVAL_P(stack)) == 0) {
 		ZVAL_NULL(return_value);
 		return FAILURE;
 	}

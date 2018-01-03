@@ -81,10 +81,16 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, __construct)
 	phalcon_update_property(getThis(), SL("_config"), config);
 
 	if (phalcon_array_isset_fetch_str(&limit, config, SL("limit"), PH_READONLY)) {
+		if (Z_TYPE(limit) != IS_LONG) {
+			convert_to_long_ex(&limit);
+		}
 		phalcon_update_property(getThis(), SL("_limitRows"), &limit);
 	}
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
+		if (Z_TYPE(page) != IS_LONG) {
+			convert_to_long_ex(&page);
+		}
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 }
@@ -113,7 +119,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 
 	phalcon_array_fetch_str(&items, &config, SL("data"), PH_NOISY|PH_READONLY);
 
-	if (Z_TYPE(page_number) == IS_NULL || PHALCON_LT(&show, &PHALCON_GLOBAL(z_zero))) {
+	if (Z_TYPE(page_number) != IS_LONG || PHALCON_LT(&show, &PHALCON_GLOBAL(z_zero))) {
 		ZVAL_COPY_VALUE(&page_number, &PHALCON_GLOBAL(z_one));
 	}
 
@@ -165,6 +171,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Model, getPaginate){
 			if (i >= i_show) {
 				break;
 			}
+			PHALCON_CALL_METHOD(NULL, &items, "next");
 		}
 	}
 

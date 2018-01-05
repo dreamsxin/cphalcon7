@@ -399,6 +399,9 @@ int phalcon_is_long_ex(const zval *op) {
  */
 int phalcon_is_equal(zval *op1, zval *op2) {
 	zval result = {};
+	if (Z_TYPE_P(op1) == IS_STRING && Z_TYPE_P(op1) == Z_TYPE_P(op2)) {
+		return !zend_binary_strcmp(Z_STRVAL_P(op1), Z_STRLEN_P(op1), Z_STRVAL_P(op2), Z_STRLEN_P(op2));
+	}
 	is_equal_function(&result, op1, op2);
 	return Z_TYPE(result) == IS_TRUE ? 1 : 0;
 }

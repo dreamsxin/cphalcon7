@@ -871,8 +871,8 @@ PHP_METHOD(Phalcon_Http_Request, getJsonRawBody)
 	PHALCON_CALL_METHOD(&raw_body, getThis(), "getrawbody");
 	if (Z_TYPE(raw_body) == IS_STRING) {
 		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &raw_body, ac));
-		return;
 	}
+	zval_ptr_dtor(&raw_body);
 }
 
 /**

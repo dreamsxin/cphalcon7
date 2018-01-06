@@ -89,6 +89,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Paginator\\Adapter, QueryBuilder, paginator_adapter_querybuilder, phalcon_paginator_adapter_ce, phalcon_paginator_adapter_querybuilder_method_entry, 0);
 
 	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_builder"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_totalItems"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_querybuilder_ce, 1, phalcon_paginator_adapterinterface_ce);
 
@@ -102,7 +103,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
-	zval *config, builder = {}, limit = {}, page = {};
+	zval *config, builder = {}, limit = {}, page = {}, total_items = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
@@ -131,6 +132,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 
 	if (phalcon_array_isset_fetch_str(&page, config, SL("page"), PH_READONLY)) {
 		phalcon_update_property(getThis(), SL("_page"), &page);
+	}
+
+	if (phalcon_array_isset_fetch_str(&total_items, config, SL("totalItems"), PH_READONLY)) {
+		convert_to_long_ex(&total_items);
+		phalcon_update_property(getThis(), SL("_totalItems"), &total_items);
 	}
 }
 
@@ -228,138 +234,140 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	PHALCON_CALL_METHOD(&items, &query, "execute");
 	zval_ptr_dtor(&query);
 
-	/* Remove the 'ORDER BY' clause, PostgreSQL requires this */
-	PHALCON_CALL_METHOD(NULL, &total_builder, "orderby", &PHALCON_GLOBAL(z_null));
+	phalcon_read_property(&rowcount, getThis(), SL("_totalItems"), PH_READONLY);
+	if (Z_TYPE(rowcount) != IS_LONG) {
+		/* Remove the 'ORDER BY' clause, PostgreSQL requires this */
+		PHALCON_CALL_METHOD(NULL, &total_builder, "orderby", &PHALCON_GLOBAL(z_null));
 
-	/* Obtain the PHQL for the total query */
-	PHALCON_CALL_METHOD(&total_query, &total_builder, "getquery");
-	zval_ptr_dtor(&total_builder);
+		/* Obtain the PHQL for the total query */
+		PHALCON_CALL_METHOD(&total_query, &total_builder, "getquery");
+		zval_ptr_dtor(&total_builder);
 
-	PHALCON_CALL_METHOD(&dependency_injector, &total_query, "getdi");
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "A dependency injection object is required to access internal services");
-		return;
+		PHALCON_CALL_METHOD(&dependency_injector, &total_query, "getdi");
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "A dependency injection object is required to access internal services");
+			return;
+		}
+
+		/* Get the connection through the model */
+		ZVAL_STR(&service_name, IS(modelsManager));
+
+		PHALCON_CALL_METHOD(&models_manager, &dependency_injector, "getshared", &service_name);
+		zval_ptr_dtor(&dependency_injector);
+		if (Z_TYPE(models_manager) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
+			return;
+		}
+
+		PHALCON_VERIFY_INTERFACE(&models_manager, phalcon_mvc_model_managerinterface_ce);
+
+		PHALCON_CALL_METHOD(&models, &builder, "getfrom");
+		zval_ptr_dtor(&builder);
+
+		if (Z_TYPE(models) == IS_ARRAY) {
+			phalcon_array_get_current(&model_name, &models);
+		} else {
+			ZVAL_COPY(&model_name, &models);
+		}
+		zval_ptr_dtor(&models);
+
+		PHALCON_CALL_METHOD(&model, &models_manager, "load", &model_name);
+		zval_ptr_dtor(&models_manager);
+		zval_ptr_dtor(&model_name);
+		PHALCON_CALL_METHOD(&connection, &model, "getreadconnection");
+		zval_ptr_dtor(&model);
+		PHALCON_CALL_METHOD(&intermediate, &total_query, "parse");
+		PHALCON_SEPARATE(&intermediate);
+
+		PHALCON_CALL_METHOD(&tmp, &total_query, "getindex");
+		if (Z_TYPE(tmp) > IS_NULL) {
+			phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
+			zval_ptr_dtor(&tmp);
+		}
+
+		PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
+		PHALCON_CALL_METHOD(&sql, &dialect, "select", &intermediate, &PHALCON_GLOBAL(z_true));
+		zval_ptr_dtor(&dialect);
+		zval_ptr_dtor(&intermediate);
+
+		PHALCON_CALL_METHOD(&bind_params, &total_query, "getbindparams");
+		PHALCON_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
+		zval_ptr_dtor(&total_query);
+
+		/**
+		 * Replace the placeholders
+		 */
+		if (Z_TYPE(bind_params) == IS_ARRAY) {
+			PHALCON_SEPARATE(&bind_types);
+			array_init(&processed);
+
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
+				zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
+				if (str_key) {
+					ZVAL_STR(&wildcard, str_key);
+				} else {
+					ZVAL_LONG(&wildcard, idx);
+				}
+
+				if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
+					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+
+					PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql);
+					zval_ptr_dtor(&string_wildcard);
+					zval_ptr_dtor(&sql);
+					ZVAL_COPY_VALUE(&sql, &sql_tmp);
+
+					phalcon_array_unset(&bind_types, &wildcard, 0);
+				} else if (Z_TYPE(wildcard) == IS_LONG) {
+					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+					phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
+					zval_ptr_dtor(&string_wildcard);
+				} else {
+					phalcon_array_update(&processed, &wildcard, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+
+		} else {
+			ZVAL_COPY(&processed, &bind_params);
+		}
+		zval_ptr_dtor(&bind_params);
+
+		/**
+		 * Replace the bind Types
+		 */
+		if (Z_TYPE(bind_types) == IS_ARRAY) {
+			array_init(&processed_types);
+
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
+				zval wildcard = {}, string_wildcard = {};
+				if (str_key) {
+					ZVAL_STR(&wildcard, str_key);
+				} else {
+					ZVAL_LONG(&wildcard, idx);
+				}
+
+				if (Z_TYPE(wildcard) == IS_LONG) {
+					PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
+					phalcon_array_update(&processed_types, &string_wildcard, value, PH_COPY);
+				} else {
+					phalcon_array_update(&processed_types, &wildcard, value, PH_COPY);
+				}
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			ZVAL_COPY(&processed_types, &bind_types);
+		}
+		zval_ptr_dtor(&bind_types);
+
+		PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &processed, &processed_types);
+		zval_ptr_dtor(&connection);
+		zval_ptr_dtor(&sql);
+		zval_ptr_dtor(&processed);
+		zval_ptr_dtor(&processed_types);
+		PHALCON_CALL_METHOD(&row, &result, "fetch");
+		zval_ptr_dtor(&result);
+
+		phalcon_array_fetch_str(&rowcount, &row, SL("rowcount"), PH_NOISY|PH_READONLY);
 	}
-
-	/* Get the connection through the model */
-	ZVAL_STR(&service_name, IS(modelsManager));
-
-	PHALCON_CALL_METHOD(&models_manager, &dependency_injector, "getshared", &service_name);
-	zval_ptr_dtor(&dependency_injector);
-	if (Z_TYPE(models_manager) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "The injected service 'modelsManager' is not object");
-		return;
-	}
-
-	PHALCON_VERIFY_INTERFACE(&models_manager, phalcon_mvc_model_managerinterface_ce);
-
-	PHALCON_CALL_METHOD(&models, &builder, "getfrom");
-	zval_ptr_dtor(&builder);
-
-	if (Z_TYPE(models) == IS_ARRAY) {
-		phalcon_array_get_current(&model_name, &models);
-	} else {
-		ZVAL_COPY(&model_name, &models);
-	}
-	zval_ptr_dtor(&models);
-
-	PHALCON_CALL_METHOD(&model, &models_manager, "load", &model_name);
-	zval_ptr_dtor(&models_manager);
-	zval_ptr_dtor(&model_name);
-	PHALCON_CALL_METHOD(&connection, &model, "getreadconnection");
-	zval_ptr_dtor(&model);
-	PHALCON_CALL_METHOD(&intermediate, &total_query, "parse");
-	PHALCON_SEPARATE(&intermediate);
-
-	PHALCON_CALL_METHOD(&tmp, &total_query, "getindex");
-	if (Z_TYPE(tmp) > IS_NULL) {
-		phalcon_array_update_str(&intermediate, SL("index"), &tmp, PH_COPY);
-		zval_ptr_dtor(&tmp);
-	}
-
-	PHALCON_CALL_METHOD(&dialect, &connection, "getdialect");
-	PHALCON_CALL_METHOD(&sql, &dialect, "select", &intermediate, &PHALCON_GLOBAL(z_true));
-	zval_ptr_dtor(&dialect);
-	zval_ptr_dtor(&intermediate);
-
-	PHALCON_CALL_METHOD(&bind_params, &total_query, "getbindparams");
-	PHALCON_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
-	zval_ptr_dtor(&total_query);
-
-	/**
-	 * Replace the placeholders
-	 */
-	if (Z_TYPE(bind_params) == IS_ARRAY) {
-		PHALCON_SEPARATE(&bind_types);
-		array_init(&processed);
-
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_params), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {}, sql_tmp = {};
-			if (str_key) {
-				ZVAL_STR(&wildcard, str_key);
-			} else {
-				ZVAL_LONG(&wildcard, idx);
-			}
-
-			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-
-				PHALCON_STR_REPLACE(&sql_tmp, &string_wildcard, value, &sql);
-				zval_ptr_dtor(&string_wildcard);
-				zval_ptr_dtor(&sql);
-				ZVAL_COPY_VALUE(&sql, &sql_tmp);
-
-				phalcon_array_unset(&bind_types, &wildcard, 0);
-			} else if (Z_TYPE(wildcard) == IS_LONG) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				phalcon_array_update(&processed, &string_wildcard, value, PH_COPY);
-				zval_ptr_dtor(&string_wildcard);
-			} else {
-				phalcon_array_update(&processed, &wildcard, value, PH_COPY);
-			}
-		} ZEND_HASH_FOREACH_END();
-
-	} else {
-		ZVAL_COPY(&processed, &bind_params);
-	}
-	zval_ptr_dtor(&bind_params);
-
-	/**
-	 * Replace the bind Types
-	 */
-	if (Z_TYPE(bind_types) == IS_ARRAY) {
-		array_init(&processed_types);
-
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(bind_types), idx, str_key, value) {
-			zval wildcard = {}, string_wildcard = {};
-			if (str_key) {
-				ZVAL_STR(&wildcard, str_key);
-			} else {
-				ZVAL_LONG(&wildcard, idx);
-			}
-
-			if (Z_TYPE(wildcard) == IS_LONG) {
-				PHALCON_CONCAT_SV(&string_wildcard, ":", &wildcard);
-				phalcon_array_update(&processed_types, &string_wildcard, value, PH_COPY);
-			} else {
-				phalcon_array_update(&processed_types, &wildcard, value, PH_COPY);
-			}
-		} ZEND_HASH_FOREACH_END();
-	} else {
-		ZVAL_COPY(&processed_types, &bind_types);
-	}
-	zval_ptr_dtor(&bind_types);
-
-	PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &processed, &processed_types);
-	zval_ptr_dtor(&connection);
-	zval_ptr_dtor(&sql);
-	zval_ptr_dtor(&processed);
-	zval_ptr_dtor(&processed_types);
-	PHALCON_CALL_METHOD(&row, &result, "fetch");
-	zval_ptr_dtor(&result);
-
-	phalcon_array_fetch_str(&rowcount, &row, SL("rowcount"), PH_NOISY|PH_READONLY);
-
 	i_rowcount    = phalcon_get_intval(&rowcount);
 	tp            = ldiv(i_rowcount, i_limit);
 	i_total_pages = tp.quot + (tp.rem ? 1 : 0);
@@ -376,7 +384,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 	phalcon_update_property_long(&page, SL("last"),        i_total_pages);
 	phalcon_update_property_long(&page, SL("current"),     i_number_page);
 	phalcon_update_property_long(&page, SL("total_pages"), i_total_pages);
+	phalcon_update_property_long(&page, SL("totalPages"), i_total_pages);
 	phalcon_update_property_long(&page, SL("total_items"), i_rowcount);
+	phalcon_update_property_long(&page, SL("totalItems"), i_rowcount);
 
 	ZVAL_STRING(&event_name, "pagination:afterGetPaginate");
 	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &page);

@@ -330,8 +330,8 @@ class RequestTest extends PHPUnit\Framework\TestCase
 		$this->assertEquals($request->getPost('array', 'string'), NULL);
 
 		// get all
-		$this->assertEquals($request->get(NULL, 'string'), array('string' => 'hello', 'array' => FALSE));
-		$this->assertEquals($request->get(NULL, 'string', NULL, TRUE, TRUE), NULL);
+		$this->assertEquals($request->get(NULL, 'string'), array('string' => 'hello', 'array' => array('string' => 'world')));
+		$this->assertEquals($request->get(NULL, 'string', NULL, TRUE, TRUE), array('string' => 'hello', 'array' => FALSE));
 	}
 
 	/**

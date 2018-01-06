@@ -229,7 +229,7 @@ PHP_METHOD(Phalcon_Http_Request, __construct){
 PHP_METHOD(Phalcon_Http_Request, _get)
 {
 	zval *data, *name, *filters, *default_value, *not_allow_empty, *norecursive;
-	zval value = {}, filter_value = {};
+	zval value = {};
 
 	phalcon_fetch_params(0, 6, 0, &data, &name, &filters, &default_value, &not_allow_empty, &norecursive);
 
@@ -237,32 +237,62 @@ PHP_METHOD(Phalcon_Http_Request, _get)
 		if (!phalcon_array_isset_fetch(&value, data, name, PH_READONLY)) {
 			RETURN_CTOR(default_value);
 		}
-	} else {
-		ZVAL_COPY_VALUE(&value, data);
-	}
 
-	if (Z_TYPE_P(filters) > IS_NULL) {
+		if (Z_TYPE_P(filters) > IS_NULL) {
+			zval service = {}, filter = {}, filter_value = {};
+			ZVAL_STR(&service, IS(filter));
+
+			PHALCON_CALL_METHOD(&filter, getThis(), "getservice", &service);
+			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+
+			PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, norecursive);
+			zval_ptr_dtor(&filter);
+
+			if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
+				RETURN_CTOR(default_value);
+			}
+
+			RETURN_NCTOR(&filter_value);
+		}
+	} else if (Z_TYPE_P(filters) > IS_NULL) {
 		zval service = {}, filter = {};
+
 		ZVAL_STR(&service, IS(filter));
 
 		PHALCON_CALL_METHOD(&filter, getThis(), "getservice", &service);
 		PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
 
-		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, norecursive);
-		zval_ptr_dtor(&filter);
+		if (Z_TYPE_P(data) == IS_ARRAY) {
+			zval *item_value;
+			zend_string *item_key;
+			ulong item_idx;
 
-		if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
-			RETURN_CTOR(default_value);
+			array_init(&value);
+
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), item_idx, item_key, item_value) {
+				zval filter_value = {};
+				PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", item_value, filters, norecursive);
+
+				if (item_key) {
+					phalcon_array_update_string(&value, item_key, &filter_value, 0);
+				} else {
+					phalcon_array_update_long(&value, item_idx, &filter_value, 0);
+				}
+			} ZEND_HASH_FOREACH_END();
+			zval_ptr_dtor(&filter);
+		} else {
+			PHALCON_CALL_METHOD(&value, &filter, "sanitize", data, filters, norecursive);
 		}
-
-		RETURN_CTOR(&filter_value);
+	} else {
+		ZVAL_COPY(&value, data);
 	}
 
 	if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
+		zval_ptr_dtor(&value);
 		RETURN_CTOR(default_value);
 	}
 
-	RETURN_CTOR(&value);
+	RETURN_NCTOR(&value);
 }
 
 /**

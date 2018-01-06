@@ -78,6 +78,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, exists);
 PHP_METHOD(Phalcon_Cache_Backend_Redis, increment);
 PHP_METHOD(Phalcon_Cache_Backend_Redis, decrement);
 PHP_METHOD(Phalcon_Cache_Backend_Redis, flush);
+PHP_METHOD(Phalcon_Cache_Backend_Redis, flushDb);
 PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey);
 PHP_METHOD(Phalcon_Cache_Backend_Redis, setTrackingKey);
 
@@ -101,6 +102,7 @@ static const zend_function_entry phalcon_cache_backend_redis_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Redis, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Redis, flushDb, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, setTrackingKey, arginfo_phalcon_cache_backend_redis_settrackingkey, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -580,6 +582,23 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 	zval_ptr_dtor(&redis);
 
 	RETURN_TRUE;
+}
+
+/**
+ * Remove all keys from the current database.
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Cache_Backend_Redis, flushDb){
+
+	zval redis = {};
+
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_COPY);
+	if (Z_TYPE(redis) != IS_OBJECT) {
+		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
+	}
+
+	PHALCON_CALL_METHOD(return_value, &redis, "flushdb");
 }
 
 PHP_METHOD(Phalcon_Cache_Backend_Redis, getTrackingKey)

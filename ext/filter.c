@@ -221,24 +221,32 @@ PHP_METHOD(Phalcon_Filter, add){
  *
  * @param mixed $value
  * @param mixed $filters
- * @param boolean $norecursive
+ * @param boolean $recursive
  * @param array $options
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Filter, sanitize){
 
-	zval *value, *filters, *norecursive = NULL, *options = NULL, new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
+	zval *value, *filters, *recursive = NULL, *options = NULL, *_recursive_level = NULL, recursive_level = {};
+	zval new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
 	zend_string *filter_key, *item_key;
 	ulong item_idx;
 
-	phalcon_fetch_params(0, 2, 2, &value, &filters, &norecursive, &options);
+	phalcon_fetch_params(0, 2, 3, &value, &filters, &recursive, &options, &_recursive_level);
 
-	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+	if (!recursive || Z_TYPE_P(recursive) == IS_NULL) {
+		recursive = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!_recursive_level || Z_TYPE_P(_recursive_level) != IS_LONG) {
+		ZVAL_LONG(&recursive_level, 0);
+	} else {
+		ZVAL_COPY(&recursive_level, _recursive_level);
 	}
 
 	/**
@@ -274,12 +282,16 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 				/**
 				 * If the value to filter is an array we apply the filters recursively
 				 */
-				if (Z_TYPE(new_value) == IS_ARRAY && !zend_is_true(norecursive)) {
+				if (Z_TYPE(new_value) == IS_ARRAY && zend_is_true(recursive)) {
 					array_init(&array_value);
 
+					phalcon_decrement(&recursive_level);
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(new_value), item_idx, item_key, item_value) {
-						PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, &real_filter, &real_options);
-
+						if (Z_TYPE_P(item_value) == IS_ARRAY && Z_LVAL(recursive_level) > 0) {
+							PHALCON_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
+						} else {
+							PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, &real_filter, &real_options);
+						}
 						if (item_key) {
 							phalcon_array_update_string(&array_value, item_key, &filter_value, 0);
 						} else {
@@ -303,11 +315,15 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	/**
 	 * Apply a single filter value
 	 */
-	if (Z_TYPE_P(value) == IS_ARRAY && !zend_is_true(norecursive)) {
+	if (Z_TYPE_P(value) == IS_ARRAY && zend_is_true(recursive)) {
 		array_init(&sanizited_value);
-
+		phalcon_decrement(&recursive_level);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
-			PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters, options);
+			if (Z_TYPE_P(item_value) == IS_ARRAY && Z_LVAL(recursive_level) > 0) {
+				PHALCON_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
+			} else {
+				PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters, options);
+			}
 			if (item_key) {
 				phalcon_array_update_string(&sanizited_value, item_key, &filter_value, 0);
 			} else {

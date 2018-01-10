@@ -124,7 +124,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_request__get, 0, 0, 6)
 	ZEND_ARG_INFO(0, filters)
 	ZEND_ARG_INFO(0, defaultValue)
 	ZEND_ARG_INFO(0, notAllowEmpty)
-	ZEND_ARG_INFO(0, noRecursive)
+	ZEND_ARG_INFO(0, recursive_level)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_request_method_entry[] = {
@@ -223,76 +223,52 @@ PHP_METHOD(Phalcon_Http_Request, __construct){
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Http_Request, _get)
 {
-	zval *data, *name, *filters, *default_value, *not_allow_empty, *norecursive;
+	zval *data, *name, *filters, *default_value, *not_allow_empty, *recursive_level;
 	zval value = {};
 
-	phalcon_fetch_params(0, 6, 0, &data, &name, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 6, 0, &data, &name, &filters, &default_value, &not_allow_empty, &recursive_level);
 
 	if (Z_TYPE_P(name) != IS_NULL) {
 		if (!phalcon_array_isset_fetch(&value, data, name, PH_READONLY)) {
 			RETURN_CTOR(default_value);
 		}
+	} else {
+		ZVAL_COPY_VALUE(&value, data);
+	}
 
-		if (Z_TYPE_P(filters) > IS_NULL) {
-			zval service = {}, filter = {}, filter_value = {};
-			ZVAL_STR(&service, IS(filter));
-
-			PHALCON_CALL_METHOD(&filter, getThis(), "getservice", &service);
-			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
-
-			PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, norecursive);
-			zval_ptr_dtor(&filter);
-
-			if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
-				RETURN_CTOR(default_value);
-			}
-
-			RETURN_NCTOR(&filter_value);
-		}
-	} else if (Z_TYPE_P(filters) > IS_NULL) {
-		zval service = {}, filter = {};
-
+	if (Z_TYPE_P(filters) > IS_NULL) {
+		zval service = {}, filter = {}, filter_value = {};
 		ZVAL_STR(&service, IS(filter));
 
 		PHALCON_CALL_METHOD(&filter, getThis(), "getservice", &service);
 		PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
-
-		if (Z_TYPE_P(data) == IS_ARRAY) {
-			zval *item_value;
-			zend_string *item_key;
-			ulong item_idx;
-
-			array_init(&value);
-
-			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), item_idx, item_key, item_value) {
-				zval filter_value = {};
-				PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", item_value, filters, norecursive);
-
-				if (item_key) {
-					phalcon_array_update_string(&value, item_key, &filter_value, 0);
-				} else {
-					phalcon_array_update_long(&value, item_idx, &filter_value, 0);
-				}
-			} ZEND_HASH_FOREACH_END();
-			zval_ptr_dtor(&filter);
+		
+		if (Z_TYPE_P(recursive_level) == IS_LONG) {
+			PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, &PHALCON_GLOBAL(z_true), &PHALCON_GLOBAL(z_null), recursive_level);
+		} else if (Z_TYPE_P(name) != IS_NULL && Z_TYPE_P(recursive_level) == IS_FALSE) {
+			PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters, &PHALCON_GLOBAL(z_false));
 		} else {
-			PHALCON_CALL_METHOD(&value, &filter, "sanitize", data, filters, norecursive);
+			PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", &value, filters);
 		}
-	} else {
-		ZVAL_COPY(&value, data);
+		zval_ptr_dtor(&filter);
+
+		if ((PHALCON_IS_EMPTY(&filter_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filter_value)) {
+			RETURN_CTOR(default_value);
+		}
+
+		RETURN_NCTOR(&filter_value);
 	}
 
 	if (PHALCON_IS_EMPTY(&value) && zend_is_true(not_allow_empty)) {
-		zval_ptr_dtor(&value);
 		RETURN_CTOR(default_value);
 	}
 
-	RETURN_NCTOR(&value);
+	RETURN_CTOR(&value);
 }
 
 /**
@@ -311,15 +287,15 @@ PHP_METHOD(Phalcon_Http_Request, _get)
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Http_Request, get)
 {
-	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, *request;
+	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *recursive_level = NULL, *request;
 	zval put = {}, merged = {}, data = {}, merged2 = {};
 
-	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &recursive_level);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -333,16 +309,12 @@ PHP_METHOD(Phalcon_Http_Request, get)
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!not_allow_empty) {
+	if (!not_allow_empty || Z_TYPE_P(not_allow_empty) == IS_NULL) {
 		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!norecursive) {
-		if (zend_is_true(name)) {
-			norecursive = &PHALCON_GLOBAL(z_true);
-		} else {
-			norecursive = &PHALCON_GLOBAL(z_false);
-		}
+	if (!recursive_level || Z_TYPE_P(recursive_level) == IS_NULL) {
+		recursive_level = zend_is_true(name) ? &PHALCON_GLOBAL(z_false) : &PHALCON_GLOBAL(z_true);
 	}
 
 	request = phalcon_get_global_str(SL("_REQUEST"));
@@ -357,7 +329,7 @@ PHP_METHOD(Phalcon_Http_Request, get)
 	phalcon_fast_array_merge(&merged2, &merged, &data);
 	zval_ptr_dtor(&merged);
 
-	PHALCON_RETURN_CALL_SELF("_get", &merged2, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", &merged2, name, filters, default_value, not_allow_empty, recursive_level);
 	zval_ptr_dtor(&merged2);
 }
 
@@ -377,14 +349,14 @@ PHP_METHOD(Phalcon_Http_Request, get)
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Http_Request, getPost)
 {
-	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, *post;
+	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *recursive_level = NULL, *post;
 
-	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &recursive_level);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -398,20 +370,16 @@ PHP_METHOD(Phalcon_Http_Request, getPost)
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!not_allow_empty) {
+	if (!not_allow_empty || Z_TYPE_P(not_allow_empty) == IS_NULL) {
 		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!norecursive) {
-		if (zend_is_true(name)) {
-			norecursive = &PHALCON_GLOBAL(z_true);
-		} else {
-			norecursive = &PHALCON_GLOBAL(z_false);
-		}
+	if (!recursive_level || Z_TYPE_P(recursive_level) == IS_NULL) {
+		recursive_level = zend_is_true(name) ? &PHALCON_GLOBAL(z_false) : &PHALCON_GLOBAL(z_true);
 	}
 
 	post = phalcon_get_global_str(SL("_POST"));
-	PHALCON_RETURN_CALL_SELF("_get", post, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", post, name, filters, default_value, not_allow_empty, recursive_level);
 }
 
 /**
@@ -427,14 +395,14 @@ PHP_METHOD(Phalcon_Http_Request, getPost)
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Http_Request, getPut)
 {
-	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, is_put = {}, put = {}, new_put = {};
+	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *recursive_level = NULL, is_put = {}, put = {}, new_put = {};
 
-	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &recursive_level);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -448,16 +416,12 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!not_allow_empty) {
+	if (!not_allow_empty || Z_TYPE_P(not_allow_empty) == IS_NULL) {
 		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!norecursive) {
-		if (zend_is_true(name)) {
-			norecursive = &PHALCON_GLOBAL(z_true);
-		} else {
-			norecursive = &PHALCON_GLOBAL(z_false);
-		}
+	if (!recursive_level || Z_TYPE_P(recursive_level) == IS_NULL) {
+		recursive_level = zend_is_true(name) ? &PHALCON_GLOBAL(z_false) : &PHALCON_GLOBAL(z_true);
 	}
 
 	PHALCON_CALL_METHOD(&is_put, getThis(), "isput");
@@ -485,7 +449,7 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
 		}
 	}
 
-	PHALCON_RETURN_CALL_SELF("_get", &new_put, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", &new_put, name, filters, default_value, not_allow_empty, recursive_level);
 	zval_ptr_dtor(&new_put);
 }
 
@@ -508,14 +472,14 @@ PHP_METHOD(Phalcon_Http_Request, getPut)
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param int $recursiveLevel
  * @return mixed
  */
 PHP_METHOD(Phalcon_Http_Request, getQuery){
 
-	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL, *get;
+	zval *name = NULL, *filters = NULL, *default_value = NULL, *not_allow_empty = NULL, *recursive_level = NULL, *get;
 
-	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 0, 5, &name, &filters, &default_value, &not_allow_empty, &recursive_level);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -529,21 +493,17 @@ PHP_METHOD(Phalcon_Http_Request, getQuery){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!not_allow_empty) {
+	if (!not_allow_empty || Z_TYPE_P(not_allow_empty) == IS_NULL) {
 		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!norecursive) {
-		if (zend_is_true(name)) {
-			norecursive = &PHALCON_GLOBAL(z_true);
-		} else {
-			norecursive = &PHALCON_GLOBAL(z_false);
-		}
+	if (!recursive_level || Z_TYPE_P(recursive_level) == IS_NULL) {
+		recursive_level = zend_is_true(name) ? &PHALCON_GLOBAL(z_false) : &PHALCON_GLOBAL(z_true);
 	}
 
 	get = phalcon_get_global_str(SL("_GET"));
 
-	PHALCON_RETURN_CALL_SELF("_get", get, name, filters, default_value, not_allow_empty, norecursive);
+	PHALCON_RETURN_CALL_SELF("_get", get, name, filters, default_value, not_allow_empty, recursive_level);
 }
 
 /**

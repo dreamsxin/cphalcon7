@@ -38,6 +38,21 @@ class FilterTest extends PHPUnit\Framework\TestCase
 
 		$ret = $filter->sanitize('A', ['in' => ['A', 'B', 'C']]);
 		$this->assertTrue($ret === 'A');
+
+		$data = array(
+			'one' => ' one ',
+			'two' => ['one' => ' one '],
+			'three' => ['two' => ['one' => ' one ']]
+		);
+
+		$data2 = array(
+			'one' => 'one',
+			'two' => ['one' => 'one'],
+			'three' => ['two' => ['one' => 'one']]
+		);
+
+		$ret = $filter->sanitize($data, 'trim', NULL, NULL, 3);
+		$this->assertEquals($ret, $data2);
 	}
 
 	public function testXSS()

@@ -828,31 +828,37 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 	}
 
 	if (PHALCON_IS_FALSE(as_value)) {
-		if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
-			phalcon_array_fetch_str(&id, &params, SL("id"), PH_NOISY|PH_READONLY);
-			phalcon_array_update_long(&params, 0, &id, PH_COPY);
+		if (!phalcon_array_isset_fetch_str(&id, &params, SL("id"), PH_READONLY) || !zend_is_true(&id)) {
+			if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
+				ZVAL_NULL(&id);
+			} else if (!phalcon_array_isset_str(&params, SL("id")) && Z_TYPE(id) == IS_STRING) {
+				/**
+				 * Automatically assign the id if the name is not an array
+				 */
+				if (!phalcon_memnstr_str(&id, SL("["))) {
+					phalcon_array_update_str(&params, SL("id"), &id, PH_COPY);
+				}
+			}
 		}
 
-		if (phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_COPY)) {
-			if (!zend_is_true(&name)) {
-				ZVAL_COPY(&name, &id);
-				phalcon_array_update_string(&params, IS(name), &name, 0);
-			}
-		} else {
+		if (!phalcon_array_isset_fetch_str(&name, &params, SL("name"), PH_READONLY)) {
+			ZVAL_NULL(&name);
+		}
+
+		if (!zend_is_true(&name) && !zend_is_true(&id)) {
+			zval_ptr_dtor(&params);
+			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "id or name must be specified");
+			return;
+		} else if (!zend_is_true(&name)) {
 			ZVAL_COPY(&name, &id);
-			phalcon_array_update_string(&params, IS(name), &name, 0);
+			phalcon_array_update_string(&params, IS(name), &name, PH_COPY);
 		}
 
-		/**
-		 * Automatically assign the id if the name is not an array
-		 */
-		if (!phalcon_memnstr_str(&id, SL("["))) {
-			if (!phalcon_array_isset_str(&params, SL("id"))) {
-				phalcon_array_update_str(&params, SL("id"), &id, PH_COPY);
-			}
+		if (zend_is_true(&id)) {
+			PHALCON_CALL_SELF(&value, "getvalue", &id, &params);
+		} else {
+			PHALCON_CALL_SELF(&value, "getvalue", &name, &params);
 		}
-
-		PHALCON_CALL_SELF(&value, "getvalue", &id, &params);
 		phalcon_array_update_string(&params, IS(value), &value, 0);
 
 		if (phalcon_array_isset_fetch_str(&label, &params, SL("label"), PH_READONLY) && zend_is_true(&label)) {

@@ -361,7 +361,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_filter, 0, 0, 2)
 	ZEND_ARG_INFO(0, filters)
 	ZEND_ARG_INFO(0, defaultValue)
 	ZEND_ARG_INFO(0, notAllowEmpty)
-	ZEND_ARG_INFO(0, noRecursive)
+	ZEND_ARG_TYPE_INFO(0, recursive, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_method_entry[] = {
@@ -7319,15 +7319,15 @@ PHP_METHOD(Phalcon_Mvc_Model, reset){
  * @param string|array $filters
  * @param mixed $defaultValue
  * @param boolean $notAllowEmpty
- * @param boolean $noRecursive
+ * @param boolean $recursive
  * @return Phalcon\Mvc\Model
  */
 PHP_METHOD(Phalcon_Mvc_Model, filter){
 
-	zval *field, *filters, *default_value = NULL, *not_allow_empty = NULL, *norecursive = NULL;
+	zval *field, *filters, *default_value = NULL, *not_allow_empty = NULL, *recursive = NULL;
 	zval value = {}, filterd_value = {}, filter = {}, dependency_injector = {}, service = {};
 
-	phalcon_fetch_params(0, 2, 3, &field, &filters, &default_value, &not_allow_empty, &norecursive);
+	phalcon_fetch_params(0, 2, 3, &field, &filters, &default_value, &not_allow_empty, &recursive);
 
 	if (!default_value) {
 		default_value = &PHALCON_GLOBAL(z_null);
@@ -7337,8 +7337,8 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 		not_allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
-	if (!norecursive) {
-		norecursive = &PHALCON_GLOBAL(z_false);
+	if (!recursive || Z_TYPE_P(recursive) == IS_NULL) {
+		recursive = &PHALCON_GLOBAL(z_true);
 	}
 
 	if (phalcon_isset_property_zval(getThis(), field)) {
@@ -7361,7 +7361,7 @@ PHP_METHOD(Phalcon_Mvc_Model, filter){
 				phalcon_update_property(getThis(), SL("_filter"), &filter);
 			}
 
-			PHALCON_CALL_METHOD(&filterd_value, &filter, "sanitize", &value, filters, norecursive);
+			PHALCON_CALL_METHOD(&filterd_value, &filter, "sanitize", &value, filters, recursive);
 
 			if ((PHALCON_IS_EMPTY(&filterd_value) && zend_is_true(not_allow_empty)) || PHALCON_IS_FALSE(&filterd_value)) {
 				phalcon_update_property_zval_zval(getThis(), field, default_value);

@@ -34,12 +34,16 @@
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
 #include "kernel/mbstring.h"
+#include "kernel/time.h"
+
 #include "interned-strings.h"
 
 #include "phalcon.h"
 
-ZEND_DECLARE_MODULE_GLOBALS(phalcon)
+static void (*_zend_execute_internal)(zend_execute_data*, zval*);
+static void (*_zend_execute_ex)(zend_execute_data*);
 
+ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
 static PHP_INI_MH(OnChangeKeysMemoryLimit) {
 	if (new_value) {
@@ -85,7 +89,68 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_yac_cli",         "0",   PHP_INI_ALL,    OnUpdateBool, cache.enable_yac_cli,      zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.cache.yac_keys_size",            "4M",  PHP_INI_SYSTEM, OnChangeKeysMemoryLimit, cache.yac_keys_size,       zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.cache.yac_values_size",          "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.yac_values_size,     zend_phalcon_globals, phalcon_globals)
+	/* Enables/Disables xhprof */
+	STD_PHP_INI_ENTRY("phalcon.xhprof.nesting_max_level", "0",  PHP_INI_ALL, OnUpdateLong, xhprof.nesting_maximum_level,	zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
+    STD_PHP_INI_ENTRY("phalcon.xhprof.clock_use_rdtsc",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.clock_use_rdtsc,	zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
+
+static void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value) {
+    int is_profiling = 1;
+
+    if (!TXRG(enabled) || (TXRG(flags) & PHALCON_XHPROF_FLAG_NO_BUILTINS) > 0) {
+        execute_internal(execute_data, return_value);
+        return;
+    }
+
+	long int current = ++TXRG(nesting_current_level);
+	long int maximum = TXRG(nesting_maximum_level);
+
+	if (maximum > 0 && current > maximum) {
+		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
+	}
+
+    is_profiling = tracing_enter_frame_callgraph(NULL, execute_data);
+
+    if (!_zend_execute_internal) {
+        execute_internal(execute_data, return_value);
+    } else {
+        _zend_execute_internal(execute_data, return_value);
+    }
+
+	--TXRG(nesting_current_level);
+
+    if (is_profiling == 1 && TXRG(callgraph_frames)) {
+        tracing_exit_frame_callgraph();
+    }
+}
+
+static void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
+    zend_execute_data *real_execute_data = execute_data;
+    int is_profiling = 0;
+
+    if (!TXRG(enabled)) {
+        _zend_execute_ex(execute_data);
+        return;
+    }
+
+	long int current = ++TXRG(nesting_current_level);
+	long int maximum = TXRG(nesting_maximum_level);
+
+	if (maximum > 0 && current > maximum) {
+		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
+	}
+
+    is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data);
+
+    _zend_execute_ex(execute_data);
+
+	--TXRG(nesting_current_level);
+
+    if (is_profiling == 1 && TXRG(callgraph_frames)) {
+        tracing_exit_frame_callgraph();
+    }
+}
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
@@ -110,6 +175,14 @@ static PHP_MINIT_FUNCTION(phalcon)
 #else
 	PHALCON_GLOBAL(cache).enable_yac = 0;
 #endif
+
+	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
+		_zend_execute_internal = zend_execute_internal;
+		zend_execute_internal = phalcon_xhprof_execute_internal;
+
+		_zend_execute_ex = zend_execute_ex;
+		zend_execute_ex = phalcon_xhprof_execute_ex;
+	}
 
 #if PHALCON_USE_MONGOC
 	mongoc_init();
@@ -271,6 +344,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 
 	/* 4. Register everything else */
+	PHALCON_INIT(Phalcon_Xhprof);
 	PHALCON_INIT(Phalcon_Di);
 	PHALCON_INIT(Phalcon_Di_Injectable);
 	PHALCON_INIT(Phalcon_Di_FactoryDefault);
@@ -670,6 +744,11 @@ static PHP_RINIT_FUNCTION(phalcon){
 
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
+	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
+		tracing_request_init();
+		tracing_determine_clock_source();
+	}
+
 #if PHALCON_USE_PYTHON
 	PHALCON_GLOBAL(python).tstate = interpreter_python_init_thread();
 #endif
@@ -677,6 +756,26 @@ static PHP_RINIT_FUNCTION(phalcon){
 }
 
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
+
+	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
+		int i = 0;
+		xhprof_callgraph_bucket *bucket;
+
+		tracing_end();
+
+		for (i = 0; i < PHALCON_XHPROF_CALLGRAPH_SLOTS; i++) {
+			bucket = PHALCON_GLOBAL(xhprof).callgraph_buckets[i];
+
+			while (bucket) {
+				PHALCON_GLOBAL(xhprof).callgraph_buckets[i] = bucket->next;
+				tracing_callgraph_bucket_free(bucket);
+				bucket = PHALCON_GLOBAL(xhprof).callgraph_buckets[i];
+			}
+		}
+
+		tracing_request_shutdown();
+	}
+
 	phalcon_deinitialize_memory();
 	phalcon_release_interned_strings();
 
@@ -692,6 +791,32 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
+
+	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
+		php_info_print_table_row(2, "Xhprof", "enabled");
+		php_info_print_table_row(2, "Function Nesting Limit", "enabled");
+		switch (PHALCON_GLOBAL(xhprof).clock_source) {
+			case PHALCON_CLOCK_TSC:
+				php_info_print_table_row(2, "Clock Source", "tsc");
+				break;
+			case PHALCON_CLOCK_CGT:
+				php_info_print_table_row(2, "Clock Source", "clock_gettime");
+				break;
+			case PHALCON_CLOCK_GTOD:
+				php_info_print_table_row(2, "Clock Source", "gettimeofday");
+				break;
+			case PHALCON_CLOCK_MACH:
+				php_info_print_table_row(2, "Clock Source", "mach");
+				break;
+			case PHALCON_CLOCK_QPC:
+				php_info_print_table_row(2, "Clock Source", "Query Performance Counter");
+				break;
+			case PHALCON_CLOCK_NONE:
+				php_info_print_table_row(2, "Clock Source", "none");
+				break;
+		}
+	}
+
 #ifdef PHALCON_CACHE_YAC
 	php_info_print_table_row(2, "Cache Yac", "enabled");
 #endif
@@ -779,6 +904,11 @@ static PHP_GINIT_FUNCTION(phalcon)
 	phalcon_globals->cache.yac_keys_size = (4 * 1024 * 1024);
 	phalcon_globals->cache.yac_values_size = (64 * 1024 * 1024);
 #endif
+	phalcon_globals->xhprof.root = NULL;
+	phalcon_globals->xhprof.callgraph_frames = NULL;
+	phalcon_globals->xhprof.frame_free_list = NULL;
+	phalcon_globals->xhprof.nesting_current_level = -1;
+	phalcon_globals->xhprof.nesting_maximum_level =  0;
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)

@@ -1,0 +1,235 @@
+
+/*
+  +------------------------------------------------------------------------+
+  | Phalcon Framework                                                      |
+  +------------------------------------------------------------------------+
+  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
+  +------------------------------------------------------------------------+
+  | This source file is subject to the New BSD License that is bundled     |
+  | with this package in the file docs/LICENSE.txt.                        |
+  |                                                                        |
+  | If you did not receive a copy of the license and are unable to         |
+  | obtain it through the world-wide-web, please send an email             |
+  | to license@phalconphp.com so we can send you a copy immediately.       |
+  +------------------------------------------------------------------------+
+  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
+  |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
+  +------------------------------------------------------------------------+
+*/
+
+#ifndef PHALCON_XHPROF_H
+#define PHALCON_XHPROF_H
+
+#include "php_phalcon.h"
+
+#include "kernel/time.h"
+
+#define PHALCON_XHPROF_ROOT_SYMBOL "main()"
+#define PHALCON_XHPROF_FLAG_CPU 1
+#define PHALCON_XHPROF_FLAG_MEMORY_MU 2
+#define PHALCON_XHPROF_FLAG_MEMORY_PMU 4
+#define PHALCON_XHPROF_FLAG_MEMORY 6
+#define PHALCON_XHPROF_FLAG_NO_BUILTINS 8
+
+void tracing_callgraph_append_to_array(zval *return_value);
+void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, char *symbol, size_t symbol_len);
+zend_ulong tracing_callgraph_bucket_key(xhprof_frame_t *frame);
+xhprof_callgraph_bucket *tracing_callgraph_bucket_find(xhprof_callgraph_bucket *bucket, xhprof_frame_t *current_frame, xhprof_frame_t *previous, zend_long key);
+void tracing_callgraph_bucket_free(xhprof_callgraph_bucket *bucket);
+void tracing_begin(zend_long flags);
+void tracing_end();
+void tracing_enter_root_frame();
+void tracing_request_init();
+void tracing_request_shutdown();
+void tracing_determine_clock_source();
+
+static zend_always_inline void tracing_fast_free_frame(xhprof_frame_t *p)
+{
+    if (p->function_name != NULL) {
+        zend_string_release(p->function_name);
+    }
+    if (p->class_name != NULL) {
+        zend_string_release(p->class_name);
+    }
+
+    /* we use/overload the previous_frame field in the structure to link entries in
+     * the free list. */
+    p->previous_frame = TXRG(frame_free_list);
+    TXRG(frame_free_list) = p;
+}
+
+static zend_always_inline xhprof_frame_t* tracing_fast_alloc_frame()
+{
+    xhprof_frame_t *p;
+
+    p = TXRG(frame_free_list);
+
+    if (p) {
+        TXRG(frame_free_list) = p->previous_frame;
+        return p;
+    } else {
+        return (xhprof_frame_t *)emalloc(sizeof(xhprof_frame_t));
+    }
+}
+
+static zend_always_inline zend_string* tracing_get_class_name(zend_execute_data *data TSRMLS_DC)
+{
+    zend_function *curr_func;
+
+    if (!data) {
+        return NULL;
+    }
+
+    curr_func = data->func;
+
+    if (curr_func->common.scope != NULL) {
+        zend_string_addref(curr_func->common.scope->name);
+
+        return curr_func->common.scope->name;
+    }
+
+    return NULL;
+}
+
+static zend_always_inline zend_string* tracing_get_function_name(zend_execute_data *data)
+{
+    zend_function *curr_func;
+
+    if (!data) {
+        return NULL;
+    }
+
+    curr_func = data->func;
+
+    if (!curr_func->common.function_name) {
+        // This branch includes execution of eval and include/require(_once) calls
+        // We assume it is not 1999 anymore and not much PHP code runs in the
+        // body of a file and if it is, we are ok with adding it to the caller's wt.
+        return NULL;
+    }
+
+    zend_string_addref(curr_func->common.function_name);
+
+    return curr_func->common.function_name;
+}
+
+zend_always_inline static int tracing_enter_frame_callgraph(zend_string *root_symbol, zend_execute_data *execute_data)
+{
+    zend_string *function_name = (root_symbol != NULL) ? zend_string_copy(root_symbol) : tracing_get_function_name(execute_data);
+    xhprof_frame_t *current_frame;
+    xhprof_frame_t *p;
+    int recurse_level = 0;
+
+    if (function_name == NULL) {
+        return 0;
+    }
+
+    current_frame = tracing_fast_alloc_frame();
+    current_frame->class_name = (root_symbol == NULL) ? tracing_get_class_name(execute_data) : NULL;
+    current_frame->function_name = function_name;
+    current_frame->previous_frame = TXRG(callgraph_frames);
+    current_frame->recurse_level = 0;
+    current_frame->wt_start = phalcon_time_milliseconds(TXRG(clock_source), TXRG(timebase_factor));
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
+        current_frame->cpu_start = phalcon_cpu_timer();
+    }
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_PMU) {
+        current_frame->pmu_start = zend_memory_peak_usage(0);
+    }
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+        current_frame->mu_start = zend_memory_usage(0);
+    }
+
+    /* We only need to compute the hash for the function name,
+     * that should be "good" enough, we sort into 1024 buckets only anyways */
+    current_frame->hash_code = ZSTR_HASH(function_name) % PHALCON_XHPROF_CALLGRAPH_COUNTER_SIZE;
+
+    /* Update entries linked list */
+    TXRG(callgraph_frames) = current_frame;
+
+    if (TXRG(function_hash_counters)[current_frame->hash_code] > 0) {
+        /* Find this symbols recurse level */
+        for(p = current_frame->previous_frame; p; p = p->previous_frame) {
+            if (current_frame->function_name == p->function_name && (!current_frame->class_name || current_frame->class_name == p->class_name)) {
+                recurse_level = (p->recurse_level) + 1;
+                break;
+            }
+        }
+    }
+    TXRG(function_hash_counters)[current_frame->hash_code]++;
+
+    /* Init current function's recurse level */
+    current_frame->recurse_level = recurse_level;
+
+    return 1;
+}
+
+zend_always_inline static void tracing_exit_frame_callgraph()
+{
+    xhprof_frame_t *current_frame = TXRG(callgraph_frames);
+    xhprof_frame_t *previous = current_frame->previous_frame;
+    zend_long duration = phalcon_time_milliseconds(TXRG(clock_source), TXRG(timebase_factor)) - current_frame->wt_start;
+
+    zend_ulong key = tracing_callgraph_bucket_key(current_frame);
+    unsigned int slot = (unsigned int)key % PHALCON_XHPROF_CALLGRAPH_SLOTS;
+    xhprof_callgraph_bucket *bucket = TXRG(callgraph_buckets)[slot];
+
+    bucket = tracing_callgraph_bucket_find(bucket, current_frame, previous, key);
+
+    if (bucket == NULL) {
+        bucket = emalloc(sizeof(xhprof_callgraph_bucket));
+        bucket->key = key;
+        bucket->child_class = current_frame->class_name ? zend_string_copy(current_frame->class_name) : NULL;
+        bucket->child_function = zend_string_copy(current_frame->function_name);
+
+        if (previous) {
+            bucket->parent_class = previous->class_name ? zend_string_copy(current_frame->previous_frame->class_name) : NULL;
+            bucket->parent_function = zend_string_copy(previous->function_name);
+            bucket->parent_recurse_level = previous->recurse_level;
+        } else {
+            bucket->parent_class = NULL;
+            bucket->parent_function = NULL;
+            bucket->parent_recurse_level = 0;
+        }
+
+        bucket->count = 0;
+        bucket->wall_time = 0;
+        bucket->cpu_time = 0;
+        bucket->memory = 0;
+        bucket->memory_peak = 0;
+        bucket->child_recurse_level = current_frame->recurse_level;
+        bucket->next = TXRG(callgraph_buckets)[slot];
+
+        TXRG(callgraph_buckets)[slot] = bucket;
+    }
+
+    bucket->count++;
+    bucket->wall_time += duration;
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
+        bucket->cpu_time += (phalcon_cpu_timer() - current_frame->cpu_start);
+    }
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+        bucket->memory += (zend_memory_usage(0) - current_frame->mu_start);
+    }
+
+    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_PMU) {
+        bucket->memory_peak += (zend_memory_peak_usage(0) - current_frame->pmu_start);
+    }
+
+    TXRG(function_hash_counters)[current_frame->hash_code]--;
+
+    TXRG(callgraph_frames) = TXRG(callgraph_frames)->previous_frame;
+    tracing_fast_free_frame(current_frame);
+}
+
+extern zend_class_entry *phalcon_xhprof_ce;
+
+PHALCON_INIT_CLASS(Phalcon_Xhprof);
+
+#endif /* PHALCON_XHPROF_H */

@@ -8,6 +8,8 @@
 #ifndef PHALCON_H
 #define PHALCON_H
 
+#include "xhprof.h"
+
 #include "acl.h"
 #include "acl/adapter.h"
 #include "acl/adapterinterface.h"

@@ -93,6 +93,72 @@ typedef struct _phalcon_cache_options {
 	size_t yac_values_size;
 } phalcon_cache_options;
 
+/** Xhprof options */
+
+#define PHALCON_XHPROF_CALLGRAPH_COUNTER_SIZE 1024
+#define PHALCON_XHPROF_CALLGRAPH_SLOTS 8192
+
+#if !defined(uint32)
+typedef unsigned int uint32;
+#endif
+
+#if !defined(uint64)
+typedef unsigned long long uint64;
+#endif
+
+typedef struct xhprof_frame_t xhprof_frame_t;
+
+typedef struct xhprof_callgraph_bucket_t {
+    zend_ulong key;
+    zend_string *parent_class;
+    zend_string *parent_function;
+    int parent_recurse_level;
+    zend_string *child_class;
+    zend_string *child_function;
+    int child_recurse_level;
+    struct xhprof_callgraph_bucket_t *next;
+    zend_long count;
+    zend_long wall_time;
+    zend_long cpu_time;
+    zend_long memory;
+    zend_long memory_peak;
+} xhprof_callgraph_bucket;
+
+/* Tracer maintains a stack of entries being profiled.
+ *
+ * This structure is a convenient place to track start time of a particular
+ * profile operation, recursion depth, and the name of the function being
+ * profiled. */
+struct xhprof_frame_t {
+    struct xhprof_frame_t   *previous_frame;        /* ptr to prev entry being profiled */
+    zend_string         *function_name;
+    zend_string         *class_name;
+    uint64              wt_start;           /* start value for wall clock timer */
+    uint64              cpu_start;         /* start value for CPU clock timer */
+    long int            mu_start;                    /* memory usage */
+    long int            pmu_start;              /* peak memory usage */
+    int                 recurse_level;
+    zend_ulong          hash_code;          /* hash_code for the function name  */
+};
+
+typedef struct _phalcon_xhprof_options {
+	zend_bool enable_xhprof;
+    int enabled;
+    uint64 start_timestamp;
+    uint64 start_time;
+    int clock_source;
+    zend_bool clock_use_rdtsc;
+    double timebase_factor;
+    zend_string *root;
+    xhprof_frame_t *callgraph_frames;
+    xhprof_frame_t *frame_free_list;
+    zend_ulong function_hash_counters[PHALCON_XHPROF_CALLGRAPH_COUNTER_SIZE];
+    xhprof_callgraph_bucket* callgraph_buckets[PHALCON_XHPROF_CALLGRAPH_SLOTS];
+    zend_long flags;
+	long int nesting_current_level;
+	long int nesting_maximum_level;
+} phalcon_xhprof_options;
+
 #if PHALCON_USE_PYTHON
 /** Python options */
 typedef struct _phalcon_python_options {
@@ -136,6 +202,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	/** Cache */
 	phalcon_cache_options cache;
 
+	/** Xhprof */
+	phalcon_xhprof_options xhprof;
+
 #if PHALCON_USE_PYTHON
 	/** Python */
 	phalcon_python_options python;
@@ -153,6 +222,8 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 	#define PHALCON_GLOBAL(v) (phalcon_globals.v)
 	#define PHALCON_VGLOBAL &(phalcon_globals)
 #endif
+
+#define TXRG(v) (PHALCON_GLOBAL(xhprof).v)
 
 extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry

@@ -4576,7 +4576,23 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	 */
 	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
 		if (cache_options_is_not_null) {
-			PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
+			zval allow_empty = {};
+			if (phalcon_array_isset_fetch_str(&allow_empty, &cache_options, SL("allowEmpty"), PH_READONLY)) {
+				if (zend_is_true(&allow_empty)) {
+					PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
+				} else {
+					if (Z_TYPE(result) == IS_OBJECT) {
+						zval num = {};
+						PHALCON_CALL_METHOD(&num, &result, "numrows");
+						if (PHALCON_GT_LONG(&num, 0)) {
+							PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
+						}
+						zval_ptr_dtor(&num);
+					}
+				}
+			} else {
+				PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
+			}
 		}
 	}
 	zval_ptr_dtor(&cache);

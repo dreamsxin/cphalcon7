@@ -53,6 +53,8 @@ PHP_METHOD(Phalcon_Kernel, setAliasDir);
 PHP_METHOD(Phalcon_Kernel, alias);
 PHP_METHOD(Phalcon_Kernel, setAlias);
 PHP_METHOD(Phalcon_Kernel, getAlias);
+PHP_METHOD(Phalcon_Kernel, evalFile);
+PHP_METHOD(Phalcon_Kernel, evalString);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrKey)
@@ -93,6 +95,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_setalias, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, alias, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_evalfile, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, vars, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, object, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_evalstring, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, vars, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, object, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, preComputeHashKey,   arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, preComputeHashKey32, arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -106,6 +120,8 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, alias, arginfo_phalcon_kernel_alias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setAlias, arginfo_phalcon_kernel_setalias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, getAlias, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, evalFile, arginfo_phalcon_kernel_evalfile, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, evalString, arginfo_phalcon_kernel_evalstring, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -560,4 +576,36 @@ PHP_METHOD(Phalcon_Kernel, getAlias){
 
 
 	phalcon_read_static_property_ce(return_value, phalcon_kernel_ce, SL("_alias"), PH_COPY);
+}
+
+/**
+ * Evaluate a PHP file
+ *
+ * @param string $filename
+ * @param array $vars
+ * @param object $object
+ */
+PHP_METHOD(Phalcon_Kernel, evalFile){
+
+	zval *file, *vars = NULL, *object = NULL;
+
+	phalcon_fetch_params(0, 1, 2, &file, &vars, &object);
+
+	phalcon_exec_file(return_value, object, file, vars);
+}
+
+/**
+ * Evaluate a string as PHP code
+ *
+ * @param string $code
+ * @param array $vars
+ * @param object $object
+ */
+PHP_METHOD(Phalcon_Kernel, evalString){
+
+	zval *code, *vars = NULL, *object = NULL;
+
+	phalcon_fetch_params(0, 1, 2, &code, &vars, &object);
+
+	phalcon_exec_code(return_value, object, code, vars);
 }

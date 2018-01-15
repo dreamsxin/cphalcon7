@@ -101,14 +101,22 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 
 	ZVAL_UNDEF(&result);
 
-	op_array->scope = Z_OBJCE_P(object);
+	if (object && Z_TYPE_P(object) == IS_OBJECT) {
+		op_array->scope = Z_OBJCE_P(object);
+	} else {
+#if PHP_VERSION_ID >= 70100
+		op_array->scope = EG(fake_scope);
+#else
+		op_array->scope = EG(scope);
+#endif
+	}
 
 	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE
 #if PHP_VERSION_ID >= 70100
 		    | ZEND_CALL_HAS_SYMBOL_TABLE
 #endif
 			,
-			(zend_function*)op_array, 0, op_array->scope, Z_OBJ_P(object));
+			(zend_function*)op_array, 0, op_array->scope, object ? Z_OBJ_P(object) : NULL);
 
 	call->symbol_table = symbol_table;
 

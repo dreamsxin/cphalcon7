@@ -4489,7 +4489,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					phalcon_array_update(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
 					phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY|PH_READONLY);
-					phalcon_array_append(&bind_types, &bind_type, PH_COPY);
+					phalcon_array_update(&bind_types, &attribute_field, &bind_type, PH_COPY);
 				} else {
 					/**
 					 * If the field is not part of the snapshot we add them as changed
@@ -4515,7 +4515,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 						phalcon_array_update(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
 						phalcon_array_fetch(&bind_type, &bind_data_types, field, PH_NOISY|PH_READONLY);
-						phalcon_array_append(&bind_types, &bind_type, PH_COPY);
+						phalcon_array_update(&bind_types, &attribute_field, &bind_type, PH_COPY);
 					}
 				}
 				zval_ptr_dtor(&convert_value);

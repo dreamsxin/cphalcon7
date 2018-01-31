@@ -128,7 +128,7 @@ static void *phalcon_thread_pool_thread_start_routine(void *arg)
 		if (thread->shutdown) {
 			pthread_cond_signal(&pool->cond);
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_THREAD_POOL_DEBUG("exit! %ld: %d\n", thread->id, thread->num_works_done);
+				PHALCON_THREAD_POOL_DEBUG("exit! %ld: %d\n", (*(unsigned long*)&(thread->id)), thread->num_works_done);
 			}
 			pthread_exit(NULL);
 		}

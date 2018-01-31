@@ -932,36 +932,6 @@ int phalcon_isset_property(zval *object, const char *property_name, uint32_t pro
 }
 
 /**
- * Lookup exact class where a property is defined
- *
- */
-static inline zend_class_entry *phalcon_lookup_class_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length) {
-
-	zend_class_entry *original_ce = ce;
-
-	while (ce) {
-		if (zend_hash_str_exists(&ce->properties_info, property_name, property_length)) {
-			return ce;
-		}
-		ce = ce->parent;
-	}
-	return original_ce;
-}
-
-static inline zend_class_entry *phalcon_lookup_str_class_ce(zend_class_entry *ce, zend_string *property) {
-
-	zend_class_entry *original_ce = ce;
-
-	while (ce) {
-		if (zend_hash_exists(&ce->properties_info, property)) {
-			return ce;
-		}
-		ce = ce->parent;
-	}
-	return original_ce;
-}
-
-/**
  * Reads a property from an object
  */
 int phalcon_read_property(zval *result, zval *object, const char *property_name, uint32_t property_length, int flags)

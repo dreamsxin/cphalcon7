@@ -1734,8 +1734,8 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, brightness_contrast)
 
 	imagick_ce = phalcon_fetch_str_class(SL("Imagick"), ZEND_FETCH_CLASS_AUTO);
 
-	tmp_brightness = abs(phalcon_get_intval(brightness)) * 5 / 150.0;
-	tmp_contrast = abs(phalcon_get_intval(contrast)) * 5 / 150.0;
+	tmp_brightness = labs(phalcon_get_intval(brightness)) * 5 / 150.0;
+	tmp_contrast = labs(phalcon_get_intval(contrast)) * 5 / 150.0;
 
 	ZVAL_DOUBLE(&brightness_normalised, tmp_brightness);
 	ZVAL_DOUBLE(&contrast_normalised, tmp_contrast);

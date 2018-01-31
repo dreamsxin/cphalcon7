@@ -88,7 +88,7 @@ int phalcon_vdump(zval *uservar){
             fprintf(phalcon_log, "Boolean: %s\n", "FALSE");
             break;
         case IS_LONG:
-            fprintf(phalcon_log, "Long: %ld at %p, refcount=%d\n", Z_LVAL_P(uservar), uservar, Z_REFCOUNT_P(uservar));
+            fprintf(phalcon_log, "Long: %ld at %p, refcount=%d\n", (long)Z_LVAL_P(uservar), uservar, Z_REFCOUNT_P(uservar));
             break;
         case IS_DOUBLE:
             fprintf(phalcon_log, "Double: %f\n", Z_DVAL_P(uservar));
@@ -116,12 +116,8 @@ int phalcon_dump_ce(zend_class_entry *ce){
 	if(ce){
 		snprintf(message, 120, "- ClassType => %d", ce->type);
 		phalcon_step_over(message);
-		if(ce->name->val){
-			snprintf(message, 120, "- ClassName => %s", ce->name->val);
-			phalcon_step_over(message);
-		} else {
-			phalcon_step_over("- ClassName => NULL");
-		}
+		snprintf(message, 120, "- ClassName => %s", ce->name->val);
+		phalcon_step_over(message);
 	} else {
 		phalcon_step_over("- NULL class entry :(");
 	}

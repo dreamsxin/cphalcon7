@@ -73,8 +73,9 @@ zval* _phalcon_call(zval *retval_ptr, zval *object, zend_class_entry *obj_ce, ze
 	} else {
 		zend_fcall_info_cache fcic;
 		ZVAL_UNDEF(&fci.function_name); /* Unused */
-
+#if PHP_VERSION_ID < 70300
 		fcic.initialized = 1;
+#endif
 		if (!obj_ce) {
 			obj_ce = object ? Z_OBJCE_P(object) : NULL;
 		}

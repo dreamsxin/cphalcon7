@@ -54,10 +54,6 @@ static inline uint32_t round_to_pow2(uint32_t x) {
 	return x;
 }
 
-static inline int max(int x, int y) {
-	return x > y ? x : y;
-}
-
 int phalcon_message_queue_init(struct phalcon_message_queue *queue, int message_size, int max_depth) {
 	int i;
 	char sem_name[128];

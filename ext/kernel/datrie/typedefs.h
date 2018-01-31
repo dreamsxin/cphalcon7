@@ -27,9 +27,17 @@
 #ifndef PHALCON_KERNEL_DATRIE_TYPEDEFS_H
 #define PHALCON_KERNEL_DATRIE_TYPEDEFS_H
 
+#include "php_phalcon.h"
+
 #include <limits.h>
 
+#ifdef TRUE
+# ifndef Bool
+#  define Bool int
+# endif
+#else
 typedef enum { FALSE = 0, TRUE = 1 } Bool;
+#endif
 
 # if UCHAR_MAX == 0xff
 #   ifndef UINT8_TYPEDEF
@@ -73,13 +81,6 @@ typedef enum { FALSE = 0, TRUE = 1 } Bool;
 #   endif /* INT16_TYPEDEF */
 # endif /* SHRT_MAX */
 
-# if UINT_MAX == 0xffffffff
-#   ifndef UINT32_TYPEDEF
-#     define UINT32_TYPEDEF
-      typedef unsigned int   uint32;
-#   endif /* UINT32_TYPEDEF */
-# endif /* UINT_MAX */
-
 # if INT_MAX == 0x7fffffff
 #   ifndef INT32_TYPEDEF
 #     define INT32_TYPEDEF
@@ -112,9 +113,6 @@ typedef enum { FALSE = 0, TRUE = 1 } Bool;
 # endif
 # ifndef INT16_TYPEDEF
 #   error "int16 type is undefined!"
-# endif
-# ifndef UINT32_TYPEDEF
-#   error "uint32 type is undefined!"
 # endif
 # ifndef INT32_TYPEDEF
 #   error "int32 type is undefined!"

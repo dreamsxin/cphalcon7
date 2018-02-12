@@ -40,7 +40,7 @@ try {
     /**
      * Include Application
      */
-    include APP_PATH . '/app.php';
+    require APP_PATH . '/app.php';
 
     /**
      * Handle the request

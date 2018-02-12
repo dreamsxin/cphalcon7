@@ -15,7 +15,7 @@ $di = new CliDi();
 /**
  * Include Services
  */
-include APP_PATH . '/config/services.php';
+require APP_PATH . '/config/services.php';
 
 /**
  * Get config service for use in inline setup below
@@ -25,7 +25,7 @@ $config = $di->getConfig();
 /**
  * Include Autoloader
  */
-include APP_PATH . '/config/loader.php';
+require APP_PATH . '/config/loader.php';
 
 /**
  * Create a console application

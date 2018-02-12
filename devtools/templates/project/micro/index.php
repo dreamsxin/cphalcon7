@@ -19,7 +19,7 @@ try {
     /**
      * Include Services
      */
-    include APP_PATH . '/config/services.php';
+    require APP_PATH . '/config/services.php';
 
     /**
      * Get config service for use in inline setup below
@@ -29,7 +29,7 @@ try {
     /**
      * Include Autoloader
      */
-    include APP_PATH . '/config/loader.php';
+    require APP_PATH . '/config/loader.php';
 
     /**
      * Starting the application

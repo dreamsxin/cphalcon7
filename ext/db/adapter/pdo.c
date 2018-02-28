@@ -365,13 +365,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 					if (Z_TYPE_P(value) != IS_DOUBLE) {
 						convert_to_double_ex(value);
 					}
-					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_STR, 0);
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				}
 			} else {
 				if (Z_TYPE_P(value) == IS_LONG) {
 					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
 				} else if (Z_TYPE_P(value) == IS_DOUBLE) {
-					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_INT, 0);
+					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_DECIMAL, 0);
 				} else if (PHALCON_IS_BOOL(value)) {
 					phalcon_array_update_zval_long(&data_types, &wildcard, PHALCON_DB_COLUMN_BIND_PARAM_BOOL, 0);
 				} else if (Z_TYPE_P(value) == IS_NULL) {

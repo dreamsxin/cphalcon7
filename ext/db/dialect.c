@@ -725,7 +725,12 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	PHALCON_CALL_METHOD(&escape_char, getThis(), "getescapechar");
 
-	if (!zend_is_true(count) || phalcon_array_isset_str(definition, SL("group"))) {
+	if (!phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"), PH_READONLY)) {
+		ZVAL_NULL(&distinct);
+	}
+
+	if (!zend_is_true(count) || phalcon_array_isset_str(definition, SL("group")) 
+		|| (Z_TYPE(distinct) == IS_LONG && (Z_LVAL(distinct) == 1 || Z_LVAL(distinct) == 0))) {
 		if (Z_TYPE(columns) == IS_ARRAY) {
 			zval selected_columns = {};
 			array_init(&selected_columns);
@@ -822,15 +827,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		ZVAL_COPY(&tables_sql, &tables);
 	}
 
-	if (phalcon_array_isset_fetch_str(&distinct, definition, SL("distinct"), PH_READONLY)) {
-		if (Z_TYPE(distinct) == IS_LONG) {
-			if (Z_LVAL(distinct) == 0) {
-				ZVAL_STRING(&sql, "SELECT ALL ");
-			} else if (Z_LVAL(distinct) == 1) {
-				ZVAL_STRING(&sql, "SELECT DISTINCT ");
-			} else {
-				ZVAL_STRING(&sql, "SELECT ");
-			}
+	if (Z_TYPE(distinct) == IS_LONG) {
+		if (Z_LVAL(distinct) == 0) {
+			ZVAL_STRING(&sql, "SELECT ALL ");
+		} else if (Z_LVAL(distinct) == 1) {
+			ZVAL_STRING(&sql, "SELECT DISTINCT ");
 		} else {
 			ZVAL_STRING(&sql, "SELECT ");
 		}
@@ -996,7 +997,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 		}
 	}
 
-	if (zend_is_true(count) && phalcon_array_isset_str(definition, SL("group"))) {
+	if (zend_is_true(count) && (phalcon_array_isset_str(definition, SL("group")) || (Z_TYPE(distinct) == IS_LONG && (Z_LVAL(distinct) == 1 || Z_LVAL(distinct) == 0)))) {
 		PHALCON_CONCAT_SVS(return_value, "SELECT COUNT(*) \"rowcount\" FROM (", &sql, ") AS T");
 		zval_ptr_dtor(&sql);
 	} else {

@@ -1002,7 +1002,44 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			}
 
 			if (phalcon_method_exists_ex(&handler, SL("initialize")) == SUCCESS) {
-				PHALCON_MM_CALL_METHOD(NULL, &handler, "initialize");
+				int flag = 0;
+				PHALCON_CALL_METHOD_FLAG(flag, NULL, &handler, "initialize");
+				if (flag && EG(exception)) {
+					zval e = {};
+					ZVAL_OBJ(&e, EG(exception));
+					
+					if (likely(!instanceof_function_ex(Z_OBJCE(e), phalcon_continueexception_ce, 0))) {
+						RETURN_MM();
+					}
+
+					ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+					PHALCON_MM_ADD_ENTRY(&exception);
+					phalcon_update_property(getThis(), SL("_lastException"), &exception);
+
+					/* Clear the exception  */
+					zend_clear_exception();
+
+					/**
+					 * Calling afterInitialize
+					 */
+					if (unlikely(Z_TYPE(events_manager) == IS_OBJECT)) {
+						PHALCON_MM_ZVAL_STRING(&event_name, "dispatch:afterInitialize");
+						PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+						if (PHALCON_IS_FALSE(&status)) {
+							continue;
+						}
+						zval_ptr_dtor(&status);
+
+						/**
+						 * Check if the user made a forward in the listener
+						 */
+						phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
+						if (PHALCON_IS_FALSE(&finished)) {
+							continue;
+						}
+					}
+					goto afterexecuteroute;
+				}
 			}
 
 			/**
@@ -1172,6 +1209,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
+
+afterexecuteroute:
 
 		if (Z_TYPE(events_manager) == IS_OBJECT) {
 			/**

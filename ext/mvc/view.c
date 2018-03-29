@@ -1157,6 +1157,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 		zval contents = {};
 		phalcon_ob_get_contents(&contents);
+		php_output_clean();
 		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&contents);
 
@@ -1334,6 +1335,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	phalcon_read_property(&disabled, getThis(), SL("_disabled"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_NOT_FALSE(&disabled)) {
 		phalcon_ob_get_contents(&contents);
+		php_output_clean();
 		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&contents);
 		RETURN_FALSE;
@@ -1478,6 +1480,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 * Get the current content in the buffer maybe some output from the controller
 	 */
 	phalcon_ob_get_contents(&contents);
+	php_output_clean();
 	PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 	zval_ptr_dtor(&contents);
 

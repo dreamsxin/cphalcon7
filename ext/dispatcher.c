@@ -1038,6 +1038,8 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 							continue;
 						}
 					}
+
+					phalcon_update_property(getThis(), SL("_lastHandler"), &handler);
 					goto afterexecuteroute;
 				}
 			}

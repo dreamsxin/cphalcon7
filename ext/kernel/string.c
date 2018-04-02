@@ -969,6 +969,43 @@ int phalcon_fast_stripos_str(zval *return_value, const zval *haystack, const cha
 /**
  * Inmediate function resolution for strrpos function
  */
+int phalcon_fast_strrpos(zval *return_value, const zval *haystack, const zval *needle) {
+
+	const char *found = NULL;
+
+	if (unlikely(Z_TYPE_P(haystack) != IS_STRING || Z_TYPE_P(needle) != IS_STRING)) {
+		if (return_value) {
+			ZVAL_NULL(return_value);
+		}
+		zend_error(E_WARNING, "Invalid arguments supplied for strrpos()");
+		return 0;
+	}
+
+	if (!Z_STRLEN_P(needle)) {
+		if (return_value) {
+			ZVAL_NULL(return_value);
+		}
+		zend_error(E_WARNING, "Empty delimiter");
+		return 0;
+	}
+
+	found = zend_memnrstr(Z_STRVAL_P(haystack), Z_STRVAL_P(needle), Z_STRLEN_P(needle), Z_STRVAL_P(haystack) + Z_STRLEN_P(haystack));
+
+	if (found) {
+		if (return_value) {
+			ZVAL_LONG(return_value, found-Z_STRVAL_P(haystack));
+		}
+		return 1;
+	}
+	if (return_value) {
+		ZVAL_FALSE(return_value);
+	}
+	return 0;
+}
+
+/**
+ * Inmediate function resolution for strrpos function
+ */
 int phalcon_fast_strrpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length) {
 
 	const char *found = NULL;

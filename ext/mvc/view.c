@@ -1421,7 +1421,6 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 		PHALCON_CONCAT_SV(&layout_namespace, "namespace/", &ds_lower_namespace_name);
 	}
-	zval_ptr_dtor(&ds);
 	zval_ptr_dtor(&namespace_separator);
 
 	/**
@@ -1561,13 +1560,28 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		 */
 		if (PHALCON_GE_LONG(&render_level, 4) && PHALCON_IS_NOT_EMPTY(&layout_namespace)) {
 			if (!phalcon_array_isset_long(&disabled_levels, 4)) {
+				zval pos = {};
 				phalcon_update_property_long(getThis(), SL("_currentRenderLevel"), 4);
 
 				PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, &layout_namespace);
 				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 				zval_ptr_dtor(&view_tpl_path);
+
+				if (phalcon_fast_strrpos(&pos, &layout_namespace, &ds)) {
+					zval tmp = {};
+
+					phalcon_substr(&tmp, &layout_namespace, 0, Z_LVAL(pos));
+					zval_ptr_dtor(&layout_namespace);
+					ZVAL_COPY(&layout_namespace, &tmp);
+					zval_ptr_dtor(&tmp);
+
+					PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, &layout_namespace);
+					PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
+					zval_ptr_dtor(&view_tpl_path);
+				}
 			}
 		}
+		zval_ptr_dtor(&ds);
 
 		/**
 		 * Inserts templates after layout

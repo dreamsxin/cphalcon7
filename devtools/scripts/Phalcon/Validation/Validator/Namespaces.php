@@ -46,21 +46,19 @@ class Namespaces extends Validator implements ValidatorInterface
      * Executes the namespaces validation
      *
      * @param Validation $validation
-     * @param string     $field
+     * @param string $field
      *
      * @return bool
      */
-    public function validate(Validation $validation, $field)
+    public function validate(\Phalcon\ValidationInterface $validation, $field, bool $allowEmpty = NULL)
     {
         $value = $validation->getValue($field);
 
-        if ($this->hasOption('allowEmpty') && empty($value)) {
+        if ($allowEmpty && empty($value)) {
             return true;
         }
 
-        $re = '#^(?:(?:\\\)?[a-z](?:[a-z0-9_]+)?)+(?:\\\\(?:[a-z](?:[a-z0-9_]+)?)+)*$#i';
-
-        if (false === (bool) preg_match($re, $value)) {
+        if (!$this->valid($value)) {
             $label = $this->getOption('label') ?: $validation->getLabel($field);
             $message = $this->getOption('message') ?: 'Invalid namespace syntax!';
             $replacePairs = array(':field' => $label);
@@ -70,5 +68,19 @@ class Namespaces extends Validator implements ValidatorInterface
         }
 
         return true;
+    }
+
+    /**
+     * Executes the validation
+     *
+     * @param mixed $value
+     *
+     * @return bool
+     */
+    public function valid($value)
+    {
+        $re = '#^(?:(?:\\\)?[a-z](?:[a-z0-9_]+)?)+(?:\\\\(?:[a-z](?:[a-z0-9_]+)?)+)*$#i';
+
+        return (false !== (bool) preg_match($re, $value));
     }
 }

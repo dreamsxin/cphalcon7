@@ -61,11 +61,6 @@ class Controller extends Component
             $this->path->setRootPath($this->options->get('directory'));
         }
 
-        $namespace = '';
-        if ($this->options->contains('namespace') && $this->checkNamespace($this->options->get('namespace'))) {
-            $namespace = 'namespace '.$this->options->get('namespace').';'.PHP_EOL.PHP_EOL;
-        }
-
         $baseClass = $this->options->get('baseClass', '\Phalcon\Mvc\Controller');
 
         if (!$controllersDir = $this->options->get('controllersDir')) {
@@ -90,7 +85,15 @@ class Controller extends Component
             $controllersDir = ltrim($controllersDir, './');
         }
 
-        $controllerPath = rtrim($controllersDir, '\\/') . DIRECTORY_SEPARATOR . $className . "Controller.php";
+        $controllerPath = rtrim($controllersDir, '\\/') . DIRECTORY_SEPARATOR;
+
+        $namespace = '';
+        if ($this->options->contains('namespace') && $this->checkNamespace($this->options->get('namespace'))) {
+			$controllerPath .= str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('namespace')). DIRECTORY_SEPARATOR;
+            $namespace = 'namespace '.$this->options->get('namespace').';'.PHP_EOL.PHP_EOL;
+        }
+
+		$controllerPath .= $className . "Controller.php";
 
         $code = "<?php\n\n".$namespace."class ".$className."Controller extends ".$baseClass."\n{\n\n\tpublic function indexAction()\n\t{\n\n\t}\n\n}\n\n";
         $code = str_replace("\t", "    ", $code);

@@ -96,6 +96,16 @@ class Scaffold extends Command
     /**
      * {@inheritdoc}
      *
+     * @return boolean
+     */
+    public function canBeExternal()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return void
      */
     public function getHelp()

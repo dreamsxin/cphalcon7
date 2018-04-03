@@ -70,11 +70,15 @@ class Scaffold extends Component
      */
     private function _getPossiblePlural($className)
     {
+		$url = '';
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$url .= strtolower(str_replace('\\', '/', $this->options->get('controllersNamespace'))).'/';
+		}
         if (substr($className, strlen($className) - 1, 1) == 's') {
-            return $className;
+            return $url.$className;
         }
 
-        return $className;
+        return $url.$className;
     }
 
     /**
@@ -149,20 +153,17 @@ class Scaffold extends Component
         $this->options->offsetSet('className', Text::camelize($this->options->get('name')));
         $this->options->offsetSet('fileName', Text::uncamelize($this->options->get('className')));
 
+        $modelName = Text::camelize($name);
+
+        $modelPath = rtrim($this->options->get('modelsDir'), '/\\') . DIRECTORY_SEPARATOR;;
+
         $modelsNamespace = '';
         if ($this->options->contains('modelsNamespace') && $this->checkNamespace($this->options->get('modelsNamespace'))) {
+			$modelPath .= str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('modelsNamespace')). DIRECTORY_SEPARATOR;
             $modelsNamespace = $this->options->get('modelsNamespace');
         }
 
-        $modelName = Text::camelize($name);
-
-        if ($modelsNamespace) {
-            $modelClass = '\\' . trim($modelsNamespace, '\\') . '\\' . $modelName;
-        } else {
-            $modelClass = $modelName;
-        }
-
-        $modelPath = $this->options->get('modelsDir') . $modelName.'.php';
+        $modelPath .= $modelName.'.php';
 
         if (!file_exists($modelPath) || $this->options->get('force')) {
             $modelBuilder = new ModelBuilder([
@@ -177,6 +178,12 @@ class Scaffold extends Component
             ]);
 
             $modelBuilder->build();
+        }
+
+        if ($modelsNamespace) {
+            $modelClass = '\\' . trim($modelsNamespace, '\\') . '\\' . $modelName;
+        } else {
+            $modelClass = $modelName;
         }
 
         if (!class_exists($modelClass)) {
@@ -217,9 +224,6 @@ class Scaffold extends Component
         $this->_makeController();
 
         if ($this->options->get('templateEngine') == 'volt') {
-            // View layouts
-            $this->_makeLayoutsVolt();
-
             // View index.phtml
             $this->makeViewVolt('index');
 
@@ -232,9 +236,6 @@ class Scaffold extends Component
             // View edit.phtml
             $this->makeViewVolt('edit');
         } else {
-            // View layouts
-            $this->_makeLayouts();
-
             // View index.phtml
             $this->makeView('index');
 
@@ -465,7 +466,11 @@ class Scaffold extends Component
      */
     private function _makeController()
     {
-        $controllerPath = $this->options->get('controllersDir') . $this->options->get('className') . 'Controller.php';
+		$controllerPath = rtrim($this->options->get('controllersDir'), '\\/').DIRECTORY_SEPARATOR;
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$controllerPath .= str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('controllersNamespace')). DIRECTORY_SEPARATOR;
+		}
+		$controllerPath .= $this->options->get('className') . 'Controller.php';
 
         if (file_exists($controllerPath)) {
             if (!$this->options->contains('force')) {
@@ -531,98 +536,19 @@ class Scaffold extends Component
     }
 
     /**
-     * Make layouts of model using scaffold
-     *
-     * @return $this
-     */
-    private function _makeLayouts()
-    {
-        // Make Layouts dir
-        $dirPathLayouts = $this->options->viewsDir . 'layouts';
-
-        //If dir doesn't exist we make it
-        if (is_dir($dirPathLayouts) == false) {
-            mkdir($dirPathLayouts, 0777, true);
-        }
-
-        $fileName = $this->options->fileName;
-        $viewPath = $dirPathLayouts . DIRECTORY_SEPARATOR . $fileName . '.phtml';
-        if (!file_exists($viewPath) || $this->options->contains('force')) {
-
-            // View model layout
-            $code = '';
-            if ($this->options->contains('theme')) {
-                $code .= '<?php $this->tag->stylesheetLink("themes/lightness/style") ?>'.PHP_EOL;
-                $code .= '<?php $this->tag->stylesheetLink("themes/base") ?>'.PHP_EOL;
-                $code .= '<div class="ui-layout" align="center">' . PHP_EOL;
-            } else {
-                $code .= '<div class="row center-block">' . PHP_EOL;
-            }
-            $code .= "\t" . '<?php echo $this->getContent(); ?>' . PHP_EOL . '</div>';
-
-            if ($this->isConsole()) {
-                echo $viewPath, PHP_EOL;
-            }
-
-            $code = str_replace("\t", "    ", $code);
-            file_put_contents($viewPath, $code);
-        }
-
-        return $this;
-    }
-
-    /**
-     * Make View layouts
-     *
-     * @return $this
-     */
-    private function _makeLayoutsVolt()
-    {
-        // Make Layouts dir
-        $dirPathLayouts = $this->options->viewsDir . 'layouts';
-
-        // If not exists dir; we make it
-        if (is_dir($dirPathLayouts) == false) {
-            mkdir($dirPathLayouts, 0777, true);
-        }
-
-        $fileName = Text::uncamelize($this->options->fileName);
-        $viewPath = $dirPathLayouts . DIRECTORY_SEPARATOR . $fileName . '.volt';
-        if (!file_exists($viewPath || $this->options->contains('force'))) {
-
-            // View model layout
-            $code = '';
-            if ($this->options->contains('theme')) {
-                $code .= '{{ stylesheet_link("themes/lightness/style") }}'.PHP_EOL;
-                $code .= '{{ stylesheet_link("themes/base") }}'.PHP_EOL;
-                $code .= '<div class="ui-layout" align="center">' . PHP_EOL;
-            } else {
-                $code .= '<div class="row center-block">' . PHP_EOL;
-            }
-
-            $code .= "\t" . '{{ content() }}' . PHP_EOL . '</div>';
-
-            if ($this->isConsole()) {
-                echo $viewPath, PHP_EOL;
-            }
-
-            $code = str_replace("\t", "    ", $code);
-            file_put_contents($viewPath, $code);
-        }
-
-        return $this;
-    }
-
-    /**
      * @param $type
      *
      * @throws BuilderException
      */
     private function makeView($type)
     {
-        $dirPath = $this->options->viewsDir . $this->options->fileName;
+		$dirPath = rtrim($this->options->viewsDir, '\\/').DIRECTORY_SEPARATOR;
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$dirPath .= strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('controllersNamespace'))). DIRECTORY_SEPARATOR;
+		}
+		$dirPath .= $this->options->fileName;
         if (is_dir($dirPath) == false) {
-            mkdir($dirPath);
+            mkdir($dirPath, 0777, true);
         }
 
         $viewPath = $dirPath . DIRECTORY_SEPARATOR .$type. '.phtml';
@@ -657,7 +583,11 @@ class Scaffold extends Component
      */
     private function makeViewVolt($type)
     {
-        $dirPath = $this->options->viewsDir . $this->options->fileName;
+		$dirPath = rtrim($this->options->viewsDir, '\\/').DIRECTORY_SEPARATOR;
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$dirPath .= strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('controllersNamespace'))). DIRECTORY_SEPARATOR;
+		}
+		$dirPath .= $this->options->fileName;
         if (is_dir($dirPath) == false) {
             mkdir($dirPath, 0777, true);
         }
@@ -694,9 +624,13 @@ class Scaffold extends Component
      */
     private function _makeViewSearch()
     {
-        $dirPath = $this->options->viewsDir . $this->options->fileName;
+		$dirPath = rtrim($this->options->viewsDir, '\\/').DIRECTORY_SEPARATOR;
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$dirPath .= strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('controllersNamespace'))). DIRECTORY_SEPARATOR;
+		}
+		$dirPath .= $this->options->fileName;
         if (is_dir($dirPath) == false) {
-            mkdir($dirPath);
+            mkdir($dirPath, 0777, true);
         }
 
         $viewPath = $dirPath . DIRECTORY_SEPARATOR . 'search.phtml';
@@ -757,9 +691,13 @@ class Scaffold extends Component
      */
     private function _makeViewSearchVolt()
     {
-        $dirPath = $this->options->viewsDir . $this->options->fileName;
+		$dirPath = rtrim($this->options->viewsDir, '\\/').DIRECTORY_SEPARATOR;
+		if ($this->options->contains('controllersNamespace') && $this->checkNamespace($this->options->get('controllersNamespace'))) {
+			$dirPath .= strtolower(str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('controllersNamespace'))). DIRECTORY_SEPARATOR;
+		}
+		$dirPath .= $this->options->fileName;
         if (is_dir($dirPath) == false) {
-            mkdir($dirPath);
+            mkdir($dirPath, 0777, true);
         }
 
         $viewPath = $dirPath . DIRECTORY_SEPARATOR . 'search.volt';

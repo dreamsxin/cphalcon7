@@ -582,8 +582,18 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		PHALCON_CALL_METHOD(&prefix, route, "getprefix");
 		if (PHALCON_IS_NOT_EMPTY(&prefix)) {
-			if (!phalcon_start_with(&prefix, &handled_uri, &case_sensitive)) {
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				PHALCON_CONCAT_SV(&debug_message, "--Route prefix: ", &prefix);
+				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
+			}
+			if (!phalcon_start_with(&handled_uri, &prefix, &case_sensitive)) {
 				zval_ptr_dtor(&prefix);
+				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+					ZVAL_STRING(&debug_message, "match failure");
+					PHALCON_DEBUG_LOG(&debug_message);
+					zval_ptr_dtor(&debug_message);
+				}
 				continue;
 			}
 		}

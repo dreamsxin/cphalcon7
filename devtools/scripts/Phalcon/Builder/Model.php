@@ -156,6 +156,12 @@ class Model extends Component
             $modelPath = $this->path->getRootPath($modelsDir);
         }
 
+        $namespace = '';
+        if ($this->options->contains('namespace') && $this->checkNamespace($this->options->get('namespace'))) {
+			$modelPath .= str_replace('\\', DIRECTORY_SEPARATOR, $this->options->get('namespace')). DIRECTORY_SEPARATOR;
+            $namespace = 'namespace '.$this->options->get('namespace').';'.PHP_EOL.PHP_EOL;
+        }
+
         $methodRawCode = [];
         $className = $this->options->get('className');
         $modelPath .= $className . '.php';
@@ -180,11 +186,6 @@ class Model extends Component
 
         if (isset($config->devtools->loader)) {
             require_once $config->devtools->loader;
-        }
-
-        $namespace = '';
-        if ($this->options->contains('namespace') && $this->checkNamespace($this->options->get('namespace'))) {
-            $namespace = 'namespace '.$this->options->get('namespace').';'.PHP_EOL.PHP_EOL;
         }
 
         $genDocMethods = $this->options->get('genDocMethods', false);

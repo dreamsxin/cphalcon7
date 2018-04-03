@@ -113,6 +113,16 @@ class Model extends Command
     /**
      * {@inheritdoc}
      *
+     * @return boolean
+     */
+    public function canBeExternal()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     *
      * @return void
      */
     public function getHelp()
@@ -121,7 +131,7 @@ class Model extends Command
         print Color::colorize('  Creates a model') . PHP_EOL . PHP_EOL;
 
         print Color::head('Usage:') . PHP_EOL;
-        print Color::colorize('  model [table-name] [options]', Color::FG_GREEN) . PHP_EOL . PHP_EOL;
+        print Color::colorize('  model [name] [options]', Color::FG_GREEN) . PHP_EOL . PHP_EOL;
 
         print Color::head('Arguments:') . PHP_EOL;
         print Color::colorize('  help', Color::FG_GREEN);

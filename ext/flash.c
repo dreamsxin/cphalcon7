@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 * We return the message as string if the implicit_flush is turned off
 		 */
 		if (!flag_implicit_flush) {
-			RETURN_CTOR(&content);
+			RETURN_NCTOR(&content);
 		}
 	} else {
 		/**
@@ -325,7 +325,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		if (flag_automatic_html) {
 			PHALCON_CONCAT_SVSVS(&html_message, "<div", &css_classes, ">", message, "</div>" PHP_EOL);
 		} else {
-			ZVAL_COPY_VALUE(&html_message, message);
+			ZVAL_COPY(&html_message, message);
 		}
 
 		/**
@@ -333,8 +333,9 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 */
 		if (flag_implicit_flush) {
 			zend_print_zval(&html_message, 0);
+			zval_ptr_dtor(&html_message);
 		} else {
-			RETURN_CTOR(&html_message);
+			RETURN_NCTOR(&html_message);
 		}
 	}
 }

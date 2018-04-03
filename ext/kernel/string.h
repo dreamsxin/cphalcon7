@@ -72,6 +72,7 @@ void phalcon_fast_explode_str_str(zval *result, const char *delimiter, unsigned 
 int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
 int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 int phalcon_fast_stripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
+int phalcon_fast_strrpos(zval *return_value, const zval *haystack, const zval *needle);
 int phalcon_fast_strrpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 int phalcon_fast_strripos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);
 zend_string* phalcon_trim(zval *str, zval *charlist, int where);

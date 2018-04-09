@@ -4177,7 +4177,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval *connection, *identity_field, bind_skip = {}, fields = {}, bind_params = {}, bind_types = {}, exception_message = {};
 	zval attributes = {}, bind_data_types = {}, automatic_attributes = {}, not_null_attributes = {}, default_values = {}, data_types = {}, column_map = {};
 	zval *field, default_value = {}, use_explicit_identity = {}, column_name = {}, column_value = {}, column_type = {}, phql = {}, model_name = {};
-	zval phql_join_fields = {}, phql_join_values = {}, models_manager = {}, query = {}, status = {}, success = {};
+	zval phql_join_fields = {}, phql_join_values = {}, models_manager = {}, query = {}, status = {};
 	int identity_field_is_not_false; /* scan-build insists on using flags */
 
 	phalcon_fetch_params(0, 2, 0, &connection, &identity_field);
@@ -4362,15 +4362,14 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval_ptr_dtor(&query);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&success, &status, "success");
-		if (zend_is_true(&success) && identity_field_is_not_false) {
-			phalcon_update_property_zval_zval(getThis(), &column_name, &success);
+		PHALCON_CALL_METHOD(return_value, &status, "success");
+		if (zend_is_true(return_value) && identity_field_is_not_false) {
+			phalcon_update_property_zval_zval(getThis(), &column_name, return_value);
 		}
-		zval_ptr_dtor(&status);
-		RETURN_ZVAL(&success, 0, 0);
 	} else {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
+	zval_ptr_dtor(&status);
 }
 
 /**
@@ -4379,7 +4378,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
  * @param Phalcon\Mvc\Model\MetadataInterface $metaData
  * @param Phalcon\Db\AdapterInterface $connection
  * @param string|array $table
- * @return boolean
+ * @return boolean|int
  */
 PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
@@ -4387,7 +4386,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	zval snapshot = {}, bind_data_types = {}, automatic_attributes = {}, data_types = {}, column_map = {}, columns = {};
 	zval model_name = {}, phql = {}, phql_updates = {}, phql_join_updates = {}, *field, attribute_field = {}, value = {};
 	zval unique_key = {}, unique_params = {}, unique_types = {}, merged_params = {}, merged_types = {};
-	zval query = {}, status = {}, ret = {}, type = {}, message = {};
+	zval query = {}, status = {}, type = {}, message = {};
 	int i_use_dynamic_update; /* To keep static code analyzer happy */
 
 	phalcon_fetch_params(0, 1, 0, &connection);
@@ -4586,23 +4585,19 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	zval_ptr_dtor(&query);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&ret, &status, "success");
-		zval_ptr_dtor(&status);
-		if (zend_is_true(&ret)) {
-			RETURN_TRUE;
-		}
+		PHALCON_CALL_METHOD(return_value, &status, "success");
 	} else {
-		zval_ptr_dtor(&status);
+		RETVAL_FALSE;
 	}
+	zval_ptr_dtor(&status);
+	if (!zend_is_true(return_value)) {
+		ZVAL_STRING(&type, "InvalidUpdateAttempt");
+		ZVAL_STRING(&message, "Record updated fail");
 
-	ZVAL_STRING(&type, "InvalidUpdateAttempt");
-	ZVAL_STRING(&message, "Record updated fail");
-
-	PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-	zval_ptr_dtor(&message);
-	zval_ptr_dtor(&type);
-
-	RETURN_FALSE;
+		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
+		zval_ptr_dtor(&message);
+		zval_ptr_dtor(&type);
+	}
 }
 
 /**
@@ -5185,6 +5180,12 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 			phalcon_throw_exception(&exception);
 			return;
+		}
+	}
+
+	if (zend_is_true(&new_success)) {
+		if (PHALCON_GLOBAL(orm).enable_strict) {
+			RETURN_ZVAL(&success, 0, 0);
 		}
 	}
 	RETURN_ZVAL(&new_success, 0, 0);

@@ -523,8 +523,8 @@ void phalcon_get_parent_class(zval *result, const zval *object, int lower) {
  */
 void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 
-	zval *value;
 	HashTable *properties;
+	zval *value;
 	zend_string *key;
 
 	zend_object *zobj;
@@ -918,14 +918,18 @@ int phalcon_zval_is_traversable(zval *object) {
 /**
  * Checks if property exists on object
  */
-int phalcon_isset_property(zval *object, const char *property_name, uint32_t property_length)
+int phalcon_property_exists(zval *object, const char *property_name, uint32_t property_length, int flags)
 {
 	if (Z_TYPE_P(object) == IS_OBJECT) {
-		if (likely(zend_hash_str_exists(&Z_OBJCE_P(object)->properties_info, property_name, property_length))) {
-			return 1;
+		if (likely((flags & PH_DECLARED) == PH_DECLARED)) {
+			if (likely(zend_hash_str_exists(&Z_OBJCE_P(object)->properties_info, property_name, property_length))) {
+				return 1;
+			}
 		}
 
-		return zend_hash_str_exists(Z_OBJ_HT_P(object)->get_properties(object), property_name, property_length);
+		if (likely((flags & PH_DYNAMIC) == PH_DYNAMIC)) {
+			return zend_hash_str_exists(Z_OBJ_HT_P(object)->get_properties(object), property_name, property_length);
+		}
 	}
 
 	return 0;

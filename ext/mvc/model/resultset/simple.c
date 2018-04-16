@@ -60,8 +60,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_simple___construct, 0
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_resultset_simple_toarray, 0, 0, 0)
-	ZEND_ARG_INFO(0, columns)
-	ZEND_ARG_INFO(0, renameColumns)
+	ZEND_ARG_TYPE_INFO(0, columns, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, mustColumn, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_resultset_simple_method_entry[] = {
@@ -267,21 +267,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
  * it could consume more memory than it currently does. Exporting the resultset to an array
  * couldn't be faster with a large number of records
  *
- * @param boolean $renameColumns
+ * @param array $columns
+ * @param boolean $mustColumn
  * @return array
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, records = {};
+	zval *columns = NULL, *must_column = NULL, records = {};
 
-	phalcon_fetch_params(0, 0, 2, &columns, &rename_columns);
+	phalcon_fetch_params(0, 0, 2, &columns, &must_column);
 
 	if (!columns) {
 		columns = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!rename_columns) {
-		rename_columns = &PHALCON_GLOBAL(z_true);
+	if (!must_column) {
+		must_column = &PHALCON_GLOBAL(z_null);
 	}
 
 	array_init(&records);
@@ -298,7 +299,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, toArray){
 
 		PHALCON_CALL_METHOD(&current, getThis(), "current");
 		if (Z_TYPE(current) == IS_OBJECT && phalcon_method_exists_ex(&current, SL("toarray")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&arr, &current, "toarray", columns, rename_columns);
+			PHALCON_CALL_METHOD(&arr, &current, "toarray", columns, must_column);
 			phalcon_array_append(&records, &arr, 0);
 			zval_ptr_dtor(&current);
 		} else {

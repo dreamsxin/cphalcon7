@@ -53,6 +53,7 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 	phalcon_globals->orm.enable_auto_convert = 1;
 	phalcon_globals->orm.allow_update_primary = 0;
 	phalcon_globals->orm.enable_strict = 0;
+	phalcon_globals->orm.must_column = 1;
 
 	/* Security options */
 	phalcon_globals->security.crypt_std_des_supported  = zend_hash_str_exists(constants, SL("CRYPT_STD_DES"));

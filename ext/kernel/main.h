@@ -36,6 +36,10 @@
 /** Main macros */
 #define PH_DEBUG		0
 
+#define PH_DECLARED		2
+#define PH_DYNAMIC		4
+#define PH_BOTH			6
+
 #define PH_NOISY		256
 #define PH_SILENT		512
 #define PH_READONLY		1024

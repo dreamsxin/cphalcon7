@@ -352,7 +352,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_toarray, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, columns, IS_ARRAY, 1)
-	ZEND_ARG_TYPE_INFO(0, renameColumns, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, mustColumn, _IS_BOOL, 1)
 	ZEND_ARG_TYPE_INFO(0, negate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
@@ -6976,21 +6976,25 @@ PHP_METHOD(Phalcon_Mvc_Model, dump){
  *</code>
  *
  * @param array $columns
- * @param bool $renameColumns
+ * @param bool $mustColumn
+ * @param bool $negate
  * @return array
  */
 PHP_METHOD(Phalcon_Mvc_Model, toArray){
 
-	zval *columns = NULL, *rename_columns = NULL, *negate = NULL, attributes = {}, column_map = {}, data = {}, *attribute, exception_message = {}, event_name = {};
+	zval *columns = NULL, *must_column = NULL, *negate = NULL, column_map = {}, data = {}, event_name = {};
+	HashTable *properties;
+	zval *value;
+	zend_string *key;
 
-	phalcon_fetch_params(0, 0, 3, &columns, &rename_columns, &negate);
+	phalcon_fetch_params(0, 0, 3, &columns, &must_column, &negate);
 
 	if (!columns) {
 		columns = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!rename_columns || Z_TYPE_P(rename_columns) == IS_NULL) {
-		rename_columns = &PHALCON_GLOBAL(z_true);
+	if (!must_column || Z_TYPE_P(must_column) == IS_NULL) {
+		must_column = PHALCON_GLOBAL(orm).must_column ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
 	}
 
 	if (!negate) {
@@ -7001,66 +7005,112 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	zval_ptr_dtor(&event_name);
 
-	/**
-	 * Original attributes
-	 */
-	PHALCON_CALL_METHOD(&attributes, getThis(), "getattributes");
-
-	/**
-	 * Reverse column map
-	 */
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
-
 	array_init(&data);
 
-	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), attribute) {
-		zval attribute_field = {}, possible_getter = {}, possible_value = {}, attribute_value = {};
+	if (zend_is_true(must_column)) {
+		zval *attribute;
 		/**
-		 * Check if the columns must be renamed
+		 * Reverse column map
 		 */
-		if (zend_is_true(rename_columns) && Z_TYPE(column_map) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch(&attribute_field, &column_map, attribute, PH_READONLY)) {
-				PHALCON_CONCAT_SVS(&exception_message, "Column \"", attribute, "\" doesn't make part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-				zval_ptr_dtor(&column_map);
-				zval_ptr_dtor(&attributes);
-				return;
-			}
-		} else {
-			ZVAL_COPY_VALUE(&attribute_field, attribute);
-		}
+		PHALCON_CALL_SELF(&column_map, "getcolumnmap");
 
-		if (Z_TYPE_P(columns) == IS_ARRAY) {
-			if (likely(!zend_is_true(negate))) {
-				if (!phalcon_fast_in_array(&attribute_field, columns) && !phalcon_fast_in_array(attribute, columns)) {
-					continue;
-				}
-			} else {
-				if (phalcon_fast_in_array(&attribute_field, columns) || phalcon_fast_in_array(attribute, columns)) {
-					continue;
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(column_map), attribute) {
+			zval attribute_value = {};
+
+			if (Z_TYPE_P(columns) == IS_ARRAY) {
+				if (likely(!zend_is_true(negate))) {
+					if (!phalcon_fast_in_array(attribute, columns)) {
+						continue;
+					}
+				} else {
+					if (phalcon_fast_in_array(attribute, columns)) {
+						continue;
+					}
 				}
 			}
-		}
 
-		if (PHALCON_GLOBAL(orm).enable_property_method) {
-			PHALCON_CONCAT_SV(&possible_getter, "__get", &attribute_field);
-			phalcon_strtolower_inplace(&possible_getter);
-			if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
-				PHALCON_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
-				phalcon_array_update(&data, &attribute_field, &possible_value, 0);
-			} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field, PH_READONLY)) {
-				phalcon_array_update(&data, &attribute_field, &attribute_value, PH_COPY);
+			if (PHALCON_GLOBAL(orm).enable_property_method) {
+				zval possible_getter = {};
+				PHALCON_CONCAT_SV(&possible_getter, "__get", attribute);
+				phalcon_strtolower_inplace(&possible_getter);
+				if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
+					zval possible_value = {};
+					PHALCON_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
+					phalcon_array_update(&data, attribute, &possible_value, 0);
+				} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute, PH_READONLY)) {
+					phalcon_array_update(&data, attribute, &attribute_value, PH_COPY);
+				} else {
+					phalcon_array_update(&data, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
+				}
+				zval_ptr_dtor(&possible_getter);
+			} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute, PH_READONLY)) {
+				phalcon_array_update(&data, attribute, &attribute_value, PH_COPY);
 			} else {
-				phalcon_array_update(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
+				phalcon_array_update(&data, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
 			}
-			zval_ptr_dtor(&possible_getter);
-		} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), &attribute_field, PH_READONLY)) {
-			phalcon_array_update(&data, &attribute_field, &attribute_value, PH_COPY);
-		} else {
-			phalcon_array_update(&data, &attribute_field, &PHALCON_GLOBAL(z_null), PH_COPY);
-		}
-	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&attributes);
+		} ZEND_HASH_FOREACH_END();
+	} else {
+		/**
+		 * Reverse column map
+		 */
+		PHALCON_CALL_SELF(&column_map, "getreversecolumnmap");
+
+		properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
+
+		ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
+			zval field = {};
+			if (key) {
+				if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
+					value = Z_REFVAL_P(value);
+				}
+				if (Z_REFCOUNTED_P(value)) {
+					Z_ADDREF_P(value);
+				}
+				if (ZSTR_VAL(key)[0] == 0) {
+					const char *prop_name, *class_name;
+					size_t prop_len;
+					zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+					ZVAL_STRINGL(&field, prop_name, prop_len);
+				} else {
+					ZVAL_STR(&field, zend_string_dup(key, 0));
+				}
+
+				if (Z_TYPE_P(columns) == IS_ARRAY) {
+					if (likely(!zend_is_true(negate))) {
+						if (!phalcon_fast_in_array(&field, columns)) {
+							continue;
+						}
+					} else {
+						if (phalcon_fast_in_array(&field, columns)) {
+							continue;
+						}
+					}
+				}
+
+				if (phalcon_array_isset(&column_map, &field)) {
+					if (PHALCON_GLOBAL(orm).enable_property_method) {
+						zval possible_getter = {};
+						PHALCON_CONCAT_SV(&possible_getter, "__get", &field);
+						phalcon_strtolower_inplace(&possible_getter);
+						if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
+							zval possible_value = {};
+							PHALCON_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
+							phalcon_array_update(&data, &field, &possible_value, 0);
+						} else {
+							phalcon_array_update(&data, &field, value, PH_COPY);
+						}
+						zval_ptr_dtor(&possible_getter);
+					} else {
+						phalcon_array_update(&data, &field, value, PH_COPY);
+					}
+				} else if (!zend_is_true(must_column) && phalcon_property_exists(getThis(), Z_STRVAL(field), Z_STRLEN(field), PH_DYNAMIC)) {
+					phalcon_array_update(&data, &field, value, PH_COPY);
+				}
+				zval_ptr_dtor(&field);
+			}
+		} ZEND_HASH_FOREACH_END();
+	}
+
 	zval_ptr_dtor(&column_map);
 
 	ZVAL_STRING(&event_name, "afterToArray");
@@ -7093,7 +7143,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 PHP_METHOD(Phalcon_Mvc_Model, setup){
 
 	zval *options, disable_events = {}, virtual_foreign_keys = {}, not_null_validations = {}, length_validations = {}, exception_on_failed_save = {};
-	zval phql_literals = {}, property_method = {}, auto_convert = {}, allow_update_primary = {}, enable_strict = {};
+	zval phql_literals = {}, property_method = {}, auto_convert = {}, allow_update_primary = {}, enable_strict = {}, must_column = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
 
@@ -7170,6 +7220,13 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	 */
 	if (phalcon_array_isset_fetch_str(&enable_strict, options, SL("strict"), PH_READONLY)) {
 		PHALCON_GLOBAL(orm).enable_strict = zend_is_true(&enable_strict);
+	}
+
+	/**
+	 * Enables/Disables must column mode
+	 */
+	if (phalcon_array_isset_fetch_str(&must_column, options, SL("mustColumn"), PH_READONLY)) {
+		PHALCON_GLOBAL(orm).must_column = zend_is_true(&must_column);
 	}
 }
 

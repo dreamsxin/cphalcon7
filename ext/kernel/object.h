@@ -56,6 +56,7 @@ zend_class_entry *phalcon_get_internal_ce(const char *class_name, unsigned int c
 			return; \
 		} \
 	} while (0)
+
 /** Class constants */
 int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, const char *constant_name, uint32_t constant_length);
 
@@ -74,7 +75,8 @@ int phalcon_method_exists_ce(const zend_class_entry *ce, const zval *method_name
 int phalcon_method_exists_ce_ex(const zend_class_entry *ce, const char *method_name, uint32_t method_len);
 
 /** Isset properties */
-int phalcon_isset_property(zval *object, const char *property_name, uint32_t property_length);
+int phalcon_property_exists(zval *object, const char *property_name, uint32_t property_length, int flags);
+#define phalcon_isset_property(object, property_name, property_length) phalcon_property_exists(object, property_name, property_length, PH_BOTH)
 
 /**
  * Checks if string property exists on object

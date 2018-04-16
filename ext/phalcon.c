@@ -80,6 +80,7 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_auto_convert",      "1",    PHP_INI_ALL,    OnUpdateBool, orm.enable_auto_convert,      zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.orm.allow_update_primary",     "0",    PHP_INI_ALL,    OnUpdateBool, orm.allow_update_primary,     zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.orm.enable_strict",            "0",    PHP_INI_ALL,    OnUpdateBool, orm.enable_strict,            zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.orm.must_column",              "1",    PHP_INI_ALL,    OnUpdateBool, orm.must_column,              zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables allow empty */
 	STD_PHP_INI_BOOLEAN("phalcon.validation.allow_empty",       "0",    PHP_INI_ALL,    OnUpdateBool, validation.allow_empty,       zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables auttomatic escape */

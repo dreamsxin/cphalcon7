@@ -1069,6 +1069,19 @@ server/exception.c"
 
 			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
 			break
+		elif test -r $i/include/ImageMagick-6/wand/MagickWand.h; then
+			WAND_CFLAGS=`pkg-config --cflags MagickWand`
+			WAND_LDFLAGS=`pkg-config --libs MagickWand`
+
+			PHP_ADD_INCLUDE($i/include/ImageMagick-6)
+
+			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+
+			AC_MSG_RESULT(yes, found in $i)
+
+			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+			break
 		elif test -r $i/bin/MagickWand-config; then
 			IM_WAND_BINARY=$i/bin/MagickWand-config
 

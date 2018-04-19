@@ -407,12 +407,13 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		dpi * INCHES_PER_METER,
 		PNG_RESOLUTION_METER);
 	png_write_info(png_ptr, info_ptr);
-
+	/* top margin */
 	memset(row, 0xff, (realwidth + 7) / 8);
 	for(y = 0; y < m * s; y++) {
 		png_write_row(png_ptr, row);
 	}
 
+	/* data */
 	p = qr->c->data;
 
 	for(y = 0; y < qr->c->width; y++) {
@@ -438,6 +439,7 @@ PHP_METHOD(Phalcon_Chart_QRcode, render){
 		}
 	}
 
+	/* bottom margin */
 	memset(row, 0xff, (realwidth + 7) / 8);
 	for(y=0; y < m * s; y++) {
 		png_write_row(png_ptr, row);

@@ -22,6 +22,15 @@
 
 #include "php_phalcon.h"
 
+/* Render level constraints */
+#define PHALCON_VIEW_LEVEL_NO_RENDER        0
+#define PHALCON_VIEW_LEVEL_ACTION           1
+#define PHALCON_VIEW_LEVEL_BEFORE_TEMPLATE  2
+#define PHALCON_VIEW_LEVEL_CONTROLLER       3
+#define PHALCON_VIEW_LEVEL_NAMESPACE        4
+#define PHALCON_VIEW_LEVEL_AFTER_TEMPLATE   5
+#define PHALCON_VIEW_LEVEL_MAIN             6
+
 extern zend_class_entry *phalcon_mvc_view_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Mvc_View);

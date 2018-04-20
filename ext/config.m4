@@ -718,6 +718,7 @@ logger/adapter/file.c \
 logger/adapter/firephp.c \
 logger/adapter/stream.c \
 logger/adapter/syslog.c \
+logger/adapter/direct.c \
 logger/exception.c \
 logger/adapterinterface.c \
 logger/formatterinterface.c \

@@ -39,8 +39,8 @@
  *
  *<code>
  *	$logger = new \Phalcon\Logger\Adapter\Firephp("");
- *	$logger->log("This is a message");
- *	$logger->log("This is an error", \Phalcon\Logger::ERROR);
+ *	$logger->log(Phalcon\Logger::INFO, "This is a message");
+ *	$logger->log(Phalcon\Logger::ERROR, "This is an error");
  *	$logger->error("This is another error");
  *</code>
  */

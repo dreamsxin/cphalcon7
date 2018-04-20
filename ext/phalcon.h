@@ -219,6 +219,7 @@
 #include "logger/adapter/firephp.h"
 #include "logger/adapter/stream.h"
 #include "logger/adapter/syslog.h"
+#include "logger/adapter/direct.h"
 #include "logger/exception.h"
 #include "logger/formatter.h"
 #include "logger/formatterinterface.h"

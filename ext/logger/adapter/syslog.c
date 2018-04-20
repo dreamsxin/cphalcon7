@@ -40,8 +40,8 @@
  *		'option' => LOG_NDELAY,
  *		'facility' => LOG_MAIL
  *	));
- *	$logger->log("This is a message");
- *	$logger->log("This is an error", \Phalcon\Logger::ERROR);
+ *	$logger->log(Phalcon\Logger::INFO, "This is a message");
+ *	$logger->log(Phalcon\Logger::ERROR, "This is an error");
  *	$logger->error("This is another error");
  *</code>
  */
@@ -126,13 +126,13 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, getFormatter){
 
 	zval formatter = {};
 
-	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_READONLY);
+	phalcon_read_property(&formatter, getThis(), SL("_formatter"), PH_COPY);
 	if (Z_TYPE(formatter) != IS_OBJECT) {
 		object_init_ex(&formatter, phalcon_logger_formatter_syslog_ce);
 		phalcon_update_property(getThis(), SL("_formatter"), &formatter);
 	}
 
-	RETURN_CTOR(&formatter);
+	RETURN_NCTOR(&formatter);
 }
 
 /**
@@ -151,6 +151,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 
 	PHALCON_CALL_METHOD(&formatter, getThis(), "getformatter");
 	PHALCON_CALL_METHOD(&applied_format, &formatter, "format", message, type, time, context);
+	zval_ptr_dtor(&formatter);
 	if (Z_TYPE(applied_format) != IS_ARRAY) {
 		ZVAL_COPY_VALUE(&syslog_type, type);
 		ZVAL_COPY_VALUE(&syslog_message, &applied_format);
@@ -160,6 +161,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_Syslog, logInternal){
 	}
 
 	PHALCON_CALL_FUNCTION(NULL, "syslog", &syslog_type, &syslog_message);
+	zval_ptr_dtor(&applied_format);
 }
 
 /**

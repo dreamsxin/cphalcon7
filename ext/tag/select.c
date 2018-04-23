@@ -224,12 +224,13 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_CALL_CE_STATIC(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &using, &value, &close_option);
 		phalcon_concat_self(&code, &array_options);
 		zval_ptr_dtor(&array_options);
-	} else {
+	} else if (Z_TYPE(options) != IS_NULL) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Invalid data provided to SELECT helper");
 		zval_ptr_dtor(&params);
 		zval_ptr_dtor(&close_option);
 		zval_ptr_dtor(&value);
 		zval_ptr_dtor(&using);
+		zval_ptr_dtor(&code);
 		return;
 	}
 	zval_ptr_dtor(&params);

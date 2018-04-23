@@ -74,6 +74,7 @@ PHP_METHOD(Phalcon_Forms_Form, get);
 PHP_METHOD(Phalcon_Forms_Form, label);
 PHP_METHOD(Phalcon_Forms_Form, getLabel);
 PHP_METHOD(Phalcon_Forms_Form, getValue);
+PHP_METHOD(Phalcon_Forms_Form, setValue);
 PHP_METHOD(Phalcon_Forms_Form, getValues);
 PHP_METHOD(Phalcon_Forms_Form, has);
 PHP_METHOD(Phalcon_Forms_Form, remove);
@@ -176,6 +177,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getvalue, 0, 0, 1)
 	ZEND_ARG_INFO(0, flag)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_setvalue, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_form_getvalues, 0, 0, 0)
 	ZEND_ARG_INFO(0, name)
 	ZEND_ARG_INFO(0, flag)
@@ -229,6 +235,7 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, label, arginfo_phalcon_forms_form_label, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getLabel, arginfo_phalcon_forms_form_getlabel, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getValue, arginfo_phalcon_forms_form_getvalue, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, setValue, arginfo_phalcon_forms_form_setvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getValues, arginfo_phalcon_forms_form_getvalues, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, has, arginfo_phalcon_forms_form_has, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, remove, arginfo_phalcon_forms_form_remove, ZEND_ACC_PUBLIC)
@@ -1102,6 +1109,49 @@ PHP_METHOD(Phalcon_Forms_Form, getValue){
 	} else {
 		PHALCON_RETURN_CALL_SELF("getvalues", name, flag);
 	}
+}
+
+/**
+ * Sets a value
+ *
+ * @param string $name
+ * @param mixed $value
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Forms_Form, setValue){
+
+	zval *name, *value = NULL, entity = {};
+
+	phalcon_fetch_params(0, 1, 1, &name, &value);
+
+	if (!value) {
+		value = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_read_property(&entity, getThis(), SL("_entity"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(entity) == IS_OBJECT) {
+		zval method = {};
+		/**
+		 * Check if the entity has a getter
+		 */
+		PHALCON_CONCAT_SV(&method, "set", name);
+		phalcon_strtolower_inplace(&method);
+		if (phalcon_method_exists(&entity, &method) == SUCCESS) {
+			PHALCON_CALL_METHOD(NULL, &entity, Z_STRVAL(method), value);
+			zval_ptr_dtor(&method);
+			return;
+		}
+		zval_ptr_dtor(&method);
+
+		if (!phalcon_isset_property_zval(&entity, name) && phalcon_method_exists_ex(&entity, SL("__set")) == SUCCESS) {
+			PHALCON_CALL_METHOD(NULL, &entity, "__set", name, value);
+		} else {
+			phalcon_update_property_zval_zval(&entity, name, value);
+		}
+		return;
+	}
+
+	phalcon_update_property_array(getThis(), SL("_filterData"), name, value);
 }
 
 /**

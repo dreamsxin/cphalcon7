@@ -69,6 +69,7 @@ PHP_METHOD(Phalcon_Forms_Element, label);
 PHP_METHOD(Phalcon_Forms_Element, setDefault);
 PHP_METHOD(Phalcon_Forms_Element, getDefault);
 PHP_METHOD(Phalcon_Forms_Element, getValue);
+PHP_METHOD(Phalcon_Forms_Element, setValue);
 PHP_METHOD(Phalcon_Forms_Element, getMessages);
 PHP_METHOD(Phalcon_Forms_Element, hasMessages);
 PHP_METHOD(Phalcon_Forms_Element, setMessages);
@@ -80,6 +81,10 @@ PHP_METHOD(Phalcon_Forms_Element, __toString);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_element_label, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, attributes, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_forms_element_setvalue, 0, 0, 0)
+	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_forms_element_method_entry[] = {
@@ -109,6 +114,7 @@ static const zend_function_entry phalcon_forms_element_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Element, setDefault, arginfo_phalcon_forms_elementinterface_setdefault, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, getDefault, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, getValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, setValue, arginfo_phalcon_forms_element_setvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, getMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, hasMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setMessages, arginfo_phalcon_forms_elementinterface_setmessages, ZEND_ACC_PUBLIC)
@@ -744,6 +750,29 @@ PHP_METHOD(Phalcon_Forms_Element, getValue){
 }
 
 /**
+ * Sets the element's value
+ *
+ */
+PHP_METHOD(Phalcon_Forms_Element, setValue){
+
+	zval *value, name = {}, form = {};
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
+
+	/**
+	 * Get the related form
+	 */
+	phalcon_read_property(&form, getThis(), SL("_form"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(form) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(NULL, &form, "setvalue", &name, value);
+		return;
+	}
+	phalcon_update_property(getThis(), SL("_value"), value);
+}
+
+/**
  * Returns the messages that belongs to the element
  * The element needs to be attached to a form
  *
@@ -845,6 +874,7 @@ PHP_METHOD(Phalcon_Forms_Element, clear)
 {
 	zval name = {};
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_METHOD(NULL, getThis(), "setvalue", &name);
 	PHALCON_CALL_CE_STATIC(NULL, phalcon_tag_ce, "setdefault", &name, &PHALCON_GLOBAL(z_null));
 	RETURN_THIS();
 }

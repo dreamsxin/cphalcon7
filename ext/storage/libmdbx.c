@@ -19,7 +19,6 @@
 */
 
 #include "storage/libmdbx.h"
-#include "storage/libmdbx/mdbx.h"
 #include "storage/libmdbx/cursor.h"
 #include "storage/exception.h"
 

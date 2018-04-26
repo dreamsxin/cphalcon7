@@ -22,7 +22,7 @@
 #define PHALCON_STORAGE_LIBMDBX_CURSOR_H
 
 #include "php_phalcon.h"
-#include "storage/libmdbx/mdbx.h"
+#include "mdbx.h"
 
 typedef struct {
 	MDBX_cursor *cursor;

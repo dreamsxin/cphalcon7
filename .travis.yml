@@ -62,6 +62,7 @@ env:
 
 before_install:
   - export PATH=$PATH:~/bin;
+  - export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/lib:/lib64:/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
   - composer self-update -q
   - travis_retry composer --prefer-source install
   - ./unit-tests/ci/install_prereqs.sh
@@ -74,6 +75,7 @@ before_script:
   - (cd deps/mongo-c-driver/src/libbson && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
   - (cd deps/mongo-c-driver && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
   - (cd deps/wiredtiger && ./autogen.sh && ./configure  --prefix=/usr && make --silent && sudo make install)
+  - (cd deps/libmdbx && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
   - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --enable-chart=yes --enable-qrcode=yes --enable-process=yes --enable-intrusive=yes --enable-cache-yac=yes --enable-storage-btree=yes --enable-storage-wiredtiger=yes --enable-storage-bloomfilter=yes --enable-storage-datrie=yes --enable-storage-lmdb=yes --enable-storage-libmdbx=yes --enable-storage-leveldb=yes --enable-server=yes && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null

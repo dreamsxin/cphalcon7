@@ -1281,7 +1281,7 @@ server/exception.c"
 				],[
 					AC_MSG_ERROR([Wrong wiredtiger version or library not found])
 				],[
-					-L$i/$PHP_LIBDIR -lm
+					-L$i/$PHP_LIBDIR
 				])
 				break
 			else
@@ -1300,8 +1300,30 @@ server/exception.c"
 	fi
 
 	if test "$PHP_STORAGE_LIBMDBX" = "yes"; then
-		AC_DEFINE(PHALCON_USE_LIBMDBX, 1, [Have libmdbx support])
-		phalcon_sources="$phalcon_sources storage/libmdbx.c storage/libmdbx/cursor.c storage/libmdbx/mdbx.c storage/libmdbx/osal.c storage/libmdbx/lck.c storage/libmdbx/version.c "
+		AC_MSG_CHECKING([checking mdbx support])
+		for i in /usr/local /usr; do
+			if test -r $i/include/mdbx.h; then
+				MDBX_DIR=$i
+				PHP_ADD_INCLUDE($i/include)
+				PHP_CHECK_LIBRARY(mdbx, mdbx_dbi_open,
+				[
+					PHP_ADD_LIBRARY_WITH_PATH(mdbx, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+					AC_DEFINE(PHALCON_USE_LIBMDBX, 1, [Have libmdbx support])
+					phalcon_sources="$phalcon_sources storage/libmdbx.c storage/libmdbx/cursor.c "
+				],[
+					AC_MSG_ERROR([Wrong mdbx version or library not found])
+				],[
+					-L$i/$PHP_LIBDIR
+				])
+				break
+			else
+				AC_MSG_RESULT([no, found in $i])
+			fi
+		done
+
+		if test -z "$MDBX_DIR"; then
+			AC_MSG_ERROR([mdbx library not found])
+		fi
 	fi
 
 	if test "$PHP_STORAGE_LEVELDB" = "yes"; then
@@ -1318,7 +1340,7 @@ server/exception.c"
 				],[
 					AC_MSG_ERROR([Wrong leveldb version or library not found])
 				],[
-					-L$i/$PHP_LIBDIR -lm
+					-L$i/$PHP_LIBDIR
 				])
 				break
 			else

@@ -28,3 +28,6 @@
 [submodule "deps/libdeep"]
 	path = deps/libdeep
 	url = https://github.com/dreamsxin/libdeep.git
+[submodule "deps/libmdbx"]
+	path = deps/libmdbx
+	url = https://github.com/leo-yuriev/libmdbx.git

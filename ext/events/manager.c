@@ -133,7 +133,7 @@ PHALCON_INIT_CLASS(Phalcon_Events_Manager){
  */
 PHP_METHOD(Phalcon_Events_Manager, attach){
 
-	zval *event_type, *handler, *_priority = NULL, priority = {}, events = {}, listener = {}, enable_priorities = {}, priority_queue = {};
+	zval *event_type, *handler, *_priority = NULL, event = {}, priority = {}, events = {}, listener = {}, enable_priorities = {}, priority_queue = {};
 
 	phalcon_fetch_params(0, 2, 1, &event_type, &handler, &_priority);
 
@@ -148,13 +148,28 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		return;
 	}
 
+	if (!phalcon_memnstr_str(event_type, SL(":"))) {
+		ZVAL_COPY(&event, event_type);
+	} else {
+		zval event_parts ={}, name = {}, type = {};
+		phalcon_fast_explode_str(&event_parts, SL(":"), event_type);
+		phalcon_array_fetch_long(&name, &event_parts, 0, PH_READONLY);
+		phalcon_array_fetch_long(&type, &event_parts, 1, PH_READONLY);
+		if (PHALCON_IS_STRING(&type, "*") || PHALCON_IS_EMPTY_STRING(&type)) {
+			ZVAL_COPY(&event, &name);
+		} else {
+			ZVAL_COPY(&event, event_type);
+		}
+		zval_ptr_dtor(&event_parts);
+	}
+
 	if (phalcon_instance_of_ev(handler, phalcon_events_listener_ce)) {
 		ZVAL_COPY(&listener, handler);
 		PHALCON_CALL_METHOD(NULL, &listener, "setpriority", &priority);
-		PHALCON_CALL_METHOD(NULL, &listener, "setevent", event_type);
+		PHALCON_CALL_METHOD(NULL, &listener, "setevent", &event);
 	} else {
 		object_init_ex(&listener, phalcon_events_listener_ce);
-		PHALCON_CALL_METHOD(NULL, &listener, "__construct", handler, &priority, event_type);
+		PHALCON_CALL_METHOD(NULL, &listener, "__construct", handler, &priority, &event);
 	}
 
 	phalcon_read_property(&events, getThis(), SL("_events"), PH_COPY);
@@ -162,7 +177,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 		array_init(&events);
 	}
 
-	if (!phalcon_array_isset_fetch(&priority_queue, &events, event_type, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&priority_queue, &events, &event, PH_COPY)) {
 		phalcon_read_property(&enable_priorities, getThis(), SL("_enablePriorities"), PH_READONLY);
 		if (zend_is_true(&enable_priorities)) {
 			/**
@@ -195,9 +210,10 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	/**
 	 * Append the events to the queue
 	 */
-	phalcon_array_update(&events, event_type, &priority_queue, 0);
+	phalcon_array_update(&events, &event, &priority_queue, 0);
 	phalcon_update_property(getThis(), SL("_events"), &events);
 	zval_ptr_dtor(&events);
+	zval_ptr_dtor(&event);
 }
 
 /**
@@ -533,7 +549,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/**
 					 * Check if the listener has implemented an event with the same name
 					 */
-					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
+					if (phalcon_method_exists(&handler, &event_name) == SUCCESS || phalcon_method_exists_ex(&handler, SL("__call")) == SUCCESS) {
 						zval prev_data = {};
 						ZVAL_COPY(&prev_data, &status);
 						zval_ptr_dtor(&status);
@@ -650,7 +666,7 @@ PHP_METHOD(Phalcon_Events_Manager, fireQueue){
 					/**
 					 * Check if the listener has implemented an event with the same name
 					 */
-					if (phalcon_method_exists(&handler, &event_name) == SUCCESS) {
+					if (phalcon_method_exists(&handler, &event_name) == SUCCESS || phalcon_method_exists_ex(&handler, SL("__call")) == SUCCESS) {
 						zval prev_data = {};
 						ZVAL_COPY(&prev_data, &status);
 						zval_ptr_dtor(&status);

@@ -5,8 +5,8 @@ PHP_ARG_ENABLE(phalcon-debug, for phalcon7 debug support,
 [  --enable-phalcon-debug  Enable enable phalcon7 debug support], no, no)
 
 if test "$PHP_PHALCON_DEBUG" != "no"; then
-    CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1"
-    AC_DEFINE(PHALCON_DEBUG, 1, [Enable phalcon7 debug support])
+	CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1"
+	AC_DEFINE(PHALCON_DEBUG, 1, [Enable phalcon7 debug support])
 else
 	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
@@ -718,6 +718,7 @@ logger/adapter/file.c \
 logger/adapter/firephp.c \
 logger/adapter/stream.c \
 logger/adapter/syslog.c \
+logger/adapter/direct.c \
 logger/exception.c \
 logger/adapterinterface.c \
 logger/formatterinterface.c \
@@ -1061,6 +1062,19 @@ server/exception.c"
 			WAND_LDFLAGS=`pkg-config --libs MagickWand`
 
 			PHP_ADD_INCLUDE($i/include/ImageMagick)
+
+			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"
+
+			AC_MSG_RESULT(yes, found in $i)
+
+			AC_DEFINE([PHALCON_USE_MAGICKWAND], [1], [Have ImageMagick MagickWand support])
+			break
+		elif test -r $i/include/ImageMagick-6/wand/MagickWand.h; then
+			WAND_CFLAGS=`pkg-config --cflags MagickWand`
+			WAND_LDFLAGS=`pkg-config --libs MagickWand`
+
+			PHP_ADD_INCLUDE($i/include/ImageMagick-6)
 
 			CPPFLAGS="${CPPFLAGS} ${WAND_CFLAGS}"
 			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${WAND_LDFLAGS}"

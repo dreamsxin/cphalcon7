@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Leonid Yuriev <leo@yuriev.ru>
+ * Copyright 2015-2018 Leonid Yuriev <leo@yuriev.ru>
  * and other libmdbx authors: please see AUTHORS file.
  * All rights reserved.
  *
@@ -32,18 +32,12 @@
 /*----------------------------------------------------------------------------*/
 /* rthc */
 
-static pthread_mutex_t mdbx_rthc_mutex = PTHREAD_MUTEX_INITIALIZER;
-
-void mdbx_rthc_lock(void) {
-  mdbx_ensure(NULL, pthread_mutex_lock(&mdbx_rthc_mutex) == 0);
+static __cold __attribute__((constructor)) void mdbx_global_constructor(void) {
+  mdbx_rthc_global_init();
 }
 
-void mdbx_rthc_unlock(void) {
-  mdbx_ensure(NULL, pthread_mutex_unlock(&mdbx_rthc_mutex) == 0);
-}
-
-void __attribute__((destructor)) mdbx_global_destructor(void) {
-  mdbx_rthc_cleanup();
+static __cold __attribute__((destructor)) void mdbx_global_destructor(void) {
+  mdbx_rthc_global_dtor();
 }
 
 /*----------------------------------------------------------------------------*/

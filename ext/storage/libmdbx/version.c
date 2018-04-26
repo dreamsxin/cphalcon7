@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Leonid Yuriev <leo@yuriev.ru>
+ * Copyright 2015-2018 Leonid Yuriev <leo@yuriev.ru>
  * and other libmdbx authors: please see AUTHORS file.
  * All rights reserved.
  *
@@ -14,12 +14,12 @@
 
 #include "storage/libmdbx/bits.h"
 
-#if MDBX_VERSION_MAJOR != 0 || MDBX_VERSION_MINOR != 0
+#if MDBX_VERSION_MAJOR != 0 || MDBX_VERSION_MINOR != 1
 #error "API version mismatch!"
 #endif
 
-#define MDBX_VERSION_RELEASE 0
-#define MDBX_VERSION_REVISION 0
+#define MDBX_VERSION_RELEASE 3
+#define MDBX_VERSION_REVISION 1
 
 /*LIBMDBX_EXPORTS*/ const mdbx_version_info mdbx_version = {
     MDBX_VERSION_MAJOR,

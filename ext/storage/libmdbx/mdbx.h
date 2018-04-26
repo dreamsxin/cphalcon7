@@ -1,6 +1,6 @@
 ﻿/* LICENSE AND COPYRUSTING *****************************************************
  *
- * Copyright 2015-2017 Leonid Yuriev <leo@yuriev.ru>
+ * Copyright 2015-2018 Leonid Yuriev <leo@yuriev.ru>
  * and other libmdbx authors: please see AUTHORS file.
  * All rights reserved.
  *
@@ -60,14 +60,11 @@
 
 /* IMPENDING CHANGES WARNING ***************************************************
  *
- * Now MDBX is under active development and until November 2017 is expected a
- * big change both of API and database format.  Unfortunately those update will
- * lead to loss of compatibility with previous versions.
+ * MDBX is under active development, database format and API aren't stable
+ * at least until 2018Q2. New version won't be backwards compatible. Main focus
+ * of the rework is to provide clear and robust API and new features.
  *
- * The aim of this revolution in providing a clearer robust API and adding new
- * features, including the database properties. */
-
-/*--------------------------------------------------------------------------*/
+ ******************************************************************************/
 
 #ifdef _MSC_VER
 #pragma warning(push, 1)
@@ -168,7 +165,7 @@ typedef pthread_t mdbx_tid_t;
 /*--------------------------------------------------------------------------*/
 
 #define MDBX_VERSION_MAJOR 0
-#define MDBX_VERSION_MINOR 0
+#define MDBX_VERSION_MINOR 1
 
 #if defined(LIBMDBX_EXPORTS)
 #define LIBMDBX_API __dll_export
@@ -424,7 +421,7 @@ typedef enum MDBX_cursor_op {
 #define MDBX_BAD_DBI (-30780)
 /* Unexpected problem - txn should abort */
 #define MDBX_PROBLEM (-30779)
-/* Unexpected problem - txn should abort */
+/* Another write transaction is running */
 #define MDBX_BUSY (-30778)
 /* The last defined error code */
 #define MDBX_LAST_ERRCODE MDBX_BUSY
@@ -478,6 +475,8 @@ typedef struct MDBX_envinfo {
   uint64_t mi_last_pgno;           /* ID of the last used page */
   uint64_t mi_recent_txnid;        /* ID of the last committed transaction */
   uint64_t mi_latter_reader_txnid; /* ID of the last reader transaction */
+  uint64_t mi_self_latter_reader_txnid; /* ID of the last reader transaction of
+                                           caller process */
   uint64_t mi_meta0_txnid, mi_meta0_sign;
   uint64_t mi_meta1_txnid, mi_meta1_sign;
   uint64_t mi_meta2_txnid, mi_meta2_sign;
@@ -754,7 +753,7 @@ LIBMDBX_API int mdbx_env_sync(MDBX_env *env, int force);
  *                 ignored on opening next time, and transactions since the
  *                 last non-weak checkpoint (meta-page update) will rolledback
  *                 for consistency guarantee. */
-LIBMDBX_API void mdbx_env_close(MDBX_env *env);
+LIBMDBX_API int mdbx_env_close(MDBX_env *env);
 
 /* Set environment flags.
  *
@@ -983,6 +982,15 @@ LIBMDBX_API int mdbx_txn_begin(MDBX_env *env, MDBX_txn *parent, unsigned flags,
  * [in] txn  A transaction handle returned by mdbx_txn_begin() */
 LIBMDBX_API MDBX_env *mdbx_txn_env(MDBX_txn *txn);
 
+/* Return the transaction's flags.
+ *
+ * This returns the flags associated with this transaction.
+ *
+ * [in] txn A transaction handle returned by mdbx_txn_begin()
+ *
+ * Returns A transaction flags, valid if input is an active transaction. */
+LIBMDBX_API int mdbx_txn_flags(MDBX_txn *txn);
+
 /* Return the transaction's ID.
  *
  * This returns the identifier associated with this transaction. For a
@@ -1155,7 +1163,8 @@ LIBMDBX_API int mdbx_dbi_stat(MDBX_txn *txn, MDBX_dbi dbi, MDBX_stat *stat,
  * Returns A non-zero error value on failure and 0 on success. */
 #define MDBX_TBL_DIRTY 0x01 /* DB was written in this txn */
 #define MDBX_TBL_STALE 0x02 /* Named-DB record is older than txnID */
-#define MDBX_TBL_NEW 0x04   /* Named-DB handle opened in this txn */
+#define MDBX_TBL_FRESH 0x04 /* Named-DB handle opened in this txn */
+#define MDBX_TBL_CREAT 0x08 /* Named-DB handle created in this txn */
 LIBMDBX_API int mdbx_dbi_flags_ex(MDBX_txn *txn, MDBX_dbi dbi, unsigned *flags,
                                   unsigned *state);
 LIBMDBX_API int mdbx_dbi_flags(MDBX_txn *txn, MDBX_dbi dbi, unsigned *flags);
@@ -1817,6 +1826,42 @@ LIBMDBX_API int mdbx_cursor_get_attr(MDBX_cursor *mc, MDBX_val *key,
  *  - MDBX_EINVAL   - an invalid parameter was specified. */
 LIBMDBX_API int mdbx_get_attr(MDBX_txn *txn, MDBX_dbi dbi, MDBX_val *key,
                               MDBX_val *data, mdbx_attr_t *attrptr);
+
+/*----------------------------------------------------------------------------*/
+/* LY: temporary workaround for Elbrus's memcmp() bug. */
+#ifndef __GLIBC_PREREQ
+#if defined(__GLIBC__) && defined(__GLIBC_MINOR__)
+#define __GLIBC_PREREQ(maj, min)                                               \
+  ((__GLIBC__ << 16) + __GLIBC_MINOR__ >= ((maj) << 16) + (min))
+#else
+#define __GLIBC_PREREQ(maj, min) (0)
+#endif
+#endif /* __GLIBC_PREREQ */
+#if defined(__e2k__) && !__GLIBC_PREREQ(2, 24)
+LIBMDBX_API int mdbx_e2k_memcmp_bug_workaround(const void *s1, const void *s2,
+                                               size_t n);
+LIBMDBX_API int mdbx_e2k_strcmp_bug_workaround(const char *s1, const char *s2);
+LIBMDBX_API int mdbx_e2k_strncmp_bug_workaround(const char *s1, const char *s2,
+                                                size_t n);
+LIBMDBX_API size_t mdbx_e2k_strlen_bug_workaround(const char *s);
+LIBMDBX_API size_t mdbx_e2k_strnlen_bug_workaround(const char *s,
+                                                   size_t maxlen);
+#include <string.h>
+#include <strings.h>
+#undef memcmp
+#define memcmp mdbx_e2k_memcmp_bug_workaround
+#undef bcmp
+#define bcmp mdbx_e2k_memcmp_bug_workaround
+#undef strcmp
+#define strcmp mdbx_e2k_strcmp_bug_workaround
+#undef strncmp
+#define strncmp mdbx_e2k_strncmp_bug_workaround
+#undef strlen
+#define strlen mdbx_e2k_strlen_bug_workaround
+#undef strnlen
+#define strnlen mdbx_e2k_strnlen_bug_workaround
+
+#endif /* Elbrus's memcmp() bug. */
 
 #ifdef __cplusplus
 }

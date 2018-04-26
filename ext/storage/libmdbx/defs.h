@@ -1,5 +1,5 @@
 /*
- * Copyright 2015-2017 Leonid Yuriev <leo@yuriev.ru>
+ * Copyright 2015-2018 Leonid Yuriev <leo@yuriev.ru>
  * and other libmdbx authors: please see AUTHORS file.
  * All rights reserved.
  *
@@ -57,6 +57,14 @@
 
 #ifndef __has_builtin
 #   define __has_builtin(x) (0)
+#endif
+
+#ifndef __has_warning
+#   define __has_warning(x) (0)
+#endif
+
+#ifndef __has_include
+#   define __has_include(x) (0)
 #endif
 
 #if __has_feature(thread_sanitizer)
@@ -184,16 +192,6 @@
 #	endif
 #endif /* __prefetch */
 
-#ifndef __aligned
-#   if defined(__GNUC__) || __has_attribute(aligned)
-#       define __aligned(N) __attribute__((aligned(N)))
-#   elif defined(_MSC_VER)
-#       define __aligned(N) __declspec(align(N))
-#   else
-#       define __aligned(N)
-#   endif
-#endif /* __aligned */
-
 #ifndef __noreturn
 #   if defined(__GNUC__) || __has_attribute(noreturn)
 #       define __noreturn __attribute__((noreturn))
@@ -268,7 +266,9 @@
 
 #ifndef __hot
 #   if defined(__OPTIMIZE__)
-#       if defined(__clang__) && !__has_attribute(hot)
+#       if defined(__e2k__)
+#           define __hot __attribute__((hot)) __optimize(3)
+#       elif defined(__clang__) && !__has_attribute(hot)
             /* just put frequently used functions in separate section */
 #           define __hot __attribute__((section("text.hot"))) __optimize("O3")
 #       elif defined(__GNUC__) || __has_attribute(hot)
@@ -283,7 +283,9 @@
 
 #ifndef __cold
 #   if defined(__OPTIMIZE__)
-#       if defined(__clang__) && !__has_attribute(cold)
+#       if defined(__e2k__)
+#           define __cold __attribute__((cold)) __optimize(1)
+#       elif defined(__clang__) && !__has_attribute(cold)
             /* just put infrequently used functions in separate section */
 #           define __cold __attribute__((section("text.unlikely"))) __optimize("Os")
 #       elif defined(__GNUC__) || __has_attribute(cold)
@@ -338,7 +340,7 @@
 #       define VALGRIND_DISABLE_ADDR_ERROR_REPORTING_IN_RANGE(a,s)
 #       define VALGRIND_ENABLE_ADDR_ERROR_REPORTING_IN_RANGE(a,s)
 #   endif
-#else
+#elif !defined(RUNNING_ON_VALGRIND)
 #   define VALGRIND_CREATE_MEMPOOL(h,r,z)
 #   define VALGRIND_DESTROY_MEMPOOL(h)
 #   define VALGRIND_MEMPOOL_TRIM(h,a,s)
@@ -357,7 +359,7 @@
 
 #ifdef __SANITIZE_ADDRESS__
 #   include <sanitizer/asan_interface.h>
-#else
+#elif !defined(ASAN_POISON_MEMORY_REGION)
 #   define ASAN_POISON_MEMORY_REGION(addr, size) \
         ((void)(addr), (void)(size))
 #   define ASAN_UNPOISON_MEMORY_REGION(addr, size) \

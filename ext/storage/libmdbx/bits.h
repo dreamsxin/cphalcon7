@@ -1,5 +1,5 @@
 ﻿/*
- * Copyright 2015-2017 Leonid Yuriev <leo@yuriev.ru>
+ * Copyright 2015-2018 Leonid Yuriev <leo@yuriev.ru>
  * and other libmdbx authors: please see AUTHORS file.
  * All rights reserved.
  *
@@ -25,7 +25,7 @@
 
 /* Features under development */
 #ifndef MDBX_DEVEL
-#   define MDBX_DEVEL 1
+#   define MDBX_DEVEL 0
 #endif
 
 /*----------------------------------------------------------------------------*/
@@ -55,6 +55,7 @@
 #pragma warning(disable : 4310) /* cast truncates constant value */
 #pragma warning(disable : 4820) /* bytes padding added after data member for aligment */
 #pragma warning(disable : 4548) /* expression before comma has no effect; expected expression with side - effect */
+#pragma warning(disable : 4366) /* the result of the unary '&' operator may be unaligned */
 #endif                          /* _MSC_VER (warnings) */
 
 #include "storage/libmdbx/mdbx.h"
@@ -65,7 +66,15 @@
      * But you could remove this #error and try to continue at your own risk.
      * In such case please don't rise up an issues related ONLY to old compilers.
      */
-#   warning "libmdbx required at least GCC 4.2 compatible C/C++ compiler."
+#   warning "libmdbx required GCC >= 4.2"
+#endif
+
+#if defined(__clang__) && !__CLANG_PREREQ(3,8)
+    /* Actualy libmdbx was not tested with CLANG older than 3.8.
+     * But you could remove this #error and try to continue at your own risk.
+     * In such case please don't rise up an issues related ONLY to old compilers.
+     */
+#   warning "libmdbx required CLANG >= 3.8"
 #endif
 
 #if defined(__GLIBC__) && !__GLIBC_PREREQ(2,12)
@@ -80,7 +89,32 @@
 #   warning "libmdbx don't compatible with ThreadSanitizer, you will get a lot of false-positive issues."
 #endif /* __SANITIZE_THREAD__ */
 
-#include "storage/libmdbx/osal.h"
+#if __has_warning("-Wconstant-logical-operand")
+#   if defined(__clang__)
+#       pragma clang diagnostic ignored "-Wconstant-logical-operand"
+#   elif defined(__GNUC__)
+#       pragma GCC diagnostic ignored "-Wconstant-logical-operand"
+#   else
+#      pragma warning disable "constant-logical-operand"
+#   endif
+#endif /* -Wconstant-logical-operand */
+
+#if defined(__LCC__) && (__LCC__ <= 121)
+    /* bug #2798 */
+#   pragma diag_suppress alignment_reduction_ignored
+#elif defined(__ICC)
+#   pragma warning(disable: 3453 1366)
+#elif __has_warning("-Walignment-reduction-ignored")
+#   if defined(__clang__)
+#       pragma clang diagnostic ignored "-Walignment-reduction-ignored"
+#   elif defined(__GNUC__)
+#       pragma GCC diagnostic ignored "-Walignment-reduction-ignored"
+#   else
+#       pragma warning disable "alignment-reduction-ignored"
+#   endif
+#endif /* -Walignment-reduction-ignored */
+
+#include "./osal.h"
 
 /* *INDENT-ON* */
 /* clang-format on */
@@ -219,7 +253,7 @@ typedef struct MDBX_reader {
   uint8_t pad[MDBX_CACHELINE_SIZE -
               (sizeof(txnid_t) + sizeof(mdbx_pid_t) + sizeof(mdbx_tid_t)) %
                   MDBX_CACHELINE_SIZE];
-} __cache_aligned MDBX_reader;
+} MDBX_reader;
 
 /* Information about a single database in the environment. */
 typedef struct MDBX_db {
@@ -377,47 +411,53 @@ typedef struct MDBX_lockinfo {
   /* Flags which environment was opened. */
   volatile uint32_t mti_envmode;
 
-  union {
 #ifdef MDBX_OSAL_LOCK
+  /* Mutex protecting write access to this table. */
+  union {
     MDBX_OSAL_LOCK mti_wmutex;
+    uint8_t pad_mti_wmutex[MDBX_OSAL_LOCK_SIZE % sizeof(size_t)];
+  };
 #endif
-    uint64_t align_wmutex;
-  };
+#define MDBX_lockinfo_SIZE_A                                                   \
+  (8 /* mti_magic_and_version */ + 4 /* mti_os_and_format */ +                 \
+   4 /* mti_envmode */ + MDBX_OSAL_LOCK_SIZE /* mti_wmutex */ +                \
+   MDBX_OSAL_LOCK_SIZE % sizeof(size_t) /* pad_mti_wmutex */)
 
-  union {
-    /* The number of slots that have been used in the reader table.
-     * This always records the maximum count, it is not decremented
-     * when readers release their slots. */
-    volatile unsigned __cache_aligned mti_numreaders;
-    uint64_t align_numreaders;
-  };
+  /* cache-line alignment */
+  uint8_t
+      pad_a[MDBX_CACHELINE_SIZE - MDBX_lockinfo_SIZE_A % MDBX_CACHELINE_SIZE];
 
-  union {
+  /* The number of slots that have been used in the reader table.
+   * This always records the maximum count, it is not decremented
+   * when readers release their slots. */
+  volatile unsigned mti_numreaders;
+
 #ifdef MDBX_OSAL_LOCK
-    /* Mutex protecting access to this table. */
+  /* Mutex protecting readers registration access to this table. */
+  union {
     MDBX_OSAL_LOCK mti_rmutex;
+    uint8_t pad_mti_rmutex[MDBX_OSAL_LOCK_SIZE % sizeof(size_t)];
+  };
 #endif
-    uint64_t align_rmutex;
-  };
 
-  union {
-    volatile txnid_t mti_oldest;
-    uint64_t align_oldest;
-  };
+  volatile txnid_t mti_oldest;
+  volatile uint32_t mti_readers_refresh_flag;
 
-  union {
-    volatile uint32_t mti_readers_refresh_flag;
-    uint64_t align_reader_finished_flag;
-  };
+#define MDBX_lockinfo_SIZE_B                                                   \
+  (sizeof(unsigned) /* mti_numreaders */ +                                     \
+   MDBX_OSAL_LOCK_SIZE /* mti_rmutex */ + sizeof(txnid_t) /* mti_oldest */ +   \
+   sizeof(uint32_t) /* mti_readers_refresh_flag */ +                           \
+   MDBX_OSAL_LOCK_SIZE % sizeof(size_t) /* pad_mti_rmutex */)
 
-  uint8_t pad_align[MDBX_CACHELINE_SIZE - sizeof(uint64_t) * 7];
+  /* cache-line alignment */
+  uint8_t
+      pad_b[MDBX_CACHELINE_SIZE - MDBX_lockinfo_SIZE_B % MDBX_CACHELINE_SIZE];
 
-  MDBX_reader __cache_aligned mti_readers[1];
+  MDBX_reader mti_readers[1];
+
 } MDBX_lockinfo;
 
-#ifdef _MSC_VER
 #pragma pack(pop)
-#endif /* MSVC: Enable aligment */
 
 #define MDBX_LOCKINFO_WHOLE_SIZE                                               \
   ((sizeof(MDBX_lockinfo) + MDBX_CACHELINE_SIZE - 1) &                         \
@@ -539,10 +579,11 @@ struct MDBX_txn {
 /* Transaction DB Flags */
 #define DB_DIRTY MDBX_TBL_DIRTY /* DB was written in this txn */
 #define DB_STALE MDBX_TBL_STALE /* Named-DB record is older than txnID */
-#define DB_NEW MDBX_TBL_NEW     /* Named-DB handle opened in this txn */
-#define DB_VALID 0x08           /* DB handle is valid, see also MDBX_VALID */
-#define DB_USRVALID 0x10        /* As DB_VALID, but not set for FREE_DBI */
-#define DB_DUPDATA 0x20         /* DB is MDBX_DUPSORT data */
+#define DB_FRESH MDBX_TBL_FRESH /* Named-DB handle opened in this txn */
+#define DB_CREAT MDBX_TBL_CREAT /* Named-DB handle created in this txn */
+#define DB_VALID 0x10           /* DB handle is valid, see also MDBX_VALID */
+#define DB_USRVALID 0x20        /* As DB_VALID, but not set for FREE_DBI */
+#define DB_DUPDATA 0x40         /* DB is MDBX_DUPSORT data */
   /* In write txns, array of cursors for each DB */
   MDBX_cursor **mt_cursors;
   /* Array of flags for each DB */
@@ -740,6 +781,14 @@ struct MDBX_env {
     size_t grow;   /* step to grow datafile */
     size_t shrink; /* threshold to shrink datafile */
   } me_dbgeo;      /* */
+
+#if defined(_WIN32) || defined(_WIN64)
+  SRWLOCK me_remap_guard;
+  /* Workaround for LockFileEx and WriteFile multithread bug */
+  CRITICAL_SECTION me_windowsbug_lock;
+#else
+  mdbx_fastmutex_t me_remap_guard;
+#endif
 };
 
 /* Nested transaction */
@@ -899,13 +948,13 @@ static __inline void mdbx_jitter4testing(bool tiny) {
 /* Internal prototypes and inlines */
 
 int mdbx_reader_check0(MDBX_env *env, int rlocked, int *dead);
-void mdbx_rthc_dtor(void *rthc);
-void mdbx_rthc_lock(void);
-void mdbx_rthc_unlock(void);
 int mdbx_rthc_alloc(mdbx_thread_key_t *key, MDBX_reader *begin,
                     MDBX_reader *end);
-void mdbx_rthc_remove(mdbx_thread_key_t key);
-void mdbx_rthc_cleanup(void);
+void mdbx_rthc_remove(const mdbx_thread_key_t key);
+
+void mdbx_rthc_global_init(void);
+void mdbx_rthc_global_dtor(void);
+void mdbx_rthc_thread_dtor(void *ptr);
 
 static __inline bool mdbx_is_power2(size_t x) { return (x & (x - 1)) == 0; }
 
@@ -1170,14 +1219,6 @@ static __inline void SETDSZ(MDBX_node *node, size_t size) {
 #undef MDBX_COMMIT_PAGES
 #define MDBX_COMMIT_PAGES IOV_MAX
 #endif
-
-/* Check txn and dbi arguments to a function */
-#define TXN_DBI_EXIST(txn, dbi, validity)                                      \
-  ((dbi) < (txn)->mt_numdbs && ((txn)->mt_dbflags[dbi] & (validity)))
-
-/* Check for misused dbi handles */
-#define TXN_DBI_CHANGED(txn, dbi)                                              \
-  ((txn)->mt_dbiseqs[dbi] != (txn)->mt_env->me_dbiseqs[dbi])
 
 /* LY: fast enough on most systems
  *

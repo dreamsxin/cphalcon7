@@ -88,9 +88,11 @@ sudo make install
 Other options:
 ```shell
 ./configure --enable-chart=yes --enable-qrcode=no --enable-process=yes \
---enable-intrusive=yes --enable-cache-yac=yes --enable-storage-btree=yes \
---enable-storage-wiredtiger=yes --enable-storage-bloomfilter=yes --enable-storage-datrie=yes \
---enable-storage-lmdb=yes --enable-storage-leveldb=yes --enable-websocket=yes \
+--enable-intrusive=yes --enable-cache-yac=yes \
+--enable-storage-btree=yes --enable-storage-wiredtiger=yes \
+--enable-storage-bloomfilter=yes --enable-storage-datrie=yes \
+--enable-storage-lmdb=yes --enable-storage-libmdbx=yes \
+--enable-storage-leveldb=yes --enable-websocket=yes \
 --enable-server=yes --enable-python=yes
 make -j4
 sudo make install

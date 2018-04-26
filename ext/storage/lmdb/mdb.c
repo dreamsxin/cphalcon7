@@ -5,7 +5,7 @@
  *	BerkeleyDB API, but much simplified.
  */
 /*
- * Copyright 2011-2017 Howard Chu, Symas Corp.
+ * Copyright 2011-2018 Howard Chu, Symas Corp.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -48,29 +48,35 @@
  * the full size. These APIs are defined in <wdm.h> and <ntifs.h>
  * but those headers are meant for driver-level development and
  * conflict with the regular user-level headers, so we explicitly
- * declare them here. Using these APIs also means we must link to
- * ntdll.dll, which is not linked by default in user code.
+ * declare them here. We get pointers to these functions from
+ * NTDLL.DLL at runtime, to avoid buildtime dependencies on any
+ * NTDLL import libraries.
  */
-NTSTATUS WINAPI
-NtCreateSection(OUT PHANDLE sh, IN ACCESS_MASK acc,
+typedef NTSTATUS WINAPI (NtCreateSectionFunc)
+  (OUT PHANDLE sh, IN ACCESS_MASK acc,
   IN void * oa OPTIONAL,
   IN PLARGE_INTEGER ms OPTIONAL,
   IN ULONG pp, IN ULONG aa, IN HANDLE fh OPTIONAL);
+
+static NtCreateSectionFunc *NtCreateSection;
 
 typedef enum _SECTION_INHERIT {
 	ViewShare = 1,
 	ViewUnmap = 2
 } SECTION_INHERIT;
 
-NTSTATUS WINAPI
-NtMapViewOfSection(IN PHANDLE sh, IN HANDLE ph,
+typedef NTSTATUS WINAPI (NtMapViewOfSectionFunc)
+  (IN PHANDLE sh, IN HANDLE ph,
   IN OUT PVOID *addr, IN ULONG_PTR zbits,
   IN SIZE_T cs, IN OUT PLARGE_INTEGER off OPTIONAL,
   IN OUT PSIZE_T vs, IN SECTION_INHERIT ih,
   IN ULONG at, IN ULONG pp);
 
-NTSTATUS WINAPI
-NtClose(HANDLE h);
+static NtMapViewOfSectionFunc *NtMapViewOfSection;
+
+typedef NTSTATUS WINAPI (NtCloseFunc)(HANDLE h);
+
+static NtCloseFunc *NtClose;
 
 /** getpid() returns int; MinGW defines pid_t but MinGW64 typedefs it
  *  as int64 which is wrong. MSVC doesn't define it at all, so just
@@ -142,6 +148,10 @@ typedef SSIZE_T	ssize_t;
 /* Most platforms have posix_memalign, older may only have memalign */
 #define HAVE_MEMALIGN	1
 #include <malloc.h>
+/* On Solaris, we need the POSIX sigwait function */
+#if defined (__sun)
+# define _POSIX_PTHREAD_SEMANTICS	1
+#endif
 #endif
 
 #if !(defined(BYTE_ORDER) || defined(__BYTE_ORDER))
@@ -1424,17 +1434,19 @@ typedef struct MDB_xcursor {
 	unsigned char mx_dbflag;
 } MDB_xcursor;
 
-	/** Check if there is an inited xcursor, so #XCURSOR_REFRESH() is proper */
+	/** Check if there is an inited xcursor */
 #define XCURSOR_INITED(mc) \
 	((mc)->mc_xcursor && ((mc)->mc_xcursor->mx_cursor.mc_flags & C_INITIALIZED))
 
-	/** Update sub-page pointer, if any, in \b mc->mc_xcursor.  Needed
+	/** Update the xcursor's sub-page pointer, if any, in \b mc.  Needed
 	 *	when the node which contains the sub-page may have moved.  Called
-	 *	with \b mp = mc->mc_pg[mc->mc_top], \b ki = mc->mc_ki[mc->mc_top].
+	 *	with leaf page \b mp = mc->mc_pg[\b top].
 	 */
-#define XCURSOR_REFRESH(mc, mp, ki) do { \
+#define XCURSOR_REFRESH(mc, top, mp) do { \
 	MDB_page *xr_pg = (mp); \
-	MDB_node *xr_node = NODEPTR(xr_pg, ki); \
+	MDB_node *xr_node; \
+	if (!XCURSOR_INITED(mc) || (mc)->mc_ki[top] >= NUMKEYS(xr_pg)) break; \
+	xr_node = NODEPTR(xr_pg, (mc)->mc_ki[top]); \
 	if ((xr_node->mn_flags & (F_DUPDATA|F_SUBDATA)) == F_DUPDATA) \
 		(mc)->mc_xcursor->mx_cursor.mc_pg[0] = NODEDATA(xr_node); \
 } while (0)
@@ -2773,8 +2785,8 @@ done:
 			if (m2 == mc) continue;
 			if (m2->mc_pg[mc->mc_top] == mp) {
 				m2->mc_pg[mc->mc_top] = np;
-				if (XCURSOR_INITED(m2) && IS_LEAF(np))
-					XCURSOR_REFRESH(m2, np, m2->mc_ki[mc->mc_top]);
+				if (IS_LEAF(np))
+					XCURSOR_REFRESH(m2, mc->mc_top, np);
 			}
 		}
 	}
@@ -4684,6 +4696,21 @@ mdb_env_open2(MDB_env *env, int prev)
 		env->me_pidquery = MDB_PROCESS_QUERY_LIMITED_INFORMATION;
 	else
 		env->me_pidquery = PROCESS_QUERY_INFORMATION;
+	/* Grab functions we need from NTDLL */
+	if (!NtCreateSection) {
+		HMODULE h = GetModuleHandle("NTDLL.DLL");
+		if (!h)
+			return MDB_PROBLEM;
+		NtClose = (NtCloseFunc *)GetProcAddress(h, "NtClose");
+		if (!NtClose)
+			return MDB_PROBLEM;
+		NtMapViewOfSection = (NtMapViewOfSectionFunc *)GetProcAddress(h, "NtMapViewOfSection");
+		if (!NtMapViewOfSection)
+			return MDB_PROBLEM;
+		NtCreateSection = (NtCreateSectionFunc *)GetProcAddress(h, "NtCreateSection");
+		if (!NtCreateSection)
+			return MDB_PROBLEM;
+	}
 #endif /* _WIN32 */
 
 #ifdef BROKEN_FDATASYNC
@@ -6518,6 +6545,10 @@ release:
 		if (rc)
 			return rc;
 	}
+#ifdef MDB_VL32
+	if (mc->mc_ovpg == mp)
+		mc->mc_ovpg = NULL;
+#endif
 	mc->mc_db->md_overflow_pages -= ovpages;
 	return 0;
 }
@@ -7269,6 +7300,11 @@ fetchm:
 			rc = MDB_INCOMPATIBLE;
 			break;
 		}
+		if (mc->mc_ki[mc->mc_top] >= NUMKEYS(mc->mc_pg[mc->mc_top])) {
+			mc->mc_ki[mc->mc_top] = NUMKEYS(mc->mc_pg[mc->mc_top]);
+			rc = MDB_NOTFOUND;
+			break;
+		}
 		{
 			MDB_node *leaf = NODEPTR(mc->mc_pg[mc->mc_top], mc->mc_ki[mc->mc_top]);
 			if (!F_ISSET(leaf->mn_flags, F_DUPDATA)) {
@@ -7633,8 +7669,9 @@ prep_subDB:
 				} else {
 					memcpy((char *)mp + mp->mp_upper + PAGEBASE, (char *)fp + fp->mp_upper + PAGEBASE,
 						olddata.mv_size - fp->mp_upper - PAGEBASE);
+					memcpy((char *)(&mp->mp_ptrs), (char *)(&fp->mp_ptrs), NUMKEYS(fp) * sizeof(mp->mp_ptrs[0]));
 					for (i=0; i<NUMKEYS(fp); i++)
-						mp->mp_ptrs[i] = fp->mp_ptrs[i] + offset;
+						mp->mp_ptrs[i] += offset;
 				}
 			}
 
@@ -7763,8 +7800,7 @@ new_sub:
 				if (m3->mc_ki[i] >= mc->mc_ki[i] && insert_key) {
 					m3->mc_ki[i]++;
 				}
-				if (XCURSOR_INITED(m3))
-					XCURSOR_REFRESH(m3, mp, m3->mc_ki[i]);
+				XCURSOR_REFRESH(m3, i, mp);
 			}
 		}
 	}
@@ -7806,7 +7842,6 @@ put_sub:
 				MDB_xcursor *mx = mc->mc_xcursor;
 				unsigned i = mc->mc_top;
 				MDB_page *mp = mc->mc_pg[i];
-				int nkeys = NUMKEYS(mp);
 
 				for (m2 = mc->mc_txn->mt_cursors[mc->mc_dbi]; m2; m2=m2->mc_next) {
 					if (m2 == mc || m2->mc_snum < mc->mc_snum) continue;
@@ -7814,8 +7849,8 @@ put_sub:
 					if (m2->mc_pg[i] == mp) {
 						if (m2->mc_ki[i] == mc->mc_ki[i]) {
 							mdb_xcursor_init2(m2, mx, new_dupdata);
-						} else if (!insert_key && m2->mc_ki[i] < nkeys) {
-							XCURSOR_REFRESH(m2, mp, m2->mc_ki[i]);
+						} else if (!insert_key) {
+							XCURSOR_REFRESH(m2, i, mp);
 						}
 					}
 				}
@@ -7920,12 +7955,7 @@ mdb_cursor_del(MDB_cursor *mc, unsigned int flags)
 						if (m2 == mc || m2->mc_snum < mc->mc_snum) continue;
 						if (!(m2->mc_flags & C_INITIALIZED)) continue;
 						if (m2->mc_pg[mc->mc_top] == mp) {
-							MDB_node *n2 = leaf;
-							if (m2->mc_ki[mc->mc_top] != mc->mc_ki[mc->mc_top]) {
-								n2 = NODEPTR(mp, m2->mc_ki[mc->mc_top]);
-								if (n2->mn_flags & F_SUBDATA) continue;
-							}
-							m2->mc_xcursor->mx_cursor.mc_pg[0] = NODEDATA(n2);
+							XCURSOR_REFRESH(m2, mc->mc_top, mp);
 						}
 					}
 				}
@@ -8777,8 +8807,8 @@ mdb_node_move(MDB_cursor *csrc, MDB_cursor *cdst, int fromleft)
 					m3->mc_ki[csrc->mc_top] = cdst->mc_ki[cdst->mc_top];
 					m3->mc_ki[csrc->mc_top-1]++;
 				}
-				if (XCURSOR_INITED(m3) && IS_LEAF(mps))
-					XCURSOR_REFRESH(m3, m3->mc_pg[csrc->mc_top], m3->mc_ki[csrc->mc_top]);
+				if (IS_LEAF(mps))
+					XCURSOR_REFRESH(m3, csrc->mc_top, m3->mc_pg[csrc->mc_top]);
 			}
 		} else
 		/* Adding on the right, bump others down */
@@ -8799,8 +8829,8 @@ mdb_node_move(MDB_cursor *csrc, MDB_cursor *cdst, int fromleft)
 					} else {
 						m3->mc_ki[csrc->mc_top]--;
 					}
-					if (XCURSOR_INITED(m3) && IS_LEAF(mps))
-						XCURSOR_REFRESH(m3, m3->mc_pg[csrc->mc_top], m3->mc_ki[csrc->mc_top]);
+					if (IS_LEAF(mps))
+						XCURSOR_REFRESH(m3, csrc->mc_top, m3->mc_pg[csrc->mc_top]);
 				}
 			}
 		}
@@ -9001,8 +9031,8 @@ mdb_page_merge(MDB_cursor *csrc, MDB_cursor *cdst)
 				m3->mc_ki[top-1] > csrc->mc_ki[top-1]) {
 				m3->mc_ki[top-1]--;
 			}
-			if (XCURSOR_INITED(m3) && IS_LEAF(psrc))
-				XCURSOR_REFRESH(m3, m3->mc_pg[top], m3->mc_ki[top]);
+			if (IS_LEAF(psrc))
+				XCURSOR_REFRESH(m3, top, m3->mc_pg[top]);
 		}
 	}
 	{
@@ -9265,8 +9295,7 @@ mdb_cursor_del0(MDB_cursor *mc)
 				} else if (m3->mc_ki[mc->mc_top] > ki) {
 					m3->mc_ki[mc->mc_top]--;
 				}
-				if (XCURSOR_INITED(m3))
-					XCURSOR_REFRESH(m3, m3->mc_pg[mc->mc_top], m3->mc_ki[mc->mc_top]);
+				XCURSOR_REFRESH(m3, mc->mc_top, mp);
 			}
 		}
 	}
@@ -9803,8 +9832,8 @@ mdb_page_split(MDB_cursor *mc, MDB_val *newkey, MDB_val *newdata, pgno_t newpgno
 				m3->mc_ki[ptop] >= mc->mc_ki[ptop]) {
 				m3->mc_ki[ptop]++;
 			}
-			if (XCURSOR_INITED(m3) && IS_LEAF(mp))
-				XCURSOR_REFRESH(m3, m3->mc_pg[mc->mc_top], m3->mc_ki[mc->mc_top]);
+			if (IS_LEAF(mp))
+				XCURSOR_REFRESH(m3, mc->mc_top, m3->mc_pg[mc->mc_top]);
 		}
 	}
 	DPRINTF(("mp left: %d, rp left: %d", SIZELEFT(mp), SIZELEFT(rp)));
@@ -10610,8 +10639,11 @@ int mdb_dbi_open(MDB_txn *txn, const char *name, unsigned int flags, MDB_dbi *db
 		MDB_node *node = NODEPTR(mc.mc_pg[mc.mc_top], mc.mc_ki[mc.mc_top]);
 		if ((node->mn_flags & (F_DUPDATA|F_SUBDATA)) != F_SUBDATA)
 			return MDB_INCOMPATIBLE;
-	} else if (! (rc == MDB_NOTFOUND && (flags & MDB_CREATE))) {
-		return rc;
+	} else {
+		if (rc != MDB_NOTFOUND || !(flags & MDB_CREATE))
+			return rc;
+		if (F_ISSET(txn->mt_flags, MDB_TXN_RDONLY))
+			return EACCES;
 	}
 
 	/* Done here so we cannot fail after creating a new DB */

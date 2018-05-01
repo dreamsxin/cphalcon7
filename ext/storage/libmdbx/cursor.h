@@ -22,6 +22,9 @@
 #define PHALCON_STORAGE_LIBMDBX_CURSOR_H
 
 #include "php_phalcon.h"
+
+#ifdef PHALCON_USE_LIBMDBX
+
 #include "mdbx.h"
 
 typedef struct {
@@ -41,4 +44,5 @@ extern zend_class_entry *phalcon_storage_libmdbx_cursor_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx_Cursor);
 
+#endif
 #endif /* PHALCON_STORAGE_LIBMDBX_CURSOR_H */

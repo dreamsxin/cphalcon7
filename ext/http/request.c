@@ -713,12 +713,15 @@ PHP_METHOD(Phalcon_Http_Request, getHeader)
 	phalcon_fetch_params(0, 1, 0, &header);
 
 	_SERVER = phalcon_get_global_str(SL("_SERVER"));
-	if (!phalcon_array_isset_fetch(return_value, _SERVER, header, PH_COPY)) {
-		PHALCON_CONCAT_SV(&key, "HTTP_", header);
-		if (phalcon_array_isset_fetch(return_value, _SERVER, &key, PH_COPY)) {
-			return;
-		}
+	if (phalcon_array_isset_fetch(return_value, _SERVER, header, PH_COPY)) {
+		return;
 	}
+	PHALCON_CONCAT_SV(&key, "HTTP_", header);
+	if (phalcon_array_isset_fetch(return_value, _SERVER, &key, PH_COPY)) {
+		zval_ptr_dtor(&key);
+		return;
+	}
+	zval_ptr_dtor(&key);
 
 	RETURN_EMPTY_STRING();
 }

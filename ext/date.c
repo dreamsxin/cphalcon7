@@ -58,6 +58,7 @@ PHP_METHOD(Phalcon_Date, createDateTimeZone);
 PHP_METHOD(Phalcon_Date, filter);
 PHP_METHOD(Phalcon_Date, valid);
 PHP_METHOD(Phalcon_Date, diff);
+PHP_METHOD(Phalcon_Date, add);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_offset, 0, 0, 1)
 	ZEND_ARG_INFO(0, remote)
@@ -165,6 +166,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_diff, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_add, 0, 0, 1)
+	ZEND_ARG_INFO(0, date1)
+	ZEND_ARG_TYPE_INFO(0, interval, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_date_method_entry[] = {
 	PHP_ME(Phalcon_Date, offset, arginfo_phalcon_date_offset, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, seconds, arginfo_phalcon_date_seconds, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -187,6 +194,7 @@ static const zend_function_entry phalcon_date_method_entry[] = {
 	PHP_ME(Phalcon_Date, filter, arginfo_phalcon_date_filter, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, valid, arginfo_phalcon_date_valid, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Date, diff, arginfo_phalcon_date_diff, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Date, add, arginfo_phalcon_date_add, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -1312,6 +1320,7 @@ PHP_METHOD(Phalcon_Date, valid){
  * @param string $date1
  * @param string $date2
  * @param string $differenceFormat
+ * @param string $format
  * @return int
  */
 PHP_METHOD(Phalcon_Date, diff){
@@ -1346,4 +1355,49 @@ PHP_METHOD(Phalcon_Date, diff){
 	PHALCON_CALL_METHOD(return_value, &interval, "format", &difference_format);
 	zval_ptr_dtor(&difference_format);
 	zval_ptr_dtor(&interval);
+}
+
+/**
+ * Gets two date difference.
+ *
+ *     $ret = Phalcon\Date::add('2012-01-22', '1 days');
+ *
+ * @param string $date1
+ * @param string $interval
+ * @param string $format
+ * @return string
+ */
+PHP_METHOD(Phalcon_Date, add){
+
+	zval *date1, *interval_string = NULL, *format = NULL, date_interval = {}, interval = {}, date_format = {}, format_date1 = {};
+	zend_class_entry *ce0, *ce1;
+
+	phalcon_fetch_params(0, 1, 2, &date1, &interval_string, &format);
+
+	if (!interval_string || Z_TYPE_P(interval_string) == IS_NULL) {
+		ZVAL_STRING(&date_interval, "1 days");
+	} else {
+		ZVAL_COPY(&date_interval, interval_string);
+	}
+
+	if (!format || Z_TYPE_P(format) == IS_NULL) {
+		ZVAL_STRING(&date_format, "Y-m-d");
+	} else {
+		ZVAL_COPY(&date_format, format);
+	}
+
+	ce0 = phalcon_fetch_str_class(SL("DateInterval"), ZEND_FETCH_CLASS_AUTO);
+	PHALCON_CALL_CE_STATIC(&interval, ce0, "createfromdatestring", &date_interval);
+	zval_ptr_dtor(&date_interval);
+
+	ce1 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
+
+	PHALCON_CALL_CE_STATIC(&format_date1, ce1, "createfromformat", &date_format, date1);
+
+	PHALCON_CALL_METHOD(NULL, &format_date1, "add", &interval);
+	zval_ptr_dtor(&interval);
+
+	PHALCON_CALL_METHOD(return_value, &format_date1, "format", &date_format);
+	zval_ptr_dtor(&format_date1);
+	zval_ptr_dtor(&date_format);
 }

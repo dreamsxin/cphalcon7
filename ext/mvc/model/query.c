@@ -4583,7 +4583,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				} else {
 					if (Z_TYPE(result) == IS_OBJECT) {
 						zval num = {};
-						PHALCON_CALL_METHOD(&num, &result, "numrows");
+						PHALCON_CALL_METHOD(&num, &result, "count");
 						if (PHALCON_GT_LONG(&num, 0)) {
 							PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
 						}

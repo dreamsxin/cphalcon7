@@ -4488,7 +4488,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			}
 
 			phalcon_update_property(getThis(), SL("_cache"), &cache);
-			zval_ptr_dtor(&cache);
 		}
 	}
 
@@ -4574,8 +4573,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 	/**
 	 * We store the resultset in the cache if any
 	 */
-	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-		if (cache_options_is_not_null) {
+	if (cache_options_is_not_null) {
+		if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
 			zval allow_empty = {};
 			if (phalcon_array_isset_fetch_str(&allow_empty, &cache_options, SL("allowEmpty"), PH_READONLY)) {
 				if (zend_is_true(&allow_empty)) {
@@ -4594,8 +4593,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
 			}
 		}
+		zval_ptr_dtor(&cache);
 	}
-	zval_ptr_dtor(&cache);
 
 	if (Z_TYPE(result) == IS_OBJECT) {
 		/**

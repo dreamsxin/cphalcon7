@@ -1279,8 +1279,10 @@ PHP_METHOD(Phalcon_Arr, filter){
 
 	if (!filters || Z_TYPE_P(filters) == IS_NULL) {
 		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(array), idx, str_key, value) {
-			if (strict && PHALCON_IS_EMPTY(value)) {
-				continue;
+			if (strict) {
+				if (PHALCON_IS_EMPTY(value)) {
+					continue;
+				}
 			} else if (!zend_is_true(value)) {
 				continue;
 			}
@@ -1306,8 +1308,10 @@ PHP_METHOD(Phalcon_Arr, filter){
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, value) {
 		zval filter_value = {};
 		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", value, filters);
-		if (strict && PHALCON_IS_EMPTY(&filter_value)) {
-			continue;
+		if (strict) {
+			if (PHALCON_IS_EMPTY(&filter_value)) {
+				continue;
+			}
 		} else if (!zend_is_true(&filter_value)) {
 			continue;
 		}

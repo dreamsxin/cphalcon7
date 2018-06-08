@@ -504,13 +504,14 @@ PHP_METHOD(Phalcon_Cli_Options, help){
  */
 PHP_METHOD(Phalcon_Cli_Options, parse){
 
-	zval *_options = NULL, names = {}, options = {}, longopts = {}, joined_opts = {}, values = {};
+	zval *_options = NULL, names = {}, short_names ={}, options = {}, longopts = {}, joined_opts = {}, values = {};
 	zval default_values = {}, types = {}, required = {}, *name;
 	zend_string *str_key;
 
 	phalcon_fetch_params(0, 0, 1, &_options);
 
 	phalcon_read_property(&names, getThis(), SL("_names"), PH_READONLY);
+	phalcon_read_property(&short_names, getThis(), SL("_shortNames"), PH_READONLY);
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 	phalcon_read_property(&longopts, getThis(), SL("_longopts"), PH_READONLY);
 
@@ -532,15 +533,19 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 	if (Z_TYPE(required) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(required), name) {
 			if (!phalcon_array_isset(&values, name)) {
-				zval msg = {}, out = {};
-				zval_ptr_dtor(&values);
-				PHALCON_CONCAT_VS(&msg, name, " is required");
-				PHALCON_CALL_CE_STATIC(&out, phalcon_cli_color_ce, "error", &msg);
-				zend_print_zval(&out, 0);
-				zval_ptr_dtor(&msg);
-				zval_ptr_dtor(&out);
-				PHALCON_CALL_METHOD(NULL, getThis(), "help");
-				RETURN_FALSE;
+				zval short_name = {};
+				if (!phalcon_array_isset_fetch(&short_name, &short_names, name, PH_READONLY)
+					|| !phalcon_array_isset(&values, &short_name)) {
+					zval msg = {}, out = {};
+					zval_ptr_dtor(&values);
+					PHALCON_CONCAT_VS(&msg, name, " is required");
+					PHALCON_CALL_CE_STATIC(&out, phalcon_cli_color_ce, "error", &msg);
+					zend_print_zval(&out, 0);
+					zval_ptr_dtor(&msg);
+					zval_ptr_dtor(&out);
+					PHALCON_CALL_METHOD(NULL, getThis(), "help");
+					RETURN_FALSE;
+				}
 			}
 		} ZEND_HASH_FOREACH_END();
 	}

@@ -244,10 +244,6 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 	ZVAL_STRING(&http, "http");
 
-	PHALCON_CALL_FUNCTION(&uniqid, "uniqid");
-
-	PHALCON_CONCAT_SV(&boundary, "--------------", &uniqid);
-
 	if (Z_TYPE(data) == IS_STRING && PHALCON_IS_NOT_EMPTY(&data)) {
 		ZVAL_STRING(&key, "Content-Type");
 
@@ -275,69 +271,72 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 		zval_ptr_dtor(&key);
 
 		ZVAL_STRING(&option, "content");
-
 		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &data);
-		zval_ptr_dtor(&http);
 		zval_ptr_dtor(&option);
-		return;
-	}
+	} else {
 
-	if (Z_TYPE(data) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
-			zval key = {};
-			if (str_key) {
-				ZVAL_STR(&key, str_key);
-			} else {
-				ZVAL_LONG(&key, idx);
-			}
-
-			PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
-			PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &key, "\"\r\n\r\n", value, "\r\n");
-		} ZEND_HASH_FOREACH_END();
-	}
-
-	if (Z_TYPE(files) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(files), file) {
-			zval path_parts = {}, filename = {}, basename = {}, filedata = {};
-			if (PHALCON_IS_NOT_EMPTY(file)) {
-				PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
-
-				if (phalcon_array_isset_fetch_str(&filename, &path_parts, SL("filename"), PH_READONLY)
-					&& phalcon_array_isset_fetch_str(&basename, &path_parts, SL("basename"), PH_READONLY)) {
-					PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
-
-					PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
-					PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &filename, "\"; filename=\"", &basename, "\"\r\n");
-					PHALCON_SCONCAT_SVS(&body, "Content-Type: application/octet-stream\r\n\r\n", &filedata, "\r\n");
+		PHALCON_CALL_FUNCTION(&uniqid, "uniqid");
+		PHALCON_CONCAT_SV(&boundary, "--------------", &uniqid);
+		zval_ptr_dtor(&uniqid);
+		if (Z_TYPE(data) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(data), idx, str_key, value) {
+				zval key = {};
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
+				} else {
+					ZVAL_LONG(&key, idx);
 				}
-			}
-		} ZEND_HASH_FOREACH_END();
+
+				PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
+				PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &key, "\"\r\n\r\n", value, "\r\n");
+			} ZEND_HASH_FOREACH_END();
+		}
+
+		if (Z_TYPE(files) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(files), file) {
+				zval path_parts = {}, filename = {}, basename = {}, filedata = {};
+				if (PHALCON_IS_NOT_EMPTY(file)) {
+					PHALCON_CALL_FUNCTION(&path_parts, "pathinfo", file);
+
+					if (phalcon_array_isset_fetch_str(&filename, &path_parts, SL("filename"), PH_READONLY)
+						&& phalcon_array_isset_fetch_str(&basename, &path_parts, SL("basename"), PH_READONLY)) {
+						PHALCON_CALL_FUNCTION(&filedata, "file_get_contents", file);
+
+						PHALCON_SCONCAT_SVS(&body, "--", &boundary, "\r\n");
+						PHALCON_SCONCAT_SVSVS(&body, "Content-Disposition: form-data; name=\"", &filename, "\"; filename=\"", &basename, "\"\r\n");
+						PHALCON_SCONCAT_SVS(&body, "Content-Type: application/octet-stream\r\n\r\n", &filedata, "\r\n");
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+
+		if (!PHALCON_IS_EMPTY(&body)) {
+			PHALCON_SCONCAT_SVS(&body, "--", &boundary, "--\r\n");
+
+			ZVAL_STRING(&key, "Content-Type");
+			PHALCON_CONCAT_SV(&key_value, "multipart/form-data; boundary=", &boundary);
+
+			PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
+
+			ZVAL_STRING(&key, "Content-Length");
+			ZVAL_LONG(&key_value, Z_STRLEN(body));
+
+			PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
+
+			ZVAL_STRING(&option, "content");
+			PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &body);
+		}
+		zval_ptr_dtor(&boundary);
 	}
-
-	if (!PHALCON_IS_EMPTY(&body)) {
-		PHALCON_SCONCAT_SVS(&body, "--", &boundary, "--\r\n");
-
-		ZVAL_STRING(&key, "Content-Type");
-		PHALCON_CONCAT_SV(&key_value, "multipart/form-data; boundary=", &boundary);
-
-		PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
-
-		ZVAL_STRING(&key, "Content-Length");
-		ZVAL_LONG(&key_value, Z_STRLEN(body));
-
-		PHALCON_CALL_METHOD(NULL, &header, "set", &key, &key_value);
-
-		ZVAL_STRING(&option, "content");
-		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &body);
-	}
-
 	ZVAL_LONG(&option, PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
 
 	PHALCON_CALL_METHOD(&headers, &header, "build", &option);
 
 	ZVAL_STRING(&option, "header");
-
 	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
+	zval_ptr_dtor(&option);
+	zval_ptr_dtor(&headers);
+	zval_ptr_dtor(&http);
 }
 
 PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, errorHandler)

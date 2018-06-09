@@ -4564,6 +4564,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			break;
 
 		default:
+			zval_ptr_dtor(&cache);
 			PHALCON_CONCAT_SV(&exception_message, "Unknown statement ", &type);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			zval_ptr_dtor(&exception_message);
@@ -4593,8 +4594,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 				PHALCON_CALL_METHOD(NULL, &cache, "save", &cache_key, &result, &lifetime);
 			}
 		}
-		zval_ptr_dtor(&cache);
 	}
+	zval_ptr_dtor(&cache);
 
 	if (Z_TYPE(result) == IS_OBJECT) {
 		/**

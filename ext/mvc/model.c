@@ -6893,6 +6893,7 @@ PHP_METHOD(Phalcon_Mvc_Model, serialize){
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				zval_ptr_dtor(&column_map);
 				zval_ptr_dtor(&attributes);
+				zval_ptr_dtor(&data);
 				return;
 			}
 		} else {

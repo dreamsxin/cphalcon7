@@ -365,10 +365,9 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 			PHALCON_CALL_METHOD(return_value, &result, "fetch");
 		}
 		zval_ptr_dtor(&result);
-		return;
+	} else {
+		RETURN_EMPTY_ARRAY();
 	}
-
-	RETURN_EMPTY_ARRAY();
 }
 
 /**

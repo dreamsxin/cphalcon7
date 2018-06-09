@@ -3888,56 +3888,58 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						PHALCON_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 						PHALCON_CALL_METHOD(&field_scale, getThis(), "getdatascale", field);
 
-						phalcon_strval(&str_value, &value);
-						phalcon_fast_strlen(&length, &value);
-						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
-						zval_ptr_dtor(&str_value);
+						if (Z_TYPE(field_size) != IS_NULL) {
+							phalcon_strval(&str_value, &value);
+							phalcon_fast_strlen(&length, &value);
+							phalcon_fast_strpos_str(&pos, &str_value, SL("."));
+							zval_ptr_dtor(&str_value);
 
-						if (!phalcon_is_numeric(&pos)) {
-							ZVAL_LONG(&pos, Z_LVAL(length) - 1);
-						}
-
-						if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
-							ZVAL_STRING(&type, "TooLarge");
-							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-							if (method_exists) {
-								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-							} else {
-								ZVAL_COPY(&label, &attribute_field);
+							if (!phalcon_is_numeric(&pos)) {
+								ZVAL_LONG(&pos, Z_LVAL(length) - 1);
 							}
-							array_init_size(&pairs, 1);
-							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-							zval_ptr_dtor(&label);
-							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-							zval_ptr_dtor(&message);
-							zval_ptr_dtor(&pairs);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-							zval_ptr_dtor(&type);
-							zval_ptr_dtor(&prepared);
-							error = &PHALCON_GLOBAL(z_true);
-							continue;
-						}
+							if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
+								ZVAL_STRING(&type, "TooLarge");
+								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								if (method_exists) {
+									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+								} else {
+									ZVAL_COPY(&label, &attribute_field);
+								}
+								array_init_size(&pairs, 1);
+								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+								zval_ptr_dtor(&label);
+								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+								zval_ptr_dtor(&message);
+								zval_ptr_dtor(&pairs);
 
-						if (PHALCON_GT_LONG(&pos, (Z_LVAL(field_size)-Z_LVAL(field_scale)))) {
-							ZVAL_STRING(&type, "TooLarge");
-							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-							if (method_exists) {
-								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-							} else {
-								ZVAL_COPY(&label, &attribute_field);
+								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+								zval_ptr_dtor(&type);
+								zval_ptr_dtor(&prepared);
+								error = &PHALCON_GLOBAL(z_true);
+								continue;
 							}
-							array_init_size(&pairs, 1);
-							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-							zval_ptr_dtor(&label);
-							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-							zval_ptr_dtor(&message);
-							zval_ptr_dtor(&pairs);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-							zval_ptr_dtor(&type);
-							zval_ptr_dtor(&prepared);
-							error = &PHALCON_GLOBAL(z_true);
+							if (PHALCON_GT_LONG(&pos, (Z_LVAL(field_size)-Z_LVAL(field_scale)))) {
+								ZVAL_STRING(&type, "TooLarge");
+								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								if (method_exists) {
+									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+								} else {
+									ZVAL_COPY(&label, &attribute_field);
+								}
+								array_init_size(&pairs, 1);
+								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+								zval_ptr_dtor(&label);
+								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+								zval_ptr_dtor(&message);
+								zval_ptr_dtor(&pairs);
+
+								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+								zval_ptr_dtor(&type);
+								zval_ptr_dtor(&prepared);
+								error = &PHALCON_GLOBAL(z_true);
+							}
 						}
 					} else {
 						PHALCON_CALL_METHOD(&field_byte, getThis(), "getdatabyte", field);

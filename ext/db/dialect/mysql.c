@@ -303,9 +303,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			ZVAL_STRING(&column_sql, "FLOAT");
 
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-			if (zend_is_true(&size)) {
+			if (Z_TYPE(size) != IS_NULL) {
 				PHALCON_SCONCAT_SV(&column_sql, "(", &size);
-				if (zend_is_true(&scale)) {
+				if (Z_TYPE(scale) != IS_NULL) {
 					PHALCON_SCONCAT_SVS(&column_sql, ",", &scale, ")");
 				} else {
 					phalcon_concat_self_str(&column_sql, SL(")"));
@@ -323,9 +323,9 @@ PHP_METHOD(Phalcon_Db_Dialect_Mysql, getColumnDefinition){
 			ZVAL_STRING(&column_sql, "DOUBLE");
 
 			PHALCON_CALL_METHOD(&scale, column, "getscale");
-			if (zend_is_true(&size)) {
+			if (Z_TYPE(size) != IS_NULL) {
 				PHALCON_SCONCAT_SV(&column_sql, "(", &size);
-				if (zend_is_true(&scale)) {
+				if (Z_TYPE(scale) != IS_NULL) {
 					PHALCON_SCONCAT_SVS(&column_sql, ",", &scale, ")");
 				} else {
 					phalcon_concat_self_str(&column_sql, SL(")"));

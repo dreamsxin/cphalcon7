@@ -228,7 +228,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 	}
 
 	phalcon_update_property(getThis(), SL("_redis"), &redis);
-	RETURN_ZVAL(&redis, 1, 0);
+	RETURN_ZVAL(&redis, 0, 0);
 }
 
 /**

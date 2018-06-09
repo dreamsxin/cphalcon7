@@ -120,7 +120,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Column){
 	zend_declare_property_bool(phalcon_db_column_ce, SL("_isNumeric"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_size"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_column_ce, SL("_bytes"), ZEND_ACC_PROTECTED);
-	zend_declare_property_long(phalcon_db_column_ce, SL("_scale"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_db_column_ce, SL("_scale"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_db_column_ce, SL("_unsigned"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_db_column_ce, SL("_notNull"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_db_column_ce, SL("_primary"), 0, ZEND_ACC_PROTECTED);

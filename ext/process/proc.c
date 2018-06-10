@@ -552,7 +552,7 @@ PHP_METHOD(Phalcon_Process_Proc, reStart){
 PHP_METHOD(Phalcon_Process_Proc, isRunning){
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "update");
-	phalcon_read_property(return_value, getThis(), SL("_running"), PH_NOISY);
+	RETURN_MEMBER(getThis(), "_running");
 }
 
 /**

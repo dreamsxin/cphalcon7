@@ -3567,15 +3567,19 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 
 	zval models_manager = {}, relations = {}, *relation;
 
+	PHALCON_MM_INIT();
+
 	/**
 	 * Get the models manager
 	 */
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
 
 	/**
 	 * We check if some of the hasOne/hasMany relations is a foreign key
 	 */
-	PHALCON_CALL_METHOD(&relations, &models_manager, "gethasoneandhasmany", getThis());
+	PHALCON_MM_CALL_METHOD(&relations, &models_manager, "gethasoneandhasmany", getThis());
+	PHALCON_MM_ADD_ENTRY(&relations);
 	if (phalcon_fast_count_ev(&relations)) {
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(relations), relation) {
@@ -3587,7 +3591,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 			/**
 			 * Check if the relation has a virtual foreign key
 			 */
-			PHALCON_CALL_METHOD(&foreign_key, relation, "getforeignkey");
+			PHALCON_MM_CALL_METHOD(&foreign_key, relation, "getforeignkey");
+			PHALCON_MM_ADD_ENTRY(&foreign_key);
 			if (PHALCON_IS_NOT_FALSE(&foreign_key)) {
 				/**
 				 * By default action is restrict
@@ -3607,14 +3612,18 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 				 * Check only if the operation is restrict
 				 */
 				if (PHALCON_IS_LONG(&action, 2)) {
-					PHALCON_CALL_METHOD(&relation_class, relation, "getreferencedmodel");
+					PHALCON_MM_CALL_METHOD(&relation_class, relation, "getreferencedmodel");
+					PHALCON_MM_ADD_ENTRY(&relation_class);
 
 					/**
 					 * Load a plain instance from the models manager
 					 */
-					PHALCON_CALL_METHOD(&referenced_model, &models_manager, "load", &relation_class);
-					PHALCON_CALL_METHOD(&fields, relation, "getfields");
-					PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
+					PHALCON_MM_CALL_METHOD(&referenced_model, &models_manager, "load", &relation_class);
+					PHALCON_MM_ADD_ENTRY(&referenced_model);
+					PHALCON_MM_CALL_METHOD(&fields, relation, "getfields");
+					PHALCON_MM_ADD_ENTRY(&fields);
+					PHALCON_MM_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
+					PHALCON_MM_ADD_ENTRY(&referenced_fields);
 
 					/**
 					 * Create the checking conditions. A relation can has many fields or a single one
@@ -3637,9 +3646,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 							phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY|PH_READONLY);
 
 							PHALCON_CONCAT_SVSV(&condition, "[", &referenced_field, "] = ?", &tmp);
-							phalcon_array_append(&conditions, &condition, PH_COPY);
+							phalcon_array_append(&conditions, &condition, 0);
 							phalcon_array_append(&bind_params, &value, PH_COPY);
-							zval_ptr_dtor(&condition);
 						} ZEND_HASH_FOREACH_END();
 
 					} else {
@@ -3648,9 +3656,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 						}
 
 						PHALCON_CONCAT_SVS(&condition, "[", &referenced_fields, "] = ?0");
-						phalcon_array_append(&conditions, &condition, PH_COPY);
+						phalcon_array_append(&conditions, &condition, 0);
 						phalcon_array_append(&bind_params, &value, PH_COPY);
-						zval_ptr_dtor(&condition);
 					}
 
 					/**
@@ -3665,29 +3672,29 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 					 * using bound parameters
 					 */
 					phalcon_fast_join_str(&join_conditions, SL(" AND "), &conditions);
+					zval_ptr_dtor(&conditions);
 
 					array_init_size(&parameters, 2);
-					phalcon_array_append(&parameters, &join_conditions, PH_COPY);
-					phalcon_array_update_str(&parameters, SL("bind"), &bind_params, PH_COPY);
-					zval_ptr_dtor(&join_conditions);
+					phalcon_array_append(&parameters, &join_conditions, 0);
+					phalcon_array_update_str(&parameters, SL("bind"), &bind_params, 0);
+					PHALCON_MM_ADD_ENTRY(&parameters);
 
 					/**
 					 * Let's make the checking
 					 */
-					PHALCON_CALL_METHOD(&resulset, &referenced_model, "find", &parameters);
-					zval_ptr_dtor(&parameters);
+					PHALCON_MM_CALL_METHOD(&resulset, &referenced_model, "find", &parameters);
+					PHALCON_MM_ADD_ENTRY(&resulset);
 
 					/**
 					 * Delete the resultset
 					 */
-					PHALCON_CALL_METHOD(&status, &resulset, "delete");
-					zval_ptr_dtor(&resulset);
+					PHALCON_MM_CALL_METHOD(&status, &resulset, "delete");
 
 					/**
 					 * Stop the operation
 					 */
 					if (PHALCON_IS_FALSE(&status)) {
-						RETURN_FALSE;
+						RETURN_MM_FALSE;
 					}
 				}
 			}
@@ -3695,7 +3702,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _checkForeignKeysReverseCascade){
 
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**

@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -1286,17 +1287,17 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
  */
 PHP_METHOD(Phalcon_Db_Dialect, delete){
 
-	zval *definition, tables = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {}, where_conditions = {}, where_expression = {};
-	zval order_fields = {}, order_items = {}, *order_item, order_sql = {}, limit_value = {}, number = {}, offset = {}, tmp1 = {}, tmp2 = {};
+	zval *definition, tables = {}, escape_char = {}, updated_tables = {}, *table, tables_sql = {}, sql = {}, where_conditions = {};
+	zval order_fields = {}, order_items = {}, *order_item, limit_value = {}, offset = {};
 
-	phalcon_fetch_params(0, 1, 0, &definition);
+	phalcon_fetch_params(1, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid Update definition");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid Update definition");
 		return;
 	}
 	if (!phalcon_array_isset_fetch_str(&tables, definition, SL("tables"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'tables' is required in the definition array");
 		return;
 	}
 
@@ -1308,23 +1309,23 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	 * Check and escape tables
 	 */
 	array_init(&updated_tables);
+	PHALCON_MM_ADD_ENTRY(&updated_tables);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(&tables), table) {
 		zval sql_table = {};
-		PHALCON_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
+		PHALCON_MM_CALL_METHOD(&sql_table, getThis(), "getsqltable", table, &escape_char);
 		phalcon_array_append(&updated_tables, &sql_table, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&tables_sql, SL(", "), &updated_tables);
-	zval_ptr_dtor(&updated_tables);
-
-	PHALCON_SCONCAT_SV(&sql, "DELETE FROM ", &tables_sql);
+	PHALCON_CONCAT_SV(&sql, "DELETE FROM ", &tables_sql);
 	zval_ptr_dtor(&tables_sql);
 
 	/* Check for a WHERE clause */
 	if (phalcon_array_isset_fetch_str(&where_conditions, definition, SL("where"), PH_READONLY)) {
 		if (Z_TYPE(where_conditions) == IS_ARRAY) {
-			PHALCON_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
+			zval where_expression = {};
+			PHALCON_MM_CALL_METHOD(&where_expression, getThis(), "getsqlexpression", &where_conditions, &escape_char);
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 			zval_ptr_dtor(&where_expression);
 		} else {
@@ -1334,6 +1335,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 	/* Check for a ORDER clause */
 	if (phalcon_array_isset_fetch_str(&order_fields, definition, SL("order"), PH_READONLY)) {
+		zval order_sql = {};
 		array_init(&order_items);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(order_fields), order_item) {
@@ -1341,7 +1343,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 
 			phalcon_array_fetch_long(&order_expression, order_item, 0, PH_NOISY|PH_READONLY);
 
-			PHALCON_CALL_METHOD(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
+			PHALCON_MM_CALL_METHOD(&order_sql_item, getThis(), "getsqlexpression", &order_expression, &escape_char);
 
 			/**
 			 * In the numeric 1 position could be a ASC/DESC clause
@@ -1351,8 +1353,8 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 			} else {
 				ZVAL_COPY(&order_sql_item_type, &order_sql_item);
 			}
-			phalcon_array_append(&order_items, &order_sql_item_type, 0);
 			zval_ptr_dtor(&order_sql_item);
+			phalcon_array_append(&order_items, &order_sql_item_type, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&order_sql, SL(", "), &order_items);
@@ -1366,13 +1368,16 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 	 */
 	if (phalcon_array_isset_fetch_str(&limit_value, definition, SL("limit"), PH_READONLY)) {
 		if (likely(Z_TYPE(limit_value) == IS_ARRAY)) {
+			zval number = {};
 			if (likely(phalcon_array_isset_fetch_str(&number, &limit_value, SL("number"), PH_READONLY))) {
+				zval tmp1 = {};
 				phalcon_array_fetch_str(&tmp1, &number, SL("value"), PH_NOISY|PH_READONLY);
 
 				/**
 				 * Check for a OFFSET condition
 				 */
 				if (phalcon_array_isset_fetch_str(&offset, &limit_value, SL("offset"), PH_READONLY)) {
+					zval tmp2 = {};
 					phalcon_array_fetch_str(&tmp2, &offset, SL("value"), PH_NOISY|PH_READONLY);
 					PHALCON_SCONCAT_SVSV(&sql, " LIMIT ", &tmp1, " OFFSET ", &tmp2);
 				} else {
@@ -1384,7 +1389,7 @@ PHP_METHOD(Phalcon_Db_Dialect, delete){
 		}
 	}
 
-	RETVAL_ZVAL(&sql, 0, 0);
+	RETURN_MM_NCTOR(&sql);
 }
 
 /**

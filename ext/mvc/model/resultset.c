@@ -604,38 +604,42 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 
 	zval *condition_callback = NULL, transaction = {}, connection = {};
 
-	phalcon_fetch_params(0, 0, 1, &condition_callback);
+	phalcon_fetch_params(1, 0, 1, &condition_callback);
 
 	if (!condition_callback) {
 		condition_callback = &PHALCON_GLOBAL(z_null);
 	}
 
 	ZVAL_FALSE(&transaction);
-	PHALCON_CALL_METHOD(NULL, getThis(), "rewind");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "rewind");
 
 	while (1) {
 		zval r0 = {}, record = {}, parameters = {}, status = {}, messages = {};
 
-		PHALCON_CALL_METHOD(&r0, getThis(), "valid");
+		PHALCON_MM_CALL_METHOD(&r0, getThis(), "valid");
+		PHALCON_MM_ADD_ENTRY(&r0);
 		if (zend_is_true(&r0)) {
 		} else {
 			break;
 		}
 
-		PHALCON_CALL_METHOD(&record, getThis(), "current");
+		PHALCON_MM_CALL_METHOD(&record, getThis(), "current");
+		PHALCON_MM_ADD_ENTRY(&record);
 		if (PHALCON_IS_FALSE(&transaction)) {
 
 			/**
 			 * We only can delete resultsets whose every element is a complete object
 			 */
 			if (phalcon_method_exists_ex(&record, SL("getwriteconnection")) == FAILURE) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
-				zval_ptr_dtor(&record);
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The returned record is not valid");
 				return;
 			}
 
-			PHALCON_CALL_METHOD(&connection, &record, "getwriteconnection");
-			PHALCON_CALL_METHOD(NULL, &connection, "begin");
+			if (!zend_is_true(&connection)) {
+				PHALCON_MM_CALL_METHOD(&connection, &record, "getwriteconnection");
+				PHALCON_MM_ADD_ENTRY(&connection);
+			}
+			PHALCON_MM_CALL_METHOD(NULL, &connection, "begin");
 
 			ZVAL_TRUE(&transaction);
 		}
@@ -646,11 +650,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 		if (Z_TYPE_P(condition_callback) == IS_OBJECT) {
 			array_init_size(&parameters, 1);
 			phalcon_array_append(&parameters, &record, PH_COPY);
-
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
-			zval_ptr_dtor(&parameters);
+			PHALCON_MM_ADD_ENTRY(&parameters);
+			PHALCON_MM_CALL_USER_FUNC_ARRAY(&status, condition_callback, &parameters);
+			PHALCON_MM_ADD_ENTRY(&status);
 			if (PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&record);
 				continue;
 			}
 		}
@@ -658,40 +661,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
 		/**
 		 * Try to delete the record
 		 */
-		PHALCON_CALL_METHOD(&status, &record, "delete");
+		PHALCON_MM_CALL_METHOD(&status, &record, "delete");
+		PHALCON_MM_ADD_ENTRY(&status);
+
 		if (!zend_is_true(&status)) {
 			/**
 			 * Get the messages from the record that produce the error
 			 */
-			PHALCON_CALL_METHOD(&messages, &record, "getmessages");
+			PHALCON_MM_CALL_METHOD(&messages, &record, "getmessages");
 			phalcon_update_property(getThis(), SL("_errorMessages"), &messages);
 			zval_ptr_dtor(&messages);
 
 			/**
 			 * Rollback the transaction
 			 */
-			PHALCON_CALL_METHOD(NULL, &connection, "rollback");
+			PHALCON_MM_CALL_METHOD(NULL, &connection, "rollback");
 
 			ZVAL_BOOL(&transaction, 0);
-			zval_ptr_dtor(&record);
 			break;
 		}
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "next");
-		zval_ptr_dtor(&record);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "next");
 	}
 
 	/**
 	 * Commit the transaction
 	 */
 	if (PHALCON_IS_TRUE(&transaction)) {
-		PHALCON_CALL_METHOD(NULL, &connection, "commit");
-	}
-	if (zend_is_true(&connection)) {
-		zval_ptr_dtor(&connection);
+		PHALCON_MM_CALL_METHOD(NULL, &connection, "commit");
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**

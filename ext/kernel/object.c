@@ -527,8 +527,6 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 	zval *value;
 	zend_string *key;
 
-	zend_object *zobj;
-
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(object)->get_properties == NULL) {
 			ZVAL_NULL(result);
@@ -542,43 +540,8 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 			return;
 		}
 
-		zobj = Z_OBJ_P(object);
 		if (check_access) {
-			if (!zobj->ce->default_properties_count && properties == zobj->properties && !ZEND_HASH_GET_APPLY_COUNT(properties)) {
-				/* fast copy */
-				if (EXPECTED(zobj->handlers == &std_object_handlers)) {
-					if (EXPECTED(!(GC_FLAGS(properties) & IS_ARRAY_IMMUTABLE))) {
-						GC_REFCOUNT(properties)++;
-					}
-					ZVAL_ARR(result, properties);
-					return;
-				}
-				ZVAL_ARR(result, zend_array_dup(properties));
-				return;
-			} else {
-				array_init_size(result, zend_hash_num_elements(properties));
-
-				ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
-					if (key) {
-						if (zend_check_property_access(zobj, key) == SUCCESS) {
-							if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
-								value = Z_REFVAL_P(value);
-							}
-							if (Z_REFCOUNTED_P(value)) {
-								Z_ADDREF_P(value);
-							}
-							if (ZSTR_VAL(key)[0] == 0) {
-								const char *prop_name, *class_name;
-								size_t prop_len;
-								zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-								zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
-							} else {
-								zend_hash_add_new(Z_ARRVAL_P(result), key, value);
-							}
-						}
-					}
-				} ZEND_HASH_FOREACH_END();
-			}
+			PHALCON_CALL_FUNCTION(result, "get_object_vars", object);
 		} else {
 			array_init_size(result, zend_hash_num_elements(properties));
 

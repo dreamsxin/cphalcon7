@@ -115,4 +115,11 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 #define PHALCON_MM_GROW()       phalcon_gc_list* gc_list = phalcon_gc_list_init();
 #define PHALCON_MM_RESTORE()    phalcon_gc_list_destroy(gc_list);
 
+/* Backwards compatibility for GC API change in PHP 7.3 */
+#if PHP_VERSION_ID < 70300
+#  define GC_ADDREF(p)            ++GC_REFCOUNT(p)
+#  define GC_DELREF(p)            --GC_REFCOUNT(p)
+#  define GC_SET_REFCOUNT(p, rc)  GC_REFCOUNT(p) = rc
+#endif
+
 #endif /* PHALCON_KERNEL_MEMORY_H */

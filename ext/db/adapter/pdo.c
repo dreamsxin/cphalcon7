@@ -1170,7 +1170,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, isUnderTransaction){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, getInternalHandler){
 
-	phalcon_read_property(return_value, getThis(), SL("_pdo"), PH_NOISY);
+	RETURN_MEMBER(getThis(), "_pdo");
 }
 
 /**

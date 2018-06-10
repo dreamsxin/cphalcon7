@@ -492,7 +492,7 @@ void phalcon_get_called_class(zval *return_value)
 	}
 
 	if (!EG(scope))  {
-		php_error_docref(NULL, E_WARNING, "zephir_get_called_class() called from outside a class");
+		php_error_docref(NULL, E_WARNING, "phalcon_get_called_class() called from outside a class");
 	}
 #endif
 }

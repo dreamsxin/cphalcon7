@@ -5302,6 +5302,8 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	zval event_name = {}, status = {}, check_foreign_keys = {},  write_connection = {}, unique_key = {}, unique_params = {}, unique_types = {};
 	zval skipped = {}, model_name = {}, phql = {}, models_manager = {}, query = {}, success = {};
 
+	PHALCON_MM_INIT();
+
 	phalcon_update_property_empty_array(getThis(), SL("_errorMessages"));
 
 	/**
@@ -5309,76 +5311,84 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	 */
 	phalcon_update_property_long(getThis(), SL("_operationMade"), PHALCON_MODEL_OP_DELETE);
 
-	ZVAL_STRING(&event_name, "beforeOperation");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeOperation");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
-	zval_ptr_dtor(&status);
 
 	/**
 	 * Check if deleting the record violates a virtual foreign key
 	 */
 	if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
-		PHALCON_CALL_METHOD(&check_foreign_keys, getThis(), "_checkforeignkeysreverserestrict");
+		PHALCON_MM_CALL_METHOD(&check_foreign_keys, getThis(), "_checkforeignkeysreverserestrict");
+		PHALCON_MM_ADD_ENTRY(&check_foreign_keys);
 		if (PHALCON_IS_FALSE(&check_foreign_keys)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 	}
 
-	PHALCON_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
-	PHALCON_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
-	PHALCON_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
+	PHALCON_MM_ADD_ENTRY(&unique_key);
+	PHALCON_MM_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
+	PHALCON_MM_ADD_ENTRY(&unique_params);
+	PHALCON_MM_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_ADD_ENTRY(&unique_types);
 
 	/**
 	 * We can't create dynamic SQL without a primary key
 	 */
 	if (PHALCON_IS_EMPTY(&unique_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A primary key must be defined in the model in order to perform the operation");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A primary key must be defined in the model in order to perform the operation");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection");
+	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection");
+	PHALCON_MM_ADD_ENTRY(&write_connection);
 
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
 
 	/**
 	 * Fire the beforeDelete event
 	 */
- 	ZVAL_STRING(&event_name, "beforeDelete");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-	zval_ptr_dtor(&event_name);
+ 	PHALCON_MM_ZVAL_STRING(&event_name, "beforeDelete");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	} else {
-		zval_ptr_dtor(&status);
 		/**
 		 * The operation can be skipped
 		 */
 		phalcon_read_property(&skipped, getThis(), SL("_skipped"), PH_READONLY);
 		if (PHALCON_IS_TRUE(&skipped)) {
-			RETURN_TRUE;
+			RETURN_MM_TRUE;
 		}
 	}
 
 	phalcon_get_called_class(&model_name);
+	PHALCON_MM_ADD_ENTRY(&model_name);
 
 	PHALCON_CONCAT_SVSV(&phql, "DELETE FROM ", &model_name, " WHERE ", &unique_key);
+	PHALCON_MM_ADD_ENTRY(&phql);
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
-	PHALCON_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	PHALCON_MM_ADD_ENTRY(&query);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
 
-	PHALCON_CALL_METHOD(NULL, &write_connection, "begin", &PHALCON_GLOBAL(z_false));
+	PHALCON_MM_CALL_METHOD(NULL, &write_connection, "begin", &PHALCON_GLOBAL(z_false));
 
-	PHALCON_CALL_METHOD(&status, &query, "execute");
+	PHALCON_MM_CALL_METHOD(&status, &query, "execute");
+	PHALCON_MM_ADD_ENTRY(&status);
 
 	ZVAL_FALSE(&success);
 	if (Z_TYPE(status) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&success, &status, "success");
+		PHALCON_MM_CALL_METHOD(&success, &status, "success");
 	}
 
 	if (!zend_is_true(&success)) {
@@ -5386,18 +5396,19 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		 * Check if there is virtual foreign keys with cascade action
 		 */
 		if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
-			PHALCON_CALL_METHOD(&check_foreign_keys, getThis(), "_checkforeignkeysreversecascade");
+			PHALCON_MM_CALL_METHOD(&check_foreign_keys, getThis(), "_checkforeignkeysreversecascade");
+			PHALCON_MM_ADD_ENTRY(&check_foreign_keys);
 			if (PHALCON_IS_FALSE(&check_foreign_keys)) {
-				PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
-				RETURN_FALSE;
+				PHALCON_MM_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+				RETURN_MM_FALSE;
 			}
 		}
 	}
 
 	if (!zend_is_true(&success)) {
-		PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+		PHALCON_MM_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 	} else {
-		PHALCON_CALL_METHOD(NULL, &write_connection, "commit", &PHALCON_GLOBAL(z_false));
+		PHALCON_MM_CALL_METHOD(NULL, &write_connection, "commit", &PHALCON_GLOBAL(z_false));
 	}
 
 	/**
@@ -5406,16 +5417,14 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 	phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_DETACHED);
 
 	if (zend_is_true(&success)) {
-		ZVAL_STRING(&event_name, "afterDelete");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "afterDelete");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
-		ZVAL_STRING(&event_name, "afterOperation");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "afterOperation");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	}
 
-	RETURN_CTOR(&success);
+	RETURN_MM_CTOR(&success);
 }
 
 /**

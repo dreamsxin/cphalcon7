@@ -747,14 +747,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection){
 
 	phalcon_fetch_params(0, 1, 0, &model);
 
-	PHALCON_CALL_SELF(&service, "getwriteconnectionservice", model);
-
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		zval_ptr_dtor(&service);
 		return;
 	}
+
+	PHALCON_CALL_SELF(&service, "getwriteconnectionservice", model);
 
 	/**
 	 * Request the connection service from the DI

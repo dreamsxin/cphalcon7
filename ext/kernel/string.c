@@ -1497,12 +1497,15 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 #else
 		switch (Z_LVAL_P(type)) {
 			case PHALCON_RANDOM_ALNUM:
+				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 0, 3, PHP_MT_RAND_MAX);
 				break;
 			case PHALCON_RANDOM_ALPHA:
+				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 1, 2, PHP_MT_RAND_MAX);
 				break;
 			case PHALCON_RANDOM_HEXDEC:
+				rand_type = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(rand_type, 0, 1, PHP_MT_RAND_MAX);
 				break;
 			case PHALCON_RANDOM_NUMERIC:
@@ -1517,18 +1520,23 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 
 		switch (rand_type) {
 			case 0:
+				ch = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(ch, '0', '9', PHP_MT_RAND_MAX);
 				break;
 			case 1:
+				ch = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(ch, 'a', 'f', PHP_MT_RAND_MAX);
 				break;
 			case 2:
+				ch = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(ch, 'a', 'z', PHP_MT_RAND_MAX);
 				break;
 			case 3:
+				ch = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(ch, 'A', 'Z', PHP_MT_RAND_MAX);
 				break;
 			case 5:
+				ch = (long) (php_mt_rand() >> 1);
 				RAND_RANGE(ch, '1', '9', PHP_MT_RAND_MAX);
 				break;
 			default:

@@ -22,9 +22,9 @@ addons:
       - libleveldb-dev
 
 php:
-  - 7.0.14
-  - 7.1
-  - 7.2
+  #- 7.0.14
+  #- 7.1
+  #- 7.2
   - nightly
 
 matrix:

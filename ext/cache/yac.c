@@ -142,10 +142,14 @@ static int phalcon_cache_yac_add_impl(zend_string *prefix, zend_string *key, zva
 			ret = phalcon_cache_yac_storage_update(ZSTR_VAL(key), ZSTR_LEN(key), (char *)&Z_DVAL_P(value), sizeof(double), flag, ttl, add, tv);
 			break;
 		case IS_STRING:
+#if PHP_VERSION_ID >= 70200
+		case IS_CONSTANT_AST:
+#else
 		case IS_CONSTANT:
+#endif
 			{
 				if (Z_STRLEN_P(value) > PHALCON_CACHE_YAC_STORAGE_MAX_ENTRY_LEN) {
-					php_error_docref(NULL, E_WARNING, "Value is too long(%d bytes) to be stored", Z_STRLEN_P(value));
+					php_error_docref(NULL, E_WARNING, "Value is too long(%lu bytes) to be stored", (unsigned long)Z_STRLEN_P(value));
 					if (prefix->len) {
 						zend_string_release(prefix_key);
 					}
@@ -272,7 +276,11 @@ static zval * phalcon_cache_yac_get_impl(zend_string *prefix, zend_string *key, 
 				efree(data);
 				break;
 			case IS_STRING:
+#if PHP_VERSION_ID >= 70200
+			case IS_CONSTANT_AST:
+#else
 			case IS_CONSTANT:
+#endif
 				{
 					ZVAL_STRINGL(rv, data, size);
 					efree(data);

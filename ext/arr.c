@@ -24,6 +24,10 @@
 
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
+#ifdef PHALCON_USE_PHP_PCRE
+#include <ext/pcre/php_pcre.h>
+#endif
+#include <ext/pcre/php_pcre.h>
 
 #include <Zend/zend_closures.h>
 
@@ -1087,46 +1091,38 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 PHP_METHOD(Phalcon_Arr, callback){
 
 	zval *str, pattern = {}, matches = {}, ret = {}, command = {}, match = {}, split = {}, search = {}, replace = {}, params = {};
-	pcre_cache_entry *pce;
 
-	phalcon_fetch_params(0, 1, 0, &str);
+	phalcon_fetch_params(1, 1, 0, &str);
 
-	ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
+	PHALCON_MM_ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
 	ZVAL_NULL(&matches);
 	ZVAL_MAKE_REF(&matches);
-	RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
 	ZVAL_UNREF(&matches);
+	PHALCON_MM_ADD_ENTRY(&matches);
 
 	if (zend_is_true(&ret)) {
-		if (!phalcon_array_isset_fetch_long(&command, &matches, 1, PH_COPY)) {
+		if (!phalcon_array_isset_fetch_long(&command, &matches, 1, PH_READONLY)) {
 			ZVAL_EMPTY_STRING(&command);
+			PHALCON_MM_ADD_ENTRY(&command);
 		}
 
 		if (phalcon_array_isset_fetch_long(&match, &matches, 2, PH_READONLY)) {
-			if ((pce = pcre_get_compiled_regex_cache(SSL("#(?<!\\\\\\\\),#"))) == NULL) {
-				RETURN_FALSE;
-			}
-			pce->refcount++;
-#if PHP_VERSION_ID >= 70200
-			php_pcre_split_impl(pce, Z_STR(match), &split, -1, 0);
-#else
-			php_pcre_split_impl(pce, Z_STRVAL(match), Z_STRLEN(match), &split, -1, 0);
-#endif
-			pce->refcount--;
+			zval regex = {};
+			PHALCON_MM_ZVAL_STRING(&regex, "#(?<!\\\\\\\\),#");
+			PHALCON_MM_CALL_FUNCTION(&split, "preg_split", &regex, &match);
+			PHALCON_MM_ADD_ENTRY(&split);
 
-			ZVAL_STRING(&search, "\\,");
-			ZVAL_STRING(&replace, ",");
+			PHALCON_MM_ZVAL_STRING(&search, "\\,");
+			PHALCON_MM_ZVAL_STRING(&replace, ",");
 
-			PHALCON_CALL_FUNCTION(&params, "str_replace", &search, &replace, &split);
-			zval_ptr_dtor(&search);
-			zval_ptr_dtor(&replace);
-			zval_ptr_dtor(&split);
+			PHALCON_MM_CALL_FUNCTION(&params, "str_replace", &search, &replace, &split);
+			PHALCON_MM_ADD_ENTRY(&params);
 		}
 	} else {
-		ZVAL_COPY(&command, str);
+		ZVAL_COPY_VALUE(&command, str);
 	}
-	zval_ptr_dtor(&matches);
 
 	array_init(return_value);
 
@@ -1137,11 +1133,11 @@ PHP_METHOD(Phalcon_Arr, callback){
 	} else {
 		phalcon_array_append(return_value, &command, PH_COPY);
 	}
-	zval_ptr_dtor(&command);
 
 	if (Z_TYPE(params) > IS_NULL) {
-		phalcon_array_append(return_value, &params, 0);
+		phalcon_array_append(return_value, &params, PH_COPY);
 	}
+	RETURN_MM();
 }
 
 /**

@@ -81,7 +81,7 @@ long int phalcon_get_proc_starttime(unsigned int pid)
     long long tmp_long_long;
 
 
-    snprintf(filename, sizeof(filename), "/proc/%lu/stat", pid);
+    snprintf(filename, sizeof(filename), "/proc/%lu/stat", (unsigned long)pid);
 
     fp = fopen(filename, "r");
     if(!fp){

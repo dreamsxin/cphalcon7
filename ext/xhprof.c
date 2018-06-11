@@ -232,10 +232,12 @@ void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, ch
         } else {
             snprintf(symbol, symbol_len, "%s==>", ZSTR_VAL(bucket->parent_function));
         }
-    } else {
+    }
+	/*
+	else {
         snprintf(symbol, symbol_len, "");
     }
-
+	*/
     if (bucket->child_class) {
         if (bucket->child_recurse_level > 0) {
             snprintf(symbol, symbol_len, "%s%s::%s@%d", symbol, ZSTR_VAL(bucket->child_class), ZSTR_VAL(bucket->child_function), bucket->child_recurse_level);

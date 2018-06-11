@@ -1454,7 +1454,47 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 	}
 
 	for (i = 0; i < Z_LVAL_P(length); i++) {
+#if PHP_VERSION_ID >= 70200
+		switch (Z_LVAL_P(type)) {
+			case PHALCON_RANDOM_ALNUM:
+				rand_type = php_mt_rand_range(0, 3);
+				break;
+			case PHALCON_RANDOM_ALPHA:
+				rand_type = php_mt_rand_range(1, 2);
+				break;
+			case PHALCON_RANDOM_HEXDEC:
+				rand_type = php_mt_rand_range(0, 1);
+				break;
+			case PHALCON_RANDOM_NUMERIC:
+				rand_type = 0;
+				break;
+			case PHALCON_RANDOM_NOZERO:
+				rand_type = 5;
+				break;
+			default:
+				continue;
+		}
 
+		switch (rand_type) {
+			case 0:
+				ch = php_mt_rand_range('0', '9');
+				break;
+			case 1:
+				ch = php_mt_rand_range('a', 'f');
+				break;
+			case 2:
+				ch = php_mt_rand_range('a', 'z');
+				break;
+			case 3:
+				ch = php_mt_rand_range('A', 'Z');
+				break;
+			case 5:
+				ch = php_mt_rand_range('1', '9');
+				break;
+			default:
+				continue;
+		}
+#else
 		switch (Z_LVAL_P(type)) {
 			case PHALCON_RANDOM_ALNUM:
 				rand_type = (long) (php_mt_rand() >> 1);
@@ -1502,7 +1542,7 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 			default:
 				continue;
 		}
-
+#endif
 		smart_str_appendc(&random_str, (unsigned int) ch);
 	}
 
@@ -1651,7 +1691,7 @@ void phalcon_append_printable_array(smart_str *implstr, zval *value) {
 			smart_str_appendc(implstr, 'O');
 			{
 				char stmp[MAX_LENGTH_OF_LONG + 1];
-				str_len = slprintf(stmp, sizeof(stmp), "%ld", Z_OBJ_HANDLE_P(tmp));
+				str_len = slprintf(stmp, sizeof(stmp), "%ld", (long)Z_OBJ_HANDLE_P(tmp));
 				smart_str_appendl(implstr, stmp, str_len);
 			}
 		} else {

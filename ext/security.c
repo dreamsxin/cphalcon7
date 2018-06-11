@@ -907,7 +907,7 @@ PHP_METHOD(Phalcon_Security, deriveKey)
 	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 
 	if (Z_STRLEN_P(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(salt));
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %lu", (unsigned long)Z_STRLEN_P(salt));
 		return;
 	}
 
@@ -953,7 +953,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 	phalcon_fetch_params(0, 2, 3, &password, &salt, &hash, &iterations, &size);
 
 	if (Z_STRLEN_P(salt) > INT_MAX - 4) {
-		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %d", Z_STRLEN_P(salt));
+		zend_throw_exception_ex(phalcon_security_exception_ce, 0, "Salt is too long: %lu", (unsigned long)Z_STRLEN_P(salt));
 		return;
 	}
 

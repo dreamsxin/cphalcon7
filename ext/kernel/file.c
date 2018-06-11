@@ -380,32 +380,20 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 		return;
 	}
 
-	switch (Z_TYPE_P(data)) {
-
-		case IS_NULL:
-		case IS_LONG:
-		case IS_DOUBLE:
-		case IS_TRUE:
-		case IS_FALSE:
-		case IS_CONSTANT:
-			use_copy = zend_make_printable_zval(data, &copy);
-			if (use_copy) {
-				data = &copy;
-			}
-			/* no break */
-
-		case IS_STRING:
-			if (Z_STRLEN_P(data)) {
-				numbytes = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
-				if (numbytes != Z_STRLEN_P(data)) {
-					php_error_docref(NULL, E_WARNING, "Only %d of %d bytes written, possibly out of free disk space", numbytes, Z_STRLEN_P(data));
-					numbytes = -1;
-				}
-			}
-			break;
-		default:
+	if( Z_TYPE_P(data) != IS_STRING ) {
+		use_copy = zend_make_printable_zval(data, &copy);
+		if (use_copy) {
+			data = &copy;
+		}
+	}
+	if( Z_TYPE_P(data) == IS_STRING && Z_STRLEN_P(data)) {
+		numbytes = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
+		if (numbytes != Z_STRLEN_P(data)) {
+			php_error_docref(NULL, E_WARNING, "Only %d of %lu bytes written, possibly out of free disk space", numbytes, (unsigned long)Z_STRLEN_P(data));
 			numbytes = -1;
-			break;
+		}
+	} else {
+		numbytes = -1;
 	}
 
 	php_stream_close(stream);
@@ -417,15 +405,13 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	if (numbytes < 0) {
 		if (return_value) {
 			RETURN_FALSE;
-		} else {
-			return;
 		}
+		return;
 	}
 
 	if (return_value) {
 		RETURN_LONG(numbytes);
 	}
-	return;
 }
 
 void phalcon_is_dir(zval *return_value, zval *path)

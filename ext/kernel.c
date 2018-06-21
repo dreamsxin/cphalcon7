@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Kernel, message){
 	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, *absolute_path = NULL, ext = {}, messages = {}, base_path = {}, messages_dir = {}, file_path = {};
 	zval default_messages = {}, validation_messages = {}, file_messages = {}, file_messages2 = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
 
-	phalcon_fetch_params(0, 1, 4, &file, &path, &default_value, &_ext, &absolute_path);
+	phalcon_fetch_params(1, 1, 4, &file, &path, &default_value, &_ext, &absolute_path);
 
 	if (!path) {
 		path = &PHALCON_GLOBAL(z_null);
@@ -327,9 +327,9 @@ PHP_METHOD(Phalcon_Kernel, message){
 	}
 
 	if (!_ext || Z_TYPE_P(_ext) == IS_NULL) {
-		ZVAL_STRING(&ext, "php");
+		PHALCON_MM_ZVAL_STRING(&ext, "php");
 	} else {
-		ZVAL_COPY(&ext, _ext);
+		PHALCON_MM_ZVAL_COPY(&ext, _ext);
 	}
 
 	if (!absolute_path) {
@@ -344,10 +344,11 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 		PHALCON_CONCAT_VVVSV(&file_path, &base_path, &messages_dir, file, ".", &ext);
 	}
-	zval_ptr_dtor(&ext);
+	PHALCON_MM_ADD_ENTRY(&file_path);
 
 	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_COPY);
 	if (Z_TYPE(messages) != IS_ARRAY) {
+		zval_ptr_dtor(&messages);
 		array_init_size(&validation_messages, 35);
 		phalcon_array_update_str_str(&validation_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), 0);
 		phalcon_array_update_str_str(&validation_messages, SL("Alpha"),             SL("Field :field must contain only letters"), 0);
@@ -395,57 +396,52 @@ PHP_METHOD(Phalcon_Kernel, message){
 		}
 		phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messages"), &messages);
 	}
+	PHALCON_MM_ADD_ENTRY(&messages);
 
-	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_COPY)) {
-		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_READONLY)) {
+		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_READONLY)) {
 			array_init(&file_messages2);
+			PHALCON_MM_ADD_ENTRY(&file_messages2);
 		}
 		if (phalcon_require_ret(&file_messages, Z_STRVAL(file_path)) != FAILURE) {
 			if (Z_TYPE(file_messages2) != IS_ARRAY) {
 				zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));
-				zval_ptr_dtor(&file_messages);
-				zval_ptr_dtor(&messages);
-				zval_ptr_dtor(&file_path);
-				return;
+				RETURN_MM();
 			}
 			phalcon_array_merge_recursive_n(&file_messages2, &file_messages);
-			zval_ptr_dtor(&file_messages);
-			ZVAL_COPY(&file_messages, &file_messages2);
+			PHALCON_MM_ZVAL_COPY(&file_messages, &file_messages2);
 		} else {
-			ZVAL_COPY(&file_messages, &file_messages2);
+			PHALCON_MM_ZVAL_COPY(&file_messages, &file_messages2);
 		}
 		phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_messages"), &file_path, &file_messages);
 	}
-	zval_ptr_dtor(&file_messages2);
-	zval_ptr_dtor(&messages);
-	zval_ptr_dtor(&file_path);
 
 	if (Z_TYPE_P(path) != IS_NULL) {
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-
+		PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		ZVAL_STR(&service, IS(translate));
 
-		PHALCON_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
-		zval_ptr_dtor(&dependency_injector);
+		PHALCON_MM_CALL_METHOD(&translate, &dependency_injector, "getshared", &service, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+		PHALCON_MM_ADD_ENTRY(&translate);
 		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
-			PHALCON_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
+			PHALCON_MM_VERIFY_INTERFACE(&translate, phalcon_translate_adapterinterface_ce);
 		}
 
 		if  (Z_TYPE(file_messages) == IS_ARRAY) {
-			PHALCON_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages, path, default_value);
+			PHALCON_MM_CALL_CE_STATIC(&value, phalcon_arr_ce, "path", &file_messages, path, default_value);
+			PHALCON_MM_ADD_ENTRY(&value);
 		} else {
-			ZVAL_COPY(&value, default_value);
+			PHALCON_MM_ZVAL_COPY(&value, default_value);
 		}
-		zval_ptr_dtor(&file_messages);
+
 		if (unlikely(Z_TYPE(translate) == IS_OBJECT)) {
-			PHALCON_CALL_METHOD(return_value, &translate, "query", &value);
-			zval_ptr_dtor(&value);
+			PHALCON_MM_CALL_METHOD(return_value, &translate, "query", &value);
+			RETURN_MM();
 		} else {
-			RETVAL_ZVAL(&value, 0, 0);
+			RETURN_MM_CTOR(&value);
 		}
-		zval_ptr_dtor(&translate);
 	} else {
-		RETURN_ZVAL(&file_messages, 0, 0);
+		RETURN_MM_CTOR(&file_messages);
 	}
 }
 

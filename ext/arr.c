@@ -338,7 +338,7 @@ PHP_METHOD(Phalcon_Arr, path){
 	}
 
 	if (Z_TYPE_P(array) != IS_ARRAY) {
-		RETURN_CTOR(default_value);
+		RETURN_MM_CTOR(default_value);
 	}
 	PHALCON_SEPARATE_PARAM(array);
 
@@ -352,7 +352,7 @@ PHP_METHOD(Phalcon_Arr, path){
 		PHALCON_MM_ZVAL_DUP(&keys, path);
 	} else {
 		if (phalcon_array_isset_fetch(return_value, array, path, PH_COPY)) {
-			return;
+			RETURN_MM();
 		}
 
 		phalcon_fast_explode(&keys, &delimiter, path);

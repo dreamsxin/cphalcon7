@@ -3022,45 +3022,48 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 	zval *validation, field = {}, handler = {}, value = {}, arguments = {}, status = {};
 	zval prepared = {}, type = {}, code = {}, messages = {};
 
-	phalcon_fetch_params(0, 1, 0, &validation);
+	phalcon_fetch_params(1, 1, 0, &validation);
 
 	if (Z_TYPE_P(validation) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch_str(&field, validation, SL("field"), PH_READONLY)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid field");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid field");
 			return;
 		}
 
 		if (!phalcon_array_isset_fetch_str(&handler, validation, SL("validator"), PH_READONLY)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid validator");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Invalid validator");
 			return;
 		}
 
 		if (!phalcon_is_callable(&handler)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Validator must be an callable");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Validator must be an callable");
 			return;
 		}
 
-		PHALCON_CALL_METHOD(&value, getThis(), "readattribute", &field);
+		PHALCON_MM_CALL_METHOD(&value, getThis(), "readattribute", &field);
+		PHALCON_MM_ADD_ENTRY(&value);
 
 		if (Z_TYPE(handler) == IS_OBJECT && instanceof_function(Z_OBJCE(handler), zend_ce_closure)) {
-			PHALCON_CALL_METHOD(&status, &handler, "call", getThis(), &value);
+			PHALCON_MM_CALL_METHOD(&status, &handler, "call", getThis(), &value);
 		} else {
 			array_init_size(&arguments, 1);
 			phalcon_array_append(&arguments, &value, PH_COPY);
-			PHALCON_CALL_USER_FUNC_ARRAY(&status, &handler, &arguments);
-			zval_ptr_dtor(&arguments);
+			PHALCON_MM_ADD_ENTRY(&arguments);
+
+			PHALCON_MM_CALL_USER_FUNC_ARRAY(&status, &handler, &arguments);
 		}
 
 		if (PHALCON_IS_FALSE(&status)) {
 			zval label = {}, message_str = {}, pairs = {};
 			if (phalcon_method_exists_ex(getThis(), SL("getlabel")) == SUCCESS) {
-				PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &field);
+				PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &field);
 			} else {
-				ZVAL_COPY_VALUE(&label, &field);
+				ZVAL_COPY(&label, &field);
 			}
+			PHALCON_MM_ADD_ENTRY(&label);
 
 			if (!phalcon_array_isset_fetch_str(&type, validation, SL("type"), PH_READONLY)) {
-				ZVAL_STRING(&type, "Validator");
+				PHALCON_MM_ZVAL_STRING(&type, "Validator");
 			}
 
 			if (!phalcon_array_isset_fetch_str(&code, validation, SL("code"), PH_READONLY)) {
@@ -3070,56 +3073,61 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 			if (phalcon_array_isset_fetch_str(&message_str, validation, SL("message"), PH_READONLY)) {
 				array_init_size(&pairs, 1);
 				phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+				PHALCON_MM_ADD_ENTRY(&pairs);
 
-				PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
-				zval_ptr_dtor(&pairs);
+				PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+				PHALCON_MM_ADD_ENTRY(&prepared);
 			} else {
-				PHALCON_CALL_CE_STATIC(&message_str, phalcon_validation_ce, "getmessage", &type);
+				PHALCON_MM_CALL_CE_STATIC(&message_str, phalcon_validation_ce, "getmessage", &type);
+				PHALCON_MM_ADD_ENTRY(&message_str);
 				if (PHALCON_IS_NOT_EMPTY(&message_str)) {
 					array_init_size(&pairs, 1);
 					phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+					PHALCON_MM_ADD_ENTRY(&pairs);
 
-					PHALCON_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
-					zval_ptr_dtor(&pairs);
+					PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message_str, &pairs);
+					PHALCON_MM_ADD_ENTRY(&prepared);
 				} else {
 					PHALCON_CONCAT_SVS(&prepared, "Invalid '", &label, "' format");
+					PHALCON_MM_ADD_ENTRY(&prepared);
 				}
 			}
 
-			PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &field, &type, &code);
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &field, &type, &code);
 		}
 
-		RETURN_CTOR(&status);
+		RETURN_MM_NCTOR(&status);
 	}
 
 	/**
 	 * Valid validation are objects
 	 */
-	PHALCON_VERIFY_INTERFACE_EX(validation, phalcon_validationinterface_ce, phalcon_mvc_model_exception_ce);
+	PHALCON_MM_VERIFY_INTERFACE_EX(validation, phalcon_validationinterface_ce, phalcon_mvc_model_exception_ce);
 
 	/**
 	 * Call the validation, if it returns false we append the messages to the current
 	 * object
 	 */
-	PHALCON_CALL_METHOD(&messages, validation, "validate", &PHALCON_GLOBAL(z_null), getThis());
-	if (Z_TYPE(messages) == IS_OBJECT) {
-		PHALCON_VERIFY_CLASS_EX(&messages, phalcon_validation_message_group_ce, phalcon_mvc_model_exception_ce);
+	PHALCON_MM_CALL_METHOD(&messages, validation, "validate", &PHALCON_GLOBAL(z_null), getThis());
+	PHALCON_MM_ADD_ENTRY(&messages);
 
-		PHALCON_CALL_METHOD(NULL, &messages, "rewind");
+	if (Z_TYPE(messages) == IS_OBJECT) {
+		PHALCON_MM_VERIFY_CLASS_EX(&messages, phalcon_validation_message_group_ce, phalcon_mvc_model_exception_ce);
+		PHALCON_MM_CALL_METHOD(NULL, &messages, "rewind");
 
 		while (1) {
 			zval valid = {}, current = {};
 
-			PHALCON_CALL_METHOD(&valid, &messages, "valid");
-			if (!PHALCON_IS_NOT_FALSE(&valid)) {
+			PHALCON_MM_CALL_METHOD(&valid, &messages, "valid");
+			if (PHALCON_IS_FALSE(&valid)) {
 				break;
 			}
+			zval_ptr_dtor(&valid);
 
-			PHALCON_CALL_METHOD(&current, &messages, "current");
-
-			PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &current);
-
-			PHALCON_CALL_METHOD(NULL, &messages, "next");
+			PHALCON_MM_CALL_METHOD(&current, &messages, "current");
+			PHALCON_MM_ADD_ENTRY(&current);
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &current);
+			PHALCON_MM_CALL_METHOD(NULL, &messages, "next");
 		}
 
 		if (phalcon_fast_count_int(&messages)) {
@@ -3127,11 +3135,10 @@ PHP_METHOD(Phalcon_Mvc_Model, validate){
 		} else {
 			RETVAL_TRUE;
 		}
-		zval_ptr_dtor(&messages);
-		return;
+		RETURN_MM();
 	}
 
-	RETURN_CTOR(&messages);
+	RETURN_MM_CTOR(&messages);
 }
 
 /**
@@ -3728,10 +3735,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	int method_exists = 0;
 	double num, max;
 
-	phalcon_fetch_params(0, 2, 0, &exists, &identity_field);
+	phalcon_fetch_params(1, 2, 0, &exists, &identity_field);
 
 	if (phalcon_method_exists_ex(getThis(), SL("filters")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "filters");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "filters");
 	}
 
 	/**
@@ -3741,27 +3748,25 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		/**
 		 * Call the beforeValidation
 		 */
-	 	ZVAL_STRING(&event_name, "beforeValidation");
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+	 	PHALCON_MM_ZVAL_STRING(&event_name, "beforeValidation");
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		zval_ptr_dtor(&status);
 
 		if (!zend_is_true(exists)) {
-			ZVAL_STRING(&event_name, "beforeValidationOnCreate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "beforeValidationOnCreate");
 		} else {
-			ZVAL_STRING(&event_name, "beforeValidationOnUpdate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "beforeValidationOnUpdate");
 		}
 
 		/**
 		 * Call the specific beforeValidation event for the current action
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		zval_ptr_dtor(&status);
 	}
@@ -3770,43 +3775,48 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	 * Check for Virtual foreign keys
 	 */
 	if (PHALCON_GLOBAL(orm).virtual_foreign_keys) {
-		PHALCON_CALL_METHOD(&status, getThis(), "_checkforeignkeysrestrict");
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "_checkforeignkeysrestrict");
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
+		zval_ptr_dtor(&status);
 	}
 
-	PHALCON_CALL_METHOD(&attributes, getThis(), "getattributes");
-	PHALCON_CALL_METHOD(&data_type_numeric, getThis(), "getdatatypesnumeric");
-	PHALCON_CALL_METHOD(&data_types, getThis(), "getdatatypes");
-	PHALCON_CALL_METHOD(&column_map, getThis(), "getcolumnmap");
-
+	PHALCON_MM_CALL_METHOD(&attributes, getThis(), "getattributes");
+	PHALCON_MM_ADD_ENTRY(&attributes);
+	PHALCON_MM_CALL_METHOD(&data_type_numeric, getThis(), "getdatatypesnumeric");
+	PHALCON_MM_ADD_ENTRY(&data_type_numeric);
+	PHALCON_MM_CALL_METHOD(&data_types, getThis(), "getdatatypes");
+	PHALCON_MM_ADD_ENTRY(&data_types);
+	PHALCON_MM_CALL_METHOD(&column_map, getThis(), "getcolumnmap");
+	PHALCON_MM_ADD_ENTRY(&column_map);
 
 	/**
 	 * Get fields that must be omitted from the SQL generation
 	 */
 	if (zend_is_true(exists)) {
-		PHALCON_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
+		PHALCON_MM_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
+		PHALCON_MM_ADD_ENTRY(&automatic_attributes);
 		array_init(&default_values);
 	} else {
-		PHALCON_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
-		PHALCON_CALL_METHOD(&default_values, getThis(), "getdefaultvalues");
+		PHALCON_MM_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
+		PHALCON_MM_ADD_ENTRY(&automatic_attributes);
+		PHALCON_MM_CALL_METHOD(&default_values, getThis(), "getdefaultvalues");
 	}
+	PHALCON_MM_ADD_ENTRY(&default_values);
 
 	error = &PHALCON_GLOBAL(z_false);
 
 	/**
 	 * Call the main validation event
 	 */
- 	ZVAL_STRING(&event_name, "validation");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-	zval_ptr_dtor(&event_name);
+ 	PHALCON_MM_ZVAL_STRING(&event_name, "validation");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
-		ZVAL_STRING(&event_name, "onValidationFails");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "onValidationFails");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 	zval_ptr_dtor(&status);
 
@@ -3825,7 +3835,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 			if (Z_TYPE(column_map) == IS_ARRAY) {
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -3856,52 +3867,50 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 					continue;
 				}
 
-				PHALCON_CALL_METHOD(&is_not_null, getThis(), "isnotnull", field);
+				PHALCON_MM_CALL_METHOD(&is_not_null, getThis(), "isnotnull", field);
 				if (zend_is_true(&is_not_null) && !phalcon_array_isset(&default_values, field)) {
-					ZVAL_STRING(&type, "PresenceOf");
-					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+					PHALCON_MM_ZVAL_STRING(&type, "PresenceOf");
+					PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+					PHALCON_MM_ADD_ENTRY(&message);
 					if (method_exists) {
-						PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+						PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+						PHALCON_MM_ADD_ENTRY(&label);
 					} else {
-						ZVAL_COPY(&label, &attribute_field);
+						PHALCON_MM_ZVAL_COPY(&label, &attribute_field);
 					}
 					array_init_size(&pairs, 1);
 					phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-					zval_ptr_dtor(&label);
-					PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-					zval_ptr_dtor(&message);
-					zval_ptr_dtor(&pairs);
+					PHALCON_MM_ADD_ENTRY(&pairs);
 
-					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-					zval_ptr_dtor(&type);
-					zval_ptr_dtor(&prepared);
+					PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+					PHALCON_MM_ADD_ENTRY(&prepared);
+
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 					error = &PHALCON_GLOBAL(z_true);
 				}
 			} else if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 				if (phalcon_array_isset(&data_type_numeric, field)) {
 					if (!phalcon_is_numeric(&value)) {
-						ZVAL_STRING(&type, "Numericality");
-						PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+						PHALCON_MM_ZVAL_STRING(&type, "Numericality");
+						PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
 						if (method_exists) {
-							PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+							PHALCON_MM_ADD_ENTRY(&label);
 						} else {
-							ZVAL_COPY(&label, &attribute_field);
+							PHALCON_MM_ZVAL_COPY(&label, &attribute_field);
 						}
 						array_init_size(&pairs, 1);
 						phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-						zval_ptr_dtor(&label);
-						PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-						zval_ptr_dtor(&message);
-						zval_ptr_dtor(&pairs);
+						PHALCON_MM_ADD_ENTRY(&pairs);
+						PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+						PHALCON_MM_ADD_ENTRY(&prepared);
 
-						PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-						zval_ptr_dtor(&type);
-						zval_ptr_dtor(&prepared);
+						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 						error = &PHALCON_GLOBAL(z_true);
 					} else if (!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER)) {
-						PHALCON_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
-						PHALCON_CALL_METHOD(&field_scale, getThis(), "getdatascale", field);
+						PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
+						PHALCON_MM_CALL_METHOD(&field_scale, getThis(), "getdatascale", field);
 
 						if (Z_TYPE(field_size) != IS_NULL) {
 							phalcon_strval(&str_value, &value);
@@ -3914,96 +3923,96 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							}
 
 							if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
-								ZVAL_STRING(&type, "TooLarge");
-								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
+								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ADD_ENTRY(&message);
 								if (method_exists) {
-									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 								} else {
 									ZVAL_COPY(&label, &attribute_field);
 								}
+								PHALCON_MM_ADD_ENTRY(&label);
 								array_init_size(&pairs, 1);
 								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								zval_ptr_dtor(&label);
-								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								zval_ptr_dtor(&message);
-								zval_ptr_dtor(&pairs);
+								PHALCON_MM_ADD_ENTRY(&pairs);
+								PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+								PHALCON_MM_ADD_ENTRY(&prepared);
 
-								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-								zval_ptr_dtor(&type);
-								zval_ptr_dtor(&prepared);
+								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+
 								error = &PHALCON_GLOBAL(z_true);
 								continue;
 							}
 
 							if (PHALCON_GT_LONG(&pos, (Z_LVAL(field_size)-Z_LVAL(field_scale)))) {
-								ZVAL_STRING(&type, "TooLarge");
-								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
+								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ADD_ENTRY(&message);
 								if (method_exists) {
-									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 								} else {
 									ZVAL_COPY(&label, &attribute_field);
 								}
+								PHALCON_MM_ADD_ENTRY(&label);
 								array_init_size(&pairs, 1);
 								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								zval_ptr_dtor(&label);
+								PHALCON_MM_ADD_ENTRY(&pairs);
 								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								zval_ptr_dtor(&message);
-								zval_ptr_dtor(&pairs);
+								PHALCON_MM_ADD_ENTRY(&prepared);
 
-								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-								zval_ptr_dtor(&type);
-								zval_ptr_dtor(&prepared);
+								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+
 								error = &PHALCON_GLOBAL(z_true);
 							}
 						}
 					} else {
-						PHALCON_CALL_METHOD(&field_byte, getThis(), "getdatabyte", field);
+						PHALCON_MM_CALL_METHOD(&field_byte, getThis(), "getdatabyte", field);
+						PHALCON_MM_ADD_ENTRY(&field_byte);
 
 						phalcon_strval(&str_value, &value);
 						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
 						zval_ptr_dtor(&str_value);
 
 						if (phalcon_is_numeric(&pos)) {
-							ZVAL_STRING(&type, "Numericality");
-							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							PHALCON_MM_ZVAL_STRING(&type, "Numericality");
+							PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							PHALCON_MM_ADD_ENTRY(&message);
 							if (method_exists) {
-								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+								PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 							} else {
 								ZVAL_COPY(&label, &attribute_field);
 							}
+							PHALCON_MM_ADD_ENTRY(&label);
 							array_init_size(&pairs, 1);
 							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-							zval_ptr_dtor(&label);
-							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-							zval_ptr_dtor(&message);
-							zval_ptr_dtor(&pairs);
+							PHALCON_MM_ADD_ENTRY(&pairs);
+							PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+							PHALCON_MM_ADD_ENTRY(&prepared);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-							zval_ptr_dtor(&type);
-							zval_ptr_dtor(&prepared);
+							PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 							error = &PHALCON_GLOBAL(z_true);
 						} else {
 							num = phalcon_get_intval(&value);
 							max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
 
 							if (num > max) {
-								ZVAL_STRING(&type, "TooLarge");
-								PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
+								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+								PHALCON_MM_ADD_ENTRY(&message);
 								if (method_exists) {
-									PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 								} else {
 									ZVAL_COPY(&label, &attribute_field);
 								}
+								PHALCON_MM_ADD_ENTRY(&label);
 								array_init_size(&pairs, 1);
 								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								zval_ptr_dtor(&label);
-								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								zval_ptr_dtor(&message);
-								zval_ptr_dtor(&pairs);
+								PHALCON_MM_ADD_ENTRY(&pairs);
+								PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+								PHALCON_MM_ADD_ENTRY(&prepared);
 
-								PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-								zval_ptr_dtor(&type);
-								zval_ptr_dtor(&prepared);
+								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+
 								error = &PHALCON_GLOBAL(z_true);
 							}
 						}
@@ -4014,39 +4023,39 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						continue;
 					}
 
-					PHALCON_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
+					PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 					if (Z_TYPE(field_size) != IS_NULL) {
 #ifdef PHALCON_USE_PHP_MBSTRING
 						phalcon_strlen(&length, &value);
 #else
 						if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
 							phalcon_strval(&str_value, &value);
-							PHALCON_CALL_FUNCTION(&length, "mb_strlen", &str_value);
-							zval_ptr_dtor(&str_value);
+							PHALCON_MM_ADD_ENTRY(&str_value);
+							PHALCON_MM_CALL_FUNCTION(&length, "mb_strlen", &str_value);
 						} else {
 							phalcon_fast_strlen(&length, &value);
 						}
 #endif
 
 						if (phalcon_greater(&length, &field_size)) {
-							ZVAL_STRING(&type, "TooLong");
-							PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							PHALCON_MM_ZVAL_STRING(&type, "TooLong");
+							PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+							PHALCON_MM_ADD_ENTRY(&message);
 							if (method_exists) {
-								PHALCON_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+								PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 							} else {
 								ZVAL_COPY(&label, &attribute_field);
 							}
+							PHALCON_MM_ADD_ENTRY(&label);
 							array_init_size(&pairs, 2);
 							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-							zval_ptr_dtor(&label);
 							phalcon_array_update_str(&pairs, SL(":max"), &field_size, PH_COPY);
-							PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-							zval_ptr_dtor(&message);
-							zval_ptr_dtor(&pairs);
+							PHALCON_MM_ADD_ENTRY(&pairs);
+							PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+							PHALCON_MM_ADD_ENTRY(&prepared);
 
-							PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-							zval_ptr_dtor(&type);
-							zval_ptr_dtor(&prepared);
+							PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+
 							error = &PHALCON_GLOBAL(z_true);
 						}
 					}
@@ -4054,20 +4063,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&attributes);
-	zval_ptr_dtor(&data_type_numeric);
-	zval_ptr_dtor(&data_types);
-	zval_ptr_dtor(&automatic_attributes);
-	zval_ptr_dtor(&default_values);
-	zval_ptr_dtor(&column_map);
 
 	if (PHALCON_IS_TRUE(error)) {
-		ZVAL_STRING(&event_name, "onValidationFails");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		PHALCON_CALL_METHOD(NULL, getThis(), "_canceloperation");
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "onValidationFails");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_canceloperation");
 
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	/**
@@ -4075,44 +4077,41 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	 */
 	if (likely(PHALCON_GLOBAL(orm).events)) {
 		if (!zend_is_true(exists)) {
-			ZVAL_STRING(&event_name, "afterValidationOnCreate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "afterValidationOnCreate");
 		} else {
-			ZVAL_STRING(&event_name, "afterValidationOnUpdate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "afterValidationOnUpdate");
 		}
 
 		/**
 		 * Run Validation Callbacks After
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		zval_ptr_dtor(&status);
 
-		ZVAL_STRING(&event_name, "afterValidation");
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "afterValidation");
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		zval_ptr_dtor(&status);
 
 		/**
 		 * Run Before Callbacks
 		 */
- 		ZVAL_STRING(&event_name, "beforeSave");
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+ 		PHALCON_MM_ZVAL_STRING(&event_name, "beforeSave");
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_FALSE;
 		}
 		zval_ptr_dtor(&status);
 
 		if (zend_is_true(exists)) {
-			ZVAL_STRING(&event_name, "beforeUpdate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "beforeUpdate");
 		} else {
-			ZVAL_STRING(&event_name, "beforeCreate");
+			PHALCON_MM_ZVAL_STRING(&event_name, "beforeCreate");
 		}
 
 		phalcon_update_property_bool(getThis(), SL("_skipped"), 0);
@@ -4120,10 +4119,9 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		/**
 		 * The operation can be skipped here
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		zval_ptr_dtor(&status);
 
@@ -4132,11 +4130,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 		 */
 		phalcon_read_property(&skipped, getThis(), SL("_skipped"), PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_TRUE(&skipped)) {
-			RETURN_TRUE;
+			RETURN_MM_TRUE;
 		}
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**
@@ -4954,7 +4952,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 0, 4, &data, &white_list, &_exists, &exists_check);
+	phalcon_fetch_params(1, 0, 4, &data, &white_list, &_exists, &exists_check);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -4975,16 +4973,17 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	/**
 	 * Get the reversed column map for future renamings
 	 */
-	PHALCON_CALL_SELF(&attributes, "getcolumnmap");
+	PHALCON_MM_CALL_SELF(&attributes, "getcolumnmap");
 	if (Z_TYPE(attributes) != IS_ARRAY) {
-		PHALCON_CALL_METHOD(&attributes, getThis(), "getattributes");
+		PHALCON_MM_CALL_METHOD(&attributes, getThis(), "getattributes");
 	}
+	PHALCON_MM_ADD_ENTRY(&attributes);
 
 	/**
 	 * Assign the values passed
 	 */
 	if (Z_TYPE_P(data) != IS_NULL) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "assign", data, &attributes, white_list);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "assign", data, &attributes, white_list);
 	}
 
 	array_init(&bind_params);
@@ -4997,33 +4996,33 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			phalcon_array_update(&bind_params, attribute, &value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&attributes);
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 
 	/**
 	 * We need to check if the record exists
 	 */
 	if (!_exists) {
-		PHALCON_CALL_METHOD(&exists, getThis(), "exists");
+		PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists");
 	} else {
 		if (zend_is_true(exists_check)) {
-			PHALCON_CALL_METHOD(&exists, getThis(), "exists");
+			PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists");
 			if (!zend_is_true(&exists)) {
 				if (zend_is_true(&exists)) {
-					ZVAL_STRING(&type, "InvalidCreateAttempt");
-					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-					RETURN_FALSE;
+					PHALCON_MM_ZVAL_STRING(&type, "InvalidCreateAttempt");
+					PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
+					RETURN_MM_FALSE;
 				}
 			} else {
 				if (!zend_is_true(&exists)) {
-					ZVAL_STRING(&type, "InvalidUpdateAttempt");
-					PHALCON_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-					PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-					RETURN_FALSE;
+					PHALCON_MM_ZVAL_STRING(&type, "InvalidUpdateAttempt");
+					PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
+					RETURN_MM_FALSE;
 				}
 			}
 		} else {
-			PHALCON_CALL_METHOD(NULL, getThis(), "_rebuild");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "_rebuild");
 		}
 	}
 
@@ -5033,28 +5032,26 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		phalcon_update_property_long(getThis(), SL("_operationMade"), PHALCON_MODEL_OP_CREATE);
 	}
 
-	ZVAL_STRING(&event_name, "beforeOperation");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeOperation");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	/**
 	 * Create/Get the current database connection
 	 */
-	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
-	zval_ptr_dtor(&bind_params);
+	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+	PHALCON_MM_ADD_ENTRY(&write_connection);
 
 	/**
 	 * Save related records in belongsTo relationships
 	 */
 	phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
 	if (Z_TYPE(related) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(&status, getThis(), "_presaverelatedrecords", &write_connection, &related);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "_presaverelatedrecords", &write_connection, &related);
 		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&write_connection);
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 	}
 
@@ -5066,20 +5063,20 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	/**
 	 * Query the identity field
 	 */
-	PHALCON_CALL_METHOD(&identity_field, getThis(), "getidentityfield");
+	PHALCON_MM_CALL_METHOD(&identity_field, getThis(), "getidentityfield");
+	PHALCON_MM_ADD_ENTRY(&identity_field);
 
 	/**
 	 * _preSave() makes all the validations
 	 */
-	PHALCON_CALL_METHOD(&status, getThis(), "_presave", &exists, &identity_field);
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "_presave", &exists, &identity_field);
 	if (PHALCON_IS_FALSE(&status)) {
 		/**
 		 * Rollback the current transaction if there was validation errors
 		 */
 		if (Z_TYPE(related) == IS_ARRAY) {
-			PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+			PHALCON_MM_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 		}
-		zval_ptr_dtor(&write_connection);
 
 		/**
 		 * Throw exceptions on failed saves?
@@ -5092,38 +5089,37 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			 * Launch a Phalcon\Mvc\Model\ValidationFailed to notify that the save failed
 			 */
 			object_init_ex(&exception, phalcon_mvc_model_validationfailed_ce);
-			PHALCON_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
+			PHALCON_MM_ADD_ENTRY(&exception);
+			PHALCON_MM_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
 
 			phalcon_throw_exception(&exception);
-			return;
+			RETURN_MM();
 		}
 
-		zval_ptr_dtor(&identity_field);
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	/**
 	 * Depending if the record exists we do an update or an insert operation
 	 */
 	if (zend_is_true(&exists)) {
-		PHALCON_CALL_METHOD(&success, getThis(), "_dolowupdate", &write_connection);
+		PHALCON_MM_CALL_METHOD(&success, getThis(), "_dolowupdate", &write_connection);
 	} else {
-		PHALCON_CALL_METHOD(&success, getThis(), "_dolowinsert", &write_connection, &identity_field);
+		PHALCON_MM_CALL_METHOD(&success, getThis(), "_dolowinsert", &write_connection, &identity_field);
 	}
-	zval_ptr_dtor(&identity_field);
 
 	/**
 	 * _postSave() makes all the validations
 	 */
-	PHALCON_CALL_METHOD(&new_success, getThis(), "_postsave", &success, &exists);
+	PHALCON_MM_CALL_METHOD(&new_success, getThis(), "_postsave", &success, &exists);
 
 	if (Z_TYPE(related) == IS_ARRAY) {
 		/**
 		 * Rollbacks the implicit transaction if the master save has failed
 		 */
 		if (PHALCON_IS_FALSE(&new_success)) {
-			PHALCON_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
-			zval_ptr_dtor(&write_connection);
+			PHALCON_MM_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
+
 			/**
 			 * Throw exceptions on failed saves?
 			 */
@@ -5135,20 +5131,21 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 				 * Launch a Phalcon\Mvc\Model\ValidationFailed to notify that the save failed
 				 */
 				object_init_ex(&exception, phalcon_mvc_model_validationfailed_ce);
-				PHALCON_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
+				PHALCON_MM_ADD_ENTRY(&exception);
+				PHALCON_MM_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
 
 				phalcon_throw_exception(&exception);
-				return;
+				RETURN_MM();
 			}
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 
 		/**
 		 * Save the post-related records
 		 */
-		PHALCON_CALL_METHOD(&status, getThis(), "_postsaverelatedrecords", &write_connection, &related);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "_postsaverelatedrecords", &write_connection, &related);
 		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(related), idx, str_key) {
@@ -5163,24 +5160,22 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 		} ZEND_HASH_FOREACH_END();
 	}
-	zval_ptr_dtor(&write_connection);
 
 	/**
 	 * Change the dirty state to persistent
 	 */
 	if (zend_is_true(&new_success)) {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
-		PHALCON_CALL_METHOD(&snapshot_data, getThis(), "toarray");
-		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot_data);
-		zval_ptr_dtor(&snapshot_data);
+		PHALCON_MM_CALL_METHOD(&snapshot_data, getThis(), "toarray");
+		PHALCON_MM_ADD_ENTRY(&snapshot_data);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot_data);
 
 		if (!zend_is_true(&exists) || PHALCON_GLOBAL(orm).allow_update_primary) {
-				PHALCON_CALL_METHOD(NULL, getThis(), "_rebuild");
+				PHALCON_MM_CALL_METHOD(NULL, getThis(), "_rebuild");
 		}
 
-		ZVAL_STRING(&event_name, "afterOperation");
-		PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-		zval_ptr_dtor(&event_name);
+		PHALCON_MM_ZVAL_STRING(&event_name, "afterOperation");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 	} else {
 		/**
 		 * Throw exceptions on failed saves?
@@ -5193,19 +5188,20 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 			 * Launch a Phalcon\Mvc\Model\ValidationFailed to notify that the save failed
 			 */
 			object_init_ex(&exception, phalcon_mvc_model_validationfailed_ce);
-			PHALCON_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
+			PHALCON_MM_ADD_ENTRY(&exception);
+			PHALCON_MM_CALL_METHOD(NULL, &exception, "__construct", getThis(), &error_messages);
 
 			phalcon_throw_exception(&exception);
-			return;
+			RETURN_MM();
 		}
 	}
 
 	if (zend_is_true(&new_success)) {
 		if (PHALCON_GLOBAL(orm).enable_strict) {
-			RETURN_ZVAL(&success, 0, 0);
+			RETURN_MM_NCTOR(&success);
 		}
 	}
-	RETURN_ZVAL(&new_success, 0, 0);
+	RETURN_MM_NCTOR(&new_success);
 }
 
 /**

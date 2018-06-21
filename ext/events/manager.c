@@ -777,10 +777,10 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	zval *_event_type, *source, *data = NULL, *cancelable = NULL, *flag = NULL, debug_message = {};
 	zval event_type = {}, events = {}, name = {}, type = {}, status = {}, collect = {}, any_type = {}, event = {}, fire_events = {};
 
-	phalcon_fetch_params(0, 2, 3, &_event_type, &source, &data, &cancelable, &flag);
+	phalcon_fetch_params(1, 2, 3, &_event_type, &source, &data, &cancelable, &flag);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-		PHALCON_CONCAT_SV(&debug_message, "--Event(fire): ", _event_type);
+		PHALCON_CONCAT_SV(&debug_message, "--Events Manager(fire): ", _event_type);
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
 	}
@@ -799,29 +799,31 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 
 	if (unlikely(Z_TYPE_P(_event_type) != IS_STRING)) {
 		if (Z_TYPE_P(_event_type) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event type must be a string");
 			return;
 		} else {
-			PHALCON_VERIFY_INTERFACE_EX(_event_type, phalcon_events_eventinterface_ce, phalcon_events_exception_ce);
-			ZVAL_COPY(&event, _event_type);
-			PHALCON_CALL_METHOD(&name, &event, "getname");
-			PHALCON_CALL_METHOD(&type, &event, "gettype");
+			PHALCON_MM_VERIFY_INTERFACE_EX(_event_type, phalcon_events_eventinterface_ce, phalcon_events_exception_ce);
+			PHALCON_MM_ZVAL_COPY(&event, _event_type);
+			PHALCON_MM_CALL_METHOD(&name, &event, "getname");
+			PHALCON_MM_ADD_ENTRY(&name);
+			PHALCON_MM_CALL_METHOD(&type, &event, "gettype");
+			PHALCON_MM_ADD_ENTRY(&type);
 			PHALCON_CONCAT_VSV(&event_type, &name, ":", &type);
-			zval_ptr_dtor(&type);
+			PHALCON_MM_ADD_ENTRY(&event_type);
 		}
 	} else {
-		ZVAL_COPY(&event_type, _event_type);
-		PHALCON_CALL_METHOD(&event, getThis(), "createevent", &event_type, source, data, cancelable, flag);
-		PHALCON_CALL_METHOD(&name, &event, "getname");
+		PHALCON_MM_ZVAL_COPY(&event_type, _event_type);
+		PHALCON_MM_CALL_METHOD(&event, getThis(), "createevent", &event_type, source, data, cancelable, flag);
+		PHALCON_MM_ADD_ENTRY(&event);
+		PHALCON_MM_CALL_METHOD(&name, &event, "getname");
+		PHALCON_MM_ADD_ENTRY(&name);
 	}
 
 	phalcon_update_property(getThis(), SL("_currentEvent"), &event);
 
 	phalcon_read_property(&events, getThis(), SL("_events"), PH_READONLY);
 	if (Z_TYPE(events) != IS_ARRAY) {
-		zval_ptr_dtor(&event);
-		zval_ptr_dtor(&name);
-		RETURN_NULL();
+		RETURN_MM_NULL();
 	}
 
 	ZVAL_NULL(&status);
@@ -837,59 +839,49 @@ PHP_METHOD(Phalcon_Events_Manager, fire){
 	/**
 	 * Check if there are listeners for the all event type
 	 */
-	ZVAL_STRING(&any_type, "*");
+	PHALCON_MM_ZVAL_STRING(&any_type, "*");
 	if (phalcon_array_isset_fetch(&fire_events, &events, &any_type, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
 			/**
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event);
+			PHALCON_MM_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event);
 			if (zend_is_true(flag) && PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&any_type);
-				zval_ptr_dtor(&type);
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 		}
 	}
-	zval_ptr_dtor(&any_type);
 
 	/**
 	 * Check if events are grouped by name
 	 */
 	if (phalcon_array_isset_fetch(&fire_events, &events, &name, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
-			zval prev_data = {};
 			/**
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event, &prev_data);
-			zval_ptr_dtor(&prev_data);
+			PHALCON_MM_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event);
 			if (zend_is_true(flag) && PHALCON_IS_FALSE(&status)) {
-				zval_ptr_dtor(&name);
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 		}
 	}
-	zval_ptr_dtor(&name);
 
 	/**
 	 * Check if there are listeners for the event type itself
 	 */
 	if (phalcon_array_isset_fetch(&fire_events, &events, &event_type, PH_READONLY)) {
 		if (Z_TYPE(fire_events) == IS_ARRAY || Z_TYPE(fire_events) == IS_OBJECT) {
-			zval prev_data = {};
 			/**
 			 * Call the events queue
 			 */
-			PHALCON_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event, &prev_data);
-			zval_ptr_dtor(&prev_data);
+			PHALCON_MM_CALL_METHOD(&status, getThis(), "firequeue", &fire_events, &event);
 			if (zend_is_true(flag) && PHALCON_IS_FALSE(&status)) {
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 		}
 	}
-	zval_ptr_dtor(&event);
-	RETURN_NCTOR(&status);
+	RETURN_MM_NCTOR(&status);
 }
 
 /**

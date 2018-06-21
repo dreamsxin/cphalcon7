@@ -1220,7 +1220,6 @@ afterexecuteroute:
 			 */
 			PHALCON_MM_ZVAL_STRING(&event_name, "dispatch:afterExecuteRoute");
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-			zval_ptr_dtor(&event_name);
 
 			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {

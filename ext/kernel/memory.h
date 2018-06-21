@@ -100,13 +100,6 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 		SEPARATE_ZVAL_IF_NOT_REF(z); \
 	} while (0)
 
-#define PHALCON_MM_SEPARATE_PARAM(z) \
-	do { \
-		ZVAL_DEREF(z); \
-		SEPARATE_ZVAL_IF_NOT_REF(z);\
-		phalcon_array_append(&phalcon_memory_entry, z, 0); \
-	} while (0)
-
 #define PHALCON_COPY_TO_STACK(a, b) \
 	{ \
     	memcpy(a, b, sizeof(zval)); \

@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 
 	zval *data = NULL, *entity = NULL, validators = {}, allow_empty = {}, messages = {}, status = {}, *scope;
 
-	phalcon_fetch_params(0, 0, 2, &data, &entity);
+	phalcon_fetch_params(1, 0, 2, &data, &entity);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -252,13 +252,13 @@ PHP_METHOD(Phalcon_Validation, validate){
 	if (!entity) {
 		entity = &PHALCON_GLOBAL(z_null);
 	} else {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setentity", entity);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setentity", entity);
 
 	}
 
 	phalcon_read_property(&validators, getThis(), SL("_validators"), PH_READONLY);
 	if (Z_TYPE(validators) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no validators to validate");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "There are no validators to validate");
 		return;
 	}
 
@@ -273,7 +273,8 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 * Implicitly creates a Phalcon\Validation\Message\Group object
 	 */
 	object_init_ex(&messages, phalcon_validation_message_group_ce);
-	PHALCON_CALL_METHOD(NULL, &messages, "__construct");
+	PHALCON_MM_ADD_ENTRY(&messages);
+	PHALCON_MM_CALL_METHOD(NULL, &messages, "__construct");
 
 	phalcon_update_property(getThis(), SL("_messages"), &messages);
 
@@ -281,13 +282,11 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 * Validation classes can implement the 'beforeValidation' callback
 	 */
 	if (phalcon_method_exists_ex(getThis(), SL("beforevalidation")) == SUCCESS) {
-		PHALCON_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity, &messages);
+		PHALCON_MM_CALL_METHOD(&status, getThis(), "beforevalidation", data, entity, &messages);
 		if (PHALCON_IS_FALSE(&status)) {
-			zval_ptr_dtor(&messages);
-			RETURN_ZVAL(&status, 0, 0);
+			RETURN_MM_NCTOR(&status);
 		}
 	}
-	zval_ptr_dtor(&messages);
 
 	if (Z_TYPE_P(data) == IS_ARRAY || Z_TYPE_P(data) == IS_OBJECT) {
 		phalcon_update_property(getThis(), SL("_data"), data);
@@ -296,7 +295,7 @@ PHP_METHOD(Phalcon_Validation, validate){
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(validators), scope) {
 		zval attribute = {}, validator = {}, attribute_validators = {}, *attribute_validator, must_cancel = {};
 		if (Z_TYPE_P(scope) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The validator scope is not valid");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "The validator scope is not valid");
 			return;
 		}
 
@@ -309,27 +308,28 @@ PHP_METHOD(Phalcon_Validation, validate){
 		} else {
 			ZVAL_COPY(&attribute_validators, &validator);
 		}
+		PHALCON_MM_ADD_ENTRY(&attribute_validators);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attribute_validators), attribute_validator) {
 			if (Z_TYPE_P(attribute_validator) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "One of the validators is not valid");
 				return;
 			}
 
-			PHALCON_CALL_METHOD(&status, attribute_validator, "validate", getThis(), &attribute, &allow_empty);
+			PHALCON_MM_CALL_METHOD(&status, attribute_validator, "validate", getThis(), &attribute, &allow_empty);
 
 			/**
 			 * Check if the validation must be canceled if this validator fails
 			 */
 			if (PHALCON_IS_FALSE(&status)) {
-				RETURN_ON_FAILURE(phalcon_validation_validator_getoption_helper(&must_cancel, Z_OBJCE_P(attribute_validator), attribute_validator, "cancelOnFail"));
+				RETURN_MM_ON_FAILURE(phalcon_validation_validator_getoption_helper(&must_cancel, Z_OBJCE_P(attribute_validator), attribute_validator, "cancelOnFail"));
 
 				if (zend_is_true(&must_cancel)) {
 					break;
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
-		zval_ptr_dtor(&attribute_validators);
+
 		if (zend_is_true(&must_cancel)) {
 			break;
 		}
@@ -340,10 +340,10 @@ PHP_METHOD(Phalcon_Validation, validate){
 	 */
 	phalcon_read_property(&messages, getThis(),  SL("_messages"), PH_READONLY);
 	if (phalcon_method_exists_ex(getThis(), SL("aftervalidation")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "aftervalidation", data, entity, &messages);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "aftervalidation", data, entity, &messages);
 	}
 
-	RETURN_CTOR(&messages);
+	RETURN_MM_CTOR(&messages);
 }
 
 /**
@@ -357,10 +357,10 @@ PHP_METHOD(Phalcon_Validation, add){
 
 	zval *attribute, *_validator, validator = {}, validators = {}, scope = {};
 
-	phalcon_fetch_params(0, 2, 0, &attribute, &_validator);
+	phalcon_fetch_params(1, 2, 0, &attribute, &_validator);
 
 	if (Z_TYPE_P(attribute) != IS_STRING && Z_TYPE_P(attribute) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Field must be passed as array of fields or string");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Field must be passed as array of fields or string");
 		return;
 	}
 
@@ -370,8 +370,11 @@ PHP_METHOD(Phalcon_Validation, add){
 	} else {
 		ZVAL_COPY(&validator, _validator);
 	}
+	PHALCON_MM_ADD_ENTRY(&validator);
 
 	array_init(&validators);
+	PHALCON_MM_ADD_ENTRY(&validators);
+
 	if (Z_TYPE(validator) == IS_ARRAY) {
 		zval *item;
 		zend_string *item_key;
@@ -381,7 +384,7 @@ PHP_METHOD(Phalcon_Validation, add){
 
 			if (!item_key) {
 				if (Z_TYPE_P(item)!= IS_STRING) {
-					PHALCON_VERIFY_INTERFACE_EX(item, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+					PHALCON_MM_VERIFY_INTERFACE_EX(item, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
 					phalcon_array_append(&validators, item, PH_COPY);
 					continue;
 				}
@@ -392,47 +395,42 @@ PHP_METHOD(Phalcon_Validation, add){
 				array_init_size(&options, 1);
 				phalcon_array_append(&options, item, PH_COPY);
 			}
+			PHALCON_MM_ADD_ENTRY(&options);
 
-			PHALCON_CALL_METHOD(&has, getThis(), "hasservice", &name);
+			PHALCON_MM_CALL_METHOD(&has, getThis(), "hasservice", &name);
 			if (!zend_is_true(&has)) {
 				if (!phalcon_memnstr_str(&name, SL("\\"))) {
 					PHALCON_CONCAT_SV(&class_name, "Phalcon\\Validation\\Validator\\", &name);
-					PHALCON_CALL_METHOD(&has, getThis(), "hasservice", &class_name);
+					PHALCON_MM_ADD_ENTRY(&class_name);
 				} else {
-					ZVAL_COPY(&class_name, &name);
+					PHALCON_MM_ZVAL_COPY(&class_name, &name);
 				}
 			} else {
-				ZVAL_COPY(&class_name, &name);
+				PHALCON_MM_ZVAL_COPY(&class_name, &name);
 			}
 
-			PHALCON_CALL_METHOD(&object, getThis(), "getresolveservice", &class_name, &options);
+			PHALCON_MM_CALL_METHOD(&object, getThis(), "getresolveservice", &class_name, &options);
+			PHALCON_MM_ADD_ENTRY(&object);
 			if (Z_TYPE(object) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_FORMAT(phalcon_validation_exception_ce, "Validator %s is invalid", Z_STRVAL(name));
-				zval_ptr_dtor(&object);
-				zval_ptr_dtor(&class_name);
-				zval_ptr_dtor(&options);
-				zval_ptr_dtor(&validator);
+				PHALCON_MM_THROW_EXCEPTION_FORMAT(phalcon_validation_exception_ce, "Validator %s is invalid", Z_STRVAL(name));
 				return;
 			}
-			zval_ptr_dtor(&class_name);
-			zval_ptr_dtor(&options);
 
-			PHALCON_VERIFY_INTERFACE_EX(&object, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
-			phalcon_array_append(&validators, &object, 0);
+			PHALCON_MM_VERIFY_INTERFACE_EX(&object, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+			phalcon_array_append(&validators, &object, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		PHALCON_VERIFY_INTERFACE_EX(&validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
+		PHALCON_MM_VERIFY_INTERFACE_EX(&validator, phalcon_validation_validatorinterface_ce, phalcon_validation_exception_ce);
 		phalcon_array_append(&validators, &validator, PH_COPY);
 	}
-	zval_ptr_dtor(&validator);
 
 	array_init_size(&scope, 2);
 	phalcon_array_append(&scope, attribute, PH_COPY);
-	phalcon_array_append(&scope, &validators, 0);
+	phalcon_array_append(&scope, &validators, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_validators"), &scope);
 	zval_ptr_dtor(&scope);
 
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**

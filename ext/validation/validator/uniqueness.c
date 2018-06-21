@@ -252,12 +252,12 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 	ulong idx;
 	zend_class_entry *ce = Z_OBJCE_P(getThis());
 
-	phalcon_fetch_params(0, 2, 1, &record, &values, &excepts);
+	phalcon_fetch_params(1, 2, 1, &record, &values, &excepts);
 
-	PHALCON_VERIFY_INTERFACE_EX(record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
+	PHALCON_MM_VERIFY_INTERFACE_EX(record, phalcon_mvc_modelinterface_ce, phalcon_validation_exception_ce);
 
 	if (Z_TYPE_P(values) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Values must be array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_validation_exception_ce, "Values must be array");
 		return;
 	}
 
@@ -266,7 +266,9 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 	 * make cast to the data passed to match those column types
 	 */
 	array_init(&conditions);
+	PHALCON_MM_ADD_ENTRY(&conditions);
 	array_init(&bind_params);
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 
 	ZVAL_LONG(&number, 0);
 
@@ -316,7 +318,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&join_conditions, SL(" AND "), &conditions);
-	zval_ptr_dtor(&conditions);
+	PHALCON_MM_ADD_ENTRY(&join_conditions);
 
 	/**
 	 * We don't trust the user, so we pass the parameters as bound parameters
@@ -327,15 +329,17 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, valid){
 	if (phalcon_validation_validator_getoption_helper(&cache, ce, getThis(), "cache") == SUCCESS) {
 		phalcon_array_update_str(&params, SL("cache"), &cache, 0);
 	}
-	zval_ptr_dtor(&join_conditions);
+	PHALCON_MM_ADD_ENTRY(&params);
+
 	/**
 	 * Check using a standard count
 	 */
-	PHALCON_CALL_CE_STATIC(&number, Z_OBJCE_P(record), "count", &params);
-	zval_ptr_dtor(&params);
+	PHALCON_MM_CALL_CE_STATIC(&number, Z_OBJCE_P(record), "count", &params);
+	PHALCON_MM_ADD_ENTRY(&number);
+
 	if (!PHALCON_IS_LONG(&number, 0)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }

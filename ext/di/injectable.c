@@ -227,6 +227,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 	}
 
 	phalcon_fast_strtolower(&lower, eventname);
+	PHALCON_MM_ADD_ENTRY(&lower);
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
@@ -242,9 +243,8 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		PHALCON_MM_ADD_ENTRY(&eventtype);
 		zval_ptr_dtor(&class_name);
 	}
-	zval_ptr_dtor(&lower);
 
-	PHALCON_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
+	PHALCON_MM_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	PHALCON_MM_ADD_ENTRY(&events_manager);
 
 	if (Z_TYPE(events_manager) != IS_NULL) {
@@ -305,7 +305,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
  */
 PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 
-	zval *eventname, *data = NULL, *cancelable = NULL, eventtype = {}, callback = {}, events_manager = {}, lower = {}, event_parts = {}, name = {};
+	zval *eventname, *data = NULL, *cancelable = NULL, eventtype = {}, callback = {}, events_manager = {}, lower = {}, name = {};
 	zval event = {}, is_stopped = {}, status = {}, debug_message = {};
 
 	phalcon_fetch_params(1, 1, 2, &eventname, &data, &cancelable);
@@ -325,7 +325,9 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 	}
 
 	phalcon_fast_strtolower(&lower, eventname);
+	PHALCON_MM_ADD_ENTRY(&lower);
 	if (phalcon_memnstr_str(&lower, SL(":"))) {
+		zval event_parts = {};
 		phalcon_fast_explode_str(&event_parts, SL(":"), &lower);
 		phalcon_array_fetch_long(&name, &event_parts, 1, PH_COPY);
 		PHALCON_MM_ADD_ENTRY(&name);
@@ -340,7 +342,6 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		PHALCON_MM_ADD_ENTRY(&eventtype);
 		zval_ptr_dtor(&class_name);
 	}
-	zval_ptr_dtor(&lower);
 
 	PHALCON_MM_CALL_METHOD(&events_manager, getThis(), "geteventsmanager");
 	PHALCON_MM_ADD_ENTRY(&events_manager);
@@ -414,10 +415,10 @@ PHP_METHOD(Phalcon_Di_Injectable, hasService){
 
 	phalcon_fetch_params(1, 1, 0, &service_name);
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(return_value, &dependency_injector, "has", service_name);
+		PHALCON_MM_CALL_METHOD(return_value, &dependency_injector, "has", service_name);
 	} else {
 		RETVAL_FALSE;
 	}

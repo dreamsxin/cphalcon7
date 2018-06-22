@@ -198,6 +198,7 @@ zend_object* phalcon_py_matplot_object_create_handler(zend_class_entry *ce)
 
 void phalcon_py_matplot_object_free_handler(zend_object *object)
 {
+	zend_object_std_dtor(object);
 }
 
 /**

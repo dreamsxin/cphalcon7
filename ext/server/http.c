@@ -37,6 +37,16 @@
  * Phalcon\Server\Http
  *
  *<code>
+ *	class App extends Phalcon\Application {
+ *		public function handle($data = NULL):Phalcon\Http\ResponseInterface{
+ *			$response = new Phalcon\Http\Response('hello');
+ *			$response->setHeader("Content-Type", "text/html");
+ *			if ($data) {
+ *				$response->setContent(json_encode($data));
+ *			}
+ *			return $response;
+ *		}
+ *	}
  *
  *	$server = new Phalcon\Server\Http('127.0.0.1', 8989);
  *  $server->start($application);
@@ -86,6 +96,7 @@ void phalcon_server_http_object_free_handler(zend_object *object)
 	if (intern->ctx.log_path) {
 		zend_string_release(intern->ctx.log_path);
 	}
+	zend_object_std_dtor(object);
 }
 
 /**
@@ -94,6 +105,8 @@ void phalcon_server_http_object_free_handler(zend_object *object)
 PHALCON_INIT_CLASS(Phalcon_Server_Http){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Server, Http, server_http, phalcon_server_http_method_entry, 0);
+
+	zend_declare_property_null(phalcon_server_http_ce, SL("_config"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -293,17 +306,46 @@ static void phalcon_server_http_process_read(struct phalcon_server_context *ctx,
 
 		phalcon_server_log_printf(ctx, "Parser state %d, request from socket %d\n", parser_data->parser->state, fd);
         if (parser_data->parser->state >= HTTP_PARSER_STATE_END || ret < PHALCON_SERVER_MAX_BUFSIZE) {
-			zval url = {}, response = {}, content = {};
+			zval data, url = {}, response = {}, content = {};
 			phalcon_server_http_object *intern;
 			int flag = 0;
 
-			ZVAL_STR(&url, parser_data->url.s);
-			intern = phalcon_server_http_object_from_ctx(ctx);
+			array_init(&data);
 
-			PHALCON_CALL_METHOD_FLAG(flag, &response, &intern->application, "handle", &url);
+			phalcon_array_update_str(&data, SL("header"), &parser_data->head, PH_COPY);
+
+			ZVAL_STR(&url, parser_data->url.s);
+			phalcon_array_update_str(&data, SL("url"), &url, PH_COPY);
+			if (parser_data->body.s) {
+				zval body = {};
+				ZVAL_STR(&body, parser_data->body.s);
+				phalcon_array_update_str(&data, SL("body"), &body, PH_COPY);
+			}
+
+			intern = phalcon_server_http_object_from_ctx(ctx);
+			PHALCON_CALL_METHOD_FLAG(flag, &response, &intern->application, "handle", &data);
 			phalcon_http_parser_data_free(parser_data);
+			zval_ptr_dtor(&data);
 			client_ctx->user_data = NULL;
-			client_ctx->response = phalcon_server_http_get_headers();
+			if (flag != FAILURE) {
+				zval header = {};
+				PHALCON_CALL_METHOD_FLAG(flag, &header, &response, "getheaders");
+				if (flag != FAILURE) {
+					zval ret = {};
+					PHALCON_CALL_METHOD_FLAG(flag, &ret, &header, "tostring");
+					if (flag != FAILURE) {
+						client_ctx->response = phalcon_server_http_get_headers(Z_STRVAL(ret));
+						zval_ptr_dtor(&ret);
+					} else {
+						client_ctx->response = phalcon_server_http_get_headers(NULL);
+					}
+					zval_ptr_dtor(&header);
+				} else {
+					client_ctx->response = phalcon_server_http_get_headers(NULL);
+				}
+			} else {
+				client_ctx->response = phalcon_server_http_get_headers(NULL);
+			}
 			if (flag == FAILURE) {
 				if (EG(exception)) {
 					zval ex, msg;

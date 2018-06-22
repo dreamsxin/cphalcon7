@@ -30,6 +30,8 @@
 #define PHALCON_XHPROF_FLAG_MEMORY_MU 2
 #define PHALCON_XHPROF_FLAG_MEMORY_PMU 4
 #define PHALCON_XHPROF_FLAG_MEMORY 6
+#define PHALCON_XHPROF_FLAG_MEMORY_ALLOC 16
+#define PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU (32|16)
 #define PHALCON_XHPROF_FLAG_NO_BUILTINS 8
 
 void tracing_callgraph_append_to_array(zval *return_value);
@@ -140,9 +142,13 @@ zend_always_inline static int tracing_enter_frame_callgraph(zend_string *root_sy
         current_frame->pmu_start = zend_memory_peak_usage(0);
     }
 
-    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+    if ((TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) || (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU)) {
         current_frame->mu_start = zend_memory_usage(0);
     }
+
+    current_frame->num_alloc = TXRG(num_alloc);
+    current_frame->num_free = TXRG(num_free);
+    current_frame->amount_alloc = TXRG(amount_alloc);
 
     /* We only need to compute the hash for the function name,
      * that should be "good" enough, we sort into 1024 buckets only anyways */
@@ -201,6 +207,9 @@ zend_always_inline static void tracing_exit_frame_callgraph()
         bucket->cpu_time = 0;
         bucket->memory = 0;
         bucket->memory_peak = 0;
+		bucket->num_alloc = 0;
+        bucket->num_free = 0;
+        bucket->amount_alloc = 0;
         bucket->child_recurse_level = current_frame->recurse_level;
         bucket->next = TXRG(callgraph_buckets)[slot];
 
@@ -210,11 +219,15 @@ zend_always_inline static void tracing_exit_frame_callgraph()
     bucket->count++;
     bucket->wall_time += duration;
 
+    bucket->num_alloc += TXRG(num_alloc) - current_frame->num_alloc;
+    bucket->num_free += TXRG(num_free) - current_frame->num_free;
+    bucket->amount_alloc += TXRG(amount_alloc) - current_frame->amount_alloc;
+
     if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
         bucket->cpu_time += (phalcon_cpu_timer() - current_frame->cpu_start);
     }
 
-    if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+    if ((TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) || (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU)) {
         bucket->memory += (zend_memory_usage(0) - current_frame->mu_start);
     }
 

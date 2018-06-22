@@ -42,13 +42,13 @@ PHP_METHOD(Phalcon_Xhprof, enable);
 PHP_METHOD(Phalcon_Xhprof, disable);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_xhprof_enable, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 0)
+    ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_xhprof_method_entry[] = {
-	PHP_ME(Phalcon_Xhprof, enable, arginfo_phalcon_xhprof_enable, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Xhprof, disable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_FE_END
+    PHP_ME(Phalcon_Xhprof, enable, arginfo_phalcon_xhprof_enable, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_ME(Phalcon_Xhprof, disable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_FE_END
 };
 
 /**
@@ -56,22 +56,34 @@ static const zend_function_entry phalcon_xhprof_method_entry[] = {
  */
 PHALCON_INIT_CLASS(Phalcon_Xhprof){
 
-	PHALCON_REGISTER_CLASS(Phalcon, Xhprof, xhprof, phalcon_xhprof_method_entry, 0);
+    PHALCON_REGISTER_CLASS(Phalcon, Xhprof, xhprof, phalcon_xhprof_method_entry, 0);
 
-	zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY"),    PHALCON_XHPROF_FLAG_MEMORY);
-	zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_MU"), PHALCON_XHPROF_FLAG_MEMORY_MU);
-	zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_PMU"), PHALCON_XHPROF_FLAG_MEMORY_PMU);
-	zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_CPU"), PHALCON_XHPROF_FLAG_CPU);
-	zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_NO_BUILTINS"), PHALCON_XHPROF_FLAG_NO_BUILTINS);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY"),    PHALCON_XHPROF_FLAG_MEMORY);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_MU"), PHALCON_XHPROF_FLAG_MEMORY_MU);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_PMU"), PHALCON_XHPROF_FLAG_MEMORY_PMU);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_CPU"), PHALCON_XHPROF_FLAG_CPU);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_NO_BUILTINS"), PHALCON_XHPROF_FLAG_NO_BUILTINS);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_ALLOC"), PHALCON_XHPROF_FLAG_MEMORY_ALLOC);
+    zend_declare_class_constant_long(phalcon_xhprof_ce, SL("FLAG_MEMORY_ALLOC_AS_MU"), PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU);
 
-	return SUCCESS;
+    return SUCCESS;
 }
 
 static const char digits[] = "0123456789abcdef";
 
+static void *(*_zend_malloc) (size_t);
+static void (*_zend_free) (void *);
+static void *(*_zend_realloc) (void *, size_t);
+
+void *xhprof_malloc (size_t size);
+void xhprof_free (void *ptr);
+void *xhprof_realloc (void *ptr, size_t size);
+
 void tracing_determine_clock_source() {
 #ifdef __APPLE__
     TXRG(clock_source) = PHALCON_CLOCK_MACH;
+#elif defined(__powerpc__) || defined(__ppc__)
+    TXRG(clock_source) = PHALCON_CLOCK_TSC;
 #else
     struct timespec res;
 
@@ -123,6 +135,21 @@ void tracing_end()
 
         TXRG(enabled) = 0;
         TXRG(callgraph_frames) = NULL;
+
+        if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
+            zend_mm_heap *heap = zend_mm_get_heap();
+
+            if (_zend_malloc || _zend_free || _zend_realloc) {
+                zend_mm_set_custom_handlers(heap, _zend_malloc, _zend_free, _zend_realloc);
+                _zend_malloc = NULL;
+                _zend_free = NULL;
+                _zend_realloc = NULL;
+            } else {
+                // zend_mm_heap is incomplete type, hence one can not access it
+                //  the following line is equivalent to heap->use_custom_heap = 0;
+                *((int*) heap) = 0;
+            }
+        }
     }
 }
 
@@ -233,11 +260,11 @@ void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, ch
             snprintf(symbol, symbol_len, "%s==>", ZSTR_VAL(bucket->parent_function));
         }
     }
-	/*
-	else {
+    /*
+    else {
         snprintf(symbol, symbol_len, "");
     }
-	*/
+    */
     if (bucket->child_class) {
         if (bucket->child_recurse_level > 0) {
             snprintf(symbol, symbol_len, "%s%s::%s@%d", symbol, ZSTR_VAL(bucket->child_class), ZSTR_VAL(bucket->child_function), bucket->child_recurse_level);
@@ -260,6 +287,8 @@ void tracing_callgraph_append_to_array(zval *return_value)
     char symbol[512] = "";
     zval stats_zv, *stats = &stats_zv;
 
+    int as_mu = (TXRG(flags) & (PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU | PHALCON_XHPROF_FLAG_MEMORY_MU)) == PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU;
+
     for (i = 0; i < PHALCON_XHPROF_CALLGRAPH_SLOTS; i++) {
         bucket = TXRG(callgraph_buckets)[i];
 
@@ -269,6 +298,16 @@ void tracing_callgraph_append_to_array(zval *return_value)
             array_init(stats);
             add_assoc_long(stats, "calls", bucket->count);
             add_assoc_long(stats, "time", bucket->wall_time);
+
+            if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
+                add_assoc_long(stats, "memory.num_alloc", bucket->num_alloc);
+                add_assoc_long(stats, "memory.num_free", bucket->num_free);
+                add_assoc_long(stats, "memory.amount_alloc", bucket->amount_alloc);
+
+                if (as_mu) {
+                    add_assoc_long(stats, "memory.usage", bucket->memory);
+                }
+            }
 
             if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
                 add_assoc_long(stats, "cpu", bucket->cpu_time);
@@ -305,6 +344,12 @@ void tracing_begin(zend_long flags)
     for (i = 0; i < PHALCON_XHPROF_CALLGRAPH_COUNTER_SIZE; i++) {
         TXRG(function_hash_counters)[i] = 0;
     }
+
+    if (flags & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
+        zend_mm_heap *heap = zend_mm_get_heap();
+        zend_mm_get_custom_handlers (heap, &_zend_malloc, &_zend_free, &_zend_realloc);
+        zend_mm_set_custom_handlers (heap, &xhprof_malloc, &xhprof_free, &xhprof_realloc);
+    }
 }
 
 void tracing_request_init()
@@ -313,11 +358,54 @@ void tracing_request_init()
     TXRG(enabled) = 0;
     TXRG(flags) = 0;
     TXRG(frame_free_list) = NULL;
+
+    TXRG(num_alloc) = 0;
+    TXRG(num_free) = 0;
+    TXRG(amount_alloc) = 0;
 }
 
 void tracing_request_shutdown()
 {
     tracing_free_the_free_list();
+}
+
+void *xhprof_malloc (size_t size)
+{
+    TXRG(num_alloc) += 1;
+    TXRG(amount_alloc) += size;
+
+    if (_zend_malloc) {
+        return _zend_malloc(size);
+    }
+
+    zend_mm_heap *heap = zend_mm_get_heap();
+    return zend_mm_alloc(heap, size);
+}
+
+void xhprof_free (void *ptr)
+{
+    TXRG(num_free) += 1;
+
+    if (_zend_free) {
+        return _zend_free(ptr);
+    }
+
+    zend_mm_heap *heap = zend_mm_get_heap();
+    return zend_mm_free(heap, ptr);
+}
+
+void *xhprof_realloc (void *ptr, size_t size)
+{
+    TXRG(num_alloc) += 1;
+    TXRG(num_free) += 1;
+    TXRG(amount_alloc) += size;
+
+    if (_zend_realloc) {
+        return _zend_realloc(ptr, size);
+    }
+
+    zend_mm_heap *heap = zend_mm_get_heap();
+    return zend_mm_realloc(heap, ptr, size);
 }
 
 /**
@@ -333,10 +421,10 @@ PHP_METHOD(Phalcon_Xhprof, enable){
         return;
     }
 
-	if (!PHALCON_GLOBAL(xhprof).enable_xhprof) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Change phalcon.xhprof.enable_xhprof in php.ini.");
-		return;
-	}
+    if (!PHALCON_GLOBAL(xhprof).enable_xhprof) {
+        PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Change phalcon.xhprof.enable_xhprof in php.ini.");
+        return;
+    }
 
     tracing_begin(flags);
     tracing_enter_root_frame();
@@ -348,10 +436,10 @@ PHP_METHOD(Phalcon_Xhprof, enable){
  */
 PHP_METHOD(Phalcon_Xhprof, disable){
 
-	if (!PHALCON_GLOBAL(xhprof).enable_xhprof) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Change phalcon.xhprof.enable_xhprof in php.ini.");
-		return;
-	}
+    if (!PHALCON_GLOBAL(xhprof).enable_xhprof) {
+        PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Change phalcon.xhprof.enable_xhprof in php.ini.");
+        return;
+    }
 
     tracing_end();
 

@@ -21,6 +21,8 @@
 
 #include <main/SAPI.h>
 
+#include <Zend/zend_smart_str.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
@@ -44,6 +46,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove);
 PHP_METHOD(Phalcon_Http_Response_Headers, send);
 PHP_METHOD(Phalcon_Http_Response_Headers, reset);
 PHP_METHOD(Phalcon_Http_Response_Headers, toArray);
+PHP_METHOD(Phalcon_Http_Response_Headers, toString);
 PHP_METHOD(Phalcon_Http_Response_Headers, __set_state);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_response_headers___set_state, 0, 0, 1)
@@ -58,6 +61,7 @@ static const zend_function_entry phalcon_http_response_headers_method_entry[] = 
 	PHP_ME(Phalcon_Http_Response_Headers, send, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, reset, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, toArray, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response_Headers, toString, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, __set_state, arginfo_phalcon_http_response_headers___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
@@ -214,6 +218,52 @@ PHP_METHOD(Phalcon_Http_Response_Headers, toArray){
 
 
 	RETURN_MEMBER(getThis(), "_headers");
+}
+
+/**
+ * Returns the current headers as an string
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Http_Response_Headers, toString)
+{
+	zval headers = {}, *value;
+	smart_str buffer = {0};
+	zend_string *str_key;
+	ulong idx;
+
+	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
+
+	if (SG(sapi_headers).http_status_line) {
+		smart_str_appends(&buffer, SG(sapi_headers).http_status_line);
+		smart_str_appendl(&buffer, "\r\n", 2);
+	}
+
+	if (Z_TYPE(headers) == IS_ARRAY) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(headers), idx, str_key, value) {
+			zval header = {}, http_header = {}, tmp = {};
+			if (str_key) {
+				ZVAL_STR(&header, str_key);
+			} else {
+				ZVAL_LONG(&header, idx);
+			}
+
+			if (PHALCON_IS_NOT_EMPTY(value)) {
+				PHALCON_CONCAT_VSV(&http_header, &header, ": ", value);
+				smart_str_appendl(&buffer, Z_STRVAL(http_header), Z_STRLEN(http_header));
+			} else if (Z_TYPE(header) == IS_STRING) {
+				smart_str_appendl(&buffer, Z_STRVAL(header), Z_STRLEN(header));
+			} else {
+				ZVAL_ZVAL(&tmp, &header, 1, 0);
+				convert_to_string(&tmp);
+				smart_str_appendl(&buffer, Z_STRVAL(tmp), Z_STRLEN(tmp));
+			}
+			smart_str_appendl(&buffer, "\r\n", 2);
+		} ZEND_HASH_FOREACH_END();
+	}
+	smart_str_0(&buffer);
+
+	RETURN_STR(buffer.s);
 }
 
 /**

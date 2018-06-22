@@ -104,6 +104,7 @@ void phalcon_server_object_free_handler(zend_object *object)
 	if (intern->ctx.log_path) {
 		zend_string_release(intern->ctx.log_path);
 	}
+	zend_object_std_dtor(object);
 }
 
 /**

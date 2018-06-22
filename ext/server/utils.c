@@ -263,9 +263,8 @@ static void append_essential_headers(smart_str* buffer)
 	smart_str_appendl_ex(buffer, "Connection: close\r\n", sizeof("Connection: close\r\n") - 1, 0);
 }
 
-zend_string *phalcon_server_http_get_headers()
+zend_string *phalcon_server_http_get_headers(char* headers)
 {
-	zend_llist *headers = &SG(sapi_headers).headers;
 	sapi_header_struct *h;
 	zend_llist_position pos;
 	smart_str buffer = {0};
@@ -280,15 +279,19 @@ zend_string *phalcon_server_http_get_headers()
 
 	append_essential_headers(&buffer);
 
-	h = (sapi_header_struct*)zend_llist_get_first_ex(headers, &pos);
+	h = (sapi_header_struct*)zend_llist_get_first_ex(&SG(sapi_headers).headers, &pos);
 	while (h) {
 		if (h->header_len) {
 			smart_str_appendl(&buffer, h->header, h->header_len);
 			smart_str_appendl(&buffer, "\r\n", 2);
 		}
-		h = (sapi_header_struct*)zend_llist_get_next_ex(headers, &pos);
+		h = (sapi_header_struct*)zend_llist_get_next_ex(&SG(sapi_headers).headers, &pos);
+	}
+	if (headers) {
+		smart_str_appends(&buffer, headers);
 	}
 	smart_str_appendl(&buffer, "\r\n", 2);
+	smart_str_0(&buffer);
 
 	return buffer.s;
 }

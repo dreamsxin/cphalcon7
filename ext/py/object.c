@@ -74,6 +74,7 @@ void phalcon_py_object_object_free_handler(zend_object *object)
 		Py_XDECREF(intern->obj);
 	}
 	PHP_PYTHON_THREAD_RELEASE();
+	zend_object_std_dtor(object);
 }
 
 static void efree_function(zend_internal_function *func)

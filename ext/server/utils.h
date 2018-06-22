@@ -57,6 +57,6 @@ void phalcon_http_parser_data_free(phalcon_http_parser_data *hp);
 extern char *http_200;
 extern char *http_200_keepalive;
 
-zend_string *phalcon_server_http_get_headers();
+zend_string *phalcon_server_http_get_headers(char *headers);
 
 #endif /* PHALCON_SERVER_UTILS_H */

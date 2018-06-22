@@ -57,6 +57,9 @@ PHP_METHOD(Phalcon_Socket_Client, read);
 PHP_METHOD(Phalcon_Socket_Client, write);
 PHP_METHOD(Phalcon_Socket_Client, recv);
 PHP_METHOD(Phalcon_Socket_Client, send);
+PHP_METHOD(Phalcon_Socket_Client, keepAlive);
+PHP_METHOD(Phalcon_Socket_Client, shutdown);
+PHP_METHOD(Phalcon_Socket_Client, close);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_client___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, address)
@@ -94,6 +97,9 @@ static const zend_function_entry phalcon_socket_client_method_entry[] = {
 	PHP_ME(Phalcon_Socket_Client, write, arginfo_phalcon_socket_client_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, recv, arginfo_phalcon_socket_client_recv, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, send, arginfo_phalcon_socket_client_send, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, keepAlive, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, shutdown, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, close, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -319,4 +325,54 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 		PHALCON_CALL_METHOD(NULL, getThis(), "_throwsocketexception");
 	}
 	RETURN_THIS();
+}
+
+/**
+ * Enable keepalive
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Socket_Client, keepAlive){
+
+	zval socket = {}, *sol_socket, *so_keepalive;
+
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+
+	if ((sol_socket = zend_get_constant_str(SL("SOL_SOCKET"))) == NULL) {
+		RETURN_FALSE;
+	}
+	if ((so_keepalive = zend_get_constant_str(SL("SO_KEEPALIVE"))) == NULL) {
+		RETURN_FALSE;
+	}
+
+	PHALCON_CALL_FUNCTION(NULL, "socket_set_option", &socket, sol_socket, so_keepalive, &PHALCON_GLOBAL(z_one));
+
+	RETURN_TRUE;
+}
+
+/**
+ * Shutdown
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Socket_Client, shutdown){
+
+	zval socket = {};
+
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_FUNCTION(return_value, "socket_shutdown", &socket);
+}
+
+/**
+ * Close
+ *
+ */
+PHP_METHOD(Phalcon_Socket_Client, close){
+
+	zval socket = {};
+
+	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_FUNCTION(NULL, "socket_close", &socket);
 }

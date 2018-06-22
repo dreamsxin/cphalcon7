@@ -41,7 +41,6 @@
 zend_class_entry *phalcon_socket_ce;
 
 PHP_METHOD(Phalcon_Socket, getSocket);
-PHP_METHOD(Phalcon_Socket, getSocketId);
 PHP_METHOD(Phalcon_Socket, _throwSocketException);
 PHP_METHOD(Phalcon_Socket, setBlocking);
 PHP_METHOD(Phalcon_Socket, isBlocking);
@@ -62,7 +61,6 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_socket_method_entry[] = {
 	PHP_ME(Phalcon_Socket, getSocket, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, getSocketId, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, _throwSocketException, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Socket, setBlocking, arginfo_phalcon_socket_setblocking, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, isBlocking, NULL, ZEND_ACC_PUBLIC)
@@ -126,26 +124,6 @@ PHALCON_INIT_CLASS(Phalcon_Socket){
 PHP_METHOD(Phalcon_Socket, getSocket){
 
 	RETURN_MEMBER(getThis(), "_socket");
-}
-
-/**
- * Gets the socket id
- *
- * @return int
- */
-PHP_METHOD(Phalcon_Socket, getSocketId){
-
-	zval socket = {};
-	php_socket *php_sock;
-
-	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
-
-	if ((php_sock = (php_socket *)zend_fetch_resource_ex(&socket, php_sockets_le_socket_name, php_sockets_le_socket())) == NULL) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_socket_exception_ce, "epoll: can't fetch socket");
-		RETURN_FALSE;
-	}
-
-	ZVAL_LONG(return_value, php_sock->bsd_socket);
 }
 
 /**

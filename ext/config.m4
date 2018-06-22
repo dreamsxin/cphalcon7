@@ -880,6 +880,9 @@ thread/pool.c \
 chart/exception.c \
 chart/captcha/tiny.c \
 socket/exception.c \
+socket.c \
+socket/client.c \
+socket/server.c \
 process/exception.c \
 storage/exception.c \
 server/simple.c \
@@ -959,24 +962,6 @@ server/exception.c"
 		AC_DEFINE(MISSING_MSGHDR_MSGFLAGS, 1, [ ])
 		AC_MSG_RESULT([no])
 	])
-
-	AC_CHECK_DECL(
-		[HAVE_PHP_SOCKET],
-		[
-			AC_CHECK_HEADERS(
-				[ext/sockets/php_sockets.h],
-				[
-					PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
-					AC_DEFINE([PHALCON_USE_PHP_SOCKET], [1], [Whether PHP sockets extension is present at compile time])
-					phalcon_sources="$phalcon_sources socket.c socket/client.c socket/server.c"
-				],
-				,
-				[[#include "main/php.h"]]
-			)
-		],
-		,
-		[[#include "php_config.h"]]
-	)
 
 	AC_CHECK_DECL(
 		[HAVE_PHP_SESSION],

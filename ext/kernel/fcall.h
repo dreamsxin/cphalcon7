@@ -131,6 +131,11 @@ static inline int phalcon_call_function(zval *retval, const char *func, uint npa
 		RETURN_MM_ON_FAILURE(phalcon_call_user_func_args(retval, handler, params, params_count)); \
 	} while (0)
 
+#define PHALCON_CALL_USER_FUNC_ARGS_FLAG(flag, retval, handler, params, params_count) \
+	do { \
+		flag = phalcon_call_user_func_args(retval, handler, params, params_count); \
+	} while (0)
+
 #define PHALCON_CALL_USER_FUNC_ARRAY(retval, handler, params) \
 	do { \
 		RETURN_ON_FAILURE(phalcon_call_user_func_array(retval, handler, params)); \

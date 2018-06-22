@@ -644,11 +644,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Process_Sharedmemory);
 #endif
 
-#if PHALCON_USE_PHP_SOCKET
 	PHALCON_INIT(Phalcon_Socket);
 	PHALCON_INIT(Phalcon_Socket_Client);
 	PHALCON_INIT(Phalcon_Socket_Server);
-#endif
 
 #ifdef PHALCON_USE_WEBSOCKET
 	PHALCON_INIT(Phalcon_Websocket_Connection);
@@ -839,9 +837,7 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Process", "enabled");
 #endif
 
-#if PHALCON_USE_PHP_SOCKET
 	php_info_print_table_row(2, "Socket", "enabled");
-#endif
 
 #if PHALCON_USE_WEBSOCKET
 	php_info_print_table_row(2, "Websocket", "enabled");
@@ -941,11 +937,9 @@ static const zend_module_dep phalcon_deps[] = {
 #else
 	ZEND_MOD_OPTIONAL("hash")
 #endif
-#if PHALCON_USE_PHP_SOCKET
-	ZEND_MOD_REQUIRED("sockets")
-#else
+
 	ZEND_MOD_OPTIONAL("sockets")
-#endif
+
 #if PHALCON_USE_PHP_MBSTRING
 	ZEND_MOD_REQUIRED("mbstring")
 #else

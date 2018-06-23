@@ -21,6 +21,18 @@
 #define PHALCON_HTTP_PARSER_H
 
 #include "php_phalcon.h"
+#include "server/utils.h"
+
+extern struct http_parser_settings http_parser_request_settings;
+
+typedef struct _phalcon_http_parser_object {
+	phalcon_http_parser_data *data;
+	zend_object std;
+} phalcon_http_parser_object;
+
+static inline phalcon_http_parser_object *phalcon_http_parser_object_from_obj(zend_object *obj) {
+	return (phalcon_http_parser_object*)((char*)(obj) - XtOffsetOf(phalcon_http_parser_object, std));
+}
 
 extern zend_class_entry *phalcon_http_parser_ce;
 

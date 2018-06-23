@@ -100,6 +100,7 @@
 zend_class_entry *phalcon_socket_server_ce;
 
 PHP_METHOD(Phalcon_Socket_Server, __construct);
+PHP_METHOD(Phalcon_Socket_Server, setTimeout);
 PHP_METHOD(Phalcon_Socket_Server, setDaemon);
 PHP_METHOD(Phalcon_Socket_Server, setMaxChildren);
 PHP_METHOD(Phalcon_Socket_Server, setEvent);
@@ -118,6 +119,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server___construct, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, domain, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, protocol, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server_settimeout, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, sec, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, usec, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_server_setdaemon, 0, 0, 1)
@@ -166,6 +172,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_socket_server_method_entry[] = {
 	PHP_ME(Phalcon_Socket_Server, __construct, arginfo_phalcon_socket_server___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Socket_Server, setTimeout, arginfo_phalcon_socket_server_settimeout, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setDaemon, arginfo_phalcon_socket_server_setdaemon, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setMaxChildren, arginfo_phalcon_socket_server_setmaxchildren, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setEvent, arginfo_phalcon_socket_server_setevent, ZEND_ACC_PUBLIC)
@@ -194,6 +201,8 @@ PHALCON_INIT_CLASS(Phalcon_Socket_Server){
 	zend_declare_property_null(phalcon_socket_server_ce, SL("_clients"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_socket_server_ce, SL("_event"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_socket_server_ce, SL("_backlog"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_tv_sec"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_socket_server_ce, SL("_tv_usec"), 0, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -262,6 +271,23 @@ PHP_METHOD(Phalcon_Socket_Server, __construct){
 	phalcon_update_property(getThis(), SL("_port"), port);
 
 	phalcon_update_property_empty_array(getThis(), SL("_clients"));
+}
+
+/**
+ * Sets the timeout
+ */
+PHP_METHOD(Phalcon_Socket_Server, setTimeout){
+
+	zval *sec, *usec = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &sec, &usec);
+
+	phalcon_update_property(getThis(), SL("_tv_sec"), sec);
+	if (usec && Z_TYPE_P(usec) == IS_LONG) {
+		phalcon_update_property(getThis(), SL("_tv_usec"), usec);
+	}
+
+	RETURN_THIS();
 }
 
 /**
@@ -612,8 +638,9 @@ static int phalcon_socket_server_startup_workers(zval *object, int max_childs) {
  */
 PHP_METHOD(Phalcon_Socket_Server, run)
 {
-	zval *_onconnection = NULL, *_onrecv = NULL, *_onsend = NULL, *_onclose = NULL, *_onerror = NULL, *_ontimeout = NULL, *timeout = NULL, *usec = NULL;
-	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout, listensocket = {}, maxlen = {}, event = {};
+	zval *_onconnection = NULL, *_onrecv = NULL, *_onsend = NULL, *_onclose = NULL, *_onerror = NULL, *_ontimeout = NULL, *_timeout = NULL, *_usec = NULL;
+	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout, timeout = {}, usec = {};
+	zval listensocket = {}, maxlen = {}, event = {};
 	zval daemon = {}, max_children = {}, *msg_dontwait;
 	int flag = 0;
 
@@ -673,12 +700,16 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (!timeout) {
-		timeout = &PHALCON_GLOBAL(z_null);
+	if (!_timeout || Z_TYPE_P(_timeout) != IS_LONG) {
+		phalcon_read_property(&timeout, getThis(), SL("_tv_sec"), PH_NOISY|PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&timeout, _timeout);
 	}
 
-	if (!usec) {
-		usec = &PHALCON_GLOBAL(z_null);
+	if (!_usec || Z_TYPE_P(_usec) != IS_LONG) {
+		phalcon_read_property(&usec, getThis(), SL("_tv_usec"), PH_NOISY|PH_READONLY);
+	} else {
+		ZVAL_COPY_VALUE(&usec, _usec);
 	}
 
 	if ((msg_dontwait = zend_get_constant_str(SL("MSG_DONTWAIT"))) == NULL) {
@@ -749,7 +780,7 @@ worker:
 		ZVAL_MAKE_REF(&r_array);
 		ZVAL_MAKE_REF(&w_array);
 		ZVAL_MAKE_REF(&e_array);
-		PHALCON_MM_CALL_FUNCTION(&ret, "socket_select", &r_array, &w_array, &e_array, timeout, usec);
+		PHALCON_MM_CALL_FUNCTION(&ret, "socket_select", &r_array, &w_array, &e_array, &timeout, &usec);
 		ZVAL_UNREF(&r_array);
 		ZVAL_UNREF(&w_array);
 		ZVAL_UNREF(&e_array);

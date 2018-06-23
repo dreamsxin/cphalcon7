@@ -38,6 +38,7 @@ static inline int phalcon_socket_set_non_blocking(int fd) {
 
 #define PHALCON_SOCKET_AF_UNIX			AF_UNIX
 #define PHALCON_SOCKET_AF_INET			AF_INET
+#define PHALCON_SOCKET_AF_UNSPEC		AF_UNSPEC
 
 #if HAVE_IPV6
 #define PHALCON_SOCKET_AF_INET6			AF_INET6

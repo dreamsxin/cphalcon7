@@ -639,14 +639,14 @@ static int phalcon_socket_server_startup_workers(zval *object, int max_childs) {
 PHP_METHOD(Phalcon_Socket_Server, run)
 {
 	zval *_onconnection = NULL, *_onrecv = NULL, *_onsend = NULL, *_onclose = NULL, *_onerror = NULL, *_ontimeout = NULL, *_timeout = NULL, *_usec = NULL;
-	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout, timeout = {}, usec = {};
+	zval onconnection = {}, onrecv = {}, onsend = {}, onclose = {}, onerror = {}, ontimeout = {}, timeout = {}, usec = {};
 	zval listensocket = {}, maxlen = {}, event = {};
 	zval daemon = {}, max_children = {}, *msg_dontwait;
 	int flag = 0;
 
 	phalcon_fetch_params(1, 0, 8, &_onconnection, &_onrecv, &_onsend, &_onclose, &_onerror, &_ontimeout, &timeout, &usec);
 
-	if (_onconnection) {
+	if (_onconnection && Z_TYPE_P(_onconnection) > IS_NULL) {
 		if (Z_TYPE_P(_onconnection) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onconnection), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&onconnection, zend_ce_closure, "bind", _onconnection, getThis());
 			PHALCON_MM_ADD_ENTRY(&onconnection);
@@ -655,7 +655,7 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (_onrecv) {
+	if (_onrecv && Z_TYPE_P(_onrecv) > IS_NULL) {
 		if (Z_TYPE_P(_onrecv) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
 			PHALCON_MM_ADD_ENTRY(&onrecv);
@@ -664,7 +664,7 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (_onsend) {
+	if (_onsend && Z_TYPE_P(_onsend) > IS_NULL) {
 		if (Z_TYPE_P(_onsend) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
 			PHALCON_MM_ADD_ENTRY(&onsend);
@@ -673,7 +673,7 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (_onclose) {
+	if (_onclose && Z_TYPE_P(_onclose) > IS_NULL) {
 		if (Z_TYPE_P(_onclose) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onclose), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&onclose, zend_ce_closure, "bind", _onclose, getThis());
 			PHALCON_MM_ADD_ENTRY(&onclose);
@@ -682,7 +682,7 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (_onerror) {
+	if (_onerror && Z_TYPE_P(_onerror) > IS_NULL) {
 		if (Z_TYPE_P(_onerror) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
 			PHALCON_MM_ADD_ENTRY(&onerror);
@@ -691,7 +691,7 @@ PHP_METHOD(Phalcon_Socket_Server, run)
 		}
 	}
 
-	if (_ontimeout) {
+	if (_ontimeout && Z_TYPE_P(_ontimeout) > IS_NULL) {
 		if (Z_TYPE_P(_ontimeout) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
 			PHALCON_MM_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
 			PHALCON_MM_ADD_ENTRY(&ontimeout);
@@ -793,11 +793,10 @@ worker:
 			RETURN_MM();
 		}
 		if (PHALCON_IS_LONG_IDENTICAL(&ret, 0)) {
-			if (phalcon_method_exists_ex(getThis(), SL("ontimeout")) == SUCCESS) {
-				PHALCON_MM_CALL_METHOD(NULL, getThis(), "ontimeout");
-			}
 			if (Z_TYPE(ontimeout) > IS_NULL) {
-				PHALCON_MM_CALL_USER_FUNC(NULL, &ontimeout);
+				PHALCON_CALL_USER_FUNC_ARGS(NULL, &ontimeout, NULL, 0);
+			} else if (phalcon_method_exists_ex(getThis(), SL("ontimeout")) == SUCCESS) {
+				PHALCON_MM_CALL_METHOD(NULL, getThis(), "ontimeout");
 			}
 			zval_ptr_dtor(&r_array);
 			zval_ptr_dtor(&w_array);

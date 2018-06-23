@@ -145,7 +145,11 @@ PHP_METHOD(Phalcon_Socket_Client, __construct){
 				if (zend_is_true(&filtered)) {
 					ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET6);
 				} else {
-					ZVAL_LONG(&domain, PHALCON_SOCKET_AF_UNIX);
+					if ( Z_LVAL_P(port) > 0) {
+						ZVAL_LONG(&domain, PHALCON_SOCKET_AF_INET);
+					} else {
+						ZVAL_LONG(&domain, PHALCON_SOCKET_AF_UNIX);
+					}
 				}
 			}
 		} else {
@@ -246,6 +250,9 @@ PHP_METHOD(Phalcon_Socket_Client, write){
 	}
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(socket) != IS_RESOURCE) {
+		RETURN_FALSE;
+	}
 
 	ZVAL_LONG(&ret, 0);
 	ZVAL_DUP(&writebuf, buffer);
@@ -281,6 +288,9 @@ PHP_METHOD(Phalcon_Socket_Client, recv){
 	phalcon_fetch_params(0, 2, 0, &length, &flag);
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(socket) != IS_RESOURCE) {
+		RETURN_FALSE;
+	}
 
 	PHALCON_CALL_FUNCTION(&ret, "socket_recv", &socket, return_value, length, flag);
 
@@ -305,6 +315,9 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 	phalcon_fetch_params(0, 3, 0, &buffer, &length, &flag);
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(socket) != IS_RESOURCE) {
+		RETURN_FALSE;
+	}
 
 	ZVAL_LONG(&ret, 0);
 	ZVAL_DUP(&writebuf, buffer);
@@ -337,7 +350,9 @@ PHP_METHOD(Phalcon_Socket_Client, keepAlive){
 	zval socket = {}, *sol_socket, *so_keepalive;
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
-
+	if (Z_TYPE(socket) != IS_RESOURCE) {
+		RETURN_FALSE;
+	}
 	if ((sol_socket = zend_get_constant_str(SL("SOL_SOCKET"))) == NULL) {
 		RETURN_FALSE;
 	}
@@ -360,7 +375,9 @@ PHP_METHOD(Phalcon_Socket_Client, shutdown){
 	zval socket = {};
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
-
+	if (Z_TYPE(socket) != IS_RESOURCE) {
+		RETURN_FALSE;
+	}
 	PHALCON_CALL_FUNCTION(return_value, "socket_shutdown", &socket);
 }
 
@@ -374,5 +391,8 @@ PHP_METHOD(Phalcon_Socket_Client, close){
 
 	phalcon_read_property(&socket, getThis(), SL("_socket"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_FUNCTION(NULL, "socket_close", &socket);
+	if (Z_TYPE(socket) == IS_RESOURCE) {
+		PHALCON_CALL_FUNCTION(NULL, "socket_close", &socket);
+		phalcon_update_property_null(getThis(), SL("_socket"));
+	}
 }

@@ -23,12 +23,26 @@
 #include <main/SAPI.h>
 #include <ext/date/php_date.h>
 
-phalcon_http_parser_data *phalcon_http_parser_data_new(struct http_parser_settings *request_settings)
+/* Http parser */
+struct http_parser_settings http_parser_request_settings = {
+    .on_message_begin = phalcon_http_parser_on_message_begin,
+    .on_url = phalcon_http_parser_on_url,
+    .on_status = phalcon_http_parser_on_status,
+    .on_header_field = phalcon_http_parser_on_header_field,
+    .on_header_value = phalcon_http_parser_on_header_value,
+    .on_headers_complete = phalcon_http_parser_on_headers_complete,
+    .on_body = phalcon_http_parser_on_body,
+    .on_message_complete = phalcon_http_parser_on_message_complete,
+    .on_chunk_header = phalcon_http_parser_on_chunk_header,
+    .on_chunk_complete = phalcon_http_parser_on_chunk_complete
+};
+
+phalcon_http_parser_data *phalcon_http_parser_data_new(struct http_parser_settings *request_settings, int type)
 {
     phalcon_http_parser_data *data = ecalloc(1, sizeof(phalcon_http_parser_data));
 
     data->parser = emalloc(sizeof(struct http_parser));
-    http_parser_init(data->parser, HTTP_REQUEST);
+    http_parser_init(data->parser, type);
     data->parser->data = data;
 
     array_init(&data->head);
@@ -42,6 +56,12 @@ phalcon_http_parser_data *phalcon_http_parser_data_new(struct http_parser_settin
 void phalcon_http_parser_data_free(phalcon_http_parser_data *data)
 {
     if (!data) return;
+	zval_ptr_dtor(&data->head);
+	smart_str_free(&data->url);
+	smart_str_free(&data->body);
+	if (data->last_key) {
+		zend_string_free(data->last_key);
+	}
     efree(data->parser);
     efree(data);
     data = NULL;

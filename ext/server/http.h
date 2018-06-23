@@ -25,6 +25,8 @@
 
 #include "server/core.h"
 
+extern struct http_parser_settings http_parser_request_settings;
+
 typedef struct _phalcon_server_http_object {
 	struct phalcon_server_context ctx;
 	int enable_keepalive;

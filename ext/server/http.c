@@ -157,20 +157,6 @@ PHP_METHOD(Phalcon_Server_Http, __construct){
 	}
 }
 
-/* Http parser */
-struct http_parser_settings http_parser_request_settings = {
-    .on_message_begin = phalcon_http_parser_on_message_begin,
-    .on_url = phalcon_http_parser_on_url,
-    .on_status = phalcon_http_parser_on_status,
-    .on_header_field = phalcon_http_parser_on_header_field,
-    .on_header_value = phalcon_http_parser_on_header_value,
-    .on_headers_complete = phalcon_http_parser_on_headers_complete,
-    .on_body = phalcon_http_parser_on_body,
-    .on_message_complete = phalcon_http_parser_on_message_complete,
-    .on_chunk_header = phalcon_http_parser_on_chunk_header,
-    .on_chunk_complete = phalcon_http_parser_on_chunk_complete
-};
-
 char *http_200="HTTP/1.0 200 OK\r\n"
 	"Cache-Control: no-cache\r\n"
 	"Connection: close\r\n"
@@ -298,7 +284,7 @@ static void phalcon_server_http_process_read(struct phalcon_server_context *ctx,
 	} else {
 		phalcon_http_parser_data *parser_data;
 		if (!client_ctx->user_data) {
-			client_ctx->user_data = phalcon_http_parser_data_new(&http_parser_request_settings);
+			client_ctx->user_data = phalcon_http_parser_data_new(&http_parser_request_settings, HTTP_REQUEST);
 		}
 		parser_data = (phalcon_http_parser_data *)client_ctx->user_data;
 

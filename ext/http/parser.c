@@ -13,11 +13,13 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
 #include "http/parser.h"
 #include "http/parser/http_parser.h"
+#include "server/utils.h"
 
 #include <ext/standard/url.h>
 
@@ -58,122 +60,26 @@ static const zend_function_entry phalcon_http_parser_method_entry[] = {
 	PHP_FE_END
 };
 
-typedef struct {
-	struct http_parser parser;
-	struct http_parser_url handle;
-	int is_response;
-	int was_header_value;
-	int finished;
-	zval data;
-	zval headers;
-	zend_string *tmp;
-} phalcon_http_parser_context;
-
-/*  http parser callbacks */
-static int phalcon_on_message_begin(http_parser *p)
+zend_object_handlers phalcon_http_parser_object_handlers;
+zend_object* phalcon_http_parser_object_create_handler(zend_class_entry *ce)
 {
-	return 0;
+	phalcon_http_parser_object *intern = ecalloc(1, sizeof(phalcon_http_parser_object) + zend_object_properties_size(ce));
+	intern->std.ce = ce;
+
+	zend_object_std_init(&intern->std, ce);
+	object_properties_init(&intern->std, ce);
+	intern->std.handlers = &phalcon_http_parser_object_handlers;
+
+	return &intern->std;
 }
 
-static int phalcon_on_headers_complete(http_parser *p)
+void phalcon_http_parser_object_free_handler(zend_object *object)
 {
-	return 0;
-}
-
-static int phalcon_on_message_complete(http_parser *p)
-{
-	phalcon_http_parser_context *result = p->data;
-	result->finished = 1;
-
-	if (result->tmp != NULL) {
-		zend_string_free(result->tmp);
-		result->tmp = NULL;
+	phalcon_http_parser_object *intern = phalcon_http_parser_object_from_obj(object);
+	if (intern->data) {
+		phalcon_http_parser_data_free(intern->data);
 	}
-
-	return 0;
-}
-
-#define PHALCON_HTTP_PARSER_PARSE_URL(flag, name) \
-	if (result->handle.field_set & (1 << flag)) { \
-		add_assoc_stringl(&result->data, #name, (char*)(at+result->handle.field_data[flag].off), result->handle.field_data[flag].len); \
-	}
-
-static int phalcon_on_url_cb(http_parser *p, const char *at, size_t len)
-{
-	phalcon_http_parser_context *result = p->data;
-
-	http_parser_parse_url(at, len, 0, &result->handle);
-	add_assoc_stringl(&result->data, "QUERY_STRING", (char*)at, len);
-
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_SCHEMA, SCHEME);
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_HOST, HOST);
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_PORT, PORT);
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_PATH, PATH);
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_QUERY, QUERY);
-	PHALCON_HTTP_PARSER_PARSE_URL(UF_FRAGMENT, FRAGMENT);
-
-	return 0;
-}
-
-static int phalcon_on_status_cb(http_parser *p, const char *at, size_t len)
-{
-	return 0;
-}
-
-static int phalcon_on_header_field_cb(http_parser *p, const char *at, size_t len)
-{
-	int tmp_len = 0;
-	phalcon_http_parser_context *result = p->data;
-
-	if (result->was_header_value) {
-		if (result->tmp != NULL) {
-			zend_string_free(result->tmp);
-		}
-		result->tmp = zend_string_init(at, len, 0);
-	} else {
-		if (result->tmp != NULL) {
-			tmp_len = ZSTR_LEN(result->tmp);
-			result->tmp = zend_string_extend(result->tmp, len + tmp_len + 1, 0);
-			memcpy(&ZSTR_VAL(result->tmp)[tmp_len], at, len);
-			ZSTR_VAL(result->tmp)[len + tmp_len] = '\0';
-		} else {
-			result->tmp = zend_string_init(at, len, 0);
-		}
-	}
-
-	result->was_header_value = 0;
-	return 0;
-}
-
-static int phalcon_on_header_value_cb(http_parser *p, const char *at, size_t len)
-{
-	int tmp_len = 0;
-	phalcon_http_parser_context *result = p->data;
-
-	if (result->was_header_value) {
-		zval *element;
-
-		if ((element = zend_hash_find(Z_ARRVAL(result->headers), result->tmp)) != NULL) {
-			tmp_len = Z_STRLEN_P(element);
-			Z_STR_P(element) = zend_string_extend(Z_STR_P(element), tmp_len + len + 1, 0);
-			memcpy(&Z_STRVAL_P(element)[tmp_len], at, len);
-			Z_STRVAL_P(element)[tmp_len + len] = '\0';
-		}
-	} else {
-		add_assoc_stringl_ex(&result->headers, ZSTR_VAL(result->tmp), ZSTR_LEN(result->tmp), (char*)at, len);
-	}
-
-	result->was_header_value = 1;
-	return 0;
-}
-
-static int phalcon_on_body_cb(http_parser *p, const char *at, size_t len)
-{
-	phalcon_http_parser_context *result = p->data;
-
-	add_assoc_stringl(&result->data, "BODY", (char*)at, len);
-
-	return 0;
+	zend_object_std_dtor(object);
 }
 
 /**
@@ -181,7 +87,7 @@ static int phalcon_on_body_cb(http_parser *p, const char *at, size_t len)
  */
 PHALCON_INIT_CLASS(Phalcon_Http_Parser){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Http, Parser, http_parser, phalcon_http_parser_method_entry, 0);
+	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Http, Parser, http_parser, phalcon_http_parser_method_entry, 0);
 
 	zend_declare_property_long(phalcon_http_parser_ce, SL("_type"), HTTP_REQUEST, ZEND_ACC_PROTECTED);
 
@@ -199,6 +105,8 @@ PHALCON_INIT_CLASS(Phalcon_Http_Parser){
 PHP_METHOD(Phalcon_Http_Parser, __construct)
 {
 	zval *type = NULL;
+	phalcon_http_parser_object *intern;
+	int t = HTTP_REQUEST;
 
 	phalcon_fetch_params(0, 0, 1, &type);
 
@@ -208,11 +116,15 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
 			case HTTP_RESPONSE:
 			case HTTP_BOTH:
 				phalcon_update_property(getThis(), SL("_type"), type);
+				t = Z_LVAL_P(type);
 				break;
 			default:
 				break;
 		}
 	}
+
+	intern = phalcon_http_parser_object_from_obj(Z_OBJ_P(getThis()));
+	intern->data = phalcon_http_parser_data_new(&http_parser_request_settings, t);
 }
 
 /**
@@ -224,66 +136,52 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
 PHP_METHOD(Phalcon_Http_Parser, execute){
 
 	zval *body, type = {};
-	phalcon_http_parser_context *ctx = NULL;
-	http_parser_settings settings;
+	phalcon_http_parser_object *intern;
 	int body_len;
 	char versiphalcon_on_buffer[4] = {0};
 	size_t nparsed = 0;
 
 	phalcon_fetch_params(0, 1, 0, &body);
 
-	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
-
 	body_len = Z_STRLEN_P(body);
 
-	ctx = emalloc(sizeof(phalcon_http_parser_context));
-	http_parser_init(&ctx->parser, Z_LVAL(type));
+	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
-	array_init(&ctx->headers);
-	array_init(&ctx->data);
+	intern = phalcon_http_parser_object_from_obj(Z_OBJ_P(getThis()));
 
-	ctx->finished = 0;
-	ctx->was_header_value = 1;
-	ctx->tmp = NULL;
-
-	if (Z_LVAL(type) == HTTP_RESPONSE) {
-		ctx->is_response = 1;
-	} else {
-		ctx->is_response = 0;
-	}
-
-	memset(&ctx->handle, 0, sizeof(struct http_parser_url));
-
-	/* setup callback */
-	settings.on_message_begin = phalcon_on_message_begin;
-	settings.on_header_field = phalcon_on_header_field_cb;
-	settings.on_header_value = phalcon_on_header_value_cb;
-	settings.on_url = phalcon_on_url_cb;
-	settings.on_status = phalcon_on_status_cb;
-	settings.on_body = phalcon_on_body_cb;
-	settings.on_headers_complete = phalcon_on_headers_complete;
-	settings.on_message_complete = phalcon_on_message_complete;
-
-	ctx->parser.data = ctx;
-	nparsed = http_parser_execute(&ctx->parser, &settings, Z_STRVAL_P(body), body_len);
+	nparsed = http_parser_execute(intern->data->parser, &http_parser_request_settings, Z_STRVAL_P(body), Z_STRLEN_P(body));
 
 	if (nparsed != body_len) {
-		efree(ctx);
 		RETURN_FALSE;
 	}
 
-	ZVAL_COPY(return_value, &ctx->data);
-
-	if (ctx->is_response == 0) {
-		add_assoc_string(return_value, "REQUEST_METHOD", (char*)http_method_str(ctx->parser.method));
-	} else {
-		add_assoc_long(return_value, "STATUS_CODE", (long)ctx->parser.status_code);
+	if (intern->data->parser->state < HTTP_PARSER_STATE_END) {
+		RETURN_TRUE;
 	}
-	add_assoc_long(return_value, "UPGRADE", (long)ctx->parser.upgrade);
 
-	snprintf(versiphalcon_on_buffer, 4, "%d.%d", ctx->parser.http_major, ctx->parser.http_minor);
+	array_init(return_value);
 
-	phalcon_array_update_str_str(&ctx->headers, SL("VERSION"), versiphalcon_on_buffer, 4, PH_COPY);
-	phalcon_array_update_str(return_value, SL("HEADERS"), &ctx->headers, PH_COPY);
-	efree(ctx);
+	if (intern->data->url.s) {
+		zval url = {};
+		ZVAL_STR(&url, intern->data->url.s);
+		phalcon_array_update_str(return_value, SL("QUERY_STRING"), &url, PH_COPY);
+	}
+
+	if (intern->data->body.s) {
+		zval body = {};
+		ZVAL_STR(&body, intern->data->body.s);
+		phalcon_array_update_str(return_value, SL("BODY"), &body, PH_COPY);
+	}
+
+	if (Z_LVAL(type) == HTTP_REQUEST) {
+		add_assoc_string(return_value, "REQUEST_METHOD", (char*)http_method_str(intern->data->parser->method));
+	} else {
+		add_assoc_long(return_value, "STATUS_CODE", (long)intern->data->parser->status_code);
+	}
+	add_assoc_long(return_value, "UPGRADE", (long)intern->data->parser->upgrade);
+
+	snprintf(versiphalcon_on_buffer, 4, "%d.%d", intern->data->parser->http_major, intern->data->parser->http_minor);
+
+	phalcon_array_update_str_str(return_value, SL("VERSION"), versiphalcon_on_buffer, 4, 0);
+	phalcon_array_update_str(return_value, SL("HEADERS"), &intern->data->head, PH_COPY);
 }

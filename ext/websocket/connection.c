@@ -22,8 +22,13 @@
 
 #include <zend_smart_str.h>
 
+#include <ext/spl/spl_dllist.h>
+
 #include "kernel/main.h"
 #include "kernel/string.h"
+#include "kernel/fcall.h"
+#include "kernel/operators.h"
+
 /**
  * Phalcon\Websocket\Connection
  *
@@ -53,30 +58,37 @@ const zend_function_entry phalcon_websocket_connection_method_entry[] = {
 	PHP_FE_END
 };
 
-int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zend_string *text) {
+int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text) {
+	zval count = {};
+	int flag;
 	if (!conn->connected) {
 		php_error_docref(NULL, E_WARNING, "Client is disconnected\n");
 		return -1;
 	}
-	if (((conn->write_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE) == conn->read_ptr) {
+	PHALCON_CALL_METHOD_FLAG(flag, &count, &conn->queue, "count");
+	if (PHALCON_GT_LONG(&count, PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE)) {
 		php_error_docref(NULL, E_WARNING, "Write buffer is full\n");
 		return -1;
 	}
 
-	zend_string_addref(text);
-	conn->buf[conn->write_ptr] = text;
-	conn->write_ptr = (conn->write_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, &conn->queue, "enqueue", text);
 
+	if (flag != SUCCESS) {
+		php_error_docref(NULL, E_WARNING, "Write buffer enqueue fail\n");
+		return -1;
+	}
 	lws_callback_on_writable(conn->wsi);
 
-	return text->len;
+	return Z_STRLEN_P(text);
 }
 
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason) {
-	conn->connected = 0;
-	printf("Send close to %lu\n", conn->id);
-	lws_close_reason(conn->wsi, LWS_CLOSE_STATUS_NORMAL, (unsigned char *)reason->val, reason->len);
-	lws_callback_on_writable(conn->wsi);
+	if (conn->connected) {
+		conn->connected = 0;
+		printf("Send close to %lu\n", conn->id);
+		lws_close_reason(conn->wsi, LWS_CLOSE_STATUS_NORMAL, (unsigned char *)reason->val, reason->len);
+		lws_callback_on_writable(conn->wsi);
+	}
 }
 
 zend_object_handlers phalcon_websocket_connection_object_handlers;
@@ -89,10 +101,10 @@ zend_object* phalcon_websocket_connection_object_create_handler(zend_class_entry
 	object_properties_init(&intern->std, ce);
 	intern->std.handlers = &phalcon_websocket_connection_object_handlers;
 
+	object_init_ex(&intern->queue, spl_ce_SplQueue);
+
 	intern->connected = 0;
 	intern->wsi = NULL;
-	intern->read_ptr = 0;
-	intern->write_ptr = 0;
 
 	return &intern->std;
 }
@@ -101,14 +113,7 @@ void phalcon_websocket_connection_object_free_handler(zend_object *object)
 {
 	phalcon_websocket_connection_object *intern;
 	intern = phalcon_websocket_connection_object_from_obj(object);
-	while (intern->read_ptr != intern->write_ptr) {
-		zend_string_delref(intern->buf[intern->read_ptr]);
-		if (zend_string_refcount(intern->buf[intern->read_ptr]) < 1) {
-			zend_string_free(intern->buf[intern->read_ptr]);
-		}
-
-		intern->read_ptr = (intern->read_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
-	}
+	zval_ptr_dtor(&intern->queue);
 
 	zend_object_std_dtor(object);
 }
@@ -129,16 +134,13 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Connection){
 PHP_METHOD(Phalcon_Websocket_Connection, send)
 {
 	phalcon_websocket_connection_object *intern;
-	zend_string *text;
+	zval *val;
 	int n;
 
-	ZEND_PARSE_PARAMETERS_START(1, 1);
-		Z_PARAM_STR(text)
-	ZEND_PARSE_PARAMETERS_END();
+	phalcon_fetch_params(0, 1, 0, &val);
 
 	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
-	n = phalcon_websocket_connection_write(intern, text);
-	efree(text);
+	n = phalcon_websocket_connection_write(intern, val);
 	if (-1 == n) {
 		RETURN_FALSE;
 	}
@@ -154,13 +156,11 @@ PHP_METHOD(Phalcon_Websocket_Connection, sendJson)
 	zval *val, text = {};
 	int n;
 
-	ZEND_PARSE_PARAMETERS_START(1, 1);
-		Z_PARAM_ZVAL(val);
-	ZEND_PARSE_PARAMETERS_END();
+	phalcon_fetch_params(0, 1, 0, &val);
 
 	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
 	RETURN_ON_FAILURE(phalcon_json_encode(&text, val, 0));
-	n = phalcon_websocket_connection_write(intern, Z_STR(text));
+	n = phalcon_websocket_connection_write(intern, &text);
 	if (-1 == n) {
 		RETURN_FALSE;
 	}

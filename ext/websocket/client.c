@@ -40,7 +40,7 @@
  * $client->on(Phalcon\Websocket\Client::ON_CLOSE, function(){
  *     echo 'Close'.PHP_EOL;
  * });
- * $client->on(Phalcon\Websocket\Client::ON_DATA, function($client, $conn){
+ * $client->on(Phalcon\Websocket\Client::ON_DATA, function($client, $conn, $data){
  *     echo 'Data'.PHP_EOL;
  * });
  * $client->connect();
@@ -100,15 +100,11 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 	zval *connection = user;
 	zval retval = {}, obj = {};
 	int n, return_code = 0, flag = 0;
-	zend_string *text;
+	unsigned char buf[LWS_SEND_BUFFER_PRE_PADDING + 1024 + LWS_SEND_BUFFER_POST_PADDING];
 
 	ZVAL_OBJ(&obj, &intern->std);
 
 	switch (reason) {
-		case LWS_CALLBACK_CHANGE_MODE_POLL_FD:
-		case LWS_CALLBACK_LOCK_POLL:
-		case LWS_CALLBACK_UNLOCK_POLL:
-			break;
 		case LWS_CALLBACK_WSI_CREATE:
 			lwsl_notice("WSI create\n");
 			break;
@@ -137,18 +133,18 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 			break;
 
 		case LWS_CALLBACK_CLIENT_RECEIVE:
-			lwsl_notice("Receive data\n");
+			lwsl_notice("Receive data: %d\n", len);
 			if (Z_TYPE(intern->callbacks[PHP_CB_CLIENT_DATA]) != IS_NULL) {
 				zval data = {};
 				ZVAL_STRINGL(&data, in, len);
-
-				PHALCON_CALL_USER_FUNC_FLAG(flag, NULL, &intern->callbacks[PHP_CB_CLIENT_DATA], &obj, connection, &data);
+				PHALCON_CALL_USER_FUNC_FLAG(flag, &retval, &intern->callbacks[PHP_CB_CLIENT_DATA], &obj, connection, &data);
+				zval_ptr_dtor(&data);
 				if (SUCCESS != flag) {
 					php_error_docref(NULL, E_WARNING, "Unable to call data callback");
 				}
 
 				// If return is different from true (or assimilated), close connection
-				if (!zval_is_true(&retval)) {
+				if (SUCCESS != flag || Z_TYPE(retval) == IS_FALSE) {
 					connection_object = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(connection));
 					connection_object->connected = 0;
 					return_code = -1;
@@ -166,24 +162,35 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 				break;
 			}
 
-			while (connection_object->read_ptr != connection_object->write_ptr) {
-				text = connection_object->buf[connection_object->read_ptr];
-				n = lws_write(wsi, (unsigned char *)ZSTR_VAL(text), ZSTR_LEN(text), LWS_WRITE_TEXT);
+			while (1) {
+				zval ret = {}, text = {};
+				int flag;
+				int len = 0;
+				PHALCON_CALL_METHOD_FLAG(flag, &ret, &connection_object->queue, "isempty");
+				if (flag != SUCCESS || zend_is_true(&ret)) {
+					break;
+				}
+				PHALCON_CALL_METHOD_FLAG(flag, &text, &connection_object->queue, "dequeue");
+				if (flag != SUCCESS) {
+					break;
+				}
+				len += sprintf((char*)&buf[LWS_SEND_BUFFER_PRE_PADDING], "%s", (unsigned char *)Z_STRVAL(text));
+				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, LWS_WRITE_BINARY);
 
 				if (n < 0) {
 					lwsl_err("Write to socket %lu failed with code %d\n", connection_object->id, n);
 					return 1;
 				}
-				if (n < (int) text->len) {
+				lwsl_notice("Write bytes %d\n", n);
+				if (n < len) {
 					// TODO Implements partial write
-					connection_object->buf[connection_object->read_ptr] = NULL;
-					connection_object->read_ptr = (connection_object->read_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
+					zval_ptr_dtor(&text);
 					lwsl_err("Partial write\n");
 					return -1;
 				}
 
-				connection_object->buf[connection_object->read_ptr] = NULL;
-				connection_object->read_ptr = (connection_object->read_ptr + 1) % PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE;
+				// Cleanup
+				zval_ptr_dtor(&text);
 			}
 
 			break;
@@ -201,6 +208,7 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 			}
 			intern->exit_request = 1;
 			break;
+
 		case LWS_CALLBACK_CLIENT_CONNECTION_ERROR:
 			lwsl_notice("Error\n");
 			if (Z_TYPE(intern->callbacks[PHP_CB_CLIENT_ERROR]) != IS_NULL) {
@@ -211,15 +219,9 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 			}
 			intern->exit_request = -1;
 			break;
-		case LWS_CALLBACK_CLIENT_FILTER_PRE_ESTABLISH:
-		case LWS_CALLBACK_CLIENT_APPEND_HANDSHAKE_HEADER:
-		case LWS_CALLBACK_PROTOCOL_INIT:
-		case LWS_CALLBACK_PROTOCOL_DESTROY:
-		case LWS_CALLBACK_GET_THREAD_ID:
-		case LWS_CALLBACK_HTTP_DROP_PROTOCOL:
-			break;
+
 		default:
-			lwsl_notice(" – Callback Non-handled action (reason: %d)\n", reason);
+			break;
 	}
 
 	return intern->exit_request == 1 ? -1 : return_code;
@@ -458,7 +460,9 @@ PHP_METHOD(Phalcon_Websocket_Client, send)
 	phalcon_fetch_params(0, 1, 0, &text);
 
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
-	PHALCON_CALL_METHOD(return_value, &intern->connection, "send", text);
+	if (Z_TYPE(intern->connection) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(return_value, &intern->connection, "send", text);
+	}
 }
 
 /**
@@ -472,10 +476,10 @@ PHP_METHOD(Phalcon_Websocket_Client, sendJson)
 	phalcon_fetch_params(0, 1, 0, &val);
 
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
-
-	RETURN_ON_FAILURE(phalcon_json_encode(&text, val, 0));
-
-	PHALCON_CALL_METHOD(return_value, &intern->connection, "sendjson", &text);
+	if (Z_TYPE(intern->connection) == IS_OBJECT) {
+		RETURN_ON_FAILURE(phalcon_json_encode(&text, val, 0));
+		PHALCON_CALL_METHOD(return_value, &intern->connection, "sendjson", &text);
+	}
 }
 
 /**
@@ -486,8 +490,9 @@ PHP_METHOD(Phalcon_Websocket_Client, isConnected)
 	phalcon_websocket_client_object *intern;
 
 	intern = phalcon_websocket_client_object_from_obj(Z_OBJ_P(getThis()));
-
-	PHALCON_CALL_METHOD(return_value, &intern->connection, "isconnected");
+	if (Z_TYPE(intern->connection) == IS_OBJECT) {
+		PHALCON_CALL_METHOD(return_value, &intern->connection, "isconnected");
+	}
 }
 
 /**

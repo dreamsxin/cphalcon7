@@ -114,6 +114,14 @@ int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *pr
 
 	phalcon_read_static_property_ce(&tmp, ce, property, property_length, PH_READONLY);
 
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		phalcon_array_update(&tmp, index,  value, 0);
+		phalcon_array_update(&tmp, index,  value, PH_COPY);
+		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		return SUCCESS;
+	}
+
 	/** Separation only when refcount > 1 */
 	if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {

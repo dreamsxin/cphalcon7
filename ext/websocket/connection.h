@@ -36,10 +36,8 @@ typedef struct _phalcon_websocket_connection_object {
 	// Connection state (Connected/Disconnected)
 	zend_bool connected;
 
-	// Write buffer
-	zend_string *buf[PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE];
-	unsigned int read_ptr;
-	unsigned int write_ptr;
+	// Write queue
+	zval queue;
 
 	// LibWebSockets context
 	struct lws *wsi;
@@ -50,7 +48,7 @@ static inline phalcon_websocket_connection_object *phalcon_websocket_connection_
 	return (phalcon_websocket_connection_object*)((char*)(obj) - XtOffsetOf(phalcon_websocket_connection_object, std));
 }
 
-int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zend_string *text);
+int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text);
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason);
 
 extern zend_class_entry *phalcon_websocket_connection_ce;

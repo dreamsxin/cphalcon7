@@ -65,6 +65,10 @@ int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn
 		php_error_docref(NULL, E_WARNING, "Client is disconnected\n");
 		return -1;
 	}
+	if (Z_STRLEN_P(text) > 1024) {
+		php_error_docref(NULL, E_WARNING, "Message must not exceed 1024 characters long\n");
+		return -1;
+	}
 	PHALCON_CALL_METHOD_FLAG(flag, &count, &conn->queue, "count");
 	if (PHALCON_GT_LONG(&count, PHALCON_WEBSOCKET_CONNECTION_BUFFER_SIZE)) {
 		php_error_docref(NULL, E_WARNING, "Write buffer is full\n");

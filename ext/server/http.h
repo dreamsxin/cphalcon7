@@ -44,4 +44,4 @@ extern zend_class_entry *phalcon_server_http_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Server_Http);
 
-#endif /* PHALCON_ERVER_HTTP_H */
+#endif /* PHALCON_SERVER_HTTP_H */

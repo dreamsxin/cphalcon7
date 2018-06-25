@@ -174,7 +174,7 @@ static int phalcon_websocket_client_callback(struct lws *wsi, enum lws_callback_
 				if (flag != SUCCESS) {
 					break;
 				}
-				len += sprintf((char*)&buf[LWS_SEND_BUFFER_PRE_PADDING], "%s", (unsigned char *)Z_STRVAL(text));
+				len += snprintf((char*)&buf[LWS_SEND_BUFFER_PRE_PADDING], 1024, "%s", (unsigned char *)Z_STRVAL(text));
 				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, LWS_WRITE_BINARY);
 
 				if (n < 0) {

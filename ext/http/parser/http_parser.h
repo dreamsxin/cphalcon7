@@ -152,9 +152,9 @@ typedef int (*http_cb) (http_parser*);
   XX(510, NOT_EXTENDED,                    Not Extended)                    \
   XX(511, NETWORK_AUTHENTICATION_REQUIRED, Network Authentication Required) \
 
-enum http_status
+enum phalcon_http_status
   {
-#define XX(num, name, string) HTTP_STATUS_##name = num,
+#define XX(num, name, string) PHALCON_HTTP_STATUS_##name = num,
   HTTP_STATUS_MAP(XX)
 #undef XX
   };

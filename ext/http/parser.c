@@ -97,6 +97,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Parser){
 	return SUCCESS;
 }
 
+extern struct http_parser_settings http_parser_request_settings;
 /**
  * Phalcon\Http\Parser constructor
  *
@@ -149,7 +150,7 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 
 	intern = phalcon_http_parser_object_from_obj(Z_OBJ_P(getThis()));
 
-	nparsed = http_parser_execute(intern->data->parser, &http_parser_request_settings, Z_STRVAL_P(body), Z_STRLEN_P(body));
+	nparsed = http_parser_execute(intern->data->parser, intern->data->settings, Z_STRVAL_P(body), Z_STRLEN_P(body));
 
 	if (nparsed != body_len) {
 		RETURN_FALSE;

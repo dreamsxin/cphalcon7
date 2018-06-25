@@ -248,6 +248,7 @@ back:
 	return;
 }
 
+extern struct http_parser_settings http_parser_request_settings;
 static void phalcon_server_http_process_read(struct phalcon_server_context *ctx, struct phalcon_server_conn_context *client_ctx)
 {
 	int ep_fd, fd;

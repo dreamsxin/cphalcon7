@@ -23,8 +23,6 @@
 #include "php_phalcon.h"
 #include "server/utils.h"
 
-extern struct http_parser_settings http_parser_request_settings;
-
 typedef struct _phalcon_http_parser_object {
 	phalcon_http_parser_data *data;
 	zend_object std;

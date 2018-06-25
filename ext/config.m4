@@ -885,6 +885,7 @@ socket/client.c \
 socket/server.c \
 process/exception.c \
 storage/exception.c \
+server/utils.c \
 server/simple.c \
 server/exception.c"
 
@@ -1376,7 +1377,7 @@ server/exception.c"
 		], [
 			AC_DEFINE([PHALCON_USE_SERVER], 1, [Have epoll support])
 			AC_MSG_RESULT([yes])
-			phalcon_sources="$phalcon_sources server/utils.c server/core.c server.c server/http.c"
+			phalcon_sources="$phalcon_sources server/core.c server.c server/http.c"
 		], [
 			AC_MSG_RESULT([no])
 		])

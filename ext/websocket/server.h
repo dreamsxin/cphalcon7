@@ -52,6 +52,8 @@ typedef struct _phalcon_websocket_server_object {
 	zend_ulong next_id;
 	zval connections;
 
+	int write_protocol;
+
 	zend_bool exit_request;
 	zend_object std;
 } phalcon_websocket_server_object;

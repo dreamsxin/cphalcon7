@@ -43,6 +43,9 @@ typedef struct {
 	// Available PHP callbacks
 	zval callbacks[PHP_CB_CLIENT_COUNT];
 	zval connection;
+
+	int write_protocol;
+
 	zend_bool exit_request;
 	zend_object std;
 } phalcon_websocket_client_object;

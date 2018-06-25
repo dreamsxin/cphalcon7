@@ -210,7 +210,7 @@ static int phalcon_websocket_server_callback(struct lws *wsi, enum lws_callback_
 					break;
 				}
 				len += snprintf((char*)&buf[LWS_SEND_BUFFER_PRE_PADDING], 1024, "%s", (unsigned char *)Z_STRVAL(text));
-				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, LWS_WRITE_BINARY);
+				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, intern->write_protocol);
 
 				if (n < 0) {
 					lwsl_err("Write to socket %lu failed with code %d\n", connection_object->id, n);
@@ -376,11 +376,16 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Server){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Websocket, Server, websocket_server, phalcon_websocket_server_method_entry, 0);
 
+	zend_declare_property_long(phalcon_websocket_server_ce, SL("_port"), 8080, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_websocket_server_ce, SL("_writeProtocol"), LWS_WRITE_BINARY, ZEND_ACC_PROTECTED);
+
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_ACCEPT"), PHP_CB_SERVER_ACCEPT);
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_CLOSE"), PHP_CB_SERVER_CLOSE);
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_DATA"), PHP_CB_SERVER_DATA);
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_TICK"), PHP_CB_SERVER_TICK);
 
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_BINARY"), LWS_WRITE_BINARY);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_TEXT"), LWS_WRITE_TEXT);
 	return SUCCESS;
 }
 
@@ -391,17 +396,24 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Server){
  */
 PHP_METHOD(Phalcon_Websocket_Server, __construct)
 {
+	zval *_port = NULL, *_write_protocol = NULL, port = {}, write_protocol = {};
 	phalcon_websocket_server_object *intern;
-	long port = 8080;
 
-	ZEND_PARSE_PARAMETERS_START(0, 1)
-		Z_PARAM_OPTIONAL
-		Z_PARAM_LONG(port)
-	ZEND_PARSE_PARAMETERS_END();
+	phalcon_fetch_params(0, 0, 2, &port, &write_protocol);
+
+	if (_port && Z_TYPE_P(_port) != IS_NULL) {
+		phalcon_update_property(getThis(), SL("_port"), _port);
+	}
+	if (_write_protocol && Z_TYPE_P(_write_protocol) != IS_NULL) {
+		phalcon_update_property(getThis(), SL("_writeProtocol"), _write_protocol);
+	}
+	phalcon_read_property(&port, getThis(), SL("_port"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&write_protocol, getThis(), SL("_writeProtocol"), PH_NOISY|PH_READONLY);
 
 	intern = phalcon_websocket_server_object_from_obj(Z_OBJ_P(getThis()));
 	if (intern != NULL) {
-		intern->info.port = port;
+		intern->info.port = Z_LVAL(port);
+		intern->write_protocol = Z_LVAL(write_protocol);
 	}
 }
 

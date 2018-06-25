@@ -460,6 +460,11 @@ PHP_METHOD(Phalcon_Websocket_Server, serviceFd)
 
 /**
  * Launch WebSocket server
+ *
+ * @param callable $onAccept
+ * @param callable $onClose
+ * @param callable $onData
+ * @param callable $onTick
  */
 PHP_METHOD(Phalcon_Websocket_Server, run)
 {

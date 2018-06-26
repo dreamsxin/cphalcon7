@@ -110,6 +110,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, parse);
 PHP_METHOD(Phalcon_Mvc_Model_Query, cache);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getCacheOptions);
 PHP_METHOD(Phalcon_Mvc_Model_Query, getCache);
+PHP_METHOD(Phalcon_Mvc_Model_Query, ignoreLastInsertId);
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect);
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert);
 PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate);
@@ -234,6 +235,7 @@ static const zend_function_entry phalcon_mvc_model_query_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query, cache, arginfo_phalcon_mvc_model_query_cache, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getCacheOptions, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, getCache, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query, ignoreLastInsertId, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query, _executeSelect, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model_Query, _executeInsert, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model_Query, _executeUpdate, NULL, ZEND_ACC_PROTECTED)
@@ -293,6 +295,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Query){
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_mergeBindParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_mergeBindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_index"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_query_ce, SL("_ignoreLastInsertId"), ZEND_ACC_PROTECTED);
 
 	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_SELECT"), PHQL_T_SELECT);
 	zend_declare_class_constant_long(phalcon_mvc_model_query_ce, SL("TYPE_INSERT"), PHQL_T_INSERT);
@@ -3398,6 +3401,16 @@ static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *va
 }
 
 /**
+ * Ignore last insert id
+ *
+ * @return Phalcon\Mvc\Model\Query
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query, ignoreLastInsertId){
+
+	phalcon_update_property_bool(getThis(), SL("_ignoreLastInsertId"), 1);
+}
+
+/**
  * Executes the SELECT intermediate representation producing a Phalcon\Mvc\Model\Resultset
  *
  * @param array $intermediate
@@ -3865,7 +3878,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, model_name = {}, connection = {}, models_instances = {};
 	zval model = {}, dialect = {}, sql_insert = {}, processed = {}, processed_types = {}, *value = NULL, tmp = {};
-	zval success = {}, identity_field = {}, support_sequences = {}, sequence_name = {};
+	zval ignore_last_lnsertid = {}, success = {}, identity_field = {}, support_sequences = {}, sequence_name = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -4006,9 +4019,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	zval_ptr_dtor(&processed_types);
 	zval_ptr_dtor(&processed);
 
+	
+	phalcon_read_property(&ignore_last_lnsertid, getThis(), SL("_ignoreLastInsertId"), PH_READONLY);
 	PHALCON_CALL_METHOD(&identity_field, &model, "getidentityfield");
 
-	if (zend_is_true(&success) && PHALCON_IS_NOT_EMPTY_STRING(&identity_field)) {
+	if (!zend_is_true(&ignore_last_lnsertid) && zend_is_true(&success) && PHALCON_IS_NOT_EMPTY_STRING(&identity_field)) {
 
 		/**
 		 * We check if the model have sequences

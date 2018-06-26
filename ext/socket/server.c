@@ -509,18 +509,6 @@ PHP_METHOD(Phalcon_Socket_Server, disconnect){
 	RETURN_MM_THIS();
 }
 
-void setkeepalive(int fd) {
-	int keepAlive = 1;
-	int keepIdle = 30;
-	int keepInterval = 5;
-	int keepCount = 3;
-
-	setsockopt(fd, SOL_SOCKET, SO_KEEPALIVE, (void *) &keepAlive, sizeof (keepAlive));
-	setsockopt(fd, SOL_TCP, TCP_KEEPIDLE, (void*) &keepIdle, sizeof (keepIdle));
-	setsockopt(fd, SOL_TCP, TCP_KEEPINTVL, (void *) &keepInterval, sizeof (keepInterval));
-	setsockopt(fd, SOL_TCP, TCP_KEEPCNT, (void *) &keepCount, sizeof (keepCount));
-}
-
 struct _phalcon_socket_server {
 	zval socket;
 	int ppid;

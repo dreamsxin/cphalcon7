@@ -73,8 +73,10 @@ static inline int phalcon_socket_set_non_blocking(int fd) {
 #endif
 
 #define PHALCON_SOCKET_TCP_NODELAY		TCP_NODELAY
-#define PHALCON_SOCKET_TCP_QUICKACK		TCP_QUICKACK
 
+#ifdef TCP_QUICKACK
+# define PHALCON_SOCKET_TCP_QUICKACK	TCP_QUICKACK
+#endif
 extern zend_class_entry *phalcon_socket_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Socket);

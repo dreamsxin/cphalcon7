@@ -4193,7 +4193,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval attributes = {}, bind_data_types = {}, automatic_attributes = {}, not_null_attributes = {}, default_values = {}, data_types = {}, column_map = {};
 	zval *field, default_value = {}, use_explicit_identity = {}, column_name = {}, column_value = {}, column_type = {}, phql = {}, model_name = {};
 	zval phql_join_fields = {}, phql_join_values = {}, models_manager = {}, query = {}, status = {};
-	int identity_field_is_not_false; /* scan-build insists on using flags */
+	int identity_field_is_not_false, ignore_last_lnsertid = 0; /* scan-build insists on using flags */
 
 	phalcon_fetch_params(0, 2, 0, &connection, &identity_field);
 
@@ -4335,6 +4335,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				return;
 			}
 
+			if (Z_TYPE(column_value) != IS_OBJECT || !instanceof_function(Z_OBJCE(column_value), phalcon_db_rawvalue_ce)) {
+				ignore_last_lnsertid = 1;
+			}
+
 			/**
 			 * Add the explicit value to the field list if the user has defined a value for it
 			 */
@@ -4372,6 +4376,10 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval_ptr_dtor(&bind_params);
 	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
 	zval_ptr_dtor(&bind_types);
+
+	if (ignore_last_lnsertid) {
+		PHALCON_CALL_METHOD(NULL, &query, "ignorelastinsertid");
+	}
 
 	PHALCON_CALL_METHOD(&status, &query, "execute");
 	zval_ptr_dtor(&query);

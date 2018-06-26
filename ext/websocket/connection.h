@@ -48,7 +48,7 @@ static inline phalcon_websocket_connection_object *phalcon_websocket_connection_
 	return (phalcon_websocket_connection_object*)((char*)(obj) - XtOffsetOf(phalcon_websocket_connection_object, std));
 }
 
-int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text);
+int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text, zval *type);
 void phalcon_websocket_connection_close(phalcon_websocket_connection_object *conn, zend_string *reason);
 
 extern zend_class_entry *phalcon_websocket_connection_ce;

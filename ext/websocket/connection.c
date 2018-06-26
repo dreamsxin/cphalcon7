@@ -43,10 +43,12 @@ PHP_METHOD(Phalcon_Websocket_Connection, disconnect);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_connection_send, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, writeProtocol, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_connection_sendjson, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, payload, 0, 0)
+	ZEND_ARG_INFO(0, payload)
+	ZEND_ARG_TYPE_INFO(0, writeProtocol, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 const zend_function_entry phalcon_websocket_connection_method_entry[] = {
@@ -58,8 +60,8 @@ const zend_function_entry phalcon_websocket_connection_method_entry[] = {
 	PHP_FE_END
 };
 
-int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text) {
-	zval count = {};
+int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn, zval *text, zval *type) {
+	zval count = {}, item = {};
 	int flag;
 	if (!conn->connected) {
 		php_error_docref(NULL, E_WARNING, "Client is disconnected\n");
@@ -74,8 +76,11 @@ int phalcon_websocket_connection_write(phalcon_websocket_connection_object *conn
 		php_error_docref(NULL, E_WARNING, "Write buffer is full\n");
 		return -1;
 	}
-
-	PHALCON_CALL_METHOD_FLAG(flag, NULL, &conn->queue, "enqueue", text);
+	array_init_size(&item, 2);
+	phalcon_array_append(&item, text, PH_COPY);
+	phalcon_array_append(&item, type, PH_COPY);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, &conn->queue, "enqueue", &item);
+	zval_ptr_dtor(&item);
 
 	if (flag != SUCCESS) {
 		php_error_docref(NULL, E_WARNING, "Write buffer enqueue fail\n");
@@ -134,17 +139,24 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Connection){
 
 /**
  * Send data to the client
+ *
+ * @param string $data
+ * @param int $writeProtocol
  */
 PHP_METHOD(Phalcon_Websocket_Connection, send)
 {
+	zval *data, *write_protocol = NULL;
 	phalcon_websocket_connection_object *intern;
-	zval *val;
 	int n;
 
-	phalcon_fetch_params(0, 1, 0, &val);
+	phalcon_fetch_params(0, 1, 1, &data, &write_protocol);
+
+	if (!write_protocol) {
+		write_protocol = &PHALCON_GLOBAL(z_null);
+	}
 
 	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
-	n = phalcon_websocket_connection_write(intern, val);
+	n = phalcon_websocket_connection_write(intern, data, write_protocol);
 	if (-1 == n) {
 		RETURN_FALSE;
 	}
@@ -153,18 +165,26 @@ PHP_METHOD(Phalcon_Websocket_Connection, send)
 
 /**
  * Send data to the client as JSON string
+ *
+ * @param mixed $text
+ * @param int $writeProtocol
  */
 PHP_METHOD(Phalcon_Websocket_Connection, sendJson)
 {
+	zval *data, *write_protocol = NULL, text = {};
 	phalcon_websocket_connection_object *intern;
-	zval *val, text = {};
 	int n;
 
-	phalcon_fetch_params(0, 1, 0, &val);
+	phalcon_fetch_params(0, 1, 1, &data, &write_protocol);
+
+	if (!write_protocol) {
+		write_protocol = &PHALCON_GLOBAL(z_null);
+	}
 
 	intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(getThis()));
-	RETURN_ON_FAILURE(phalcon_json_encode(&text, val, 0));
-	n = phalcon_websocket_connection_write(intern, &text);
+	RETURN_ON_FAILURE(phalcon_json_encode(&text, data, 0));
+	n = phalcon_websocket_connection_write(intern, &text, write_protocol);
+	zval_ptr_dtor(&text);
 	if (-1 == n) {
 		RETURN_FALSE;
 	}

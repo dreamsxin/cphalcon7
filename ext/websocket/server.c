@@ -28,6 +28,8 @@
 
 #include "kernel/main.h"
 #include "kernel/fcall.h"
+#include "kernel/array.h"
+#include "kernel/object.h"
 
 /**
  * Phalcon\Websocket\Server
@@ -71,7 +73,8 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_websocket_server_broadcast, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, ignored, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, ignored, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, writeProtocol, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 #if PHP_VERSION_ID >= 70200
@@ -198,34 +201,42 @@ static int phalcon_websocket_server_callback(struct lws *wsi, enum lws_callback_
 			}
 
 			while (1) {
-				zval ret = {}, text = {};
-				int flag;
+				zval ret = {}, item = {}, text = {}, type = {};
+				int flag, write_protocol;
 				int len = 0;
 				PHALCON_CALL_METHOD_FLAG(flag, &ret, &connection_object->queue, "isempty");
 				if (flag != SUCCESS || zend_is_true(&ret)) {
 					break;
 				}
-				PHALCON_CALL_METHOD_FLAG(flag, &text, &connection_object->queue, "dequeue");
+				PHALCON_CALL_METHOD_FLAG(flag, &item, &connection_object->queue, "dequeue");
 				if (flag != SUCCESS) {
 					break;
 				}
+				phalcon_array_fetch_long(&text, &item, 0, PH_READONLY);
+				phalcon_array_fetch_long(&type, &item, 1, PH_READONLY);
+				if (unlikely(Z_TYPE(type) == IS_LONG)) {
+					write_protocol = Z_LVAL(type);
+				} else {
+					write_protocol = intern->write_protocol;
+				}
 				len += snprintf((char*)&buf[LWS_SEND_BUFFER_PRE_PADDING], 1024, "%s", (unsigned char *)Z_STRVAL(text));
-				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, intern->write_protocol);
+				n = lws_write(wsi, &buf[LWS_SEND_BUFFER_PRE_PADDING], len, write_protocol);
 
 				if (n < 0) {
+					zval_ptr_dtor(&item);
 					lwsl_err("Write to socket %lu failed with code %d\n", connection_object->id, n);
 					return 1;
 				}
 				lwsl_notice("Write bytes %d\n", n);
 				if (n < len) {
 					// TODO Implements partial write
-					zval_ptr_dtor(&text);
+					zval_ptr_dtor(&item);
 					lwsl_err("Partial write\n");
 					return -1;
 				}
 
 				// Cleanup
-				zval_ptr_dtor(&text);
+				zval_ptr_dtor(&item);
 			}
 
 			break;
@@ -384,8 +395,15 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Server){
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_DATA"), PHP_CB_SERVER_DATA);
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("ON_TICK"), PHP_CB_SERVER_TICK);
 
-	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_BINARY"), LWS_WRITE_BINARY);
 	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_TEXT"), LWS_WRITE_TEXT);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_BINARY"), LWS_WRITE_BINARY);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_CONTINUATION"), LWS_WRITE_CONTINUATION);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_HTTP"), LWS_WRITE_HTTP);
+	//zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_CLOSE"), LWS_WRITE_CLOSE);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_PING"), LWS_WRITE_PING);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_PONG"), LWS_WRITE_PONG);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_NO_FIN"), LWS_WRITE_NO_FIN);
+	zend_declare_class_constant_long(phalcon_websocket_server_ce, SL("WRITE_CLIENT_IGNORE_XOR_MASK"), LWS_WRITE_CLIENT_IGNORE_XOR_MASK);
 	return SUCCESS;
 }
 
@@ -393,6 +411,7 @@ PHALCON_INIT_CLASS(Phalcon_Websocket_Server){
  * Phalcon\Websocket\Server constructor
  *
  * @param int $port
+ * @param int $writeProtocol
  */
 PHP_METHOD(Phalcon_Websocket_Server, __construct)
 {
@@ -570,28 +589,36 @@ PHP_METHOD(Phalcon_Websocket_Server, stop)
 
 /**
  * Broadcast a message to all connected clients
+ *
+ * @param string $text
+ * @param array $ignored
+ * @param int $writeProtocol
  */
 PHP_METHOD(Phalcon_Websocket_Server, broadcast)
 {
+	zval *text, *ignored = NULL, *write_protocol = NULL, *connection;
 	phalcon_websocket_server_object *intern;
-	zval *str;
-	phalcon_websocket_connection_object *conn;
-	long ignoredId = -1;
 
-	ZEND_PARSE_PARAMETERS_START(1, 2)
-		Z_PARAM_ZVAL(str)
-		Z_PARAM_OPTIONAL
-		Z_PARAM_LONG(ignoredId)
-	ZEND_PARSE_PARAMETERS_END();
+	phalcon_fetch_params(0, 1, 2, &text, &ignored, &write_protocol);
+
+	if (!ignored) {
+		ignored = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!write_protocol) {
+		write_protocol = &PHALCON_GLOBAL(z_null);
+	}
 
 	intern = phalcon_websocket_server_object_from_obj(Z_OBJ_P(getThis()));
-	ZEND_HASH_FOREACH(Z_ARR(intern->connections), 0);
+	ZEND_HASH_FOREACH_VAL(Z_ARR(intern->connections), connection);
+		zval id = {};
+		phalcon_websocket_connection_object *intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(connection));
 		// TODO Test return? Interrupt if a write fail?
-		conn = (phalcon_websocket_connection_object *) Z_OBJ_P(_z);
-		if (conn->id == ignoredId) {
+		ZVAL_LONG(&id, intern->id);
+		if (Z_TYPE_P(ignored) == IS_ARRAY && phalcon_fast_in_array(&id, ignored)) {
 			continue;
 		}
-		phalcon_websocket_connection_write(conn, str);
+		phalcon_websocket_connection_write(intern, text, write_protocol);
 	ZEND_HASH_FOREACH_END();
 }
 

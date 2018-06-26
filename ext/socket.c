@@ -112,7 +112,9 @@ PHALCON_INIT_CLASS(Phalcon_Socket){
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("SO_REUSEPORT"),		PHALCON_SOCKET_SO_REUSEPORT);
 #endif
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("TCP_NODELAY"),		PHALCON_SOCKET_TCP_NODELAY);
+#ifdef TCP_QUICKACK
 	zend_declare_class_constant_long(phalcon_socket_ce, SL("TCP_QUICKACK"),		PHALCON_SOCKET_TCP_QUICKACK);
+#endif
 	return SUCCESS;
 }
 

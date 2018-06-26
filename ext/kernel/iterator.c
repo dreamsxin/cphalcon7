@@ -20,7 +20,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "kernel/../config.h"
 #endif
 
 #include <php.h>

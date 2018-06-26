@@ -19,7 +19,7 @@
 
 
 #ifdef HAVE_CONFIG_H
-#include "config.h"
+#include "kernel/../config.h"
 #endif
 
 #ifdef PHP_WIN32

@@ -462,7 +462,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 					if (Z_TYPE(v) != IS_STRING) {
 						convert_to_string(&v);
 					}
-					if (PHALCON_IS_EQUAL(&op_value, value)) {
+					if (PHALCON_IS_IDENTICAL(&op_value, value)) {
 						PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &op_text, close_option);
 					} else {
 						PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", &op_text, close_option);
@@ -495,7 +495,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 				if (Z_TYPE(v) != IS_STRING) {
 					convert_to_string(&v);
 				}
-				if (PHALCON_IS_EQUAL(&option_value, value)) {
+				if (PHALCON_IS_IDENTICAL(&v, value)) {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", option_text, close_option);
 				} else {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", option_text, close_option);

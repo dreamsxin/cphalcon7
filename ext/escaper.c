@@ -203,7 +203,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
 #endif
 	if (zend_is_true(&detected)) {
-		RETURN_CTOR(&charset);
+		RETURN_NCTOR(&charset);
 	}
 	zval_ptr_dtor(&charset);
 
@@ -218,7 +218,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
 #endif
 	if (zend_is_true(&detected)) {
-		RETURN_CTOR(&charset);
+		RETURN_NCTOR(&charset);
 	}
 	zval_ptr_dtor(&charset);
 
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
 #endif
 	if (zend_is_true(&detected)) {
-		RETURN_CTOR(&charset);
+		RETURN_NCTOR(&charset);
 	}
 	zval_ptr_dtor(&charset);
 
@@ -246,7 +246,7 @@ PHP_METHOD(Phalcon_Escaper, detectEncoding){
 	PHALCON_CALL_FUNCTION(&detected, "mb_detect_encoding", str, &charset, &strict_check);
 #endif
 	if (zend_is_true(&detected)) {
-		RETURN_CTOR(&charset);
+		RETURN_NCTOR(&charset);
 	}
 	zval_ptr_dtor(&charset);
 

@@ -494,29 +494,33 @@ PHP_METHOD(Phalcon_Tag, getEscaperService){
 
 	zval escaper = {}, dependency_injector = {}, service = {};
 
-	phalcon_read_static_property_ce(&escaper, phalcon_tag_ce, SL("_escaperService"), PH_COPY);
+	PHALCON_MM_INIT();
+
+	phalcon_read_static_property_ce(&escaper, phalcon_tag_ce, SL("_escaperService"), PH_READONLY);
 	if (Z_TYPE(escaper) != IS_OBJECT) {
-		phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_COPY);
+		phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_READONLY);
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		}
 
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"escaper\" service");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"escaper\" service");
 			return;
 		}
 
-		PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
+		PHALCON_MM_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
 		ZVAL_STR(&service, IS(escaper));
 
-		PHALCON_CALL_METHOD(&escaper, &dependency_injector, "getshared", &service);
-		zval_ptr_dtor(&dependency_injector);
-		PHALCON_VERIFY_INTERFACE(&escaper, phalcon_escaperinterface_ce);
+		PHALCON_MM_CALL_METHOD(&escaper, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&escaper);
+
+		PHALCON_MM_VERIFY_INTERFACE(&escaper, phalcon_escaperinterface_ce);
 		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_escaperService"), &escaper);
 	}
 
-	RETVAL_ZVAL(&escaper, 0, 0);
+	RETURN_MM_CTOR(&escaper);
 }
 
 /**

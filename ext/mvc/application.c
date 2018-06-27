@@ -493,9 +493,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&controller);
 				RETVAL_ZVAL(&response, 0, 0);
-				if (f_implicit_view) {
-					zval_ptr_dtor(&view);
-				}
+				zval_ptr_dtor(&view);
 				return;
 			} else if (Z_TYPE(possible_response) == IS_STRING) {
 				PHALCON_CALL_METHOD(NULL, &response, "setcontent", &possible_response);
@@ -504,9 +502,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				zval_ptr_dtor(&dependency_injector);
 				zval_ptr_dtor(&controller);
 				RETVAL_ZVAL(&response, 0, 0);
-				if (f_implicit_view) {
-					zval_ptr_dtor(&view);
-				}
+				zval_ptr_dtor(&view);
 				return;
 			}
 			ZVAL_FALSE(&returned_response);
@@ -555,13 +551,31 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 				zval_ptr_dtor(&params);
 			}
 		}
-		zval_ptr_dtor(&possible_response);
 	} else {
-		ZVAL_STR(&service, IS(response));
+		/* Get the latest value returned by an action */
+		PHALCON_CALL_METHOD(&possible_response, &dispatcher, "getreturnedvalue");
 
-		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+		/* Check if the returned object is already a response */
+		if (Z_TYPE(possible_response) == IS_OBJECT && instanceof_function_ex(Z_OBJCE(possible_response), phalcon_http_responseinterface_ce, 1)) {
+			ZVAL_COPY(&response, &possible_response);
+			ZVAL_TRUE(&returned_response);
+		} else {
+			ZVAL_STR(&service, IS(response));
+
+			PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
+			PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+			ZVAL_FALSE(&returned_response);
+		}
+
+		if (PHALCON_IS_FALSE(&returned_response)) {
+			if (Z_TYPE(possible_response) == IS_STRING) {
+				PHALCON_CALL_METHOD(NULL, &response, "setcontent", &possible_response);
+			} else if (Z_TYPE(possible_response) == IS_ARRAY) {
+				PHALCON_CALL_METHOD(NULL, &response, "setjsoncontent", &possible_response);
+			}
+		}
 	}
+	zval_ptr_dtor(&possible_response);
 	zval_ptr_dtor(&dispatcher);
 	zval_ptr_dtor(&dependency_injector);
 

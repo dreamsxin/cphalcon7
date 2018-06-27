@@ -653,6 +653,7 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 
 	RETURN_ON_FAILURE(phalcon_json_encode(&json_content, content, options));
 	phalcon_update_property(getThis(), SL("_content"), &json_content);
+	zval_ptr_dtor(&json_content);
 	RETURN_THIS();
 }
 

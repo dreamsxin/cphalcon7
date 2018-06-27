@@ -455,7 +455,7 @@ PHP_METHOD(Phalcon_Http_Response, setNotModified)
  */
 PHP_METHOD(Phalcon_Http_Response, setContentType){
 
-	zval *content_type, *charset = NULL, headers = {}, name = {}, header_value = {};
+	zval *content_type, *charset = NULL, headers = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 1, &content_type, &charset);
 
@@ -466,11 +466,13 @@ PHP_METHOD(Phalcon_Http_Response, setContentType){
 	if (!charset || Z_TYPE_P(charset) == IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, &headers, "set", &name, content_type);
 	} else {
+		zval header_value = {};
 		PHALCON_CONCAT_VSV(&header_value, content_type, "; charset=", charset);
-
 		PHALCON_CALL_METHOD(NULL, &headers, "set", &name, &header_value);
+		zval_ptr_dtor(&header_value);
 	}
-
+	zval_ptr_dtor(&name);
+	zval_ptr_dtor(&headers);
 	RETURN_THIS();
 }
 

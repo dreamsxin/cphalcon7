@@ -82,6 +82,8 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent);
 PHP_METHOD(Phalcon_Http_Response, setBsonContent);
 PHP_METHOD(Phalcon_Http_Response, appendContent);
 PHP_METHOD(Phalcon_Http_Response, getContent);
+PHP_METHOD(Phalcon_Http_Response, getJsonContent);
+PHP_METHOD(Phalcon_Http_Response, getBsonContent);
 PHP_METHOD(Phalcon_Http_Response, isSent);
 PHP_METHOD(Phalcon_Http_Response, sendHeaders);
 PHP_METHOD(Phalcon_Http_Response, sendCookies);
@@ -126,6 +128,8 @@ static const zend_function_entry phalcon_http_response_method_entry[] = {
 	PHP_ME(Phalcon_Http_Response, setBsonContent, arginfo_phalcon_http_responseinterface_setbsoncontent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, appendContent, arginfo_phalcon_http_responseinterface_appendcontent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, getContent, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response, getJsonContent, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response, getBsonContent, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, isSent, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, sendHeaders, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response, sendCookies, NULL, ZEND_ACC_PUBLIC)
@@ -451,7 +455,7 @@ PHP_METHOD(Phalcon_Http_Response, setNotModified)
  */
 PHP_METHOD(Phalcon_Http_Response, setContentType){
 
-	zval *content_type, *charset = NULL, headers = {}, name = {}, header_value = {};
+	zval *content_type, *charset = NULL, headers = {}, name = {};
 
 	phalcon_fetch_params(0, 1, 1, &content_type, &charset);
 
@@ -462,11 +466,13 @@ PHP_METHOD(Phalcon_Http_Response, setContentType){
 	if (!charset || Z_TYPE_P(charset) == IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, &headers, "set", &name, content_type);
 	} else {
+		zval header_value = {};
 		PHALCON_CONCAT_VSV(&header_value, content_type, "; charset=", charset);
-
 		PHALCON_CALL_METHOD(NULL, &headers, "set", &name, &header_value);
+		zval_ptr_dtor(&header_value);
 	}
-
+	zval_ptr_dtor(&name);
+	zval_ptr_dtor(&headers);
 	RETURN_THIS();
 }
 
@@ -669,12 +675,9 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
  */
 PHP_METHOD(Phalcon_Http_Response, setBsonContent){
 
-	zval *content, content_type = {}, bson_content = {};
+	zval *content, bson_content = {};
 
 	phalcon_fetch_params(0, 1, 0, &content);
-
-	ZVAL_STRING(&content_type, "application/bson");
-	PHALCON_CALL_METHOD(NULL, getThis(), "setContentType", &content_type);
 
 	PHALCON_CALL_FUNCTION(&bson_content, "bson_encode", content);
 	phalcon_update_property(getThis(), SL("_content"), &bson_content);
@@ -710,6 +713,32 @@ PHP_METHOD(Phalcon_Http_Response, getContent){
 
 
 	RETURN_MEMBER(getThis(), "_content");
+}
+
+/**
+ * Gets the HTTP response json body
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Http_Response, getJsonContent){
+
+	zval content = {};
+
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_FUNCTION(return_value, "json_decode", &content);
+}
+
+/**
+ * Gets the HTTP response bson body
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Http_Response, getBsonContent){
+
+	zval content = {};
+
+	phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
+	PHALCON_CALL_FUNCTION(return_value, "bson_decode", &content);
 }
 
 /**

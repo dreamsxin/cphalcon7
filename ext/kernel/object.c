@@ -116,9 +116,9 @@ int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *pr
 
 	if (Z_TYPE(tmp) != IS_ARRAY) {
 		array_init(&tmp);
-		phalcon_array_update(&tmp, index,  value, 0);
 		phalcon_array_update(&tmp, index,  value, PH_COPY);
 		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 		return SUCCESS;
 	}
 

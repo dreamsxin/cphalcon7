@@ -21,6 +21,7 @@
 #include "arr.h"
 #include "di.h"
 #include "filterinterface.h"
+#include "exception.h"
 
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
@@ -73,6 +74,7 @@ PHP_METHOD(Phalcon_Arr, sum);
 PHP_METHOD(Phalcon_Arr, toArray);
 PHP_METHOD(Phalcon_Arr, aggr);
 PHP_METHOD(Phalcon_Arr, group);
+PHP_METHOD(Phalcon_Arr, flip);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
@@ -200,6 +202,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_group, 0, 0, 3)
 	ZEND_ARG_TYPE_INFO(0, aggregators, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_flip, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, is_assoc, arginfo_phalcon_arr_is_assoc, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, is_array, arginfo_phalcon_arr_is_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -224,6 +232,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, toArray, arginfo_phalcon_arr_toarray, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, aggr, arginfo_phalcon_arr_aggr, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, group, arginfo_phalcon_arr_group, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, flip, arginfo_phalcon_arr_flip, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -2031,4 +2040,48 @@ PHP_METHOD(Phalcon_Arr, group){
 
 	zval_ptr_dtor(&groups);
 	efree(agts);
+}
+
+/**
+ * Exchanges all keys with their associated values in an array
+ *
+ * @param array $array
+ * @param string $key
+ * @param string $value
+ * @return array
+ */
+PHP_METHOD(Phalcon_Arr, flip){
+
+	zval *array, *key, *value = NULL, *item;
+
+	phalcon_fetch_params(0, 2, 1, &array, &key, &value);
+
+	if (!value) {
+		value = &PHALCON_GLOBAL(z_null);
+	}
+
+	array_init(return_value);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(array), item) {
+		zval k = {};
+		PHALCON_CALL_SELF(&k, "path", item, key);
+		if (Z_TYPE(k) == IS_NULL) {
+			zval_ptr_dtor(&k);
+			RETURN_FALSE;
+		}
+		if (Z_TYPE_P(value) == IS_STRING) {
+			zval v = {};
+			PHALCON_CALL_SELF(&v, "path", item, value);
+			phalcon_array_update(return_value, &k, &v, 0);
+		} else if (phalcon_is_callable(value)) {
+			zval params = {}, v = {};
+			array_init(&params);
+			phalcon_array_update_long(&params, 0, item, PH_COPY);
+
+			PHALCON_CALL_USER_FUNC_ARRAY(&v, value, &params);
+			phalcon_array_update(return_value, &k, &v, 0);
+			zval_ptr_dtor(&params);
+		} else {
+			phalcon_array_update(return_value, &k, item, PH_COPY);
+		}
+	} ZEND_HASH_FOREACH_END();
 }

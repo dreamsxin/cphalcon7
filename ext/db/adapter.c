@@ -366,6 +366,7 @@ PHP_METHOD(Phalcon_Db_Adapter, fetchOne){
 		}
 		zval_ptr_dtor(&result);
 	} else {
+		zval_ptr_dtor(&result);
 		RETURN_EMPTY_ARRAY();
 	}
 }

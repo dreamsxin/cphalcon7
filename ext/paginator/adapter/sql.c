@@ -269,6 +269,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	}
 
 	PHALCON_CALL_METHOD(&items, &db, "fetchall", &sql, &fetch_mode, &bind);
+	zval_ptr_dtor(&bind);
 
 	i_rowcount    = phalcon_get_intval(&rowcount);
 	tp            = ldiv(i_rowcount, i_limit);

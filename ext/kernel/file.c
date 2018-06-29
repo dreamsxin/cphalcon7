@@ -321,6 +321,76 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 	}
 }
 
+/**
+ * Removes malicious characters, replace namespace separator by directory separator
+ */
+void phalcon_possible_autoload_filepath2(zval *return_value, zval *class_name, zval *virtual_separator, zval *separator) {
+
+	int i;
+	unsigned char ch;
+	smart_str virtual_str = {0};
+
+	if (Z_TYPE_P(class_name) != IS_STRING || Z_TYPE_P(virtual_separator) != IS_STRING) {
+		RETURN_FALSE;
+	}
+
+	for (i = 0; i < Z_STRLEN_P(class_name); i++) {
+
+		ch = Z_STRVAL_P(class_name)[i];
+
+		/**
+		 * Anticipated end of string
+		 */
+		if (ch == '\0') {
+			break;
+		}
+
+		/**
+		 * Replace namespace separator by directory separator
+		 */
+		if (ch == '\\') {
+			smart_str_appendl(&virtual_str, Z_STRVAL_P(virtual_separator), Z_STRLEN_P(virtual_separator));
+			continue;
+		}
+
+		/**
+		 * Replace separator
+		 */
+		if (separator) {
+			if (ch == Z_STRVAL_P(separator)[0]) {
+				smart_str_appendl(&virtual_str, Z_STRVAL_P(virtual_separator), Z_STRLEN_P(virtual_separator));
+				continue;
+			}
+		}
+
+		/**
+		 * Basic alphanumeric characters
+		 */
+		if ((ch == '_') || (ch >= '0' && ch <= '9') || (ch >= 'a' && ch <= 'z') || (ch >= 'A' && ch <= 'Z')) {
+			smart_str_appendc(&virtual_str, ch);
+			continue;
+		}
+
+		/**
+		 * Multibyte characters?
+		 */
+		if (ch > 127) {
+			smart_str_appendc(&virtual_str, ch);
+			continue;
+		}
+
+	}
+
+	smart_str_0(&virtual_str);
+
+	if (virtual_str.s) {
+		RETURN_STR(virtual_str.s);
+	} else {
+		smart_str_free(&virtual_str);
+		RETURN_FALSE;
+	}
+}
+
 void phalcon_file_get_contents(zval *return_value, zval *filename)
 {
 	zend_string *contents;

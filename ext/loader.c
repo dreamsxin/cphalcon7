@@ -70,6 +70,8 @@ PHP_METHOD(Phalcon_Loader, registerNamespaces);
 PHP_METHOD(Phalcon_Loader, getNamespaces);
 PHP_METHOD(Phalcon_Loader, registerPrefixes);
 PHP_METHOD(Phalcon_Loader, getPrefixes);
+PHP_METHOD(Phalcon_Loader, registerSufixes);
+PHP_METHOD(Phalcon_Loader, getSufixes);
 PHP_METHOD(Phalcon_Loader, registerDirs);
 PHP_METHOD(Phalcon_Loader, getDirs);
 PHP_METHOD(Phalcon_Loader, registerClasses);
@@ -93,6 +95,11 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_loader_registerprefixes, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, prefixes, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_loader_registersufixes, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, sufixes, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
@@ -125,6 +132,8 @@ static const zend_function_entry phalcon_loader_method_entry[] = {
 	PHP_ME(Phalcon_Loader, getNamespaces, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, registerPrefixes, arginfo_phalcon_loader_registerprefixes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, getPrefixes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Loader, registerSufixes, arginfo_phalcon_loader_registersufixes, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Loader, getSufixes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, registerDirs, arginfo_phalcon_loader_registerdirs, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, getDirs, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Loader, registerClasses, arginfo_phalcon_loader_registerclasses, ZEND_ACC_PUBLIC)
@@ -150,6 +159,7 @@ PHALCON_INIT_CLASS(Phalcon_Loader){
 	zend_declare_property_null(phalcon_loader_ce, SL("_foundPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_checkedPath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_prefixes"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_loader_ce, SL("_sufixes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_classes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_extensions"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_loader_ce, SL("_namespaces"), ZEND_ACC_PROTECTED);
@@ -265,10 +275,11 @@ PHP_METHOD(Phalcon_Loader, registerPrefixes){
 		if (Z_TYPE(current_prefixes) == IS_ARRAY) {
 			phalcon_fast_array_merge(&merged_prefixes, &current_prefixes, prefixes);
 		} else {
-			ZVAL_COPY_VALUE(&merged_prefixes, prefixes);
+			ZVAL_COPY(&merged_prefixes, prefixes);
 		}
 
 		phalcon_update_property(getThis(), SL("_prefixes"), &merged_prefixes);
+		zval_ptr_dtor(&merged_prefixes);
 	} else {
 		phalcon_update_property(getThis(), SL("_prefixes"), prefixes);
 	}
@@ -285,6 +296,47 @@ PHP_METHOD(Phalcon_Loader, getPrefixes){
 
 
 	RETURN_MEMBER(getThis(), "_prefixes");
+}
+
+/**
+ * Register directories on which "not found" classes could be found
+ *
+ * @param array $sufixes
+ * @param boolean $merge
+ * @return Phalcon\Loader
+ */
+PHP_METHOD(Phalcon_Loader, registerSufixes){
+
+	zval *sufixes, *merge = NULL, current_sufixes = {}, merged_sufixes = {};
+
+	phalcon_fetch_params(0, 1, 1, &sufixes, &merge);
+
+	if (merge && zend_is_true(merge)) {
+		phalcon_read_property(&current_sufixes, getThis(), SL("_sufixes"), PH_NOISY|PH_READONLY);
+		if (Z_TYPE(current_sufixes) == IS_ARRAY) {
+			phalcon_fast_array_merge(&merged_sufixes, &current_sufixes, sufixes);
+		} else {
+			ZVAL_COPY(&merged_sufixes, sufixes);
+		}
+
+		phalcon_update_property(getThis(), SL("_sufixes"), &merged_sufixes);
+		zval_ptr_dtor(&merged_sufixes);
+	} else {
+		phalcon_update_property(getThis(), SL("_sufixes"), sufixes);
+	}
+
+	RETURN_THIS();
+}
+
+/**
+ * Return current prefixes registered in the autoloader
+ *
+ * @param array
+ */
+PHP_METHOD(Phalcon_Loader, getSufixes){
+
+
+	RETURN_MEMBER(getThis(), "_sufixes");
 }
 
 /**
@@ -531,7 +583,7 @@ PHP_METHOD(Phalcon_Loader, findFile){
 PHP_METHOD(Phalcon_Loader, autoLoad){
 
 	zval *class_name, events_manager = {}, event_name = {}, classes = {}, file_path = {}, found = {}, ds = {}, namespace_separator = {};
-	zval extensions = {}, namespaces = {}, *directory, pseudo_separator = {}, prefixes = {}, directories = {};
+	zval extensions = {}, *directory, pseudo_separator = {}, directories = {};
 	zend_string *str_key;
 	ulong idx;
 	char slash[2] = {DEFAULT_SLASH, 0};
@@ -574,6 +626,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	phalcon_read_property(&extensions, getThis(), SL("_extensions"), PH_NOISY|PH_READONLY);
 
 	if (!zend_is_true(&found)) {
+		zval namespaces = {};
 		/**
 		 * Checking in namespaces
 		 */
@@ -626,6 +679,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	}
 
 	if (!zend_is_true(&found)) {
+		zval prefixes = {};
 		/**
 		 * Checking in prefixes
 		 */
@@ -658,6 +712,54 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 
 					if (phalcon_memnstr_str(class_name, SL("_"))) {
 						phalcon_possible_autoload_filepath(&file_name, &prefix, class_name, &ds, &pseudo_separator);
+						if (zend_is_true(&file_name)) {
+							PHALCON_CALL_METHOD(&found, getThis(), "findfile", &file_name, directory, &extensions, &ds);
+							zval_ptr_dtor(&file_name);
+
+							if (zend_is_true(&found)) {
+								break;
+							}
+						}
+					}
+				}
+			} ZEND_HASH_FOREACH_END();
+		}
+	}
+
+	if (!zend_is_true(&found)) {
+		zval sufixes = {};
+		/**
+		 * Checking in sufixes
+		 */
+		phalcon_read_property(&sufixes, getThis(), SL("_sufixes"), PH_READONLY);
+		if (Z_TYPE(sufixes) == IS_ARRAY) {
+			ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(sufixes), idx, str_key, directory) {
+				zval sufix = {}, file_name = {};
+				if (str_key) {
+					ZVAL_STR(&sufix, str_key);
+				} else {
+					ZVAL_LONG(&sufix, idx);
+				}
+
+				/**
+				 * The class name ends with the sufix?
+				 */
+				if (phalcon_end_with(class_name, &sufix, NULL)) {
+					/**
+					 * Get the possible file path
+					 */
+					phalcon_possible_autoload_filepath2(&file_name, class_name, &ds, NULL);
+					if (zend_is_true(&file_name)) {
+						PHALCON_CALL_METHOD(&found, getThis(), "findfile", &file_name, directory, &extensions, &ds);
+						zval_ptr_dtor(&file_name);
+
+						if (zend_is_true(&found)) {
+							break;
+						}
+					}
+
+					if (phalcon_memnstr_str(class_name, SL("_"))) {
+						phalcon_possible_autoload_filepath2(&file_name, class_name, &ds, &pseudo_separator);
 						if (zend_is_true(&file_name)) {
 							PHALCON_CALL_METHOD(&found, getThis(), "findfile", &file_name, directory, &extensions, &ds);
 							zval_ptr_dtor(&file_name);

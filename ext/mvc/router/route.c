@@ -492,14 +492,14 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			/**
 			 * Process module name
 			 */
-			if (Z_TYPE(module_name) != IS_NULL) {
+			if (PHALCON_IS_NOT_EMPTY_STRING(&module_name)) {
 				phalcon_array_update_str(&route_paths, SL("module"), &module_name, PH_COPY);
 			}
 
 			/**
 			 * Process controller name
 			 */
-			if (Z_TYPE(controller_name) != IS_NULL) {
+			if (PHALCON_IS_NOT_EMPTY_STRING(&controller_name)) {
 
 				/**
 				 * Check if we need to obtain the namespace
@@ -519,7 +519,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 					/**
 					 * Update the namespace
 					 */
-					if (zend_is_true(&namespace_name)) {
+					if (PHALCON_IS_NOT_EMPTY_STRING(&namespace_name)) {
 						phalcon_array_update_str(&route_paths, SL("namespace"), &namespace_name, 0);
 					}
 				} else {
@@ -541,7 +541,7 @@ PHP_METHOD(Phalcon_Mvc_Router_Route, reConfigure){
 			/**
 			 * Process action name
 			 */
-			if (Z_TYPE(action_name) != IS_NULL) {
+			if (PHALCON_IS_NOT_EMPTY_STRING(&action_name)) {
 				phalcon_array_update_str(&route_paths, SL("action"), &action_name, PH_COPY);
 			}
 			zval_ptr_dtor(&parts);

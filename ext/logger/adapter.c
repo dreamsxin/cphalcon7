@@ -401,6 +401,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, log){
 			PHALCON_CALL_METHOD(NULL, &queue_item, "__construct", message, type, &timestamp, context);
 
 			phalcon_update_property_array_append(getThis(), SL("_queue"), &queue_item);
+			zval_ptr_dtor(&queue_item);
 		} else {
 			PHALCON_CALL_METHOD(NULL, getThis(), "loginternal", message, type, &timestamp, context);
 		}

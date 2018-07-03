@@ -170,7 +170,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	phalcon_fetch_params(0, 4, 0, &message, &type, &timestamp, &context);
 
-	phalcon_read_property(&format, getThis(), SL("_format"), PH_READONLY);
+	phalcon_read_property(&format, getThis(), SL("_format"), PH_COPY);
 
 	/**
 	 * Check if the format has the %date% placeholder
@@ -183,32 +183,50 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 		ZVAL_STRING(&date_wildcard, "%date%");
 
 		PHALCON_STR_REPLACE(&new_format, &date_wildcard, &date, &format);
+
+		zval_ptr_dtor(&date);
+		zval_ptr_dtor(&date_wildcard);
 	} else {
-		ZVAL_COPY_VALUE(&new_format, &format);
+		ZVAL_COPY(&new_format, &format);
 	}
+	zval_ptr_dtor(&format);
 
 	/**
 	 * Check if the format has the %type% placeholder
 	 */
-	if (phalcon_memnstr_str(&format, SL("%type%"))) {
+	if (phalcon_memnstr_str(&new_format, SL("%type%"))) {
 		PHALCON_CALL_METHOD(&type_string, getThis(), "gettypestring", type);
 
 		ZVAL_STRING(&type_wildcard, "%type%");
 
 		PHALCON_STR_REPLACE(&format, &type_wildcard, &type_string, &new_format);
+		zval_ptr_dtor(&type_string);
+		zval_ptr_dtor(&type_wildcard);
 	} else {
-		ZVAL_COPY_VALUE(&format, &new_format);
+		ZVAL_COPY(&format, &new_format);
 	}
+	zval_ptr_dtor(&new_format);
 
 	ZVAL_STRING(&message_wildcard, "%message%");
 
-	PHALCON_STR_REPLACE(&new_format, &message_wildcard, message, &format);
+	if (Z_TYPE_P(message) != IS_STRING) {
+		zval tmp = {};
+		PHALCON_CALL_FUNCTION(&tmp, "var_export", message, &PHALCON_GLOBAL(z_true));
+		PHALCON_STR_REPLACE(&new_format, &message_wildcard, &tmp, &format);
+		zval_ptr_dtor(&tmp);
+	} else {
+		PHALCON_STR_REPLACE(&new_format, &message_wildcard, message, &format);
+	}
+	zval_ptr_dtor(&format);
+	zval_ptr_dtor(&message_wildcard);
 
 	if (Z_TYPE_P(context) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(context)) > 0) {
 		PHALCON_CALL_METHOD(&format, getThis(), "interpolate", &new_format, context);
 	} else {
-		ZVAL_COPY_VALUE(&format, &new_format);
+		ZVAL_COPY(&format, &new_format);
 	}
+	zval_ptr_dtor(&new_format);
 
 	PHALCON_CONCAT_VS(return_value, &format, PHP_EOL);
+	zval_ptr_dtor(&format);
 }

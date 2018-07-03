@@ -21,6 +21,8 @@
 #include "files.h"
 #include "di.h"
 
+#include <main/php_streams.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -48,7 +50,10 @@ PHP_METHOD(Phalcon_Files, delete);
 PHP_METHOD(Phalcon_Files, list);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_files_createdirectory, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, pathname, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, recursive, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, context, IS_RESOURCE, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_files_createfile, 0, 0, 1)
@@ -94,16 +99,30 @@ PHALCON_INIT_CLASS(Phalcon_Files){
 }
 
 /**
- * 
+ * Create a directory
  *
- * @param string $path
+ * @param string pathname
+ * @param int mode
+ * @param bool recursive
+ * @param resource context
  * @return boolean
  */
 PHP_METHOD(Phalcon_Files, createDirectory){
 
-	zval *path;
+	char *dir;
+	size_t dir_len;
+	zval *zcontext = NULL;
+	zend_long mode = 0777;
+	zend_bool recursive = 0;
+	php_stream_context *context;
 
-	phalcon_fetch_params(0, 1, 0, &path);
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "p|lbr", &dir, &dir_len, &mode, &recursive, &zcontext) == FAILURE) {
+		RETURN_FALSE;
+	}
+
+	context = php_stream_context_from_zval(zcontext, 0);
+
+	RETURN_BOOL(php_stream_mkdir(dir, (int)mode, (recursive ? PHP_STREAM_MKDIR_RECURSIVE : 0) | REPORT_ERRORS, context));
 }
 
 /**

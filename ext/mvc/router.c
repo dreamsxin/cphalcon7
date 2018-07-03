@@ -459,6 +459,10 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		zval_ptr_dtor(&real_uri);
 		RETURN_FALSE;
 	}
+	if (PHALCON_IS_NOT_EMPTY_STRING(&status)) {
+		zval_ptr_dtor(&real_uri);
+		ZVAL_COPY(&real_uri, &status);
+	}
 
 	/**
 	 * Remove extra slashes in the route

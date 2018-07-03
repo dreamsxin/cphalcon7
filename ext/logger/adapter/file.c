@@ -102,8 +102,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_COPY)) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
+			zval_ptr_dtor(&mode);
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
 			return;
 		}
@@ -115,6 +116,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
 	PHALCON_CALL_FUNCTION(&handler, "fopen", name, &mode);
+	zval_ptr_dtor(&mode);
 	if (Z_TYPE(handler) != IS_RESOURCE) {
 		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
 	} else {
@@ -122,6 +124,7 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 		phalcon_update_property(getThis(), SL("_options"), options);
 		phalcon_update_property(getThis(), SL("_fileHandler"), &handler);
 	}
+	zval_ptr_dtor(&handler);
 }
 
 /**

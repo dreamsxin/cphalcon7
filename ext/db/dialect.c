@@ -1015,22 +1015,22 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 PHP_METHOD(Phalcon_Db_Dialect, insert)
 {
 	zval *definition, table = {}, fields = {}, number_fields = {}, values = {}, exception_message = {}, escaped_table = {}, escape_char = {};
-	zval *row_values = NULL, joined_rows = {}, joined_values = {}, escaped_fields = {}, *field, joined_fields = {};
+	zval *row_values = NULL, joined_rows = {}, joined_values = {}, escaped_fields = {}, *field;
 
-	phalcon_fetch_params(0, 1, 0, &definition);
+	phalcon_fetch_params(1, 1, 0, &definition);
 
 	if (Z_TYPE_P(definition) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid INSERT definition");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid INSERT definition");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&table, definition, SL("table"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'table' is required in the definition array");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&fields, definition, SL("fields"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The index 'fields' is required in the definition array");
 		return;
 	}
 
@@ -1040,7 +1040,7 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 	}
 
 	if (unlikely(Z_TYPE(values) != IS_ARRAY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The second parameter for insert isn't an Array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "The second parameter for insert isn't an Array");
 		return;
 	}
 
@@ -1049,19 +1049,23 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 	 */
 	if (!phalcon_fast_count_ev(&values)) {
 		PHALCON_CONCAT_SVS(&exception_message, "Unable to insert into ", &table, " without data");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
+		PHALCON_MM_ADD_ENTRY(&exception_message);
+		PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
 		return;
 	}
 
 	phalcon_fast_count(&number_fields, &fields);
 
-	PHALCON_CALL_METHOD(&escaped_table, getThis(), "getsqltable", &table);
-	PHALCON_CALL_METHOD(&escape_char, getThis(), "getescapechar");
+	PHALCON_MM_CALL_METHOD(&escaped_table, getThis(), "getsqltable", &table);
+	PHALCON_MM_ADD_ENTRY(&escaped_table);
+	PHALCON_MM_CALL_METHOD(&escape_char, getThis(), "getescapechar");
+	PHALCON_MM_ADD_ENTRY(&escape_char);
 
 	/**
 	 * Build the final SQL INSERT statement
 	 */
 	array_init(&joined_rows);
+	PHALCON_MM_ADD_ENTRY(&joined_rows);
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(values), row_values) {
 		zval number_values = {}, insert_row_values = {}, *value, joined_row = {};
 
@@ -1073,30 +1077,31 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		 */
 		if (!PHALCON_IS_EQUAL(&number_fields, &number_values)) {
 			PHALCON_CONCAT_SVSVS(&exception_message, "The fields count(", &number_fields, ") does not match the values count(", &number_values, ")");
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
-			zval_ptr_dtor(&joined_rows);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_db_exception_ce, &exception_message);
 			return;
 		}
 
 		array_init(&insert_row_values);
+		PHALCON_MM_ADD_ENTRY(&insert_row_values);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(row_values), value) {
 			zval insert_value = {};
 
-			PHALCON_CALL_METHOD(&insert_value, getThis(), "getsqlexpression", value, &escape_char);
+			PHALCON_MM_CALL_METHOD(&insert_value, getThis(), "getsqlexpression", value, &escape_char);
 
 			phalcon_array_append(&insert_row_values, &insert_value, 0);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_fast_join_str(&joined_row, SL(", "), &insert_row_values);
-		zval_ptr_dtor(&insert_row_values);
 		phalcon_array_append(&joined_rows, &joined_row, 0);
 	} ZEND_HASH_FOREACH_END();
 
 	phalcon_fast_join_str(&joined_values, SL("), ("), &joined_rows);
-	zval_ptr_dtor(&joined_rows);
+	PHALCON_MM_ADD_ENTRY(&joined_values);
 
 	if (Z_TYPE(fields) == IS_ARRAY) {
+		zval joined_fields = {};
 		if (PHALCON_GLOBAL(db).escape_identifiers) {
 			array_init(&escaped_fields);
 
@@ -1111,14 +1116,14 @@ PHP_METHOD(Phalcon_Db_Dialect, insert)
 		}
 
 		phalcon_fast_join_str(&joined_fields, SL(", "), &escaped_fields);
+		zval_ptr_dtor(&escaped_fields);
 
 		PHALCON_CONCAT_SVSVSVS(return_value, "INSERT INTO ", &escaped_table, " (", &joined_fields, ") VALUES (", &joined_values, ")");
 		zval_ptr_dtor(&joined_fields);
 	} else {
 		PHALCON_CONCAT_SVSVS(return_value, "INSERT INTO ", &escaped_table, " VALUES (", &joined_values, ")");
 	}
-	zval_ptr_dtor(&escaped_table);
-	zval_ptr_dtor(&joined_values);
+	RETURN_MM();
 }
 
 /**

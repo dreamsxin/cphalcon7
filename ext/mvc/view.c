@@ -131,6 +131,8 @@ PHP_METHOD(Phalcon_Mvc_View, enable);
 PHP_METHOD(Phalcon_Mvc_View, isDisabled);
 PHP_METHOD(Phalcon_Mvc_View, enableNamespaceView);
 PHP_METHOD(Phalcon_Mvc_View, disableNamespaceView);
+PHP_METHOD(Phalcon_Mvc_View, enableMultiNamespaceView);
+PHP_METHOD(Phalcon_Mvc_View, disableMultiNamespaceView);
 PHP_METHOD(Phalcon_Mvc_View, enableLowerCase);
 PHP_METHOD(Phalcon_Mvc_View, disableLowerCase);
 PHP_METHOD(Phalcon_Mvc_View, setConverter);
@@ -207,6 +209,8 @@ static const zend_function_entry phalcon_mvc_view_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_View, isDisabled, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, enableNamespaceView, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, disableNamespaceView, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View, enableMultiNamespaceView, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View, disableMultiNamespaceView, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, enableLowerCase, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, disableLowerCase, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, setConverter, arginfo_phalcon_mvc_viewinterface_setconverter, ZEND_ACC_PUBLIC)
@@ -241,6 +245,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View){
 	zend_declare_property_bool(phalcon_mvc_view_ce, SL("_enablePartialsAbsolutePath"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_view_ce, SL("_viewsDir"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_view_ce, SL("_enableNamespaceView"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_view_ce, SL("_enableMultiNamespaceView"), 1, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_view_ce, SL("_templatesBefore"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_view_ce, SL("_templatesAfter"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_view_ce, SL("_engines"), 0, ZEND_ACC_PROTECTED);
@@ -1163,7 +1168,9 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		zval contents = {};
 		phalcon_ob_get_contents(&contents);
 		php_output_clean();
-		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		if (Z_TYPE(contents) == IS_STRING) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		}
 		zval_ptr_dtor(&contents);
 
 		/**
@@ -1334,7 +1341,9 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (PHALCON_IS_NOT_FALSE(&disabled)) {
 		phalcon_ob_get_contents(&contents);
 		php_output_clean();
-		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		if (Z_TYPE(contents) == IS_STRING) {
+			PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		}
 		zval_ptr_dtor(&contents);
 		RETURN_FALSE;
 	}
@@ -1478,7 +1487,9 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 */
 	phalcon_ob_get_contents(&contents);
 	php_output_clean();
-	PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+	if (Z_TYPE(contents) == IS_STRING) {
+		PHALCON_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+	}
 	zval_ptr_dtor(&contents);
 
 	ZVAL_TRUE(&silence);
@@ -1577,7 +1588,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		 */
 		if (PHALCON_GE_LONG(&render_level, PHALCON_VIEW_LEVEL_NAMESPACE) && PHALCON_IS_NOT_EMPTY(&layout_namespace)) {
 			if (!phalcon_array_isset_long(&disabled_levels, PHALCON_VIEW_LEVEL_NAMESPACE)) {
-				zval pos = {};
+				zval enable_multi_namespace_view = {}, pos = {};
 				if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 					ZVAL_STRING(&debug_message, "Ready insert namespace layout");
 					PHALCON_DEBUG_LOG(&debug_message);
@@ -1588,20 +1599,24 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 				PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, &layout_namespace);
 				PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
 				zval_ptr_dtor(&view_tpl_path);
-				/**
-				 * Top-level namespace
-				 */
-				if (phalcon_fast_strrpos(&pos, &layout_namespace, &ds)) {
-					zval tmp = {};
 
-					phalcon_substr(&tmp, &layout_namespace, 0, Z_LVAL(pos));
-					zval_ptr_dtor(&layout_namespace);
-					ZVAL_COPY(&layout_namespace, &tmp);
-					zval_ptr_dtor(&tmp);
+				phalcon_read_property(&enable_multi_namespace_view, getThis(), SL("_enableMultiNamespaceView"), PH_NOISY|PH_READONLY);
+				if (zend_is_true(&enable_multi_namespace_view)) {
+					/**
+					 * Top-level namespace
+					 */
+					while (phalcon_fast_strrpos(&pos, &layout_namespace, &ds)) {
+						zval tmp = {};
 
-					PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, &layout_namespace);
-					PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
-					zval_ptr_dtor(&view_tpl_path);
+						phalcon_substr(&tmp, &layout_namespace, 0, Z_LVAL(pos));
+						zval_ptr_dtor(&layout_namespace);
+						ZVAL_COPY(&layout_namespace, &tmp);
+						zval_ptr_dtor(&tmp);
+
+						PHALCON_CONCAT_VV(&view_tpl_path, &layouts_dir, &layout_namespace);
+						PHALCON_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &view_tpl_path, &silence, &PHALCON_GLOBAL(z_true), &enable_layouts_absolute_path);
+						zval_ptr_dtor(&view_tpl_path);
+					}
 				}
 			}
 		}
@@ -2220,6 +2235,28 @@ PHP_METHOD(Phalcon_Mvc_View, enableNamespaceView){
 PHP_METHOD(Phalcon_Mvc_View, disableNamespaceView){
 
 	phalcon_update_property_bool(getThis(), SL("_enableNamespaceView"), 0);
+	RETURN_THIS();
+}
+
+/**
+ * Enables multi namespace view render
+ *
+ * @return Phalcon\Mvc\View
+ */
+PHP_METHOD(Phalcon_Mvc_View, enableMultiNamespaceView){
+
+	phalcon_update_property_bool(getThis(), SL("_enableMultiNamespaceView"), 1);
+	RETURN_THIS();
+}
+
+/**
+ * Disables multi namespace view render
+ *
+ * @return Phalcon\Mvc\View
+ */
+PHP_METHOD(Phalcon_Mvc_View, disableMultiNamespaceView){
+
+	phalcon_update_property_bool(getThis(), SL("_enableMultiNamespaceView"), 0);
 	RETURN_THIS();
 }
 

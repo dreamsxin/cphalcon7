@@ -3733,7 +3733,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 	zval *exists, *identity_field, event_name = {}, status = {}, attributes = {}, data_type_numeric = {}, data_types = {}, column_map = {};
 	zval automatic_attributes = {}, default_values = {}, *error, *field, skipped = {}, exception_message = {};
 	int method_exists = 0;
-	double num, max;
 
 	phalcon_fetch_params(1, 2, 0, &exists, &identity_field);
 
@@ -3908,7 +3907,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
 						error = &PHALCON_GLOBAL(z_true);
-					} else if (!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER)) {
+					} else if (
+						!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER) 
+						&& 
+						!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BIGINTEGER)
+					) {
 						PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 						PHALCON_MM_CALL_METHOD(&field_scale, getThis(), "getdatascale", field);
 
@@ -3992,8 +3995,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 							PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 							error = &PHALCON_GLOBAL(z_true);
 						} else {
-							num = phalcon_get_intval(&value);
-							max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
+							zend_long num = phalcon_get_intval(&value);
+							zend_long max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
 
 							if (num > max) {
 								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");

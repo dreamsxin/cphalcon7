@@ -95,10 +95,11 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, validate){
 			ZVAL_COPY(&allow_empty, _allow_empty);
 		}
 	}
-	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY_STRING(&value)) {
-		zval_ptr_dtor(&allow_empty);
-		zval_ptr_dtor(&value);
-		RETURN_TRUE;
+	if (PHALCON_IS_EMPTY_STRING(&value)) {
+		if (zend_is_true(&allow_empty)) {
+			zval_ptr_dtor(&allow_empty);
+			RETURN_TRUE;
+		}
 	}
 	zval_ptr_dtor(&allow_empty);
 
@@ -157,6 +158,10 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, valid){
 
 	if (!format) {
 		format = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(value) != IS_STRING || Z_STRLEN_P(value) <= 0) {
+		RETURN_FALSE;
 	}
 
 	PHALCON_CALL_CE_STATIC(&valid, phalcon_date_ce, "valid", value, format);

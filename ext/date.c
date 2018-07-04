@@ -149,25 +149,25 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_createdatetimezone, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_filter, 0, 0, 1)
-	ZEND_ARG_INFO(0, date)
+	ZEND_ARG_TYPE_INFO(0, date, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, delimiter, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_valid, 0, 0, 1)
-	ZEND_ARG_INFO(0, date)
+	ZEND_ARG_TYPE_INFO(0, date, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_diff, 0, 0, 2)
-	ZEND_ARG_INFO(0, date1)
-	ZEND_ARG_INFO(0, date2)
+	ZEND_ARG_TYPE_INFO(0, date1, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, date2, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, diffFormat, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_date_add, 0, 0, 1)
-	ZEND_ARG_INFO(0, date1)
+	ZEND_ARG_TYPE_INFO(0, date1, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, interval, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 1)
 ZEND_END_ARG_INFO()
@@ -1285,7 +1285,11 @@ PHP_METHOD(Phalcon_Date, valid){
 	phalcon_fetch_params(0, 1, 1, &date, &format);
 
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
-		ZVAL_STRING(&date_format, "Y-m-d");
+		if (Z_STRLEN_P(date) > 10) {
+			ZVAL_STRING(&date_format, "Y-m-d H:i:s");
+		} else {
+			ZVAL_STRING(&date_format, "Y-m-d");
+		}
 	} else {
 		ZVAL_COPY(&date_format, format);
 	}
@@ -1325,19 +1329,17 @@ PHP_METHOD(Phalcon_Date, valid){
  */
 PHP_METHOD(Phalcon_Date, diff){
 
-	zval *date1, *date2, *diff_format = NULL, *format = NULL, difference_format = {}, date_format = {}, format_date1 = {}, format_date2 = {}, interval = {};
+	zval *date1, *date2, *diff_format = NULL, *format = NULL, date_format = {}, format_date1 = {}, format_date2 = {}, interval = {};
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(0, 2, 2, &date1, &date2, &diff_format, &format);
 
-	if (!diff_format || Z_TYPE_P(diff_format) == IS_NULL) {
-		ZVAL_STRING(&difference_format, "%a");
-	} else {
-		ZVAL_COPY(&difference_format, format);
-	}
-
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
-		ZVAL_STRING(&date_format, "Y-m-d");
+		if (Z_STRLEN_P(date1) > 10) {
+			ZVAL_STRING(&date_format, "Y-m-d H:i:s");
+		} else {
+			ZVAL_STRING(&date_format, "Y-m-d");
+		}
 	} else {
 		ZVAL_COPY(&date_format, format);
 	}
@@ -1345,16 +1347,32 @@ PHP_METHOD(Phalcon_Date, diff){
 	ce0 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_CALL_CE_STATIC(&format_date1, ce0, "createfromformat", &date_format, date1);
+	if (!zend_is_true(&format_date1)) {
+		zval_ptr_dtor(&date_format);
+		RETURN_FALSE;
+	}
 	PHALCON_CALL_CE_STATIC(&format_date2, ce0, "createfromformat", &date_format, date2);
+	if (!zend_is_true(&format_date2)) {
+		zval_ptr_dtor(&format_date1);
+		zval_ptr_dtor(&date_format);
+		RETURN_FALSE;
+	}
 	zval_ptr_dtor(&date_format);
 
-	PHALCON_CALL_METHOD(&interval, &format_date1, "diff", &format_date2);
+	if (!diff_format || Z_TYPE_P(diff_format) == IS_NULL) {
+		zval time1 = {}, time2 = {};
+		PHALCON_CALL_METHOD(&time1, &format_date1, "gettimestamp");
+		PHALCON_CALL_METHOD(&time2, &format_date2, "gettimestamp");
+		phalcon_sub_function(return_value, &time1, &time2);
+		zval_ptr_dtor(&time1);
+		zval_ptr_dtor(&time2);
+	} else {
+		PHALCON_CALL_METHOD(&interval, &format_date1, "diff", &format_date2);
+		PHALCON_CALL_METHOD(return_value, &interval, "format", diff_format);
+		zval_ptr_dtor(&interval);
+	}
 	zval_ptr_dtor(&format_date1);
 	zval_ptr_dtor(&format_date2);
-
-	PHALCON_CALL_METHOD(return_value, &interval, "format", &difference_format);
-	zval_ptr_dtor(&difference_format);
-	zval_ptr_dtor(&interval);
 }
 
 /**
@@ -1375,13 +1393,21 @@ PHP_METHOD(Phalcon_Date, add){
 	phalcon_fetch_params(0, 1, 2, &date1, &interval_string, &format);
 
 	if (!interval_string || Z_TYPE_P(interval_string) == IS_NULL) {
-		ZVAL_STRING(&date_interval, "1 days");
+		if (Z_STRLEN_P(date1) > 10) {
+			ZVAL_STRING(&date_interval, "1 seconds");
+		} else {
+			ZVAL_STRING(&date_interval, "1 days");
+		}
 	} else {
 		ZVAL_COPY(&date_interval, interval_string);
 	}
 
 	if (!format || Z_TYPE_P(format) == IS_NULL) {
-		ZVAL_STRING(&date_format, "Y-m-d");
+		if (Z_STRLEN_P(date1) > 10) {
+			ZVAL_STRING(&date_format, "Y-m-d H:i:s");
+		} else {
+			ZVAL_STRING(&date_format, "Y-m-d");
+		}
 	} else {
 		ZVAL_COPY(&date_format, format);
 	}
@@ -1393,6 +1419,11 @@ PHP_METHOD(Phalcon_Date, add){
 	ce1 = phalcon_fetch_str_class(SL("DateTime"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_CALL_CE_STATIC(&format_date1, ce1, "createfromformat", &date_format, date1);
+	if (!zend_is_true(&format_date1)) {
+		zval_ptr_dtor(&interval);
+		zval_ptr_dtor(&date_format);
+		RETURN_FALSE;
+	}
 
 	PHALCON_CALL_METHOD(NULL, &format_date1, "add", &interval);
 	zval_ptr_dtor(&interval);

@@ -205,7 +205,7 @@ static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *V)
 {
 	zval values = {};
 
-	ZVAL_DUP(ret, Q);
+	ZVAL_COPY_VALUE(ret, Q);
 
 	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values), PH_READONLY)) {
 		array_init(&values);
@@ -275,8 +275,10 @@ static void phql_ret_index_list(zval *ret, zval *list_left, zval *right_list)
 		if (zend_hash_index_exists(list, 0)) {
 			zval *item;
 			ZEND_HASH_FOREACH_VAL(list, item) {
+				Z_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
+			zval_ptr_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}
@@ -305,8 +307,10 @@ static void phql_ret_zval_list(zval *ret, zval *list_left, zval *right_list)
 		if (zend_hash_index_exists(list, 0)) {
 			zval *item;
 			ZEND_HASH_FOREACH_VAL(list, item) {
+				Z_ADDREF_P(item);
 				add_next_index_zval(ret, item);
 			} ZEND_HASH_FOREACH_END();
+			zval_ptr_dtor(list_left);
 		} else {
 			add_next_index_zval(ret, list_left);
 		}

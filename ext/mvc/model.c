@@ -2331,66 +2331,71 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
 	zval *force = NULL, build = {}, dirty_state = {}, unique_key = {}, unique_params = {}, unique_types = {};
 	zval model_name = {}, phql = {}, models_manager = {}, query = {}, write_connection = {}, model = {}, snapshot = {};
 
-	phalcon_fetch_params(0, 0, 1, &force);
+	phalcon_fetch_params(1, 0, 1, &force);
 
 	if (!force) {
 		force = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHOD(&build, getThis(), "_rebuild");
+	PHALCON_MM_CALL_METHOD(&build, getThis(), "_rebuild");
+	PHALCON_MM_ADD_ENTRY(&build);
 
 	if (!zend_is_true(&build)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
-	PHALCON_CALL_METHOD(&dirty_state, getThis(), "getdirtystate");
+	PHALCON_MM_CALL_METHOD(&dirty_state, getThis(), "getdirtystate");
 
 	if (!zend_is_true(force) && PHALCON_IS_LONG(&dirty_state, PHALCON_MODEL_DIRTY_STATE_PERSISTEN)) {
-		RETURN_TRUE;
+		RETURN_MM_TRUE;
 	}
 
-	PHALCON_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
-	PHALCON_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
-	PHALCON_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
+	PHALCON_MM_ADD_ENTRY(&unique_key);
+	PHALCON_MM_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
+	PHALCON_MM_ADD_ENTRY(&unique_params);
+	PHALCON_MM_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_ADD_ENTRY(&unique_types);
 
 	phalcon_get_called_class(&model_name);
+	PHALCON_MM_ADD_ENTRY(&model_name);
 
 	/**
 	 * Here we use a single COUNT(*) without PHQL to make the execution faster
 	 */
 	PHALCON_CONCAT_SVSVS(&phql, "SELECT * FROM ", &model_name, " WHERE ", &unique_key, " LIMIT 1");
-	zval_ptr_dtor(&model_name);
+	PHALCON_MM_ADD_ENTRY(&phql);
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
-	zval_ptr_dtor(&models_manager);
-	zval_ptr_dtor(&phql);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	PHALCON_MM_ADD_ENTRY(&query);
 
 	/**
 	 * Create/Get the current database connection
 	 */
-	PHALCON_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
+	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
+	PHALCON_MM_ADD_ENTRY(&write_connection);
 
-	PHALCON_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
-	zval_ptr_dtor(&write_connection);
-	PHALCON_CALL_METHOD(NULL, &query, "setuniquerow", &PHALCON_GLOBAL(z_true));
-	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setuniquerow", &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
 
-	PHALCON_CALL_METHOD(&model, &query, "execute");
-	zval_ptr_dtor(&query);
+	PHALCON_MM_CALL_METHOD(&model, &query, "execute");
+	PHALCON_MM_ADD_ENTRY(&model);
 
 	if (Z_TYPE(model) == IS_OBJECT) {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
-		PHALCON_CALL_METHOD(&snapshot, &model, "getsnapshotdata");
+		PHALCON_MM_CALL_METHOD(&snapshot, &model, "getsnapshotdata");
+		PHALCON_MM_ADD_ENTRY(&snapshot);
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot);
-		zval_ptr_dtor(&snapshot);
 		RETVAL_TRUE;
 	} else {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
 		RETVAL_FALSE;
 	}
-	zval_ptr_dtor(&model);
+	RETURN_MM();
 }
 
 /**
@@ -3825,7 +3830,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), field) {
 		zval attribute_field = {}, value = {}, field_type = {}, is_not_null = {}, message = {}, type = {}, field_size = {};
-		zval field_scale = {}, field_byte = {}, str_value = {}, length = {}, pos = {}, label = {}, pairs = {}, prepared = {};
+		zval str_value = {}, length = {}, label = {}, pairs = {}, prepared = {};
 		/**
 		 * We don't check fields that must be omitted
 		 */
@@ -3908,117 +3913,47 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 						error = &PHALCON_GLOBAL(z_true);
 					} else if (
-						!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER) 
-						&& 
-						!phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BIGINTEGER)
+						!phalcon_is_numeric_ex(&value)
 					) {
-						PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
-						PHALCON_MM_CALL_METHOD(&field_scale, getThis(), "getdatascale", field);
-
-						if (Z_TYPE(field_size) != IS_NULL) {
-							phalcon_strval(&str_value, &value);
-							phalcon_fast_strlen(&length, &value);
-							phalcon_fast_strpos_str(&pos, &str_value, SL("."));
-							zval_ptr_dtor(&str_value);
-
-							if (!phalcon_is_numeric(&pos)) {
-								ZVAL_LONG(&pos, Z_LVAL(length) - 1);
-							}
-
-							if (phalcon_is_numeric(&field_scale) && PHALCON_LT_LONG(&field_scale, (Z_LVAL(length)-Z_LVAL(pos)-1))) {
-								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
-								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-								PHALCON_MM_ADD_ENTRY(&message);
-								if (method_exists) {
-									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-								} else {
-									ZVAL_COPY(&label, &attribute_field);
-								}
-								PHALCON_MM_ADD_ENTRY(&label);
-								array_init_size(&pairs, 1);
-								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								PHALCON_MM_ADD_ENTRY(&pairs);
-								PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								PHALCON_MM_ADD_ENTRY(&prepared);
-
-								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-
-								error = &PHALCON_GLOBAL(z_true);
-								continue;
-							}
-
-							if (PHALCON_GT_LONG(&pos, (Z_LVAL(field_size)-Z_LVAL(field_scale)))) {
-								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
-								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-								PHALCON_MM_ADD_ENTRY(&message);
-								if (method_exists) {
-									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-								} else {
-									ZVAL_COPY(&label, &attribute_field);
-								}
-								PHALCON_MM_ADD_ENTRY(&label);
-								array_init_size(&pairs, 1);
-								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								PHALCON_MM_ADD_ENTRY(&pairs);
-								PHALCON_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								PHALCON_MM_ADD_ENTRY(&prepared);
-
-								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-
-								error = &PHALCON_GLOBAL(z_true);
-							}
-						}
-					} else {
-						PHALCON_MM_CALL_METHOD(&field_byte, getThis(), "getdatabyte", field);
-						PHALCON_MM_ADD_ENTRY(&field_byte);
-
-						phalcon_strval(&str_value, &value);
-						phalcon_fast_strpos_str(&pos, &str_value, SL("."));
-						zval_ptr_dtor(&str_value);
-
-						if (phalcon_is_numeric(&pos)) {
-							PHALCON_MM_ZVAL_STRING(&type, "Numericality");
-							PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-							PHALCON_MM_ADD_ENTRY(&message);
-							if (method_exists) {
-								PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-							} else {
-								ZVAL_COPY(&label, &attribute_field);
-							}
-							PHALCON_MM_ADD_ENTRY(&label);
-							array_init_size(&pairs, 1);
-							phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-							PHALCON_MM_ADD_ENTRY(&pairs);
-							PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-							PHALCON_MM_ADD_ENTRY(&prepared);
-
-							PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-							error = &PHALCON_GLOBAL(z_true);
+						PHALCON_MM_ZVAL_STRING(&type, "Numericality");
+						PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+						PHALCON_MM_ADD_ENTRY(&message);
+						if (method_exists) {
+							PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
 						} else {
-							zend_long num = phalcon_get_intval(&value);
-							zend_long max = pow(2, ((Z_LVAL(field_byte)*8) - 1)) - 1;
-
-							if (num > max) {
-								PHALCON_MM_ZVAL_STRING(&type, "TooLarge");
-								PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-								PHALCON_MM_ADD_ENTRY(&message);
-								if (method_exists) {
-									PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-								} else {
-									ZVAL_COPY(&label, &attribute_field);
-								}
-								PHALCON_MM_ADD_ENTRY(&label);
-								array_init_size(&pairs, 1);
-								phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-								PHALCON_MM_ADD_ENTRY(&pairs);
-								PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-								PHALCON_MM_ADD_ENTRY(&prepared);
-
-								PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
-
-								error = &PHALCON_GLOBAL(z_true);
-							}
+							ZVAL_COPY(&label, &attribute_field);
 						}
+						PHALCON_MM_ADD_ENTRY(&label);
+						array_init_size(&pairs, 1);
+						phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+						PHALCON_MM_ADD_ENTRY(&pairs);
+						PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+						PHALCON_MM_ADD_ENTRY(&prepared);
+
+						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+						error = &PHALCON_GLOBAL(z_true);
+					} else if (
+						(phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER) || phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BIGINTEGER))
+						&&
+						!phalcon_is_long_ex(&value)
+					) {
+						PHALCON_MM_ZVAL_STRING(&type, "Numericality");
+						PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
+						PHALCON_MM_ADD_ENTRY(&message);
+						if (method_exists) {
+							PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
+						} else {
+							ZVAL_COPY(&label, &attribute_field);
+						}
+						PHALCON_MM_ADD_ENTRY(&label);
+						array_init_size(&pairs, 1);
+						phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
+						PHALCON_MM_ADD_ENTRY(&pairs);
+						PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
+						PHALCON_MM_ADD_ENTRY(&prepared);
+
+						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
+						error = &PHALCON_GLOBAL(z_true);
 					}
 				} else if (phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_VARCHAR)
 					|| phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_CHAR)) {
@@ -4198,21 +4133,31 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	zval phql_join_fields = {}, phql_join_values = {}, models_manager = {}, query = {}, status = {};
 	int identity_field_is_not_false, ignore_last_lnsertid = 0; /* scan-build insists on using flags */
 
-	phalcon_fetch_params(0, 2, 0, &connection, &identity_field);
+	phalcon_fetch_params(1, 2, 0, &connection, &identity_field);
 
 	ZVAL_LONG(&bind_skip, 1024);
 
 	array_init(&fields);
+	PHALCON_MM_ADD_ENTRY(&fields);
 	array_init(&bind_params);
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 	array_init(&bind_types);
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 
-	PHALCON_CALL_METHOD(&attributes, getThis(), "getattributes");
-	PHALCON_CALL_METHOD(&bind_data_types, getThis(), "getbindtypes");
-	PHALCON_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticcreateattributes");
-	PHALCON_CALL_METHOD(&not_null_attributes, getThis(), "getnotnullattributes");
-	PHALCON_CALL_METHOD(&default_values, getThis(), "getdefaultvalues");
-	PHALCON_CALL_METHOD(&data_types, getThis(), "getdatatypes");
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_MM_CALL_METHOD(&attributes, getThis(), "getattributes");
+	PHALCON_MM_ADD_ENTRY(&attributes);
+	PHALCON_MM_CALL_METHOD(&bind_data_types, getThis(), "getbindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_data_types);
+	PHALCON_MM_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticcreateattributes");
+	PHALCON_MM_ADD_ENTRY(&automatic_attributes);
+	PHALCON_MM_CALL_METHOD(&not_null_attributes, getThis(), "getnotnullattributes");
+	PHALCON_MM_ADD_ENTRY(&not_null_attributes);
+	PHALCON_MM_CALL_METHOD(&default_values, getThis(), "getdefaultvalues");
+	PHALCON_MM_ADD_ENTRY(&default_values);
+	PHALCON_MM_CALL_METHOD(&data_types, getThis(), "getdatatypes");
+	PHALCON_MM_ADD_ENTRY(&data_types);
+	PHALCON_MM_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_MM_ADD_ENTRY(&column_map);
 
 	/**
 	 * All fields in the model makes part or the INSERT
@@ -4226,7 +4171,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			if (Z_TYPE(column_map) == IS_ARRAY) {
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -4242,7 +4188,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 				 */
 				if (!phalcon_array_isset_fetch(&field_bind_type, &bind_data_types, field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' has not defined a bind data type");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -4263,20 +4210,24 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 						}
 					}
 				} else {
-					ZVAL_COPY_VALUE(&convert_value, &value);
+					ZVAL_COPY(&convert_value, &value);
+					PHALCON_MM_ADD_ENTRY(&convert_value);
 					if (PHALCON_GLOBAL(orm).enable_auto_convert) {
 						if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 							if (phalcon_array_isset_fetch(&field_type, &data_types, field, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 								switch(Z_LVAL(field_type)) {
 									case PHALCON_DB_COLUMN_TYPE_JSON:
-										RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+										RETURN_MM_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									case PHALCON_DB_COLUMN_TYPE_BYTEA:
-										PHALCON_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+										PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									case PHALCON_DB_COLUMN_TYPE_ARRAY:
 									case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-										PHALCON_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+										PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									default:
 										break;
@@ -4292,11 +4243,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&attributes);
-	zval_ptr_dtor(&automatic_attributes);
-	zval_ptr_dtor(&not_null_attributes);
-	zval_ptr_dtor(&default_values);
-	zval_ptr_dtor(&data_types);
 
 	/**
 	 * If there is an identity field we add it using "null" or "default"
@@ -4309,19 +4255,21 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 		if (Z_TYPE(column_map) == IS_ARRAY) {
 			if (!phalcon_array_isset_fetch(&column_name, &column_map, identity_field, PH_READONLY)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Identity column '", identity_field, "' isn't part of the column map");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+				PHALCON_MM_ADD_ENTRY(&exception_message);
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 		} else {
 			ZVAL_COPY_VALUE(&column_name, identity_field);
 		}
 
-		PHALCON_CALL_METHOD(&default_value, connection, "getdefaultidvalue");
+		PHALCON_MM_CALL_METHOD(&default_value, connection, "getdefaultidvalue");
+		PHALCON_MM_ADD_ENTRY(&default_value);
 
 		/**
 		 * Not all the database systems require an explicit value for identity columns
 		 */
-		PHALCON_CALL_METHOD(&use_explicit_identity, connection, "useexplicitidvalue");
+		PHALCON_MM_CALL_METHOD(&use_explicit_identity, connection, "useexplicitidvalue");
 
 		/**
 		 * Check if the developer set an explicit value for the column
@@ -4332,9 +4280,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			 */
 			if (!phalcon_array_isset_fetch(&column_type, &bind_data_types, identity_field, PH_READONLY)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Identity column '", identity_field, "' isn't part of the table columns");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-				zval_ptr_dtor(&bind_data_types);
-				zval_ptr_dtor(&column_map);
+				PHALCON_MM_ADD_ENTRY(&exception_message);
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -4354,48 +4301,44 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			phalcon_array_update(&bind_types, &column_name, &bind_skip, PH_COPY);
 		}
 	}
-	zval_ptr_dtor(&bind_data_types);
-	zval_ptr_dtor(&column_map);
 
 	phalcon_get_called_class(&model_name);
+	PHALCON_MM_ADD_ENTRY(&model_name);
 
 	phalcon_fast_join_str(&phql_join_fields, SL(", "), &fields);
+	PHALCON_MM_ADD_ENTRY(&phql_join_fields);
 	PHALCON_CONCAT_SVSVS(&phql, "INSERT INTO [", &model_name, "] (", &phql_join_fields ,") VALUES ");
-	zval_ptr_dtor(&model_name);
-	zval_ptr_dtor(&phql_join_fields);
 
 	phalcon_fast_join_str(&phql_join_values, SL(":, :"), &fields);
-	zval_ptr_dtor(&fields);
+	PHALCON_MM_ADD_ENTRY(&phql_join_values);
 	PHALCON_SCONCAT_SVS(&phql, " (:", &phql_join_values, ":) ");
-	zval_ptr_dtor(&phql_join_values);
+	PHALCON_MM_ADD_ENTRY(&phql);
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
-	zval_ptr_dtor(&models_manager);
-	zval_ptr_dtor(&phql);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	PHALCON_MM_ADD_ENTRY(&query);
 
-	PHALCON_CALL_METHOD(NULL, &query, "setconnection", connection);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
-	zval_ptr_dtor(&bind_params);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
-	zval_ptr_dtor(&bind_types);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", connection);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
 
 	if (ignore_last_lnsertid) {
-		PHALCON_CALL_METHOD(NULL, &query, "ignorelastinsertid");
+		PHALCON_MM_CALL_METHOD(NULL, &query, "ignorelastinsertid");
 	}
 
-	PHALCON_CALL_METHOD(&status, &query, "execute");
-	zval_ptr_dtor(&query);
+	PHALCON_MM_CALL_METHOD(&status, &query, "execute");
+	PHALCON_MM_ADD_ENTRY(&status);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(return_value, &status, "success");
+		PHALCON_MM_CALL_METHOD(return_value, &status, "success");
 		if (zend_is_true(return_value) && identity_field_is_not_false) {
 			phalcon_update_property_zval_zval(getThis(), &column_name, return_value);
 		}
 	} else {
 		RETVAL_FALSE;
 	}
-	zval_ptr_dtor(&status);
+	RETURN_MM();
 }
 
 /**
@@ -4415,40 +4358,50 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	zval query = {}, status = {}, type = {}, message = {};
 	int i_use_dynamic_update; /* To keep static code analyzer happy */
 
-	phalcon_fetch_params(0, 1, 0, &connection);
+	phalcon_fetch_params(1, 1, 0, &connection);
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
 
 	/**
 	 * Check if the model must use dynamic update
 	 */
-	PHALCON_CALL_METHOD(&use_dynamic_update, &models_manager, "isusingdynamicupdate", getThis());
+	PHALCON_MM_CALL_METHOD(&use_dynamic_update, &models_manager, "isusingdynamicupdate", getThis());
 	i_use_dynamic_update = zend_is_true(&use_dynamic_update);
 	if (i_use_dynamic_update) {
-		PHALCON_CALL_METHOD(&snapshot, getThis(), "getsnapshotdata");
+		PHALCON_MM_CALL_METHOD(&snapshot, getThis(), "getsnapshotdata");
+		PHALCON_MM_ADD_ENTRY(&snapshot);
 		if (Z_TYPE(snapshot) != IS_ARRAY) {
 			i_use_dynamic_update = 0;
 		}
 	}
 
-	PHALCON_CALL_METHOD(&bind_data_types, getThis(), "getbindtypes");
-	PHALCON_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
-	PHALCON_CALL_METHOD(&data_types, getThis(), "getdatatypes");
-	PHALCON_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_MM_CALL_METHOD(&bind_data_types, getThis(), "getbindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_data_types);
+	PHALCON_MM_CALL_METHOD(&automatic_attributes, getThis(), "getautomaticupdateattributes");
+	PHALCON_MM_ADD_ENTRY(&automatic_attributes);
+	PHALCON_MM_CALL_METHOD(&data_types, getThis(), "getdatatypes");
+	PHALCON_MM_ADD_ENTRY(&data_types);
+	PHALCON_MM_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_MM_ADD_ENTRY(&column_map);
 
 	/**
 	 * We only make the update based on the non-primary attributes, values in primary
 	 * key attributes are ignored
 	 */
 	if (PHALCON_GLOBAL(orm).allow_update_primary) {
-		PHALCON_CALL_METHOD(&columns, getThis(), "getattributes");
+		PHALCON_MM_CALL_METHOD(&columns, getThis(), "getattributes");
 	} else {
-		PHALCON_CALL_METHOD(&columns, getThis(), "getnonprimarykeyattributes");
+		PHALCON_MM_CALL_METHOD(&columns, getThis(), "getnonprimarykeyattributes");
 	}
+	PHALCON_MM_ADD_ENTRY(&columns);
 
 	array_init(&phql_updates);
+	PHALCON_MM_ADD_ENTRY(&phql_updates);
 	array_init(&bind_params);
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 	array_init(&bind_types);
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), field) {
 		zval field_type = {}, convert_value = {}, bind_type = {}, changed = {}, snapshot_value = {}, phql_update = {};
@@ -4458,8 +4411,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			 */
 			if (!phalcon_array_isset(&bind_data_types, field)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' have not defined a bind data type");
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-				zval_ptr_dtor(&models_manager);
+				PHALCON_MM_ADD_ENTRY(&exception_message);
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 				return;
 			}
 
@@ -4469,8 +4422,8 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			if (Z_TYPE(column_map) == IS_ARRAY) {
 				if (!phalcon_array_isset_fetch(&attribute_field, &column_map, field, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column '", field, "' isn't part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-					zval_ptr_dtor(&models_manager);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
@@ -4482,19 +4435,23 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 			 */
 			if (phalcon_property_isset_fetch_zval(&value, getThis(), &attribute_field, PH_READONLY)) {
 				ZVAL_COPY(&convert_value, &value);
+				PHALCON_MM_ADD_ENTRY(&convert_value);
 				if (PHALCON_GLOBAL(orm).enable_auto_convert) {
 					if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 						if (phalcon_array_isset_fetch(&field_type, &data_types, field, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 							switch(Z_LVAL(field_type)) {
 								case PHALCON_DB_COLUMN_TYPE_JSON:
-									RETURN_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+									RETURN_MM_ON_FAILURE(phalcon_json_encode(&convert_value, &value, 0));
+									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								case PHALCON_DB_COLUMN_TYPE_BYTEA:
-									PHALCON_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+									PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								case PHALCON_DB_COLUMN_TYPE_ARRAY:
 								case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-									PHALCON_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+									PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								default:
 									break;
@@ -4508,8 +4465,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 				 */
 				if (!i_use_dynamic_update || (Z_TYPE(value) == IS_OBJECT && instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce))) {
 					PHALCON_CONCAT_VSVS(&phql_update, &attribute_field, "= :", &attribute_field, ":");
-					phalcon_array_append(&phql_updates, &phql_update, PH_COPY);
-					zval_ptr_dtor(&phql_update);
+					phalcon_array_append(&phql_updates, &phql_update, 0);
 
 					phalcon_array_update(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
@@ -4534,8 +4490,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 					 */
 					if (zend_is_true(&changed)) {
 						PHALCON_CONCAT_VSVS(&phql_update, &attribute_field, "= :", &attribute_field, ":");
-						phalcon_array_append(&phql_updates, &phql_update, PH_COPY);
-						zval_ptr_dtor(&phql_update);
+						phalcon_array_append(&phql_updates, &phql_update, 0);
 
 						phalcon_array_update(&bind_params, &attribute_field, &convert_value, PH_COPY);
 
@@ -4543,87 +4498,73 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 						phalcon_array_update(&bind_types, &attribute_field, &bind_type, PH_COPY);
 					}
 				}
-				zval_ptr_dtor(&convert_value);
 			} else {
 				PHALCON_CONCAT_VS(&phql_update, &attribute_field, "= NULL");
-				phalcon_array_append(&phql_updates, &phql_update, PH_COPY);
-				zval_ptr_dtor(&phql_update);
+				phalcon_array_append(&phql_updates, &phql_update, 0);
 			}
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&snapshot);
-	zval_ptr_dtor(&columns);
-	zval_ptr_dtor(&bind_data_types);
-	zval_ptr_dtor(&automatic_attributes);
-	zval_ptr_dtor(&data_types);
-	zval_ptr_dtor(&column_map);
 
 	/**
 	 * If there is no fields to update we return true
 	 */
 	if (!phalcon_fast_count_ev(&phql_updates)) {
-		zval_ptr_dtor(&models_manager);
 		if (PHALCON_GLOBAL(orm).enable_strict) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
-		RETURN_TRUE;
+		RETURN_MM_TRUE;
 	}
 
 	phalcon_fast_join_str(&phql_join_updates, SL(", "), &phql_updates);
-	zval_ptr_dtor(&phql_updates);
+	PHALCON_MM_ADD_ENTRY(&phql_join_updates);
 
-	PHALCON_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
-	PHALCON_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
-	PHALCON_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_CALL_METHOD(&unique_key, getThis(), "getuniquekey");
+	PHALCON_MM_ADD_ENTRY(&unique_key);
+	PHALCON_MM_CALL_METHOD(&unique_params, getThis(), "getuniqueparams");
+	PHALCON_MM_ADD_ENTRY(&unique_params);
+	PHALCON_MM_CALL_METHOD(&unique_types, getThis(), "getuniquetypes");
+	PHALCON_MM_ADD_ENTRY(&unique_types);
 
 	if (Z_TYPE(unique_params) == IS_ARRAY) {
 		phalcon_add_function(&merged_params, &bind_params, &unique_params);
 	} else {
 		ZVAL_COPY(&merged_params, &bind_params);
 	}
-	zval_ptr_dtor(&bind_params);
-	zval_ptr_dtor(&unique_params);
+	PHALCON_MM_ADD_ENTRY(&merged_params);
 
 	if (Z_TYPE(unique_types) == IS_ARRAY) {
 		phalcon_add_function(&merged_types, &bind_types, &unique_types);
 	} else {
 		ZVAL_COPY(&merged_types, &bind_types);
 	}
-	zval_ptr_dtor(&bind_types);
-	zval_ptr_dtor(&unique_types);
+	PHALCON_MM_ADD_ENTRY(&merged_types);
 
 	phalcon_get_called_class(&model_name);
+	PHALCON_MM_ADD_ENTRY(&model_name);
 	PHALCON_CONCAT_SVSVSV(&phql, "UPDATE [", &model_name, "] SET ", &phql_join_updates, " WHERE ", &unique_key);
-	zval_ptr_dtor(&model_name);
-	zval_ptr_dtor(&phql_join_updates);
-	zval_ptr_dtor(&unique_key);
+	PHALCON_MM_ADD_ENTRY(&phql);
 
-	PHALCON_CALL_METHOD(&query, &models_manager, "createquery", &phql);
-	zval_ptr_dtor(&models_manager);
-	zval_ptr_dtor(&phql);
-	PHALCON_CALL_METHOD(NULL, &query, "setconnection", connection);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &merged_params);
-	zval_ptr_dtor(&merged_params);
-	PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &merged_types);
-	zval_ptr_dtor(&merged_types);
+	PHALCON_MM_CALL_METHOD(&query, &models_manager, "createquery", &phql);
+	PHALCON_MM_ADD_ENTRY(&query);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", connection);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &merged_params);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &merged_types);
 
-	PHALCON_CALL_METHOD(&status, &query, "execute");
-	zval_ptr_dtor(&query);
+	PHALCON_MM_CALL_METHOD(&status, &query, "execute");
+	PHALCON_MM_ADD_ENTRY(&status);
 
 	if (Z_TYPE(status) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(return_value, &status, "success");
+		PHALCON_MM_CALL_METHOD(return_value, &status, "success");
 	} else {
 		RETVAL_FALSE;
 	}
-	zval_ptr_dtor(&status);
 	if (!zend_is_true(return_value)) {
-		ZVAL_STRING(&type, "InvalidUpdateAttempt");
-		ZVAL_STRING(&message, "Record updated fail");
+		PHALCON_MM_ZVAL_STRING(&type, "InvalidUpdateAttempt");
+		PHALCON_MM_ZVAL_STRING(&message, "Record updated fail");
 
-		PHALCON_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
-		zval_ptr_dtor(&message);
-		zval_ptr_dtor(&type);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &message, &PHALCON_GLOBAL(z_null), &type);
 	}
+	RETURN_MM();
 }
 
 /**

@@ -191,6 +191,7 @@ void phalcon_gettype(zval *return_value, zval *arg);
 
 /** Return empty array */
 #define RETURN_EMPTY_ARRAY() array_init(return_value); return;
+#define RETURN_MM_EMPTY_ARRAY() array_init(return_value); RETURN_MM();
 
 /** class/interface registering */
 #define PHALCON_REGISTER_CLASS(ns, class_name, name, methods, flags) \

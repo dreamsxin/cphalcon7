@@ -1364,7 +1364,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 
 	zval *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, tables = {}, *table;
 
-	phalcon_fetch_params(0, 0, 1, &schema_name);
+	phalcon_fetch_params(1, 0, 1, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1375,7 +1375,8 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 	/**
 	 * Get the SQL to list the tables
 	 */
-	PHALCON_CALL_METHOD(&sql, &dialect, "listtables", schema_name);
+	PHALCON_MM_CALL_METHOD(&sql, &dialect, "listtables", schema_name);
+	PHALCON_MM_ADD_ENTRY(&sql);
 
 	/**
 	 * Use fetch Num
@@ -1385,7 +1386,8 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 	/**
 	 * Execute the SQL returning the tables
 	 */
-	PHALCON_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_CALL_METHOD(&tables, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_ADD_ENTRY(&tables);
 
 	if (Z_TYPE(tables) == IS_ARRAY) {
 		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL(tables)));
@@ -1396,6 +1398,7 @@ PHP_METHOD(Phalcon_Db_Adapter, listTables){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	RETURN_MM();
 }
 
 /**
@@ -1466,7 +1469,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(1, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
@@ -1482,14 +1485,17 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 	/**
 	 * Get the SQL required to describe indexes from the Dialect
 	 */
-	PHALCON_CALL_METHOD(&sql, &dialect, "describeindexes", table, schema);
+	PHALCON_MM_CALL_METHOD(&sql, &dialect, "describeindexes", table, schema);
+	PHALCON_MM_ADD_ENTRY(&sql);
 
 	/**
 	 * Cryptic Guide: 2: table, 3: from, 4: to
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_ADD_ENTRY(&describe);
 
 	array_init(&indexes);
+	PHALCON_MM_ADD_ENTRY(&indexes);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), index) {
 		zval key_name = {}, column_name = {};
@@ -1512,10 +1518,11 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 		 * Every index is abstracted using a Phalcon\Db\Index instance
 		 */
 		object_init_ex(&index, phalcon_db_index_ce);
-		PHALCON_CALL_METHOD(NULL, &index, "__construct", &name, index_columns);
+		PHALCON_MM_CALL_METHOD(NULL, &index, "__construct", &name, index_columns);
 
-		phalcon_array_update(return_value, &name, &index, PH_COPY);
+		phalcon_array_update(return_value, &name, &index, 0);
 	} ZEND_HASH_FOREACH_END();
+	RETURN_MM();
 }
 
 /**
@@ -1535,7 +1542,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &table, &schema);
+	phalcon_fetch_params(1, 1, 1, &table, &schema);
 
 	if (!schema) {
 		schema = &PHALCON_GLOBAL(z_null);
@@ -1551,15 +1558,19 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 	/**
 	 * Get the SQL required to describe the references from the Dialect
 	 */
-	PHALCON_CALL_METHOD(&sql, &dialect, "describereferences", table, schema);
+	PHALCON_MM_CALL_METHOD(&sql, &dialect, "describereferences", table, schema);
+	PHALCON_MM_ADD_ENTRY(&sql);
 
 	array_init(&empty_arr);
+	PHALCON_MM_ADD_ENTRY(&empty_arr);
 	array_init(&references);
+	PHALCON_MM_ADD_ENTRY(&references);
 
 	/**
 	 * Execute the SQL returning the
 	 */
-	PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_num);
+	PHALCON_MM_ADD_ENTRY(&describe);
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(describe), reference) {
 		zval constraint_name = {}, referenced_schema = {}, referenced_table = {}, reference_array = {}, column_name = {}, referenced_columns = {};
@@ -1573,14 +1584,15 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 			phalcon_array_update_str(&reference_array, SL("referencedTable"), &referenced_table, PH_COPY);
 			phalcon_array_update_str(&reference_array, SL("columns"), &empty_arr, PH_COPY);
 			phalcon_array_update_str(&reference_array, SL("referencedColumns"), &empty_arr, PH_COPY);
-			phalcon_array_update(&references, &constraint_name, &reference_array, PH_COPY);
+
+			phalcon_array_update(&references, &constraint_name, &reference_array, 0);
 		}
 
 		phalcon_array_fetch_long(&column_name, reference, 1, PH_NOISY|PH_READONLY);
-		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("columns"), &column_name, 0);
+		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("columns"), &column_name, PH_COPY);
 
 		phalcon_array_fetch_long(&referenced_columns, reference, 5, PH_NOISY|PH_READONLY);
-		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("referencedColumns"), &referenced_columns, 0);
+		phalcon_array_update_zval_str_append_multi_3(&references, &constraint_name, SL("referencedColumns"), &referenced_columns, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
 	array_init(return_value);
@@ -1603,12 +1615,14 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 		phalcon_array_update_str(&definition, SL("referencedTable"), &referenced_table, PH_COPY);
 		phalcon_array_update_str(&definition, SL("columns"), &columns, PH_COPY );
 		phalcon_array_update_str(&definition, SL("referencedColumns"), &referenced_columns, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&definition);
 
 		object_init_ex(&reference, phalcon_db_reference_ce);
 		PHALCON_CALL_METHOD(NULL, &reference, "__construct", &name, &definition);
 
-		phalcon_array_update(return_value, &name, &reference, PH_COPY);
+		phalcon_array_update(return_value, &name, &reference, 0);
 	} ZEND_HASH_FOREACH_END();
+	RETURN_MM();
 }
 
 /**
@@ -1626,7 +1640,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
 	zval *table_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_assoc = {}, describe = {}, first = {};
 
-	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
+	phalcon_fetch_params(1, 1, 1, &table_name, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -1634,17 +1648,19 @@ PHP_METHOD(Phalcon_Db_Adapter, tableOptions){
 
 	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_METHOD(&sql, &dialect, "tableoptions", table_name, schema_name);
+	PHALCON_MM_CALL_METHOD(&sql, &dialect, "tableoptions", table_name, schema_name);
+	PHALCON_MM_ADD_ENTRY(&sql);
 	if (zend_is_true(&sql)) {
 		ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
 
-		PHALCON_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_assoc);
+		PHALCON_MM_CALL_METHOD(&describe, getThis(), "fetchall", &sql, &fetch_assoc);
+		PHALCON_MM_ADD_ENTRY(&describe);
 
 		phalcon_array_fetch_long(&first, &describe, 0, PH_NOISY|PH_READONLY);
-		RETURN_CTOR(&first);
+		RETURN_MM_CTOR(&first);
 	}
 
-	RETURN_EMPTY_ARRAY();
+	RETURN_MM_EMPTY_ARRAY();
 }
 
 /**

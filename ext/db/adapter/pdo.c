@@ -767,17 +767,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
 	zval *sql, *params, query_params = {}, placeholders = {}, matches = {}, set_order = {}, bind_pattern = {}, status = {}, *place_match = NULL, question = {}, bound_sql = {};
 
-	phalcon_fetch_params(0, 2, 0, &sql, &params);
+	phalcon_fetch_params(1, 2, 0, &sql, &params);
 
 	array_init(&query_params);
+	PHALCON_MM_ADD_ENTRY(&query_params);
 	array_init(&placeholders);
+	PHALCON_MM_ADD_ENTRY(&placeholders);
+
 	ZVAL_LONG(&set_order, 2);
 
-	ZVAL_STRING(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
+	PHALCON_MM_ZVAL_STRING(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
 
 	ZVAL_MAKE_REF(&matches);
-	PHALCON_CALL_FUNCTION(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
+	PHALCON_MM_CALL_FUNCTION(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
 	ZVAL_UNREF(&matches);
+
+	PHALCON_MM_ADD_ENTRY(&matches);
+	PHALCON_MM_ADD_ENTRY(&status);
 
 	if (zend_is_true(&status)) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(matches), place_match) {
@@ -787,23 +793,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 			if (!phalcon_array_isset_fetch(&value, params, &numeric_place, PH_READONLY)) {
 				if (phalcon_array_isset_fetch_long(&str_place, place_match, 2, PH_READONLY)) {
 					if (!phalcon_array_isset_fetch(&value, params, &str_place, 0)) {
-						PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");
-						goto end;
+						PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");
+						return;
 					}
 				} else {
-					PHALCON_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");
-					goto end;
+					PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Matched parameter wasn't found in parameters list");
+					return;
 				}
 			}
 			phalcon_array_append(&placeholders, &value, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
-		ZVAL_STRING(&question, "?");
+		PHALCON_MM_ZVAL_STRING(&question, "?");
 
-		PHALCON_CALL_FUNCTION(&bound_sql, "preg_replace", &bind_pattern, &question, sql);
-		zval_ptr_dtor(&question);
+		PHALCON_MM_CALL_FUNCTION(&bound_sql, "preg_replace", &bind_pattern, &question, sql);
+		PHALCON_MM_ADD_ENTRY(&bound_sql);
 	} else {
-		ZVAL_COPY(&bound_sql, sql);
+		ZVAL_COPY_VALUE(&bound_sql, sql);
 	}
 
 	/**
@@ -813,11 +819,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 	phalcon_array_update_str(return_value, SL("sql"), &bound_sql, PH_COPY);
 	phalcon_array_update_str(return_value, SL("params"), &placeholders, PH_COPY);
 
-end:
-	zval_ptr_dtor(&matches);
-	zval_ptr_dtor(&bind_pattern);
-	zval_ptr_dtor(&bound_sql);
-	zval_ptr_dtor(&placeholders);
+	RETURN_MM();
 }
 
 /**

@@ -239,9 +239,9 @@ static void phql_ret_insert_statement2(zval *ret, zval *Q, zval *V)
 
 	if (!phalcon_array_isset_fetch_str(&values, ret, ISL(values), PH_READONLY)) {
 		array_init(&values);
+		add_assoc_zval(ret, ISV(values), &values);
 	}
 	add_next_index_zval(&values, V);
-	add_assoc_zval(ret, ISV(values), &values);
 }
 
 static void phql_ret_update_statement(zval *ret, zval *U, zval *W, zval *L)

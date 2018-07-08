@@ -1,7 +1,6 @@
 language: php
 
 sudo: required
-group: deprecated-2017Q2
 dist: trusty
 
 addons:
@@ -22,12 +21,13 @@ addons:
       - libleveldb-dev
 
 php:
-  - 7.0.14
+  - 7.0
   - 7.1
   - 7.2
   - nightly
 
 matrix:
+  fast_finish: true
   allow_failures:
     - php: nightly
 

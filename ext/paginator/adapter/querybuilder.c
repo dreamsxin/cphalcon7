@@ -134,8 +134,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 
-	if (phalcon_array_isset_fetch_str(&total_items, config, SL("totalItems"), PH_READONLY)) {
-		convert_to_long_ex(&total_items);
+	if (phalcon_array_isset_fetch_str(&total_items, config, SL("totalItems"), PH_READONLY) && Z_TYPE(total_items) == IS_LONG) {
 		phalcon_update_property(getThis(), SL("_totalItems"), &total_items);
 	}
 }

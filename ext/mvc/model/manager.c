@@ -77,6 +77,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getModelSchema);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setWriteConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService);
+PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultConnectionService);
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultWriteConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultReadConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection);
@@ -160,6 +162,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_setreadconnectionservice, 0, 0, 2)
 	ZEND_ARG_INFO(0, model)
 	ZEND_ARG_INFO(0, connectionService)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_setdefaultconnectionservice, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, connectionService, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_manager_setdefaultwriteconnectionservice, 0, 0, 1)
@@ -261,6 +267,8 @@ static const zend_function_entry phalcon_mvc_model_manager_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Manager, setConnectionService, arginfo_phalcon_mvc_model_manager_setconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setWriteConnectionService, arginfo_phalcon_mvc_model_manager_setwriteconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setReadConnectionService, arginfo_phalcon_mvc_model_manager_setreadconnectionservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultconnectionservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Manager, getDefaultConnectionService, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultWriteConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultwriteconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultReadConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultreadconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, getWriteConnection, arginfo_phalcon_mvc_model_manager_getwriteconnection, ZEND_ACC_PUBLIC)
@@ -316,6 +324,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Manager){
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_customEventsManager"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_readConnectionServices"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_writeConnectionServices"), ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_mvc_model_manager_ce, SL("_defaultConnectionService"), "db", ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_defaultReadConnectionService"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_defaultWriteConnectionService"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_manager_ce, SL("_aliases"), ZEND_ACC_PROTECTED);
@@ -708,6 +717,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService){
 }
 
 /**
+ * Sets default connection service for a model
+ *
+ * @param string $connectionService
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultConnectionService){
+
+	zval *connection_service;
+
+	phalcon_fetch_params(0, 1, 0, &connection_service);
+
+	phalcon_update_property(getThis(), SL("_defaultConnectionService"), connection_service);
+}
+
+/**
+ * Gets default connection service for a model
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultConnectionService){
+
+	RETURN_MEMBER(getThis(), "_defaultConnectionService");
+}
+
+/**
  * Sets default write connection service for a model
  *
  * @param string $connectionService
@@ -834,7 +867,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService){
 	if (PHALCON_IS_NOT_EMPTY(&connection)) {
 		RETURN_CTOR(&connection);
 	}
-	RETURN_STRING("db");
+
+	RETURN_MEMBER(getThis(), "_defaultConnectionService");
 }
 
 /**
@@ -868,7 +902,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnectionService){
 		RETURN_CTOR(&connection);
 	}
 
-	RETURN_STRING("db");
+	RETURN_MEMBER(getThis(), "_defaultConnectionService");
 }
 
 /**

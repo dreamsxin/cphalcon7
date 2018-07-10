@@ -90,6 +90,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
 
 	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_builder"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_totalItems"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_totalItems"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_querybuilder_ce, 1, phalcon_paginator_adapterinterface_ce);
 
@@ -134,8 +135,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, __construct){
 		phalcon_update_property(getThis(), SL("_page"), &page);
 	}
 
-	if (phalcon_array_isset_fetch_str(&total_items, config, SL("totalItems"), PH_READONLY)) {
-		convert_to_long_ex(&total_items);
+	if (phalcon_array_isset_fetch_str(&total_items, config, SL("totalItems"), PH_READONLY) && Z_TYPE(total_items) == IS_LONG) {
 		phalcon_update_property(getThis(), SL("_totalItems"), &total_items);
 	}
 }

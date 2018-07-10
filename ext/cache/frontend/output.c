@@ -140,7 +140,7 @@ PHP_METHOD(Phalcon_Cache_Frontend_Output, getLifetime){
 	zval options = {}, lifetime = {};
 
 	phalcon_read_property(&options, getThis(), SL("_frontendOptions"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&lifetime, &options, SL("lifetime"), PH_READONLY) && Z_TYPE(lifetime) == IS_LONG) {
 		RETURN_CTOR(&lifetime);
 	} else {
 		RETURN_LONG(1);

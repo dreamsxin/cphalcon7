@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, _connect)
 		}
 	}
 
-	if (phalcon_array_isset_fetch_str(&db, &options, SL("db"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&db, &options, SL("db"), PH_READONLY) && Z_TYPE(db) != IS_NULL) {
 		PHALCON_CALL_METHOD(NULL, &redis, "select", &db);
 	}
 

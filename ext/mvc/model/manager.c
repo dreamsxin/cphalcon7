@@ -727,7 +727,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultConnectionService){
 
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
-	phalcon_update_property(getThis(), SL("_defaultConnectionService"), connection_service);
+	if (PHALCON_IS_NOT_EMPTY(connection_service)) {
+		phalcon_update_property(getThis(), SL("_defaultConnectionService"), connection_service);
+	}
 }
 
 /**

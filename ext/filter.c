@@ -356,15 +356,9 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(filter) == IS_OBJECT || phalcon_is_callable(filter)) {
+	if (Z_TYPE_P(filter) == IS_OBJECT) {
 		if (Z_TYPE_P(filter) == IS_OBJECT && instanceof_function(Z_OBJCE_P(filter), zend_ce_closure)) {
 			PHALCON_CALL_METHOD(return_value, filter, "call", getThis(), value);
-			return;
-		} else if (phalcon_is_callable(filter)) {
-			array_init_size(&arguments, 1);
-			phalcon_array_append(&arguments, value, PH_COPY);
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, filter, &arguments);
-			zval_ptr_dtor(&arguments);
 			return;
 		}
 
@@ -624,6 +618,14 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		goto ph_end_0;
 	}
 
+	if (phalcon_is_callable(filter)) {
+		array_init_size(&arguments, 1);
+		phalcon_array_append(&arguments, value, PH_COPY);
+		PHALCON_CALL_USER_FUNC_ARRAY(return_value, filter, &arguments);
+		zval_ptr_dtor(&arguments);
+		return;
+	}
+	
 	PHALCON_CONCAT_SVS(&exception_message, "Sanitize filter ", filter, " is not supported");
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
 	return;

@@ -356,13 +356,24 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(filter) == IS_OBJECT) {
-		if (Z_TYPE_P(filter) == IS_OBJECT && instanceof_function(Z_OBJCE_P(filter), zend_ce_closure)) {
-			PHALCON_CALL_METHOD(return_value, filter, "call", getThis(), value);
+	if (Z_TYPE_P(filter) != IS_STRING) {
+		if (Z_TYPE_P(filter) == IS_OBJECT) {
+			if (instanceof_function(Z_OBJCE_P(filter), zend_ce_closure)) {
+				PHALCON_CALL_METHOD(return_value, filter, "call", getThis(), value);
+				return;
+			}
+
+			PHALCON_RETURN_CALL_METHOD(filter, "filter", value);
 			return;
 		}
-
-		PHALCON_RETURN_CALL_METHOD(filter, "filter", value);
+		if (phalcon_is_callable(filter)) {
+			array_init_size(&arguments, 1);
+			phalcon_array_append(&arguments, value, PH_COPY);
+			PHALCON_CALL_USER_FUNC_ARRAY(return_value, filter, &arguments);
+			zval_ptr_dtor(&arguments);
+			return;
+		}
+		PHALCON_THROW_EXCEPTION_STR(phalcon_filter_exception_ce, "Filter must be an object or callable");
 		return;
 	}
 

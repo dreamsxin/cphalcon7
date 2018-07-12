@@ -48,10 +48,16 @@ PHP_METHOD(Phalcon_Cache_Backend, getOptions);
 PHP_METHOD(Phalcon_Cache_Backend, isFresh);
 PHP_METHOD(Phalcon_Cache_Backend, isStarted);
 PHP_METHOD(Phalcon_Cache_Backend, getLifetime);
+PHP_METHOD(Phalcon_Cache_Backend, setPrefix);
+PHP_METHOD(Phalcon_Cache_Backend, getPrefix);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, frontend)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cache_backend_setprefix, 0, 0, 1)
+	ZEND_ARG_INFO(0, prefix)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_backend_method_entry[] = {
@@ -63,6 +69,8 @@ static const zend_function_entry phalcon_cache_backend_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend, isFresh, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, isStarted, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, getLifetime, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, setPrefix, arginfo_phalcon_cache_backend_setprefix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, getPrefix, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -232,4 +240,31 @@ PHP_METHOD(Phalcon_Cache_Backend, getLifetime){
 		PHALCON_CALL_METHOD(&lifetime, &frontend, "getlifetime");
 	}
 	RETURN_ZVAL(&lifetime, 0, 0);
+}
+
+/**
+ * Sets prefix
+ *
+ * @param string $prefix
+ * @return Phalcon\Cache\Backend
+ */
+PHP_METHOD(Phalcon_Cache_Backend, setPrefix){
+
+	zval *prefix;
+
+	phalcon_fetch_params(0, 1, 0, &prefix);
+
+	phalcon_update_property(getThis(), SL("_prefix"), prefix);
+
+	RETURN_THIS();
+}
+
+/**
+ * Gets prefix
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Cache_Backend, getPrefix){
+
+	RETURN_MEMBER(getThis(), "_prefix");
 }

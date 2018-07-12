@@ -176,6 +176,12 @@ typedef struct _phalcon_python_options {
 } phalcon_python_options;
 #endif
 
+/** Snowflake options */
+typedef struct _phalcon_snowflake_options {
+	uint32_t node;
+	uint64_t epoch;
+} phalcon_snowflake_options;
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -217,6 +223,8 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	/** Python */
 	phalcon_python_options python;
 #endif
+
+	phalcon_snowflake_options snowflake;
 
 ZEND_END_MODULE_GLOBALS(phalcon)
 

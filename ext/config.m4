@@ -885,6 +885,7 @@ socket/client.c \
 socket/server.c \
 process/exception.c \
 storage/exception.c \
+snowflake.c \
 server/utils.c \
 server/simple.c \
 server/exception.c"

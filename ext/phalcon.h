@@ -459,6 +459,8 @@
 #include "process/proc.h"
 #include "process/exception.h"
 
+#include "snowflake.h"
+
 #include "storage/exception.h"
 #include "storage/btree.h"
 #include "storage/wiredtiger.h"

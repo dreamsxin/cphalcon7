@@ -94,6 +94,7 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("phalcon.xhprof.nesting_max_level", "0",  PHP_INI_ALL, OnUpdateLong, xhprof.nesting_maximum_level,	zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.xhprof.clock_use_rdtsc",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.clock_use_rdtsc,	zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.snowflake.node", "0", PHP_INI_SYSTEM, OnUpdateLong, snowflake.node,  zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
 
 static void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value) {
@@ -176,6 +177,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 #else
 	PHALCON_GLOBAL(cache).enable_yac = 0;
 #endif
+
+    if (PHALCON_GLOBAL(snowflake).node < 0) {
+		php_error_docref(NULL, E_WARNING, "snowflake.node must greater than 0");
+		PHALCON_GLOBAL(snowflake).node = 0;
+    }
+
+    if (PHALCON_GLOBAL(snowflake).node > 0x3FF) {
+		php_error_docref(NULL, E_WARNING, "snowflake.node must less than %d", 0x3FF);
+		PHALCON_GLOBAL(snowflake).node = 0;
+    }
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		_zend_execute_internal = zend_execute_internal;
@@ -696,6 +707,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Storage_Datrie);
 #endif
 
+	PHALCON_INIT(Phalcon_Snowflake);
+
 #if PHALCON_USE_SERVER
 	PHALCON_INIT(Phalcon_Server);
 	PHALCON_INIT(Phalcon_Server_Http);
@@ -907,6 +920,8 @@ static PHP_GINIT_FUNCTION(phalcon)
 	phalcon_globals->xhprof.frame_free_list = NULL;
 	phalcon_globals->xhprof.nesting_current_level = -1;
 	phalcon_globals->xhprof.nesting_maximum_level =  0;
+
+	phalcon_globals->snowflake.epoch = 1420864633000ULL;
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)

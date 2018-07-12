@@ -91,22 +91,37 @@ zend_object* phalcon_snowflake_object_create_handler(zend_class_entry *ce)
 			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Failed to create shared memory");
 			return &intern->std;
 		}
-	}
 
-	int size = phalcon_shared_memory_size(intern->shm);
-	if (size < sizeof(snowflake_data_t)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Shared memory size is error");
-		return &intern->std;
-	}
+		int size = phalcon_shared_memory_size(intern->shm);
+		if (size < sizeof(snowflake_data_t)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Shared memory size is error");
+			return &intern->std;
+		}
 
-	intern->data = (snowflake_data_t*)phalcon_shared_memory_ptr(intern->shm);
-  	if (!intern->data) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Failed to get shared memory");
-		return &intern->std;
-	}
+		intern->data = (snowflake_data_t*)phalcon_shared_memory_ptr(intern->shm);
+		if (!intern->data) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Failed to get shared memory");
+			return &intern->std;
+		}
 
-    intern->data->sequence  = 0;
-    intern->data->timestamp = 0;
+		intern->data = (snowflake_data_t*)phalcon_shared_memory_ptr(intern->shm);
+		intern->data->sequence  = 0;
+		intern->data->timestamp = 0;
+	} else {
+		intern->data = (snowflake_data_t*)phalcon_shared_memory_ptr(intern->shm);
+
+		int size = phalcon_shared_memory_size(intern->shm);
+		if (size < sizeof(snowflake_data_t)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Shared memory size is error");
+			return &intern->std;
+		}
+
+		intern->data = (snowflake_data_t*)phalcon_shared_memory_ptr(intern->shm);
+		if (!intern->data) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Failed to get shared memory");
+			return &intern->std;
+		}
+	}
 
 	return &intern->std;
 }
@@ -144,27 +159,29 @@ PHP_METHOD(Phalcon_Snowflake, nextId){
 
 	intern = phalcon_snowflake_object_from_obj(Z_OBJ_P(getThis()));
 	if (intern->data != NULL) {
-		int len;
-		char *str = NULL;
-		uint64_t ts;
-		
-		phalcon_shared_memory_lock(intern->shm);
-		ts = get_time_in_ms();
-		if (ts == intern->data->timestamp) {		
-			intern->data->sequence = (intern->data->sequence + 1) & 0xFFF;
-			if(intern->data->sequence == 0)
-			{
-				ts = till_next_ms(ts);
-			}
-		} else  {
-			intern->data->sequence = 0;
-		}	
-		intern->data->timestamp = ts;		
-		uint64_t id = ((ts - PHALCON_GLOBAL(snowflake).epoch) << 22) | ((PHALCON_GLOBAL(snowflake).node & 0x3FF) << 12) | intern->data->sequence;	
-		phalcon_shared_memory_unlock(intern->shm);
-		len = spprintf(&str, 0, "%llu", id);
-		RETVAL_STRINGL(str, len);
-		efree(str);
+		if (!phalcon_shared_memory_lock(intern->shm)) {
+			int len;
+			char *str = NULL;
+			uint64_t ts;
+			ts = get_time_in_ms();
+			if (ts == intern->data->timestamp) {		
+				intern->data->sequence = (intern->data->sequence + 1) & 0xFFF;
+				if(intern->data->sequence == 0)
+				{
+					ts = till_next_ms(ts);
+				}
+			} else  {
+				intern->data->sequence = 0;
+			}	
+			intern->data->timestamp = ts;		
+			uint64_t id = ((ts - PHALCON_GLOBAL(snowflake).epoch) << 22) | ((PHALCON_GLOBAL(snowflake).node & 0x3FF) << 12) | intern->data->sequence;	
+			phalcon_shared_memory_unlock(intern->shm);
+			len = spprintf(&str, 0, "%llu", id);
+			RETVAL_STRINGL(str, len);
+			efree(str);
+		} else {
+			RETURN_FALSE;
+		}
 	} else {
 		RETURN_FALSE;
 	}

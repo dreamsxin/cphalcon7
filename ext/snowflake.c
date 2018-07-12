@@ -88,7 +88,7 @@ zend_object* phalcon_snowflake_object_create_handler(zend_class_entry *ce)
 	if (NULL == intern->shm) {
 		intern->shm = phalcon_shared_memory_create("phalcon_snowflake", sizeof(snowflake_data_t));
 		if (NULL == intern->shm) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Failed to create shared memory");
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_exception_ce, "Failed to create shared memory (%d)", errno);
 			return &intern->std;
 		}
 

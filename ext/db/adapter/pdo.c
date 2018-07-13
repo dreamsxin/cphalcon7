@@ -331,23 +331,24 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 2, &statement, &_placeholders, &_data_types);
+	phalcon_fetch_params(1, 1, 2, &statement, &_placeholders, &_data_types);
 
 	if (!_placeholders || Z_TYPE_P(_placeholders) != IS_ARRAY) {
 		ZVAL_NULL(&placeholders);
 	} else {
-		ZVAL_DUP(&placeholders, _placeholders);
+		PHALCON_MM_ZVAL_DUP(&placeholders, _placeholders);
 	}
 
 	if (!_data_types || Z_TYPE_P(_data_types) != IS_ARRAY) {
 		ZVAL_NULL(&data_types);
 	} else {
-		ZVAL_DUP(&data_types, _data_types);
+		PHALCON_MM_ZVAL_DUP(&data_types, _data_types);
 	}
 
 	if (Z_TYPE(placeholders) == IS_ARRAY) {
 		if (Z_TYPE(data_types) != IS_ARRAY) {
 			array_init(&data_types);
+			PHALCON_MM_ADD_ENTRY(&data_types);
 		}
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(placeholders), idx, str_key, value) {
 			zval wildcard = {}, type = {};
@@ -386,9 +387,8 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 	phalcon_update_property(getThis(), SL("_sqlVariables"), &placeholders);
 	phalcon_update_property(getThis(), SL("_sqlBindTypes"), &data_types);
 
-	ZVAL_STRING(&event_name, "db:beforeExecutePrepared");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, statement);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:beforeExecutePrepared");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, statement);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
@@ -408,6 +408,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 			} else {
 				ZVAL_COPY(&parameter, &wildcard);
 			}
+			PHALCON_MM_ADD_ENTRY(&parameter);
 			
 			if (likely(phalcon_array_isset_fetch(&type, &data_types, &wildcard, PH_READONLY))) {
 				/**
@@ -415,17 +416,16 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 				 */
 				ZVAL_MAKE_REF(value);
 				if (phalcon_compare_strict_long(&type, PHALCON_DB_COLUMN_BIND_SKIP)) {
-					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
+					PHALCON_MM_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
 				} else {
-					PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value, &type);
+					PHALCON_MM_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value, &type);
 				}
 				ZVAL_UNREF(value);
 			} else {
 				ZVAL_MAKE_REF(value);
-				PHALCON_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
+				PHALCON_MM_CALL_METHOD(NULL, statement, "bindvalue", &parameter, value);
 				ZVAL_UNREF(value);
 			}
-			zval_ptr_dtor(&parameter);
 		} ZEND_HASH_FOREACH_END();
 	}
 
@@ -435,30 +435,28 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 		zval profile_name = {}, profile_data = {};
 		ZVAL_STR(&profile_name, IS(db));
 		array_init(&profile_data);
+		PHALCON_MM_ADD_ENTRY(&profile_data);
 
 		phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
 		phalcon_array_update_str(&profile_data, SL("sqlStatement"), &sql_statement, PH_COPY);
 		phalcon_array_update_str(&profile_data, SL("sqlVariables"), &placeholders, PH_COPY);
 		phalcon_array_update_str(&profile_data, SL("sqlBindTypes"), &data_types, PH_COPY);
 
-		PHALCON_CALL_METHOD(NULL, &profiler, "startprofile", &profile_name, &profile_data);
-		zval_ptr_dtor(&profile_data);
-		PHALCON_CALL_METHOD(NULL, statement, "execute");
-		PHALCON_CALL_METHOD(NULL, &profiler, "stopprofile");
+		PHALCON_MM_CALL_METHOD(NULL, &profiler, "startprofile", &profile_name, &profile_data);
+		PHALCON_MM_CALL_METHOD(NULL, statement, "execute");
+		PHALCON_MM_CALL_METHOD(NULL, &profiler, "stopprofile");
 	} else {
-		PHALCON_CALL_METHOD(NULL, statement, "execute");
+		PHALCON_MM_CALL_METHOD(NULL, statement, "execute");
 	}
-	zval_ptr_dtor(&placeholders);
-	zval_ptr_dtor(&data_types);
 
-	ZVAL_STRING(&event_name, "db:afterExecutePrepared");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, statement);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:afterExecutePrepared");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, statement);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
-	RETURN_CTOR(statement);
+	RETURN_MM_CTOR(statement);
 }
 
 /**
@@ -481,7 +479,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, debug_message = {}, event_name = {}, status = {};
 	zval statement = {}, new_statement = {};
 
-	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
+	phalcon_fetch_params(1, 1, 2, &sql_statement, &bind_params, &bind_types);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
@@ -513,25 +511,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	phalcon_update_property(getThis(), SL("_sqlVariables"), bind_params);
 	phalcon_update_property(getThis(), SL("_sqlBindTypes"), bind_types);
 
-	ZVAL_STRING(&event_name, "db:beforeQuery");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, bind_params);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:beforeQuery");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, bind_params);
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
 	zval_ptr_dtor(&status);
 
-	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
+	PHALCON_MM_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
+	PHALCON_MM_ADD_ENTRY(&statement);
 	if (Z_TYPE(statement) == IS_OBJECT){
-		PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-		zval_ptr_dtor(&statement);
+		PHALCON_MM_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+		PHALCON_MM_ADD_ENTRY(&new_statement);
 		ZVAL_COPY_VALUE(&statement, &new_statement);
 	}
 
-
-	ZVAL_STRING(&event_name, "db:afterQuery");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &new_statement);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:afterQuery");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &new_statement);
 
 	/**
 	 * Execute the afterQuery event if a EventsManager is available
@@ -539,11 +535,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, query){
 	if (likely(Z_TYPE(statement) == IS_OBJECT)) {
 		object_init_ex(return_value, phalcon_db_result_pdo_ce);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct", getThis(), &statement, sql_statement, bind_params, bind_types);
-		zval_ptr_dtor(&statement);
-		return;
+		RETURN_MM();
 	}
 
-	RETURN_ZVAL(&statement, 0, 0);
+	RETURN_MM_CTOR(&statement);
 }
 
 /**
@@ -566,7 +561,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	zval *sql_statement, *bind_params = NULL, *bind_types = NULL, debug_message = {}, event_name = {}, status = {}, affected_rows = {};
 	zval statement = {}, new_statement = {};
 
-	phalcon_fetch_params(0, 1, 2, &sql_statement, &bind_params, &bind_types);
+	phalcon_fetch_params(1, 1, 2, &sql_statement, &bind_params, &bind_types);
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "SQL STATEMENT: ", sql_statement);
@@ -599,23 +594,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 	phalcon_update_property(getThis(), SL("_sqlVariables"), bind_params);
 	phalcon_update_property(getThis(), SL("_sqlBindTypes"), bind_types);
 
-	ZVAL_STRING(&event_name, "db:beforeExecute");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, bind_params);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:beforeExecute");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, bind_params);
+
 	if (PHALCON_IS_FALSE(&status)) {
 		RETURN_FALSE;
 	}
 	zval_ptr_dtor(&status);
 
-	PHALCON_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
+	PHALCON_MM_CALL_METHOD(&statement, getThis(), "prepare", sql_statement);
+	PHALCON_MM_ADD_ENTRY(&statement);
 	if (Z_TYPE(statement) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
-		PHALCON_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
-		zval_ptr_dtor(&new_statement);
+		PHALCON_MM_CALL_METHOD(&new_statement, getThis(), "executeprepared", &statement, bind_params, bind_types);
+		PHALCON_MM_ADD_ENTRY(&new_statement);
+		PHALCON_MM_CALL_METHOD(&affected_rows, &new_statement, "rowcount");
 	} else {
 		ZVAL_LONG(&affected_rows, 0);
 	}
-	zval_ptr_dtor(&statement);
 
 	/**
 	 * Execute the afterQuery event if a EventsManager is available
@@ -624,11 +619,10 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, execute){
 		phalcon_update_property(getThis(), SL("_affectedRows"), &affected_rows);
 	}
 
-	ZVAL_STRING(&event_name, "db:afterExecute");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, bind_params);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "db:afterExecute");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, bind_params);
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**

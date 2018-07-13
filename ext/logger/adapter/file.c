@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -23,6 +24,8 @@
 #include "logger/exception.h"
 #include "logger/formatter/line.h"
 
+#include <ext/standard/file.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/array.h"
@@ -31,6 +34,7 @@
 #include "kernel/fcall.h"
 #include "kernel/concat.h"
 #include "kernel/object.h"
+#include "kernel/file.h"
 
 /**
  * Phalcon\Logger\Adapter\File
@@ -93,38 +97,67 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Adapter_File){
  */
 PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 
-	zval *name, *options = NULL, mode = {}, handler = {};
+	zval *name, *options = NULL, mode = {}, auto_create = {}, handler = {};
 
-	phalcon_fetch_params(0, 1, 1, &name, &options);
+	phalcon_fetch_params(1, 1, 1, &name, &options);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!options) {
 		options = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_COPY)) {
+	if (phalcon_array_isset_fetch_str(&mode, options, SL("mode"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&mode, SL("r"))) {
-			zval_ptr_dtor(&mode);
 			PHALCON_THROW_EXCEPTION_STR(phalcon_logger_exception_ce, "Logger must be opened in append or write mode");
 			return;
 		}
 	} else {
-		ZVAL_STRING(&mode, "ab");
+		PHALCON_MM_ZVAL_STRING(&mode, "ab");
+	}
+
+	if (
+		phalcon_array_isset_fetch_str(&auto_create, options, SL("autoCreateDirectory"), PH_READONLY)
+		|| 
+		phalcon_array_isset_fetch_str(&auto_create, options, SL("autoCreate"), PH_READONLY)
+	) {
+		if (zend_is_true(&auto_create)) {
+			zend_string *ret;
+			zval path = {}, isdir = {};
+
+			ret = zend_string_init(Z_STRVAL_P(name), Z_STRLEN_P(name), 0);
+			ZSTR_LEN(ret) = zend_dirname(ZSTR_VAL(ret), ZSTR_LEN(ret));
+			ZVAL_STR(&path, ret);
+			phalcon_is_dir(&isdir, &path);
+			if (!zend_is_true(&isdir)) {
+				zend_long mode = 0777;
+				zend_bool recursive = 1;
+				php_stream_context *context;
+				context = php_stream_context_from_zval(NULL, 0);
+				if (!php_stream_mkdir(ZSTR_VAL(ret), (int)mode, (recursive ? PHP_STREAM_MKDIR_RECURSIVE : 0) | REPORT_ERRORS, context)) {
+					zend_string_free(ret);
+					RETURN_MM();
+				}
+			}
+
+			zend_string_free(ret);
+		}
 	}
 
 	/**
 	 * We use 'fopen' to respect to open-basedir directive
 	 */
-	PHALCON_CALL_FUNCTION(&handler, "fopen", name, &mode);
-	zval_ptr_dtor(&mode);
+	PHALCON_MM_CALL_FUNCTION(&handler, "fopen", name, &mode);
+	PHALCON_MM_ADD_ENTRY(&handler);
 	if (Z_TYPE(handler) != IS_RESOURCE) {
-		zend_throw_exception_ex(phalcon_logger_exception_ce, 0, "Cannot open log file '%s'", Z_STRVAL_P(name));
-	} else {
-		phalcon_update_property(getThis(), SL("_path"), name);
-		phalcon_update_property(getThis(), SL("_options"), options);
-		phalcon_update_property(getThis(), SL("_fileHandler"), &handler);
+		PHALCON_MM_THROW_EXCEPTION_FORMAT(phalcon_logger_exception_ce, "Cannot open log file '%s'", Z_STRVAL_P(name));
+		return;
 	}
-	zval_ptr_dtor(&handler);
+
+	phalcon_update_property(getThis(), SL("_path"), name);
+	phalcon_update_property(getThis(), SL("_options"), options);
+	phalcon_update_property(getThis(), SL("_fileHandler"), &handler);
+
+	RETURN_MM();
 }
 
 /**

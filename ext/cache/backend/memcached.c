@@ -144,16 +144,16 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, __construct){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || Z_TYPE(special_key) == IS_TRUE) {
-		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCM"), PH_COPY);
+		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCM"), 0);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&memcached, &options, SL("memcached"), PH_READONLY)) {
 		if (!phalcon_array_isset_str(&options, SL("servers"))) {
 			array_init_size(&server, 3);
 
-			phalcon_array_update_str_str(&server, SL("host"), SL("127.0.0.1"), PH_COPY);
-			phalcon_array_update_str_long(&server, SL("port"), 11211, PH_COPY);
-			phalcon_array_update_str_long(&server, SL("weight"), 1, PH_COPY);
+			phalcon_array_update_str_str(&server, SL("host"), SL("127.0.0.1"), 0);
+			phalcon_array_update_str_long(&server, SL("port"), 11211, 0);
+			phalcon_array_update_str_long(&server, SL("weight"), 1, 0);
 
 			array_init_size(&servers, 1);
 			phalcon_array_append(&servers, &server, 0);

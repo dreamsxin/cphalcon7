@@ -95,19 +95,17 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_MetaData_Mongo){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 
-	zval *options, backend_options = {}, lifetime = {}, prefix = {}, frontend_data = {}, mongo = {}, option = {};
+	zval *options, backend_options = {}, lifetime = {}, frontend_data = {}, mongo = {}, option = {};
 
-	phalcon_fetch_params(0, 1, 0, &options);
-
-	PHALCON_ZVAL_DUP(&backend_options, options);
+	phalcon_fetch_params(1, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
 	if (!phalcon_array_isset_str(options, SL("collection"))) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The parameter 'collection' is required");
 		return;
 	}
 
@@ -115,28 +113,28 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Mongo, __construct){
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
+	PHALCON_MM_ZVAL_DUP(&backend_options, options);
+
 	phalcon_update_property(getThis(), SL("_lifetime"), &lifetime);
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
-		ZVAL_EMPTY_STRING(&prefix);
-	}
-
 	array_init_size(&option, 1);
+	PHALCON_MM_ADD_ENTRY(&option);
 
-	phalcon_array_update_str(&option, SL("lifetime"), &lifetime, PH_COPY);
+	phalcon_array_update_str(&option, SL("lifetime"), &lifetime, 0);
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
+	PHALCON_MM_ADD_ENTRY(&frontend_data);
+	PHALCON_MM_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
 
-	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &option);
-
-	phalcon_array_update_str_str(&backend_options, SL("statsKey"), SL("$PMM$"), PH_COPY);;
+	phalcon_array_update_str_str(&backend_options, SL("statsKey"), SL("$PMM$"), 0);
 
 	object_init_ex(&mongo, phalcon_cache_backend_mongo_ce);
-
-	PHALCON_CALL_METHOD(NULL, &mongo, "__construct", &frontend_data, &backend_options);
+	PHALCON_MM_ADD_ENTRY(&mongo);
+	PHALCON_MM_CALL_METHOD(NULL, &mongo, "__construct", &frontend_data, &backend_options);
 
 	phalcon_update_property(getThis(), SL("_mongo"), &mongo);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
+	RETURN_MM();
 }
 
 /**

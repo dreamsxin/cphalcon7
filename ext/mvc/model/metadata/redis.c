@@ -97,16 +97,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 	zval *options, host = {}, port = {}, auth = {}, persistent = {}, lifetime = {}, prefix = {}, frontend_data = {}, redis = {}, frontend_option = {}, backend_option = {};
 
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(1, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The options must be an array");
 		return;
 	}
 
 	array_init(&backend_option);
+	PHALCON_MM_ADD_ENTRY(&backend_option);
 
-	phalcon_array_update_str_str(&backend_option, SL("statsKey"), SL("$PMM$"), PH_COPY);
+	phalcon_array_update_str_str(&backend_option, SL("statsKey"), SL("$PMM$"), 0);
 
 	if (phalcon_array_isset_fetch_str(&host, options, SL("host"), PH_READONLY)) {
 		phalcon_array_update_str(&backend_option, SL("host"), &host, PH_COPY);
@@ -130,31 +131,27 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Redis, __construct){
 		ZVAL_LONG(&lifetime, 8600);
 	}
 
-	if (!phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_COPY)) {
-		ZVAL_EMPTY_STRING(&prefix);
+	if (phalcon_array_isset_fetch_str(&prefix, options, SL("prefix"), PH_READONLY)) {
+		phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, PH_COPY);
 	}
-
-	phalcon_array_update_str(&backend_option, SL("prefix"), &prefix, 0);
 
 	/* create redis instance */
 	array_init_size(&frontend_option, 1);
+	PHALCON_MM_ADD_ENTRY(&frontend_option);
 
 	phalcon_array_update_str(&frontend_option, SL("lifetime"), &lifetime, PH_COPY);
 
 	object_init_ex(&frontend_data, phalcon_cache_frontend_data_ce);
-
-	PHALCON_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
-	zval_ptr_dtor(&frontend_option);
+	PHALCON_MM_ADD_ENTRY(&frontend_data);
+	PHALCON_MM_CALL_METHOD(NULL, &frontend_data, "__construct", &frontend_option);
 
 	object_init_ex(&redis, phalcon_cache_backend_redis_ce);
-
-	PHALCON_CALL_METHOD(NULL, &redis, "__construct", &frontend_data, &backend_option);
-	zval_ptr_dtor(&frontend_data);
-	zval_ptr_dtor(&backend_option);
+	PHALCON_MM_ADD_ENTRY(&redis);
+	PHALCON_MM_CALL_METHOD(NULL, &redis, "__construct", &frontend_data, &backend_option);
 
 	phalcon_update_property(getThis(), SL("_redis"), &redis);
 	phalcon_update_property_empty_array(getThis(), SL("_metaData"));
-	zval_ptr_dtor(&redis);
+	RETURN_MM();
 }
 
 /**

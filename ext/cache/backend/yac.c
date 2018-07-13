@@ -137,7 +137,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Yac, __construct){
 	}
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || Z_TYPE(special_key) == IS_TRUE) {
-		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCY"), PH_COPY);
+		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCY"), 0);
 	}
 
 	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_yac_ce, getThis(), "__construct", frontend, &options);

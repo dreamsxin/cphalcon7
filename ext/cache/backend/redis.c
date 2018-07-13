@@ -134,21 +134,22 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 
 	zval *frontend, *_options = NULL, options = {}, special_key = {}, redis = {};
 
-	phalcon_fetch_params(0, 1, 1, &frontend, &_options);
+	phalcon_fetch_params(1, 1, 1, &frontend, &_options);
 
 	if (!_options || Z_TYPE_P(_options) == IS_NULL) {
 		array_init_size(&options, 4);
 	} else {
 		ZVAL_DUP(&options, _options);
 	}
+	PHALCON_MM_ADD_ENTRY(&options);
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || Z_TYPE(special_key) == IS_TRUE) {
-		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), PH_COPY);
+		phalcon_array_update_str_str(&options, SL("statsKey"), SL("_PHCR"), 0);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&redis, &options, SL("redis"), PH_READONLY)) {
 		if (!phalcon_array_isset_str(&options, SL("host"))) {
-			phalcon_array_update_str_str(&options, SL("host"), SL("127.0.0.1"), PH_COPY);
+			phalcon_array_update_str_str(&options, SL("host"), SL("127.0.0.1"), 0);
 		}
 
 		if (!phalcon_array_isset_str(&options, SL("port"))) {
@@ -163,18 +164,18 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, __construct){
 		ce0 = phalcon_fetch_str_class(SL("Redis"), ZEND_FETCH_CLASS_AUTO);
 		if (Z_TYPE(redis) == IS_STRING) {
 			zval service = {};
-			PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &redis);
-			PHALCON_VERIFY_CLASS(&service, ce0);
+			PHALCON_MM_CALL_METHOD(&service, getThis(), "getresolveservice", &redis);
+			PHALCON_MM_ADD_ENTRY(&service);
+			PHALCON_MM_VERIFY_CLASS(&service, ce0);
 			phalcon_update_property(getThis(), SL("_redis"), &service);
-			zval_ptr_dtor(&service);
 		} else {
-			PHALCON_VERIFY_CLASS(&redis, ce0);
+			PHALCON_MM_VERIFY_CLASS(&redis, ce0);
 			phalcon_update_property(getThis(), SL("_redis"), &redis);
 		}
 	}
 
-	PHALCON_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
-	zval_ptr_dtor(&options);
+	PHALCON_MM_CALL_PARENT(NULL, phalcon_cache_backend_redis_ce, getThis(), "__construct", frontend, &options);
+	RETURN_MM();
 }
 
 /**

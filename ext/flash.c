@@ -111,10 +111,10 @@ PHP_METHOD(Phalcon_Flash, __construct){
 
 	if (!_css_classes || Z_TYPE_P(_css_classes) == IS_NULL) {
 		array_init_size(&css_classes, 4);
-		phalcon_array_update_str_str(&css_classes, SL("error"), SL("errorMessage"), PH_COPY);
-		phalcon_array_update_str_str(&css_classes, SL("notice"), SL("noticeMessage"), PH_COPY);
-		phalcon_array_update_str_str(&css_classes, SL("success"), SL("successMessage"), PH_COPY);
-		phalcon_array_update_str_str(&css_classes, SL("warning"), SL("warningMessage"), PH_COPY);
+		phalcon_array_update_str_str(&css_classes, SL("error"), SL("errorMessage"), 0);
+		phalcon_array_update_str_str(&css_classes, SL("notice"), SL("noticeMessage"), 0);
+		phalcon_array_update_str_str(&css_classes, SL("success"), SL("successMessage"), 0);
+		phalcon_array_update_str_str(&css_classes, SL("warning"), SL("warningMessage"), 0);
 	} else {
 		ZVAL_COPY_VALUE(&css_classes, _css_classes);
 	}

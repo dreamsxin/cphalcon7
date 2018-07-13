@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __construct){
 	}
 
 	if (!phalcon_array_isset_str(&parameters, SL("host"))) {
-		phalcon_array_update_str_str(&parameters, SL("host"), SL("127.0.0.1"), PH_COPY);
+		phalcon_array_update_str_str(&parameters, SL("host"), SL("127.0.0.1"), 0);
 	}
 
 	if (!phalcon_array_isset_str(&parameters, SL("port"))) {

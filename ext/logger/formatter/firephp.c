@@ -31,6 +31,7 @@
 #include "kernel/fcall.h"
 #include "kernel/operators.h"
 #include "kernel/string.h"
+#include "kernel/array.h"
 
 
 /**
@@ -126,18 +127,21 @@ PHP_METHOD(Phalcon_Logger_Formatter_Firephp, getTypeString) {
 		"INFO",  "INFO",  "LOG",  "INFO",  "LOG"
 	};
 
-	zval *type;
+	zval *type, types = {};
 	int itype;
 
 	phalcon_fetch_params(0, 1, 0, &type);
 	PHALCON_ENSURE_IS_LONG(type);
 
-	itype = Z_LVAL_P(type);
-	if (itype > 0 && itype < 10) {
-		RETURN_STRING(lut[itype]);
-	}
+	phalcon_read_property(&types, getThis(), SL("_typeStrings"), PH_NOISY|PH_READONLY);
+	if (!phalcon_array_isset_fetch(return_value, &types, type, PH_COPY)) {
+		itype = Z_LVAL_P(type);
+		if (itype > 0 && itype < 10) {
+			RETURN_STRING(lut[itype]);
+		}
 
-	RETURN_STRING("CUSTOM");
+		RETURN_STRING("CUSTOM");
+	}
 }
 
 /**

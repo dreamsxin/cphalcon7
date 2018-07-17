@@ -27,7 +27,7 @@ extern zend_class_entry *phalcon_logger_formatter_ce;
 PHALCON_INIT_CLASS(Phalcon_Logger_Formatter);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_logger_formatter_gettypestring, 0, 0, 1)
-	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_logger_formatter_interpolate, 0, 0, 2)

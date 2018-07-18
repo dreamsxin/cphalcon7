@@ -3392,7 +3392,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getCache){
 	RETURN_MEMBER(getThis(), "_cache");
 }
 
-static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *value)
+static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *value, zend_bool memory_grow)
 {
 	zval string_wildcard = {}, fixed_value = {}, sql_tmp = {};
 	PHALCON_CONCAT_SVS(&string_wildcard, ":", wildcard, ",");
@@ -3419,9 +3419,10 @@ static inline void phalcon_query_sql_replace(zval *sql, zval *wildcard, zval *va
 	phalcon_fast_str_replace(&sql_tmp, &string_wildcard, &fixed_value, sql);
 	zval_ptr_dtor(&string_wildcard);
 	zval_ptr_dtor(&fixed_value);
-	zval_ptr_dtor(sql);
-	ZVAL_STRING(sql, Z_STRVAL(sql_tmp));
-	zval_ptr_dtor(&sql_tmp);
+	if (!memory_grow) {
+		zval_ptr_dtor(sql);
+	}
+	ZVAL_COPY_VALUE(sql, &sql_tmp);
 }
 
 /**
@@ -3707,7 +3708,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-				phalcon_query_sql_replace(&sql_select, &wildcard, &tmp_value);
+				phalcon_query_sql_replace(&sql_select, &wildcard, &tmp_value, 0);
 				zval_ptr_dtor(&tmp_value);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
@@ -3730,7 +3731,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-				phalcon_query_sql_replace(&sql_select, &wildcard, &joined_keys);
+				phalcon_query_sql_replace(&sql_select, &wildcard, &joined_keys, 0);
 				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
@@ -3972,7 +3973,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				zval tmp_value = {};
 				PHALCON_MM_CALL_METHOD(&tmp_value, value, "getvalue");
-				phalcon_query_sql_replace(&sql_insert, &wildcard, &tmp_value);
+				phalcon_query_sql_replace(&sql_insert, &wildcard, &tmp_value, 1);
+				PHALCON_MM_ADD_ENTRY(&sql_insert);
 				zval_ptr_dtor(&tmp_value);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
@@ -3994,7 +3996,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-				phalcon_query_sql_replace(&sql_insert, &wildcard, &joined_keys);
+				phalcon_query_sql_replace(&sql_insert, &wildcard, &joined_keys, 1);
+				PHALCON_MM_ADD_ENTRY(&sql_insert);
 				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
@@ -4158,7 +4161,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 			if (Z_TYPE_P(value) == IS_OBJECT && instanceof_function(Z_OBJCE_P(value), phalcon_db_rawvalue_ce)) {
 				zval tmp_value = {};
 				PHALCON_CALL_METHOD(&tmp_value, value, "getvalue");
-				phalcon_query_sql_replace(&update_sql, &wildcard, &tmp_value);
+				phalcon_query_sql_replace(&update_sql, &wildcard, &tmp_value, 0);
 				zval_ptr_dtor(&tmp_value);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
@@ -4180,7 +4183,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-				phalcon_query_sql_replace(&update_sql, &wildcard, &joined_keys);
+				phalcon_query_sql_replace(&update_sql, &wildcard, &joined_keys, 0);
 				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
@@ -4311,7 +4314,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				zval tmp_value = {};
 				PHALCON_MM_CALL_METHOD(&tmp_value, value, "getvalue");
 				PHALCON_MM_ADD_ENTRY(&tmp_value);
-				phalcon_query_sql_replace(&delete_sql, &wildcard, &tmp_value);
+				phalcon_query_sql_replace(&delete_sql, &wildcard, &tmp_value, 1);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				zval *v, bind_keys = {}, joined_keys = {}, hidden_param = {};
@@ -4333,7 +4336,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 				} ZEND_HASH_FOREACH_END();
 				phalcon_fast_join_str(&joined_keys, SL(", "), &bind_keys);
 				zval_ptr_dtor(&bind_keys);
-				phalcon_query_sql_replace(&delete_sql, &wildcard, &joined_keys);
+				phalcon_query_sql_replace(&delete_sql, &wildcard, &joined_keys, 1);
 				zval_ptr_dtor(&joined_keys);
 				phalcon_array_unset(&bind_types, &wildcard, 0);
 			} else if (Z_TYPE(wildcard) == IS_LONG) {
@@ -4468,7 +4471,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
 			PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
-			PHALCON_CALL_METHOD(&cache, &dependency_injector, "getshared", &cache_service);
+			PHALCON_MM_CALL_METHOD(&cache, &dependency_injector, "getshared", &cache_service);
 			PHALCON_MM_ADD_ENTRY(&cache);
 			if (Z_TYPE(cache) != IS_OBJECT) {
 				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache service must be an object");

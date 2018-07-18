@@ -5101,6 +5101,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	} else {
 		PHALCON_MM_CALL_METHOD(&success, getThis(), "_dolowinsert", &write_connection, &identity_field);
 	}
+	PHALCON_MM_ADD_ENTRY(&success);
 
 	/**
 	 * _postSave() makes all the validations
@@ -5194,7 +5195,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 	if (zend_is_true(&new_success)) {
 		if (PHALCON_GLOBAL(orm).enable_strict) {
-			RETURN_MM_NCTOR(&success);
+			RETURN_MM_CTOR(&success);
 		}
 	}
 	RETURN_MM_NCTOR(&new_success);

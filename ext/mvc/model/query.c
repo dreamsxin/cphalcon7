@@ -38,6 +38,7 @@
 #include "di/injectable.h"
 #include "db/rawvalue.h"
 #include "db/column.h"
+#include "db/adapterinterface.h"
 #include "debug.h"
 
 #include "kernel/main.h"
@@ -4981,13 +4982,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 	zval *bind_params = NULL, *bind_types = NULL, connection = {}, intermediate = {}, type = {}, manager = {}, models_instances = {}, models = {};
 	zval number_models = {}, model_name = {}, model = {}, connections = {}, *model_key, connection_type = {}, connection_types = {};
 
-	phalcon_fetch_params(0, 0, 2, &bind_params, &bind_types);
+	phalcon_fetch_params(1, 0, 2, &bind_params, &bind_types);
 
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(connection) == IS_OBJECT) {
-		RETURN_CTOR(&connection);
+		RETURN_MM_CTOR(&connection);
 	}
 
 	if (!bind_params) {
@@ -4998,121 +4999,123 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHOD(&intermediate, getThis(), "parse");
+	PHALCON_MM_CALL_METHOD(&intermediate, getThis(), "parse");
+	PHALCON_MM_ADD_ENTRY(&intermediate);
 
 	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-		if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&connection, getThis(), "selectreadconnection", &intermediate, bind_params, bind_types);
-			zval_ptr_dtor(&intermediate);
-			if (Z_TYPE(connection) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "'selectReadConnection' didn't returned a valid connection");
-				return;
-			}
-
-			RETVAL_ZVAL(&connection, 0, 0);
-			return;
+		zval data = {}, event_name = {};
+		array_init(&data);
+		phalcon_array_append(&data, &intermediate, PH_COPY);
+		phalcon_array_append(&data, bind_params, PH_COPY);
+		phalcon_array_append(&data, bind_types, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&data);
+		PHALCON_MM_ZVAL_STRING(&event_name, "query:selectReadConnection");
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "fireevent", &event_name, &data);
+		PHALCON_MM_ADD_ENTRY(&connection);
+		if (Z_TYPE(connection) == IS_OBJECT) {
+			PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
+			RETURN_MM_CTOR(&connection);
 		}
 	} else {
-		if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
-			PHALCON_CALL_METHOD(&connection, getThis(), "selectwriteconnection", &intermediate, bind_params, bind_types);
-			zval_ptr_dtor(&intermediate);
-			if (Z_TYPE(connection) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "'selectWriteConnection' didn't returned a valid connection");
-				return;
-			}
-
-			RETVAL_ZVAL(&connection, 0, 0);
-			return;
+		zval data = {}, event_name = {};
+		array_init(&data);
+		phalcon_array_append(&data, &intermediate, PH_COPY);
+		phalcon_array_append(&data, bind_params, PH_COPY);
+		phalcon_array_append(&data, bind_types, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&data);
+		PHALCON_MM_ZVAL_STRING(&event_name, "query:selectWriteConnection");
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "fireevent", &event_name, &data);
+		PHALCON_MM_ADD_ENTRY(&connection);
+		if (Z_TYPE(connection) == IS_OBJECT) {
+			PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
+			RETURN_MM_CTOR(&connection);
 		}
 	}
 
-	PHALCON_CALL_SELF(&manager, "getmodelsmanager");
+	PHALCON_MM_CALL_SELF(&manager, "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&manager);
 
-	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_COPY);
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_READONLY);
 	if (Z_TYPE(models_instances) != IS_ARRAY) {
 		array_init(&models_instances);
+		PHALCON_MM_ADD_ENTRY(&models_instances);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&models, &intermediate, SL("models"), PH_READONLY) 
 		&& phalcon_array_isset_fetch_str(&model_name, &intermediate, SL("model"), PH_READONLY)) {
 		if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
-			PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+			PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name);
 			phalcon_array_update(&models_instances, &model_name, &model, 0);
 		}
 
 		if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
+			PHALCON_MM_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
 		} else {
-			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
+			PHALCON_MM_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
 		}
+		PHALCON_MM_ADD_ENTRY(&connection);
 
-		zval_ptr_dtor(&models_instances);
-		zval_ptr_dtor(&manager);
-		zval_ptr_dtor(&intermediate);
-		RETVAL_ZVAL(&connection, 0, 0);
-		return;
+		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
+		RETURN_MM_CTOR(&connection);
 	}
 
 	phalcon_fast_count(&number_models, &models);
 	if (PHALCON_IS_LONG(&number_models, 1)) {
 		phalcon_array_fetch_long(&model_name, &models, 0, PH_NOISY|PH_READONLY);
 		if (!phalcon_array_isset_fetch(&model, &models_instances, &model_name, PH_READONLY)) {
-			PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
+			PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name);
 			phalcon_array_update(&models_instances, &model_name, &model, 0);
 		}
 
 		if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-			PHALCON_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
+			PHALCON_MM_CALL_METHOD(&connection, &model, "getreadconnection", getThis(), &intermediate, bind_params, bind_types);
 		} else {
-			PHALCON_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
+			PHALCON_MM_CALL_METHOD(&connection, &model, "getwriteconnection", getThis(), &intermediate, bind_params, bind_types);
 		}
+		PHALCON_MM_ADD_ENTRY(&connection);
+		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
+		RETURN_MM_CTOR(&connection);
 	} else {
 		array_init(&connections);
+		PHALCON_MM_ADD_ENTRY(&connections);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(models), model_key) {
 			zval tmp_conn = {};
 			if (!phalcon_array_isset_fetch(&model, &models_instances, model_key, PH_READONLY)) {
-				PHALCON_CALL_METHOD(&model, &manager, "load", model_key);
+				PHALCON_MM_CALL_METHOD(&model, &manager, "load", model_key);
 				phalcon_array_update(&models_instances, model_key, &model, 0);
 			}
 
 			if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-				PHALCON_CALL_METHOD(&tmp_conn, &model, "getreadconnection", getThis());
+				PHALCON_MM_CALL_METHOD(&tmp_conn, &model, "getreadconnection", getThis());
 			} else {
-				PHALCON_CALL_METHOD(&tmp_conn, &model, "getwriteconnection", getThis());
+				PHALCON_MM_CALL_METHOD(&tmp_conn, &model, "getwriteconnection", getThis());
 			}
+			PHALCON_MM_ADD_ENTRY(&tmp_conn);
 
 			if (Z_TYPE(connection) != IS_OBJECT) {
-				ZVAL_COPY(&connection, &tmp_conn);
+				PHALCON_MM_ZVAL_COPY(&connection, &tmp_conn);
 			}
 
-			PHALCON_CALL_METHOD(&connection_type, &tmp_conn, "gettype");
-			zval_ptr_dtor(&tmp_conn);
+			PHALCON_MM_CALL_METHOD(&connection_type, &tmp_conn, "gettype");
+			PHALCON_MM_ADD_ENTRY(&connection_type);
 
-			phalcon_array_update_zval_bool(&connections, &connection_type, 1, PH_COPY);
-			zval_ptr_dtor(&connection_type);
+			phalcon_array_update_zval_bool(&connections, &connection_type, 1, 0);
 
 			phalcon_fast_count(&connection_types, &connections);
 
 			if (PHALCON_IS_LONG(&connection_types, 2)) {
-				zval_ptr_dtor(&connections);
-				zval_ptr_dtor(&models_instances);
-				zval_ptr_dtor(&manager);
-				zval_ptr_dtor(&intermediate);
 
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Cannot use models of different database systems in the same query");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Cannot use models of different database systems in the same query");
 				return;
 			}
 		} ZEND_HASH_FOREACH_END();
-		zval_ptr_dtor(&connections);
 	}
 
-	zval_ptr_dtor(&models_instances);
-	zval_ptr_dtor(&manager);
-	zval_ptr_dtor(&intermediate);
-	RETVAL_ZVAL(&connection, 0, 0);
+	PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
+	RETURN_MM_CTOR(&connection);
 }
 
 /**

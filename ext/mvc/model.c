@@ -1349,7 +1349,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 
 	zval *query = NULL, *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, transaction = {}, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 4, &query, &intermediate, &bind_params, &bind_types);
+	phalcon_fetch_params(1, 0, 4, &query, &intermediate, &bind_params, &bind_types);
 
 	if (!query) {
 		query = &PHALCON_GLOBAL(z_null);
@@ -1370,24 +1370,28 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_READONLY);
 	if (Z_TYPE(transaction) == IS_OBJECT) {
 		if (instanceof_function_ex(Z_OBJCE(transaction), phalcon_db_adapterinterface_ce, 1)) {
-			RETURN_CTOR(&transaction);
+			RETURN_MM_CTOR(&transaction);
 		}
 
-		PHALCON_CALL_METHOD(return_value, &transaction, "getconnection");
-		return;
+		PHALCON_MM_CALL_METHOD(return_value, &transaction, "getconnection");
+		PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
+		RETURN_MM();
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "selectreadconnection", query, intermediate, bind_params, bind_types);
+		PHALCON_MM_CALL_METHOD(return_value, getThis(), "selectreadconnection", query, intermediate, bind_params, bind_types);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectReadConnection' didn't returned a valid connection");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectReadConnection' didn't returned a valid connection");
 		}
-		return;
+		PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
+		RETURN_MM();
 	}
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(return_value, &models_manager, "getreadconnection", getThis());
-	zval_ptr_dtor(&models_manager);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(return_value, &models_manager, "getreadconnection", getThis());
+	PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
+	RETURN_MM();
 }
 
 /**
@@ -1429,6 +1433,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 		}
 
 		PHALCON_CALL_METHOD(return_value, &transaction, "getconnection");
+		PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
 		return;
 	}
 
@@ -1437,12 +1442,14 @@ PHP_METHOD(Phalcon_Mvc_Model, getWriteConnection){
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectWriteConnection' didn't returned a valid connection");
 		}
+		PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
 		return;
 	}
 
 	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_CALL_METHOD(return_value, &models_manager, "getwriteconnection", getThis());
 	zval_ptr_dtor(&models_manager);
+	PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
 }
 
 /**
@@ -2328,13 +2335,17 @@ PHP_METHOD(Phalcon_Mvc_Model, _reBuild){
  */
 PHP_METHOD(Phalcon_Mvc_Model, exists){
 
-	zval *force = NULL, build = {}, dirty_state = {}, unique_key = {}, unique_params = {}, unique_types = {};
-	zval model_name = {}, phql = {}, models_manager = {}, query = {}, write_connection = {}, model = {}, snapshot = {};
+	zval *force = NULL, *conection = NULL, build = {}, dirty_state = {}, unique_key = {}, unique_params = {}, unique_types = {};
+	zval model_name = {}, phql = {}, models_manager = {}, query = {}, model = {}, snapshot = {};
 
-	phalcon_fetch_params(1, 0, 1, &force);
+	phalcon_fetch_params(1, 0, 2, &force, &conection);
 
 	if (!force) {
 		force = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (!conection) {
+		conection = &PHALCON_GLOBAL(z_null);
 	}
 
 	PHALCON_MM_CALL_METHOD(&build, getThis(), "_rebuild");
@@ -2371,13 +2382,7 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
 	PHALCON_MM_CALL_METHOD(&query, &models_manager, "createquery", &phql);
 	PHALCON_MM_ADD_ENTRY(&query);
 
-	/**
-	 * Create/Get the current database connection
-	 */
-	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
-	PHALCON_MM_ADD_ENTRY(&write_connection);
-
-	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", &write_connection);
+	PHALCON_MM_CALL_METHOD(NULL, &query, "setconnection", conection);
 	PHALCON_MM_CALL_METHOD(NULL, &query, "setuniquerow", &PHALCON_GLOBAL(z_true));
 	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &unique_params);
 	PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &unique_types);
@@ -4127,7 +4132,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSave){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 
-	zval *connection, *identity_field, bind_skip = {}, fields = {}, bind_params = {}, bind_types = {}, exception_message = {};
+	zval *connection, *identity_field, read_connection = {}, bind_skip = {}, fields = {}, bind_params = {}, bind_types = {}, exception_message = {};
 	zval attributes = {}, bind_data_types = {}, automatic_attributes = {}, not_null_attributes = {}, default_values = {}, data_types = {}, column_map = {};
 	zval *field, default_value = {}, use_explicit_identity = {}, column_name = {}, column_value = {}, column_type = {}, phql = {}, model_name = {};
 	zval phql_join_fields = {}, phql_join_values = {}, models_manager = {}, query = {}, status = {};
@@ -4158,6 +4163,16 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	PHALCON_MM_ADD_ENTRY(&data_types);
 	PHALCON_MM_CALL_SELF(&column_map, "getcolumnmap");
 	PHALCON_MM_ADD_ENTRY(&column_map);
+
+	if (Z_TYPE_P(connection) != IS_OBJECT) {
+		/**
+		 * Create/Get the current database connection
+		 */
+		PHALCON_MM_CALL_METHOD(&read_connection, getThis(), "getreadconnection");
+		PHALCON_MM_ADD_ENTRY(&read_connection);
+	} else {
+		ZVAL_COPY_VALUE(&read_connection, connection);
+	}
 
 	/**
 	 * All fields in the model makes part or the INSERT
@@ -4221,12 +4236,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									case PHALCON_DB_COLUMN_TYPE_BYTEA:
-										PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+										PHALCON_MM_CALL_METHOD(&convert_value, &read_connection, "escapebytea", &value);
 										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									case PHALCON_DB_COLUMN_TYPE_ARRAY:
 									case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-										PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+										PHALCON_MM_CALL_METHOD(&convert_value, &read_connection, "escapearray", &value, &field_type);
 										PHALCON_MM_ADD_ENTRY(&convert_value);
 										break;
 									default:
@@ -4263,13 +4278,13 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 			ZVAL_COPY_VALUE(&column_name, identity_field);
 		}
 
-		PHALCON_MM_CALL_METHOD(&default_value, connection, "getdefaultidvalue");
+		PHALCON_MM_CALL_METHOD(&default_value, &read_connection, "getdefaultidvalue");
 		PHALCON_MM_ADD_ENTRY(&default_value);
 
 		/**
 		 * Not all the database systems require an explicit value for identity columns
 		 */
-		PHALCON_MM_CALL_METHOD(&use_explicit_identity, connection, "useexplicitidvalue");
+		PHALCON_MM_CALL_METHOD(&use_explicit_identity, &read_connection, "useexplicitidvalue");
 
 		/**
 		 * Check if the developer set an explicit value for the column
@@ -4351,7 +4366,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
  */
 PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 
-	zval *connection, bind_params = {}, bind_types = {}, models_manager = {}, use_dynamic_update = {}, exception_message = {};
+	zval *connection, read_connection = {}, bind_params = {}, bind_types = {}, models_manager = {}, use_dynamic_update = {}, exception_message = {};
 	zval snapshot = {}, bind_data_types = {}, automatic_attributes = {}, data_types = {}, column_map = {}, columns = {};
 	zval model_name = {}, phql = {}, phql_updates = {}, phql_join_updates = {}, *field, attribute_field = {}, value = {};
 	zval unique_key = {}, unique_params = {}, unique_types = {}, merged_params = {}, merged_types = {};
@@ -4359,6 +4374,16 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	int i_use_dynamic_update; /* To keep static code analyzer happy */
 
 	phalcon_fetch_params(1, 1, 0, &connection);
+
+	if (Z_TYPE_P(connection) != IS_OBJECT) {
+		/**
+		 * Create/Get the current database connection
+		 */
+		PHALCON_MM_CALL_METHOD(&read_connection, getThis(), "getreadconnection");
+		PHALCON_MM_ADD_ENTRY(&read_connection);
+	} else {
+		ZVAL_COPY_VALUE(&read_connection, connection);
+	}
 
 	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
 	PHALCON_MM_ADD_ENTRY(&models_manager);
@@ -4445,12 +4470,12 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								case PHALCON_DB_COLUMN_TYPE_BYTEA:
-									PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapebytea", &value);
+									PHALCON_MM_CALL_METHOD(&convert_value, &read_connection, "escapebytea", &value);
 									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								case PHALCON_DB_COLUMN_TYPE_ARRAY:
 								case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-									PHALCON_MM_CALL_METHOD(&convert_value, connection, "escapearray", &value, &field_type);
+									PHALCON_MM_CALL_METHOD(&convert_value, &read_connection, "escapearray", &value, &field_type);
 									PHALCON_MM_ADD_ENTRY(&convert_value);
 									break;
 								default:
@@ -4899,7 +4924,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _postSaveRelatedRecords){
 PHP_METHOD(Phalcon_Mvc_Model, save){
 
 	zval *data = NULL, *white_list = NULL, *_exists = NULL, *exists_check = NULL, exists = {}, attributes = {}, bind_params = {}, *attribute;
-	zval type = {}, message = {}, event_name = {}, status = {}, write_connection = {}, related = {}, identity_field = {};
+	zval type = {}, message = {}, event_name = {}, status = {}, transaction = {}, write_connection = {}, related = {}, identity_field = {};
 	zval success = {}, new_success = {}, snapshot_data = {};
 	zend_string *str_key;
 	ulong idx;
@@ -4950,14 +4975,38 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	} ZEND_HASH_FOREACH_END();
 	PHALCON_MM_ADD_ENTRY(&bind_params);
 
+	phalcon_read_property(&transaction, getThis(), SL("_transaction"), PH_READONLY);
+	if (Z_TYPE(transaction) == IS_OBJECT) {
+		if (instanceof_function_ex(Z_OBJCE(transaction), phalcon_db_adapterinterface_ce, 1)) {
+			PHALCON_MM_ZVAL_COPY(&write_connection, &transaction);
+		} else {
+			PHALCON_MM_CALL_METHOD(&write_connection, &transaction, "getconnection");
+			PHALCON_MM_ADD_ENTRY(&write_connection);
+			PHALCON_MM_VERIFY_INTERFACE(&write_connection, phalcon_db_adapterinterface_ce);
+		}
+	} else {
+		ZVAL_NULL(&write_connection);
+	}
+
+	if (Z_TYPE(write_connection) != IS_OBJECT) {
+		phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
+		if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
+				/**
+				 * Create/Get the current database connection
+				 */
+				PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+				PHALCON_MM_ADD_ENTRY(&write_connection);
+		}
+	}
+
 	/**
 	 * We need to check if the record exists
 	 */
 	if (!_exists) {
-		PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists");
+		PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_false), &write_connection);
 	} else {
 		if (zend_is_true(exists_check)) {
-			PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists");
+			PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_false), &write_connection);
 			if (!zend_is_true(&exists)) {
 				if (zend_is_true(&exists)) {
 					PHALCON_MM_ZVAL_STRING(&type, "InvalidCreateAttempt");
@@ -4991,16 +5040,9 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	}
 
 	/**
-	 * Create/Get the current database connection
-	 */
-	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
-	PHALCON_MM_ADD_ENTRY(&write_connection);
-
-	/**
 	 * Save related records in belongsTo relationships
 	 */
-	phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
-	if (Z_TYPE(related) == IS_ARRAY) {
+	if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
 		PHALCON_MM_CALL_METHOD(&status, getThis(), "_presaverelatedrecords", &write_connection, &related);
 		if (PHALCON_IS_FALSE(&status)) {
 			RETURN_MM_FALSE;
@@ -5026,7 +5068,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		/**
 		 * Rollback the current transaction if there was validation errors
 		 */
-		if (Z_TYPE(related) == IS_ARRAY) {
+		if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
 			PHALCON_MM_CALL_METHOD(NULL, &write_connection, "rollback", &PHALCON_GLOBAL(z_false));
 		}
 
@@ -5065,7 +5107,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	 */
 	PHALCON_MM_CALL_METHOD(&new_success, getThis(), "_postsave", &success, &exists);
 
-	if (Z_TYPE(related) == IS_ARRAY) {
+	if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
 		/**
 		 * Rollbacks the implicit transaction if the master save has failed
 		 */
@@ -5095,22 +5137,24 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		/**
 		 * Save the post-related records
 		 */
-		PHALCON_MM_CALL_METHOD(&status, getThis(), "_postsaverelatedrecords", &write_connection, &related);
-		if (PHALCON_IS_FALSE(&status)) {
-			RETURN_MM_FALSE;
-		}
-
-		ZEND_HASH_FOREACH_KEY(Z_ARRVAL(related), idx, str_key) {
-			zval tmp = {};
-			if (str_key) {
-				ZVAL_STR(&tmp, str_key);
-			} else {
-				ZVAL_LONG(&tmp, idx);
+		if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
+			PHALCON_MM_CALL_METHOD(&status, getThis(), "_postsaverelatedrecords", &write_connection, &related);
+			if (PHALCON_IS_FALSE(&status)) {
+				RETURN_MM_FALSE;
 			}
 
-			phalcon_unset_property_array(getThis(), SL("_relatedResult"), &tmp);
+			ZEND_HASH_FOREACH_KEY(Z_ARRVAL(related), idx, str_key) {
+				zval tmp = {};
+				if (str_key) {
+					ZVAL_STR(&tmp, str_key);
+				} else {
+					ZVAL_LONG(&tmp, idx);
+				}
 
-		} ZEND_HASH_FOREACH_END();
+				phalcon_unset_property_array(getThis(), SL("_relatedResult"), &tmp);
+
+			} ZEND_HASH_FOREACH_END();
+		}
 	}
 
 	/**
@@ -6453,6 +6497,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		zval_ptr_dtor(&extra_method);
 		zval_ptr_dtor(&model_name);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 
@@ -6461,6 +6506,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		zval_ptr_dtor(&extra_method);
 		zval_ptr_dtor(&model_name);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 
@@ -6506,6 +6552,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 				zval_ptr_dtor(&field);
 				zval_ptr_dtor(&attributes);
 				zval_ptr_dtor(&extra_method_first);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 		}

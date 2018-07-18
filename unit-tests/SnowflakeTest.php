@@ -23,6 +23,7 @@ class SnowflakeTest extends PHPUnit\Framework\TestCase
 {
 	public function test()
 	{
+		$this->markTestSkipped("Skipped");
 		return;
 		$snowflake = new Phalcon\Snowflake;
 		$id = $snowflake->nextId();

@@ -2060,7 +2060,11 @@ void phalcon_addslashes(zval *return_value, zval *str)
 		}
 	}
 
+#if PHP_VERSION_ID < 70300
 	ZVAL_STR(return_value, php_addslashes(Z_STR_P(str), 0));
+#else
+	ZVAL_STR(return_value, php_addslashes(Z_STR_P(str)));
+#endif
 
 	if (unlikely(use_copy)) {
 		zval_ptr_dtor(&copy);

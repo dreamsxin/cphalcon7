@@ -21,6 +21,8 @@
 #include "snowflake.h"
 #include "exception.h"
 
+#include <inttypes.h>
+
 #include "kernel/main.h"
 #include "kernel/shm.h"
 #include "kernel/exception.h"
@@ -160,7 +162,7 @@ PHP_METHOD(Phalcon_Snowflake, nextId){
 	intern = phalcon_snowflake_object_from_obj(Z_OBJ_P(getThis()));
 	if (intern->data != NULL) {
 		if (!phalcon_shared_memory_lock(intern->shm)) {
-			int len;
+			zend_long len;
 			char *str = NULL;
 			uint64_t ts;
 			ts = get_time_in_ms();
@@ -176,7 +178,7 @@ PHP_METHOD(Phalcon_Snowflake, nextId){
 			intern->data->timestamp = ts;		
 			uint64_t id = ((ts - PHALCON_GLOBAL(snowflake).epoch) << 22) | ((PHALCON_GLOBAL(snowflake).node & 0x3FF) << 12) | intern->data->sequence;	
 			phalcon_shared_memory_unlock(intern->shm);
-			len = spprintf(&str, 0, "%llu", id);
+			len = spprintf(&str, 0, "%" PRId64, id);
 			RETVAL_STRINGL(str, len);
 			efree(str);
 		} else {

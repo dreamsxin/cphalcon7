@@ -177,6 +177,7 @@ int phql_parse_phql(zval *result, zval *phql) {
 	if (phql_internal_parse_phql(result, Z_STRVAL_P(phql), Z_STRLEN_P(phql), &error_msg) == FAILURE) {
 		if (Z_TYPE(error_msg) > IS_NULL) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, Z_STRVAL(error_msg));
+			zval_ptr_dtor(&error_msg);
 		}
 		else {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "There was an error parsing PHQL");
@@ -553,7 +554,7 @@ int phql_internal_parse_phql(zval *result, char *phql, unsigned int phql_length,
 		switch (scanner_status) {
 			case PHQL_SCANNER_RETCODE_ERR:
 			case PHQL_SCANNER_RETCODE_IMPOSSIBLE:
-				if (Z_TYPE_P(error_msg) > IS_NULL) {
+				if (Z_TYPE_P(error_msg) <= IS_NULL) {
 					phql_scanner_error_msg(parser_status, error_msg);
 				}
 				status = FAILURE;

@@ -533,37 +533,37 @@ PHP_METHOD(Phalcon_Dispatcher, getParam){
 	zval *param, *filters = NULL, *default_value = NULL, params = {}, param_value = {}, dependency_injector = {}, exception_code = {}, exception_message = {};
 	zval service = {}, filter = {};
 
-	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
+	phalcon_fetch_params(1, 1, 2, &param, &filters, &default_value);
 
 	phalcon_read_property(&params, getThis(), SL("_params"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&param_value, &params, param, PH_READONLY)) {
 		if (filters && Z_TYPE_P(filters) != IS_NULL) {
-			PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+			PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+			PHALCON_MM_ADD_ENTRY(&dependency_injector);
 			if (Z_TYPE(dependency_injector) != IS_OBJECT) {
 				ZVAL_LONG(&exception_code, PHALCON_EXCEPTION_NO_DI);
-				ZVAL_STRING(&exception_message, "A dependency injection object is required to access the 'filter' service");
-				PHALCON_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
-				return;
+				PHALCON_MM_ZVAL_STRING(&exception_message, "A dependency injection object is required to access the 'filter' service");
+				PHALCON_MM_CALL_METHOD(NULL, getThis(), "_throwdispatchexception", &exception_message, &exception_code);
+				RETURN_MM();
 			}
 
 			ZVAL_STR(&service, IS(filter));
 
-			PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
-			zval_ptr_dtor(&dependency_injector);
-			PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
-			PHALCON_RETURN_CALL_METHOD(&filter, "sanitize", &param_value, filters);
-			zval_ptr_dtor(&filter);
-			return;
+			PHALCON_MM_CALL_METHOD(&filter, &dependency_injector, "getshared", &service);
+			PHALCON_MM_ADD_ENTRY(&filter);
+			PHALCON_MM_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
+			PHALCON_MM_RETURN_CALL_METHOD(&filter, "sanitize", &param_value, filters);
+			RETURN_MM();
 		} else {
-			RETURN_CTOR(&param_value);
+			RETURN_MM_CTOR(&param_value);
 		}
 	}
 
 	if (default_value) {
-		RETURN_CTOR(default_value);
+		RETURN_MM_CTOR(default_value);
 	}
 
-	RETURN_NULL();
+	RETURN_MM_NULL();
 }
 
 /**

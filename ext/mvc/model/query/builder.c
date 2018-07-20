@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 
 	zval *type, *params = NULL, *_di = NULL, di = {}, service_name = {}, has = {}, exception_message = {};
 
-	phalcon_fetch_params(0, 1, 2, &type, &params, &_di);
+	phalcon_fetch_params(1, 1, 2, &type, &params, &_di);
 
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
@@ -173,65 +173,67 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, create){
 	}
 
 	if (Z_TYPE_P(_di) == IS_OBJECT) {
-		PHALCON_VERIFY_INTERFACE(_di, phalcon_diinterface_ce);
-		ZVAL_COPY(&di, _di);
+		PHALCON_MM_VERIFY_INTERFACE(_di, phalcon_diinterface_ce);
+		ZVAL_COPY_VALUE(&di, _di);
 	} else {
-		PHALCON_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault", _di);
+		PHALCON_MM_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault", _di);
+		PHALCON_MM_ADD_ENTRY(&di);
 	}
 
 	switch (phalcon_get_intval(type)) {
 		case PHQL_T_SELECT:
 			ZVAL_STR(&service_name, IS(modelsQueryBuilderForSelect));
-			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
+			PHALCON_MM_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name);
+				PHALCON_MM_CALL_METHOD(return_value, &di, "get", &service_name);
 			} else {
 				object_init_ex(return_value, phalcon_mvc_model_query_builder_select_ce);
 			}
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", params);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_INSERT:
 			ZVAL_STR(&service_name, IS(modelsQueryBuilderForInsert));
-			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
+			PHALCON_MM_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
+				PHALCON_MM_CALL_METHOD(return_value, &di, "get", &service_name, params);
 			} else {
 				object_init_ex(return_value, phalcon_mvc_model_query_builder_insert_ce);
 			}
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", params);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_UPDATE:
 			ZVAL_STR(&service_name, IS(modelsQueryBuilderForUpdate));
-			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
+			PHALCON_MM_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
+				PHALCON_MM_CALL_METHOD(return_value, &di, "get", &service_name, params);
 			} else {
 				object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
 			}
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", params);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", params);
 			break;
 
 		case PHQL_T_DELETE:
 			ZVAL_STR(&service_name, IS(modelsQueryBuilderForDelete));
-			PHALCON_CALL_METHOD(&has, &di, "has", &service_name);
+			PHALCON_MM_CALL_METHOD(&has, &di, "has", &service_name);
 			if (zend_is_true(&has)) {
-				PHALCON_CALL_METHOD(return_value, &di, "get", &service_name, params);
+				PHALCON_MM_CALL_METHOD(return_value, &di, "get", &service_name, params);
 			} else {
 				object_init_ex(return_value, phalcon_mvc_model_query_builder_delete_ce);
 			}
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct", params);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", params);
 			break;
 
 		default:
 			PHALCON_CONCAT_SV(&exception_message, "Not found builder: ", type);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 	}
-	zval_ptr_dtor(&di);
 
-	PHALCON_VERIFY_INTERFACE(return_value, phalcon_mvc_model_query_builderinterface_ce);
+	PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_mvc_model_query_builderinterface_ce);
+	RETURN_MM();
 }
 
 /**

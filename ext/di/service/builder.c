@@ -79,6 +79,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 	if (Z_TYPE_P(argument) != IS_ARRAY) {
 		PHALCON_CONCAT_SVS(&exception_message, "Argument at position ", position, " must be an array");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 
@@ -93,6 +94,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 	if (!phalcon_array_isset_fetch_str(&type, argument, SL("type"), PH_READONLY)) {
 		PHALCON_CONCAT_SVS(&exception_message, "Argument at position ", position, " must have a type");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 
@@ -103,6 +105,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 		if (!phalcon_array_isset_fetch_str(&name, argument, SL("name"), PH_READONLY)) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'name' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+			zval_ptr_dtor(&exception_message);
 			return;
 		}
 
@@ -117,6 +120,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 		if (!phalcon_array_isset_fetch_str(&value, argument, SL("value"), PH_READONLY)) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'value' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+			zval_ptr_dtor(&exception_message);
 			return;
 		}
 
@@ -130,6 +134,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 		if (!phalcon_array_isset_fetch_str(&name, argument, SL("className"), PH_READONLY)) {
 			PHALCON_CONCAT_SV(&exception_message, "Service 'className' is required in parameter on position ", position);
 			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+			zval_ptr_dtor(&exception_message);
 			return;
 		}
 
@@ -154,6 +159,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameter){
 	 */
 	PHALCON_CONCAT_SV(&exception_message, "Unknown service type in parameter on position ", position);
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+	zval_ptr_dtor(&exception_message);
 	return;
 }
 
@@ -293,6 +299,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			if (Z_TYPE_P(method) != IS_ARRAY) {
 				PHALCON_CONCAT_SV(&exception_message, "Method call must be an array on position ", &method_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 
@@ -302,6 +309,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			if (!phalcon_array_isset_str(method, SL("method"))) {
 				PHALCON_CONCAT_SV(&exception_message, "The method name is required on position ", &method_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 
@@ -317,6 +325,8 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 				if (Z_TYPE(method_args) != IS_ARRAY) {
 					PHALCON_CONCAT_SV(&exception_message, "Call arguments must be an array ", &method_position);
 					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+					zval_ptr_dtor(&exception_message);
+					zval_ptr_dtor(&method_call);
 					return;
 				}
 
@@ -330,6 +340,8 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 					 * Call the method on the instance
 					 */
 					PHALCON_CALL_USER_FUNC_ARRAY(&status, &method_call, &build_arguments);
+					zval_ptr_dtor(&build_arguments);
+					zval_ptr_dtor(&method_call);
 					continue;
 				}
 			}
@@ -338,6 +350,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			 * Call the method on the instance without arguments
 			 */
 			PHALCON_CALL_USER_FUNC(&status, &method_call);
+			zval_ptr_dtor(&method_call);
 
 		} ZEND_HASH_FOREACH_END();
 
@@ -374,6 +387,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			if (Z_TYPE_P(property) != IS_ARRAY) {
 				PHALCON_CONCAT_SV(&exception_message, "Property must be an array on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 
@@ -383,6 +397,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			if (!phalcon_array_isset_str(property, SL("name"))) {
 				PHALCON_CONCAT_SV(&exception_message, "The property name is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 
@@ -392,6 +407,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			if (!phalcon_array_isset_str(property, SL("value"))) {
 				PHALCON_CONCAT_SV(&exception_message, "The property value is required on position ", &property_position);
 				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_di_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
 				return;
 			}
 
@@ -407,6 +423,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 			 * Update the public property
 			 */
 			phalcon_update_property_zval_zval(&instance, &property_name, &value);
+			zval_ptr_dtor(&value);
 		} ZEND_HASH_FOREACH_END();
 	}
 

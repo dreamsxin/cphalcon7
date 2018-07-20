@@ -639,6 +639,7 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	
 	PHALCON_CONCAT_SVS(&exception_message, "Sanitize filter ", filter, " is not supported");
 	PHALCON_THROW_EXCEPTION_ZVAL(phalcon_filter_exception_ce, &exception_message);
+	zval_ptr_dtor(&exception_message);
 	return;
 
 ph_end_0:

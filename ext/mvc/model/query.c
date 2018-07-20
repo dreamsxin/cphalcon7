@@ -381,44 +381,48 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getModelsMetaData){
 
 	zval meta_data = {}, dependency_injector = {}, service_name = {}, has = {}, service = {};
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&meta_data, getThis(), SL("_modelsMetaData"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(meta_data) == IS_OBJECT) {
-		RETURN_CTOR(&meta_data);
-	} else {
+		RETURN_MM_CTOR(&meta_data);
+	}
+	/**
+	 * Check if the DI is valid
+	 */
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		return;
+	}
+
+	ZVAL_STR(&service_name, IS(modelsMetadata));
+
+	PHALCON_MM_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+	if (zend_is_true(&has)) {
 		/**
-		 * Check if the DI is valid
+		 * Obtain the models-metadata service from the DI
 		 */
-		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_MM_CALL_METHOD(&service, &dependency_injector, "getshared", &service_name);
+		PHALCON_MM_ADD_ENTRY(&service);
+		if (Z_TYPE(service) != IS_OBJECT) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The injected service 'modelsMetadata' is not valid");
 			return;
 		}
 
-		ZVAL_STR(&service_name, IS(modelsMetadata));
-
-		PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
-		if (zend_is_true(&has)) {
-			/**
-			 * Obtain the models-metadata service from the DI
-			 */
-			PHALCON_CALL_METHOD(&service, &dependency_injector, "getshared", &service_name);
-			if (Z_TYPE(service) != IS_OBJECT) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The injected service 'modelsMetadata' is not valid");
-				return;
-			}
-
-			PHALCON_VERIFY_INTERFACE(&service, phalcon_mvc_model_metadatainterface_ce);
-		} else {
-			object_init_ex(&service, phalcon_mvc_model_metadata_memory_ce);
-		}
-
-		/**
-		 * Update the models-metada property
-		 */
-		phalcon_update_property(getThis(), SL("_modelsMetaData"), &service);
-
-		RETVAL_ZVAL(&service, 0, 0);
+		PHALCON_MM_VERIFY_INTERFACE(&service, phalcon_mvc_model_metadatainterface_ce);
+	} else {
+		object_init_ex(&service, phalcon_mvc_model_metadata_memory_ce);
+		PHALCON_MM_ADD_ENTRY(&service);
 	}
+
+	/**
+	 * Update the models-metada property
+	 */
+	phalcon_update_property(getThis(), SL("_modelsMetaData"), &service);
+
+	RETURN_MM_CTOR(&service);
 }
 
 /**
@@ -461,7 +465,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	zval has_model = {}, models_instances = {}, *model_instance, models = {}, class_name = {};
 	long int number = 0;
 
-	phalcon_fetch_params(0, 1, 0, &expr);
+	phalcon_fetch_params(1, 1, 0, &expr);
 
 	phalcon_array_fetch_string(&column_name, expr, IS(name), PH_NOISY|PH_READONLY);
 
@@ -475,7 +479,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		ZVAL_STR(&s_qualified, IS(qualified));
 		phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
 		phalcon_array_update_string(return_value, IS(name), &column_name, PH_COPY);
-		return;
+		RETURN_MM();
 	}
 
 	/**
@@ -492,7 +496,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Unknown model or alias '", &column_domain, "' (1), when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -508,23 +513,25 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "There is no model related to model or alias '", &column_domain, "', when executing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
-		PHALCON_CALL_METHOD(&column_map, &model, "getreversecolumnmap");
+		PHALCON_MM_CALL_METHOD(&column_map, &model, "getreversecolumnmap");
+		PHALCON_MM_ADD_ENTRY(&column_map);
 
 		if (Z_TYPE(column_map) == IS_ARRAY) {
-			if (!phalcon_array_isset_fetch(&real_column_name, &column_map, &column_name, PH_COPY)) {
+			if (!phalcon_array_isset_fetch(&real_column_name, &column_map, &column_name, PH_READONLY)) {
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 				PHALCON_CONCAT_SVSVSV(&exception_message, "Column '", &column_name, "' doesn't belong to the model or alias '", &column_domain, "', when executing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+				PHALCON_MM_ADD_ENTRY(&exception_message);
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
-			zval_ptr_dtor(&column_map);
 		} else {
-			ZVAL_COPY(&real_column_name, &column_name);
+			ZVAL_COPY_VALUE(&real_column_name, &column_name);
 		}
 	} else {
 		/**
@@ -539,18 +546,19 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			/**
 			 * Check if the atribute belongs to the current model
 			 */
-			PHALCON_CALL_METHOD(&has_attribute, model_instance, "hasattribute", &column_name);
+			PHALCON_MM_CALL_METHOD(&has_attribute, model_instance, "hasattribute", &column_name);
 			if (zend_is_true(&has_attribute)) {
 				++number;
 				if (number > 1) {
 					phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 					PHALCON_CONCAT_SVSV(&exception_message, "The column '", &column_name, "' is ambiguous, when preparing: ", &phql);
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 					return;
 				}
 
-				ZVAL_COPY(&has_model, model_instance);
+				ZVAL_COPY_VALUE(&has_model, model_instance);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -562,7 +570,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Column '", &column_name, "' doesn't belong to any of the selected models (1), when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
 
@@ -571,7 +580,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		 */
 		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(models) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The models list was not loaded correctly");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The models list was not loaded correctly");
 			return;
 		}
 
@@ -579,37 +588,38 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 		 * Obtain the model's source from the _models list
 		 */
 		phalcon_get_class(&class_name, &has_model, 0);
+		PHALCON_MM_ADD_ENTRY(&class_name);
 		if (!phalcon_array_isset_fetch(&source, &models, &class_name, PH_READONLY)) {
 			phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 			PHALCON_CONCAT_SVSV(&exception_message, "Can't obtain the model '", &class_name, "' source from the _models list, when preparing: ", &phql);
-			PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+			PHALCON_MM_ADD_ENTRY(&exception_message);
+			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 			return;
 		}
-		zval_ptr_dtor(&class_name);
 
 		/**
 		 * Rename the column
 		 */
-		PHALCON_CALL_METHOD(&column_map, &has_model, "getreversecolumnmap");
-		zval_ptr_dtor(&has_model);
+		PHALCON_MM_CALL_METHOD(&column_map, &has_model, "getreversecolumnmap");
+		PHALCON_MM_ADD_ENTRY(&column_map);
 
 		if (Z_TYPE(column_map) == IS_ARRAY) {
 			/**
 			 * The real column name is in the column map
 			 */
 			if (phalcon_array_isset(&column_map, &column_name)) {
-				phalcon_array_fetch(&real_column_name, &column_map, &column_name, PH_NOISY|PH_COPY);
+				phalcon_array_fetch(&real_column_name, &column_map, &column_name, PH_NOISY|PH_READONLY);
 			} else {
 				phalcon_read_property(&phql, getThis(), SL("_phql"), PH_NOISY|PH_READONLY);
 
 				PHALCON_CONCAT_SVSV(&exception_message, "Column '", &column_name, "' doesn't belong to any of the selected models (3), when preparing: ", &phql);
-				PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
+				PHALCON_MM_ADD_ENTRY(&exception_message);
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 				return;
 			}
-			zval_ptr_dtor(&column_map);
 		} else {
-			ZVAL_COPY(&real_column_name, &column_name);
+			ZVAL_COPY_VALUE(&real_column_name, &column_name);
 		}
 	}
 
@@ -620,8 +630,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getQualified){
 	array_init_size(return_value, 4);
 	phalcon_array_update_string(return_value, IS(type), &s_qualified, PH_COPY);
 	phalcon_array_update_string(return_value, IS(domain), &source, PH_COPY);
-	phalcon_array_update_string(return_value, IS(name), &real_column_name, 0);
+	phalcon_array_update_string(return_value, IS(name), &real_column_name, PH_COPY);
 	phalcon_array_update_string(return_value, IS(balias), &column_name, PH_COPY);
+	RETURN_MM();
 }
 
 /**
@@ -657,9 +668,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 
 	zval *expr, when_clauses, left = {}, right = {}, *when_expr, tmp;
 
-	phalcon_fetch_params(0, 1, 0, &expr);
+	phalcon_fetch_params(1, 1, 0, &expr);
 
 	array_init(&when_clauses);
+	PHALCON_MM_ADD_ENTRY(&when_clauses);
 
 	phalcon_array_fetch_string(&left, expr, IS(left), PH_NOISY|PH_READONLY);
 	phalcon_array_fetch_string(&right, expr, IS(right), PH_NOISY|PH_READONLY);
@@ -671,35 +683,39 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getCaseExpression){
 		 * Resolving left part of the expression if any
 		 */
 		if (phalcon_array_isset_fetch_str(&expr_left, when_expr, SL("left"), PH_READONLY)) {
-			PHALCON_CALL_METHOD(&when_left, getThis(), "_getexpression", &expr_left);
+			PHALCON_MM_CALL_METHOD(&when_left, getThis(), "_getexpression", &expr_left);
+			PHALCON_MM_ADD_ENTRY(&when_left);
 		}
 
 		array_init(&tmp1);
+		PHALCON_MM_ADD_ENTRY(&tmp1);
 		if (phalcon_array_isset_str(when_expr, SL("right"))) {
 			/**
 			 * Resolving right part of the expression if any
 			 */
 			if (phalcon_array_isset_fetch_str(&expr_right, when_expr, SL("right"), PH_READONLY)) {
-				PHALCON_CALL_METHOD(&when_right, getThis(), "_getexpression", &expr_right);
+				PHALCON_MM_CALL_METHOD(&when_right, getThis(), "_getexpression", &expr_right);
+				PHALCON_MM_ADD_ENTRY(&when_right);
 			}
 
 			phalcon_array_update_string_str(&tmp1, IS(type), SL("when"), 0);
-			phalcon_array_update_str(&tmp1, SL("when"), &when_left, 0);
-			phalcon_array_update_str(&tmp1, SL("then"), &when_right, 0);
+			phalcon_array_update_str(&tmp1, SL("when"), &when_left, PH_COPY);
+			phalcon_array_update_str(&tmp1, SL("then"), &when_right, PH_COPY);
 		} else {
 			phalcon_array_update_string_str(&tmp1, IS(type), SL("else"), 0);
-			phalcon_array_update_str(&tmp1, SL("expr"), &when_left, 0);
+			phalcon_array_update_str(&tmp1, SL("expr"), &when_left, PH_COPY);
 		}
-		phalcon_array_append(&when_clauses, &tmp1, 0);
+		phalcon_array_append(&when_clauses, &tmp1, PH_COPY);
 	} ZEND_HASH_FOREACH_END();
 
-	PHALCON_CALL_METHOD(&tmp, getThis(), "_getexpression", &left);
+	PHALCON_MM_CALL_METHOD(&tmp, getThis(), "_getexpression", &left);
 
 	array_init(return_value);
 
 	phalcon_array_update_string_str(return_value, IS(type), SL("case"), 0);
-	phalcon_array_update_str(return_value, SL("expr"), &tmp, 0);
-	phalcon_array_update_str(return_value, SL("when-clauses"), &when_clauses, 0);
+	phalcon_array_update_str(return_value, SL("expr"), &tmp, PH_COPY);
+	phalcon_array_update_str(return_value, SL("when-clauses"), &when_clauses, PH_COPY);
+	RETURN_MM();
 }
 
 /**
@@ -713,7 +729,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 	zval *expr, name = {}, arguments = {}, function_args = {}, *argument, argument_expr = {};
 	int distinct;
 
-	phalcon_fetch_params(0, 1, 0, &expr);
+	phalcon_fetch_params(1, 1, 0, &expr);
 
 	phalcon_array_fetch_string(&name, expr, IS(name), PH_NOISY|PH_READONLY);
 
@@ -725,12 +741,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 	if (phalcon_array_isset_fetch_str(&arguments, expr, SL("arguments"), PH_READONLY)) {
 		distinct = phalcon_array_isset_str(expr, SL("distinct")) ? 1 : 0;
 		array_init(&function_args);
+		PHALCON_MM_ADD_ENTRY(&function_args);
 		if (phalcon_array_isset_long(&arguments, 0)) {
 			/**
 			 * There are more than one argument
 			 */
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(arguments), argument) {
-				PHALCON_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", argument);
+				PHALCON_MM_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", argument);
 				phalcon_array_append(&function_args, &argument_expr, 0);
 			} ZEND_HASH_FOREACH_END();
 
@@ -738,16 +755,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getFunctionCall){
 			/**
 			 * There is only one argument
 			 */
-			PHALCON_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", &arguments);
+			PHALCON_MM_CALL_METHOD(&argument_expr, getThis(), "_getcallargument", &arguments);
 			phalcon_array_append(&function_args, &argument_expr, 0);
 		}
 
-		phalcon_array_update_string(return_value, IS(arguments), &function_args, 0);
+		phalcon_array_update_string(return_value, IS(arguments), &function_args, PH_COPY);
 
 		if (distinct) {
 			add_assoc_bool_ex(return_value, ISL(distinct), distinct);
 		}
 	}
+	RETURN_MM();
 }
 
 /**

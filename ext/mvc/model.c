@@ -1515,6 +1515,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 						if (PHALCON_GLOBAL(orm).enable_strict) {
 							PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
 							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+							zval_ptr_dtor(&exception_message);
 							return;
 						} else {
 							continue;
@@ -1623,31 +1624,33 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 	zval data_types = {}, connection = {}, *value, exception_message = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 3, 3, &base, &data, &column_map, &dirty_state, &source_model);
+	phalcon_fetch_params(1, 3, 3, &base, &data, &column_map, &dirty_state, &source_model);
 
 	if (!dirty_state) {
 		dirty_state = &PHALCON_GLOBAL(z_zero);
 	}
 
 	if (Z_TYPE_P(base) != IS_OBJECT) {
-		ZVAL_STRING(&exception_message, "The base must be object");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		PHALCON_MM_ZVAL_STRING(&exception_message, "The base must be object");
+		PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 		return;
 	}
 
 	if (phalcon_clone(return_value, base) == FAILURE) {
-		return;
+		RETURN_MM();
 	}
 
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&data_types, source_model, "getdatatypes");
-		PHALCON_CALL_METHOD(&connection, source_model, "getreadconnection");
+		PHALCON_MM_CALL_METHOD(&data_types, source_model, "getdatatypes");
+		PHALCON_MM_ADD_ENTRY(&data_types);
+		PHALCON_MM_CALL_METHOD(&connection, source_model, "getreadconnection");
+		PHALCON_MM_ADD_ENTRY(&connection);
 	}
 
 	/**
 	 * Change the dirty state to persistent
 	 */
-	PHALCON_CALL_METHOD(NULL, return_value, "setdirtystate", dirty_state);
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "setdirtystate", dirty_state);
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
 		zval key = {}, field_type = {}, convert_value = {}, attribute = {};
@@ -1658,14 +1661,14 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 					switch(Z_LVAL(field_type)) {
 						case PHALCON_DB_COLUMN_TYPE_JSON:
-							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
+							RETURN_MM_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
 							break;
 						case PHALCON_DB_COLUMN_TYPE_BYTEA:
-							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);
+							PHALCON_MM_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);
 							break;
 						case PHALCON_DB_COLUMN_TYPE_ARRAY:
 						case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
+							PHALCON_MM_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
 							ZVAL_COPY(&convert_value, value);
@@ -1676,6 +1679,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 			} else {
 				ZVAL_COPY(&convert_value, value);
 			}
+			PHALCON_MM_ADD_ENTRY(&convert_value);
 
 			/**
 			 * Only string keys in the data are valid
@@ -1688,26 +1692,19 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 					phalcon_update_property_zval_zval(return_value, &attribute, &convert_value);
 				} else {
 					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 			} else {
 				phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 			}
-			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
- 
-	if (zend_is_true(&data_types)) {
-		zval_ptr_dtor(&data_types);
-	}
-	if (zend_is_true(&connection)) {
-		zval_ptr_dtor(&connection);
-	}
 
 	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
-		PHALCON_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
-		PHALCON_CALL_METHOD(NULL, return_value, "build");
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
 	}
 
 	/**
@@ -1715,8 +1712,9 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 	 * fetched from the database
 	 */
 	if (phalcon_method_exists_ex(return_value, SL("afterfetch")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, return_value, "afterfetch");
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "afterfetch");
 	}
+	RETURN_MM();
 }
 
 /**
@@ -1734,7 +1732,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 	zval data_types = {}, connection = {}, *value, exception_message = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 3, 1, &data, &column_map, &hydration_mode, &source_model);
+	phalcon_fetch_params(1, 3, 1, &data, &column_map, &hydration_mode, &source_model);
 
 	/**
 	 * If there is no column map and the hydration mode is arrays return the data as it
@@ -1742,7 +1740,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 	 */
 	if (Z_TYPE_P(column_map) != IS_ARRAY) {
 		if (PHALCON_IS_LONG(hydration_mode, 1)) {
-			RETURN_CTOR(data);
+			RETURN_MM_CTOR(data);
 		}
 	}
 
@@ -1756,8 +1754,10 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 	}
 
 	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&data_types, source_model, "getdatatypes");
-		PHALCON_CALL_METHOD(&connection, source_model, "getreadconnection");
+		PHALCON_MM_CALL_METHOD(&data_types, source_model, "getdatatypes");
+		PHALCON_MM_ADD_ENTRY(&data_types);
+		PHALCON_MM_CALL_METHOD(&connection, source_model, "getreadconnection");
+		PHALCON_MM_ADD_ENTRY(&connection);
 	}
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
@@ -1769,14 +1769,14 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 					switch(Z_LVAL(field_type)) {
 						case PHALCON_DB_COLUMN_TYPE_JSON:
-							RETURN_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
+							RETURN_MM_ON_FAILURE(phalcon_json_decode(&convert_value, value, 1));
 							break;
 						case PHALCON_DB_COLUMN_TYPE_BYTEA:
-							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);
+							PHALCON_MM_CALL_METHOD(&convert_value, &connection, "unescapebytea", value);
 							break;
 						case PHALCON_DB_COLUMN_TYPE_ARRAY:
 						case PHALCON_DB_COLUMN_TYPE_INT_ARRAY:
-							PHALCON_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
+							PHALCON_MM_CALL_METHOD(&convert_value, &connection, "unescapearray", value, &field_type);
 							break;
 						default:
 							ZVAL_COPY(&convert_value, value);
@@ -1787,6 +1787,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 			} else {
 				ZVAL_COPY(&convert_value, value);
 			}
+			PHALCON_MM_ADD_ENTRY(&convert_value);
 
 			if (Z_TYPE_P(column_map) == IS_ARRAY) {
 				/**
@@ -1794,7 +1795,8 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 				 */
 				if (!phalcon_array_isset_fetch(&attribute, column_map, &key, PH_READONLY)) {
 					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 					return;
 				}
 
@@ -1810,16 +1812,10 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 					phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 				}
 			}
-			zval_ptr_dtor(&convert_value);
 		}
 	} ZEND_HASH_FOREACH_END();
  
-	if (zend_is_true(&data_types)) {
-		zval_ptr_dtor(&data_types);
-	}
-	if (zend_is_true(&connection)) {
-		zval_ptr_dtor(&connection);
-	}
+	RETURN_MM();
 }
 
 /**
@@ -1852,6 +1848,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
 	if (Z_TYPE_P(base) != IS_OBJECT) {
 		ZVAL_STRING(&exception_message, "The base must be object");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 

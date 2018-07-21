@@ -25,9 +25,6 @@
 
 #include <ext/standard/php_array.h>
 #include <ext/spl/spl_array.h>
-#ifdef PHALCON_USE_PHP_PCRE
-#include <ext/pcre/php_pcre.h>
-#endif
 #include <ext/pcre/php_pcre.h>
 
 #include <Zend/zend_closures.h>

@@ -487,4 +487,9 @@
 #include "py/exception.h"
 #include "py/matplot.h"
 
+#include "aop.h"
+#include "aop/exception.h"
+#include "aop/lexer.h"
+#include "aop/joinpoint.h"
+
 #endif /* PHALCON_H */

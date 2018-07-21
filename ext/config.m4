@@ -888,7 +888,11 @@ storage/exception.c \
 snowflake.c \
 server/utils.c \
 server/simple.c \
-server/exception.c"
+server/exception.c \
+aop/lexer.c \
+aop/exception.c \
+aop/joinpoint.c \
+aop.c"
 
 	if test "$PHP_CACHE_YAC" = "yes"; then
 		phalcon_sources="$phalcon_sources cache/yac/allocators/mmap.c cache/yac/allocators/shm.c cache/yac/serializer.c cache/yac/storage.c cache/yac/allocator.c cache/yac.c"
@@ -923,21 +927,17 @@ server/exception.c"
 		[[#include "main/php.h"]]
 	)
 
-	AC_CHECK_DECL(
-		[HAVE_BUNDLED_PCRE],
+
+	AC_CHECK_HEADERS(
+		[ext/pcre/php_pcre.h],
 		[
-			AC_CHECK_HEADERS(
-				[ext/pcre/php_pcre.h],
-				[
-					PHP_ADD_EXTENSION_DEP([phalcon], [pcre])
-					AC_DEFINE([PHALCON_USE_PHP_PCRE], [1], [Whether PHP pcre extension is present at compile time])
-				],
-				,
-				[[#include "main/php.h"]]
-			)
+			PHP_ADD_EXTENSION_DEP([phalcon], [pcre])
+			AC_DEFINE([PHALCON_USE_PHP_PCRE], [1], [Whether PHP pcre extension is present at compile time])
 		],
-		,
-		[[#include "php_config.h"]]
+		[
+			AC_MSG_ERROR([Incorrect pcre extension])
+		],
+		[[#include "main/php.h"]]
 	)
 
 	AC_CHECK_HEADERS(

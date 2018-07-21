@@ -31,10 +31,7 @@
 #include <ext/standard/url.h>
 #include <ext/standard/html.h>
 #include <ext/date/php_date.h>
-
-#ifdef PHALCON_USE_PHP_PCRE
 #include <ext/pcre/php_pcre.h>
-#endif
 
 #ifdef PHALCON_USE_PHP_JSON
 #include <ext/json/php_json.h>

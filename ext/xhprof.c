@@ -69,6 +69,63 @@ PHALCON_INIT_CLASS(Phalcon_Xhprof){
     return SUCCESS;
 }
 
+ZEND_API void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value) {
+    int is_profiling = 1;
+
+    if (!TXRG(enabled) || (TXRG(flags) & PHALCON_XHPROF_FLAG_NO_BUILTINS) > 0) {
+        execute_internal(execute_data, return_value);
+        return;
+    }
+
+	long int current = ++TXRG(nesting_current_level);
+	long int maximum = TXRG(nesting_maximum_level);
+
+	if (maximum > 0 && current > maximum) {
+		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
+	}
+
+    is_profiling = tracing_enter_frame_callgraph(NULL, execute_data);
+
+    if (!_zend_execute_internal) {
+        execute_internal(execute_data, return_value);
+    } else {
+        _zend_execute_internal(execute_data, return_value);
+    }
+
+	--TXRG(nesting_current_level);
+
+    if (is_profiling == 1 && TXRG(callgraph_frames)) {
+        tracing_exit_frame_callgraph();
+    }
+}
+
+ZEND_API void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
+    zend_execute_data *real_execute_data = execute_data;
+    int is_profiling = 0;
+
+    if (!TXRG(enabled)) {
+        _zend_execute_ex(execute_data);
+        return;
+    }
+
+	long int current = ++TXRG(nesting_current_level);
+	long int maximum = TXRG(nesting_maximum_level);
+
+	if (maximum > 0 && current > maximum) {
+		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
+	}
+
+    is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data);
+
+    _zend_execute_ex(execute_data);
+
+	--TXRG(nesting_current_level);
+
+    if (is_profiling == 1 && TXRG(callgraph_frames)) {
+        tracing_exit_frame_callgraph();
+    }
+}
+
 static const char digits[] = "0123456789abcdef";
 
 static void *(*_zend_malloc) (size_t);

@@ -14,6 +14,7 @@
  +------------------------------------------------------------------------+
  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
  |          Eduar Carvajal <eduar@phalconphp.com>                         |
+ |          ZhuZongXin <dreamsxin@qq.com>                                 |
  +------------------------------------------------------------------------+
 */
 
@@ -40,6 +41,12 @@
 #define PHP_PHALCON_VERSION_RELEASE         PHALCON_VERSION_STABLE
 #define PHP_PHALCON_VERSION_RELEASE_VERSION 1
 #define PHP_PHALCON_EXTNAME "phalcon7"
+
+ZEND_API void (*original_zend_execute_internal)(zend_execute_data *execute_data, zval *return_value);
+ZEND_API void (*original_zend_execute_ex)(zend_execute_data *execute_data);
+
+ZEND_API void (*_zend_execute_internal)(zend_execute_data*, zval*);
+ZEND_API void (*_zend_execute_ex)(zend_execute_data*);
 
 /** DEBUG options */
 typedef struct _phalcon_debug_options {
@@ -182,6 +189,30 @@ typedef struct _phalcon_snowflake_options {
 	uint64_t epoch;
 } phalcon_snowflake_options;
 
+/** AOP options */
+typedef struct {
+    zend_array *read;
+    zend_array *write;
+    zend_array *func;
+} phalcon_aop_object_cache;
+
+typedef struct _phalcon_aop_options {
+	zend_bool enable_aop;
+	zend_array *pointcuts_table;
+	int pointcut_version;
+	int overloaded;
+
+	zend_array *function_cache;
+
+	phalcon_aop_object_cache **object_cache;
+	int object_cache_size;
+
+	int lock_read_property;
+	int lock_write_property;
+
+	zval *property_value;
+} phalcon_aop_options;
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -225,6 +256,8 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 #endif
 
 	phalcon_snowflake_options snowflake;
+
+	phalcon_aop_options aop;
 
 ZEND_END_MODULE_GLOBALS(phalcon)
 

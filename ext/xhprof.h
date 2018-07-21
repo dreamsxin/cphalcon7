@@ -34,6 +34,9 @@
 #define PHALCON_XHPROF_FLAG_MEMORY_ALLOC_AS_MU (32|16)
 #define PHALCON_XHPROF_FLAG_NO_BUILTINS 8
 
+ZEND_API void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value);
+ZEND_API void phalcon_xhprof_execute_ex(zend_execute_data *execute_data);
+
 void tracing_callgraph_append_to_array(zval *return_value);
 void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, char *symbol, size_t symbol_len);
 zend_ulong tracing_callgraph_bucket_key(xhprof_frame_t *frame);

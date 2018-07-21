@@ -40,9 +40,6 @@
 
 #include "phalcon.h"
 
-static void (*_zend_execute_internal)(zend_execute_data*, zval*);
-static void (*_zend_execute_ex)(zend_execute_data*);
-
 ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
 static PHP_INI_MH(OnChangeKeysMemoryLimit) {
@@ -92,67 +89,11 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("phalcon.cache.yac_values_size",          "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.yac_values_size,     zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables xhprof */
 	STD_PHP_INI_ENTRY("phalcon.xhprof.nesting_max_level", "0",  PHP_INI_ALL, OnUpdateLong, xhprof.nesting_maximum_level,	zend_phalcon_globals, phalcon_globals)
-	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_SYSTEM, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.xhprof.clock_use_rdtsc",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.clock_use_rdtsc,	zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.snowflake.node", "0", PHP_INI_SYSTEM, OnUpdateLong, snowflake.node,  zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_BOOLEAN("phalcon.aop.enable_aop",   "0", PHP_INI_SYSTEM, OnUpdateBool, aop.enable_aop, zend_phalcon_globals, phalcon_globals)
 PHP_INI_END()
-
-static void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value) {
-    int is_profiling = 1;
-
-    if (!TXRG(enabled) || (TXRG(flags) & PHALCON_XHPROF_FLAG_NO_BUILTINS) > 0) {
-        execute_internal(execute_data, return_value);
-        return;
-    }
-
-	long int current = ++TXRG(nesting_current_level);
-	long int maximum = TXRG(nesting_maximum_level);
-
-	if (maximum > 0 && current > maximum) {
-		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
-	}
-
-    is_profiling = tracing_enter_frame_callgraph(NULL, execute_data);
-
-    if (!_zend_execute_internal) {
-        execute_internal(execute_data, return_value);
-    } else {
-        _zend_execute_internal(execute_data, return_value);
-    }
-
-	--TXRG(nesting_current_level);
-
-    if (is_profiling == 1 && TXRG(callgraph_frames)) {
-        tracing_exit_frame_callgraph();
-    }
-}
-
-static void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
-    zend_execute_data *real_execute_data = execute_data;
-    int is_profiling = 0;
-
-    if (!TXRG(enabled)) {
-        _zend_execute_ex(execute_data);
-        return;
-    }
-
-	long int current = ++TXRG(nesting_current_level);
-	long int maximum = TXRG(nesting_maximum_level);
-
-	if (maximum > 0 && current > maximum) {
-		zend_error(E_ERROR, "Call nesting too deep, maximum call nesting level of '%ld' has been reached", maximum);
-	}
-
-    is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data);
-
-    _zend_execute_ex(execute_data);
-
-	--TXRG(nesting_current_level);
-
-    if (is_profiling == 1 && TXRG(callgraph_frames)) {
-        tracing_exit_frame_callgraph();
-    }
-}
 
 static PHP_MINIT_FUNCTION(phalcon)
 {
@@ -187,6 +128,25 @@ static PHP_MINIT_FUNCTION(phalcon)
 		php_error_docref(NULL, E_WARNING, "snowflake.node must less than %d", 0x3FF);
 		PHALCON_GLOBAL(snowflake).node = 0;
     }
+
+	if (PHALCON_GLOBAL(aop).enable_aop) {
+		// overload zend_execute_ex and zend_execute_internal
+		original_zend_execute_internal = zend_execute_internal;
+		zend_execute_internal = phalcon_aop_execute_internal;
+
+		original_zend_execute_ex = zend_execute_ex;
+		zend_execute_ex = phalcon_aop_execute_ex;
+
+		// overload zend_std_read_property and zend_std_write_property
+		original_zend_std_read_property = std_object_handlers.read_property;
+		std_object_handlers.read_property = phalcon_aop_read_property;
+
+		original_zend_std_write_property = std_object_handlers.write_property;
+		std_object_handlers.write_property = phalcon_aop_write_property;
+
+		original_zend_std_get_property_ptr_ptr = std_object_handlers.get_property_ptr_ptr;
+		std_object_handlers.get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
+	}
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		_zend_execute_internal = zend_execute_internal;
@@ -272,6 +232,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Py_Exception);
 #endif
 	PHALCON_INIT(Phalcon_Thread_Exception);
+	PHALCON_INIT(Phalcon_Aop_Exception);
 
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
@@ -720,6 +681,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Py_Object);
 	PHALCON_INIT(Phalcon_Py_Matplot);
 #endif
+
+	PHALCON_INIT(Phalcon_Aop);
+	PHALCON_INIT(Phalcon_Aop_Joinpoint);
+
 	return SUCCESS;
 }
 
@@ -757,6 +722,25 @@ static PHP_RINIT_FUNCTION(phalcon){
 
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
+	if (PHALCON_GLOBAL(aop).enable_aop) {
+		PHALCON_GLOBAL(aop).overloaded = 0;
+		PHALCON_GLOBAL(aop).pointcut_version = 0;
+
+		PHALCON_GLOBAL(aop).object_cache_size = 1024;
+		PHALCON_GLOBAL(aop).object_cache = ecalloc(1024, sizeof(phalcon_aop_object_cache*));
+
+		PHALCON_GLOBAL(aop).property_value = NULL;
+
+		PHALCON_GLOBAL(aop).lock_read_property = 0;
+		PHALCON_GLOBAL(aop).lock_write_property = 0;
+
+		ALLOC_HASHTABLE(PHALCON_GLOBAL(aop).pointcuts_table);
+		zend_hash_init(PHALCON_GLOBAL(aop).pointcuts_table, 16, NULL, phalcon_aop_free_pointcut, 0);
+
+		ALLOC_HASHTABLE(PHALCON_GLOBAL(aop).function_cache);
+		zend_hash_init(PHALCON_GLOBAL(aop).function_cache, 16, NULL, phalcon_aop_free_pointcut_cache, 0);
+	}
+
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		tracing_request_init();
 		tracing_determine_clock_source();
@@ -769,6 +753,36 @@ static PHP_RINIT_FUNCTION(phalcon){
 }
 
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
+
+	if (PHALCON_GLOBAL(aop).enable_aop) {
+		int i;
+		zend_array_destroy(PHALCON_GLOBAL(aop).pointcuts_table);
+		zend_array_destroy(PHALCON_GLOBAL(aop).function_cache);
+		for (i = 0; i < PHALCON_GLOBAL(aop).object_cache_size; i++) {
+			if (PHALCON_GLOBAL(aop).object_cache[i] != NULL) {
+				phalcon_aop_object_cache *_cache = PHALCON_GLOBAL(aop).object_cache[i];
+				if (_cache->write!=NULL) {
+					zend_hash_destroy(_cache->write);
+					FREE_HASHTABLE(_cache->write);
+				}
+				if (_cache->read!=NULL) {
+					zend_hash_destroy(_cache->read);
+					FREE_HASHTABLE(_cache->read);
+				}
+				if (_cache->func!=NULL) {
+					zend_hash_destroy(_cache->func);
+					FREE_HASHTABLE(_cache->func);
+				}
+				efree(_cache);
+			}
+		}
+		efree(PHALCON_GLOBAL(aop).object_cache);
+
+		if (PHALCON_GLOBAL(aop).property_value != NULL) {
+			zval_ptr_dtor(PHALCON_GLOBAL(aop).property_value);
+			efree(PHALCON_GLOBAL(aop).property_value);
+		}
+	}
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		int i = 0;
@@ -804,6 +818,10 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
+
+	if (PHALCON_GLOBAL(aop).enable_aop) {
+		php_info_print_table_header(2, "AOP support", "enabled");
+	}
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		php_info_print_table_row(2, "Xhprof", "enabled");

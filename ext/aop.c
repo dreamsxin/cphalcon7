@@ -1063,11 +1063,10 @@ zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, voi
 	zend_execute_data *ex = EG(current_execute_data);
 	if (ex->opline == NULL || (ex->opline->opcode != ZEND_PRE_INC_OBJ && ex->opline->opcode != ZEND_POST_INC_OBJ && ex->opline->opcode != ZEND_PRE_DEC_OBJ && ex->opline->opcode != ZEND_POST_DEC_OBJ)) {
 		return original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
-	} else {
-		// Call original to not have a notice
-		original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
-		return NULL;
 	}
+	// Call original to not have a notice
+	//original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
+	return NULL;
 }
 
 void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/

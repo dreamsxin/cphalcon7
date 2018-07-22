@@ -464,6 +464,7 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
 		PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", &complete_path, "\" cannot be read");
 		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
 		zval_ptr_dtor(&complete_path);
+		zval_ptr_dtor(&exception_message);
 		return;
 	}
 	zval_ptr_dtor(&complete_path);

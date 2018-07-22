@@ -24,6 +24,8 @@
 #include "assets/resource/css.h"
 #include "assets/resource/js.h"
 
+#include <ext/standard/file.h>
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
@@ -669,6 +671,18 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				ZVAL_TRUE(&filter_needed);
 			}
 
+			if (zend_is_true(&join)) {
+				if (phalcon_file_exists(&complete_target_path) == SUCCESS) {
+					if (!phalcon_compare_mtime(&complete_target_path, &source_path)) {
+						ZVAL_TRUE(&filter_needed);
+						ZVAL_TRUE(&changed);
+					}
+				} else {
+					ZVAL_TRUE(&changed);
+					ZVAL_TRUE(&filter_needed);
+				}
+			}
+
 			/**
 			 * Get the target path, we need to write the filtered content to a file
 			 */
@@ -760,15 +774,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			continue;
 		}
 
-		/**
-		 * Get the resource's content
-		 */
-		PHALCON_MM_CALL_METHOD(&content, resource, "getcontent", &complete_source_path);
-		PHALCON_MM_ADD_ENTRY(&content);
-
-		PHALCON_MM_ZVAL_COPY(&filtered_content, &content);
-
 		if (zend_is_true(&filter_needed)) {
+			/**
+			 * Get the resource's content
+			 */
+			PHALCON_MM_CALL_METHOD(&content, resource, "getcontent", &complete_source_path);
+			PHALCON_MM_ADD_ENTRY(&content);
+
+			PHALCON_MM_ZVAL_COPY(&filtered_content, &content);
+
 			/**
 			 * Check if the resource must be filtered
 			 */
@@ -794,6 +808,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 					PHALCON_MM_ADD_ENTRY(&filtered_content);
 				} ZEND_HASH_FOREACH_END();
 			}
+		} else {
+			phalcon_file_get_contents(&filtered_content, &target_path);
+			if (PHALCON_IS_FALSE(&filtered_content)) {
+				PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", &target_path, "\" cannot be read");
+				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
+				zval_ptr_dtor(&exception_message);
+				return;
+			}
+			PHALCON_MM_ADD_ENTRY(&filtered_content);
 		}
 
 		/**
@@ -818,6 +841,27 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		}
 
 		if (zend_is_true(&filter_needed)) {
+			zend_string *ret;
+			zval path = {}, isdir = {};
+
+			ret = zend_string_init(Z_STRVAL(target_path), Z_STRLEN(target_path), 0);
+			ZSTR_LEN(ret) = zend_dirname(ZSTR_VAL(ret), ZSTR_LEN(ret));
+			ZVAL_STR(&path, ret);
+			phalcon_is_dir(&isdir, &path);
+			if (!zend_is_true(&isdir)) {
+				zend_long mode = 0777;
+				zend_bool recursive = 1;
+				php_stream_context *context;
+				context = php_stream_context_from_zval(NULL, 0);
+				if (!php_stream_mkdir(ZSTR_VAL(ret), (int)mode, 
+					(recursive ? PHP_STREAM_MKDIR_RECURSIVE : 0) | REPORT_ERRORS, context)) {
+					zend_string_free(ret);
+					RETURN_MM();
+				}
+			}
+
+			zend_string_free(ret);
+
 			/**
 			 * Write the file using file-put-contents. This respects the openbase-dir also
 			 * writes to streams

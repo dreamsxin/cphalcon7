@@ -130,6 +130,9 @@ static PHP_MINIT_FUNCTION(phalcon)
     }
 
 	if (PHALCON_GLOBAL(aop).enable_aop) {
+#if PHP_VERSION_ID >= 70300
+		zend_object_handlers *handlers = (zend_object_handlers *)zend_get_std_object_handlers();
+#endif
 		// overload zend_execute_ex and zend_execute_internal
 		original_zend_execute_internal = zend_execute_internal;
 		zend_execute_internal = phalcon_aop_execute_internal;
@@ -137,6 +140,17 @@ static PHP_MINIT_FUNCTION(phalcon)
 		original_zend_execute_ex = zend_execute_ex;
 		zend_execute_ex = phalcon_aop_execute_ex;
 
+#if PHP_VERSION_ID >= 70300
+		// overload zend_std_read_property and zend_std_write_property
+		original_zend_std_read_property = handlers->read_property;
+		handlers->read_property = phalcon_aop_read_property;
+
+		original_zend_std_write_property = handlers->write_property;
+		handlers->write_property = phalcon_aop_write_property;
+
+		original_zend_std_get_property_ptr_ptr = handlers->get_property_ptr_ptr;
+		handlers->get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
+#else
 		// overload zend_std_read_property and zend_std_write_property
 		original_zend_std_read_property = std_object_handlers.read_property;
 		std_object_handlers.read_property = phalcon_aop_read_property;
@@ -146,6 +160,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 		original_zend_std_get_property_ptr_ptr = std_object_handlers.get_property_ptr_ptr;
 		std_object_handlers.get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
+#endif
 	}
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {

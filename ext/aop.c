@@ -141,20 +141,32 @@ static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_
 {
 	int i, matches;
 
+#if PHP_VERSION_ID >= 70300
+	matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->name), ZSTR_LEN(ce->name), 0, 0, NULL, 0);
+#else
 	matches = pcre_exec(pc->re_class, NULL, ZSTR_VAL(ce->name), ZSTR_LEN(ce->name), 0, 0, NULL, 0);
+#endif
 	if (matches >= 0) {
 		return 1;
 	}
 
 	for (i = 0; i < (int) ce->num_interfaces; i++) {
+#if PHP_VERSION_ID >= 70300
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->interfaces[i]->name), ZSTR_LEN(ce->interfaces[i]->name), 0, 0, NULL, 0);
+#else
 		matches = pcre_exec(pc->re_class, NULL, ZSTR_VAL(ce->interfaces[i]->name), ZSTR_LEN(ce->interfaces[i]->name), 0, 0, NULL, 0);
+#endif
 		if (matches >= 0) {
 			return 1;
 		}
 	}
 
 	for (i = 0; i < (int) ce->num_traits; i++) {
+#if PHP_VERSION_ID >= 70300
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->traits[i]->name), ZSTR_LEN(ce->traits[i]->name), 0, 0, NULL, 0);
+#else
 		matches = pcre_exec(pc->re_class, NULL, ZSTR_VAL(ce->traits[i]->name), ZSTR_LEN(ce->traits[i]->name), 0, 0, NULL, 0);
+#endif
 		if (matches>=0) {
 			return 1;
 		}
@@ -162,7 +174,11 @@ static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_
 
 	ce = ce->parent;
 	while (ce != NULL) {
+#if PHP_VERSION_ID >= 70300
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->name), ZSTR_LEN(ce->name), 0, 0, NULL, 0);
+#else
 		matches = pcre_exec(pc->re_class, NULL, ZSTR_VAL(ce->name), ZSTR_LEN(ce->name), 0, 0, NULL, 0);
+#endif
 		if (matches >= 0) {
 			return 1;
 		}
@@ -225,8 +241,11 @@ static int pointcut_match_zend_function(phalcon_aop_pointcut *pc, zend_execute_d
 		return 0;
 	}
 	if (pc->method_jok) {
+#if PHP_VERSION_ID >= 70300
+		int matches = pcre2_match(pc->re_method, (PCRE2_SPTR)ZSTR_VAL(curr_func->common.function_name), ZSTR_LEN(curr_func->common.function_name), 0, 0, NULL, 0);
+#else
 		int matches = pcre_exec(pc->re_method, NULL, ZSTR_VAL(curr_func->common.function_name), ZSTR_LEN(curr_func->common.function_name), 0, 0, NULL, 0);
-
+#endif
 		if (matches < 0) {
 			return 0;
 		}
@@ -1071,8 +1090,13 @@ zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, voi
 
 void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 {
+#if PHP_VERSION_ID >= 70300
+	uint32_t *pcre_extra = NULL;
+	uint32_t preg_options = 0;
+#else
 	pcre_extra *pcre_extra = NULL;
 	int preg_options = 0;
+#endif
 	zend_string *regexp;
 	zend_string *regexp_buffer = NULL;
 	zend_string *regexp_tmp = NULL;
@@ -1110,7 +1134,11 @@ void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 	zend_string_release(regexp_buffer);
 
 	regexp = zend_string_init(tempregexp, strlen(tempregexp), 0);
+#if PHP_VERSION_ID >= 70300
+	pc->re_method = pcre_get_compiled_regex(regexp, pcre_extra, &preg_options);
+#else
 	pc->re_method = pcre_get_compiled_regex(regexp, &pcre_extra, &preg_options);
+#endif
 	zend_string_release(regexp);	
 
 	if (!pc->re_method) {
@@ -1148,7 +1176,11 @@ void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 		zend_string_release(regexp_buffer);
 
 		regexp = zend_string_init(tempregexp, strlen(tempregexp), 0);
+#if PHP_VERSION_ID >= 70300
+		pc->re_class = pcre_get_compiled_regex(regexp, pcre_extra, &preg_options);
+#else
 		pc->re_class = pcre_get_compiled_regex(regexp, &pcre_extra, &preg_options);
+#endif
 		zend_string_release(regexp);
 
 		if (!pc->re_class) {

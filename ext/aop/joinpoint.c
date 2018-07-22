@@ -133,11 +133,18 @@ static inline void _zend_assign_to_variable_reference(zval *variable_ptr, zval *
 	}
 
 	ref = Z_REF_P(value_ptr);
+#if PHP_VERSION_ID >= 70300
+	GC_ADDREF(ref);
+#else
 	GC_REFCOUNT(ref)++;
+#endif
 	if (Z_REFCOUNTED_P(variable_ptr)) {
 		zend_refcounted *garbage = Z_COUNTED_P(variable_ptr);
-
+#if PHP_VERSION_ID >= 70300
+		if (GC_DELREF(garbage) == 0) {
+#else
 		if (--GC_REFCOUNT(garbage) == 0) {
+#endif
 			ZVAL_REF(variable_ptr, ref);
 #if PHP_VERSION_ID >= 70100
 			zval_dtor_func(garbage);

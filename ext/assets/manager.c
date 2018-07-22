@@ -669,40 +669,52 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				ZVAL_TRUE(&filter_needed);
 			}
 
-			/**
-			 * Get the target path, we need to write the filtered content to a file
-			 */
-			PHALCON_MM_CALL_METHOD(&target_path, resource, "getrealtargetpath", &complete_target_dir);
-			PHALCON_MM_ADD_ENTRY(&target_path);
-
-			/**
-			 * We need a valid final target path
-			 */
-			if (!zend_is_true(&target_path)) {
-				PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' does not have a valid target path");
-				PHALCON_MM_ADD_ENTRY(&exception_message);
-				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-				return;
-			}
-
-			if (zend_is_true(&local)) {
-				/**
-				 * Make sure the target path is not the same source path
-				 */
-				if (PHALCON_IS_EQUAL(&target_path, &source_path)) {
-					PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' have the same source and target paths");
-					PHALCON_MM_ADD_ENTRY(&exception_message);
-					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-					return;
-				}
-				if (phalcon_file_exists(&target_path) == SUCCESS) {
-					if (!phalcon_compare_mtime(&target_path, &source_path)) {
+			if (zend_is_true(&join)) {
+				if (phalcon_file_exists(&complete_target_path) == SUCCESS) {
+					if (!phalcon_compare_mtime(&complete_target_path, &source_path)) {
 						ZVAL_TRUE(&filter_needed);
 						ZVAL_TRUE(&changed);
 					}
 				} else {
 					ZVAL_TRUE(&changed);
 					ZVAL_TRUE(&filter_needed);
+				}
+			} else {
+				/**
+				 * Get the target path, we need to write the filtered content to a file
+				 */
+				PHALCON_MM_CALL_METHOD(&target_path, resource, "getrealtargetpath", &complete_target_dir);
+				PHALCON_MM_ADD_ENTRY(&target_path);
+
+				/**
+				 * We need a valid final target path
+				 */
+				if (!zend_is_true(&target_path)) {
+					PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' does not have a valid target path");
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
+					return;
+				}
+
+				if (zend_is_true(&local)) {
+					/**
+					 * Make sure the target path is not the same source path
+					 */
+					if (PHALCON_IS_EQUAL(&target_path, &source_path)) {
+						PHALCON_CONCAT_SVS(&exception_message, "Resource '", &target_path, "' have the same source and target paths");
+						PHALCON_MM_ADD_ENTRY(&exception_message);
+						PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
+						return;
+					}
+					if (phalcon_file_exists(&target_path) == SUCCESS) {
+						if (!phalcon_compare_mtime(&target_path, &source_path)) {
+							ZVAL_TRUE(&filter_needed);
+							ZVAL_TRUE(&changed);
+						}
+					} else {
+						ZVAL_TRUE(&changed);
+						ZVAL_TRUE(&filter_needed);
+					}
 				}
 			}
 		} else {
@@ -817,7 +829,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			}
 		}
 
-		if (zend_is_true(&filter_needed)) {
+		if (zend_is_true(&filter_needed) && !zend_is_true(&join)) {
 			/**
 			 * Write the file using file-put-contents. This respects the openbase-dir also
 			 * writes to streams

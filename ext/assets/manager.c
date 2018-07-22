@@ -45,8 +45,12 @@
 zend_class_entry *phalcon_assets_manager_ce;
 
 PHP_METHOD(Phalcon_Assets_Manager, __construct);
-PHP_METHOD(Phalcon_Assets_Manager, setOptions);
-PHP_METHOD(Phalcon_Assets_Manager, getOptions);
+PHP_METHOD(Phalcon_Assets_Manager, setSourceBasePath);
+PHP_METHOD(Phalcon_Assets_Manager, getSourceBasePath);
+PHP_METHOD(Phalcon_Assets_Manager, setTargetBasePath);
+PHP_METHOD(Phalcon_Assets_Manager, getTargetBasePath);
+PHP_METHOD(Phalcon_Assets_Manager, setTargetBaseUri);
+PHP_METHOD(Phalcon_Assets_Manager, getTargetBaseUri);
 PHP_METHOD(Phalcon_Assets_Manager, useImplicitOutput);
 PHP_METHOD(Phalcon_Assets_Manager, addCss);
 PHP_METHOD(Phalcon_Assets_Manager, addJs);
@@ -65,8 +69,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, options)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_setoptions, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_setsourcebasepath, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, basePath, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_settargetbasepath, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, basePath, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_settargetbaseuri, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, baseUri, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_manager_useimplicitoutput, 0, 0, 1)
@@ -128,8 +140,12 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_assets_manager_method_entry[] = {
 	PHP_ME(Phalcon_Assets_Manager, __construct, arginfo_phalcon_assets_manager___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Assets_Manager, setOptions, arginfo_phalcon_assets_manager_setoptions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Assets_Manager, getOptions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, setSourceBasePath, arginfo_phalcon_assets_manager_setsourcebasepath, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, getSourceBasePath, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, setTargetBasePath, arginfo_phalcon_assets_manager_settargetbasepath, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, getTargetBasePath, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, setTargetBaseUri, arginfo_phalcon_assets_manager_settargetbaseuri, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Assets_Manager, getTargetBaseUri, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Assets_Manager, useImplicitOutput, arginfo_phalcon_assets_manager_useimplicitoutput, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Assets_Manager, addCss, arginfo_phalcon_assets_manager_addcss, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Assets_Manager, addJs, arginfo_phalcon_assets_manager_addjs, ZEND_ACC_PUBLIC)
@@ -153,9 +169,11 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Manager){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Assets, Manager, assets_manager, phalcon_assets_manager_method_entry, 0);
 
-	zend_declare_property_null(phalcon_assets_manager_ce, SL("_options"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_assets_manager_ce, SL("_collections"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_assets_manager_ce, SL("_implicitOutput"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_manager_ce, SL("_sourceBasePath"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_manager_ce, SL("_targetBasePath"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_assets_manager_ce, SL("_targetBaseUri"), ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -172,25 +190,111 @@ PHP_METHOD(Phalcon_Assets_Manager, __construct){
 	phalcon_fetch_params(0, 0, 1, &options);
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
-		phalcon_update_property(getThis(), SL("_options"), options);
+		zval base = {};
+		zval ds_slash = {};
+		char slash[2] = {DEFAULT_SLASH, 0};
+		ZVAL_STRING(&ds_slash, slash);
+		if (phalcon_array_isset_fetch_str(&base, options, SL("sourceBasePath"), PH_READONLY) && Z_TYPE(base) == IS_STRING) {
+			zval fix = {};
+			phalcon_fix_path(&fix, &base, &ds_slash);
+			phalcon_update_property(getThis(), SL("_sourceBasePath"), &fix);
+			zval_ptr_dtor(&fix);
+		}
+		if (phalcon_array_isset_fetch_str(&base, options, SL("targetBasePath"), PH_READONLY) && Z_TYPE(base) == IS_STRING) {
+			zval fix = {};
+			phalcon_fix_path(&fix, &base, &ds_slash);
+			phalcon_update_property(getThis(), SL("_targetBasePath"), &fix);
+			zval_ptr_dtor(&fix);
+		}
+		if (phalcon_array_isset_fetch_str(&base, options, SL("targetBaseUri"), PH_READONLY) && Z_TYPE(base) == IS_STRING) {
+			phalcon_update_property(getThis(), SL("_targetBaseUri"), &base);
+		}
+		zval_ptr_dtor(&ds_slash);
 	}
 }
 
 /**
- * Sets the manager's options
+ * Sets the source base path
  *
- * @param array $options
+ * @param string $basePath
  * @return Phalcon\Assets\Manager
  */
-PHP_METHOD(Phalcon_Assets_Manager, setOptions){
+PHP_METHOD(Phalcon_Assets_Manager, setSourceBasePath){
 
-	zval *options;
+	zval *path;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(0, 1, 0, &path);
 
-	phalcon_update_property(getThis(), SL("_options"), options);
+	phalcon_update_property(getThis(), SL("_sourceBasePath"), path);
 
 	RETURN_THIS();
+}
+
+/**
+ * Returns the source base path
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Assets_Manager, getSourceBasePath){
+
+
+	RETURN_MEMBER(getThis(), "_sourceBasePath");
+}
+
+/**
+ * Sets the target base path
+ *
+ * @param string $basePath
+ * @return Phalcon\Assets\Manager
+ */
+PHP_METHOD(Phalcon_Assets_Manager, setTargetBasePath){
+
+	zval *path;
+
+	phalcon_fetch_params(0, 1, 0, &path);
+
+	phalcon_update_property(getThis(), SL("_targetBasePath"), path);
+
+	RETURN_THIS();
+}
+
+/**
+ * Returns the target base path
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Assets_Manager, getTargetBasePath){
+
+
+	RETURN_MEMBER(getThis(), "_targetBasePath");
+}
+
+/**
+ * Sets the target base uri
+ *
+ * @param string $baseUri
+ * @return Phalcon\Assets\Manager
+ */
+PHP_METHOD(Phalcon_Assets_Manager, setTargetBaseUri){
+
+	zval *uri;
+
+	phalcon_fetch_params(0, 1, 0, &uri);
+
+	phalcon_update_property(getThis(), SL("_targetBaseUri"), uri);
+
+	RETURN_THIS();
+}
+
+/**
+ * Returns the target base uri
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Assets_Manager, getTargetBaseUri){
+
+
+	RETURN_MEMBER(getThis(), "_targetBaseUri");
 }
 
 /**
@@ -486,9 +590,9 @@ PHP_METHOD(Phalcon_Assets_Manager, collection){
 PHP_METHOD(Phalcon_Assets_Manager, output){
 
 	zval *collection, *callback, *z_type = NULL, *args = NULL, type = {}, output = {}, use_implicit_output = {}, exception_message = {};
-	zval options = {}, collection_source_path = {}, collection_target_path = {}, changed = {};
+	zval options = {}, collection_source_path = {}, collection_target_path = {}, base_uri = {}, changed = {};
 	zval resources = {}, filters = {}, prefix = {}, type_css = {}, source_base_path = {}, target_base_path = {};
-	zval complete_source_path = {}, complete_target_path = {}, complete_target_dir = {}, join = {}, is_directory = {};
+	zval complete_target_base_uri = {}, complete_source_path = {}, complete_target_path = {}, complete_target_dir = {}, join = {}, is_directory = {};
 	zval *resource, filtered_joined_content = {};
 	zval ds_slash = {}, tmp = {};
 	char slash[2] = {DEFAULT_SLASH, 0};
@@ -530,29 +634,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
-	/**
-	 * Check for global options in the assets manager
-	 */
-	if (Z_TYPE(options) == IS_ARRAY) {
-		zval base_path = {};
-		/**
-		 * The source base path is a global location where all resources are located
-		 */
-		if (phalcon_array_isset_fetch_str(&base_path, &options, SL("sourceBasePath"), PH_NOISY|PH_READONLY)) {
-			phalcon_fix_path(&source_base_path, &base_path, &ds_slash);
-			PHALCON_MM_ADD_ENTRY(&source_base_path);
-			zval_ptr_dtor(&base_path);
-		}
+	phalcon_read_property(&source_base_path, getThis(), SL("_sourceBasePath"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&target_base_path, getThis(), SL("_targetBasePath"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&base_uri, getThis(), SL("_targetBaseUri"), PH_NOISY|PH_READONLY);
 
-		/**
-		 * The target base path is a global location where all resources are written
-		 */
-		if (phalcon_array_isset_fetch_str(&base_path, &options, SL("targetBasePath"), PH_NOISY|PH_READONLY)) {
-			phalcon_fix_path(&target_base_path, &base_path, &ds_slash);
-			PHALCON_MM_ADD_ENTRY(&target_base_path);
-			zval_ptr_dtor(&base_path);
-		}
-	}
+	PHALCON_CONCAT_VV(&complete_target_base_uri, &base_uri, &prefix);
+	PHALCON_MM_ADD_ENTRY(&complete_target_base_uri);
 
 	/**
 	 * Check if the collection have its own source base path
@@ -720,18 +807,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				}
 			}
 		} else {
-			zval path = {}, prefixed_path = {}, attributes = {}, parameters = {}, html = {};
+			zval prefixed_path = {}, attributes = {}, parameters = {}, html = {};
 			/**
 			 * If there are no filters, just print/buffer the HTML
 			 */
-			PHALCON_MM_CALL_METHOD(&path, resource, "getrealtargeturi");
-			PHALCON_MM_ADD_ENTRY(&path);
-			if (Z_TYPE(prefix) != IS_NULL) {
-				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
-				PHALCON_MM_ADD_ENTRY(&prefixed_path);
-			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &path);
-			}
+			PHALCON_MM_CALL_METHOD(&prefixed_path, resource, "getrealtargeturi", &complete_target_base_uri);
+			PHALCON_MM_ADD_ENTRY(&prefixed_path);
 
 			/**
 			 * Gets extra HTML attributes in the resource
@@ -870,18 +951,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		}
 
 		if (!zend_is_true(&join)) {
-			zval path = {}, prefixed_path = {}, attributes = {}, parameters = {}, html = {};
+			zval prefixed_path = {}, attributes = {}, parameters = {}, html = {};
 			/**
 			 * Generate the HTML using the original path in the resource
 			 */
-			PHALCON_MM_CALL_METHOD(&path, resource, "getrealtargeturi");
-			PHALCON_MM_ADD_ENTRY(&path);
-			if (Z_TYPE(prefix) != IS_NULL) {
-				PHALCON_CONCAT_VV(&prefixed_path, &prefix, &path);
-				PHALCON_MM_ADD_ENTRY(&prefixed_path);
-			} else {
-				ZVAL_COPY_VALUE(&prefixed_path, &path);
-			}
+			PHALCON_MM_CALL_METHOD(&prefixed_path, resource, "getrealtargeturi", &complete_target_base_uri);
+			PHALCON_MM_ADD_ENTRY(&prefixed_path);
 
 			/**
 			 * Gets extra HTML attributes in the resource
@@ -938,17 +1013,14 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			phalcon_file_put_contents(NULL, &complete_target_path, &filtered_joined_content);
 		}
 
+		PHALCON_MM_CALL_METHOD(&target_uri, collection, "gettargeturi");
+		PHALCON_MM_ADD_ENTRY(&target_uri);
+
 		/**
 		 * Generate the HTML using the original path in the resource
 		 */
-		PHALCON_MM_CALL_METHOD(&target_uri, collection, "gettargeturi");
-		PHALCON_MM_ADD_ENTRY(&target_uri);
-		if (Z_TYPE(prefix) != IS_NULL) {
-			PHALCON_CONCAT_VV(&prefixed_path, &prefix, &target_uri);
-			PHALCON_MM_ADD_ENTRY(&prefixed_path);
-		} else {
-			ZVAL_COPY_VALUE(&prefixed_path, &target_uri);
-		}
+		PHALCON_CONCAT_VV(&prefixed_path, &complete_target_base_uri, &target_uri);
+		PHALCON_MM_ADD_ENTRY(&prefixed_path);
 
 		/**
 		 * Gets extra HTML attributes in the resource

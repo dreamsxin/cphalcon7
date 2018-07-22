@@ -477,14 +477,20 @@ PHP_METHOD(Phalcon_Assets_Resource, getContent){
  */
 PHP_METHOD(Phalcon_Assets_Resource, getRealTargetUri){
 
-	zval target_uri = {};
+	zval *base_uri = NULL, target_uri = {};
+
+	phalcon_fetch_params(0, 0, 1, &base_uri);
+
+	if (!base_uri) {
+		base_uri = &PHALCON_GLOBAL(z_null);
+	}
 
 	phalcon_read_property(&target_uri, getThis(), SL("_targetUri"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_EMPTY(&target_uri)) {
 		phalcon_read_property(&target_uri, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	}
 
-	RETURN_CTOR(&target_uri);
+	PHALCON_CONCAT_VV(return_value, base_uri, &target_uri);
 }
 
 /**

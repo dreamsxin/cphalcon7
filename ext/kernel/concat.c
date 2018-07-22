@@ -154,6 +154,20 @@ void phalcon_concat_vs(zval *result, zval *op1, const char *op2, uint32_t op2_le
 	zval_ptr_dtor(&zop2);
 }
 
+void phalcon_mm_sconcat_vs(zval *result, zval *op1, const char *op2, uint32_t op2_len){
+	zval zop2 = {}, tmp = {};
+	ZVAL_STRINGL(&zop2, op2, op2_len);
+
+	ZVAL_COPY(&tmp, result);
+	concat_function(result, &tmp, op1);
+	zval_ptr_dtor(&tmp);
+	ZVAL_COPY(&tmp, result);
+	concat_function(result, result, &zop2);
+	zval_ptr_dtor(&tmp);
+	
+	zval_ptr_dtor(&zop2);
+}
+
 void phalcon_concat_vsv(zval *result, zval *op1, const char *op2, uint32_t op2_len, zval *op3, int self_var){
 	zval zop2 = {};
 	ZVAL_STRINGL(&zop2, op2, op2_len);
@@ -262,6 +276,13 @@ void phalcon_concat_vvvvv(zval *result, zval *op1, zval *op2, zval *op3, zval *o
  */
 void phalcon_concat_self(zval *left, zval *right){
 	concat_function(left, left, right);
+}
+
+void phalcon_mm_concat_self(zval *left, zval *right){
+	zval tmp = {};
+	ZVAL_COPY(&tmp, left);
+	concat_function(left, &tmp, right);
+	zval_ptr_dtor(&tmp);
 }
 
 /**

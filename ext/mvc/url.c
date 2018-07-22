@@ -425,7 +425,7 @@ PHP_METHOD(Phalcon_Mvc_Url, get){
  */
 PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 
-	zval *uri = NULL, *args = NULL, static_base_uri = {}, base_uri = {}, matched = {}, pattern = {};
+	zval *uri = NULL, *args = NULL, static_base_uri = {}, matched = {}, pattern = {};
 
 	phalcon_fetch_params(0, 0, 2, &uri, &args);
 
@@ -455,6 +455,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 			zval_ptr_dtor(&trimmed);
 		}
 	} else {
+		zval base_uri = {};
 		PHALCON_CALL_METHOD(&base_uri, getThis(), "getbaseuri");
 		if (!phalcon_start_with_str(uri, SL("/"))) {
 			PHALCON_CONCAT_VV(return_value, &base_uri, uri);
@@ -464,6 +465,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 			PHALCON_SCONCAT_VV(return_value, &base_uri, &trimmed);
 			zval_ptr_dtor(&trimmed);
 		}
+		zval_ptr_dtor(&base_uri);
 	}
 
 	if (args) {

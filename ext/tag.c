@@ -460,29 +460,32 @@ PHP_METHOD(Phalcon_Tag, getUrlService){
 
 	zval url = {}, dependency_injector = {}, service = {};
 
-	phalcon_read_static_property_ce(&url, phalcon_tag_ce, SL("_urlService"), PH_COPY);
+	PHALCON_MM_INIT();
+
+	phalcon_read_static_property_ce(&url, phalcon_tag_ce, SL("_urlService"), PH_READONLY);
 	if (Z_TYPE(url) != IS_OBJECT) {
-		phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_COPY);
+		phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_READONLY);
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+			PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		}
 
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
 			return;
 		}
 
-		PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
+		PHALCON_MM_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
 		ZVAL_STR(&service, IS(url));
 
-		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
-		zval_ptr_dtor(&dependency_injector);
-		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
+		PHALCON_MM_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&url);
+		PHALCON_MM_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_urlService"), &url);
 	}
 
-	RETVAL_ZVAL(&url, 0, 0);
+	RETURN_MM_CTOR(&url);
 }
 
 /**
@@ -1789,7 +1792,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	zval *parameters = NULL, *local = NULL, *args = NULL, params = {}, default_params = {};
 	zval first_param = {}, z_local = {}, z_args = {}, params_src = {}, url = {}, src = {}, code = {};
 
-	phalcon_fetch_params(0, 0, 3, &parameters, &local, &args);
+	phalcon_fetch_params(1, 0, 3, &parameters, &local, &args);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -1808,8 +1811,9 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		phalcon_array_append(&params, parameters, PH_COPY);
 		phalcon_array_append(&params, local, PH_COPY);
 		phalcon_array_append(&params, args, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&params);
 	} else {
-		ZVAL_DUP(&params, parameters);
+		PHALCON_MM_ZVAL_DUP(&params, parameters);
 	}
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
@@ -1825,16 +1829,16 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 		}
 	}
 
-	if (!phalcon_array_isset_fetch_long(&z_local, &params, 1, PH_COPY)) {
-		if (phalcon_array_isset_fetch_str(&z_local, &params, SL("local"), PH_COPY)) {
+	if (!phalcon_array_isset_fetch_long(&z_local, &params, 1, PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&z_local, &params, SL("local"), PH_READONLY)) {
 			phalcon_array_unset_str(&params, SL("local"), 0);
 		} else {
 			ZVAL_TRUE(&z_local);
 		}
 	}
 
-	if (!phalcon_array_isset_fetch_long(&z_args, &params, 2, PH_COPY)) {
-		if (phalcon_array_isset_fetch_str(&z_args, &params, SL("args"), PH_COPY)) {
+	if (!phalcon_array_isset_fetch_long(&z_args, &params, 2, PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&z_args, &params, SL("args"), PH_READONLY)) {
 			phalcon_array_unset_str(&params, SL("args"), 0);
 		} else {
 			ZVAL_TRUE(&z_args);
@@ -1849,24 +1853,23 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	 * URLs are generated through the 'url' service
 	 */
 	if (zend_is_true(&z_local)) {
-		PHALCON_CALL_SELF(&url, "geturlservice");
+		PHALCON_MM_CALL_SELF(&url, "geturlservice");
+		PHALCON_MM_ADD_ENTRY(&url);
 
 		phalcon_array_fetch_str(&params_src, &params, SL("src"), PH_NOISY|PH_READONLY);
 
-		PHALCON_CALL_METHOD(&src, &url, "getstatic", &params_src, &z_args);
-		zval_ptr_dtor(&url);
+		PHALCON_MM_CALL_METHOD(&src, &url, "getstatic", &params_src, &z_args);
+
 		phalcon_array_update_str(&params, SL("src"), &src, 0);
 	}
-	zval_ptr_dtor(&z_local);
-	zval_ptr_dtor(&z_args);
 
 	ZVAL_STRING(&code, "<script");
 
 	phalcon_tag_render_attributes(&code, &params);
-	zval_ptr_dtor(&params);
 
 	PHALCON_CONCAT_VS(return_value, &code, "></script>" PHP_EOL);
-	zval_ptr_dtor(&code);
+	PHALCON_MM_ADD_ENTRY(&code);
+	RETURN_MM();
 }
 
 /**

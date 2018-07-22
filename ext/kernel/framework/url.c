@@ -45,6 +45,7 @@ void phalcon_get_uri(zval *return_value, zval *path) {
 					memcpy(str, Z_STRVAL_P(path) + i, mark - i);
 					str[mark - i] = '\0';
 					ZVAL_STRINGL(return_value, str, mark - i);
+					efree(str);
 					return;
 				}
 			}

@@ -320,7 +320,7 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 		//Enabling join
 		$js->join(true);
-		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="unit-tests/assets/jquery.js"></script>' . PHP_EOL);
+		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="/production/combined.js"></script>' . PHP_EOL);
 
 		//Disabling join
 		$js->join(false);
@@ -366,7 +366,7 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 		//Enabling join
 		$js->join(true);
-		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="unit-tests/assets/jquery.js"></script>' . PHP_EOL);
+		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="/production/combined.js"></script>' . PHP_EOL);
 
 		//Disabling join
 		$js->join(false);
@@ -401,7 +401,7 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 		$js = $assets->collection('js');
 
 		$js->setTargetPath('unit-tests/assets/production/combined-1.js');
-
+		$js->setSourcePath('unit-tests/assets/');
 		$js->setTargetUri('production/combined.js');
 
 		$js->addJs('jquery.js', false, false);
@@ -412,7 +412,7 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 		//Enabling join
 		$js->join(true);
-		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="jquery.js"></script>' . PHP_EOL . '<script type="text/javascript" src="/gs.js"></script>' . PHP_EOL);
+		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="/production/combined.js"></script>' . PHP_EOL);
 
 		//Disabling join
 		$js->join(false);
@@ -441,7 +441,8 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 		$js = $assets->collection('js');
 
-		$js->setTargetPath('unit-tests/assets/production/');
+		$js->setTargetPath('unit-tests/assets/production/combined-2.js');
+		$js->setTargetUri('production/combined.js');
 
 		$jquery = new Phalcon\Assets\Resource\Js('unit-tests/assets/jquery.js', false, false);
 
@@ -461,7 +462,7 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 		//Enabling join
 		$js->join(true);
-		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="jquery.js"></script>' . PHP_EOL . '<script type="text/javascript" src="/gs.js"></script>' . PHP_EOL);
+		$this->assertEquals($assets->outputJs('js'), '<script type="text/javascript" src="/production/combined.js"></script>' . PHP_EOL);
 
 		//Disabling join
 		$js->join(false);
@@ -519,13 +520,14 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 	public function testIssue1198()
 	{
-		@unlink(__DIR__ . '/assets/production/1198.css');
+		@unlink('unit-tests/assets/production/1198.css');
 		$di = new \Phalcon\Di\FactoryDefault();
 		$assets = new \Phalcon\Assets\Manager();
 		$assets->useImplicitOutput(false);
 		$css = $assets->collection('css');
-		$css->setTargetPath(__DIR__ . '/assets/production/1198.css');
-		$css->addCss(__DIR__ . '/assets/1198.css');
+		$css->setTargetPath('unit-tests/assets/production/1198.css');
+		$css->setSourcePath('unit-tests/assets/');
+		$css->addCss('1198.css');
 		$css->addFilter(new UppercaseFilter());
 		$css->addFilter(new TrimFilter());
 		$css->join(true);
@@ -537,15 +539,16 @@ class AssetsTest extends PHPUnit\Framework\TestCase
 
 	public function testIssue1532()
 	{
-		@unlink(__DIR__ . '/assets/production/1532.js');
+		@unlink('unit-tests/assets/production/1532.js');
 		$di = new \Phalcon\Di\FactoryDefault();
 		$assets = new \Phalcon\Assets\Manager();
 		$assets->useImplicitOutput(false);
 		$assets->collection('js')
-			->addJs('unit-tests/assets/jquery.js')
+			->setSourcePath('unit-tests/assets/')
+			->addJs('jquery.js')
 			->join(true)
 			->addFilter(new Phalcon\Assets\Filters\Jsmin())
-			->setTargetPath(__DIR__ .'/assets/production/1532.js')
+			->setTargetPath('unit-tests/assets/production/1532.js')
 			->setTargetLocal(FALSE)
 			->setPrefix('//phalconphp.com/')
 			->setTargetUri('js/jquery.js');

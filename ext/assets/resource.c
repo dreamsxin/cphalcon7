@@ -84,7 +84,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_resource_setlocal, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_resource_setfilter, 0, 0, 1)
-	ZEND_ARG_INFO(0, filter)
+	ZEND_ARG_TYPE_INFO(0, filter, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_assets_resource_setattributes, 0, 0, 1)
@@ -381,7 +381,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setSourcePath){
 PHP_METHOD(Phalcon_Assets_Resource, getSourcePath){
 
 
-	RETURN_MEMBER(getThis(), "_targetPath");
+	RETURN_MEMBER(getThis(), "_sourcePath");
 }
 
 /**
@@ -408,7 +408,7 @@ PHP_METHOD(Phalcon_Assets_Resource, setTargetPath){
 PHP_METHOD(Phalcon_Assets_Resource, getTargetPath){
 
 
-	RETURN_MEMBER(getThis(), "_sourcePath");
+	RETURN_MEMBER(getThis(), "_targetPath");
 }
 
 /**

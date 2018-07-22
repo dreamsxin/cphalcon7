@@ -65,9 +65,13 @@ typedef struct {
 	int kind_of_advice;
 	zend_fcall_info fci;
 	zend_fcall_info_cache fci_cache;
-	
+#if PHP_VERSION_ID < 70300
 	pcre *re_method;
 	pcre *re_class;
+#else
+	pcre2_code *re_method;
+	pcre2_code *re_class;
+#endif
 } phalcon_aop_pointcut;
 
 typedef struct {

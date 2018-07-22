@@ -133,11 +133,18 @@ static inline void _zend_assign_to_variable_reference(zval *variable_ptr, zval *
 	}
 
 	ref = Z_REF_P(value_ptr);
+#if PHP_VERSION_ID >= 70300
+	GC_ADDREF(ref);
+#else
 	GC_REFCOUNT(ref)++;
+#endif
 	if (Z_REFCOUNTED_P(variable_ptr)) {
 		zend_refcounted *garbage = Z_COUNTED_P(variable_ptr);
-
+#if PHP_VERSION_ID >= 70300
+		if (GC_DELREF(garbage) == 0) {
+#else
 		if (--GC_REFCOUNT(garbage) == 0) {
+#endif
 			ZVAL_REF(variable_ptr, ref);
 #if PHP_VERSION_ID >= 70100
 			zval_dtor_func(garbage);
@@ -259,7 +266,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getException){
 	intern = phalcon_aop_joinpoint_object_from_obj(Z_OBJ_P(getThis()));
 
 	if (!(intern->current_pointcut->kind_of_advice & PHALCON_AOP_KIND_CATCH)){
-		zend_error(E_ERROR, "getException is only available when the advice was added with aop_add_after or aop_add_after_throwing");
+		zend_error(E_ERROR, "getException is only available when the advice was added with after or afterThrowing");
 		return;
 	}
 
@@ -560,6 +567,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyName){
 PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
 
 	zval *ret;
+	zend_class_entry *old_scope;
 	phalcon_aop_joinpoint_object *intern;
 
 	intern = phalcon_aop_joinpoint_object_from_obj(Z_OBJ_P(getThis()));
@@ -569,8 +577,24 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
 		return;
 	}
 
+	if (Z_TYPE(intern->property_value) > IS_NULL) {
+		RETURN_ZVAL(&intern->property_value, 1, 0);
+	}
+
 	if (intern->object != NULL && intern->member != NULL) {
-	   ret = phalcon_aop_get_property_ptr_ptr(intern->object, intern->member, intern->type, intern->cache_slot);
+#if PHP_VERSION_ID >= 70100
+		old_scope = EG(fake_scope);
+		EG(fake_scope) = Z_OBJCE_P(intern->object);
+#else
+		old_scope = EG(scope);
+		EG(scope) = Z_OBJCE_P(intern->object);
+#endif
+	   ret = original_zend_std_get_property_ptr_ptr(intern->object, intern->member, intern->type, intern->cache_slot);
+#if PHP_VERSION_ID >= 70100
+		EG(fake_scope) = old_scope;
+#else
+		EG(scope) = old_scope;
+#endif
 	}
 	if (ret) {
 		RETURN_ZVAL(ret, 1, 0);

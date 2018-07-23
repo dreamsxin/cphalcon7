@@ -31,9 +31,9 @@
 #include "kernel/exception.h"
 
 /**
- * Phalcon\Arr
+ * Phalcon\Aop
  *
- * Provides utilities to work with arrs
+ * AOP aims to allow separation of cross-cutting concerns (cache, log, security, transactions, ...)
  */
 zend_class_entry *phalcon_aop_ce;
 

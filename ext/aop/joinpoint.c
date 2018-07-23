@@ -53,6 +53,8 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getAssignedValue);
 PHP_METHOD(Phalcon_Aop_Joinpoint, setAssignedValue);
 PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyName);
 PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue);
+PHP_METHOD(Phalcon_Aop_Joinpoint, setProperty);
+PHP_METHOD(Phalcon_Aop_Joinpoint, getProperty);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_aop_joinpoint_setarguments, 0, 0, 1)
 	ZEND_ARG_ARRAY_INFO(0, params, 0)
@@ -72,6 +74,15 @@ ZEND_BEGIN_ARG_INFO(arginfo_phalcon_aop_joinpoint_setassignedvalue, 0)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO(arginfo_phalcon_aop_joinpoint_setproperty, 2)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO(arginfo_phalcon_aop_joinpoint_getproperty, 1)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_aop_joinpoint_method_entry[] = {
 	PHP_ME(Phalcon_Aop_Joinpoint, getArguments, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, setArguments, arginfo_phalcon_aop_joinpoint_setarguments, ZEND_ACC_PUBLIC)
@@ -89,6 +100,8 @@ static const zend_function_entry phalcon_aop_joinpoint_method_entry[] = {
 	PHP_ME(Phalcon_Aop_Joinpoint, setAssignedValue, arginfo_phalcon_aop_joinpoint_setassignedvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyName, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, setProperty, arginfo_phalcon_aop_joinpoint_setproperty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getProperty, arginfo_phalcon_aop_joinpoint_getproperty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -494,6 +507,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getFunctionName){
 }
 
 /**
+ * Gets the assigned value
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, getAssignedValue){
 
@@ -514,6 +528,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getAssignedValue){
 }
 
 /**
+ * Sets the assigned value
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, setAssignedValue){
 
@@ -543,6 +558,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, setAssignedValue){
 }
 
 /**
+ * Gets the property name
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyName){
 
@@ -598,5 +614,74 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
 	}
 	if (ret) {
 		RETURN_ZVAL(ret, 1, 0);
+	}
+}
+
+/**
+ * Sets the object property
+ */
+PHP_METHOD(Phalcon_Aop_Joinpoint, setProperty){
+
+	zval *key, *value, *object;
+	phalcon_aop_joinpoint_object *intern;
+
+	phalcon_fetch_params(0, 2, 0, &key, &value);
+
+	intern = phalcon_aop_joinpoint_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (intern->current_pointcut->kind_of_advice & PHALCON_AOP_KIND_PROPERTY) {
+		if (intern->object != NULL) {
+			object = intern->object;
+		}
+	} else {
+		zend_object *call_object = NULL;
+#if PHP_MINOR_VERSION < 1
+		call_object = Z_OBJ(intern->ex->This);
+#else
+		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {
+			call_object = Z_OBJ(intern->ex->This);
+		}
+#endif
+		if (call_object != NULL) {
+			object = &intern->ex->This;
+		}
+	}
+
+	if (object) {
+		phalcon_update_property_zval_zval(object, key, value);
+	}
+}
+
+/**
+ * Gets the object property
+ */
+PHP_METHOD(Phalcon_Aop_Joinpoint, getProperty){
+
+	zval *key, *object;
+	phalcon_aop_joinpoint_object *intern;
+
+	phalcon_fetch_params(0, 1, 0, &key);
+
+	intern = phalcon_aop_joinpoint_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (intern->current_pointcut->kind_of_advice & PHALCON_AOP_KIND_PROPERTY) {
+		if (intern->object != NULL) {
+			object = intern->object;
+		}
+	} else {
+		zend_object *call_object = NULL;
+#if PHP_MINOR_VERSION < 1
+		call_object = Z_OBJ(intern->ex->This);
+#else
+		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {
+			call_object = Z_OBJ(intern->ex->This);
+		}
+#endif
+		if (call_object != NULL) {
+			object = &intern->ex->This;
+		}
+	}
+	if (object) {
+		phalcon_read_property_zval(return_value, object, key, PH_COPY);
 	}
 }

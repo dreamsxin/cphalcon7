@@ -855,17 +855,18 @@ PHP_METHOD(Phalcon_Http_Request, getJsonRawBody)
 	zval raw_body = {}, *assoc = NULL;
 	int ac = 0;
 
-	phalcon_fetch_params(0, 0, 1, &assoc);
+	phalcon_fetch_params(1, 0, 1, &assoc);
 
 	if (assoc && zend_is_true(assoc)) {
 		ac = 1;
 	}
 
-	PHALCON_CALL_METHOD(&raw_body, getThis(), "getrawbody");
+	PHALCON_MM_CALL_METHOD(&raw_body, getThis(), "getrawbody");
+	PHALCON_MM_ADD_ENTRY(&raw_body);
 	if (Z_TYPE(raw_body) == IS_STRING) {
-		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &raw_body, ac));
+		RETURN_MM_ON_FAILURE(phalcon_json_decode(return_value, &raw_body, ac));
 	}
-	zval_ptr_dtor(&raw_body);
+	RETURN_MM();
 }
 
 /**

@@ -571,27 +571,31 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 
 	zval *value, *type = NULL, *constant, ret = {}, search = {}, replace = {};
 
-	phalcon_fetch_params(0, 1, 1, &value, &type);
+	phalcon_fetch_params(1, 1, 1, &value, &type);
 
 	if (Z_TYPE_P(value) == IS_NULL) {
 		RETURN_NULL();
 	}
 
 	if ((constant = zend_get_constant_str(SL("JSON_UNESCAPED_UNICODE"))) != NULL) {
-		RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, Z_LVAL_P(constant)));
+		RETURN_MM_ON_FAILURE(phalcon_json_encode(&ret, value, Z_LVAL_P(constant)));
 	} else {
-		RETURN_ON_FAILURE(phalcon_json_encode(&ret, value, 0));
+		RETURN_MM_ON_FAILURE(phalcon_json_encode(&ret, value, 0));
 	}
+	PHALCON_MM_ADD_ENTRY(&ret);
 
 	array_init_size(&search, 2);
+	PHALCON_MM_ADD_ENTRY(&search);
 	phalcon_array_append_str(&search, SL("["), 0);
 	phalcon_array_append_str(&search, SL("]"), 0);
 
 	array_init_size(&replace, 2);
+	PHALCON_MM_ADD_ENTRY(&replace);
 	phalcon_array_append_str(&replace, SL("{"), 0);
 	phalcon_array_append_str(&replace, SL("}"), 0);
 
-	PHALCON_CALL_FUNCTION(return_value, "str_replace", &search, &replace, &ret);
+	PHALCON_MM_CALL_FUNCTION(return_value, "str_replace", &search, &replace, &ret);
+	RETURN_MM();
 }
 
 void pg_text_array_parse(zval *return_value, zval* v) {
@@ -675,23 +679,28 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray){
 
 	zval *value, *type = NULL, parse_value = {}, search = {}, replace = {}, ret = {};
 
-	phalcon_fetch_params(0, 1, 1, &value, &type);
+	phalcon_fetch_params(1, 1, 1, &value, &type);
 
 	if (Z_LVAL_P(type) != PHALCON_DB_COLUMN_TYPE_INT_ARRAY) {
 		pg_text_array_parse(&parse_value, value);
+		PHALCON_MM_ADD_ENTRY(&parse_value);
 	} else {
 		ZVAL_COPY_VALUE(&parse_value, value);
 	}
 
 	array_init_size(&search, 2);
+	PHALCON_MM_ADD_ENTRY(&search);
 	phalcon_array_append_str(&search, SL("{"), 0);
 	phalcon_array_append_str(&search, SL("}"), 0);
 
 	array_init_size(&replace, 2);
+	PHALCON_MM_ADD_ENTRY(&replace);
 	phalcon_array_append_str(&replace, SL("["), 0);
 	phalcon_array_append_str(&replace, SL("]"), 0);
 
-	PHALCON_CALL_FUNCTION(&ret, "str_replace", &search, &replace, &parse_value);
+	PHALCON_MM_CALL_FUNCTION(&ret, "str_replace", &search, &replace, &parse_value);
+	PHALCON_MM_ADD_ENTRY(&ret);
 
-	RETURN_ON_FAILURE(phalcon_json_decode(return_value, &ret, 1));
+	RETURN_MM_ON_FAILURE(phalcon_json_decode(return_value, &ret, 1));
+	RETURN_MM();
 }

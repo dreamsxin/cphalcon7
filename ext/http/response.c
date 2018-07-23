@@ -651,16 +651,16 @@ PHP_METHOD(Phalcon_Http_Response, setJsonContent){
 	zval *content, *json_options = NULL, json_content = {};
 	int options = 0;
 
-	phalcon_fetch_params(0, 1, 1, &content, &json_options);
+	phalcon_fetch_params(1, 1, 1, &content, &json_options);
 
 	if (json_options) {
 		options = phalcon_get_intval(json_options);
 	}
 
-	RETURN_ON_FAILURE(phalcon_json_encode(&json_content, content, options));
+	RETURN_MM_ON_FAILURE(phalcon_json_encode(&json_content, content, options));
+	PHALCON_MM_ADD_ENTRY(&json_content);
 	phalcon_update_property(getThis(), SL("_content"), &json_content);
-	zval_ptr_dtor(&json_content);
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**
@@ -822,9 +822,7 @@ PHP_METHOD(Phalcon_Http_Response, send){
 			if (phalcon_array_isset_fetch_str(&http_range, _SERVER, SL("HTTP_RANGE"), PH_READONLY)) {
 				zval pattern = {}, matched = {}, matches = {};
 				ZVAL_STRING(&pattern, "#bytes=(\\d+)-(\\d+)?#i");
-				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, &http_range, &matches));
-				ZVAL_UNREF(&matches);
 				zval_ptr_dtor(&pattern);
 				if (zend_is_true(&matched)) {
 					zval match_one = {}, match_two = {}, status = {}, message = {}, content_range = {}, length = {};

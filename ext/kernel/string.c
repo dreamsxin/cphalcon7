@@ -1849,35 +1849,98 @@ void phalcon_crc32(zval *return_value, zval *str)
 
 int phalcon_preg_match(zval *retval, zval *regex, zval *subject, zval *matches)
 {
-	int result;
+	pcre_cache_entry *pce;
+	zend_long flags = 0;
+	zend_long start_offset = 0;
+	int global = 0;
+	int use_flags = 0;
 
-	if (matches) {
-		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject, matches);
-	} else {
-		PHALCON_CALL_FUNCTION_FLAG(result, retval, "preg_match", regex, subject);
+	if (Z_TYPE_P(subject) != IS_STRING) {
+		convert_to_string_ex(subject);
 	}
 
-	return result;
+	ZVAL_FALSE(retval);
+	if (ZEND_SIZE_T_INT_OVFL(Z_STRLEN_P(subject))) {
+		php_error_docref(NULL, E_WARNING, "Subject is too long");
+		ZVAL_FALSE(retval);
+		return FAILURE;
+	}
+
+	/* Compile regex or get it from cache. */
+	if ((pce = pcre_get_compiled_regex_cache(Z_STR_P(regex))) == NULL) {
+		ZVAL_FALSE(retval);
+		return FAILURE;
+	}
+
+	pce->refcount++;
+	php_pcre_match_impl(pce, Z_STRVAL_P(subject), Z_STRLEN_P(subject), retval, matches, global, use_flags, flags, start_offset);
+	pce->refcount--;
+	return SUCCESS;
 }
 
 int phalcon_json_encode(zval *retval, zval *v, int opts)
 {
-	zval zopts = {};
 	int flag;
 
+#ifdef PHALCON_USE_PHP_JSON
+	smart_str buf = {0};
+# if PHP_VERSION_ID >= 70100
+	flag = php_json_encode(&buf, v, opts);
+# else
+	JSON_G(error_code) = PHP_JSON_ERROR_NONE;
+	php_json_encode(&buf, v, opts);
+	if (JSON_G(error_code) != PHP_JSON_ERROR_NONE && !(opts & PHP_JSON_PARTIAL_OUTPUT_ON_ERROR)) {
+		flag = FAILURE;
+	} else {
+		flag = SUCCESS;
+	}
+# endif
+	if (flag == SUCCESS) {
+		smart_str_0(&buf); /* copy? */
+		if (buf.s) {
+			ZVAL_NEW_STR(retval, buf.s);
+			return flag;
+		}
+		ZVAL_EMPTY_STRING(retval);
+		return flag;
+	} else {
+		smart_str_free(&buf);
+		ZVAL_FALSE(retval);
+	}
+#else
+	zval zopts = {};
 	ZVAL_LONG(&zopts, opts);
-
 	PHALCON_CALL_FUNCTION_FLAG(flag, retval, "json_encode", v, &zopts);
-
+#endif
 	return flag;
 }
 
 int phalcon_json_decode(zval *retval, zval *v, zend_bool assoc)
 {
+
+#ifdef PHALCON_USE_PHP_JSON
+	if (Z_TYPE_P(v) != IS_STRING) {
+		convert_to_string_ex(v);
+	}
+# if PHP_VERSION_ID >= 70100
+	return php_json_decode(retval, Z_STRVAL_P(v), Z_STRLEN_P(v), assoc, PHP_JSON_PARSER_DEFAULT_DEPTH);
+# else
+	JSON_G(error_code) = PHP_JSON_ERROR_NONE;
+
+	if (!Z_STRLEN_P(v)) {
+		JSON_G(error_code) = PHP_JSON_ERROR_SYNTAX;
+		ZVAL_NULL(retval);
+		return FAILURE;
+	}
+	php_json_decode(retval, Z_STRVAL_P(v), Z_STRLEN_P(v), assoc, PHP_JSON_PARSER_DEFAULT_DEPTH);
+	return SUCCESS;
+# endif
+#else
 	zval *zassoc = assoc ? &PHALCON_GLOBAL(z_true) : &PHALCON_GLOBAL(z_false);
 	zval *params[] = { v, zassoc };
 
 	return phalcon_call_function_with_params(retval, SL("json_decode"), 2, params);
+#endif
 }
 
 void phalcon_lcfirst(zval *return_value, zval *s)

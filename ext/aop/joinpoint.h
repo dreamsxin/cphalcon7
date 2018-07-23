@@ -16,6 +16,7 @@
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
   |          ZhuZongXin <dreamsxin@qq.com>                                 |
   |          Julien Salleyron <julien.salleyron@gmail.com>                 |
+  |          <pangudashu@gmail.com>                                        |
   +------------------------------------------------------------------------+
 */
 

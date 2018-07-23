@@ -1103,9 +1103,7 @@ PHP_METHOD(Phalcon_Arr, callback){
 	PHALCON_MM_ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
 	ZVAL_NULL(&matches);
-	ZVAL_MAKE_REF(&matches);
 	RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
-	ZVAL_UNREF(&matches);
 	PHALCON_MM_ADD_ENTRY(&matches);
 
 	if (zend_is_true(&ret)) {

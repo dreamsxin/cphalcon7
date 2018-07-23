@@ -328,9 +328,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
 
 				ZVAL_NULL(&matches);
-				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, &sql_statement, &matches));
-				ZVAL_UNREF(&matches);
 				zval_ptr_dtor(&pattern);
 
 				if (zend_is_true(&match)) {

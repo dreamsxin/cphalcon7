@@ -622,14 +622,10 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		if (Z_TYPE(pattern) == IS_STRING && Z_STRLEN(pattern) > 3 && Z_STRVAL(pattern)[1] == '^') {
 			if (zend_is_true(&case_sensitive)) {
 				PHALCON_CONCAT_VS(&case_pattern, &pattern, "i");
-				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&route_found, &case_pattern, &handled_uri, &matches));
-				ZVAL_UNREF(&matches);
 				zval_ptr_dtor(&case_pattern);
 			} else {
-				ZVAL_MAKE_REF(&matches);
 				RETURN_ON_FAILURE(phalcon_preg_match(&route_found, &pattern, &handled_uri, &matches));
-				ZVAL_UNREF(&matches);
 			}
 		} else {
 			ZVAL_BOOL(&route_found, phalcon_comparestr(&pattern, &handled_uri, &case_sensitive));

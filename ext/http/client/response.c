@@ -149,19 +149,20 @@ PHP_METHOD(Phalcon_Http_Client_Response, getJsonBody){
 	zval *assoc = NULL, body = {};
 	int ac = 0;
 
-	phalcon_fetch_params(0, 0, 1, &assoc);
+	phalcon_fetch_params(1, 0, 1, &assoc);
 
 	if (assoc && zend_is_true(assoc)) {
 		ac = 1;
 	}
 
-	PHALCON_CALL_METHOD(&body, getThis(), "getbody");
+	PHALCON_MM_CALL_METHOD(&body, getThis(), "getbody");
+	PHALCON_MM_ADD_ENTRY(&body);
 	if (Z_TYPE(body) == IS_STRING) {
-		RETURN_ON_FAILURE(phalcon_json_decode(return_value, &body, ac));
+		RETURN_MM_ON_FAILURE(phalcon_json_decode(return_value, &body, ac));
 	} else {
 		ZVAL_NULL(return_value);
 	}
-	zval_ptr_dtor(&body);
+	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Http_Client_Response, setStatusCode){

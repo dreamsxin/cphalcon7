@@ -158,10 +158,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Regex, valid){
 
 	/* Check if the value match using preg_match in the PHP userland */
 	ZVAL_NULL(&matches);
-	ZVAL_MAKE_REF(&matches);
 	RETURN_ON_FAILURE(phalcon_preg_match(&match_pattern, pattern, value, &matches));
-	ZVAL_UNREF(&matches);
-
 	RETVAL_FALSE;
 
 	if (zend_is_true(&match_pattern)) {

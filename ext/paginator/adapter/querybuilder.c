@@ -90,7 +90,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder){
 
 	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_builder"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_totalItems"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_totalItems"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_querybuilder_ce, SL("_limitRows"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_querybuilder_ce, 1, phalcon_paginator_adapterinterface_ce);
 

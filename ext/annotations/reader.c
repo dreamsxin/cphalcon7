@@ -77,22 +77,22 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	const char *file;
 	uint32_t line;
 
-	phalcon_fetch_params(0, 1, 0, &class_name);
+	phalcon_fetch_params(1, 1, 0, &class_name);
 
 	if (unlikely(Z_TYPE_P(class_name) != IS_STRING)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The class name must be a string");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_annotations_exception_ce, "The class name must be a string");
 		return;
 	}
 
 	class_ce = zend_fetch_class(Z_STR_P(class_name), ZEND_FETCH_CLASS_AUTO | ZEND_FETCH_CLASS_SILENT);
 	if (!class_ce) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
+		PHALCON_MM_THROW_EXCEPTION_FORMAT(phalcon_annotations_exception_ce, "Class %s does not exist", Z_STRVAL_P(class_name));
 		return;
 	}
 
 	array_init(return_value);
 	if (class_ce->type != ZEND_USER_CLASS) {
-		return;
+		RETURN_MM();
 	}
 
 	file = ZSTR_VAL(phalcon_get_class_filename(class_ce));
@@ -104,19 +104,19 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 	if ((cmt = phalcon_get_class_doc_comment(class_ce)) != NULL) {
 		line = phalcon_get_class_startline(class_ce);
 
-		RETURN_ON_FAILURE(phannot_parse_annotations(&class_annotations, cmt, file, line));
+		RETURN_MM_ON_FAILURE(phannot_parse_annotations(&class_annotations, cmt, file, line));
+		PHALCON_MM_ADD_ENTRY(&class_annotations);
 
 		if (Z_TYPE(class_annotations) == IS_ARRAY) {
 			phalcon_array_update_str(return_value, SL("class"), &class_annotations, PH_COPY);
 		}
-		zval_ptr_dtor(&class_annotations);
 	}
 
 	/* Get class properties */
 	props = &class_ce->properties_info;
 	if (zend_hash_num_elements(props) > 0) {
 		array_init_size(&annotations_properties, zend_hash_num_elements(props));
-
+		PHALCON_MM_ADD_ENTRY(&annotations_properties);
 		ZEND_HASH_FOREACH_PTR(props, property) {
 			zval property_annotations = {};
 			zend_string *cmt;
@@ -126,10 +126,12 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				if (FAILURE == phannot_parse_annotations(&property_annotations, cmt, file, 0)) {
 					return;
 				}
+				PHALCON_MM_ADD_ENTRY(&property_annotations);
 
 				if (Z_TYPE(property_annotations) == IS_ARRAY) {
 					if (zend_unmangle_property_name(property->name, &class_name, &prop_name) == SUCCESS) {
-						add_assoc_zval_ex(&annotations_properties, prop_name, strlen(prop_name), &property_annotations);
+						phalcon_array_update_str(&annotations_properties, prop_name, strlen(prop_name), &property_annotations, PH_COPY);
+						continue;
 					}
 				}
 			}
@@ -138,14 +140,13 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		if (zend_hash_num_elements(Z_ARRVAL(annotations_properties))) {
 			phalcon_array_update_str(return_value, SL("properties"), &annotations_properties, PH_COPY);
 		}
-		zval_ptr_dtor(&annotations_properties);
 	}
 
 	/* Get class methods */
 	methods = &class_ce->function_table;
 	if (zend_hash_num_elements(methods) > 0) {
 		array_init_size(&annotations_methods, zend_hash_num_elements(methods));
-
+		PHALCON_MM_ADD_ENTRY(&annotations_methods);
 		ZEND_HASH_FOREACH_PTR(methods, method) {
 			zval method_annotations = {};
 			zend_string *cmt;
@@ -156,9 +157,10 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 				if (FAILURE == phannot_parse_annotations(&method_annotations, cmt, file, line)) {
 					return;
 				}
+				PHALCON_MM_ADD_ENTRY(&method_annotations);
 
 				if (Z_TYPE(method_annotations) == IS_ARRAY) {
-					zend_hash_add(Z_ARRVAL(annotations_methods), method->common.function_name, &method_annotations);
+					phalcon_array_update_string(&annotations_methods, method->common.function_name, &method_annotations, PH_COPY);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
@@ -166,8 +168,8 @@ PHP_METHOD(Phalcon_Annotations_Reader, parse){
 		if (zend_hash_num_elements(Z_ARRVAL(annotations_methods))) {
 			phalcon_array_update_str(return_value, SL("methods"), &annotations_methods, PH_COPY);
 		}
-		zval_ptr_dtor(&annotations_methods);
 	}
+	RETURN_MM();
 }
 
 /**

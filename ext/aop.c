@@ -699,7 +699,8 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 			exception = EG(exception);
 			joinpoint->exception = exception;
 			EG(exception) = NULL;
-			execute_pointcut(current_pc, aop_object, &pointcut_ret);		if (EG(exception)) {
+			execute_pointcut(current_pc, aop_object, &pointcut_ret);
+			if (EG(exception)) {
 				zend_object_release(EG(exception));
 			}
 			EG(exception) = exception;

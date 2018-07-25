@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -552,8 +553,11 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		}
 
 		zobj = Z_OBJ_P(object);
-
+#if PHP_VERSION_ID < 70300
 		if (!zobj->ce->default_properties_count && properties == zobj->properties && !ZEND_HASH_GET_APPLY_COUNT(properties)) {
+#else
+		if (!zobj->ce->default_properties_count && properties == zobj->properties && !GC_IS_RECURSIVE(properties)) {
+#endif
 			fast_copy = 1;
 			/* Check if the object has a numeric property, See Bug 73998 */
 			ZEND_HASH_FOREACH_STR_KEY(properties, key) {
@@ -567,7 +571,11 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		if (fast_copy) {
 			if (EXPECTED(zobj->handlers == &std_object_handlers)) {
 				if (EXPECTED(!(GC_FLAGS(properties) & IS_ARRAY_IMMUTABLE))) {
+#if PHP_VERSION_ID >= 70300
+					GC_ADDREF(properties);
+#else
 					GC_REFCOUNT(properties)++;
+#endif
 				}
 				ZVAL_ARR(result, properties);
 				return;

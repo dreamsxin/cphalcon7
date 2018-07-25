@@ -1940,7 +1940,82 @@ static int preg_replace_impl(zval *return_value, zval *regex, zval *replace, zva
  */
 void phalcon_fast_preg_replace(zval *return_value, zval *regex, zval *replace, zval *subject)
 {
-#if PHP_VERSION_ID < 70300 && PHP_VERSION_ID >= 70200
+#if PHP_VERSION_ID >= 70300
+	zval *zcount = NULL;
+	zend_long limit = -1;
+	size_t replace_count = 0;
+	zend_string	*result;
+	size_t old_replace_count;
+	int is_filter = 0;
+
+	if (Z_TYPE_P(replace) != IS_ARRAY) {
+		convert_to_string_ex(replace);
+		if (Z_TYPE_P(regex) != IS_ARRAY) {
+			convert_to_string_ex(regex);
+		}
+	} else {
+		if (Z_TYPE_P(regex) != IS_ARRAY) {
+			php_error_docref(NULL, E_WARNING, "Parameter mismatch, pattern is a string while replacement is an array");
+			RETURN_FALSE;
+		}
+	}
+
+	if (Z_TYPE_P(subject) != IS_ARRAY) {
+		old_replace_count = replace_count;
+		result = php_replace_in_subject(regex,
+										replace,
+										subject,
+										limit,
+										&replace_count);
+		if (result != NULL) {
+			if (!is_filter || replace_count > old_replace_count) {
+				RETVAL_STR(result);
+			} else {
+				zend_string_release_ex(result, 0);
+				RETVAL_NULL();
+			}
+		} else {
+			RETVAL_NULL();
+		}
+	} else {
+		/* if subject is an array */
+		zval		*subject_entry, zv;
+		zend_string	*string_key;
+		zend_ulong	 num_key;
+
+		array_init_size(return_value, zend_hash_num_elements(Z_ARRVAL_P(subject)));
+
+		/* For each subject entry, convert it to string, then perform replacement
+		   and add the result to the return_value array. */
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(subject), num_key, string_key, subject_entry) {
+			old_replace_count = replace_count;
+			result = php_replace_in_subject(regex,
+											replace,
+											subject_entry,
+											limit,
+											&replace_count);
+			if (result != NULL) {
+				if (!is_filter || replace_count > old_replace_count) {
+					/* Add to return array */
+					ZVAL_STR(&zv, result);
+					if (string_key) {
+						zend_hash_add_new(Z_ARRVAL_P(return_value), string_key, &zv);
+					} else {
+						zend_hash_index_add_new(Z_ARRVAL_P(return_value), num_key, &zv);
+					}
+				} else {
+					zend_string_release_ex(result, 0);
+				}
+			}
+		} ZEND_HASH_FOREACH_END();
+	}
+
+	if (zcount) {
+		zval_ptr_dtor(zcount);
+		ZVAL_LONG(zcount, replace_count);
+	}
+#else
+# if PHP_VERSION_ID >= 70200
 	zend_long limit = -1;
 	int replace_count = 0;
 	zend_string	*result;
@@ -2007,7 +2082,7 @@ void phalcon_fast_preg_replace(zval *return_value, zval *regex, zval *replace, z
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-#else
+# else
 	zval *zcount = NULL;
 	zend_long limit = -1;
 	int replace_count;
@@ -2023,6 +2098,7 @@ void phalcon_fast_preg_replace(zval *return_value, zval *regex, zval *replace, z
 		zval_ptr_dtor(zcount);
 		ZVAL_LONG(zcount, replace_count);
 	}
+# endif
 #endif
 }
 

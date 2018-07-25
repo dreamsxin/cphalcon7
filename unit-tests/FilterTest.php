@@ -54,19 +54,4 @@ class FilterTest extends PHPUnit\Framework\TestCase
 		$ret = $filter->sanitize($data, 'trim', NULL, NULL, 3);
 		$this->assertEquals($ret, $data2);
 	}
-
-	public function testXSS()
-	{
-		if (!class_exists('DOMDocument')) {
-			$this->markTestSkipped('Test skipped');
-			return;
-		}
-
-		$filter = new Phalcon\Filter;
-		$ret = $filter->sanitize('<strong style="color:blue" onclick="alert(\'clicked\')">Click</strong><div style="color:expression(1+1)">name</div>', 'xssclean');
-		$this->assertEquals($ret, '<strong style="color:blue">Click</strong><div>name</div>');
-
-		$ret = $filter->sanitize('<strong style="color:blue" onclick="alert(\'clicked\')">Click</strong><div style="color:expression(1+1)">name</div>', 'xssclean', NULL, array('allowAttributes' => array()));
-		$this->assertEquals($ret, '<strong>Click</strong><div>name</div>');
-	}
 }

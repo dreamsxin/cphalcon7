@@ -290,23 +290,26 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, fetchAll){
 PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 
 	zval row_count = {}, connection = {}, type = {}, pdo_statement = {}, sql_statement = {}, bind_params = {}, bind_types = {};
-	zval matches = {}, pattern = {}, match = {}, else_clauses = {}, sql = {}, result = {}, row = {};
+	zval matches = {}, pattern = {}, match = {}, else_clauses = {}, result = {}, row = {};
 
 	phalcon_read_property(&row_count, getThis(), SL("_rowCount"), PH_READONLY);
+
+	PHALCON_MM_INIT();
 
 	if (PHALCON_IS_FALSE(&row_count)) {
 		phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY|PH_READONLY);
 
-		PHALCON_CALL_METHOD(&type, &connection, "gettype");
+		PHALCON_MM_CALL_METHOD(&type, &connection, "gettype");
+		PHALCON_MM_ADD_ENTRY(&type);
 
 		/**
 		 * MySQL/PostgreSQL library property returns the number of records
 		 */
 		if (PHALCON_IS_STRING(&type, "mysql") || PHALCON_IS_STRING(&type, "pgsql")) {
 			phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY|PH_READONLY);
-			PHALCON_CALL_METHOD(&row_count, &pdo_statement, "rowcount");
+			PHALCON_MM_CALL_METHOD(&row_count, &pdo_statement, "rowcount");
+			PHALCON_MM_ADD_ENTRY(&row_count);
 		}
-		zval_ptr_dtor(&type);
 
 		/**
 		 * We should get the count using a new statement :(
@@ -325,26 +328,27 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 				phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
 				phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
 
-				ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
+				PHALCON_MM_ZVAL_STRING(&pattern, "/^SELECT\\s+(.*)$/i");
 
 				ZVAL_NULL(&matches);
-				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, &sql_statement, &matches));
-				zval_ptr_dtor(&pattern);
+				RETURN_ON_FAILURE(phalcon_preg_match(&match, &pattern, &sql_statement, &matches, 0, 0));
+				PHALCON_MM_ADD_ENTRY(&matches);
 
 				if (zend_is_true(&match)) {
+					zval sql = {};
 					phalcon_array_fetch_long(&else_clauses, &matches, 1, PH_NOISY|PH_READONLY);
 
 					PHALCON_CONCAT_SVS(&sql, "SELECT COUNT(*) \"numrows\" FROM (SELECT ", &else_clauses, ")");
-					zval_ptr_dtor(&matches);
+					PHALCON_MM_ADD_ENTRY(&sql);
 
-					PHALCON_CALL_METHOD(&result, &connection, "query", &sql, &bind_params, &bind_types);
-					zval_ptr_dtor(&sql);
+					PHALCON_MM_CALL_METHOD(&result, &connection, "query", &sql, &bind_params, &bind_types);
+					PHALCON_MM_ADD_ENTRY(&result);
 
-					PHALCON_CALL_METHOD(&row, &result, "fetch");
-					zval_ptr_dtor(&result);
+					PHALCON_MM_CALL_METHOD(&row, &result, "fetch");
+					PHALCON_MM_ADD_ENTRY(&row);
 
 					phalcon_array_fetch_str(&row_count, &row, SL("numrows"), PH_NOISY|PH_COPY);
-					zval_ptr_dtor(&row);
+					PHALCON_MM_ADD_ENTRY(&row_count);
 				}
 			} else {
 				ZVAL_LONG(&row_count, 1);
@@ -357,7 +361,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
 		phalcon_update_property(getThis(), SL("_rowCount"), &row_count);
 	}
 
-	RETVAL_ZVAL(&row_count, 0, 0);
+	RETURN_MM_CTOR(&row_count);
 }
 
 /**

@@ -941,7 +941,7 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
 	zval *table_name, *schema_name = NULL, dialect = {}, sql = {}, fetch_num = {}, num = {};
 
-	phalcon_fetch_params(0, 1, 1, &table_name, &schema_name);
+	phalcon_fetch_params(1, 1, 1, &table_name, &schema_name);
 
 	if (!schema_name) {
 		schema_name = &PHALCON_GLOBAL(z_null);
@@ -949,15 +949,16 @@ PHP_METHOD(Phalcon_Db_Adapter, tableExists){
 
 	phalcon_read_property(&dialect, getThis(), SL("_dialect"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_METHOD(&sql, &dialect, "tableexists", table_name, schema_name);
+	PHALCON_MM_CALL_METHOD(&sql, &dialect, "tableexists", table_name, schema_name);
+	PHALCON_MM_ADD_ENTRY(&sql);
 
 	ZVAL_LONG(&fetch_num, PDO_FETCH_NUM);
 
-	PHALCON_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
-	zval_ptr_dtor(&sql);
+	PHALCON_MM_CALL_METHOD(&num, getThis(), "fetchone", &sql, &fetch_num);
+	PHALCON_MM_ADD_ENTRY(&num);
 
 	phalcon_array_fetch_long(return_value, &num, 0, PH_COPY);
-	zval_ptr_dtor(&num);
+	RETURN_MM();
 }
 
 /**

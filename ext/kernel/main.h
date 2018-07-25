@@ -94,6 +94,12 @@ void phalcon_gettype(zval *return_value, zval *arg);
 #define PHALCON_MM_DEINIT() zval_ptr_dtor(&phalcon_memory_entry);
 #define PHALCON_MM_ADD_ENTRY(var) phalcon_array_append(&phalcon_memory_entry, var, 0);
 
+#define PHALCON_MM_ZVAL_EMPTY_STRING(z) \
+	do { \
+		ZVAL_EMPTY_STRING(z); \
+		phalcon_array_append(&phalcon_memory_entry, z, 0); \
+	} while (0)
+
 #define PHALCON_MM_ZVAL_STRING(z, s) \
 	do { \
 		ZVAL_STRING(z, s); \

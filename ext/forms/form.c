@@ -1197,7 +1197,7 @@ PHP_METHOD(Phalcon_Forms_Form, getValues){
 	if (Z_TYPE(entity) == IS_OBJECT) {
 		if (PHALCON_IS_EMPTY(name)) {
 			if ((f & PHALCON_FROM_VALUES_AS_ARRAY) == PHALCON_FROM_VALUES_AS_ARRAY) {
-				PHALCON_RETURN_CALL_FUNCTION("get_object_vars", &entity);
+				phalcon_get_object_vars(return_value, &entity, 1);
 				return;
 			} else {
 				RETURN_CTOR(&entity);

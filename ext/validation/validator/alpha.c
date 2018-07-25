@@ -149,14 +149,14 @@ PHP_METHOD(Phalcon_Validation_Validator_Alpha, valid){
 
 	zval *value, regex = {}, valid = {};
 
-	phalcon_fetch_params(0, 1, 0, &value);
+	phalcon_fetch_params(1, 1, 0, &value);
 
-	ZVAL_STRING(&regex, "/[^[:alpha:]]/imu");
+	PHALCON_MM_ZVAL_STRING(&regex, "/[^[:alpha:]]/imu");
 
-	RETURN_ON_FAILURE(phalcon_preg_match(&valid, &regex, value, NULL));
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(&valid, &regex, value, NULL, 0, 0));
 	if (zend_is_true(&valid)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }

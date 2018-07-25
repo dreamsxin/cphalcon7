@@ -321,6 +321,7 @@ PHP_METHOD(Phalcon_Debug, listenExceptions){
 	phalcon_array_append(&handler, getThis(), PH_COPY);
 	add_next_index_stringl(&handler, SL("onUncaughtException"));
 	PHALCON_CALL_FUNCTION(NULL, "set_exception_handler", &handler);
+	zval_ptr_dtor(&handler);
 	RETURN_THIS();
 }
 
@@ -337,12 +338,13 @@ PHP_METHOD(Phalcon_Debug, listenLowSeverity)
 	phalcon_array_append(&handler, getThis(), PH_COPY);
 	add_next_index_stringl(&handler, SL("onUserDefinedError"));
 	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", &handler);
+	zval_ptr_dtor(&handler);
 
 	array_init_size(&handler, 2);
 	phalcon_array_append(&handler, getThis(), PH_COPY);
 	add_next_index_stringl(&handler, SL("onShutdown"));
 	PHALCON_CALL_FUNCTION(NULL, "register_shutdown_function", &handler);
-
+	zval_ptr_dtor(&handler);
 	RETURN_THIS();
 }
 
@@ -380,6 +382,7 @@ PHP_METHOD(Phalcon_Debug, debugVar){
 	phalcon_array_append(&data, &backtrace, PH_COPY);
 	phalcon_array_append(&data, &ztime, PH_COPY);
 	phalcon_update_property_array_append(getThis(), SL("_data"), &data);
+	zval_ptr_dtor(&data);
 	RETURN_THIS();
 }
 
@@ -416,7 +419,10 @@ PHP_METHOD(Phalcon_Debug, _escapeString){
 		ZVAL_STRING(&escaped_line_break, "\\n");
 
 		PHALCON_STR_REPLACE(&replaced_value, &line_break, &escaped_line_break, value);
+		zval_ptr_dtor(&line_break);
+		zval_ptr_dtor(&escaped_line_break);
 		phalcon_htmlentities(return_value, &replaced_value, NULL, &charset);
+		zval_ptr_dtor(&replaced_value);
 		return;
 	}
 
@@ -441,9 +447,9 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 		n = &PHALCON_GLOBAL(z_zero);
 	}
 
-	phalcon_fast_count(&number_arguments, argument);
 
 	if (PHALCON_LT_LONG(n, 3)) {
+		phalcon_fast_count(&number_arguments, argument);
 		if (PHALCON_GT_LONG(&number_arguments, 0)) {
 			if (PHALCON_LT_LONG(&number_arguments, 10)) {
 				array_init(&dump);
@@ -462,16 +468,17 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 						} else {
 							PHALCON_CALL_METHOD(&escaped_string, getThis(), "_escapestring", v);
 							PHALCON_CONCAT_SVSV(&var_dump, "[", &tmp, "] =&gt; ", &escaped_string);
+							zval_ptr_dtor(&escaped_string);
 						}
-						phalcon_array_append(&dump, &var_dump, PH_COPY);
+						phalcon_array_append(&dump, &var_dump, 0);
 					} else {
 						if (Z_TYPE_P(v) == IS_ARRAY) {
 							phalcon_add_function(&next, n, &PHALCON_GLOBAL(z_one));
 
 							PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", v, &next);
-
 							PHALCON_CONCAT_SVSVS(&var_dump, "[", &tmp, "] =&gt; Array(", &array_dump, ")");
-							phalcon_array_append(&dump, &var_dump, PH_COPY);
+							zval_ptr_dtor(&array_dump);
+							phalcon_array_append(&dump, &var_dump, 0);
 							continue;
 						}
 						if (Z_TYPE_P(v) == IS_OBJECT) {
@@ -479,27 +486,27 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 							ZVAL_NEW_STR(&class_name, ce->name);
 
 							PHALCON_CONCAT_SVSVS(&var_dump, "[", &tmp, "] =&gt; Object(", &class_name, ")");
-							phalcon_array_append(&dump, &var_dump, PH_COPY);
+							phalcon_array_append(&dump, &var_dump, 0);
 							continue;
 						}
 
 						if (Z_TYPE_P(v) == IS_NULL) {
 							PHALCON_CONCAT_SVS(&var_dump, "[", &tmp, "] =&gt; null");
-							phalcon_array_append(&dump, &var_dump, PH_COPY);
+							phalcon_array_append(&dump, &var_dump, 0);
 							continue;
 						}
 
 						PHALCON_CONCAT_SVSV(&var_dump, "[", &tmp, "] =&gt; ", v);
-						phalcon_array_append(&dump, &var_dump, PH_COPY);
+						phalcon_array_append(&dump, &var_dump, 0);
 					}
 				} ZEND_HASH_FOREACH_END();
 
 				phalcon_fast_join_str(&joined_dump, SL(", "), &dump);
-
-				RETURN_CTOR(&joined_dump);
+				zval_ptr_dtor(&dump);
+				RETURN_NCTOR(&joined_dump);
 			}
 
-			RETURN_CTOR(&number_arguments);
+			RETURN_NCTOR(&number_arguments);
 		}
 	}
 
@@ -550,7 +557,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 	if (Z_TYPE_P(variable) == IS_OBJECT) {
 		const zend_class_entry *ce = Z_OBJCE_P(variable);
 
-		ZVAL_NEW_STR(&class_name, ce->name);
+		ZVAL_STR(&class_name, ce->name);
 
 		/**
 		 * Try to check for a 'dump' method, this surely produces a better printable
@@ -564,8 +571,10 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 			 * getArrayDump
 			 */
 			PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", &dumped_object);
+			zval_ptr_dtor(&dumped_object);
 
 			PHALCON_CONCAT_SVSVS(&dump, "Object(", &class_name, ": ", &array_dump, ")");
+			zval_ptr_dtor(&array_dump);
 		} else {
 			/**
 			 * If dump() is not available just print the class name
@@ -573,7 +582,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 			PHALCON_CONCAT_SVS(&dump, "Object(", &class_name, ")</span>");
 		}
 
-		RETURN_CTOR(&dump);
+		RETURN_NCTOR(&dump);
 	}
 
 	/**
@@ -582,6 +591,7 @@ PHP_METHOD(Phalcon_Debug, _getVarDump){
 	if (Z_TYPE_P(variable) == IS_ARRAY) {
 		PHALCON_CALL_METHOD(&array_dump, getThis(), "_getarraydump", variable);
 		PHALCON_CONCAT_SVS(return_value, "Array(", &array_dump, ")");
+		zval_ptr_dtor(&array_dump);
 		return;
 	}
 
@@ -604,8 +614,10 @@ PHP_METHOD(Phalcon_Debug, getMajorVersion){
 	PHALCON_CALL_CE_STATIC(&version, phalcon_version_ce, "get");
 
 	phalcon_fast_explode_str(&parts, SL(" "), &version);
+	zval_ptr_dtor(&version);
 
-	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY);
+	phalcon_array_fetch_long(return_value, &parts, 0, PH_NOISY|PH_COPY);
+	zval_ptr_dtor(&parts);
 }
 
 /**
@@ -619,6 +631,7 @@ PHP_METHOD(Phalcon_Debug, getVersion){
 
 	PHALCON_CALL_METHOD(&version, getThis(), "getmajorversion");
 	PHALCON_CONCAT_SVSVS(return_value, "<div class=\"version\">Phalcon7 Framework <a target=\"_new\" href=\"http://docs.myleftstudio.com/", &version, "/\">", &version, "</a></div>");
+	zval_ptr_dtor(&version);
 }
 
 /**
@@ -715,16 +728,20 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 
 			/* Prepare the class name according to the Phalcon's conventions */
 			PHALCON_STR_REPLACE(&prepare_uri_class, &namespace_separator, &underscore, &class_name);
+			zval_ptr_dtor(&namespace_separator);
 
 			/* Generate a link to the official docs */
 			PHALCON_SCONCAT_SVSVS(&html, "<span class=\"error-class\"><a target=\"_new\" href=\"http://www.myleftstudio.com/api/", &prepare_uri_class, ".html\">", &class_name, "</a></span>");
+			zval_ptr_dtor(&prepare_uri_class);
 		} else if (class_ce->type == ZEND_INTERNAL_CLASS) {
 			phalcon_fast_strtolower(&lower_class_name, &class_name);
 
 			PHALCON_STR_REPLACE(&prepare_internal_class, &underscore, &minus, &lower_class_name);
+			zval_ptr_dtor(&lower_class_name);
 
 			/* Generate a link to the official docs */
 			PHALCON_SCONCAT_SVSVS(&html, "<span class=\"error-class\"><a target=\"_new\" href=\"http://php.net/manual/en/class.", &prepare_internal_class, ".php\">", &class_name, "</a></span>");
+			zval_ptr_dtor(&prepare_internal_class);
 		} else {
 			PHALCON_SCONCAT_SVS(&html, "<span class=\"error-class\">", &class_name, "</span>");
 		}
@@ -761,6 +778,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 					 */
 					PHALCON_STR_REPLACE(&prepared_function_name, &underscore, &minus, &function_name);
 					PHALCON_SCONCAT_SVSVS(&html, "<span class=\"error-function\"><a target=\"_new\" href=\"http://php.net/manual/en/function.", &prepared_function_name, ".php\">", &function_name, "</a></span>");
+					zval_ptr_dtor(&prepared_function_name);
 				} else {
 					PHALCON_SCONCAT_SVS(&html, "<span class=\"error-function\">", &function_name, "</span>");
 				}
@@ -784,18 +802,21 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 				 */
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", argument);
 				PHALCON_CONCAT_SVS(&span_argument, "<span class=\"error-parameter\">", &dumped_argument, "</span>");
+				zval_ptr_dtor(&dumped_argument);
 
 				/**
 				 * Append the HTML generated to the argument's list
 				 */
-				phalcon_array_append(&arguments, &span_argument, PH_COPY);
+				phalcon_array_append(&arguments, &span_argument, 0);
 			} ZEND_HASH_FOREACH_END();
 
 			/**
 			 * Join all the arguments
 			 */
 			phalcon_fast_join_str(&joined_arguments, SL(", "), &arguments);
+			zval_ptr_dtor(&arguments);
 			PHALCON_SCONCAT_SVS(&html, "(", &joined_arguments, ")");
+			zval_ptr_dtor(&joined_arguments);
 		} else {
 			phalcon_concat_self_str(&html, SL("()"));
 		}
@@ -813,6 +834,7 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 		 * Realpath to the file and its line using a special header
 		 */
 		PHALCON_SCONCAT_SVSVS(&html, "<br/><div class=\"error-file\">", &formatted_file, " (", &line, ")</div>");
+		zval_ptr_dtor(&formatted_file);
 
 		phalcon_read_property(&show_files, getThis(), SL("_showFiles"), PH_READONLY);
 
@@ -900,11 +922,12 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 					if (PHALCON_IS_EQUAL(&i, &first_line)) {
 						ZVAL_STR(&trimmed, phalcon_trim(&current_line, NULL, PHALCON_TRIM_RIGHT));
 
-						RETURN_ON_FAILURE(phalcon_preg_match(&is_comment, &comment_pattern, &current_line, NULL));
+						phalcon_preg_match(&is_comment, &comment_pattern, &current_line, NULL, 0, 0);
 
 						if (zend_is_true(&is_comment)) {
 							PHALCON_STR_REPLACE(&spaced_current_line, &comment, &space, &current_line);
 							ZVAL_COPY_VALUE(&current_line, &spaced_current_line);
+							zval_ptr_dtor(&spaced_current_line);
 						}
 					}
 				}
@@ -922,19 +945,28 @@ PHP_METHOD(Phalcon_Debug, showTraceItem){
 						PHALCON_STR_REPLACE(&spaced_current_line, &tab, &two_spaces, &current_line);
 
 						phalcon_htmlentities(&escaped_line, &spaced_current_line, NULL, &charset);
+						zval_ptr_dtor(&spaced_current_line);
 						phalcon_concat_self(&html, &escaped_line);
+						zval_ptr_dtor(&escaped_line);
 					}
 				}
 
 				phalcon_increment(&i);
 			}
+			zval_ptr_dtor(&lines);
+			zval_ptr_dtor(&tab);
+			zval_ptr_dtor(&comment);
+			zval_ptr_dtor(&comment_pattern);
 			phalcon_concat_self_str(&html, SL("</pre>"));
 		}
 	}
 
 	phalcon_concat_self_str(&html, SL("</td></tr>"));
-
-	RETURN_CTOR(&html);
+	zval_ptr_dtor(&space);
+	zval_ptr_dtor(&two_spaces);
+	zval_ptr_dtor(&underscore);
+	zval_ptr_dtor(&minus);
+	RETURN_NCTOR(&html);
 }
 
 /**
@@ -972,6 +1004,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	if (zend_is_true(&is_active)) {
 		PHALCON_CALL_METHOD(&message, exception, "getmessage");
 		zend_print_zval(&message, 0);
+		zval_ptr_dtor(&message);
 	}
 
 	/**
@@ -999,12 +1032,15 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	 */
 	PHALCON_CONCAT_SVSVS(&html, "<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\"/><title>", &class_name, ": ", &escaped_message, "</title>");
 	PHALCON_SCONCAT_VS(&html, &css_sources, "</head><body>");
+	zval_ptr_dtor(&css_sources);
+	zval_ptr_dtor(&escaped_message);
 
 	/**
 	 * Get the version link
 	 */
 	PHALCON_CALL_METHOD(&version, getThis(), "getversion");
 	phalcon_concat_self(&html, &version);
+	zval_ptr_dtor(&version);
 
 	PHALCON_CALL_METHOD(&file, exception, "getfile");
 	PHALCON_CALL_METHOD(&line, exception, "getline");
@@ -1017,14 +1053,21 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	ZVAL_STRING(&z_link_format, link_format);
 
 	PHALCON_CALL_METHOD(&formatted_file, getThis(), "getfilelink", &file, &line, &z_link_format);
+	zval_ptr_dtor(&file);
+	zval_ptr_dtor(&z_link_format);
 
 	/**
 	 * Main exception info
 	 */
 	phalcon_concat_self_str(&html, SL("<div class=\"container-fluid\"><div class=\"alert alert-danger\">"));
 	PHALCON_SCONCAT_SVSVS(&html, "<h1>", &class_name, ": ", &escaped_message, "</h1>");
+	zval_ptr_dtor(&class_name);
+	zval_ptr_dtor(&escaped_message);
+
 	PHALCON_SCONCAT_SVSVS(&html, "<span>", &formatted_file, " (", &line, ")</span>");
 	phalcon_concat_self_str(&html, SL("</div>"));
+	zval_ptr_dtor(&formatted_file);
+	zval_ptr_dtor(&line);
 
 	phalcon_read_property(&show_back_trace, getThis(), SL("_showBackTrace"), PH_READONLY);
 
@@ -1073,7 +1116,9 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 			 */
 			PHALCON_CALL_METHOD(&html_item, getThis(), "showtraceitem", &tmp, trace_item, &z_link_format);
 			phalcon_concat_self(&html, &html_item);
+			zval_ptr_dtor(&html_item);
 		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&trace);
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
 
@@ -1095,6 +1140,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				if (Z_TYPE_P(value) == IS_ARRAY) {
 					PHALCON_CALL_METHOD(&joined_value, getThis(), "_getvardump", value);
 					PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &joined_value, "</td></tr>");
+					zval_ptr_dtor(&joined_value);
 				} else {
 					PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", value, "</td></tr>");
 				}
@@ -1120,6 +1166,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				}
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", value);
 				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
+				zval_ptr_dtor(&dumped_argument);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -1142,6 +1189,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				}
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", value);
 				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
+				zval_ptr_dtor(&dumped_argument);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -1164,6 +1212,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 				}
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", value);
 				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
+				zval_ptr_dtor(&dumped_argument);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -1187,6 +1236,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 			PHALCON_SCONCAT_SVSVS(&html, "<tr><td>", &tmp, "</th><td>", value, "</td></tr>");
 		} ZEND_HASH_FOREACH_END();
+		zval_ptr_dtor(&files);
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
 
@@ -1211,11 +1261,19 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 					PHALCON_CALL_METHOD(&methods, route, "gethttpmethods");
 
 					PHALCON_CALL_METHOD(&dumped_paths, getThis(), "_getvardump", &paths);
+					zval_ptr_dtor(&paths);
 					PHALCON_CALL_METHOD(&dumped_methods, getThis(), "_getvardump", &methods);
+					zval_ptr_dtor(&methods);
 					PHALCON_SCONCAT_SVSVSVS(&html, "<tr><td>", &pattern, "</th><td>", &dumped_paths, "</td><td>", &dumped_methods, "</td></tr>");
+					zval_ptr_dtor(&pattern);
+					zval_ptr_dtor(&dumped_paths);
+					zval_ptr_dtor(&dumped_methods);
 				} ZEND_HASH_FOREACH_END();
+				zval_ptr_dtor(&routes);
 			}
+			zval_ptr_dtor(&router);
 		}
+		zval_ptr_dtor(&di);
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
 
@@ -1229,19 +1287,27 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 		if (Z_TYPE(loader) == IS_OBJECT) {
 			PHALCON_CALL_METHOD(&loader_value, &loader, "getdirs");
 			PHALCON_CALL_METHOD(&dumped_loader_value, getThis(), "_getvardump", &loader_value);
+			zval_ptr_dtor(&loader_value);
 			PHALCON_SCONCAT_SVS(&html, "<tr><td>Directories Registered</th><td>", &dumped_loader_value, "</td></tr>");
+			zval_ptr_dtor(&dumped_loader_value);
 
 			PHALCON_CALL_METHOD(&loader_value, &loader, "getclasses");
 			PHALCON_CALL_METHOD(&dumped_loader_value, getThis(), "_getvardump", &loader_value);
+			zval_ptr_dtor(&loader_value);
 			PHALCON_SCONCAT_SVS(&html, "<tr><td>Class-map Registered</th><td>", &dumped_loader_value, "</td></tr>");
+			zval_ptr_dtor(&dumped_loader_value);
 
 			PHALCON_CALL_METHOD(&loader_value, &loader, "getprefixes");
 			PHALCON_CALL_METHOD(&dumped_loader_value, getThis(), "_getvardump", &loader_value);
+			zval_ptr_dtor(&loader_value);
 			PHALCON_SCONCAT_SVS(&html, "<tr><td>Prefixes Registered</th><td>", &dumped_loader_value, "</td></tr>");
+			zval_ptr_dtor(&dumped_loader_value);
 
 			PHALCON_CALL_METHOD(&loader_value, &loader, "getnamespaces");
 			PHALCON_CALL_METHOD(&dumped_loader_value, getThis(), "_getvardump", &loader_value);
+			zval_ptr_dtor(&loader_value);
 			PHALCON_SCONCAT_SVS(&html, "<tr><td>Namespaces Registered</th><td>", &dumped_loader_value, "</td></tr>");
+			zval_ptr_dtor(&dumped_loader_value);
 		}
 
 		phalcon_concat_self_str(&html, SL("</table></div>"));
@@ -1273,6 +1339,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", &variable);
 				PHALCON_SCONCAT_SVSVS(&html, "<tr><td class=\"key\">", &tmp, "</td><td>", &dumped_argument, "</td></tr>");
+				zval_ptr_dtor(&dumped_argument);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -1289,6 +1356,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 
 				PHALCON_CALL_METHOD(&dumped_argument, getThis(), "_getvardump", log);
 				PHALCON_SCONCAT_SVS(&html, "<tr><td>", &dumped_argument, "</td></tr>");
+				zval_ptr_dtor(&dumped_argument);
 			} ZEND_HASH_FOREACH_END();
 		}
 
@@ -1302,11 +1370,13 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	 */
 	PHALCON_CALL_METHOD(&js_sources, getThis(), "getjssources");
 	PHALCON_SCONCAT_VS(&html, &js_sources, "</div></body></html>");
+	zval_ptr_dtor(&js_sources);
 
 	/**
 	 * Print the HTML, @TODO, add an option to store the html
 	 */
 	zend_print_zval(&html, 0);
+	zval_ptr_dtor(&html);
 
 	/**
 	 * Unlock the exception renderer
@@ -1390,6 +1460,7 @@ PHP_METHOD(Phalcon_Debug, onShutdown){
 
 		zend_throw_exception_object(&exception);
 	}
+	zval_ptr_dtor(&error);
 }
 
 /**
@@ -1515,7 +1586,7 @@ PHP_METHOD(Phalcon_Debug, log){
 
 	zval *message, *_type = NULL, *context = NULL, type = {},  listen = {}, log_type = {}, log = {}, logger = {};
 
-	phalcon_fetch_params(0, 1, 2, &message, &_type, &context);
+	phalcon_fetch_params(1, 1, 2, &message, &_type, &context);
 
 	if (!_type || Z_TYPE_P(_type) == IS_NULL) {
 		ZVAL_LONG(&type, PHALCON_LOGGER_DEBUG);
@@ -1530,8 +1601,10 @@ PHP_METHOD(Phalcon_Debug, log){
 	phalcon_read_static_property_ce(&listen, phalcon_debug_ce, SL("_listen"), PH_READONLY);
 	if (zend_is_true(&listen)) {
 		if (Z_TYPE_P(message) == IS_STRING) {
-			PHALCON_CALL_CE_STATIC(&log_type, phalcon_logger_ce, "gettypestring", &type);
+			PHALCON_MM_CALL_CE_STATIC(&log_type, phalcon_logger_ce, "gettypestring", &type);
+			PHALCON_MM_ADD_ENTRY(&log_type);
 			PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
+			PHALCON_MM_ADD_ENTRY(&log);
 			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
 		} else {
 			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
@@ -1540,11 +1613,12 @@ PHP_METHOD(Phalcon_Debug, log){
 
 	phalcon_read_static_property_ce(&logger, phalcon_debug_ce, SL("_logger"), PH_READONLY);
 	if (Z_TYPE(logger) != IS_NULL) {
-		PHALCON_VERIFY_INTERFACE_EX(&logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
-		PHALCON_CALL_METHOD(NULL, &logger, "log", &type, message, context);
+		PHALCON_MM_VERIFY_INTERFACE_EX(&logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
+		PHALCON_MM_CALL_METHOD(NULL, &logger, "log", &type, message, context);
 	} else if (!zend_is_true(&listen)) {
 		phalcon_debug_print_r(message);
 	}
+	RETURN_MM();
 }
 
 /**

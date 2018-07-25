@@ -538,7 +538,7 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		/* 308 */ "Permanent Redirect"
 	};
 
-	phalcon_fetch_params(0, 0, 3, &location, &external_redirect, &_status_code);
+	phalcon_fetch_params(1, 0, 3, &location, &external_redirect, &_status_code);
 
 	if (!location) {
 		location = &PHALCON_GLOBAL(z_null);
@@ -560,8 +560,8 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 	if (Z_TYPE_P(location) == IS_STRING && zend_is_true(external_redirect)) {
 		ZVAL_COPY_VALUE(&header, location);
 	} else if (Z_TYPE_P(location) == IS_STRING && strstr(Z_STRVAL_P(location), "://")) {
-		ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
-		RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL));
+		PHALCON_MM_ZVAL_STRING(&pattern, "/^[^:\\/?#]++:/");
+		RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &pattern, location, NULL, 0, 0));
 		if (zend_is_true(&matched)) {
 			ZVAL_COPY_VALUE(&header, location);
 		} else {
@@ -571,47 +571,51 @@ PHP_METHOD(Phalcon_Http_Response, redirect){
 		ZVAL_NULL(&header);
 	}
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 	if (Z_TYPE(header) <= IS_NULL) {
 		ZVAL_STR(&service_name, IS(url));
 
-		PHALCON_CALL_METHOD(&url, &dependency_injector, "getshared", &service_name);
-		PHALCON_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
+		PHALCON_MM_CALL_METHOD(&url, &dependency_injector, "getshared", &service_name);
+		PHALCON_MM_ADD_ENTRY(&url);
+		PHALCON_MM_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 
-		PHALCON_CALL_METHOD(&header, &url, "get", location);
+		PHALCON_MM_CALL_METHOD(&header, &url, "get", location);
+		PHALCON_MM_ADD_ENTRY(&header);
 	}
 
 	ZVAL_STR(&service_name, IS(view));
 
-	PHALCON_CALL_METHOD(&view, &dependency_injector, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_CALL_METHOD(&view, &dependency_injector, "get", &service_name, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_ADD_ENTRY(&view);
 	if (Z_TYPE(view) == IS_OBJECT && instanceof_function(Z_OBJCE(view), phalcon_mvc_viewinterface_ce)) {
-		PHALCON_CALL_METHOD(NULL, &view, "disable");
+		PHALCON_MM_CALL_METHOD(NULL, &view, "disable");
 	}
 
 	/* The HTTP status is 302 by default, a temporary redirection */
 	if (Z_LVAL(status_code) < 300 || Z_LVAL(status_code) > 308) {
-		ZVAL_STRING(&status_text, "Redirect");
+		PHALCON_MM_ZVAL_STRING(&status_text, "Redirect");
 		if (!Z_LVAL(status_code)) {
 			ZVAL_LONG(&status_code, 302);
 		}
 	} else {
-		ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL(status_code) - 300]);
+		PHALCON_MM_ZVAL_STRING(&status_text, redirect_phrases[Z_LVAL(status_code) - 300]);
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", &status_code, &status_text);
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "setstatuscode", &status_code, &status_text);
 
 	/**
 	 * Change the current location using 'Location'
 	 */
-	ZVAL_STRING(&header_name, "Location");
-	PHALCON_CALL_METHOD(NULL, getThis(), "setheader", &header_name, &header);
+	PHALCON_MM_ZVAL_STRING(&header_name, "Location");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "setheader", &header_name, &header);
 
 	if (unlikely(!strcmp(sapi_module.name, "cli"))) {
 		php_error_docref(NULL, E_WARNING, "Command line mode cannot redirect");
 	}
 
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**
@@ -795,13 +799,15 @@ PHP_METHOD(Phalcon_Http_Response, send){
 
 	zval sent = {}, headers = {}, content = {}, file = {};
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&sent, getThis(), SL("_sent"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_FALSE(&sent)) {
 		/* Output the response body */
 		phalcon_read_property(&content, getThis(), SL("_content"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(content) != IS_NULL) {
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendcookies");
 			zend_print_zval(&content, 0);
 			goto gotoend;
 		}
@@ -816,56 +822,51 @@ PHP_METHOD(Phalcon_Http_Response, send){
 			if (stream == NULL) {
 				goto gotoend;
 			}
-			PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
-			PHALCON_CALL_FUNCTION(&filesize, "filesize", &file);
+			PHALCON_MM_CALL_METHOD(&headers, getThis(), "getheaders");
+			PHALCON_MM_ADD_ENTRY(&headers);
+			PHALCON_MM_CALL_FUNCTION(&filesize, "filesize", &file);
+			PHALCON_MM_ADD_ENTRY(&filesize);
 			_SERVER = phalcon_get_global_str(SL("_SERVER"));
 			if (phalcon_array_isset_fetch_str(&http_range, _SERVER, SL("HTTP_RANGE"), PH_READONLY)) {
 				zval pattern = {}, matched = {}, matches = {};
-				ZVAL_STRING(&pattern, "#bytes=(\\d+)-(\\d+)?#i");
-				RETURN_ON_FAILURE(phalcon_preg_match(&matched, &pattern, &http_range, &matches));
-				zval_ptr_dtor(&pattern);
+				PHALCON_MM_ZVAL_STRING(&pattern, "#bytes=(\\d+)-(\\d+)?#i");
+				RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &pattern, &http_range, &matches, 0, 0));
+				PHALCON_MM_ADD_ENTRY(&matches);
 				if (zend_is_true(&matched)) {
 					zval match_one = {}, match_two = {}, status = {}, message = {}, content_range = {}, length = {};
 					zend_long max, start = 0, end = 0, len = 0;
 
 					ZVAL_LONG(&status, 206);
-					ZVAL_STRING(&message, "Partial Content");
-					PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", &status, &message);
-					zval_ptr_dtor(&message);
+					PHALCON_MM_ZVAL_STRING(&message, "Partial Content");
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "setstatuscode", &status, &message);
 
 					max = Z_LVAL(filesize) - 1;
-					phalcon_array_fetch_long(&match_one, &matches, 1, PH_COPY);
-					convert_to_long(&match_one);
-					start = Z_LVAL(match_one);
+					phalcon_array_fetch_long(&match_one, &matches, 1, PH_READONLY);
+					start = phalcon_get_intval(&match_one);
 					start = start > max ? max : start;
 					ZVAL_LONG(&match_one, start);
-					if (!phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_COPY)) {
+					if (!phalcon_array_isset_fetch_long(&match_two, &matches, 2, PH_READONLY)) {
 						end = max - 1;
 					} else {
-						convert_to_long(&match_two);
-						end = Z_LVAL(match_two);
+						end = phalcon_get_intval(&match_two);
 					}
 					end = end < start ? start : end;
 					end = end > max ? max : end;
 					ZVAL_LONG(&match_two, end);
-					zval_ptr_dtor(&matches);
 
 					len = end - start + 1;
 					ZVAL_LONG(&length, len);
 		
 					PHALCON_CONCAT_SVSVSV(&content_range, "Content-Range: bytes ", &match_one, "-", &match_two, "/", &filesize);
-					zval_ptr_dtor(&match_one);
-					zval_ptr_dtor(&match_two);
-					zval_ptr_dtor(&filesize);
-					PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_range);
-					zval_ptr_dtor(&content_range);
+					PHALCON_MM_ADD_ENTRY(&content_range);
+					PHALCON_MM_CALL_METHOD(NULL, &headers, "setraw", &content_range);
 
 					PHALCON_CONCAT_SV(&content_length, "Content-Length: ", &length);
-					PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_length);
-					zval_ptr_dtor(&content_length);
+					PHALCON_MM_ADD_ENTRY(&content_length);
+					PHALCON_MM_CALL_METHOD(NULL, &headers, "setraw", &content_length);
 					
-					PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
-					PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendheaders");
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendcookies");
 
 					if (php_stream_seek(stream, start, 0) != -1) {
 						char buf[8192];
@@ -889,31 +890,30 @@ PHP_METHOD(Phalcon_Http_Response, send){
 						}
 					}
 					php_stream_close(stream);
-					zval_ptr_dtor(&headers);
 					goto gotoend;
 				}
 			}
 
 			PHALCON_CONCAT_SV(&content_length, "Content-Length: ", &filesize);
-			PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_length);
-			zval_ptr_dtor(&content_length);
+			PHALCON_MM_ADD_ENTRY(&content_length);
+			PHALCON_MM_CALL_METHOD(NULL, &headers, "setraw", &content_length);
 
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendcookies");
 			php_stream_passthru(stream);
 			php_stream_close(stream);
-			zval_ptr_dtor(&headers);
 		} else {
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendheaders");
-			PHALCON_CALL_METHOD(NULL, getThis(), "sendcookies");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendheaders");
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "sendcookies");
 		}
 gotoend:
 		phalcon_update_property_bool(getThis(), SL("_sent"), 1);
 
-		RETURN_THIS();
+		RETURN_MM_THIS();
 	}
 
-	PHALCON_THROW_EXCEPTION_STR(phalcon_http_response_exception_ce, "Response was already sent");
+	PHALCON_MM_THROW_EXCEPTION_STR(phalcon_http_response_exception_ce, "Response was already sent");
+	return;
 }
 
 /**

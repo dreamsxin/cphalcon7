@@ -109,23 +109,22 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, read){
 
-	zval *key, meta_data_dir = {}, virtual_key = {}, path = {}, data = {};
+	zval *key, meta_data_dir = {}, virtual_key = {}, path = {};
 
-	phalcon_fetch_params(0, 1, 0, &key);
+	phalcon_fetch_params(1, 1, 0, &key);
 	PHALCON_ENSURE_IS_STRING(key);
 
 	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
-
+	PHALCON_MM_ADD_ENTRY(&virtual_key);
 	PHALCON_CONCAT_VVS(&path, &meta_data_dir, &virtual_key, ".php");
-	zval_ptr_dtor(&virtual_key);
+	PHALCON_MM_ADD_ENTRY(&path);
 
 	if (phalcon_file_exists(&path) == SUCCESS) {
-		RETURN_ON_FAILURE(phalcon_require_ret(&data, Z_STRVAL(path)));
-		RETVAL_ZVAL(&data, 0, 0);
+		RETURN_MM_ON_FAILURE(phalcon_require_ret(return_value, Z_STRVAL(path)));
 	}
-	zval_ptr_dtor(&path);
+	RETURN_MM();
 }
 
 /**
@@ -139,14 +138,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	zval *key, *data, meta_data_dir = {}, virtual_key = {}, path = {}, php_export = {}, status = {};
 	smart_str exp = { 0 };
 
-	phalcon_fetch_params(0, 2, 0, &key, &data);
+	phalcon_fetch_params(1, 2, 0, &key, &data);
 
 	phalcon_read_property(&meta_data_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	phalcon_prepare_virtual_path_ex(&virtual_key, Z_STRVAL_P(key), Z_STRLEN_P(key), '_');
+	PHALCON_MM_ADD_ENTRY(&virtual_key);
 
 	PHALCON_CONCAT_VVS(&path, &meta_data_dir, &virtual_key, ".php");
-	zval_ptr_dtor(&virtual_key);
+	PHALCON_MM_ADD_ENTRY(&path);
 
 	smart_str_appends(&exp, "<?php return ");
 	php_var_export_ex(data, 0, &exp);
@@ -154,14 +154,15 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, write){
 	smart_str_0(&exp);
 
 	ZVAL_STR(&php_export, exp.s);
+	PHALCON_MM_ADD_ENTRY(&php_export);
 
 	phalcon_file_put_contents(&status, &path, &php_export);
-	zval_ptr_dtor(&path);
-	zval_ptr_dtor(&php_export);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Meta-Data directory cannot be written");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Meta-Data directory cannot be written");
 		return;
 	}
+	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
@@ -169,13 +170,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 	zval metadata_dir = {}, pattern = {}, iterator = {};
 	zend_object_iterator *it;
 
+	PHALCON_MM_INIT();
+	
+	PHALCON_MM_CALL_PARENT(NULL, phalcon_mvc_model_metadata_files_ce, getThis(), "reset");
+
 	phalcon_read_property(&metadata_dir, getThis(), SL("_metaDataDir"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VS(&pattern, &metadata_dir, "meta-*.php");
-
+	PHALCON_MM_ADD_ENTRY(&pattern);
 	object_init_ex(&iterator, spl_ce_GlobIterator);
-	PHALCON_CALL_METHOD(NULL, &iterator, "__construct", &pattern);
-	zval_ptr_dtor(&pattern);
+	PHALCON_MM_ADD_ENTRY(&iterator);
+	PHALCON_MM_CALL_METHOD(NULL, &iterator, "__construct", &pattern);
 
 	it = spl_ce_GlobIterator->get_iterator(spl_ce_GlobIterator, &iterator, 0);
 	it->funcs->rewind(it);
@@ -185,12 +190,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData_Files, reset)
 		phalcon_unlink(&dummy, &itkey);
 		it->funcs->move_forward(it);
 	}
-
-	it->funcs->dtor(it);
+	zend_iterator_dtor(it);
+	//it->funcs->dtor(it);
 	//efree(it);
-	zval_ptr_dtor(&iterator);
 
-	if (!EG(exception)) {
-		PHALCON_CALL_PARENT(NULL, phalcon_mvc_model_metadata_files_ce, getThis(), "reset");
-	}
+	RETURN_MM();
 }

@@ -768,23 +768,24 @@ PHP_METHOD(Phalcon_Mvc_Model, getSource){
 
 	zval *query = NULL, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 1, &query);
+	phalcon_fetch_params(1, 0, 1, &query);
 
 	if (!query) {
 		query = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectsource")) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "selectsource", query);
+		PHALCON_MM_CALL_METHOD(return_value, getThis(), "selectsource", query);
 		if (Z_TYPE_P(return_value) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSource' didn't returned a valid source");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSource' didn't returned a valid source");
 		}
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelsource", getThis());
-	zval_ptr_dtor(&models_manager);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(return_value, &models_manager, "getmodelsource", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -815,23 +816,24 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 
 	zval *query = NULL, models_manager = {};
 
-	phalcon_fetch_params(0, 0, 1, &query);
+	phalcon_fetch_params(1, 0, 1, &query);
 
 	if (!query) {
 		query = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectschema")) == SUCCESS) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "selectschema", query);
+		PHALCON_MM_CALL_METHOD(return_value, getThis(), "selectschema", query);
 		if (Z_TYPE_P(return_value) != IS_STRING) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSchema' didn't returned a valid schema");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "'selectSchema' didn't returned a valid schema");
 		}
-		return;
+		RETURN_MM();
 	}
 
-	PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(return_value, &models_manager, "getmodelschema", getThis());
-	zval_ptr_dtor(&models_manager);
+	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&models_manager);
+	PHALCON_MM_CALL_METHOD(return_value, &models_manager, "getmodelschema", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -1473,7 +1475,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 	zval *data, *column_map = NULL, *white_list = NULL, *negate = NULL, *value, exception_message = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 1, 3, &data, &column_map, &white_list, &negate);
+	phalcon_fetch_params(1, 1, 3, &data, &column_map, &white_list, &negate);
 
 	if (!column_map) {
 		column_map = &PHALCON_GLOBAL(z_null);
@@ -1514,8 +1516,8 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 					} else {
 						if (PHALCON_GLOBAL(orm).enable_strict) {
 							PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
-							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-							zval_ptr_dtor(&exception_message);
+							PHALCON_MM_ADD_ENTRY(&exception_message);
+							PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
 							return;
 						} else {
 							continue;
@@ -1528,13 +1530,13 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 				 */
 				if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
 					PHALCON_CONCAT_SV(&possible_setter, "__set", &attribute);
+					PHALCON_MM_ADD_ENTRY(&possible_setter);
 					zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
 					if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-						PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
+						PHALCON_MM_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &attribute, value);
 					}
-					zval_ptr_dtor(&possible_setter);
 				} else {
 					phalcon_update_property_zval_zval(getThis(), &attribute, value);
 				}
@@ -1548,55 +1550,33 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 				/**
 				 * If the white-list is an array check if the attribute is on that list
 				 */
-				if (Z_TYPE_P(white_list) != IS_ARRAY) {
-					if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
-						PHALCON_CONCAT_SV(&possible_setter, "__set", &key);
-						zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
-						if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-							PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
-						} else {
-							phalcon_update_property_zval_zval(getThis(), &key, value);
+				if (Z_TYPE_P(white_list) == IS_ARRAY) {
+					if (likely(!zend_is_true(negate))) {
+						if (!phalcon_fast_in_array(&key, white_list)) {
+							continue;
 						}
-						zval_ptr_dtor(&possible_setter);
+					} else {
+						if (phalcon_fast_in_array(&key, white_list)) {
+							continue;
+						}
+					}
+				}
+				if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
+					PHALCON_CONCAT_SV(&possible_setter, "__set", &key);
+					PHALCON_MM_ADD_ENTRY(&possible_setter);
+					zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
+					if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
+						PHALCON_MM_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
 					} else {
 						phalcon_update_property_zval_zval(getThis(), &key, value);
 					}
 				} else {
-					if (likely(!zend_is_true(negate))) {
-						if (phalcon_fast_in_array(&key, white_list)) {
-							if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
-								PHALCON_CONCAT_SV(&possible_setter, "__set", &key);
-								zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
-								if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-									PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
-								} else {
-									phalcon_update_property_zval_zval(getThis(), &key, value);
-								}
-								zval_ptr_dtor(&possible_setter);
-							} else {
-								phalcon_update_property_zval_zval(getThis(), &key, value);
-							}
-						}
-					} else {
-						if (!phalcon_fast_in_array(&key, white_list)) {
-							if (likely(PHALCON_GLOBAL(orm).enable_property_method)) {
-								PHALCON_CONCAT_SV(&possible_setter, "__set", &key);
-								zend_str_tolower(Z_STRVAL(possible_setter), Z_STRLEN(possible_setter));
-								if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-									PHALCON_CALL_ZVAL_METHOD(NULL, getThis(), &possible_setter, value);
-								} else {
-									phalcon_update_property_zval_zval(getThis(), &key, value);
-								}
-								zval_ptr_dtor(&possible_setter);
-							} else {
-								phalcon_update_property_zval_zval(getThis(), &key, value);
-							}
-						}
-					}
+					phalcon_update_property_zval_zval(getThis(), &key, value);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
+	RETURN_MM_THIS();
 }
 
 /**
@@ -6985,7 +6965,7 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
  */
 PHP_METHOD(Phalcon_Mvc_Model, dump){
 
-	PHALCON_RETURN_CALL_FUNCTION("get_object_vars", getThis());
+	phalcon_get_object_vars(return_value, getThis(), 1);
 }
 
 /**

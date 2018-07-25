@@ -1103,7 +1103,7 @@ PHP_METHOD(Phalcon_Arr, callback){
 	PHALCON_MM_ZVAL_STRING(&pattern, "#^([^\\(]*+)\\((.*)\\)$#");
 
 	ZVAL_NULL(&matches);
-	RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches));
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, str, &matches, 0, 0));
 	PHALCON_MM_ADD_ENTRY(&matches);
 
 	if (zend_is_true(&ret)) {
@@ -1121,7 +1121,7 @@ PHP_METHOD(Phalcon_Arr, callback){
 			PHALCON_MM_ZVAL_STRING(&search, "\\,");
 			PHALCON_MM_ZVAL_STRING(&replace, ",");
 
-			PHALCON_MM_CALL_FUNCTION(&params, "str_replace", &search, &replace, &split);
+			PHALCON_STR_REPLACE(&params, &search, &replace, &split);
 			PHALCON_MM_ADD_ENTRY(&params);
 		}
 	} else {

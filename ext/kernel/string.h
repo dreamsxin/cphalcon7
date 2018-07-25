@@ -39,8 +39,8 @@
 #define PHALCON_RANDOM_NUMERIC 3
 #define PHALCON_RANDOM_NOZERO  4
 
-#define PHALCON_STR_REPLACE(return_value, search, replace, subject) PHALCON_CALL_FUNCTION(return_value, "str_replace", search, replace, subject)
-#define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) PHALCON_CALL_FUNCTION(return_value, "preg_replace", regex, replace, subject)
+#define PHALCON_STR_REPLACE(return_value, search, replace, subject) phalcon_fast_str_replace(return_value, search, replace, subject)
+#define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) phalcon_fast_preg_replace(return_value, regex, replace, subject)
 
 
 /** Fast char position */
@@ -89,6 +89,7 @@ static inline void phalcon_fast_trim_str(zval *return_value, zval *str, const ch
 }
 
 void phalcon_fast_str_replace(zval *return_value, zval *search, zval *replace, zval *subject);
+void phalcon_fast_preg_replace(zval *return_value, zval *search, zval *replace, zval *subject);
 
 static inline void phalcon_fast_str_replace_str(zval *return_value, const char *search, const char *replace, zval *subject)
 {
@@ -139,7 +140,7 @@ void phalcon_substr(zval *return_value, zval *str, unsigned long from, long leng
 void phalcon_substr_string(zval *return_value, zend_string *str, unsigned long from, long length);
 
 /** Preg-Match */
-int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches) PHALCON_ATTR_WARN_UNUSED_RESULT;
+int phalcon_preg_match(zval *return_value, zval *regex, zval *subject, zval *matches, zend_long flags, int global);
 
 /** Base64 */
 void phalcon_base64_encode(zval *return_value, zval *data);
@@ -150,8 +151,8 @@ void phalcon_md5(zval *return_value, zval *str);
 void phalcon_crc32(zval *return_value, zval *str);
 
 /** JSON */
-int phalcon_json_encode(zval *return_value, zval *v, int opts) PHALCON_ATTR_WARN_UNUSED_RESULT;
-int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc) PHALCON_ATTR_WARN_UNUSED_RESULT;
+int phalcon_json_encode(zval *return_value, zval *v, int opts);
+int phalcon_json_decode(zval *return_value, zval *v, zend_bool assoc);
 
 /***/
 void phalcon_lcfirst(zval *return_value, zval *s);

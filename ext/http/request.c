@@ -1829,16 +1829,18 @@ PHP_METHOD(Phalcon_Http_Request, getBasicAuth)
  */
 PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 
-	zval *_SERVER, key = {}, *value, pattern = {}, digest = {}, set_order = {}, matches = {}, ret = {}, *match;
+	zval *_SERVER, *value, pattern = {}, digest = {}, matches = {}, ret = {}, *match;
 	const char *auth_digest = SG(request_info).auth_digest;
+
+	PHALCON_MM_INIT();
 
 	if (unlikely(!auth_digest)) {
 		_SERVER = phalcon_get_global_str(SL("_SERVER"));
 		if (Z_TYPE_P(_SERVER) == IS_ARRAY) {
-			ZVAL_STRING(&key, "PHP_AUTH_DIGEST");
+			zval key = {};
+			PHALCON_MM_ZVAL_STRING(&key, "PHP_AUTH_DIGEST");
 
 			value = phalcon_hash_get(Z_ARRVAL_P(_SERVER), &key, BP_VAR_UNSET);
-			zval_ptr_dtor(&key);
 			if (value && Z_TYPE_P(value) == IS_STRING) {
 				auth_digest = Z_STRVAL_P(value);
 			}
@@ -1846,15 +1848,10 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 	}
 
 	if (auth_digest) {
-		ZVAL_STRING(&pattern, "#(\\w+)=(['\"]?)([^'\", ]+)\\2#");
-		ZVAL_STRING(&digest, auth_digest);
-		ZVAL_LONG(&set_order, 2);
-
-		ZVAL_MAKE_REF(&matches);
-		PHALCON_CALL_FUNCTION(&ret, "preg_match_all", &pattern, &digest, &matches, &set_order);
-		ZVAL_UNREF(&matches);
-		zval_ptr_dtor(&digest);
-		zval_ptr_dtor(&pattern);
+		PHALCON_MM_ZVAL_STRING(&pattern, "#(\\w+)=(['\"]?)([^'\", ]+)\\2#");
+		PHALCON_MM_ZVAL_STRING(&digest, auth_digest);
+		RETURN_MM_ON_FAILURE(phalcon_preg_match(&ret, &pattern, &digest, &matches, 2, 1));
+		PHALCON_MM_ADD_ENTRY(&matches);
 
 		if (zend_is_true(&ret) && Z_TYPE(matches) == IS_ARRAY) {
 			array_init(return_value);
@@ -1866,11 +1863,9 @@ PHP_METHOD(Phalcon_Http_Request, getDigestAuth){
 					phalcon_array_update(return_value, &tmp1, &tmp2, PH_COPY);
 				}
 			} ZEND_HASH_FOREACH_END();
-
-			return;
+			RETURN_MM();
 		}
-		zval_ptr_dtor(&matches);
 	}
 
-	RETURN_NULL();
+	RETURN_MM_NULL();
 }

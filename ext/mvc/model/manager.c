@@ -1729,17 +1729,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationByAlias){
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 
 	zval *relation, *method, *record, *p = NULL, parameters = {}, pre_conditions = {}, placeholders = {}, referenced_model = {}, is_through = {}, conditions = {};
-	zval intermediate_model = {}, intermediate_fields = {}, fields = {}, value = {}, condition = {}, join_conditions = {}, referenced_fields = {}, joined_join_conditions = {};
-	zval joined_conditions = {}, builder = {}, query = {}, referenced_field = {}, *field, dependency_injector = {}, find_params = {}, find_arguments = {}, arguments = {};
+	zval intermediate_model = {}, intermediate_fields = {}, fields = {}, join_conditions = {}, joined_join_conditions = {};
+	zval joined_conditions = {}, builder = {}, query = {}, *field, dependency_injector = {}, find_params = {}, find_arguments = {}, arguments = {};
 	zval type = {}, retrieve_method = {}, reusable = {}, unique_key = {}, records = {}, referenced_entity = {}, call_object = {};
 	zend_string *str_key;
 	ulong idx;
 	int f_reusable;
 
-	phalcon_fetch_params(0, 3, 1, &relation, &method, &record, &p);
+	phalcon_fetch_params(1, 3, 1, &relation, &method, &record, &p);
 
 	if (p) {
-		ZVAL_DUP(&parameters, p);
+		PHALCON_MM_ZVAL_DUP(&parameters, p);
 	}
 
 	if (Z_TYPE(parameters) == IS_ARRAY) {
@@ -1747,9 +1747,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * Re-use conditions
 		 */
 		if (phalcon_array_isset_fetch_long(&pre_conditions, &parameters, 0, PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&pre_conditions);
 			phalcon_array_unset_long(&parameters, 0, 0);
 		} else {
 			if (phalcon_array_isset_fetch_str(&pre_conditions, &parameters, SL("conditions"), PH_COPY)) {
+				PHALCON_MM_ADD_ENTRY(&pre_conditions);
 				phalcon_array_unset_str(&parameters, SL("conditions"), 0);
 			}
 		}
@@ -1762,60 +1764,70 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		} else {
 			array_init(&placeholders);
 		}
+		PHALCON_MM_ADD_ENTRY(&placeholders);
 	} else {
 		if (Z_TYPE(parameters) == IS_STRING) {
-			ZVAL_COPY(&pre_conditions, &parameters);
+			PHALCON_MM_ZVAL_COPY(&pre_conditions, &parameters);
 		}
 
 		array_init(&placeholders);
+		PHALCON_MM_ADD_ENTRY(&placeholders);
 	}
 
 	/**
 	 * Perform the query on the referenced model
 	 */
-	PHALCON_CALL_METHOD(&referenced_model, relation, "getreferencedmodel");
+	PHALCON_MM_CALL_METHOD(&referenced_model, relation, "getreferencedmodel");
+	PHALCON_MM_ADD_ENTRY(&referenced_model);
 
 	/**
 	 * Check if the relation is direct or through an intermediate model
 	 */
-	PHALCON_CALL_METHOD(&is_through, relation, "isthrough");
+	PHALCON_MM_CALL_METHOD(&is_through, relation, "isthrough");
 	if (zend_is_true(&is_through)) {
 		array_init(&conditions);
+		PHALCON_MM_ADD_ENTRY(&conditions);
 
-		PHALCON_CALL_METHOD(&intermediate_model, relation, "getintermediatemodel");
+		PHALCON_MM_CALL_METHOD(&intermediate_model, relation, "getintermediatemodel");
+		PHALCON_MM_ADD_ENTRY(&intermediate_model);
 
 		/**
 		 * Appends conditions created from the fields defined in the relation
 		 */
-		PHALCON_CALL_METHOD(&fields, relation, "getfields");
+		PHALCON_MM_CALL_METHOD(&fields, relation, "getfields");
+		PHALCON_MM_ADD_ENTRY(&fields);
 		if (Z_TYPE(fields) != IS_ARRAY) {
-			PHALCON_CALL_METHOD(&intermediate_fields, relation, "getintermediatefields");
-			PHALCON_CALL_METHOD(&value, record, "readattribute", &fields);
+			zval condition = {}, value = {};
+			PHALCON_MM_CALL_METHOD(&intermediate_fields, relation, "getintermediatefields");
+			PHALCON_MM_ADD_ENTRY(&intermediate_fields);
+			PHALCON_MM_CALL_METHOD(&value, record, "readattribute", &fields);
 
 			PHALCON_CONCAT_SVSVS(&condition, "[", &intermediate_model, "].[", &intermediate_fields, "] = ?0");
 			phalcon_array_append(&conditions, &condition, 0);
 			phalcon_array_append(&placeholders, &value, 0);
-			zval_ptr_dtor(&intermediate_fields);
 		} else {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
 		}
 
 		array_init(&join_conditions);
+		PHALCON_MM_ADD_ENTRY(&join_conditions);
 
 		/**
 		 * Create the join conditions
 		 */
-		PHALCON_CALL_METHOD(&intermediate_fields, relation, "getintermediatereferencedfields");
+		PHALCON_MM_CALL_METHOD(&intermediate_fields, relation, "getintermediatereferencedfields");
+		PHALCON_MM_ADD_ENTRY(&intermediate_fields);
 		if (Z_TYPE(intermediate_fields) != IS_ARRAY) {
-			PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
+			zval referenced_fields = {}, condition = {};
+			PHALCON_MM_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
 
 			PHALCON_CONCAT_SVSV(&condition, "[", &intermediate_model, "].[", &intermediate_fields);
 			PHALCON_SCONCAT_SVSVS(&condition, "] = [", &referenced_model, "].[", &referenced_fields, "]");
 			phalcon_array_append(&join_conditions, &condition, 0);
 			zval_ptr_dtor(&referenced_fields);
 		} else {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Not supported");
 			return;
 		}
 
@@ -1823,7 +1835,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * We don't trust the user or the database so we use bound parameters
 		 */
 		phalcon_fast_join_str(&joined_join_conditions, SL(" AND "), &join_conditions);
-		zval_ptr_dtor(&join_conditions);
+		PHALCON_MM_ADD_ENTRY(&joined_join_conditions);
 
 		/**
 		 * Add extra conditions passed by the programmer
@@ -1836,34 +1848,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 		 * We don't trust the user or the database so we use bound parameters
 		 */
 		phalcon_fast_join_str(&joined_conditions, SL(" AND "), &conditions);
-		zval_ptr_dtor(&conditions);
+		PHALCON_MM_ADD_ENTRY(&joined_conditions);
 
 		/**
 		 * Create a query builder
 		 */
-		PHALCON_CALL_METHOD(&builder, getThis(), "createbuilder", &parameters);
-		PHALCON_CALL_METHOD(NULL, &builder, "from", &referenced_model);
-		PHALCON_CALL_METHOD(NULL, &builder, "innerjoin", &intermediate_model, &joined_join_conditions);
-		PHALCON_CALL_METHOD(NULL, &builder, "andwhere", &joined_conditions, &placeholders);
-		zval_ptr_dtor(&intermediate_model);
-		zval_ptr_dtor(&referenced_model);
-		zval_ptr_dtor(&joined_conditions);
-		zval_ptr_dtor(&joined_join_conditions);
-		zval_ptr_dtor(&placeholders);
-		zval_ptr_dtor(&parameters);
+		PHALCON_MM_CALL_METHOD(&builder, getThis(), "createbuilder", &parameters);
+		PHALCON_MM_ADD_ENTRY(&builder);
+		PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &referenced_model);
+		PHALCON_MM_CALL_METHOD(NULL, &builder, "innerjoin", &intermediate_model, &joined_join_conditions);
+		PHALCON_MM_CALL_METHOD(NULL, &builder, "andwhere", &joined_conditions, &placeholders);
 
 		/**
 		 * Get the query
 		 */
-		PHALCON_CALL_METHOD(&query, &builder, "getquery");
-		zval_ptr_dtor(&builder);
+		PHALCON_MM_CALL_METHOD(&query, &builder, "getquery");
+		PHALCON_MM_ADD_ENTRY(&query);
 
 		/**
 		 * Execute the query
 		 */
-		PHALCON_RETURN_CALL_METHOD(&query, "execute");
-		zval_ptr_dtor(&query);
-		return;
+		PHALCON_MM_RETURN_CALL_METHOD(&query, "execute");
+		RETURN_MM();
 	}
 
 	if (PHALCON_IS_NOT_EMPTY(&pre_conditions)) {
@@ -1872,34 +1878,38 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	} else {
 		array_init(&conditions);
 	}
-	zval_ptr_dtor(&pre_conditions);
+	PHALCON_MM_ADD_ENTRY(&conditions);
 
 	/**
 	 * Appends conditions created from the fields defined in the relation
 	 */
-	PHALCON_CALL_METHOD(&fields, relation, "getfields");
+	PHALCON_MM_CALL_METHOD(&fields, relation, "getfields");
+	PHALCON_MM_ADD_ENTRY(&fields);
 	if (Z_TYPE(fields) != IS_ARRAY) {
-		PHALCON_CALL_METHOD(&value, record, "readattribute", &fields);
-		PHALCON_CALL_METHOD(&referenced_field, relation, "getreferencedfields");
+		zval value = {}, referenced_field = {}, condition = {};
+		PHALCON_MM_CALL_METHOD(&value, record, "readattribute", &fields);
+		PHALCON_MM_ADD_ENTRY(&value);
+		PHALCON_MM_CALL_METHOD(&referenced_field, relation, "getreferencedfields");
 
 		PHALCON_CONCAT_SVS(&condition, "[", &referenced_field, "] = ?0");
 		phalcon_array_append(&conditions, &condition, 0);
-		phalcon_array_append(&placeholders, &value, 0);
+		phalcon_array_append(&placeholders, &value, PH_COPY);
 		zval_ptr_dtor(&referenced_field);
 	} else {
+		zval referenced_fields = {};
 		/**
 		 * Compound relation
 		 */
-		PHALCON_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
-
+		PHALCON_MM_CALL_METHOD(&referenced_fields, relation, "getreferencedfields");
+		PHALCON_MM_ADD_ENTRY(&referenced_fields);
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(fields), idx, str_key, field) {
-			zval tmp = {};
+			zval tmp = {}, value = {}, referenced_field = {}, condition = {};
 			if (str_key) {
 				ZVAL_STR(&tmp, str_key);
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
-			PHALCON_CALL_METHOD(&value, record, "readattribute", field);
+			PHALCON_MM_CALL_METHOD(&value, record, "readattribute", field);
 
 			phalcon_array_fetch(&referenced_field, &referenced_fields, &tmp, PH_NOISY|PH_READONLY);
 
@@ -1907,81 +1917,77 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 			phalcon_array_append(&conditions, &condition, 0);
 			phalcon_array_append(&placeholders, &value, 0);
 		} ZEND_HASH_FOREACH_END();
-		zval_ptr_dtor(&referenced_fields);
 	}
-	zval_ptr_dtor(&fields);
 
-	PHALCON_CALL_METHOD(&dependency_injector, record, "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, record, "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 	/**
 	 * We don't trust the user or the database so we use bound parameters
 	 */
 	phalcon_fast_join_str(&joined_conditions, SL(" AND "), &conditions);
-	zval_ptr_dtor(&conditions);
+	PHALCON_MM_ADD_ENTRY(&joined_conditions);
 
 	/**
 	 * Create a valid params array to pass to the find/findFirst method
 	 */
 	array_init_size(&find_params, 3);
+	PHALCON_MM_ADD_ENTRY(&find_params);
 	phalcon_array_append(&find_params, &joined_conditions, PH_COPY);
 	phalcon_array_update_str(&find_params, SL("bind"), &placeholders, PH_COPY);
 	phalcon_array_update_str(&find_params, SL("di"), &dependency_injector, PH_COPY);
 	if (Z_TYPE(parameters) == IS_ARRAY) {
 		phalcon_fast_array_merge(&find_arguments, &find_params, &parameters);
+		PHALCON_MM_ADD_ENTRY(&find_arguments);
 	} else {
-		ZVAL_COPY(&find_arguments, &find_params);
+		ZVAL_COPY_VALUE(&find_arguments, &find_params);
 	}
-	zval_ptr_dtor(&parameters);
-	zval_ptr_dtor(&find_params);
-	zval_ptr_dtor(&joined_conditions);
-	zval_ptr_dtor(&dependency_injector);
-	zval_ptr_dtor(&placeholders);
 
 	array_init_size(&arguments, 1);
-	phalcon_array_append(&arguments, &find_arguments, 0);
+	PHALCON_MM_ADD_ENTRY(&arguments);
+	phalcon_array_append(&arguments, &find_arguments, PH_COPY);
 
 	/**
 	 * Check the right method to get the data
 	 */
 	if (Z_TYPE_P(method) == IS_NULL) {
-		PHALCON_CALL_METHOD(&type, relation, "gettype");
+		PHALCON_MM_CALL_METHOD(&type, relation, "gettype");
+		PHALCON_MM_ADD_ENTRY(&type);
 
 		switch (phalcon_get_intval(&type)) {
 
 			case 0:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_MM_ZVAL_STRING(&retrieve_method, "findFirst");
 				break;
 
 			case 1:
-				ZVAL_STRING(&retrieve_method, "findFirst");
+				PHALCON_MM_ZVAL_STRING(&retrieve_method, "findFirst");
 				break;
 
 			case 2:
-				ZVAL_STRING(&retrieve_method, "find");
+				PHALCON_MM_ZVAL_STRING(&retrieve_method, "find");
 				break;
 
 		}
 	} else {
-		ZVAL_COPY(&retrieve_method, method);
+		ZVAL_COPY_VALUE(&retrieve_method, method);
 	}
 
 	/**
 	 * Find first results could be reusable
 	 */
-	PHALCON_CALL_METHOD(&reusable, relation, "isreusable");
+	PHALCON_MM_CALL_METHOD(&reusable, relation, "isreusable");
+	PHALCON_MM_ADD_ENTRY(&reusable);
 	if (zend_is_true(&reusable)) {
 		f_reusable = 1;
 
 		phalcon_unique_key(&unique_key, &referenced_model, &arguments);
+		PHALCON_MM_ADD_ENTRY(&unique_key);
 
-		PHALCON_CALL_METHOD(&records, getThis(), "getreusablerecords", &referenced_model, &unique_key);
+		PHALCON_MM_CALL_METHOD(&records, getThis(), "getreusablerecords", &referenced_model, &unique_key);
+		PHALCON_MM_ADD_ENTRY(&records);
 		if (Z_TYPE(records) == IS_ARRAY || Z_TYPE(records) == IS_OBJECT) {
-			RETVAL_ZVAL(&records, 0, 0);
-			zval_ptr_dtor(&arguments);
-			zval_ptr_dtor(&referenced_model);
-			zval_ptr_dtor(&retrieve_method);
-			zval_ptr_dtor(&unique_key);
-			return;
+			RETURN_MM_CTOR(&records);
 		}
 	} else {
 		/* Use int variable in order not to confuse static code analysers */
@@ -1991,31 +1997,28 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, getRelationRecords){
 	/**
 	 * Load the referenced model
 	 */
-	PHALCON_CALL_METHOD(&referenced_entity, getThis(), "load", &referenced_model);
+	PHALCON_MM_CALL_METHOD(&referenced_entity, getThis(), "load", &referenced_model);
+	PHALCON_MM_ADD_ENTRY(&referenced_entity);
 
 	/**
 	 * Call the function in the model
 	 */
 	array_init_size(&call_object, 2);
+	PHALCON_MM_ADD_ENTRY(&call_object);
 	phalcon_array_append(&call_object, &referenced_entity, PH_COPY);
 	phalcon_array_append(&call_object, &retrieve_method, PH_COPY);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(&records, &call_object, &arguments);
-	zval_ptr_dtor(&call_object);
-	zval_ptr_dtor(&arguments);
-	zval_ptr_dtor(&referenced_entity);
-	zval_ptr_dtor(&retrieve_method);
+	PHALCON_MM_CALL_USER_FUNC_ARRAY(&records, &call_object, &arguments);
+	PHALCON_MM_ADD_ENTRY(&records);
 
 	/**
 	 * Store the result in the cache if it's reusable
 	 */
 	if (f_reusable) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "setreusablerecords", &referenced_model, &unique_key, &records);
-		zval_ptr_dtor(&unique_key);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setreusablerecords", &referenced_model, &unique_key, &records);
 	}
-	zval_ptr_dtor(&referenced_model);
 
-	RETVAL_ZVAL(&records, 0, 0);
+	RETURN_MM_CTOR(&records);
 }
 
 /**

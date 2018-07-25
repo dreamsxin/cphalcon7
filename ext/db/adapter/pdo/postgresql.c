@@ -594,7 +594,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, escapeArray){
 	phalcon_array_append_str(&replace, SL("{"), 0);
 	phalcon_array_append_str(&replace, SL("}"), 0);
 
-	PHALCON_MM_CALL_FUNCTION(return_value, "str_replace", &search, &replace, &ret);
+	PHALCON_STR_REPLACE(return_value, &search, &replace, &ret);
 	RETURN_MM();
 }
 
@@ -698,7 +698,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Postgresql, unescapeArray){
 	phalcon_array_append_str(&replace, SL("["), 0);
 	phalcon_array_append_str(&replace, SL("]"), 0);
 
-	PHALCON_MM_CALL_FUNCTION(&ret, "str_replace", &search, &replace, &parse_value);
+	PHALCON_STR_REPLACE(&ret, &search, &replace, &parse_value);
 	PHALCON_MM_ADD_ENTRY(&ret);
 
 	RETURN_MM_ON_FAILURE(phalcon_json_decode(return_value, &ret, 1));

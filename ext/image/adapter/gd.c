@@ -138,40 +138,6 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, check){
 		return;
 	}
 
-	/*
-	zval gd_version = {}, ret = {}, gd_info = {};
-	if (!phalcon_get_constant(&gd_version, SL("GD_VERSION"))) {
-		zval version = {};
-		PHALCON_CALL_FUNCTION(&gd_info, "gd_info");
-
-		if (phalcon_array_isset_fetch_str(&version, &gd_info, SL("GD Version"), PH_READONLY)) {
-			zval pattern = {}, matches = {};
-			ZVAL_STRING(&pattern, "#\\d+\\.\\d+(?:\\.\\d+)?#");
-			RETURN_ON_FAILURE(phalcon_preg_match(&ret, &pattern, &version, &matches));
-			zval_ptr_dtor(&pattern);
-
-			if (zend_is_true(&ret)) {
-				if (!phalcon_array_isset_fetch_long(&gd_version, &matches, 0, PH_COPY)) {
-					ZVAL_EMPTY_STRING(&gd_version);
-				}
-			} else {
-				ZVAL_EMPTY_STRING(&gd_version);
-			}
-			zval_ptr_dtor(&matches);
-		} else {
-			ZVAL_EMPTY_STRING(&gd_version);
-		}
-		zval_ptr_dtor(&gd_info);
-	}
-	if (-1 == php_version_compare(Z_STRVAL(gd_version), "2.0.1")) {
-		PHALCON_CONCAT_SV(&exception_message, "Phalcon\\Image\\Adapter\\GD requires GD version '2.0.1' or greater, you have '", &gd_version);
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_image_exception_ce, &exception_message);
-		zval_ptr_dtor(&gd_version);
-		return;
-	}
-	zval_ptr_dtor(&gd_version);
-	*/
-
 	phalcon_update_static_property_ce(phalcon_image_adapter_gd_ce, SL("_checked"), &PHALCON_GLOBAL(z_true));
 
 	RETURN_TRUE;

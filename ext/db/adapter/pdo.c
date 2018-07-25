@@ -759,7 +759,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, escapeString){
  */
 PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 
-	zval *sql, *params, query_params = {}, placeholders = {}, matches = {}, set_order = {}, bind_pattern = {}, status = {}, *place_match = NULL, question = {}, bound_sql = {};
+	zval *sql, *params, query_params = {}, placeholders = {}, matches = {}, bind_pattern = {}, status = {}, *place_match = NULL, question = {}, bound_sql = {};
 
 	phalcon_fetch_params(1, 2, 0, &sql, &params);
 
@@ -768,13 +768,9 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, convertBoundParams){
 	array_init(&placeholders);
 	PHALCON_MM_ADD_ENTRY(&placeholders);
 
-	ZVAL_LONG(&set_order, 2);
-
 	PHALCON_MM_ZVAL_STRING(&bind_pattern, "/\\?([0-9]+)|:([a-zA-Z0-9_]+):/");
 
-	ZVAL_MAKE_REF(&matches);
-	PHALCON_MM_CALL_FUNCTION(&status, "preg_match_all", &bind_pattern, sql, &matches, &set_order);
-	ZVAL_UNREF(&matches);
+	RETURN_MM_ON_FAILURE(phalcon_preg_match(&status, &bind_pattern, sql, &matches, 2, 1));
 
 	PHALCON_MM_ADD_ENTRY(&matches);
 	PHALCON_MM_ADD_ENTRY(&status);

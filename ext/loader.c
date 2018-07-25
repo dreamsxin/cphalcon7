@@ -451,16 +451,18 @@ PHP_METHOD(Phalcon_Loader, unregister){
 
 	zval registered = {}, autoloader = {};
 
+	PHALCON_MM_INIT();
 	phalcon_read_property(&registered, getThis(), SL("_registered"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_TRUE(&registered)) {
 		array_init_size(&autoloader, 2);
-		phalcon_array_append(&autoloader, getThis(), 0);
+		phalcon_array_append(&autoloader, getThis(), PH_COPY);
 		add_next_index_stringl(&autoloader, SL("autoLoad"));
-		PHALCON_CALL_FUNCTION(NULL, "spl_autoload_unregister", &autoloader);
+		PHALCON_MM_ADD_ENTRY(&autoloader);
+		PHALCON_MM_CALL_FUNCTION(NULL, "spl_autoload_unregister", &autoloader);
 		phalcon_update_property(getThis(), SL("_registered"), &PHALCON_GLOBAL(z_false));
 	}
 
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**
@@ -477,21 +479,22 @@ PHP_METHOD(Phalcon_Loader, findFile){
 	zval *class_name, *directory, *extensions, *ds = NULL, ds_slash = {}, events_manager = {}, event_name = {}, directories = {}, *dir, *extension, debug_message = {};
 	char slash[2] = {DEFAULT_SLASH, 0};
 
-	phalcon_fetch_params(0, 3, 1, &class_name, &directory, &extensions, &ds);
+	phalcon_fetch_params(1, 3, 1, &class_name, &directory, &extensions, &ds);
 
 	phalcon_read_property(&events_manager, getThis(), SL("_eventsManager"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE_P(directory) != IS_ARRAY) {
 		array_init(&directories);
 		phalcon_array_append(&directories, directory, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&directories);
 	} else {
-		ZVAL_COPY(&directories, directory);
+		ZVAL_COPY_VALUE(&directories, directory);
 	}
 
 	if (!ds) {
-		ZVAL_STRING(&ds_slash, slash);
+		PHALCON_MM_ZVAL_STRING(&ds_slash, slash);
 	} else {
-		ZVAL_COPY(&ds_slash, ds);
+		ZVAL_COPY_VALUE(&ds_slash, ds);
 	}
 
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
@@ -512,20 +515,19 @@ PHP_METHOD(Phalcon_Loader, findFile){
 		 * Add a trailing directory separator if the user forgot to do that
 		 */
 		phalcon_fix_path(&fixed_dir, dir, &ds_slash);
-
+		PHALCON_MM_ADD_ENTRY(&fixed_dir);
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(extensions), extension) {
 			zval file_path = {};
 			PHALCON_CONCAT_VVSV(&file_path, &fixed_dir, class_name, ".", extension);
-
+			PHALCON_MM_ADD_ENTRY(&file_path);
 			/**
 			 * Check if a events manager is available
 			 */
 			if (Z_TYPE(events_manager) == IS_OBJECT) {
 				phalcon_update_property(getThis(), SL("_checkedPath"), &file_path);
 
-				ZVAL_STRING(&event_name, "loader:beforeCheckPath");
-				PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
-				zval_ptr_dtor(&event_name);
+				PHALCON_MM_ZVAL_STRING(&event_name, "loader:beforeCheckPath");
+				PHALCON_MM_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis());
 			}
 
 			/**
@@ -541,37 +543,32 @@ PHP_METHOD(Phalcon_Loader, findFile){
 				if (Z_TYPE(events_manager) == IS_OBJECT) {
 					phalcon_update_property(getThis(), SL("_foundPath"), &file_path);
 
-					ZVAL_STRING(&event_name, "loader:pathFound");
-					PHALCON_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
-					zval_ptr_dtor(&event_name);
+					PHALCON_MM_ZVAL_STRING(&event_name, "loader:pathFound");
+					PHALCON_MM_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &file_path);
 				}
 
 				/**
 				 * Simulate a require
 				 */
 				assert(Z_TYPE(file_path) == IS_STRING);
-				RETURN_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
+				RETURN_MM_ON_FAILURE(phalcon_require(Z_STRVAL(file_path)));
 
 				/**
 				 * Return true mean success
 				 */
 				RETVAL_TRUE;
-				zval_ptr_dtor(&file_path);
 				break;
 			} else if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 				PHALCON_CONCAT_SV(&debug_message, "--Not Found: ", &file_path);
 				PHALCON_DEBUG_LOG(&debug_message);
 				zval_ptr_dtor(&debug_message);
 			}
-			zval_ptr_dtor(&file_path);
 		} ZEND_HASH_FOREACH_END();
-		zval_ptr_dtor(&fixed_dir);
 		if (zend_is_true(return_value)) {
 			break;
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&directories);
-	zval_ptr_dtor(&ds_slash);
+	RETURN_MM();
 }
 
 /**

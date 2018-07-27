@@ -938,13 +938,14 @@ PHP_METHOD(Phalcon_Date, fuzzy_span)
  */
 PHP_METHOD(Phalcon_Date, fuzzy_span2)
 {
-	zval *timestamp, *lables = NULL, output = {}, label = {}, span = {};
+	zval *timestamp, *lables = NULL, output = {}, label = {}, span = {}, ret = {};
 	long offset, hours, minutes, seconds;
 
-	phalcon_fetch_params(0, 1, 1, &timestamp, &lables);
+	phalcon_fetch_params(1, 1, 1, &timestamp, &lables);
 
 	if (!lables) {
 		array_init_size(&output, 7);
+		PHALCON_MM_ADD_ENTRY(&output);
 		phalcon_array_append_str(&output, SL(" years"), 0);
 		phalcon_array_append_str(&output, SL(" months"), 0);
 		phalcon_array_append_str(&output, SL(" weeks"), 0);
@@ -967,22 +968,25 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
 
 	if (hours > 0 && phalcon_array_isset_fetch_long(&label, &output, 4, PH_READONLY)) {
 		ZVAL_LONG(&span, hours);
-		PHALCON_SCONCAT_VV(return_value, &span, &label);
+		PHALCON_SCONCAT_VV(&ret, &span, &label);
+		PHALCON_MM_ADD_ENTRY(&ret);
 	}
 
 	if (minutes > 0) {
 		ZVAL_LONG(&span, minutes);
 		phalcon_array_fetch_long(&label, &output, 5, PH_NOISY|PH_READONLY);
 
-		PHALCON_SCONCAT_VV(return_value, &span, &label);
+		PHALCON_SCONCAT_VV(&ret, &span, &label);
+		PHALCON_MM_ADD_ENTRY(&ret);
 	}
 
 	if (seconds > 0) {
 		ZVAL_LONG(&span, seconds);
 		phalcon_array_fetch_long(&label, &output, 6, PH_NOISY|PH_READONLY);
 
-		PHALCON_SCONCAT_VV(return_value, &span, &label);
+		PHALCON_CONCAT_VVV(return_value, &ret, &span, &label);
 	}
+	RETURN_MM();
 }
 
 /**

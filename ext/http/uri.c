@@ -302,7 +302,7 @@ PHP_METHOD(Phalcon_Http_Uri, build)
 		if (!phalcon_start_with_str(&path, SL("/"))) {
 			PHALCON_SCONCAT_SV(&uri, "/", &path);
 		} else {
-			PHALCON_SCONCAT(&uri, &path);
+			concat_function(&uri, &uri, &path);
 		}
 	}
 

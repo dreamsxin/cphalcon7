@@ -2890,31 +2890,27 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 
 int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 {
-	if (Z_TYPE_P(params) == IS_ARRAY || Z_TYPE_P(params) == IS_OBJECT) {
-		smart_str formstr = { 0 };
-		int res;
+	smart_str formstr = { 0 };
+	int res;
 
-		res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
+	if (Z_TYPE_P(params) != IS_ARRAY && Z_TYPE_P(params) != IS_OBJECT) {
+		return FAILURE;
+	}
 
-		if (res == SUCCESS) {
-			if (!formstr.s) {
-				ZVAL_EMPTY_STRING(return_value);
-			} else {
-				smart_str_0(&formstr);
-				ZVAL_STR(return_value, formstr.s);
-			}
+	res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 
-			return SUCCESS;
-		}
-
+	if (res == FAILURE) {
 		smart_str_free(&formstr);
 		ZVAL_FALSE(return_value);
+		return FAILURE;
 	}
-	else {
-		ZVAL_NULL(return_value);
+	if (!formstr.s) {
+		ZVAL_EMPTY_STRING(return_value);
+	} else {
+		smart_str_0(&formstr);
+		ZVAL_NEW_STR(return_value, formstr.s);
 	}
-
-	return FAILURE;
+	return SUCCESS;
 }
 
 void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, zval *charset)

@@ -21,6 +21,8 @@
 
 #include "php_phalcon.h"
 
+#include <Zend/zend_smart_str.h>
+
 #ifdef PHALCON_USE_PHP_JSON
 # include <ext/json/php_json.h>
 #endif
@@ -42,6 +44,8 @@
 #define PHALCON_STR_REPLACE(return_value, search, replace, subject) phalcon_fast_str_replace(return_value, search, replace, subject)
 #define PHALCON_PREG_REPLACE(return_value, regex, replace, subject) phalcon_fast_preg_replace(return_value, regex, replace, subject)
 
+#define phalcon_smart_str_appendl(dest, src, len) \
+	smart_str_appendl_ex((dest), (src), (len), 0)
 
 /** Fast char position */
 int phalcon_memnstr(const zval *haystack, const zval *needle);
@@ -65,6 +69,7 @@ void phalcon_strtolower_inplace(zval *s);
 void phalcon_fast_strtoupper(zval *return_value, zval *str);
 void phalcon_strtoupper(zval *return_value, zval *str);
 void phalcon_fast_join(zval *result, zval *glue, zval *pieces);
+void phalcon_append_printable_zval(smart_str *implstr, zval *tmp);
 void phalcon_fast_join_str(zval *result, char *glue, unsigned int glue_length, zval *pieces);
 void phalcon_fast_explode(zval *result, zval *delimiter, zval *str);
 void phalcon_fast_explode_str(zval *result, const char *delimiter, unsigned int delimiter_length, zval *str);

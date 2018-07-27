@@ -76,6 +76,7 @@
 #define PHALCON_GT_DOUBLE(op1, op2)  ((Z_TYPE_P(op1) == IS_DOUBLE && Z_DVAL_P(op1) > op2) || phalcon_greater_double(op1, op2))
 
 #define ZVAL_STRINGING_OFFSET(op1, index) ((index >= 0 && index < Z_STRLEN_P(op1)) ? Z_STRVAL_P(op1)[index] : '\0')
+#define CHAR_STRINGING_OFFSET(op1, index) ((index >= 0 && index < strlen(op1)) ? op1[index] : '\0')
 
 #define phalcon_increment(var) increment_function(var)
 #define phalcon_decrement(var) decrement_function(var)

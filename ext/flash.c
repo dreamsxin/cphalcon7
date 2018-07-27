@@ -261,7 +261,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 	int flag_automatic_html;
 	int flag_implicit_flush;
 
-	phalcon_fetch_params(0, 2, 0, &type, &message);
+	phalcon_fetch_params(1, 2, 0, &type, &message);
 
 	phalcon_read_property(&automatic_html, getThis(), SL("_automaticHtml"), PH_READONLY);
 	flag_automatic_html = zend_is_true(&automatic_html);
@@ -273,6 +273,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 				phalcon_fast_join_str(&joined_classes, SL(" "), &type_classes);
 
 				PHALCON_CONCAT_SVS(&css_classes, " class=\"", &joined_classes, "\"");
+				zval_ptr_dtor(&joined_classes);
 			} else {
 				PHALCON_CONCAT_SVS(&css_classes, " class=\"", &type_classes, "\"");
 			}
@@ -280,6 +281,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			ZVAL_EMPTY_STRING(&css_classes);
 		}
 	}
+	PHALCON_MM_ADD_ENTRY(&css_classes);
 
 	phalcon_read_property(&implicit_flush, getThis(), SL("_implicitFlush"), PH_READONLY);
 	flag_implicit_flush = zend_is_true(&implicit_flush);
@@ -288,7 +290,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 * We create the message with implicit flush or other
 		 */
 		if (!flag_implicit_flush) {
-			ZVAL_EMPTY_STRING(&content);
+			PHALCON_MM_ZVAL_EMPTY_STRING(&content);
 		}
 
 		/**
@@ -301,6 +303,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 			 */
 			if (flag_automatic_html) {
 				PHALCON_CONCAT_SVSVS(&html_message0, "<div", &css_classes, ">", msg, "</div>" PHP_EOL);
+				PHALCON_MM_ADD_ENTRY(&html_message0);
 			} else {
 				ZVAL_COPY_VALUE(&html_message0, msg);
 			}
@@ -309,6 +312,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 				zend_print_zval(&html_message0, 0);
 			} else {
 				phalcon_concat_self(&content, &html_message0);
+				PHALCON_MM_ADD_ENTRY(&content);
 			}
 		} ZEND_HASH_FOREACH_END();
 
@@ -316,7 +320,7 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 * We return the message as string if the implicit_flush is turned off
 		 */
 		if (!flag_implicit_flush) {
-			RETURN_NCTOR(&content);
+			RETURN_MM_CTOR(&content);
 		}
 	} else {
 		/**
@@ -324,8 +328,9 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 */
 		if (flag_automatic_html) {
 			PHALCON_CONCAT_SVSVS(&html_message, "<div", &css_classes, ">", message, "</div>" PHP_EOL);
+			PHALCON_MM_ADD_ENTRY(&html_message);
 		} else {
-			ZVAL_COPY(&html_message, message);
+			ZVAL_COPY_VALUE(&html_message, message);
 		}
 
 		/**
@@ -333,9 +338,10 @@ PHP_METHOD(Phalcon_Flash, outputMessage){
 		 */
 		if (flag_implicit_flush) {
 			zend_print_zval(&html_message, 0);
-			zval_ptr_dtor(&html_message);
-		} else {
-			RETURN_NCTOR(&html_message);
+			RETURN_MM();
 		}
+		RETURN_MM_CTOR(&html_message);
+
 	}
+	RETURN_MM();
 }

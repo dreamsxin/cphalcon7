@@ -848,8 +848,15 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (zend_is_true(&use_implicit_output)) {
 				zend_print_zval(&html, 0);
 			} else {
-				phalcon_mm_concat_self(&output, &html);
-				PHALCON_MM_ADD_ENTRY(&output);
+				if (Z_TYPE(output) <= IS_NULL) {
+					PHALCON_MM_ZVAL_COPY(&output, &html);
+				} else {
+					zval tmp = {};
+					PHALCON_CONCAT_VV(&tmp, &output, &html);
+					PHALCON_MM_ADD_ENTRY(&tmp);
+					ZVAL_COPY_VALUE(&output, &tmp);
+				}
+				
 			}
 
 			continue;
@@ -893,8 +900,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			phalcon_file_get_contents(&filtered_content, &target_path);
 			if (PHALCON_IS_FALSE(&filtered_content)) {
 				PHALCON_CONCAT_SVS(&exception_message, "Resource's content for \"", &target_path, "\" cannot be read");
+				PHALCON_MM_ADD_ENTRY(&exception_message);
 				PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
-				zval_ptr_dtor(&exception_message);
 				return;
 			}
 			PHALCON_MM_ADD_ENTRY(&filtered_content);
@@ -908,16 +915,21 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 				if (Z_TYPE(filtered_joined_content) <= IS_NULL) {
 					PHALCON_MM_ZVAL_COPY(&filtered_joined_content, &filtered_content);
 				} else {
-					PHALCON_MM_SCONCAT_VS(&filtered_joined_content, &filtered_content, "");
-					PHALCON_MM_ADD_ENTRY(&filtered_joined_content);
+					zval tmp = {};
+					PHALCON_CONCAT_VV(&tmp, &filtered_joined_content, &filtered_content);
+					PHALCON_MM_ADD_ENTRY(&tmp);
+					ZVAL_COPY_VALUE(&filtered_joined_content, &tmp);
 				}
 			} else {
 				if (Z_TYPE(filtered_joined_content) <= IS_NULL) {
 					PHALCON_CONCAT_VS(&filtered_joined_content, &filtered_content, ";");
+					PHALCON_MM_ADD_ENTRY(&filtered_joined_content);
 				} else {
-					PHALCON_MM_SCONCAT_VS(&filtered_joined_content, &filtered_content, ";");
+					zval tmp = {};
+					PHALCON_CONCAT_VVS(&tmp, &filtered_joined_content, &filtered_content, ";");
+					PHALCON_MM_ADD_ENTRY(&tmp);
+					ZVAL_COPY_VALUE(&filtered_joined_content, &tmp);
 				}
-				PHALCON_MM_ADD_ENTRY(&filtered_joined_content);
 			}
 		}
 
@@ -997,7 +1009,11 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			if (zend_is_true(&use_implicit_output)) {
 				zend_print_zval(&html, 0);
 			} else {
-				phalcon_mm_concat_self(&output, &html);
+				if (Z_TYPE(output) <= IS_NULL) {
+					ZVAL_STRINGL(&output, Z_STRVAL(html), Z_STRLEN(html));
+				} else {
+					phalcon_concat_self(&output, &html);
+				}
 				PHALCON_MM_ADD_ENTRY(&output);
 			}
 		}

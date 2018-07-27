@@ -379,37 +379,37 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, offsetGet){
 
 	zval *index, count = {}, pointer = {}, valid = {};
 
-	phalcon_fetch_params(0, 1, 0, &index);
+	phalcon_fetch_params(1, 1, 0, &index);
 
-	PHALCON_CALL_METHOD(&count, getThis(), "count");
+	PHALCON_MM_CALL_METHOD(&count, getThis(), "count");
+	PHALCON_MM_ADD_ENTRY(&count);
 	if (PHALCON_LT(index, &count)) {
 		/**
 		 * Check if the last record returned is the current requested
 		 */
 		phalcon_read_property(&pointer, getThis(), SL("_pointer"), PH_NOISY|PH_READONLY);
 		if (PHALCON_IS_EQUAL(&pointer, index)) {
-			PHALCON_RETURN_CALL_METHOD(getThis(), "current");
-			return;
+			PHALCON_MM_RETURN_CALL_METHOD(getThis(), "current");
+			RETURN_MM();
 		}
 
 		/**
 		 * Move the cursor to the specific position
 		 */
-		PHALCON_CALL_METHOD(NULL, getThis(), "seek", index);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "seek", index);
 
 		/**
 		 * Check if the last record returned is the requested
 		 */
-		PHALCON_CALL_METHOD(&valid, getThis(), "valid");
+		PHALCON_MM_CALL_METHOD(&valid, getThis(), "valid");
 		if (PHALCON_IS_NOT_FALSE(&valid)) {
-			PHALCON_RETURN_CALL_METHOD(getThis(), "current");
-		} else {
-			RETVAL_FALSE;
+			PHALCON_MM_RETURN_CALL_METHOD(getThis(), "current");
+			RETURN_MM();
 		}
-	} else {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the cursor");
+		RETURN_MM_FALSE;
 	}
-	zval_ptr_dtor(&count);
+	PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The index does not exist in the cursor");
+	return;
 }
 
 /**

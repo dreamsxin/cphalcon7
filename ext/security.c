@@ -50,6 +50,7 @@
 #include "kernel/string.h"
 #include "kernel/filter.h"
 #include "kernel/concat.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 #include "internal/arginfo.h"
@@ -632,10 +633,10 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 
 	zval *name = NULL, *_number_bytes = NULL, number_bytes = {}, key = {}, random_bytes = {}, base64bytes = {}, safe_bytes = {}, service = {}, session = {};
 
-	phalcon_fetch_params(0, 0, 2, &name, &number_bytes);
+	phalcon_fetch_params(1, 0, 2, &name, &number_bytes);
 
 	if (phalcon_function_exists_ex(SL("openssl_random_pseudo_bytes")) == FAILURE) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}
 
@@ -647,27 +648,27 @@ PHP_METHOD(Phalcon_Security, getTokenKey){
 
 	ZVAL_STR(&service, IS(session));
 
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_MM_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_MM_ADD_ENTRY(&session);
+	PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
-	ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
+	PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
 
 	if (name && !PHALCON_IS_EMPTY(name)) {
 		PHALCON_SCONCAT(&key, name);
+		PHALCON_MM_ADD_ENTRY(&key);
 	}
 
-	PHALCON_CALL_FUNCTION(&random_bytes, "openssl_random_pseudo_bytes", &number_bytes);
-
+	PHALCON_MM_CALL_FUNCTION(&random_bytes, "openssl_random_pseudo_bytes", &number_bytes);
+	PHALCON_MM_ADD_ENTRY(&random_bytes);
 	phalcon_base64_encode(&base64bytes, &random_bytes);
-	zval_ptr_dtor(&random_bytes);
+	PHALCON_MM_ADD_ENTRY(&base64bytes);
 	phalcon_filter_alphanum(&safe_bytes, &base64bytes);
-	zval_ptr_dtor(&base64bytes);
+	PHALCON_MM_ADD_ENTRY(&safe_bytes);
 
-	PHALCON_CALL_METHOD(NULL, &session, "set", &key, &safe_bytes);
-	zval_ptr_dtor(&key);
-	zval_ptr_dtor(&session);
+	PHALCON_MM_CALL_METHOD(NULL, &session, "set", &key, &safe_bytes);
 
-	RETURN_ZVAL(&safe_bytes, 0, 0);
+	RETURN_MM_CTOR(&safe_bytes);
 }
 
 /**
@@ -680,17 +681,18 @@ PHP_METHOD(Phalcon_Security, getToken){
 
 	zval *name = NULL, *_number_bytes = NULL, number_bytes = {}, key = {}, random_bytes = {}, token = {}, service = {}, session = {};
 
-	phalcon_fetch_params(0, 0, 2, &name, &number_bytes);
+	phalcon_fetch_params(1, 0, 2, &name, &number_bytes);
 
 	if (phalcon_function_exists_ex(SL("openssl_random_pseudo_bytes")) == FAILURE) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_security_exception_ce, "Openssl extension must be loaded");
 		return;
 	}
 
 	ZVAL_STR(&service, IS(session));
 
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_MM_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_MM_ADD_ENTRY(&session);
+	PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
 	if (!_number_bytes) {
 		ZVAL_LONG(&number_bytes, 12);
@@ -698,22 +700,21 @@ PHP_METHOD(Phalcon_Security, getToken){
 		ZVAL_COPY_VALUE(&number_bytes, _number_bytes);
 	}
 
-	ZVAL_STRING(&key, "$PHALCON/CSRF$");
+	PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF$");
 
 	if (name && !PHALCON_IS_EMPTY(name)) {
 		PHALCON_SCONCAT(&key, name);
+		PHALCON_MM_ADD_ENTRY(&key);
 	}
 
-	PHALCON_CALL_FUNCTION(&random_bytes, "openssl_random_pseudo_bytes", &number_bytes);
-
+	PHALCON_MM_CALL_FUNCTION(&random_bytes, "openssl_random_pseudo_bytes", &number_bytes);
+	PHALCON_MM_ADD_ENTRY(&random_bytes);
 	phalcon_md5(&token, &random_bytes);
-	zval_ptr_dtor(&random_bytes);
+	PHALCON_MM_ADD_ENTRY(&token);
 
-	PHALCON_CALL_METHOD(NULL, &session, "set", &key, &token);
-	zval_ptr_dtor(&key);
-	zval_ptr_dtor(&session);
+	PHALCON_MM_CALL_METHOD(NULL, &session, "set", &key, &token);
 
-	RETURN_ZVAL(&token, 0, 0);
+	RETURN_MM_CTOR(&token);
 }
 
 /**
@@ -727,7 +728,7 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	zval *name = NULL, *_token_key = NULL, *token_value = NULL, token_key = {}, service = {}, session = {}, key = {}, request = {}, token = {}, session_token = {};
 
-	phalcon_fetch_params(0, 0, 3, &name, &_token_key, &token_value);
+	phalcon_fetch_params(1, 0, 3, &name, &_token_key, &token_value);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -735,20 +736,22 @@ PHP_METHOD(Phalcon_Security, checkToken){
 
 	ZVAL_STR(&service, IS(session));
 
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_MM_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_MM_ADD_ENTRY(&session);
+	PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
 	if (!_token_key || Z_TYPE_P(_token_key) == IS_NULL) {
-		ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
+		PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
 
 		if (!PHALCON_IS_EMPTY(name)) {
 			PHALCON_SCONCAT(&key, name);
+			PHALCON_MM_ADD_ENTRY(&key);
 		}
 
-		PHALCON_CALL_METHOD(&token_key, &session, "get", &key);
-		zval_ptr_dtor(&key);
+		PHALCON_MM_CALL_METHOD(&token_key, &session, "get", &key);
+		PHALCON_MM_ADD_ENTRY(&token_key);
 	} else {
-		ZVAL_COPY(&token_key, _token_key);
+		ZVAL_COPY_VALUE(&token_key, _token_key);
 	}
 
 	if (!token_value) {
@@ -758,35 +761,34 @@ PHP_METHOD(Phalcon_Security, checkToken){
 	if (Z_TYPE_P(token_value) == IS_NULL) {
 		ZVAL_STR(&service, IS(request));
 
-		PHALCON_CALL_METHOD(&request, getThis(), "getresolveservice", &service);
-		PHALCON_VERIFY_INTERFACE(&request, phalcon_http_requestinterface_ce);
+		PHALCON_MM_CALL_METHOD(&request, getThis(), "getresolveservice", &service);
+		PHALCON_MM_ADD_ENTRY(&request);
+		PHALCON_MM_VERIFY_INTERFACE(&request, phalcon_http_requestinterface_ce);
 
 		/**
 		 * We always check if the value is correct in post
 		 */
-		PHALCON_CALL_METHOD(&token, &request, "getpost", &token_key);
-		zval_ptr_dtor(&request);
+		PHALCON_MM_CALL_METHOD(&token, &request, "getpost", &token_key);
+		PHALCON_MM_ADD_ENTRY(&token);
 	} else {
-		ZVAL_COPY(&token, token_value);
+		ZVAL_COPY_VALUE(&token, token_value);
 	}
-	zval_ptr_dtor(&token_key);
 
-	ZVAL_STRING(&key, "$PHALCON/CSRF$");
+	PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF$");
 
 	if (!PHALCON_IS_EMPTY(name)) {
 		PHALCON_SCONCAT(&key, name);
+		PHALCON_MM_ADD_ENTRY(&key);
 	}
 
-	PHALCON_CALL_METHOD(&session_token, &session, "get", &key);
-	zval_ptr_dtor(&key);
-	zval_ptr_dtor(&session);
+	PHALCON_MM_CALL_METHOD(&session_token, &session, "get", &key);
+	PHALCON_MM_ADD_ENTRY(&session_token);
 
 	/**
 	 * The value is the same?
 	 */
 	is_equal_function(return_value, &token, &session_token);
-	zval_ptr_dtor(&token);
-	zval_ptr_dtor(&session_token);
+	RETURN_MM();
 }
 
 /**
@@ -798,7 +800,7 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 
 	zval *name = NULL, service = {}, session = {}, key = {};
 
-	phalcon_fetch_params(0, 0, 1, &name);
+	phalcon_fetch_params(1, 0, 1, &name);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -806,18 +808,19 @@ PHP_METHOD(Phalcon_Security, getSessionToken){
 
 	ZVAL_STR(&service, IS(session));
 
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_MM_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_MM_ADD_ENTRY(&session);
+	PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
-	ZVAL_STRING(&key, "$PHALCON/CSRF$");
+	PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF$");
 
 	if (!PHALCON_IS_EMPTY(name)) {
 		PHALCON_SCONCAT(&key, name);
+		PHALCON_MM_ADD_ENTRY(&key);
 	}
 
-	PHALCON_RETURN_CALL_METHOD(&session, "get", &key);
-	zval_ptr_dtor(&key);
-	zval_ptr_dtor(&session);
+	PHALCON_MM_RETURN_CALL_METHOD(&session, "get", &key);
+	RETURN_MM();
 }
 
 /**
@@ -827,7 +830,7 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	zval *name = NULL, *token_key = NULL, service = {}, session = {}, key = {};
 
-	phalcon_fetch_params(0, 0, 2, &name, &token_key);
+	phalcon_fetch_params(1, 0, 2, &name, &token_key);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -839,34 +842,35 @@ PHP_METHOD(Phalcon_Security, destroyToken){
 
 	ZVAL_STR(&service, IS(session));
 
-	PHALCON_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
-	PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+	PHALCON_MM_CALL_METHOD(&session, getThis(), "getresolveservice", &service);
+	PHALCON_MM_ADD_ENTRY(&session);
+	PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 
-	ZVAL_STRING(&key, "$PHALCON/CSRF$");
+	PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF$");
 
 	if (!PHALCON_IS_EMPTY(name)) {
 		PHALCON_SCONCAT(&key, name);
+		PHALCON_MM_ADD_ENTRY(&key);
 	}
 
-	PHALCON_CALL_METHOD(NULL, &session, "remove", &key);
-	zval_ptr_dtor(&key);
+	PHALCON_MM_CALL_METHOD(NULL, &session, "remove", &key);
 
 	if (PHALCON_IS_EMPTY(token_key)) {
-		ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
+		PHALCON_MM_ZVAL_STRING(&key, "$PHALCON/CSRF/KEY$");
 		if (!PHALCON_IS_EMPTY(name)) {
 			PHALCON_SCONCAT(&key, name);
+			PHALCON_MM_ADD_ENTRY(&key);
 		}
 	} else {
 		if (UNEXPECTED(Z_TYPE_P(token_key) != IS_STRING)) {
 			PHALCON_ENSURE_IS_STRING(token_key);
 		}
 
-		ZVAL_STRING(&key, Z_STRVAL_P(token_key));
+		PHALCON_MM_ZVAL_STRING(&key, Z_STRVAL_P(token_key));
 	}
 
-	PHALCON_CALL_METHOD(NULL, &session, "remove", &key);
-	zval_ptr_dtor(&key);
-	zval_ptr_dtor(&session);
+	PHALCON_MM_CALL_METHOD(NULL, &session, "remove", &key);
+	RETURN_MM();
 }
 
 /**
@@ -1036,7 +1040,7 @@ PHP_METHOD(Phalcon_Security, pbkdf2)
 			zval_ptr_dtor(&tmp);
 		}
 
-		phalcon_concat_self(&result, &K2);
+		concat_function(&result, &result, &K2);
 		zval_ptr_dtor(&K2);
 		zval_ptr_dtor(&K1);
 	}

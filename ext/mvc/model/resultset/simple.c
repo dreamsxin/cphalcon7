@@ -13,6 +13,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -101,7 +102,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
 	zval *column_map, *model, *result, *cache = NULL, *source_model = NULL, fetch_assoc = {}, limit = {}, row_count = {}, big_resultset = {};
 
-	phalcon_fetch_params(0, 3, 3, &column_map, &model, &result, &cache, &source_model);
+	phalcon_fetch_params(1, 3, 3, &column_map, &model, &result, &cache, &source_model);
 
 	if (!cache) {
 		cache = &PHALCON_GLOBAL(z_null);
@@ -125,11 +126,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 	 * Use only fetch assoc
 	 */
 	ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
-	PHALCON_CALL_METHOD(NULL, result, "setfetchmode", &fetch_assoc);
+	PHALCON_MM_CALL_METHOD(NULL, result, "setfetchmode", &fetch_assoc);
 
 	ZVAL_LONG(&limit, 32);
 
-	PHALCON_CALL_METHOD(&row_count, result, "numrows");
+	PHALCON_MM_CALL_METHOD(&row_count, result, "numrows");
+	PHALCON_MM_ADD_ENTRY(&row_count);
 
 	/**
 	 * Check if it's a big resultset
@@ -148,6 +150,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
 	phalcon_update_property_empty_array(getThis(), SL("_models"));
 	phalcon_update_property_empty_array(getThis(), SL("_others"));
+	RETURN_MM();
 }
 
 /**
@@ -161,11 +164,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 	zval source_model = {}, model = {}, active_row = {}, rows_objects = {};
 	zend_class_entry *ce;
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 	if (zend_is_true(&type)) {
 		phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(result) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(&row, &result, "fetch");
+			PHALCON_MM_CALL_METHOD(&row, &result, "fetch");
+			PHALCON_MM_ADD_ENTRY(&row);
 		} else {
 			ZVAL_FALSE(&row);
 		}
@@ -174,14 +180,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 		if (Z_TYPE(rows) != IS_ARRAY) {
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
-				PHALCON_CALL_METHOD(&rows, &result, "fetchall");
+				PHALCON_MM_CALL_METHOD(&rows, &result, "fetchall");
+				PHALCON_MM_ADD_ENTRY(&rows);
 				phalcon_update_property(getThis(), SL("_rows"), &rows);
-				zval_ptr_dtor(&rows);
 			}
 		}
 
 		if (Z_TYPE(rows) == IS_ARRAY) {
 			phalcon_array_get_current(&row, &rows);
+			PHALCON_MM_ADD_ENTRY(&row);
 			if (PHALCON_IS_NOT_FALSE(&row)) {
 				zend_hash_move_forward(Z_ARRVAL(rows));
 			}
@@ -192,7 +199,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 	if (Z_TYPE(row) != IS_ARRAY) {
 		phalcon_update_property_bool(getThis(), SL("_activeRow"), 0);
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	/**
@@ -210,8 +217,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 	 */
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_SELF(&key, "key");
-
+	PHALCON_MM_CALL_SELF(&key, "key");
+	PHALCON_MM_ADD_ENTRY(&key);
 	phalcon_read_property(&source_model, getThis(), SL("_sourceModel"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(source_model) == IS_OBJECT) {
@@ -227,7 +234,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 
 		case 0:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsModels"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_COPY)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
 				/**
 				 * this_ptr->model is the base entity
 				 */
@@ -236,30 +243,27 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 				/**
 				 * Performs the standard hydration based on objects
 				 */
-				PHALCON_CALL_CE_STATIC(&active_row, ce, "cloneresultmap", &model, &row, &column_map, &dirty_state, &source_model);
-
+				PHALCON_MM_CALL_CE_STATIC(&active_row, ce, "cloneresultmap", &model, &row, &column_map, &dirty_state, &source_model);
+				PHALCON_MM_ADD_ENTRY(&active_row);
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), &key, &active_row);
 			}
 			break;
 
 		default:
 			phalcon_read_property(&rows_objects, getThis(), SL("_rowsObjects"), PH_NOISY|PH_READONLY);
-			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_COPY)) {
+			if (!phalcon_array_isset_fetch(&active_row, &rows_objects, &key, PH_READONLY)) {
 				/**
 				 * Other kinds of hydrations
 				 */
-				PHALCON_CALL_CE_STATIC(&active_row, ce, "cloneresultmaphydrate", &row, &column_map, &hydrate_mode, &source_model);
-
+				PHALCON_MM_CALL_CE_STATIC(&active_row, ce, "cloneresultmaphydrate", &row, &column_map, &hydrate_mode, &source_model);
+				PHALCON_MM_ADD_ENTRY(&active_row);
 				phalcon_update_property_array(getThis(), SL("_rowsModels"), &key, &active_row);
 			}
 			break;
 	}
-	zval_ptr_dtor(&row);
-	zval_ptr_dtor(&key);
 
 	phalcon_update_property(getThis(), SL("_activeRow"), &active_row);
-	zval_ptr_dtor(&active_row);
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**

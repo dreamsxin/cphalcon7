@@ -844,10 +844,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getSchema){
 PHP_METHOD(Phalcon_Mvc_Model, getIdentityField){
 
 	zval meta_data = {};
-
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getidentityfield", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getidentityfield", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -865,11 +866,13 @@ PHP_METHOD(Phalcon_Mvc_Model, getColumnMap){
 	phalcon_read_property(return_value, getThis(), SL("_columnMap"), PH_COPY);
 
 	if (!zend_is_true(return_value)) {
-		PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-		PHALCON_CALL_METHOD(return_value, &meta_data, "getcolumnmap", getThis());
-		zval_ptr_dtor(&meta_data);
+		PHALCON_MM_INIT();
+		PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+		PHALCON_MM_ADD_ENTRY(&meta_data);
+		PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getcolumnmap", getThis());
 
 		phalcon_update_property(getThis(), SL("_columnMap"), return_value);
+		RETURN_MM();
 	}
 }
 
@@ -882,9 +885,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getReverseColumnMap){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getreversecolumnmap", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getreversecolumnmap", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -896,9 +901,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -910,9 +917,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getPrimaryKeyAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getprimarykeyattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getprimarykeyattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -924,9 +933,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getNonPrimaryKeyAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getnonprimarykeyattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getnonprimarykeyattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -938,9 +949,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getNotNullAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getnotnullattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getnotnullattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -952,9 +965,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataTypesNumeric){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdatatypesnumeric", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdatatypesnumeric", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -966,11 +981,12 @@ PHP_METHOD(Phalcon_Mvc_Model, isNotNull){
 
 	zval meta_data = {}, *attribute;
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(1, 1, 0, &attribute);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "isNotNull", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "isNotNull", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -982,9 +998,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataTypes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdatatypes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdatatypes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -997,11 +1015,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataSize){
 
 	zval meta_data = {}, *attribute;
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(1, 1, 0, &attribute);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdatasize", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdatasize", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -1014,11 +1033,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataByte){
 
 	zval meta_data = {}, *attribute;
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(1, 1, 0, &attribute);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdatabyte", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdatabyte", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -1031,11 +1051,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getDataScale){
 
 	zval meta_data = {}, *attribute;
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(1, 1, 0, &attribute);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdatascale", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdatascale", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -1047,9 +1068,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getBindTypes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getbindtypes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getbindtypes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -1061,9 +1084,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getDefaultValues){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getdefaultvalues", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getdefaultvalues", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -1075,9 +1100,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getAutomaticCreateAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getautomaticcreateattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getautomaticcreateattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -1089,9 +1116,11 @@ PHP_METHOD(Phalcon_Mvc_Model, getAutomaticUpdateAttributes){
 
 	zval meta_data = {};
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getautomaticupdateattributes", getThis());
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getautomaticupdateattributes", getThis());
+	RETURN_MM();
 }
 
 /**
@@ -1104,11 +1133,12 @@ PHP_METHOD(Phalcon_Mvc_Model, hasRealAttribute){
 
 	zval *column, meta_data = {};
 
-	phalcon_fetch_params(0, 1, 0, &column);
+	phalcon_fetch_params(1, 1, 0, &column);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "hasrealattribute", getThis(), column);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "hasrealattribute", getThis(), column);
+	RETURN_MM();
 }
 
 /**
@@ -1121,11 +1151,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getRealAttribute){
 
 	zval *column, meta_data = {};
 
-	phalcon_fetch_params(0, 1, 0, &column);
+	phalcon_fetch_params(1, 1, 0, &column);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getrealattribute", getThis(), column);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getrealattribute", getThis(), column);
+	RETURN_MM();
 }
 
 /**
@@ -1138,11 +1169,12 @@ PHP_METHOD(Phalcon_Mvc_Model, hasAttribute){
 
 	zval *attribute, meta_data = {};
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
-
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "hasattribute", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	phalcon_fetch_params(1, 1, 0, &attribute);
+	
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "hasattribute", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -1155,11 +1187,12 @@ PHP_METHOD(Phalcon_Mvc_Model, getAttribute){
 
 	zval *attribute, meta_data = {};
 
-	phalcon_fetch_params(0, 1, 0, &attribute);
+	phalcon_fetch_params(1, 1, 0, &attribute);
 
-	PHALCON_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
-	PHALCON_CALL_METHOD(return_value, &meta_data, "getAttribute", getThis(), attribute);
-	zval_ptr_dtor(&meta_data);
+	PHALCON_MM_CALL_METHOD(&meta_data, getThis(), "getmodelsmetadata");
+	PHALCON_MM_ADD_ENTRY(&meta_data);
+	PHALCON_MM_CALL_METHOD(return_value, &meta_data, "getAttribute", getThis(), attribute);
+	RETURN_MM();
 }
 
 /**
@@ -2126,37 +2159,36 @@ PHP_METHOD(Phalcon_Mvc_Model, query){
 
 	zval *di = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {};
 
-	phalcon_fetch_params(0, 0, 1, &di);
+	phalcon_fetch_params(1, 0, 1, &di);
 
 	if (!di || Z_TYPE_P(di) != IS_OBJECT) {
 		/**
 		 * Use the global dependency injector if there is no one defined
 		 */
-		PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-
+		PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 			return;
 		}
 	} else {
-		ZVAL_COPY(&dependency_injector, di);
+		ZVAL_COPY_VALUE(&dependency_injector, di);
 	}
 
 	phalcon_get_called_class(&model_name);
-
+	PHALCON_MM_ADD_ENTRY(&model_name);
 	ZVAL_STR(&service_name, IS(modelsCriteria));
 
-	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+	PHALCON_MM_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
 	if (zend_is_true(&has)) {
-		PHALCON_CALL_METHOD(return_value, &dependency_injector, "get", &service_name);
+		PHALCON_MM_CALL_METHOD(return_value, &dependency_injector, "get", &service_name);
 	} else {
 		object_init_ex(return_value, phalcon_mvc_model_criteria_ce);
 	}
 
-	PHALCON_CALL_METHOD(NULL, return_value, "setdi", &dependency_injector);
-	PHALCON_CALL_METHOD(NULL, return_value, "setmodelname", &model_name);
-	zval_ptr_dtor(&model_name);
-	zval_ptr_dtor(&dependency_injector);
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "setdi", &dependency_injector);
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "setmodelname", &model_name);
+	RETURN_MM();
 }
 
 /**

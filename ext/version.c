@@ -89,7 +89,9 @@ PHP_METHOD(Phalcon_Version, get){
 
 	zval version = {}, major = {}, medium = {}, minor = {}, special = {}, special_number = {}, result = {}, suffix = {};
 
-	PHALCON_CALL_SELF(&version, "_getversion");
+	PHALCON_MM_INIT();
+	PHALCON_MM_CALL_SELF(&version, "_getversion");
+	PHALCON_MM_ADD_ENTRY(&version);
 
 	phalcon_array_fetch_long(&major, &version, 0, PH_NOISY|PH_READONLY);
 	phalcon_array_fetch_long(&medium, &version, 1, PH_NOISY|PH_READONLY);
@@ -98,7 +100,7 @@ PHP_METHOD(Phalcon_Version, get){
 	phalcon_array_fetch_long(&special_number, &version, 4, PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VSVSVS(&result, &major, ".", &medium, ".", &minor, " ");
-
+	PHALCON_MM_ADD_ENTRY(&result);
 	switch (phalcon_get_intval(&special)) {
 
 		case PHALCON_VERSION_ALPHA:
@@ -118,11 +120,11 @@ PHP_METHOD(Phalcon_Version, get){
 			break;
 
 	}
-	zval_ptr_dtor(&version);
+	PHALCON_MM_ADD_ENTRY(&suffix);
 	phalcon_concat_self(&result, &suffix);
-	zval_ptr_dtor(&suffix);
+	PHALCON_MM_ADD_ENTRY(&result);
 	ZVAL_STR(return_value, phalcon_trim(&result, NULL, PHALCON_TRIM_BOTH));
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**

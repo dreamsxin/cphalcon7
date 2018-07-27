@@ -450,7 +450,7 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		} else {
 			zval trimmed = {};
 			phalcon_fast_trim_str(&trimmed, uri, "/", PHALCON_TRIM_LEFT);
-			PHALCON_SCONCAT_VV(return_value, &static_base_uri, &trimmed);
+			PHALCON_CONCAT_VV(return_value, &static_base_uri, &trimmed);
 			zval_ptr_dtor(&trimmed);
 		}
 	} else {
@@ -461,13 +461,13 @@ PHP_METHOD(Phalcon_Mvc_Url, getStatic){
 		} else {
 			zval trimmed = {};
 			phalcon_fast_trim_str(&trimmed, uri, "/", PHALCON_TRIM_LEFT);
-			PHALCON_SCONCAT_VV(return_value, &base_uri, &trimmed);
+			PHALCON_CONCAT_VV(return_value, &base_uri, &trimmed);
 			zval_ptr_dtor(&trimmed);
 		}
 		zval_ptr_dtor(&base_uri);
 	}
 
-	if (args) {
+	if (args && Z_TYPE_P(args) == IS_ARRAY) {
 		zval query_string = {};
 		phalcon_http_build_query(&query_string, args, "&");
 		if (Z_TYPE(query_string) == IS_STRING && Z_STRLEN(query_string)) {

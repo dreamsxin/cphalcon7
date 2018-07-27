@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo_Sqlite, describeColumns){
 			ZVAL_NULL(&matches);
 			RETURN_MM_ON_FAILURE(phalcon_preg_match(&pos, &size_pattern, &column_type, &matches, 0, 0));
 			PHALCON_MM_ADD_ENTRY(&matches);
-			if (zend_is_true(&pos)) {zend_print_zval_r(&matches, 0);
+			if (zend_is_true(&pos)) {
 				if (phalcon_array_isset_fetch_long(&match_one, &matches, 1, PH_READONLY)) {
 					phalcon_array_update_str_long(&definition, SL("size"), phalcon_get_intval(&match_one), 0);
 					phalcon_array_update_str_long(&definition, SL("bytes"), phalcon_get_intval(&match_one), 0);

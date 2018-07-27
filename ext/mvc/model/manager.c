@@ -2524,7 +2524,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 
 	zval *phql, *placeholders = NULL, *types = NULL, query = {};
 
-	phalcon_fetch_params(0, 1, 2, &phql, &placeholders, &types);
+	phalcon_fetch_params(1, 1, 2, &phql, &placeholders, &types);
 
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);
@@ -2534,15 +2534,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, executeQuery){
 		types = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHOD(&query, getThis(), "createquery", phql);
-
+	PHALCON_MM_CALL_METHOD(&query, getThis(), "createquery", phql);
+	PHALCON_MM_ADD_ENTRY(&query);
 	phalcon_update_property(getThis(), SL("_lastQuery"), &query);
 
 	/**
 	 * Execute the query
 	 */
-	PHALCON_RETURN_CALL_METHOD(&query, "execute", placeholders, types);
-	zval_ptr_dtor(&query);
+	PHALCON_MM_RETURN_CALL_METHOD(&query, "execute", placeholders, types);
+	RETURN_MM();
 }
 
 /**

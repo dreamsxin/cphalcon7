@@ -540,7 +540,7 @@ PHP_METHOD(Phalcon_Text, concat){
 	zval *separator, *a, *b, *args, str = {}, a_trimmed = {}, str_trimmed = {};
 	uint32_t i;
 
-	phalcon_fetch_params(0, 3, 0, &separator, &a, &b);
+	phalcon_fetch_params(1, 3, 0, &separator, &a, &b);
 
 	if (ZEND_NUM_ARGS() > 3) {
 		args = (zval *)safe_emalloc(ZEND_NUM_ARGS(), sizeof(zval), 0);
@@ -555,19 +555,20 @@ PHP_METHOD(Phalcon_Text, concat){
 
 			PHALCON_SCONCAT_VV(&str, &trimmed, separator);
 			zval_ptr_dtor(&trimmed);
+			PHALCON_MM_ADD_ENTRY(&str);
 		}
 		efree(args);
 	} else {
-		ZVAL_COPY(&str, b);
+		PHALCON_MM_ZVAL_COPY(&str, b);
 	}
 
 	ZVAL_STR(&a_trimmed, phalcon_trim(a, separator, PHALCON_TRIM_RIGHT));
 	ZVAL_STR(&str_trimmed, phalcon_trim(&str, separator, PHALCON_TRIM_LEFT));
-	zval_ptr_dtor(&str);
 
 	PHALCON_CONCAT_VVV(return_value, &a_trimmed, separator, &str_trimmed)
 	zval_ptr_dtor(&a_trimmed);
 	zval_ptr_dtor(&str_trimmed);
+	RETURN_MM();
 }
 
 /**

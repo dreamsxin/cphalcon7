@@ -2892,8 +2892,9 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 {
 	smart_str formstr = { 0 };
 	int res;
-
+	
 	if (Z_TYPE_P(params) != IS_ARRAY && Z_TYPE_P(params) != IS_OBJECT) {
+		ZVAL_FALSE(return_value);
 		return FAILURE;
 	}
 

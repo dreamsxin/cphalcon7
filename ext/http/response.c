@@ -705,6 +705,7 @@ PHP_METHOD(Phalcon_Http_Response, appendContent){
 	concat_function(&temp_content, &content, _content);
 
 	phalcon_update_property(getThis(), SL("_content"), &temp_content);
+	zval_ptr_dtor(&temp_content);
 	RETURN_THIS();
 }
 

@@ -119,12 +119,17 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	}
 
 	if (clean) {
+		int flag = 0;
 		phalcon_ob_get_contents(&contents);
 		phalcon_ob_clean();
 
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY|PH_READONLY);
-		PHALCON_CALL_METHOD(NULL, &view, "setcontent", &contents);
+		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents);
 		zval_ptr_dtor(&contents);
+		if (flag == FAILURE) {
+			ZVAL_FALSE(return_value);
+			goto end;
+		}
 	}
 
 	ZVAL_TRUE(return_value);

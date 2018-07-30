@@ -213,20 +213,20 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, addMethod){
 
 	zval *name, *method_callable, class_name = {}, method = {};
 
-	phalcon_fetch_params(0, 2, 0, &name, &method_callable);
+	phalcon_fetch_params(1, 2, 0, &name, &method_callable);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (Z_TYPE_P(method_callable) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(method_callable), zend_ce_closure)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Method must be an closure object");
 		return;
 	}
 
 	phalcon_get_class(&class_name, getThis(), 0);
-
-	PHALCON_CALL_CE_STATIC(&method, zend_ce_closure, "bind", method_callable, getThis(), &class_name);
-
+	PHALCON_MM_ADD_ENTRY(&class_name);
+	PHALCON_MM_CALL_CE_STATIC(&method, zend_ce_closure, "bind", method_callable, getThis(), &class_name);
+	PHALCON_MM_ADD_ENTRY(&method);
 	phalcon_update_property_array(getThis(), SL("_methods"), name, &method);
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**
@@ -240,20 +240,20 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 
 	zval *method, *args = NULL, method_name = {}, arguments = {}, methods = {}, func = {}, exception_message = {}, service_name = {}, service = {}, callback = {};
 
-	phalcon_fetch_params(0, 1, 1, &method, &args);
-	ZVAL_DUP(&method_name, method);
+	phalcon_fetch_params(1, 1, 1, &method, &args);
+	PHALCON_MM_ZVAL_DUP(&method_name, method);
 
 	if (!args || Z_TYPE_P(args) == IS_NULL) {
 		array_init(&arguments);
+		PHALCON_MM_ADD_ENTRY(&arguments);
 	} else {
-		ZVAL_COPY(&arguments, args);
+		ZVAL_COPY_VALUE(&arguments, args);
 	}
 
 	phalcon_read_property(&methods, getThis(), SL("_methods"), PH_NOISY|PH_READONLY);
 	if (phalcon_array_isset_fetch(&func, &methods, &method_name, PH_READONLY)) {
-			PHALCON_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
-			zval_ptr_dtor(&arguments);
-			return;
+			PHALCON_MM_CALL_USER_FUNC_ARRAY(return_value, &func, &arguments);
+			RETURN_MM();
 	}
 
 	if (phalcon_compare_strict_string(&method_name, SL("get"))
@@ -263,33 +263,33 @@ PHP_METHOD(Phalcon_Mvc_View_Engine, __call){
 		|| phalcon_compare_strict_string(&method_name, SL("getServer"))) {
 		ZVAL_STR(&service_name, IS(request));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getSession"))) {
-		zval_ptr_dtor(&method_name);
-		ZVAL_STRING(&method_name, "get");
+		PHALCON_MM_ZVAL_STRING(&method_name, "get");
 		ZVAL_STR(&service_name, IS(session));
 	} else if (phalcon_compare_strict_string(&method_name, SL("getParam"))) {
 		ZVAL_STR(&service_name, IS(dispatcher));
 	}
 
-	PHALCON_CALL_METHOD(&service, getThis(), "getresolveservice", &service_name);
-
+	PHALCON_MM_CALL_METHOD(&service, getThis(), "getresolveservice", &service_name);
+	PHALCON_MM_ADD_ENTRY(&service);
 	if (Z_TYPE(service) != IS_OBJECT) {
 		PHALCON_CONCAT_SVS(&exception_message, "The injected service '", &service_name, "' is not valid");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
-		zval_ptr_dtor(&method_name);
+		PHALCON_MM_ADD_ENTRY(&exception_message);
+		PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	if (phalcon_method_exists(&service, &method_name) == FAILURE) {
 		PHALCON_CONCAT_SVS(&exception_message, "The method \"", &method_name, "\" doesn't exist on view");
-		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
-		zval_ptr_dtor(&method_name);
+		PHALCON_MM_ADD_ENTRY(&exception_message);
+		PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_view_exception_ce, &exception_message);
 		return;
 	}
 
 	array_init(&callback);
-	phalcon_array_append(&callback, &service, 0);
-	phalcon_array_append(&callback, &method_name, 0);
+	PHALCON_MM_ADD_ENTRY(&callback);
+	phalcon_array_append(&callback, &service, PH_COPY);
+	phalcon_array_append(&callback, &method_name, PH_COPY);
 
-	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
-	zval_ptr_dtor(&arguments);
+	PHALCON_MM_CALL_USER_FUNC_ARRAY(return_value, &callback, &arguments);
+	RETURN_MM();
 }

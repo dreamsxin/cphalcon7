@@ -255,12 +255,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 	if (PHALCON_IS_TRUE(&is_different)) {
 
 		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
+
 		if (zend_is_true(&type)) {
 			/**
 			 * Here, the resultset is fetched one by one because is large
 			 */
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			PHALCON_CALL_METHOD(NULL, &result, "dataseek", position);
+			phalcon_update_property(getThis(), SL("_pointer"), position);
 		} else {
 			/**
 			 * Here, the resultset is a small array
@@ -328,6 +330,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, count){
 			if (PHALCON_IS_NOT_FALSE(&result)) {
 				PHALCON_CALL_METHOD(&number_rows, &result, "numrows");
 				ZVAL_LONG(&count, phalcon_get_intval(&number_rows));
+				zval_ptr_dtor(&number_rows);
 			}
 		} else {
 			/**
@@ -710,45 +713,41 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, delete){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, filter){
 
-	zval *filter, records = {};
+	zval *filter;
 
-	phalcon_fetch_params(0, 1, 0, &filter);
+	phalcon_fetch_params(1, 1, 0, &filter);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "rewind");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "rewind");
 
-	array_init(&records);
+	array_init(return_value);
 
 	while (1) {
 		zval r0 = {}, record = {}, parameters = {}, processed_record = {};
 
-		PHALCON_CALL_METHOD(&r0, getThis(), "valid");
+		PHALCON_MM_CALL_METHOD(&r0, getThis(), "valid");
 		if (!zend_is_true(&r0)) {
 			break;
 		}
 
-		PHALCON_CALL_METHOD(&record, getThis(), "current");
+		PHALCON_MM_CALL_METHOD(&record, getThis(), "current");
 
 		array_init(&parameters);
+		PHALCON_MM_ADD_ENTRY(&parameters);
 		phalcon_array_update_long(&parameters, 0, &record, 0);
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&processed_record, filter, &parameters);
-		zval_ptr_dtor(&parameters);
-
+		PHALCON_MM_CALL_USER_FUNC_ARRAY(&processed_record, filter, &parameters);
+		PHALCON_MM_ADD_ENTRY(&processed_record);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "next");
+		
 		/**
 		 * Only add processed records to 'records' if the returned value is an array/object
 		 */
-		if (Z_TYPE(processed_record) != IS_OBJECT) {
-			if (Z_TYPE(processed_record) != IS_ARRAY) {
-				zval_ptr_dtor(&processed_record);
-				continue;
-			}
+		if (Z_TYPE(processed_record) == IS_OBJECT || Z_TYPE(processed_record) == IS_ARRAY) {
+			phalcon_array_append(return_value, &processed_record, PH_COPY);
 		}
-
-		phalcon_array_append(&records, &processed_record, 0);
-		PHALCON_CALL_METHOD(NULL, getThis(), "next");
 	}
 
-	RETVAL_ZVAL(&records, 0, 0);
+	RETURN_MM();
 }
 
 /**

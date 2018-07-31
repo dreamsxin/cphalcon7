@@ -1885,17 +1885,18 @@ PHP_METHOD(Phalcon_Db_Adapter, getSQLStatement){
  */
 PHP_METHOD(Phalcon_Db_Adapter, getExpectSQLStatement){
 
-	zval sql_statement = {}, sql_variables = {}, *value;
+	zval sql_statement = {}, sql_variables = {}, *value, sql = {};
 	zend_string *str_key;
 
+	PHALCON_MM_INIT();
 	phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&sql_variables, getThis(), SL("_sqlVariables"), PH_NOISY|PH_READONLY);
 
 	if (Z_TYPE(sql_variables) != IS_ARRAY) {
-		RETURN_CTOR(&sql_statement);
+		RETURN_MM_CTOR(&sql_statement);
 	}
 
-	ZVAL_DUP(return_value, &sql_statement);
+	PHALCON_MM_ZVAL_COPY(&sql, &sql_statement);
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(sql_variables), str_key, value) {
 		zval pattern = {}, escaped_value = {}, replaced_str = {};
@@ -1906,18 +1907,18 @@ PHP_METHOD(Phalcon_Db_Adapter, getExpectSQLStatement){
 			phalcon_addslashes(&tmp, &wildcard);
 			PHALCON_CONCAT_SVS(&pattern, "#", &tmp , "#");
 			zval_ptr_dtor(&tmp);
+			PHALCON_MM_ADD_ENTRY(&pattern);
 		} else {
-			ZVAL_STRING(&pattern, "#\?#");
+			PHALCON_MM_ZVAL_STRING(&pattern, "#\?#");
 		}
 
-		PHALCON_CALL_METHOD(&escaped_value, getThis(), "escapevalue", value);
-		
-		PHALCON_CALL_FUNCTION(&replaced_str, "preg_replace", &pattern, &escaped_value, return_value);
-		zval_ptr_dtor(&pattern);
-		zval_ptr_dtor(&escaped_value);
-		zval_ptr_dtor(return_value);
-		ZVAL_COPY_VALUE(return_value, &replaced_str);
+		PHALCON_MM_CALL_METHOD(&escaped_value, getThis(), "escapevalue", value);
+		PHALCON_MM_ADD_ENTRY(&escaped_value);
+		phalcon_fast_preg_replace(&replaced_str, &pattern, &escaped_value, &sql);
+		PHALCON_MM_ADD_ENTRY(&replaced_str);
+		ZVAL_COPY_VALUE(&sql, &replaced_str);
 	} ZEND_HASH_FOREACH_END();
+	RETURN_MM_CTOR(&sql);
 }
 
 /**

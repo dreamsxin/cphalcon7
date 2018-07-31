@@ -2618,6 +2618,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _prepareSelect){
 				phalcon_array_append(&complete_source, &alias, PH_COPY);
 			} else {
 				array_init_size(&complete_source, 3);
+				PHALCON_MM_ADD_ENTRY(&complete_source);
 				phalcon_array_append(&complete_source, &source, PH_COPY);
 				add_next_index_null(&complete_source);
 				phalcon_array_append(&complete_source, &alias, PH_COPY);
@@ -3477,7 +3478,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	zval event_name = {}, intermediate = {}, bind_params = {}, bind_types = {}, manager = {}, models = {}, number_models = {}, models_instances = {};
 	zval model_name = {}, model = {}, instance = {}, connection = {}, *model_name2, columns = {}, *column, select_columns = {};
 	zval simple_column_map = {}, dialect = {}, sql_select = {}, processed = {}, *value = NULL, processed_types = {}, tmp = {};
-	zval result = {}, count = {}, result_data = {}, dependency_injector = {}, cache = {};
+	zval result = {}, dependency_injector = {}, cache = {};
 	zval service_name = {}, has = {}, service_params = {};
 	zend_string *str_key;
 	ulong idx;
@@ -3809,17 +3810,6 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	PHALCON_MM_CALL_METHOD(&result, &connection, "query", &sql_select, &processed, &processed_types);
 	PHALCON_MM_ADD_ENTRY(&result);
 
-	/**
-	 * Check if the query has data
-	 */
-	PHALCON_MM_CALL_METHOD(&count, &result, "numrows");
-	PHALCON_MM_ADD_ENTRY(&count);
-	if (zend_is_true(&count)) {
-		ZVAL_COPY_VALUE(&result_data, &result);
-	} else {
-		ZVAL_BOOL(&result_data, 0);
-	}
-
 	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
@@ -3873,14 +3863,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			PHALCON_MM_ADD_ENTRY(&service_params);
 			phalcon_array_append(&service_params, &simple_column_map, PH_COPY);
 			phalcon_array_append(&service_params, &result_object, PH_COPY);
-			phalcon_array_append(&service_params, &result_data, PH_COPY);
+			phalcon_array_append(&service_params, &result, PH_COPY);
 			phalcon_array_append(&service_params, &cache, PH_COPY);
 			phalcon_array_append(&service_params, &model, PH_COPY);
 
 			PHALCON_MM_CALL_METHOD(return_value, &dependency_injector, "get", &service_name, &service_params);
 		} else {
 			object_init_ex(return_value, phalcon_mvc_model_resultset_simple_ce);
-			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", &simple_column_map, &result_object, &result_data, &cache, &model);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", &simple_column_map, &result_object, &result, &cache, &model);
 		}
 	} else {
 		/**
@@ -3893,14 +3883,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 			array_init(&service_params);
 			PHALCON_MM_ADD_ENTRY(&service_params);
 			phalcon_array_append(&service_params, &columns, PH_COPY);
-			phalcon_array_append(&service_params, &result_data, PH_COPY);
+			phalcon_array_append(&service_params, &result, PH_COPY);
 			phalcon_array_append(&service_params, &cache, PH_COPY);
 			phalcon_array_append(&service_params, &model, PH_COPY);
 
 			PHALCON_MM_CALL_METHOD(return_value, &dependency_injector, "get", &service_name, &service_params);
 		} else {
 			object_init_ex(return_value, phalcon_mvc_model_resultset_complex_ce);
-			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", &columns, &result_data, &cache, &model);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", &columns, &result, &cache, &model);
 		}
 	}
 
@@ -4998,7 +4988,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
 
 	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL;
 
-	phalcon_fetch_params(1, 0, 3, &intermediate, &bind_params, &bind_types);
+	phalcon_fetch_params(0, 0, 3, &intermediate, &bind_params, &bind_types);
 
 	RETURN_MEMBER(getThis(), "_connection");
 }

@@ -4441,100 +4441,98 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 
 	phalcon_read_property(&unique_row, getThis(), SL("_uniqueRow"), PH_NOISY|PH_READONLY);
 
+	ZVAL_NULL(&cache);
+	if (cache_options_is_not_null) {
+		zval dependency_injector = {};
+		if (Z_TYPE(cache_options) != IS_ARRAY) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Invalid caching options");
+			return;
+		}
+
+		/**
+		 * The user must set a cache key
+		 */
+		if (!phalcon_array_isset_fetch_str(&cache_key, &cache_options, SL("key"), PH_READONLY)) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
+			return;
+		}
+
+		/**
+		 * 'modelsCache' is the default name for the models cache service
+		 */
+		if (!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_READONLY)) {
+			ZVAL_STR(&cache_service, IS(modelsCache));
+		}
+
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
+
+		PHALCON_MM_CALL_METHOD(&cache, &dependency_injector, "getshared", &cache_service);
+		PHALCON_MM_ADD_ENTRY(&cache);
+		if (Z_TYPE(cache) != IS_OBJECT) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache service must be an object");
+			return;
+		}
+
+		PHALCON_MM_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
+
+		/**
+		 * By defaut use use 3600 seconds (1 hour) as cache lifetime
+		 */
+		if (!phalcon_array_isset_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_READONLY)) {
+			PHALCON_MM_CALL_METHOD(&frontend, &cache, "getfrontend");
+			PHALCON_MM_ADD_ENTRY(&frontend);
+
+			if (Z_TYPE(frontend) == IS_OBJECT) {
+				PHALCON_MM_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_query_exception_ce);
+				PHALCON_MM_CALL_METHOD(&lifetime, &frontend, "getlifetime");
+			} else {
+				ZVAL_LONG(&lifetime, 3600);
+			}
+		}
+
+		PHALCON_MM_CALL_METHOD(&result, &cache, "get", &cache_key, &lifetime);
+		PHALCON_MM_ADD_ENTRY(&result);
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "Get model query cache: ", &cache_key);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
+		if (Z_TYPE(result) != IS_NULL) {
+			if (Z_TYPE(result) != IS_OBJECT) {
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache didn't return a valid resultset");
+				return;
+			}
+
+			ZVAL_BOOL(&is_fresh, 0);
+			PHALCON_MM_CALL_METHOD(NULL, &result, "setisfresh", &is_fresh);
+
+			/**
+			 * Check if only the first row must be returned
+			 */
+			if (zend_is_true(&unique_row)) {
+				PHALCON_MM_CALL_METHOD(return_value, &result, "getfirst");
+			} else {
+				ZVAL_COPY(return_value, &result);
+			}
+			RETURN_MM();
+		}
+
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			PHALCON_CONCAT_SV(&debug_message, "Model query Cache is null: ", &cache_key);
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+		}
+
+		phalcon_update_property(getThis(), SL("_cache"), &cache);
+	}
+
 	/**
 	 * The statement is parsed from its PHQL string or a previously processed IR
 	 */
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "parse");
 
 	phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
-
-	ZVAL_NULL(&cache);
-	if (phalcon_get_intval(&type) == PHQL_T_SELECT) {
-		if (cache_options_is_not_null) {
-			zval dependency_injector = {};
-			if (Z_TYPE(cache_options) != IS_ARRAY) {
-				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Invalid caching options");
-				return;
-			}
-
-			/**
-			 * The user must set a cache key
-			 */
-			if (!phalcon_array_isset_fetch_str(&cache_key, &cache_options, SL("key"), PH_READONLY)) {
-				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
-				return;
-			}
-
-			/**
-			 * 'modelsCache' is the default name for the models cache service
-			 */
-			if (!phalcon_array_isset_fetch_str(&cache_service, &cache_options, SL("service"), PH_READONLY)) {
-				ZVAL_STR(&cache_service, IS(modelsCache));
-			}
-
-			PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
-			PHALCON_MM_ADD_ENTRY(&dependency_injector);
-
-			PHALCON_MM_CALL_METHOD(&cache, &dependency_injector, "getshared", &cache_service);
-			PHALCON_MM_ADD_ENTRY(&cache);
-			if (Z_TYPE(cache) != IS_OBJECT) {
-				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache service must be an object");
-				return;
-			}
-
-			PHALCON_MM_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
-
-			/**
-			 * By defaut use use 3600 seconds (1 hour) as cache lifetime
-			 */
-			if (!phalcon_array_isset_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_READONLY)) {
-				PHALCON_MM_CALL_METHOD(&frontend, &cache, "getfrontend");
-				PHALCON_MM_ADD_ENTRY(&frontend);
-
-				if (Z_TYPE(frontend) == IS_OBJECT) {
-					PHALCON_MM_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_query_exception_ce);
-					PHALCON_MM_CALL_METHOD(&lifetime, &frontend, "getlifetime");
-				} else {
-					ZVAL_LONG(&lifetime, 3600);
-				}
-			}
-
-			PHALCON_MM_CALL_METHOD(&result, &cache, "get", &cache_key, &lifetime);
-			PHALCON_MM_ADD_ENTRY(&result);
-			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_CONCAT_SV(&debug_message, "Get model query cache: ", &cache_key);
-				PHALCON_DEBUG_LOG(&debug_message);
-				zval_ptr_dtor(&debug_message);
-			}
-			if (Z_TYPE(result) != IS_NULL) {
-				if (Z_TYPE(result) != IS_OBJECT) {
-					PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache didn't return a valid resultset");
-					return;
-				}
-
-				ZVAL_BOOL(&is_fresh, 0);
-				PHALCON_MM_CALL_METHOD(NULL, &result, "setisfresh", &is_fresh);
-
-				/**
-				 * Check if only the first row must be returned
-				 */
-				if (zend_is_true(&unique_row)) {
-					PHALCON_MM_CALL_METHOD(return_value, &result, "getfirst");
-				} else {
-					ZVAL_COPY(return_value, &result);
-				}
-				RETURN_MM();
-			}
-
-			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-				PHALCON_CONCAT_SV(&debug_message, "Model query Cache is null: ", &cache_key);
-				PHALCON_DEBUG_LOG(&debug_message);
-				zval_ptr_dtor(&debug_message);
-			}
-
-			phalcon_update_property(getThis(), SL("_cache"), &cache);
-		}
-	}
 
 	/**
 	 * Check for default bind parameters and merge them with the passed ones

@@ -1276,7 +1276,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getExpression){
 			case PHQL_T_TS_AND:
 				array_init_size(return_value, 4);
 				phalcon_array_update_string_str(return_value, IS(type), SL("binary-op"), 0);
-				phalcon_array_update_string_str(return_value, IS(op), SL("||"), 0);
+				phalcon_array_update_string_str(return_value, IS(op), SL("&&"), 0);
 				phalcon_array_update_string(return_value, IS(left), &left, PH_COPY);
 				phalcon_array_update_string(return_value, IS(right), &right, PH_COPY);
 				break;

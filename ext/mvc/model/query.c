@@ -5001,7 +5001,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getReadConnection){
 
-	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, connection = {}, data = {}, event_name = {};
+	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, connection = {};
 	zval manager = {}, models_instances = {}, models = {};
 	zval number_models = {}, model_name = {}, model = {}, connections = {}, *model_key, connection_type = {}, connection_types = {};
 
@@ -5019,14 +5019,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getReadConnection){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	array_init(&data);
-	phalcon_array_append(&data, intermediate, PH_COPY);
-	phalcon_array_append(&data, bind_params, PH_COPY);
-	phalcon_array_append(&data, bind_types, PH_COPY);
-	PHALCON_MM_ADD_ENTRY(&data);
-	PHALCON_MM_ZVAL_STRING(&event_name, "query:selectReadConnection");
-	PHALCON_MM_CALL_METHOD(&connection, getThis(), "fireevent", &event_name, &data);
-	PHALCON_MM_ADD_ENTRY(&connection);
+	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectreadconnection", query, intermediate, bind_params, bind_types);
+		PHALCON_MM_ADD_ENTRY(&connection);
+	}
+
 	if (Z_TYPE(connection) == IS_OBJECT) {
 		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
 		RETURN_MM_CTOR(&connection);
@@ -5120,7 +5117,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getReadConnection){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Query, getWriteConnection){
 
-	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, connection = {}, data = {}, event_name = {}, manager = {};
+	zval *intermediate = NULL, *bind_params = NULL, *bind_types = NULL, connection = {}, manager = {};
 	zval models_instances = {}, models = {};
 	zval number_models = {}, model_name = {}, model = {}, connections = {}, *model_key, connection_type = {}, connection_types = {};
 
@@ -5138,14 +5135,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getWriteConnection){
 		bind_types = &PHALCON_GLOBAL(z_null);
 	}
 
-	array_init(&data);
-	phalcon_array_append(&data, intermediate, PH_COPY);
-	phalcon_array_append(&data, bind_params, PH_COPY);
-	phalcon_array_append(&data, bind_types, PH_COPY);
-	PHALCON_MM_ADD_ENTRY(&data);
-	PHALCON_MM_ZVAL_STRING(&event_name, "query:selectWriteConnection");
-	PHALCON_MM_CALL_METHOD(&connection, getThis(), "fireevent", &event_name, &data);
-	PHALCON_MM_ADD_ENTRY(&connection);
+	if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectwriteconnection", query, intermediate, bind_params, bind_types);
+		PHALCON_MM_ADD_ENTRY(&connection);
+	}
+
 	if (Z_TYPE(connection) == IS_OBJECT) {
 		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
 		RETURN_MM_CTOR(&connection);

@@ -5020,7 +5020,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getReadConnection){
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectreadconnection")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectreadconnection", query, intermediate, bind_params, bind_types);
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectreadconnection", intermediate, bind_params, bind_types);
 		PHALCON_MM_ADD_ENTRY(&connection);
 	}
 
@@ -5136,7 +5136,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, getWriteConnection){
 	}
 
 	if (phalcon_method_exists_ex(getThis(), SL("selectwriteconnection")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectwriteconnection", query, intermediate, bind_params, bind_types);
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "selectwriteconnection", intermediate, bind_params, bind_types);
 		PHALCON_MM_ADD_ENTRY(&connection);
 	}
 

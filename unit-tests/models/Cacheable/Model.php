@@ -30,15 +30,15 @@ class Model extends \Phalcon\Mvc\Model
 		return $parameters;
 	}
 
-	public static function findFirst($parameters=null, $autoCreate=false)
+	public static function findFirst($conditions = NULL, array $bindParams = NULL, array $options = NULL, bool $autoCreate = NULL)
 	{
-		$parameters = self::getCacheableParams($parameters);
-		return parent::findFirst($parameters, $autoCreate);
+		$parameters = self::getCacheableParams($conditions);
+		return parent::findFirst($parameters);
 	}
 
-	public static function find($parameters=null)
+	public static function find($conditions = NULL, array $bindParams = NULL, array $options = NULL)
 	{
-		$parameters = self::getCacheableParams($parameters);
+		$parameters = self::getCacheableParams($conditions);
 		return parent::find($parameters);
 	}
 

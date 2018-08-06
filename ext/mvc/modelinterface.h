@@ -114,12 +114,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_cloneresultmaphydrate,
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_find, 0, 0, 0)
-	ZEND_ARG_INFO(0, parameters)
+	ZEND_ARG_INFO(0, conditions)
+	ZEND_ARG_TYPE_INFO(0, bindParams, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_findfirst, 0, 0, 0)
-	ZEND_ARG_INFO(0, parameters)
-	ZEND_ARG_INFO(0, autoCreate)
+	ZEND_ARG_INFO(0, conditions)
+	ZEND_ARG_TYPE_INFO(0, bindParams, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+	ZEND_ARG_TYPE_INFO(0, autoCreate, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_modelinterface_query, 0, 0, 0)

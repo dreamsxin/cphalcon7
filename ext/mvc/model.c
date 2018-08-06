@@ -1913,6 +1913,11 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
  *	   echo $robot->name, "\n";
  * }
  *
+ * $robots = Robots::find("type=:type:", array("type" => "virtual"), array("order" => "name"));
+ * foreach ($robots as $robot) {
+ *	   echo $robot->name, "\n";
+ * }
+ *
  * //Get first 100 virtual robots ordered by name
  * $robots = Robots::find(array("type='virtual'", "order" => "name", "limit" => 100));
  * foreach ($robots as $robot) {
@@ -1920,27 +1925,44 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResult){
  * }
  * </code>
  *
- * @param 	array $parameters
+ * @param string|array $conditions
+ * @param array $bindParams
+ * @param array $options
  * @return  Phalcon\Mvc\Model\ResultsetInterface
  */
 PHP_METHOD(Phalcon_Mvc_Model, find){
 
-	zval *parameters = NULL, dependency_injector = {}, model_name = {}, service_name = {}, manager = {}, model = {};
-	zval params = {}, builder = {}, event_name = {}, query = {}, hydration = {};
+	zval *parameters = NULL, *bind_params = NULL, *options = NULL, params = {},dependency_injector = {}, model_name = {}, service_name = {};
+	zval  manager = {}, model = {}, builder = {}, event_name = {}, query = {}, hydration = {};
 
-	phalcon_fetch_params(1, 0, 1, &parameters);
+	phalcon_fetch_params(1, 0, 3, &parameters, &bind_params, &options);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
-		array_init(&params);
-		phalcon_array_append(&params, parameters, PH_COPY);
+	if (bind_params) {
+		if (options && Z_TYPE_P(options) == IS_ARRAY) {
+			ZVAL_DUP(&params, options);
+		} else {
+			array_init(&params);
+		}
+		if (Z_TYPE_P(parameters) != IS_NULL) {
+			phalcon_array_update_str(&params, SL("conditions"), parameters, PH_COPY);
+		}
+		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
+			phalcon_array_update_str(&params, SL("bind"), bind_params, PH_COPY);
+		}
+		PHALCON_MM_ADD_ENTRY(&params);
 	} else {
-		ZVAL_DUP(&params, parameters);
+		if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
+			array_init(&params);
+			phalcon_array_append(&params, parameters, PH_COPY);
+		} else {
+			ZVAL_DUP(&params, parameters);
+		}
+		PHALCON_MM_ADD_ENTRY(&params);
 	}
-	PHALCON_MM_ADD_ENTRY(&params);
 
 	PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 	PHALCON_MM_ADD_ENTRY(&dependency_injector);
@@ -2019,16 +2041,18 @@ PHP_METHOD(Phalcon_Mvc_Model, find){
  *
  * </code>
  *
- * @param array $parameters
+ * @param string|array $conditions
+ * @param array $bindParams
+ * @param array $options
  * @param bool $autoCreate
  * @return Phalcon\Mvc\Model
  */
 PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
-	zval *parameters = NULL, *auto_create = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {}, manager = {}, model = {};
-	zval identityfield = {}, id_condition = {}, params = {}, builder = {}, query = {}, event_name = {}, hydration = {}, resultset = {};
+	zval *parameters = NULL, *bind_params = NULL, *options = NULL,  *auto_create = NULL, dependency_injector = {}, model_name = {}, service_name = {}, has = {};
+	zval manager = {}, model = {}, identityfield = {}, id_condition = {}, params = {}, builder = {}, query = {}, event_name = {}, hydration = {}, resultset = {};
 
-	phalcon_fetch_params(1, 0, 2, &parameters, &auto_create);
+	phalcon_fetch_params(1, 0, 4, &parameters, &bind_params, &options, &auto_create);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -2061,8 +2085,13 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 	PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name, &PHALCON_GLOBAL(z_true));
 	PHALCON_MM_ADD_ENTRY(&model);
 
-	if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
-		array_init(&params);
+	if (bind_params) {
+		if (options && Z_TYPE_P(options) == IS_ARRAY) {
+			ZVAL_DUP(&params, options);
+		} else {
+			array_init(&params);
+		}
+		
 		if (phalcon_is_numeric(parameters)) {
 			zval condition = {};
 			PHALCON_MM_CALL_METHOD(&identityfield, &model, "getidentityfield");
@@ -2071,41 +2100,44 @@ PHP_METHOD(Phalcon_Mvc_Model, findFirst){
 
 			PHALCON_SCONCAT_VSVS(&condition, &id_condition, " = '", parameters, "'");
 			zval_ptr_dtor(&id_condition);
-			phalcon_array_append(&params, &condition, 0);
-		} else {
-			phalcon_array_append(&params, parameters, PH_COPY);
+			phalcon_array_update_str(&params, SL("conditions"), &condition, 0);
+		} else if (Z_TYPE_P(parameters) != IS_NULL) {
+			phalcon_array_update_str(&params, SL("conditions"), parameters, PH_COPY);
 		}
+		if (Z_TYPE_P(bind_params) == IS_ARRAY) {
+			phalcon_array_update_str(&params, SL("bind"), bind_params, PH_COPY);
+		}
+		PHALCON_MM_ADD_ENTRY(&params);
 	} else {
-		if (Z_TYPE_P(parameters) != IS_ARRAY) {
+		if (Z_TYPE_P(parameters) != IS_NULL && Z_TYPE_P(parameters) != IS_ARRAY) {
 			array_init(&params);
+			if (phalcon_is_numeric(parameters)) {
+				zval condition = {};
+				PHALCON_MM_CALL_METHOD(&identityfield, &model, "getidentityfield");
+				PHALCON_MM_CALL_METHOD(&id_condition, &model, "getattribute", &identityfield);
+				zval_ptr_dtor(&identityfield);
+
+				PHALCON_SCONCAT_VSVS(&condition, &id_condition, " = '", parameters, "'");
+				zval_ptr_dtor(&id_condition);
+				phalcon_array_update_str(&params, SL("conditions"), &condition, 0);
+			} else {
+				phalcon_array_append(&params, parameters, PH_COPY);
+			}
 		} else {
 			ZVAL_DUP(&params, parameters);
 		}
-
-		if (!phalcon_array_isset_str(&params, SL("limit"))) {
-			zval key = {}, value = {}, bind_key = {}, bind = {};
-
-			ZVAL_STRING(&key, "limit");
-			ZVAL_STRING(&value, ":pha_limit:");
-			ZVAL_STRING(&bind_key, "pha_limit");
-
-			phalcon_array_update(&params, &key, &value, 0);
-			zval_ptr_dtor(&key);
-
-			if (!phalcon_array_isset_fetch_str(&bind, &params, SL("bind"), PH_CTOR) || Z_TYPE(bind) != IS_ARRAY) {
-				array_init(&bind);
-			}
-			phalcon_array_update(&bind, &bind_key, &PHALCON_GLOBAL(z_one), 0);
-			phalcon_array_update_str(&params, SL("bind"), &bind, 0);
-			zval_ptr_dtor(&bind_key);
-		}
+		PHALCON_MM_ADD_ENTRY(&params);
 	}
-	PHALCON_MM_ADD_ENTRY(&params);
+
+	if (!phalcon_array_isset_str(&params, SL("limit"))) {
+		phalcon_array_unset_str(&params, SL("limit"), 0);
+	}
 
 	PHALCON_MM_CALL_METHOD(&builder, &manager, "createbuilder", &params);
 	PHALCON_MM_ADD_ENTRY(&builder);
 
 	PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &model_name);
+	PHALCON_MM_CALL_METHOD(NULL, &builder, "limit", &PHALCON_GLOBAL(z_one));
 
 	PHALCON_MM_ZVAL_STRING(&event_name, "beforeQuery");
 	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &builder);

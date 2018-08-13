@@ -150,6 +150,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Cookie){
 	zend_declare_property_null(phalcon_http_cookie_ce, SL("_domain"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_cookie_ce, SL("_secure"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_http_cookie_ce, SL("_httpOnly"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_string(phalcon_http_cookie_ce, SL("_samesite"), "Lax", ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -167,9 +168,9 @@ PHALCON_INIT_CLASS(Phalcon_Http_Cookie){
  */
 PHP_METHOD(Phalcon_Http_Cookie, __construct){
 
-	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL;
+	zval *name, *value = NULL, *expire = NULL, *path = NULL, *secure = NULL, *domain = NULL, *http_only = NULL, *samesite = NULL;
 
-	phalcon_fetch_params(0, 1, 6, &name, &value, &expire, &path, &secure, &domain, &http_only);
+	phalcon_fetch_params(0, 1, 7, &name, &value, &expire, &path, &secure, &domain, &http_only, &samesite);
 	PHALCON_ENSURE_IS_STRING(name);
 
 	if (!expire) {
@@ -204,6 +205,10 @@ PHP_METHOD(Phalcon_Http_Cookie, __construct){
 
 	if (http_only && Z_TYPE_P(http_only) != IS_NULL) {
 		phalcon_update_property(getThis(), SL("_httpOnly"), http_only);
+	}
+
+	if (samesite && Z_TYPE_P(samesite) != IS_NULL) {
+		phalcon_update_property(getThis(), SL("_samesite"), samesite);
 	}
 }
 
@@ -325,7 +330,7 @@ PHP_METHOD(Phalcon_Http_Cookie, getValue)
  */
 PHP_METHOD(Phalcon_Http_Cookie, send){
 
-	zval name = {}, value = {}, expire = {}, domain = {}, path = {}, secure = {}, http_only = {}, dependency_injector = {};
+	zval name = {}, value = {}, expire = {}, domain = {}, path = {}, secure = {}, http_only = {}, samesite = {}, dependency_injector = {};
 	zval service = {}, has_session = {}, definition = {}, session = {}, key = {}, encryption = {}, crypt = {}, encrypt_value = {};
 
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
@@ -335,6 +340,7 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&samesite, getThis(), SL("_samesite"), PH_NOISY|PH_READONLY);
 	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
 
 	if (Z_TYPE(dependency_injector) == IS_OBJECT) {
@@ -414,8 +420,11 @@ PHP_METHOD(Phalcon_Http_Cookie, send){
 	convert_to_long_ex(&secure);
 	convert_to_long_ex(&http_only);
 	convert_to_string_ex(&encrypt_value);
-
+#if PHP_VERSION_ID >= 70300
+	php_setcookie(Z_STR(name), Z_STR(encrypt_value), Z_LVAL(expire), Z_STR(path), Z_STR(domain), Z_LVAL(secure), Z_LVAL(http_only), Z_STR(samesite), 1);
+#else
 	php_setcookie(Z_STR(name), Z_STR(encrypt_value), Z_LVAL(expire), Z_STR(path), Z_STR(domain), Z_LVAL(secure), 1, Z_LVAL(http_only));
+#endif
 	zval_ptr_dtor(&encrypt_value);
 
 	RETURN_THIS();
@@ -482,13 +491,14 @@ PHP_METHOD(Phalcon_Http_Cookie, restore)
  */
 PHP_METHOD(Phalcon_Http_Cookie, delete)
 {
-	zval name = {}, domain = {}, path = {}, secure = {}, http_only = {}, service = {}, session = {}, key = {};
+	zval name = {}, domain = {}, path = {}, secure = {}, http_only = {}, samesite = {}, service = {}, session = {}, key = {};
 
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&domain, getThis(), SL("_domain"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&path, getThis(), SL("_path"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&secure, getThis(), SL("_secure"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&http_only, getThis(), SL("_httpOnly"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&samesite, getThis(), SL("_samesite"), PH_NOISY|PH_READONLY);
 
 	ZVAL_STR(&service, IS(session));
 
@@ -507,8 +517,11 @@ PHP_METHOD(Phalcon_Http_Cookie, delete)
 	convert_to_string_ex(&domain);
 	convert_to_long_ex(&secure);
 	convert_to_long_ex(&http_only);
-
+#if PHP_VERSION_ID >= 70300
+	php_setcookie(Z_STR(name), NULL, time(NULL) - 691200, Z_STR(path), Z_STR(domain), Z_LVAL(secure), Z_LVAL(http_only), Z_STR(samesite), 1);
+#else
 	php_setcookie(Z_STR(name), NULL, time(NULL) - 691200, Z_STR(path), Z_STR(domain), Z_LVAL(secure), 1, Z_LVAL(http_only));
+#endif
 }
 
 /**

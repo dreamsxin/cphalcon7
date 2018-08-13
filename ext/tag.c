@@ -330,7 +330,6 @@ PHALCON_INIT_CLASS(Phalcon_Tag){
 	zend_declare_property_null(phalcon_tag_ce, SL("_documentTitleSeparator"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_long(phalcon_tag_ce, SL("_documentType"), 11, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_tag_ce, SL("_dependencyInjector"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
-	zend_declare_property_null(phalcon_tag_ce, SL("_urlService"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_tag_ce, SL("_dispatcherService"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_tag_ce, SL("_escaperService"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_bool(phalcon_tag_ce, SL("_autoEscape"), 1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
@@ -465,28 +464,21 @@ PHP_METHOD(Phalcon_Tag, getUrlService){
 
 	PHALCON_MM_INIT();
 
-	phalcon_read_static_property_ce(&url, phalcon_tag_ce, SL("_urlService"), PH_READONLY);
-	if (Z_TYPE(url) != IS_OBJECT) {
-		phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_READONLY);
-		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-			PHALCON_MM_ADD_ENTRY(&dependency_injector);
-		}
-
-		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "A dependency injector container is required to obtain the \"url\" service");
-			return;
-		}
-
-		PHALCON_MM_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
-
-		ZVAL_STR(&service, IS(url));
-
-		PHALCON_MM_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
-		PHALCON_MM_ADD_ENTRY(&url);
-		PHALCON_MM_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
-		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_urlService"), &url);
+	phalcon_read_static_property_ce(&dependency_injector, phalcon_tag_ce, SL("_dependencyInjector"), PH_READONLY);
+	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+		PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
+		PHALCON_MM_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_tag_exception_ce);
+		phalcon_update_static_property_ce(phalcon_tag_ce, SL("_dependencyInjector"), &dependency_injector);
+	} else {
+		PHALCON_MM_VERIFY_INTERFACE_EX(&dependency_injector, phalcon_diinterface_ce, phalcon_tag_exception_ce);
 	}
+
+	ZVAL_STR(&service, IS(url));
+
+	PHALCON_MM_CALL_METHOD(&url, &dependency_injector, "getshared", &service);
+	PHALCON_MM_ADD_ENTRY(&url);
+	PHALCON_MM_VERIFY_INTERFACE(&url, phalcon_mvc_urlinterface_ce);
 
 	RETURN_MM_CTOR(&url);
 }

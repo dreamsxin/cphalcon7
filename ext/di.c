@@ -475,6 +475,8 @@ PHP_METHOD(Phalcon_Di, get){
 	/* Pass the DI itself if the instance implements Phalcon\Di\InjectionAwareInterface */
 	if (ce && instanceof_function_ex(ce, phalcon_di_injectionawareinterface_ce, 1)) {
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "setdi", getThis());
+	} else if (phalcon_method_exists_ex(return_value, SL("setdi")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "setdi", getThis());
 	}
 
 	if (Z_TYPE(events_manager) == IS_OBJECT) {

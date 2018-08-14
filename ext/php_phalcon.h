@@ -42,12 +42,6 @@
 #define PHP_PHALCON_VERSION_RELEASE_VERSION 1
 #define PHP_PHALCON_EXTNAME "phalcon7"
 
-ZEND_API void (*original_zend_execute_internal)(zend_execute_data *execute_data, zval *return_value);
-ZEND_API void (*original_zend_execute_ex)(zend_execute_data *execute_data);
-
-ZEND_API void (*_zend_execute_internal)(zend_execute_data*, zval*);
-ZEND_API void (*_zend_execute_ex)(zend_execute_data*);
-
 /** DEBUG options */
 typedef struct _phalcon_debug_options {
 	int debug_level;

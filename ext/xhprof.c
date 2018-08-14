@@ -31,6 +31,9 @@
 
 #include "interned-strings.h"
 
+extern ZEND_API void (*_zend_execute_internal)(zend_execute_data*, zval*);
+extern ZEND_API void (*_zend_execute_ex)(zend_execute_data*);
+
 /**
  * Phalcon\Xhprof
  *

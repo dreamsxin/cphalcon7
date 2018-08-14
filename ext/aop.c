@@ -31,6 +31,9 @@
 #include "kernel/memory.h"
 #include "kernel/exception.h"
 
+extern ZEND_API void (*original_zend_execute_internal)(zend_execute_data *execute_data, zval *return_value);
+extern ZEND_API void (*original_zend_execute_ex)(zend_execute_data *execute_data);
+
 /**
  * Phalcon\Aop
  *

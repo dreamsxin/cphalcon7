@@ -40,6 +40,12 @@
 
 #include "phalcon.h"
 
+ZEND_API void (*original_zend_execute_internal)(zend_execute_data *execute_data, zval *return_value);
+ZEND_API void (*original_zend_execute_ex)(zend_execute_data *execute_data);
+
+ZEND_API void (*_zend_execute_internal)(zend_execute_data*, zval*);
+ZEND_API void (*_zend_execute_ex)(zend_execute_data*);
+
 ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
 static PHP_INI_MH(OnChangeKeysMemoryLimit) {

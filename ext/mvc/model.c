@@ -3940,7 +3940,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 				}
 			} else if (Z_TYPE(value) != IS_OBJECT || !instanceof_function(Z_OBJCE(value), phalcon_db_rawvalue_ce)) {
 				if (phalcon_array_isset(&data_type_numeric, field)) {
-					if (!phalcon_is_numeric(&value)) {
+					if (!phalcon_is_numeric_ex(&value)) {
 						PHALCON_MM_ZVAL_STRING(&type, "Numericality");
 						PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
 						if (method_exists) {
@@ -3957,26 +3957,6 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 
-						error = &PHALCON_GLOBAL(z_true);
-					} else if (
-						!phalcon_is_numeric_ex(&value)
-					) {
-						PHALCON_MM_ZVAL_STRING(&type, "Numericality");
-						PHALCON_MM_CALL_CE_STATIC(&message, phalcon_validation_ce, "getmessage", &type);
-						PHALCON_MM_ADD_ENTRY(&message);
-						if (method_exists) {
-							PHALCON_MM_CALL_METHOD(&label, getThis(), "getlabel", &attribute_field);
-						} else {
-							ZVAL_COPY(&label, &attribute_field);
-						}
-						PHALCON_MM_ADD_ENTRY(&label);
-						array_init_size(&pairs, 1);
-						phalcon_array_update_str(&pairs, SL(":field"), &label, PH_COPY);
-						PHALCON_MM_ADD_ENTRY(&pairs);
-						PHALCON_MM_CALL_FUNCTION(&prepared, "strtr", &message, &pairs);
-						PHALCON_MM_ADD_ENTRY(&prepared);
-
-						PHALCON_MM_CALL_METHOD(NULL, getThis(), "appendmessage", &prepared, &attribute_field, &type);
 						error = &PHALCON_GLOBAL(z_true);
 					} else if (
 						(phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_INTEGER) || phalcon_is_equal_long(&field_type, PHALCON_DB_COLUMN_TYPE_BIGINTEGER))

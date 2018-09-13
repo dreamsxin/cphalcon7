@@ -142,7 +142,7 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	phalcon_fetch_params(0, 0, 1, &_arguments);
 
 	if (!_arguments) {
-		array_init(&arguments);
+		ZVAL_NULL(&arguments);
 	} else {
 		ZVAL_COPY(&arguments, _arguments);
 	}

@@ -24,6 +24,7 @@
 #include "dispatcherinterface.h"
 
 #include "kernel/main.h"
+#include "kernel/array.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
 #include "kernel/fcall.h"
@@ -172,21 +173,21 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 
 	zval *message, *exception_code = NULL, exception = {}, event_name = {}, status = {};
 
-	phalcon_fetch_params(0, 1, 1, &message, &exception_code);
+	phalcon_fetch_params(1, 1, 1, &message, &exception_code);
 
 	if (!exception_code) {
 		exception_code = &PHALCON_GLOBAL(z_zero);
 	}
 
 	object_init_ex(&exception, phalcon_cli_dispatcher_exception_ce);
-	PHALCON_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
+	PHALCON_MM_ADD_ENTRY(&exception);
+	PHALCON_MM_CALL_METHOD(NULL, &exception, "__construct", message, exception_code);
 
-	ZVAL_STRING(&event_name, "dispatch:beforeException");
-	PHALCON_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &exception);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "dispatch:beforeException");
+	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name, &exception);
+
 	if (PHALCON_IS_FALSE(&status)) {
-		zval_ptr_dtor(&exception);
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 	zval_ptr_dtor(&status);
 
@@ -194,7 +195,7 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, _throwDispatchException){
 	 * Throw the exception if it wasn't handled
 	 */
 	phalcon_throw_exception(&exception);
-	zval_ptr_dtor(&exception);
+	RETURN_MM();
 }
 
 /**

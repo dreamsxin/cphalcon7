@@ -24,7 +24,6 @@
 #include "cli/../routerinterface.h"
 #include "diinterface.h"
 #include "dispatcherinterface.h"
-#include "diinterface.h"
 #include "di/injectable.h"
 
 #include "kernel/main.h"
@@ -246,5 +245,5 @@ PHP_METHOD(Phalcon_Cli_Console, handle){
 	PHALCON_MM_ZVAL_STRING(&event_name, "console:afterHandleTask");
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &status);
 
-	RETURN_MM_CTOR(&status);
+	RETURN_MM_NCTOR(&status);
 }

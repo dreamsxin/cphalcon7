@@ -60,6 +60,30 @@ HTML;
 		$ret = Tag::selectStatic($data);
 
 		$this->assertEquals($ret, $html);
+
+		$ret = \Phalcon\Tag::select(array('status', 'value' => 1, [1, 2, 3, 4]));
+
+		$html = <<<HTML
+<select id="status" name="status">
+	<option value="0">1</option>
+	<option selected="selected" value="1">2</option>
+	<option value="2">3</option>
+	<option value="3">4</option>
+</select>
+HTML;
+		$this->assertEquals($ret, $html);
+
+		$ret = \Phalcon\Tag::selectStatic(array('id' => 'status', 'value' => 1, 'class' => '', 'options' => [1, 2, 3, 4]));
+
+		$html = <<<HTML
+<select id="status" name="status" class="">
+	<option value="0">1</option>
+	<option selected="selected" value="1">2</option>
+	<option value="2">3</option>
+	<option value="3">4</option>
+</select>
+HTML;
+		$this->assertEquals($ret, $html);
 	}
 
 	/**

@@ -38,6 +38,12 @@ class HttpClientTest extends PHPUnit\Framework\TestCase
 
 		$uri = $uri->resolve('index');
 		$this->assertEquals($uri->build(), 'http://phalconphp.com/index');
+
+		$uri = new Phalcon\Http\Uri('http://myleft.org/one/?x1=1&');
+		$this->assertEquals($uri->extend('two?x2=2')->build(), 'http://myleft.org/one/two?x1=1&x2=2');
+		$this->assertEquals($uri->extendQuery(['x3' => '3'])->build(), 'http://myleft.org/one/two?x1=1&x2=2&x3=3');
+		$this->assertEquals($uri->extendPath('three')->build(), 'http://myleft.org/one/two/three?x1=1&x2=2&x3=3');
+		$this->assertEquals($uri->extendPath('/four')->build(), 'http://myleft.org/four?x1=1&x2=2&x3=3');
 	}
 
 	public function testCurl()

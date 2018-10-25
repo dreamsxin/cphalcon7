@@ -179,7 +179,7 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 
 	zval *data = NULL, *endian = NULL;
 
-	phalcon_fetch_params(0, 0, 2, &data, &endian);
+	phalcon_fetch_params(1, 0, 2, &data, &endian);
 
 	if (!data) {
 		data = &PHALCON_GLOBAL(z_null);
@@ -187,40 +187,41 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 
 	if (Z_TYPE_P(data) == IS_STRING || Z_TYPE_P(data) == IS_NULL) {
 		zval filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
-		ZVAL_STRING(&filename, "php://memory");
-		ZVAL_STRING(&mode, "br+");
-		PHALCON_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
-		zval_ptr_dtor(&filename);
-		zval_ptr_dtor(&mode);
-		PHALCON_CALL_FUNCTION(NULL, "fwrite", &handler, data);
+		PHALCON_MM_ZVAL_STRING(&filename, "php://memory");
+		PHALCON_MM_ZVAL_STRING(&mode, "br+");
+		PHALCON_MM_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
+		PHALCON_MM_ADD_ENTRY(&handler);
 
-		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
+		PHALCON_MM_CALL_FUNCTION(NULL, "fwrite", &handler, data);
+		PHALCON_MM_CALL_FUNCTION(&fstat, "fstat", &handler);
+		PHALCON_MM_ADD_ENTRY(&fstat);
+
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
-		zval_ptr_dtor(&fstat);
 		phalcon_update_property(getThis(), SL("_output"), &handler);
-		zval_ptr_dtor(&handler);
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
 		zval fstat = {}, size = {};
 		phalcon_update_property(getThis(), SL("_output"), data);
 
-		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
+		PHALCON_MM_CALL_FUNCTION(&fstat, "fstat", data);
+		PHALCON_MM_ADD_ENTRY(&fstat);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_position"), &size);
 		}
-		zval_ptr_dtor(&fstat);
 	} else {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
 		return;
 	}
 
 	if (endian && Z_TYPE_P(endian) != IS_NULL) {
 		if (Z_TYPE_P(endian) != IS_LONG || Z_LVAL_P(endian) < 0 || Z_LVAL_P(endian) > 2) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
+			return;
 		}
 		phalcon_update_property(getThis(), SL("_endian"), endian);
 	}
+	RETURN_MM();
 }
 
 /**
@@ -300,17 +301,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeChar){
 
 	zval *byte, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &byte);
+	phalcon_fetch_params(1, 1, 0, &byte);
 
 	ZVAL_LONG(&length, 1);
 
-	ZVAL_STRING(&format, "c");
+	PHALCON_MM_ZVAL_STRING(&format, "c");
 	PHALCON_CALL_FUNCTION(&result, "pack", &format, byte);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -322,17 +323,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedChar){
 
 	zval *byte, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &byte);
+	phalcon_fetch_params(1, 1, 0, &byte);
 
 	ZVAL_LONG(&length, 1);
 
-	ZVAL_STRING(&format, "C");
+	PHALCON_MM_ZVAL_STRING(&format, "C");
 	PHALCON_CALL_FUNCTION(&result, "pack", &format, byte);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -344,17 +345,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt16){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, 2);
 
-	ZVAL_STRING(&format, "s");
+	PHALCON_MM_ZVAL_STRING(&format, "s");
 	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -366,7 +367,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 
 	zval *_endian = NULL, *num, length = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 1, &num, &_endian);
+	phalcon_fetch_params(1, 1, 1, &num, &_endian);
 
 	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
 		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
@@ -383,12 +384,14 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt16){
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_MACHINE) {
 		ZVAL_STRING(&format, "S");
 	}
+	PHALCON_MM_ADD_ENTRY(&format);
 
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
+
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -400,17 +403,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, sizeof(int));
 
-	ZVAL_STRING(&format, "i");
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ZVAL_STRING(&format, "i");
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -422,17 +425,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, sizeof(int));
 
-	ZVAL_STRING(&format, "I");
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ZVAL_STRING(&format, "I");
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -444,17 +447,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeInt32){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, 4);
 
-	ZVAL_STRING(&format, "l");
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ZVAL_STRING(&format, "l");
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -466,7 +469,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 
 	zval *_endian = NULL, *num, length = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 1, &num, &_endian);
+	phalcon_fetch_params(1, 1, 1, &num, &_endian);
 
 	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
 		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
@@ -483,12 +486,14 @@ PHP_METHOD(Phalcon_Binary_Writer, writeUnsignedInt32){
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_MACHINE) {
 		ZVAL_STRING(&format, "L");
 	}
+	PHALCON_MM_ADD_ENTRY(&format);
 
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
+
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -500,17 +505,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeFloat){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, sizeof(float));
 
-	ZVAL_STRING(&format, "f");
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ZVAL_STRING(&format, "f");
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -522,17 +527,17 @@ PHP_METHOD(Phalcon_Binary_Writer, writeDouble){
 
 	zval *num, length = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 0, &num);
+	phalcon_fetch_params(1, 1, 0, &num);
 
 	ZVAL_LONG(&length, sizeof(double));
 
-	ZVAL_STRING(&format, "d");
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, num);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ZVAL_STRING(&format, "d");
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, num);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &length);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &length);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -544,7 +549,7 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
 
 	zval *str, *length = NULL, *exact = NULL, len = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 2, &str, &length, &exact);
+	phalcon_fetch_params(1, 1, 2, &str, &length, &exact);
 
 	if (length && Z_TYPE_P(length) != IS_NULL) {
 		if (exact && zend_is_true(exact)) {
@@ -559,14 +564,15 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
 			ZVAL_STRING(&format, "Z*");
 		}
 	}
+	PHALCON_MM_ADD_ENTRY(&format);
 	PHALCON_CALL_FUNCTION(&result, "pack", &format, str);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ADD_ENTRY(&result);
 
 	ZVAL_LONG(&len, Z_STRLEN(result));
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &len);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &len);
+
+	RETURN_MM_THIS();
 }
 
 /**
@@ -576,29 +582,39 @@ PHP_METHOD(Phalcon_Binary_Writer, writeString){
  */
 PHP_METHOD(Phalcon_Binary_Writer, writeHexString){
 
-	zval *str, *length = NULL, *low_nibble = NULL, len = {}, format = {}, result = {};
+	zval *str, *length = NULL, *low_nibble = NULL, endian = {}, len = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 1, 2, &str, &length, &low_nibble);
+	phalcon_fetch_params(1, 1, 2, &str, &length, &low_nibble);
+
+	if (!low_nibble || Z_TYPE_P(low_nibble) == IS_NULL) {
+		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
+		if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
+			low_nibble = &PHALCON_GLOBAL(z_true);
+		} else {
+			low_nibble = &PHALCON_GLOBAL(z_false);
+		}
+	}
 
 	if (length && Z_TYPE_P(length) != IS_NULL) {
-		if (low_nibble && zend_is_true(low_nibble)) {
+		if (zend_is_true(low_nibble)) {
 			PHALCON_CONCAT_SV(&format, "h", length);
 		} else {
 			PHALCON_CONCAT_SV(&format, "H", length);
 		}
 	} else {
-		if (low_nibble && zend_is_true(low_nibble)) {
+		if (zend_is_true(low_nibble)) {
 			ZVAL_STRING(&format, "h*");
 		} else {
 			ZVAL_STRING(&format, "H*");
 		}
 	}
-	PHALCON_CALL_FUNCTION(&result, "pack", &format, str);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_ADD_ENTRY(&format);
+	PHALCON_MM_CALL_FUNCTION(&result, "pack", &format, str);
+	PHALCON_MM_ADD_ENTRY(&result);
 
 	ZVAL_LONG(&len, Z_STRLEN(result));
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "write", &result, &len);
-	zval_ptr_dtor(&result);
-	RETURN_THIS();
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "write", &result, &len);
+
+	RETURN_MM_THIS();
 }

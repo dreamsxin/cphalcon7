@@ -155,55 +155,55 @@ PHP_METHOD(Phalcon_Binary_Reader, __construct){
 
 	zval *data, *endian = NULL;
 
-	phalcon_fetch_params(0, 1, 1, &data, &endian);
+	phalcon_fetch_params(1, 1, 1, &data, &endian);
 
 	if (Z_TYPE_P(data) == IS_STRING) {
 		zval filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
 		phalcon_update_property(getThis(), SL("_data"), data);
 
-		ZVAL_STRING(&filename, "php://memory");
-		ZVAL_STRING(&mode, "br+");
-		PHALCON_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
-		zval_ptr_dtor(&filename);
-		zval_ptr_dtor(&mode);
-		PHALCON_CALL_FUNCTION(NULL, "fwrite", &handler, data);
-		PHALCON_CALL_FUNCTION(NULL, "rewind", &handler);
+		PHALCON_MM_ZVAL_STRING(&filename, "php://memory");
+		PHALCON_MM_ZVAL_STRING(&mode, "br+");
+		PHALCON_MM_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
+		PHALCON_MM_ADD_ENTRY(&handler);
+		PHALCON_MM_CALL_FUNCTION(NULL, "fwrite", &handler, data);
+		PHALCON_MM_CALL_FUNCTION(NULL, "rewind", &handler);
 
-		PHALCON_CALL_FUNCTION(&fstat, "fstat", &handler);
+		PHALCON_MM_CALL_FUNCTION(&fstat, "fstat", &handler);
+		PHALCON_MM_ADD_ENTRY(&fstat);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		}
-		zval_ptr_dtor(&fstat);
 		phalcon_update_property(getThis(), SL("_input"), &handler);
-		zval_ptr_dtor(&handler);
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
 		zval fstat = {}, size = {}, content = {};
 		phalcon_update_property(getThis(), SL("_input"), data);
 
-		PHALCON_CALL_FUNCTION(&fstat, "fstat", data);
+		PHALCON_MM_CALL_FUNCTION(&fstat, "fstat", data);
+		PHALCON_MM_ADD_ENTRY(&fstat);
 		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_eofPosition"), &size);
 		} else {
 			ZVAL_LONG(&size, 0);
 		}
-		zval_ptr_dtor(&fstat);
 
-		PHALCON_CALL_FUNCTION(NULL, "rewind", data);
-		PHALCON_CALL_FUNCTION(&content, "fread", data, &size);
-		PHALCON_CALL_FUNCTION(NULL, "rewind", data);
+		PHALCON_MM_CALL_FUNCTION(NULL, "rewind", data);
+		PHALCON_MM_CALL_FUNCTION(&content, "fread", data, &size);
+		PHALCON_MM_ADD_ENTRY(&content);
+		PHALCON_MM_CALL_FUNCTION(NULL, "rewind", data);
 		phalcon_update_property(getThis(), SL("_data"), &content);
-		zval_ptr_dtor(&content);
 	} else {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Data must be set as string or resource");
 		return;
 	}
 
 	if (endian && Z_TYPE_P(endian) != IS_NULL) {
 		if (Z_TYPE_P(endian) != IS_LONG || Z_LVAL_P(endian) < 0 || Z_LVAL_P(endian) > 2) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Endian must be set as big or little");
+			return;
 		}
 		phalcon_update_property(getThis(), SL("_endian"), endian);
 	}
+	RETURN_MM();
 }
 
 /**
@@ -362,17 +362,20 @@ PHP_METHOD(Phalcon_Binary_Reader, readChar){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
-	ZVAL_LONG(&length, 1);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_INIT();
 
-	ZVAL_STRING(&format, "c");
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	ZVAL_LONG(&length, 1);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
+
+	PHALCON_MM_ZVAL_STRING(&format, "c");
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -384,17 +387,20 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedChar){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
-	ZVAL_LONG(&length, 1);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_INIT();
 
-	ZVAL_STRING(&format, "C");
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	ZVAL_LONG(&length, 1);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
+
+	PHALCON_MM_ZVAL_STRING(&format, "C");
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -406,18 +412,20 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt16){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&length, 2);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
-	ZVAL_STRING(&format, "s");
+	PHALCON_MM_ZVAL_STRING(&format, "s");
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -429,7 +437,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt16){
 
 	zval *_endian = NULL, length = {}, bytes = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 0, 1, &_endian);
+	phalcon_fetch_params(1, 0, 1, &_endian);
 
 	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
 		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
@@ -438,23 +446,24 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt16){
 	}
 
 	ZVAL_LONG(&length, 2);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
-		ZVAL_STRING(&format, "n");
+		PHALCON_MM_ZVAL_STRING(&format, "n");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
-		ZVAL_STRING(&format, "v");
+		PHALCON_MM_ZVAL_STRING(&format, "v");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_MACHINE) {
-		ZVAL_STRING(&format, "S");
+		PHALCON_MM_ZVAL_STRING(&format, "S");
 	}
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -466,18 +475,21 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
-	ZVAL_LONG(&length, sizeof(int));
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_INIT();
 
-	ZVAL_STRING(&format, "i");
+	ZVAL_LONG(&length, sizeof(int));
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
+
+	PHALCON_MM_ZVAL_STRING(&format, "i");
 
 	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -489,18 +501,21 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&length, sizeof(int));
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
-	ZVAL_STRING(&format, "I");
+	PHALCON_MM_ZVAL_STRING(&format, "I");
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -512,18 +527,21 @@ PHP_METHOD(Phalcon_Binary_Reader, readInt32){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&length, 4);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
-	ZVAL_STRING(&format, "l");
+	PHALCON_MM_ZVAL_STRING(&format, "l");
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -535,7 +553,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt32){
 
 	zval *_endian = NULL, length = {}, bytes = {}, endian = {}, format = {}, result = {};
 
-	phalcon_fetch_params(0, 0, 1, &_endian);
+	phalcon_fetch_params(1, 0, 1, &_endian);
 
 	if (!_endian || Z_TYPE_P(_endian) == IS_NULL) {
 		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
@@ -544,23 +562,24 @@ PHP_METHOD(Phalcon_Binary_Reader, readUnsignedInt32){
 	}
 
 	ZVAL_LONG(&length, 4);
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
 	if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_BIG) {
-		ZVAL_STRING(&format, "N");
+		PHALCON_MM_ZVAL_STRING(&format, "N");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
-		ZVAL_STRING(&format, "V");
+		PHALCON_MM_ZVAL_STRING(&format, "V");
 	} else if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_MACHINE) {
-		ZVAL_STRING(&format, "L");
+		PHALCON_MM_ZVAL_STRING(&format, "L");
 	}
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -572,18 +591,21 @@ PHP_METHOD(Phalcon_Binary_Reader, readFloat){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&length, sizeof(float));
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
-	ZVAL_STRING(&format, "f");
+	PHALCON_MM_ZVAL_STRING(&format, "f");
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -595,18 +617,21 @@ PHP_METHOD(Phalcon_Binary_Reader, readDouble){
 
 	zval length = {}, bytes = {}, format = {}, result = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&length, sizeof(double));
-	PHALCON_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_CALL_METHOD(&bytes, getThis(), "read", &length);
+	PHALCON_MM_ADD_ENTRY(&bytes);
 
-	ZVAL_STRING(&format, "d");
+	PHALCON_MM_ZVAL_STRING(&format, "d");
 
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &bytes);
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&bytes);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -618,26 +643,28 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
 
 	zval *length = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {};
 
-	phalcon_fetch_params(0, 0, 1, &length);
+	phalcon_fetch_params(1, 0, 1, &length);
 
 	if (length && Z_TYPE_P(length) != IS_NULL) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "read", length);
-		return;
+		PHALCON_MM_CALL_METHOD(return_value, getThis(), "read", length);
+		RETURN_MM();
 	}
 
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&eof_position, getThis(), SL("_eofPosition"), PH_NOISY|PH_READONLY);
 	if (PHALCON_GE(&position, &eof_position)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Not enough input");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Not enough input");
 		return;
 	}
 	PHALCON_CONCAT_SVS(&format, "@", &position, "/Z*");
+	PHALCON_MM_ADD_ENTRY(&format);
 
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
-	PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
-	zval_ptr_dtor(&format);
+	PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &data);
+	PHALCON_MM_ADD_ENTRY(&result);
+
 	if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-		RETVAL_NULL();
+		RETURN_MM_NULL();
 	} else {
 		zval len = {}, seek_type = {}, new_position = {};
 		ZVAL_LONG(&len, Z_STRLEN_P(return_value));
@@ -647,9 +674,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
 		}
 
 		ZVAL_LONG(&seek_type, SEEK_CUR);
-		PHALCON_CALL_METHOD(NULL, getThis(), "setposition", &len, &seek_type);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setposition", &len, &seek_type);
 	}
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }
 
 /**
@@ -659,48 +686,57 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
  */
 PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 
-	zval *length = NULL, *low_nibble = NULL, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {}, seek_type = {};
+	zval *length = NULL, *low_nibble = NULL, endian = {}, position = {}, eof_position = {}, format = {}, data = {}, result = {}, len = {}, seek_type = {};
 
-	phalcon_fetch_params(0, 0, 2, &length, &low_nibble);
+	phalcon_fetch_params(1, 0, 2, &length, &low_nibble);
+
+	if (!low_nibble || Z_TYPE_P(low_nibble) == IS_NULL) {
+		phalcon_read_property(&endian, getThis(), SL("_endian"), PH_NOISY|PH_READONLY);
+		if (Z_LVAL(endian) == PHALCON_BINARY_ENDIAN_LITTLE) {
+			low_nibble = &PHALCON_GLOBAL(z_true);
+		} else {
+			low_nibble = &PHALCON_GLOBAL(z_false);
+		}
+	}
 
 	if (length && Z_TYPE_P(length) != IS_NULL) {
-		PHALCON_CALL_METHOD(&data, getThis(), "read", length);
+		PHALCON_MM_CALL_METHOD(&data, getThis(), "read", length);
 
 		// 低位是否在前半字节
-		if (low_nibble && zend_is_true(low_nibble)) {
+		if (zend_is_true(low_nibble)) {
 			PHALCON_CONCAT_SV(&format, "h", length);
 		} else {
 			PHALCON_CONCAT_SV(&format, "H", length);
 		}
-		PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
+		PHALCON_MM_ADD_ENTRY(&format);
+		PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &data);
+		PHALCON_MM_ADD_ENTRY(&result);
 		if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-			RETVAL_NULL();
+			RETURN_MM_NULL();
 		}
 	} else {
 		phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 		phalcon_read_property(&eof_position, getThis(), SL("_eofPosition"), PH_NOISY|PH_READONLY);
 		if (PHALCON_GE(&position, &eof_position)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Not enough input");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_binary_exception_ce, "Not enough input");
 			return;
 		}
 		// 低位是否在前半字节
-		if (low_nibble && zend_is_true(low_nibble)) {
+		if (zend_is_true(low_nibble)) {
 			PHALCON_CONCAT_SVS(&format, "@", &position, "/h*");
 		} else {
 			PHALCON_CONCAT_SVS(&format, "@", &position, "/H*");
 		}
+		PHALCON_MM_ADD_ENTRY(&format);
 
 		phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_COPY);
-		PHALCON_CALL_FUNCTION(&result, "unpack", &format, &data);
+		PHALCON_MM_CALL_FUNCTION(&result, "unpack", &format, &data);
 		if (!phalcon_array_isset_fetch_long(return_value, &result, 1, PH_COPY)) {
-			RETVAL_NULL();
-		} else {
-			ZVAL_LONG(&len, Z_STRLEN_P(return_value)/2);
-			ZVAL_LONG(&seek_type, SEEK_CUR);
-			PHALCON_CALL_METHOD(NULL, getThis(), "setposition", &len, &seek_type);
+			RETURN_MM_NULL();
 		}
+		ZVAL_LONG(&len, Z_STRLEN_P(return_value)/2);
+		ZVAL_LONG(&seek_type, SEEK_CUR);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setposition", &len, &seek_type);
 	}
-	zval_ptr_dtor(&format);
-	zval_ptr_dtor(&data);
-	zval_ptr_dtor(&result);
+	RETURN_MM();
 }

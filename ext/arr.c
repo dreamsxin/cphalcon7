@@ -173,7 +173,8 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_filter, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
 	ZEND_ARG_INFO(0, callback)
-	ZEND_ARG_INFO(0, strict)
+	ZEND_ARG_TYPE_INFO(0, strict, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, allowEmpty, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sum, 0, 0, 1)
@@ -1262,14 +1263,18 @@ PHP_METHOD(Phalcon_Arr, key){
  */
 PHP_METHOD(Phalcon_Arr, filter){
 
-	zval *array, *filters = NULL, *strict = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
+	zval *array, *filters = NULL, *strict = NULL, *allow_empty = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 2, &array, &filters, &strict);
+	phalcon_fetch_params(0, 1, 3, &array, &filters, &strict, &allow_empty);
 
 	if (!strict) {
 		strict = &PHALCON_GLOBAL(z_false);
+	}
+
+	if (!allow_empty) {
+		allow_empty = &PHALCON_GLOBAL(z_false);
 	}
 
 	array_init(return_value);
@@ -1279,12 +1284,14 @@ PHP_METHOD(Phalcon_Arr, filter){
 
 	if (!filters || Z_TYPE_P(filters) == IS_NULL) {
 		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(array), idx, str_key, value) {
-			if (strict) {
-				if (PHALCON_IS_EMPTY(value)) {
+			if (!zend_is_true(allow_empty)) {
+				if (strict) {
+					if (PHALCON_IS_EMPTY(value)) {
+						continue;
+					}
+				} else if (!zend_is_true(value)) {
 					continue;
 				}
-			} else if (!zend_is_true(value)) {
-				continue;
 			}
 
 			if (str_key) {
@@ -1308,12 +1315,14 @@ PHP_METHOD(Phalcon_Arr, filter){
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(array), idx, str_key, value) {
 		zval filter_value = {};
 		PHALCON_CALL_METHOD(&filter_value, &filter, "sanitize", value, filters);
-		if (strict) {
-			if (PHALCON_IS_EMPTY(&filter_value)) {
+		if (!zend_is_true(allow_empty)) {
+			if (strict) {
+				if (PHALCON_IS_EMPTY(&filter_value)) {
+					continue;
+				}
+			} else if (!zend_is_true(&filter_value)) {
 				continue;
 			}
-		} else if (!zend_is_true(&filter_value)) {
-			continue;
 		}
 		if (str_key) {
 			phalcon_array_update_string(return_value, str_key, &filter_value, 0);

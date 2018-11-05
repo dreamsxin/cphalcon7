@@ -111,7 +111,6 @@ int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *
 int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index, zval *value)
 {
 	zval tmp = {};
-	int separated = 0;
 
 	phalcon_read_static_property_ce(&tmp, ce, property, property_length, PH_READONLY);
 
@@ -123,40 +122,7 @@ int phalcon_update_static_property_array_ce(zend_class_entry *ce, const char *pr
 		return SUCCESS;
 	}
 
-	/** Separation only when refcount > 1 */
-	if (Z_REFCOUNTED(tmp)) {
-		if (Z_REFCOUNT(tmp) > 1) {
-			if (!Z_ISREF(tmp)) {
-				zval new_zv;
-				ZVAL_DUP(&new_zv, &tmp);
-				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
-				separated = 1;
-			}
-		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		if (separated) {
-			convert_to_array(&tmp);
-		} else {
-			array_init(&tmp);
-			separated = 1;
-		}
-		Z_DELREF(tmp);
-	}
-
 	phalcon_array_update(&tmp, index,  value, PH_COPY);
-	if (separated) {
-		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
-	}
 
 	return SUCCESS;
 }
@@ -168,38 +134,23 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 {
 	zval tmp = {};
 	va_list ap;
-	int separated = 0;
+	int separated = 0, flag = SUCCESS;
 
 	phalcon_read_static_property_ce(&tmp, ce, property, property_length, PH_READONLY);
 
-	/** Separation only when refcount > 1 */
-	if (Z_REFCOUNTED(tmp)) {
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		separated = 1;
+	} else if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {
 			if (!Z_ISREF(tmp)) {
 				zval new_zv;
 				ZVAL_DUP(&new_zv, &tmp);
 				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
 				separated = 1;
 			}
 		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		if (separated) {
-			convert_to_array(&tmp);
-		} else {
-			array_init(&tmp);
-			separated = 1;
-		}
-		Z_DELREF(tmp);
 	}
 
 	va_start(ap, types_count);
@@ -207,9 +158,10 @@ int phalcon_update_static_property_array_multi_ce(zend_class_entry *ce, const ch
 	va_end(ap);
 
 	if (separated) {
-		return phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		flag = phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 	}
-	return SUCCESS;
+	return flag;
 }
 
 int phalcon_update_static_property_ce(zend_class_entry *ce, const char *property_name, uint32_t property_length, zval *value)
@@ -271,40 +223,26 @@ int phalcon_update_static_property_array_append_ce(zend_class_entry *ce, const c
 
 	phalcon_read_static_property_ce(&tmp, ce, property, property_length, PH_READONLY);
 
-	/** Separation only when refcount > 1 */
-	if (Z_REFCOUNTED(tmp)) {
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		separated = 1;
+	} else if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {
 			if (!Z_ISREF(tmp)) {
 				zval new_zv;
 				ZVAL_DUP(&new_zv, &tmp);
 				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
 				separated = 1;
 			}
 		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		if (separated) {
-			convert_to_array(&tmp);
-		} else {
-			array_init(&tmp);
-			separated = 1;
-		}
-		Z_DELREF(tmp);
 	}
 
 	phalcon_array_append(&tmp, value, PH_COPY);
 
 	if (separated) {
 		phalcon_update_static_property_ce(ce, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 	}
 
 	return SUCCESS;
@@ -1225,25 +1163,10 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		/*
-		if (Z_REFCOUNTED(tmp)) {
-			if (Z_REFCOUNT(tmp) > 1) {
-				if (!Z_ISREF(tmp)) {
-					zval new_zv;
-					ZVAL_DUP(&new_zv, &tmp);
-					ZVAL_COPY_VALUE(&tmp, &new_zv);
-					Z_TRY_DELREF(new_zv);
-					separated = 1;
-				}
-			}
-		}
-		*/
 		/** Convert the value to array if not is an array */
 		if (Z_TYPE(tmp) != IS_ARRAY) {
 			array_init(&tmp);
 			separated = 1;
-			Z_DELREF(tmp);
 		}
 		Z_TRY_ADDREF_P(value);
 
@@ -1257,6 +1180,7 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 
 		if (separated) {
 			phalcon_update_property(object, property, property_length, &tmp);
+			zval_ptr_dtor(&tmp);
 		}
 	}
 
@@ -1275,32 +1199,19 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		/*
-		if (Z_REFCOUNTED(tmp)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp) != IS_ARRAY) {
+			array_init(&tmp);
+			separated = 1;
+		} else if (Z_REFCOUNTED(tmp)) {
 			if (Z_REFCOUNT(tmp) > 1) {
 				if (!Z_ISREF(tmp)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp);
 					ZVAL_COPY_VALUE(&tmp, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp);
-			ZVAL_COPY_VALUE(&tmp, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated = 1;
-		}
-		*/
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp) != IS_ARRAY) {
-			array_init(&tmp);
-			separated = 1;
-			Z_DELREF(tmp);
 		}
 
 		va_start(ap, types_count);
@@ -1309,6 +1220,7 @@ int phalcon_update_property_array_multi(zval *object, const char *property, uint
 
 		if (separated) {
 			phalcon_update_property(object, property, property_length, &tmp);
+			zval_ptr_dtor(&tmp);
 		}
 	}
 
@@ -1356,38 +1268,26 @@ int phalcon_update_property_array_append(zval *object, const char *property, uin
 
 	phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-	/** Separation only when refcount > 1 */
-	/*
-	if (Z_REFCOUNTED(tmp)) {
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		separated = 1;
+	} else if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {
 			if (!Z_ISREF(tmp)) {
 				zval new_zv;
 				ZVAL_DUP(&new_zv, &tmp);
 				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
 				separated = 1;
 			}
 		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-	*/
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		array_init(&tmp);
-		separated = 1;
-		Z_DELREF(tmp);
 	}
 
 	phalcon_array_append(&tmp, value, PH_COPY);
 
 	if (separated) {
 		phalcon_update_property(object, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 	}
 
 	return SUCCESS;
@@ -1410,38 +1310,26 @@ int phalcon_update_property_array_merge(zval *object, const char *property, uint
 
 	phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-	/** Separation only when refcount > 1 */
-	/*
-	if (Z_REFCOUNTED(tmp)) {
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		separated = 1;
+	} else if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {
 			if (!Z_ISREF(tmp)) {
 				zval new_zv;
 				ZVAL_DUP(&new_zv, &tmp);
 				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
 				separated = 1;
 			}
 		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-	*/
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		array_init(&tmp);
-		separated = 1;
-		Z_DELREF(tmp);
 	}
 
 	phalcon_array_merge_recursive_n(&tmp, values);
 
 	if (separated) {
 		phalcon_update_property(object, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 	}
 
 	return SUCCESS;
@@ -1467,38 +1355,26 @@ int phalcon_update_property_array_merge_append(zval *object, const char *propert
 
 	phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-	/** Separation only when refcount > 1 */
-	/*
-	if (Z_REFCOUNTED(tmp)) {
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) != IS_ARRAY) {
+		array_init(&tmp);
+		separated = 1;
+	} else if (Z_REFCOUNTED(tmp)) {
 		if (Z_REFCOUNT(tmp) > 1) {
 			if (!Z_ISREF(tmp)) {
 				zval new_zv;
 				ZVAL_DUP(&new_zv, &tmp);
 				ZVAL_COPY_VALUE(&tmp, &new_zv);
-				Z_TRY_DELREF(new_zv);
 				separated = 1;
 			}
 		}
-	} else {
-		zval new_zv;
-		ZVAL_DUP(&new_zv, &tmp);
-		ZVAL_COPY_VALUE(&tmp, &new_zv);
-		Z_TRY_DELREF(new_zv);
-		separated = 1;
-	}
-	*/
-
-	/** Convert the value to array if not is an array */
-	if (Z_TYPE(tmp) != IS_ARRAY) {
-		array_init(&tmp);
-		separated = 1;
-		Z_DELREF(tmp);
 	}
 
 	phalcon_merge_append(&tmp, values);
 
 	if (separated) {
 		phalcon_update_property(object, property, property_length, &tmp);
+		zval_ptr_dtor(&tmp);
 	}
 
 	return SUCCESS;
@@ -1554,43 +1430,13 @@ int phalcon_read_property_array(zval *return_value, zval *object, const char *pr
 int phalcon_unset_property_array(zval *object, const char *property, uint32_t property_length, const zval *index) {
 
 	zval tmp = {};
-	int separated = 0;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		phalcon_read_property(&tmp, object, property, property_length, PH_NOISY | PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		/*
-		if (Z_REFCOUNTED(tmp)) {
-			if (Z_REFCOUNT(tmp) > 1) {
-				if (!Z_ISREF(tmp)) {
-					zval new_zv;
-					ZVAL_DUP(&new_zv, &tmp);
-					ZVAL_COPY_VALUE(&tmp, &new_zv);
-					Z_TRY_DELREF(new_zv);
-					separated = 1;
-				}
-			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp);
-			ZVAL_COPY_VALUE(&tmp, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated = 1;
-		}
-		*/
-
 		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp) != IS_ARRAY) {
-			array_init(&tmp);
-			separated = 1;
-			Z_DELREF(tmp);
-		}
-
-		phalcon_array_unset(&tmp, index, 0);
-
-		if (separated) {
-			phalcon_update_property(object, property, property_length, &tmp);
+		if (Z_TYPE(tmp) == IS_ARRAY) {
+			phalcon_array_unset(&tmp, index, 0);
 		}
 	}
 

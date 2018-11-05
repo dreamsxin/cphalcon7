@@ -634,39 +634,24 @@ void phalcon_array_append_multi_2(zval *arr, zval *index, zval *value, int flags
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&tmp, arr, index, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp) != IS_ARRAY) {
+			array_init(&tmp);
+			separated = 1;
+		} else if (Z_REFCOUNTED(tmp)) {
 			if (Z_REFCOUNT(tmp) > 1) {
 				if (!Z_ISREF(tmp)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp);
 					ZVAL_COPY_VALUE(&tmp, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp);
-			ZVAL_COPY_VALUE(&tmp, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp) != IS_ARRAY) {
-			if (separated) {
-				convert_to_array(&tmp);
-			} else {
-				array_init(&tmp);
-				separated = 1;
-			}
-			Z_DELREF(tmp);
 		}
 
 		phalcon_array_append(&tmp, value, flags);
 		if (separated) {
-			phalcon_array_update(arr, index, &tmp, PH_COPY);
+			phalcon_array_update(arr, index, &tmp, 0);
 		}
 	}
 }
@@ -679,39 +664,24 @@ void phalcon_array_update_multi_2(zval *arr, const zval *index1, const zval *ind
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&tmp, arr, index1, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp) != IS_ARRAY) {
+			array_init(&tmp);
+			separated = 1;
+		} else if (Z_REFCOUNTED(tmp)) {
 			if (Z_REFCOUNT(tmp) > 1) {
 				if (!Z_ISREF(tmp)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp);
 					ZVAL_COPY_VALUE(&tmp, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp);
-			ZVAL_COPY_VALUE(&tmp, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp) != IS_ARRAY) {
-			if (separated) {
-				convert_to_array(&tmp);
-			} else {
-				array_init(&tmp);
-				separated = 1;
-			}
-			Z_DELREF(tmp);
 		}
 
 		phalcon_array_update(&tmp, index2, value, flags);
 		if (separated) {
-			phalcon_array_update(arr, index1, &tmp, PH_COPY);
+			phalcon_array_update(arr, index1, &tmp, 0);
 		}
 	}
 
@@ -753,74 +723,44 @@ void phalcon_array_update_zval_str_append_multi_3(zval *arr, const zval *index1,
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&tmp1, arr, index1, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp1)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp1) != IS_ARRAY) {
+			array_init(&tmp1);
+			separated1 = 1;
+		} else if (Z_REFCOUNTED(tmp1)) {
 			if (Z_REFCOUNT(tmp1) > 1) {
 				if (!Z_ISREF(tmp1)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp1);
 					ZVAL_COPY_VALUE(&tmp1, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated1 = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp1);
-			ZVAL_COPY_VALUE(&tmp1, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated1 = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp1) != IS_ARRAY) {
-			if (separated1) {
-				convert_to_array(&tmp1);
-			} else {
-				array_init(&tmp1);
-				separated1 = 1;
-			}
-			Z_DELREF(tmp1);
 		}
 
 		phalcon_array_fetch_str(&tmp2, &tmp1, index2, index2_length, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp2)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp2) != IS_ARRAY) {
+			array_init(&tmp2);
+			separated2 = 1;
+		} else if (Z_REFCOUNTED(tmp2)) {
 			if (Z_REFCOUNT(tmp2) > 1) {
 				if (!Z_ISREF(tmp2)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp2);
 					ZVAL_COPY_VALUE(&tmp2, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated2 = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp2);
-			ZVAL_COPY_VALUE(&tmp2, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated2 = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp2) != IS_ARRAY) {
-			if (separated2) {
-				convert_to_array(&tmp2);
-			} else {
-				array_init(&tmp2);
-				separated2 = 1;
-			}
-			Z_DELREF(tmp2);
 		}
 
 		phalcon_array_append(&tmp2, value, flags);
 		if (separated2) {
-			phalcon_array_update_str(&tmp1, index2, index2_length, &tmp2, PH_COPY);
+			phalcon_array_update_str(&tmp1, index2, index2_length, &tmp2, 0);
 		}
 		if (separated1) {
-			phalcon_array_update(arr, index1, &tmp1, PH_COPY);
+			phalcon_array_update(arr, index1, &tmp1, 0);
 		}
 	}
 }
@@ -833,74 +773,44 @@ void phalcon_array_update_zval_zval_zval_multi_3(zval *arr, const zval *index1, 
 	if (Z_TYPE_P(arr) == IS_ARRAY) {
 		phalcon_array_fetch(&tmp1, arr, index1, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp1)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp1) != IS_ARRAY) {
+			array_init(&tmp1);
+			separated1 = 1;
+		} else if (Z_REFCOUNTED(tmp1)) {
 			if (Z_REFCOUNT(tmp1) > 1) {
 				if (!Z_ISREF(tmp1)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp1);
 					ZVAL_COPY_VALUE(&tmp1, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated1 = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp1);
-			ZVAL_COPY_VALUE(&tmp1, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated1 = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp1) != IS_ARRAY) {
-			if (separated1) {
-				convert_to_array(&tmp1);
-			} else {
-				array_init(&tmp1);
-				separated1 = 1;
-			}
-			Z_DELREF(tmp1);
 		}
 
 		phalcon_array_fetch(&tmp2, &tmp1, index2, PH_READONLY);
 
-		/** Separation only when refcount > 1 */
-		if (Z_REFCOUNTED(tmp2)) {
+		/** Convert the value to array if not is an array */
+		if (Z_TYPE(tmp2) != IS_ARRAY) {
+			array_init(&tmp2);
+			separated2 = 1;
+		} else if (Z_REFCOUNTED(tmp2)) {
 			if (Z_REFCOUNT(tmp2) > 1) {
 				if (!Z_ISREF(tmp2)) {
 					zval new_zv;
 					ZVAL_DUP(&new_zv, &tmp2);
 					ZVAL_COPY_VALUE(&tmp2, &new_zv);
-					Z_TRY_DELREF(new_zv);
 					separated2 = 1;
 				}
 			}
-		} else {
-			zval new_zv;
-			ZVAL_DUP(&new_zv, &tmp2);
-			ZVAL_COPY_VALUE(&tmp2, &new_zv);
-			Z_TRY_DELREF(new_zv);
-			separated2 = 1;
-		}
-
-		/** Convert the value to array if not is an array */
-		if (Z_TYPE(tmp2) != IS_ARRAY) {
-			if (separated2) {
-				convert_to_array(&tmp2);
-			} else {
-				array_init(&tmp2);
-				separated2 = 1;
-			}
-			Z_DELREF(tmp2);
 		}
 
 		phalcon_array_update(&tmp2, index3, value, flags);
 		if (separated2) {
-			phalcon_array_update(&tmp1, index2, &tmp2, PH_COPY);
+			phalcon_array_update(&tmp1, index2, &tmp2, 0);
 		}
 		if (separated1) {
-			phalcon_array_update(arr, index1, &tmp1, PH_COPY);
+			phalcon_array_update(arr, index1, &tmp1, 0);
 		}
 	}
 }

@@ -5475,37 +5475,44 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 
 	zval *force = NULL, dirty_state = {}, exists = {}, row = {};
 
-	phalcon_fetch_params(0, 0, 1, &force);
+	phalcon_fetch_params(1, 0, 1, &force);
 
 	if (!force) {
 		force = &PHALCON_GLOBAL(z_false);
 	}
 
-	PHALCON_CALL_METHOD(&dirty_state, getThis(), "getdirtystate");
+	PHALCON_MM_CALL_METHOD(&dirty_state, getThis(), "getdirtystate");
 
 	if (!zend_is_true(force) && !PHALCON_IS_LONG(&dirty_state, 0)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted1");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted1");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_true));
 
 	/**
 	 * We need to check if the record exists
 	 */
 	if (!zend_is_true(&exists)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted2");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted2");
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&row, getThis(), "getsnapshotdata");
+	PHALCON_MM_CALL_METHOD(&row, getThis(), "getsnapshotdata");
+	PHALCON_MM_ADD_ENTRY(&row);
 
 	/**
 	 * Assign the resulting array to the this_ptr object
 	 */
 	if (Z_TYPE(row) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, getThis(), "assign", &row);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "assign", &row);
 	}
+
+	if (phalcon_method_exists_ex(return_value, SL("afterrefresh")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "afterrefresh");
+	}
+
+	RETURN_MM_THIS();
 }
 
 /**

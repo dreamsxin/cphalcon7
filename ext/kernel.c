@@ -346,7 +346,7 @@ PHP_METHOD(Phalcon_Kernel, message){
 	}
 	PHALCON_MM_ADD_ENTRY(&file_path);
 
-	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_COPY);
+	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_READONLY);
 	if (Z_TYPE(messages) != IS_ARRAY) {
 		zval_ptr_dtor(&messages);
 		array_init_size(&validation_messages, 35);
@@ -395,8 +395,8 @@ PHP_METHOD(Phalcon_Kernel, message){
 			phalcon_array_merge_recursive_n(&messages, &default_messages);
 		}
 		phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messages"), &messages);
+		zval_ptr_dtor(&messages);
 	}
-	PHALCON_MM_ADD_ENTRY(&messages);
 
 	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_READONLY)) {
 		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_READONLY)) {

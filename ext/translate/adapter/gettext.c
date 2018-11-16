@@ -90,20 +90,20 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(1, 1, 0, &options);
 
 	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"locale\" is required");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&default_domain, options, SL("defaultDomain"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"defaultDomain\" is required");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"defaultDomain\" is required");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"directory\" is required");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Parameter \"directory\" is required");
 		return;
 	}
 
@@ -112,10 +112,12 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 	phalcon_update_property(getThis(), SL("_directory"), &directory);
 
 	PHALCON_CONCAT_SV(&setting, "LC_ALL=", &locale);
-	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);
+	PHALCON_MM_ADD_ENTRY(&setting);
+	PHALCON_MM_CALL_FUNCTION(NULL, "putenv", &setting);
 
 	PHALCON_CONCAT_SV(&setting, "LANGUAGE=", &locale);
-	PHALCON_CALL_FUNCTION(NULL, "putenv", &setting);
+	PHALCON_MM_ADD_ENTRY(&setting);
+	PHALCON_MM_CALL_FUNCTION(NULL, "putenv", &setting);
 
 	if (!phalcon_array_isset_fetch_str(&category, options, SL("category"), PH_READONLY)) {
 		/*
@@ -124,10 +126,10 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 		} else
 		*/
 		if ((constant = zend_get_constant_str(SL("LC_ALL"))) != NULL) {
-			PHALCON_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
+			PHALCON_MM_CALL_FUNCTION(NULL, "setlocale", constant, &locale);
 		}
 	} else {
-		PHALCON_CALL_FUNCTION(NULL, "setlocale", &category, &locale);
+		PHALCON_MM_CALL_FUNCTION(NULL, "setlocale", &category, &locale);
 	}
 
 	if (Z_TYPE(directory) == IS_ARRAY) {
@@ -138,13 +140,14 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, __construct){
 			} else {
 				ZVAL_LONG(&key, idx);
 			}
-			PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &key, value);
+			PHALCON_MM_CALL_FUNCTION(NULL, "bindtextdomain", &key, value);
 		} ZEND_HASH_FOREACH_END();
 	} else {
-		PHALCON_CALL_FUNCTION(NULL, "bindtextdomain", &default_domain, &directory);
+		PHALCON_MM_CALL_FUNCTION(NULL, "bindtextdomain", &default_domain, &directory);
 	}
 
-	PHALCON_CALL_FUNCTION(NULL, "textdomain", &default_domain);
+	PHALCON_MM_CALL_FUNCTION(NULL, "textdomain", &default_domain);
+	RETURN_MM();
 }
 
 /**

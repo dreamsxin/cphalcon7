@@ -84,36 +84,39 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 
 	zval *options, locale = {}, directory = {}, file = {}, translate = {};
 
-	phalcon_fetch_params(0, 1, 0, &options);
+	phalcon_fetch_params(1, 1, 0, &options);
 
 	if (Z_TYPE_P(options) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Invalid options");
 		return;
 	}
 
 	if (!phalcon_array_isset_fetch_str(&locale, options, SL("locale"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation locale was not provided");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation locale was not provided");
 		return;
 	}
 
 	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
 		phalcon_add_trailing_slash(&directory);
 		PHALCON_CONCAT_VVS(&file, &directory, &locale, ".php");
+		zval_ptr_dtor(&directory);
 	} else {
 		PHALCON_CONCAT_VS(&file, &locale, ".php");
 	}
-
+	PHALCON_MM_ADD_ENTRY(&file);
 	if (phalcon_require_ret(&translate, Z_STRVAL(file)) == FAILURE) {
 		zend_throw_exception_ex(phalcon_translate_exception_ce, 0, "Translation file '%s' cannot be read", Z_STRVAL(file));
-		return;
+		RETURN_MM();
 	}
+	PHALCON_MM_ADD_ENTRY(&translate);
 
 	if (Z_TYPE(translate) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation data must be an array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_translate_exception_ce, "Translation data must be an array");
 		return;
 	}
 
 	phalcon_update_property(getThis(), SL("_translate"), &translate);
+	RETURN_MM();
 }
 
 /**

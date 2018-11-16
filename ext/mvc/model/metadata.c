@@ -259,9 +259,9 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize){
 
 		if (Z_TYPE(column_map) != IS_ARRAY) {
 			array_init(&column_map);
-			PHALCON_MM_ADD_ENTRY(&column_map);
 			
 			phalcon_update_property(getThis(), SL("_columnMap"), &column_map);
+			zval_ptr_dtor(&column_map);
 		} else if (phalcon_array_isset_fetch(&model_column_map, &column_map, key, PH_READONLY) && Z_TYPE(model_column_map) != IS_NULL) {
 			RETURN_MM();
 		}

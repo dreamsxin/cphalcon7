@@ -88,16 +88,16 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 void phalcon_aop_do_read_property(HashPosition pos, zend_array *pointcut_table, zval *aop_object);
 void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table, zval *aop_object);
 
-zend_object_read_property_t			original_zend_std_read_property;
-zend_object_write_property_t		original_zend_std_write_property;
-zend_object_get_property_ptr_ptr_t	original_zend_std_get_property_ptr_ptr;
-
 zval *phalcon_aop_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv);
 void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot);
 zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot);
 
 void phalcon_aop_free_pointcut(zval *elem);
 void phalcon_aop_free_pointcut_cache(zval *elem);
+
+extern zend_object_read_property_t    original_zend_std_read_property;
+extern zend_object_write_property_t   original_zend_std_write_property;
+extern zend_object_get_property_ptr_ptr_t	original_zend_std_get_property_ptr_ptr;
 
 extern zend_class_entry *phalcon_aop_ce;
 

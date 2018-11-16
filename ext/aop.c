@@ -34,6 +34,10 @@
 extern ZEND_API void (*original_zend_execute_internal)(zend_execute_data *execute_data, zval *return_value);
 extern ZEND_API void (*original_zend_execute_ex)(zend_execute_data *execute_data);
 
+zend_object_read_property_t    original_zend_std_read_property;
+zend_object_write_property_t   original_zend_std_write_property;
+zend_object_get_property_ptr_ptr_t	original_zend_std_get_property_ptr_ptr;
+
 /**
  * Phalcon\Aop
  *

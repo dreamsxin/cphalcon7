@@ -313,11 +313,13 @@ PHP_METHOD(Phalcon_Mvc_View, __construct){
  */
 PHP_METHOD(Phalcon_Mvc_View, setViewsDir){
 
-	zval *views_dir;
+	zval *views_dir, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &views_dir);
-	phalcon_add_trailing_slash(views_dir);
-	phalcon_update_property(getThis(), SL("_viewsDir"), views_dir);
+
+	phalcon_add_trailing_slash(&path, views_dir);
+	phalcon_update_property(getThis(), SL("_viewsDir"), &path);
+	zval_ptr_dtor(&path);
 
 	RETURN_THIS();
 }
@@ -345,13 +347,14 @@ PHP_METHOD(Phalcon_Mvc_View, getViewsDir){
  */
 PHP_METHOD(Phalcon_Mvc_View, setLayoutsDir){
 
-	zval *layouts_dir, *absolute_path = NULL;
+	zval *layouts_dir, *absolute_path = NULL, path = {};
 	int absolute = 0;
 
 	phalcon_fetch_params(0, 1, 1, &layouts_dir, &absolute_path);
-	phalcon_add_trailing_slash(layouts_dir);
+	phalcon_add_trailing_slash(&path, layouts_dir);
+	phalcon_update_property(getThis(), SL("_layoutsDir"), &path);
+	zval_ptr_dtor(&path);
 	absolute = absolute_path ? zend_is_true(absolute_path) : 0;
-	phalcon_update_property(getThis(), SL("_layoutsDir"), layouts_dir);
 	phalcon_update_property_bool(getThis(), SL("_enableLayoutsAbsolutePath"), absolute);
 	RETURN_THIS();
 }
@@ -379,13 +382,14 @@ PHP_METHOD(Phalcon_Mvc_View, getLayoutsDir){
  */
 PHP_METHOD(Phalcon_Mvc_View, setPartialsDir){
 
-	zval *partials_dir, *absolute_path = NULL;
+	zval *partials_dir, *absolute_path = NULL, path = {};
 	int absolute = 0;
 
 	phalcon_fetch_params(0, 1, 1, &partials_dir, &absolute_path);
-	phalcon_add_trailing_slash(partials_dir);
+	phalcon_add_trailing_slash(&path, partials_dir);
 	absolute = absolute_path ? zend_is_true(absolute_path) : 0;
-	phalcon_update_property(getThis(), SL("_partialsDir"), partials_dir);
+	phalcon_update_property(getThis(), SL("_partialsDir"), &path);
+	zval_ptr_dtor(&path);
 	phalcon_update_property_bool(getThis(), SL("_enablePartialsAbsolutePath"), absolute);
 	RETURN_THIS();
 }
@@ -421,14 +425,18 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 		array_init(&paths);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(base_path), path) {
-			phalcon_add_trailing_slash(path);
+			zval tmp = {};
+			phalcon_add_trailing_slash(&tmp, path);
+			zval_ptr_dtor(&tmp);
 			phalcon_array_append(&paths, path, PH_COPY);
 		} ZEND_HASH_FOREACH_END();
 
 		phalcon_update_property(getThis(), SL("_basePath"), &paths);
 		zval_ptr_dtor(&paths);
 	} else {
-		phalcon_add_trailing_slash(base_path);
+		zval tmp = {};
+		phalcon_add_trailing_slash(&tmp, base_path);
+		zval_ptr_dtor(&tmp);
 		phalcon_update_property(getThis(), SL("_basePath"), base_path);
 	}
 

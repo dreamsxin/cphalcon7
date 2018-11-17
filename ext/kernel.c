@@ -279,12 +279,13 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey64){
  */
 PHP_METHOD(Phalcon_Kernel, setBasePath){
 
-	zval *base_path;
+	zval *base_path, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &base_path);
 
-	phalcon_add_trailing_slash(base_path);
-	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_basePath"), base_path);
+	phalcon_add_trailing_slash(&path, base_path);
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_basePath"), &path);
+	zval_ptr_dtor(&path);
 }
 
 /**
@@ -294,12 +295,13 @@ PHP_METHOD(Phalcon_Kernel, setBasePath){
  */
 PHP_METHOD(Phalcon_Kernel, setMessagesDir){
 
-	zval *messages_dir;
+	zval *messages_dir, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &messages_dir);
 
-	phalcon_add_trailing_slash(messages_dir);
-	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"), messages_dir);
+	phalcon_add_trailing_slash(&path, messages_dir);
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_messagesDir"), &path);
+	zval_ptr_dtor(&path);
 }
 
 /**
@@ -314,7 +316,7 @@ PHP_METHOD(Phalcon_Kernel, setMessagesDir){
 PHP_METHOD(Phalcon_Kernel, message){
 
 	zval *file, *path = NULL, *default_value = NULL, *_ext = NULL, *absolute_path = NULL, ext = {}, messages = {}, base_path = {}, messages_dir = {}, file_path = {};
-	zval default_messages = {}, validation_messages = {}, file_messages = {}, file_messages2 = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
+	zval default_messages = {}, validation_messages = {}, file_messages = {}, value = {}, dependency_injector = {}, service = {}, translate = {};
 
 	phalcon_fetch_params(1, 1, 4, &file, &path, &default_value, &_ext, &absolute_path);
 
@@ -348,7 +350,6 @@ PHP_METHOD(Phalcon_Kernel, message){
 
 	phalcon_read_static_property_ce(&messages, phalcon_kernel_ce, SL("_messages"), PH_READONLY);
 	if (Z_TYPE(messages) != IS_ARRAY) {
-		zval_ptr_dtor(&messages);
 		array_init_size(&validation_messages, 35);
 		phalcon_array_update_str_str(&validation_messages, SL("Alnum"),             SL("Field :field must contain only letters and numbers"), 0);
 		phalcon_array_update_str_str(&validation_messages, SL("Alpha"),             SL("Field :field must contain only letters"), 0);
@@ -399,21 +400,19 @@ PHP_METHOD(Phalcon_Kernel, message){
 	}
 
 	if (!phalcon_array_isset_fetch(&file_messages, &messages, &file_path, PH_READONLY)) {
-		if (!phalcon_array_isset_fetch(&file_messages2, &messages, file, PH_READONLY)) {
-			array_init(&file_messages2);
+		zval file_messages2 = {};
+		if (!phalcon_array_isset_fetch(&file_messages, &messages, file, PH_READONLY)) {
+			array_init(&file_messages);
+			phalcon_array_update(&messages, &file_path, &file_messages, 0);
+		}
+		if (Z_TYPE(file_messages) != IS_ARRAY) {
+			zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));
+			RETURN_MM();
+		}
+		if (phalcon_require_ret(&file_messages2, Z_STRVAL(file_path)) != FAILURE) {
+			phalcon_array_merge_recursive_n(&file_messages, &file_messages2);
 			PHALCON_MM_ADD_ENTRY(&file_messages2);
 		}
-		if (phalcon_require_ret(&file_messages, Z_STRVAL(file_path)) != FAILURE) {
-			if (Z_TYPE(file_messages2) != IS_ARRAY) {
-				zend_throw_exception_ex(phalcon_exception_ce, 0, "Messages file '%s' value must be array", Z_STRVAL(file_path));
-				RETURN_MM();
-			}
-			phalcon_array_merge_recursive_n(&file_messages2, &file_messages);
-			PHALCON_MM_ZVAL_COPY(&file_messages, &file_messages2);
-		} else {
-			PHALCON_MM_ZVAL_COPY(&file_messages, &file_messages2);
-		}
-		phalcon_update_static_property_array_ce(phalcon_kernel_ce, SL("_messages"), &file_path, &file_messages);
 	}
 
 	if (Z_TYPE_P(path) != IS_NULL) {
@@ -478,12 +477,13 @@ PHP_METHOD(Phalcon_Kernel, getMessages){
  */
 PHP_METHOD(Phalcon_Kernel, setAliasDir){
 
-	zval *alias_dir;
+	zval *alias_dir, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &alias_dir);
 
-	phalcon_add_trailing_slash(alias_dir);
-	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_aliasDir"), alias_dir);
+	phalcon_add_trailing_slash(&path, alias_dir);
+	phalcon_update_static_property_ce(phalcon_kernel_ce, SL("_aliasDir"), &path);
+	zval_ptr_dtor(&path);
 }
 
 /**

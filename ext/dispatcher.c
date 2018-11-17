@@ -39,6 +39,7 @@
 #include "kernel/operators.h"
 #include "kernel/string.h"
 #include "kernel/exception.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -469,6 +470,7 @@ PHP_METHOD(Phalcon_Dispatcher, setParams){
 	zval *params;
 
 	phalcon_fetch_params(0, 1, 0, &params);
+	PHALCON_SEPARATE_PARAM(params);
 
 	phalcon_update_property(getThis(), SL("_params"), params);
 }
@@ -1091,10 +1093,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		phalcon_read_property(&logic_binding, getThis(), SL("_logicBinding"), PH_READONLY);
 		if (zend_is_true(&logic_binding)) {
-			count_action_params = phalcon_fast_count_int(&action_params);
 			PHALCON_MM_ZVAL_DUP(&tmp_params, &action_params);
+
+			count_action_params = phalcon_fast_count_int(&action_params);
+
 			array_init(&params);
 			PHALCON_MM_ADD_ENTRY(&params);
+
 			reflection_method_ce = phalcon_fetch_str_class(SL("ReflectionMethod"), ZEND_FETCH_CLASS_AUTO);
 			object_init_ex(&reflection_method, reflection_method_ce);
 			PHALCON_MM_ADD_ENTRY(&reflection_method);
@@ -1120,6 +1125,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 						logic_ce = phalcon_fetch_class(&logic_classname, ZEND_FETCH_CLASS_AUTO);
 						if (instanceof_function_ex(logic_ce, phalcon_user_logic_ce, 0)) {
 							PHALCON_MM_CALL_CE_STATIC(&logic, logic_ce, "call", &action_name, &action_params);
+
 							phalcon_array_update(&params, &key, &logic, 0);
 
 							if (phalcon_method_exists_ex(&logic, SL("start")) == SUCCESS) {
@@ -1145,7 +1151,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					zval_ptr_dtor(&var_name);
 				}
 				if (count_action_params) {
-					zend_hash_move_forward(Z_ARRVAL(action_params));
+					zend_hash_move_forward(Z_ARRVAL_P(&action_params));
 					count_action_params -= 1;
 				}
 			} ZEND_HASH_FOREACH_END();

@@ -382,10 +382,11 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 
 	zval *attributes = NULL, *use_checked = NULL, name = {}, widget_attributes = {}, default_attributes = {}, merged_attributes = {}, value = {}, current_value = {};
 
-	phalcon_fetch_params(0, 0, 2, &attributes, &use_checked);
+	phalcon_fetch_params(1, 0, 2, &attributes, &use_checked);
 
 	if (!attributes || Z_TYPE_P(attributes) == IS_NULL) {
 		array_init(&widget_attributes);
+		PHALCON_MM_ADD_ENTRY(&widget_attributes);
 	} else {
 		PHALCON_SEPARATE_PARAM(attributes);
 		ZVAL_COPY_VALUE(&widget_attributes, attributes);
@@ -408,14 +409,16 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 	phalcon_read_property(&default_attributes, getThis(), SL("_attributes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(default_attributes) == IS_ARRAY) {
 		phalcon_fast_array_merge(&merged_attributes, &default_attributes, &widget_attributes);
+		PHALCON_MM_ADD_ENTRY(&merged_attributes);
 	} else {
-		ZVAL_COPY(&merged_attributes, &widget_attributes);
+		ZVAL_COPY_VALUE(&merged_attributes, &widget_attributes);
 	}
 
 	/**
 	 * Get the current element's value
 	 */
-	PHALCON_CALL_METHOD(&value, getThis(), "getvalue");
+	PHALCON_MM_CALL_METHOD(&value, getThis(), "getvalue");
+	PHALCON_MM_ADD_ENTRY(&value);
 
 	/**
 	 * If the widget has a value set it as default value
@@ -437,14 +440,14 @@ PHP_METHOD(Phalcon_Forms_Element, prepareAttributes){
 				if (zend_is_true(&value)) {
 					phalcon_array_update_str_str(&merged_attributes, SL("checked"), SL("checked"), 0);
 				}
-				phalcon_array_update_str(&merged_attributes, SL("value"), &value, 0);
+				phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
 			}
 		} else {
-			phalcon_array_update_str(&merged_attributes, SL("value"), &value, 0);
+			phalcon_array_update_str(&merged_attributes, SL("value"), &value, PH_COPY);
 		}
 	}
 
-	RETURN_ZVAL(&merged_attributes, 0, 0);
+	RETURN_MM_CTOR(&merged_attributes);
 }
 
 /**
@@ -505,6 +508,7 @@ PHP_METHOD(Phalcon_Forms_Element, setAttributes){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "Parameter 'attributes' must be an array");
 		return;
 	}
+	PHALCON_SEPARATE_PARAM(attributes);
 	phalcon_update_property(getThis(), SL("_attributes"), attributes);
 
 	RETURN_THIS();

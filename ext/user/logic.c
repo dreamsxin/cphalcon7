@@ -93,6 +93,7 @@ PHP_METHOD(Phalcon_User_Logic, __construct){
 	}
 
 	if (params) {
+		PHALCON_SEPARATE_PARAM(params);
 		phalcon_update_property(getThis(), SL("_actionParams"), params);
 	}
 }

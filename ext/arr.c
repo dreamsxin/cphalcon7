@@ -38,6 +38,7 @@
 #include "kernel/concat.h"
 #include "kernel/object.h"
 #include "kernel/hash.h"
+#include "kernel/debug.h"
 
 #include "interned-strings.h"
 
@@ -1990,6 +1991,7 @@ PHP_METHOD(Phalcon_Arr, aggr){
 	zend_long agts_cnt;
 
 	phalcon_fetch_params(0, 2, 0, &rows, &aggregators);
+	PHALCON_SEPARATE_PARAM(rows);
 
 	agts_cnt = zend_array_count(Z_ARRVAL_P(aggregators));
 	agts = (phalcon_arr_aggregator *)safe_emalloc(agts_cnt, sizeof(phalcon_arr_aggregator), 0);

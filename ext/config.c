@@ -365,29 +365,36 @@ PHP_METHOD(Phalcon_Config, merge){
  */
 PHP_METHOD(Phalcon_Config, toArray){
 
-	zval *recursive = NULL, *value;
+	zval *recursive = NULL, *value, values = {};
 	zend_string *key;
 	ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &recursive);
 
-	phalcon_get_object_vars(return_value, getThis(), 0);
-
-	if (!recursive || zend_is_true(recursive)) {
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
-			zval tmp = {}, array_value = {};
-			if (key) {
-				ZVAL_STR(&tmp, key);
-			} else {
-				ZVAL_LONG(&tmp, idx);
-			}
-			if (Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
-				if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
-					phalcon_array_update(return_value, &tmp, &array_value, 0);
-				}
-			}
-		} ZEND_HASH_FOREACH_END();
+	if (!recursive) {
+		recursive = &PHALCON_GLOBAL(z_true);
 	}
+
+	array_init(return_value);
+
+	phalcon_get_object_vars(&values, getThis(), 1);
+
+	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(values), idx, key, value) {
+		zval tmp = {}, array_value = {};
+		if (key) {
+			ZVAL_STR(&tmp, key);
+		} else {
+			ZVAL_LONG(&tmp, idx);
+		}
+		if (zend_is_true(recursive) && Z_TYPE_P(value) == IS_OBJECT && phalcon_method_exists_ex(value, SL("toarray")) == SUCCESS) {
+			if (SUCCESS == phalcon_call_method(&array_value, value, "toarray", 0, NULL)) {
+				phalcon_array_update(return_value, &tmp, &array_value, 0);
+			}
+		}else {
+			phalcon_array_update(return_value, &tmp, value, PH_COPY);
+		}
+	} ZEND_HASH_FOREACH_END();
+	zval_ptr_dtor(&values);
 }
 
 PHP_METHOD(Phalcon_Config, count)

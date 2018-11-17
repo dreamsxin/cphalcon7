@@ -29,6 +29,7 @@
 #include "kernel/concat.h"
 #include "kernel/operators.h"
 #include "kernel/string.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Http\Uri
@@ -163,8 +164,9 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 	} else if (Z_TYPE_P(uri) == IS_ARRAY) {
 		phalcon_update_property(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
-		phalcon_read_property(&parts, uri, SL("_parts"), PH_READONLY);
+		phalcon_read_property(&parts, uri, SL("_parts"), PH_SEPARATE);
 		phalcon_update_property(getThis(), SL("_parts"), &parts);
+		zval_ptr_dtor(&parts);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	}
@@ -355,19 +357,18 @@ PHP_METHOD(Phalcon_Http_Uri, extend)
 
 	phalcon_fetch_params(1, 1, 0, &uri);
 
-	PHALCON_MM_CALL_METHOD(&parts, getThis(), "getParts");
-	PHALCON_MM_ADD_ENTRY(&parts);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
+
 	if (Z_TYPE_P(uri) != IS_OBJECT || Z_OBJCE_P(uri) != phalcon_http_uri_ce) {
 		zval self = {};
 		object_init_ex(&self, phalcon_http_uri_ce);
 		PHALCON_MM_ADD_ENTRY(&self);
 		PHALCON_MM_CALL_METHOD(NULL, &self, "__construct", uri);
 		PHALCON_MM_CALL_METHOD(&parts2, &self, "getParts");
-		PHALCON_MM_ADD_ENTRY(&parts2);
 	} else {
 		PHALCON_MM_CALL_METHOD(&parts2, uri, "getParts");
-		PHALCON_MM_ADD_ENTRY(&parts2);
 	}
+	zval_ptr_dtor(&parts2);
 
 	if (phalcon_array_isset_fetch_str(&path, &parts, SL("path"), PH_READONLY)) {
 		if (phalcon_array_isset_fetch_str(&path2, &parts2, SL("path"), PH_READONLY)) {
@@ -386,8 +387,6 @@ PHP_METHOD(Phalcon_Http_Uri, extend)
 
 	phalcon_array_merge_recursive_n(&parts, &parts2);
 
-	phalcon_update_property(getThis(), SL("_parts"), &parts);
-
 	RETURN_MM_THIS();
 }
 
@@ -395,10 +394,9 @@ PHP_METHOD(Phalcon_Http_Uri, extendQuery){
 
 	zval *params, parts = {}, query = {};
 
-	phalcon_fetch_params(1, 1, 0, &params);
+	phalcon_fetch_params(0, 1, 0, &params);
 
-	PHALCON_MM_CALL_METHOD(&parts, getThis(), "getParts");
-	PHALCON_MM_ADD_ENTRY(&parts);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_array_isset_fetch_str(&query, &parts, SL("query"), PH_READONLY)) {
 		phalcon_array_merge_recursive_n(&query, params);
@@ -406,19 +404,16 @@ PHP_METHOD(Phalcon_Http_Uri, extendQuery){
 		phalcon_array_update_str(&parts, SL("query"), params, PH_COPY);
 	}
 
-	phalcon_update_property(getThis(), SL("_parts"), &parts);
-
-	RETURN_MM_THIS();
+	RETURN_THIS();
 }
 
 PHP_METHOD(Phalcon_Http_Uri, extendPath){
 
 	zval *uri_path, parts = {}, path = {};
 
-	phalcon_fetch_params(1, 1, 0, &uri_path);
+	phalcon_fetch_params(0, 1, 0, &uri_path);
 
-	PHALCON_MM_CALL_METHOD(&parts, getThis(), "getParts");
-	PHALCON_MM_ADD_ENTRY(&parts);
+	phalcon_read_property(&parts, getThis(), SL("_parts"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_start_with_str(uri_path, SL("/"))) {
 		if (phalcon_array_isset_fetch_str(&path, &parts, SL("path"), PH_READONLY)) {
@@ -434,7 +429,5 @@ PHP_METHOD(Phalcon_Http_Uri, extendPath){
 		phalcon_array_update_str(&parts, SL("path"), uri_path, PH_COPY);
 	}
 
-	phalcon_update_property(getThis(), SL("_parts"), &parts);
-
-	RETURN_MM_THIS();
+	RETURN_THIS();
 }

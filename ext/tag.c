@@ -877,14 +877,18 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 			}
 			if (Z_TYPE(label) == IS_ARRAY) {
 				PHALCON_SCONCAT_STR(&code, "<label");
+				PHALCON_MM_ADD_ENTRY(&code);
 				phalcon_tag_render_attributes(&code, &label);
+				PHALCON_MM_ADD_ENTRY(&code);
 				PHALCON_SCONCAT_SVS(&code, ">", &label_text, "</label>");
+				PHALCON_MM_ADD_ENTRY(&code);
 			} else {
 				if (zend_is_true(&id)) {
 					PHALCON_CONCAT_SVSVS(&code, "<label for=\"", &id, "\">", &label_text, "</label>");
 				} else {
 					PHALCON_CONCAT_SVS(&code, "<label>", &label_text, "</label>");
 				}
+				PHALCON_MM_ADD_ENTRY(&code);
 			}
 		}
 	} else {
@@ -901,8 +905,10 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 	phalcon_array_update_string(&params, IS(type), type, PH_COPY);
 
 	PHALCON_SCONCAT_STR(&code, "<input");
+	PHALCON_MM_ADD_ENTRY(&code);
 
 	phalcon_tag_render_attributes(&code, &params);
+	PHALCON_MM_ADD_ENTRY(&code);
 
 	phalcon_read_static_property_ce(&doctype, phalcon_tag_ce, SL("_documentType"), PH_READONLY);
 
@@ -914,7 +920,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 	} else {
 		PHALCON_CONCAT_VS(return_value, &code, ">");
 	}
-	zval_ptr_dtor(&code);
+
 	RETURN_MM();
 }
 

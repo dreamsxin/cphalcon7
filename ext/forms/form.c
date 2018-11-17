@@ -1457,21 +1457,20 @@ PHP_METHOD(Phalcon_Forms_Form, appendMessages){
 
 	phalcon_fetch_params(0, 2, 0, &filed, &messages);
 
-	phalcon_read_property(&current_messages, getThis(), SL("_messages"), PH_COPY);
+	phalcon_read_property(&current_messages, getThis(), SL("_messages"), PH_READONLY);
 	if (Z_TYPE(current_messages) != IS_ARRAY) {
 		array_init(&current_messages);
+		phalcon_update_property(getThis(), SL("_messages"), &current_messages);
+		zval_ptr_dtor(&current_messages);
 	}
 
-	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&element_messages, &current_messages, filed, PH_READONLY)) {
 		object_init_ex(&element_messages, phalcon_validation_message_group_ce);
 		PHALCON_CALL_METHOD(NULL, &element_messages, "__construct");
+		phalcon_array_update(&current_messages, filed, &element_messages, 0);
 	}
 
 	PHALCON_CALL_METHOD(NULL, &element_messages, "appendmessages", messages);
-
-	phalcon_array_update(&current_messages, filed, &element_messages, 0);
-	phalcon_update_property(getThis(), SL("_messages"), &current_messages);
-	zval_ptr_dtor(&current_messages);
 
 	RETURN_THIS();
 }

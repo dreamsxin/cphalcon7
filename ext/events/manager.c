@@ -135,7 +135,7 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 
 	zval *event_type, *handler, *_priority = NULL, event = {}, priority = {}, events = {}, listener = {}, enable_priorities = {}, priority_queue = {};
 
-	phalcon_fetch_params(0, 2, 1, &event_type, &handler, &_priority);
+	phalcon_fetch_params(1, 2, 1, &event_type, &handler, &_priority);
 
 	if (!_priority) {
 		ZVAL_LONG(&priority, 100);
@@ -144,56 +144,61 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	}
 
 	if (Z_TYPE_P(handler) != IS_OBJECT && !phalcon_is_callable(handler)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_events_exception_ce, "Event handler must be an object or callable");
 		return;
 	}
 
 	if (!phalcon_memnstr_str(event_type, SL(":"))) {
-		ZVAL_COPY(&event, event_type);
+		ZVAL_COPY_VALUE(&event, event_type);
 	} else {
 		zval event_parts ={}, name = {}, type = {};
 		phalcon_fast_explode_str(&event_parts, SL(":"), event_type);
 		phalcon_array_fetch_long(&name, &event_parts, 0, PH_READONLY);
 		phalcon_array_fetch_long(&type, &event_parts, 1, PH_READONLY);
 		if (PHALCON_IS_STRING(&type, "*") || PHALCON_IS_EMPTY_STRING(&type)) {
-			ZVAL_COPY(&event, &name);
+			PHALCON_MM_ZVAL_COPY(&event, &name);
 		} else {
-			ZVAL_COPY(&event, event_type);
+			PHALCON_MM_ZVAL_COPY(&event, event_type);
 		}
 		zval_ptr_dtor(&event_parts);
 	}
 
 	if (phalcon_instance_of_ev(handler, phalcon_events_listener_ce)) {
-		ZVAL_COPY(&listener, handler);
-		PHALCON_CALL_METHOD(NULL, &listener, "setpriority", &priority);
-		PHALCON_CALL_METHOD(NULL, &listener, "setevent", &event);
+		ZVAL_COPY_VALUE(&listener, handler);
+		PHALCON_MM_CALL_METHOD(NULL, &listener, "setpriority", &priority);
+		PHALCON_MM_CALL_METHOD(NULL, &listener, "setevent", &event);
 	} else {
 		object_init_ex(&listener, phalcon_events_listener_ce);
-		PHALCON_CALL_METHOD(NULL, &listener, "__construct", handler, &priority, &event);
+		PHALCON_MM_ADD_ENTRY(&listener);
+		PHALCON_MM_CALL_METHOD(NULL, &listener, "__construct", handler, &priority, &event);
 	}
 
-	phalcon_read_property(&events, getThis(), SL("_events"), PH_COPY);
+	phalcon_read_property(&events, getThis(), SL("_events"), PH_READONLY);
 	if (Z_TYPE(events) != IS_ARRAY) {
 		array_init(&events);
+		phalcon_update_property(getThis(), SL("_events"), &events);
+		zval_ptr_dtor(&events);
 	}
 
-	if (!phalcon_array_isset_fetch(&priority_queue, &events, &event, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&priority_queue, &events, &event, PH_READONLY)) {
 		phalcon_read_property(&enable_priorities, getThis(), SL("_enablePriorities"), PH_READONLY);
 		if (zend_is_true(&enable_priorities)) {
 			/**
 			 * Create a SplPriorityQueue to store the events with priorities
 			 */
 			object_init_ex(&priority_queue, spl_ce_SplPriorityQueue);
+			PHALCON_MM_ADD_ENTRY(&priority_queue);
 			if (phalcon_has_constructor(&priority_queue)) {
-				PHALCON_CALL_METHOD(NULL, &priority_queue, "__construct");
+				PHALCON_MM_CALL_METHOD(NULL, &priority_queue, "__construct");
 			}
 
 			/**
 			 * Extract only the Data, Set extraction flags
 			 */
-			PHALCON_CALL_METHOD(NULL, &priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
+			PHALCON_MM_CALL_METHOD(NULL, &priority_queue, "setextractflags", &PHALCON_GLOBAL(z_one));
 		} else {
 			array_init(&priority_queue);
+			PHALCON_MM_ADD_ENTRY(&priority_queue);
 		}
 	}
 
@@ -201,19 +206,17 @@ PHP_METHOD(Phalcon_Events_Manager, attach){
 	 * Insert the handler in the queue
 	 */
 	if (unlikely(Z_TYPE(priority_queue) == IS_OBJECT)) {
-		PHALCON_CALL_METHOD(NULL, &priority_queue, "insert", &listener, &priority);
+		PHALCON_MM_CALL_METHOD(NULL, &priority_queue, "insert", &listener, &priority);
 	} else {
 		phalcon_array_append(&priority_queue, &listener, PH_COPY);
 	}
-	zval_ptr_dtor(&listener);
 
 	/**
 	 * Append the events to the queue
 	 */
-	phalcon_array_update(&events, &event, &priority_queue, 0);
-	phalcon_update_property(getThis(), SL("_events"), &events);
-	zval_ptr_dtor(&events);
-	zval_ptr_dtor(&event);
+	phalcon_array_update(&events, &event, &priority_queue, PH_COPY);
+
+	RETURN_MM();
 }
 
 /**

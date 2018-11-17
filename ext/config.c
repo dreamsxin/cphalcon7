@@ -371,8 +371,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 
 	phalcon_fetch_params(0, 0, 1, &recursive);
 
-	phalcon_get_object_vars(return_value, getThis(), 0);
-	Z_DELREF_P(return_value);
+	phalcon_get_object_vars(return_value, getThis(), 1);
 	if (!recursive || zend_is_true(recursive)) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(return_value), idx, key, value) {
 			zval tmp = {}, array_value = {};
@@ -388,7 +387,6 @@ PHP_METHOD(Phalcon_Config, toArray){
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
-	Z_TRY_ADDREF_P(return_value);
 }
 
 PHP_METHOD(Phalcon_Config, count)

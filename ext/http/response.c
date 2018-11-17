@@ -199,16 +199,18 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode)
 	zval *code, *message, headers = {}, current_headers_raw = {}, header_value = {}, status_value = {}, status_header = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 2, 0, &code, &message);
+	phalcon_fetch_params(1, 2, 0, &code, &message);
 
-	PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
+	PHALCON_MM_CALL_METHOD(&headers, getThis(), "getheaders");
+	PHALCON_MM_ADD_ENTRY(&headers);
 
 	/**
 	 * We use HTTP/1.1 instead of HTTP/1.0
 	 *
 	 * Before that we would like to unset any existing HTTP/x.y headers
 	 */
-	PHALCON_CALL_METHOD(&current_headers_raw, &headers, "toarray");
+	PHALCON_MM_CALL_METHOD(&current_headers_raw, &headers, "toarray");
+	zval_ptr_dtor(&current_headers_raw);
 
 	if (Z_TYPE(current_headers_raw) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL(current_headers_raw), str_key) {
@@ -216,24 +218,25 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode)
 			if (str_key) {
 				ZVAL_STR(&header_name, str_key);
 				if ((size_t)(Z_STRLEN(header_name)) > sizeof("HTTP/x.y ")-1 && !memcmp(Z_STRVAL(header_name), "HTTP/", 5)) {
-					PHALCON_CALL_METHOD(NULL, &headers, "remove", &header_name);
+					PHALCON_MM_CALL_METHOD(NULL, &headers, "remove", &header_name);
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 
 	PHALCON_CONCAT_SVSV(&header_value, "HTTP/1.1 ", code, " ", message);
+	PHALCON_MM_ADD_ENTRY(&header_value);
 	PHALCON_CALL_METHOD(NULL, &headers, "setraw", &header_value);
 
 	/**
 	 * We also define a 'Status' header with the HTTP status
 	 */
 	PHALCON_CONCAT_VSV(&status_value, code, " ", message);
+	PHALCON_MM_ADD_ENTRY(&status_value);
 
-	ZVAL_STRING(&status_header, "Status");
-	PHALCON_CALL_METHOD(NULL, &headers, "set", &status_header, &status_value);
-	phalcon_update_property(getThis(), SL("_headers"), &headers);
-	RETURN_THIS();
+	PHALCON_MM_ZVAL_STRING(&status_header, "Status");
+	PHALCON_MM_CALL_METHOD(NULL, &headers, "set", &status_header, &status_value);
+	RETURN_MM_THIS();
 }
 
 /**
@@ -348,7 +351,7 @@ PHP_METHOD(Phalcon_Http_Response, setRawHeader)
 
 	PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
 	PHALCON_CALL_METHOD(NULL, &headers, "setraw", header);
-
+	zval_ptr_dtor(&headers);
 	RETURN_THIS();
 }
 
@@ -363,6 +366,7 @@ PHP_METHOD(Phalcon_Http_Response, resetHeaders)
 
 	PHALCON_CALL_METHOD(&headers, getThis(), "getheaders");
 	PHALCON_CALL_METHOD(NULL, &headers, "reset");
+	zval_ptr_dtor(&headers);
 
 	RETURN_THIS();
 }
@@ -437,6 +441,8 @@ PHP_METHOD(Phalcon_Http_Response, setNotModified)
 	ZVAL_STRING(&status, "Not modified");
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "setstatuscode", &code, &status);
+
+	zval_ptr_dtor(&status);
 
 	RETURN_THIS();
 }

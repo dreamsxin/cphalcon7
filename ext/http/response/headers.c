@@ -31,6 +31,7 @@
 #include "kernel/hash.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/debug.h"
 
 /**
  * Phalcon\Http\Response\Headers
@@ -122,6 +123,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, setRaw){
 	zval *header;
 
 	phalcon_fetch_params(0, 1, 0, &header);
+	PHALCON_SEPARATE_PARAM(header);
 
 	phalcon_update_property_array(getThis(), SL("_headers"), header, &PHALCON_GLOBAL(z_null));
 }
@@ -140,8 +142,6 @@ PHP_METHOD(Phalcon_Http_Response_Headers, remove){
 	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
 
 	phalcon_array_unset(&headers, header_index, 0);
-
-	phalcon_update_property(getThis(), SL("_headers"), &headers);
 }
 
 /**

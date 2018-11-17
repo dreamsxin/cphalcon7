@@ -594,7 +594,7 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 		PHALCON_MM_ADD_ENTRY(&dependency_injector_new);
 		
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(services), idx, key, value) {
-			zval tmp = {}, array_value = {};
+			zval tmp = {};
 			if (key) {
 				ZVAL_STR(&tmp, key);
 			} else {

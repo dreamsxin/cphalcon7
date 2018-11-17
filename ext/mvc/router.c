@@ -1235,6 +1235,7 @@ PHP_METHOD(Phalcon_Mvc_Router, notFound){
 			return;
 		}
 	}
+	PHALCON_SEPARATE_PARAM(paths);
 	phalcon_update_property(getThis(), SL("_notFoundPaths"), paths);
 
 	RETURN_THIS();

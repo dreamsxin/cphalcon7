@@ -3026,12 +3026,14 @@ void phalcon_addslashes(zval *return_value, zval *str)
 	}
 }
 
-void phalcon_add_trailing_slash(zval* v)
+void phalcon_add_trailing_slash(zval* return_value, zval *v)
 {
-	PHALCON_ENSURE_IS_STRING(v);
-	if (Z_STRLEN_P(v)) {
-		int len = Z_STRLEN_P(v);
-		char *c = Z_STRVAL_P(v);
+	ZVAL_COPY(return_value, v);
+	PHALCON_ENSURE_IS_STRING(return_value);
+
+	if (Z_STRLEN_P(return_value)) {
+		int len = Z_STRLEN_P(return_value);
+		char *c = Z_STRVAL_P(return_value);
 
 #ifdef PHP_WIN32
 		if (c[len - 1] != '/' && c[len - 1] != '\\')
@@ -3039,15 +3041,14 @@ void phalcon_add_trailing_slash(zval* v)
 		if (c[len - 1] != PHP_DIR_SEPARATOR)
 #endif
 		{
-			SEPARATE_ZVAL(v);
-			Z_STR_P(v) = zend_string_extend(Z_STR_P(v), len+2, 0);
-			c = Z_STRVAL_P(v);
+			Z_STR_P(return_value) = zend_string_extend(Z_STR_P(return_value), len+2, 0);
+			c = Z_STRVAL_P(return_value);
 
 			if (c != NULL) {
 				c[len]   = PHP_DIR_SEPARATOR;
 				c[len + 1] = 0;
-
-				ZVAL_STRINGL(v, c, len+1);
+				zend_string_free(Z_STR_P(return_value));
+				ZVAL_STRINGL(return_value, c, len+1);
 			}
 		}
 	}

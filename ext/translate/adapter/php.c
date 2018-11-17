@@ -97,9 +97,10 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, __construct){
 	}
 
 	if (phalcon_array_isset_fetch_str(&directory, options, SL("directory"), PH_READONLY)) {
-		phalcon_add_trailing_slash(&directory);
-		PHALCON_CONCAT_VVS(&file, &directory, &locale, ".php");
-		zval_ptr_dtor(&directory);
+		zval path = {};
+		phalcon_add_trailing_slash(&path, &directory);
+		PHALCON_MM_ADD_ENTRY(&path);
+		PHALCON_CONCAT_VVS(&file, &path, &locale, ".php");
 	} else {
 		PHALCON_CONCAT_VS(&file, &locale, ".php");
 	}
@@ -138,8 +139,8 @@ PHP_METHOD(Phalcon_Translate_Adapter_Php, query){
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);
 	}
-
 	phalcon_read_property(&translate, getThis(), SL("_translate"), PH_NOISY|PH_READONLY);
+
 	if (!phalcon_array_isset_fetch(&translation, &translate, index, PH_READONLY)) {
 		ZVAL_COPY_VALUE(&translation, index);
 	}

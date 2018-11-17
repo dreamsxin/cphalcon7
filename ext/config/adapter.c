@@ -135,12 +135,13 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
  */
 PHP_METHOD(Phalcon_Config_Adapter, setBasePath){
 
-	zval *base_path;
+	zval *base_path, path = {};
 
 	phalcon_fetch_params(0, 1, 0, &base_path);
 
-	phalcon_add_trailing_slash(base_path);
-	phalcon_update_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"), base_path);
+	phalcon_add_trailing_slash(&path, base_path);
+	phalcon_update_static_property_ce(phalcon_config_adapter_ce, SL("_basePath"), &path);
+	zval_ptr_dtor(&path);
 }
 
 /**

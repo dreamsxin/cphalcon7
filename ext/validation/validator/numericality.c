@@ -148,7 +148,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, valid){
 
 	zval *value;
 
-	phalcon_fetch_params(0, 2, 0, &value);
+	phalcon_fetch_params(0, 1, 0, &value);
 
 	if (phalcon_is_numeric(value)) {
 		RETURN_TRUE;

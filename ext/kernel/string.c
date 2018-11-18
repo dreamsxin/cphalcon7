@@ -2852,7 +2852,8 @@ void phalcon_lcfirst(zval *return_value, zval *s)
 			ZVAL_DUP(return_value, s);
 		}
 	} else {
-		ZVAL_DUP(return_value, s);
+		// 可被复制的（IS_TYPE_COPYABLE）
+		ZVAL_STRINGL(return_value, Z_STRVAL_P(s), Z_STRLEN_P(s));
 	}
 
 	if (Z_STRLEN_P(s)) {

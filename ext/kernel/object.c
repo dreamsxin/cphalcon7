@@ -1167,6 +1167,15 @@ int phalcon_update_property_array(zval *object, const char *property, uint32_t p
 		if (Z_TYPE(tmp) != IS_ARRAY) {
 			array_init(&tmp);
 			separated = 1;
+		} else if (Z_REFCOUNTED(tmp)) {
+			if (Z_REFCOUNT(tmp) > 1) {
+				if (!Z_ISREF(tmp)) {
+					zval new_zv;
+					ZVAL_DUP(&new_zv, &tmp);
+					ZVAL_COPY_VALUE(&tmp, &new_zv);
+					separated = 1;
+				}
+			}
 		}
 		Z_TRY_ADDREF_P(value);
 

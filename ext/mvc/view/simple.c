@@ -840,9 +840,10 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setParamToView){
  */
 PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 
-	zval *params, *merge = NULL, view_params = {}, merged_params = {};
+	zval *params, *merge = NULL, view_params = {};
 
-	phalcon_fetch_params(1, 1, 1, &params, &merge);
+	phalcon_fetch_params(0, 1, 1, &params, &merge);
+	PHALCON_SEPARATE_PARAM(params);
 
 	if (!merge) {
 		merge = &PHALCON_GLOBAL(z_true);
@@ -856,18 +857,16 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, setVars){
 	if (zend_is_true(merge)) {
 		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(view_params) == IS_ARRAY) {
-			phalcon_fast_array_merge(&merged_params, &view_params, params);
-			PHALCON_MM_ADD_ENTRY(&merged_params);
+			phalcon_array_replace(&view_params, params);
 		} else {
-			ZVAL_COPY_VALUE(&merged_params, params);
+			phalcon_update_property(getThis(), SL("_viewParams"), params);
 		}
 
-		phalcon_update_property(getThis(), SL("_viewParams"), &merged_params);
 	} else {
 		phalcon_update_property(getThis(), SL("_viewParams"), params);
 	}
 
-	RETURN_MM_THIS();
+	RETURN_THIS();
 }
 
 /**

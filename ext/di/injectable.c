@@ -598,12 +598,10 @@ PHP_METHOD(Phalcon_Di_Injectable, __sleep){
 
 PHP_METHOD(Phalcon_Di_Injectable, __debugInfo){
 
-	phalcon_get_object_vars(return_value, getThis(), 0);
-	Z_DELREF_P(return_value);
+	phalcon_get_object_vars(return_value, getThis(), 1);
 
 	if (likely(!PHALCON_GLOBAL(debug).enable_debug)) {
 		phalcon_array_unset_str(return_value, SL("_dependencyInjector"), 0);
 		phalcon_array_unset_str(return_value, SL("_eventsManager"), 0);
 	}
-	Z_TRY_ADDREF_P(return_value);
 }

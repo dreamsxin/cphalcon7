@@ -57,6 +57,7 @@
 zend_class_entry *phalcon_cli_dispatcher_ce;
 
 PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskSuffix);
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskSuffix);
 PHP_METHOD(Phalcon_Cli_Dispatcher, setDefaultTask);
 PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskName);
 PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskName);
@@ -80,6 +81,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Cli_Dispatcher, setTaskSuffix, arginfo_phalcon_cli_dispatcher_settasksuffix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskSuffix, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Dispatcher, setDefaultTask, arginfo_phalcon_cli_dispatcher_setdefaulttask, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Dispatcher, setTaskName, arginfo_phalcon_cli_dispatcher_settaskname, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Dispatcher, getTaskName, NULL, ZEND_ACC_PUBLIC)
@@ -120,6 +122,17 @@ PHP_METHOD(Phalcon_Cli_Dispatcher, setTaskSuffix){
 
 	phalcon_update_property(getThis(), SL("_handlerSuffix"), task_suffix);
 
+}
+
+/**
+ * Gets the default task suffix
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Cli_Dispatcher, getTaskSuffix){
+
+
+	RETURN_MEMBER(getThis(), "_handlerSuffix");
 }
 
 /**

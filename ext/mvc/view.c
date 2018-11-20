@@ -1321,21 +1321,27 @@ PHP_METHOD(Phalcon_Mvc_View, exists) {
  */
 PHP_METHOD(Phalcon_Mvc_View, render){
 
-	zval *controller_name, *action_name, *params = NULL, *namespace_name = NULL, *view_model = NULL, ds = {}, namespace_separator = {}, disabled = {};
+	zval *controller, *action, *params = NULL, *namespace = NULL, *view_model = NULL, ds = {}, namespace_separator = {}, disabled = {};
+	zval controller_name = {}, action_name = {}, namespace_name = {};
 	zval contents = {}, converter_key = {}, converter = {}, parameters = {}, lower_case = {}, lower_controller_name = {}, lower_action_name = {};
 	zval layouts_dir = {}, enable_namespace_view = {}, ds_lower_namespace_name = {}, layout_namespace = {}, debug_message = {};
 	zval layout = {}, layout_name = {}, engines = {}, pick_view = {}, render_view = {}, pick_view_action = {}, event_name = {}, status = {}, silence = {}, disabled_levels = {};
 	zval render_level = {}, enable_layouts_absolute_path = {}, templates_before = {}, *tpl, view_tpl_path = {}, templates_after = {}, main_view = {};
 	char slash[2] = {DEFAULT_SLASH, 0};
 
-	phalcon_fetch_params(1, 2, 3, &controller_name, &action_name, &params, &namespace_name, &view_model);
+	phalcon_fetch_params(1, 2, 3, &controller, &action, &params, &namespace, &view_model);
 
 	if (!params) {
 		params = &PHALCON_GLOBAL(z_null);
 	}
 
-	if (!namespace_name) {
-		namespace_name = &PHALCON_GLOBAL(z_null);
+	PHALCON_MM_ZVAL_COPY(&controller_name, controller);
+	if (action) {
+		PHALCON_MM_ZVAL_COPY(&action_name, action);
+	}
+
+	if (namespace) {
+		PHALCON_MM_ZVAL_COPY(&namespace_name, namespace);
 	}
 
 	PHALCON_MM_ZVAL_STRING(&ds, slash);
@@ -1358,10 +1364,10 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		RETURN_MM_FALSE;
 	}
 
-	phalcon_update_property(getThis(), SL("_controllerName"), controller_name);
-	phalcon_update_property(getThis(), SL("_actionName"), action_name);
+	phalcon_update_property(getThis(), SL("_controllerName"), &controller_name);
+	phalcon_update_property(getThis(), SL("_actionName"), &action_name);
 	phalcon_update_property(getThis(), SL("_params"), params);
-	phalcon_update_property(getThis(), SL("_namespaceName"), namespace_name);
+	phalcon_update_property(getThis(), SL("_namespaceName"), &namespace_name);
 
 	PHALCON_MM_ZVAL_STRING(&converter_key, "controller");
 	PHALCON_MM_CALL_SELF(&converter, "getconverter", &converter_key);
@@ -1371,10 +1377,11 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 		zval tmp = {};
 		array_init_size(&parameters, 1);
 		PHALCON_MM_ADD_ENTRY(&parameters);
-		phalcon_array_append(&parameters, controller_name, PH_COPY);
+		phalcon_array_append(&parameters, &controller_name, PH_COPY);
+
 		PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, &converter, &parameters);
 		PHALCON_MM_ADD_ENTRY(&tmp);
-		ZVAL_COPY_VALUE(controller_name, &tmp);
+		ZVAL_COPY_VALUE(&controller_name, &tmp);
 	}
 
 	PHALCON_MM_ZVAL_STRING(&converter_key, "action");
@@ -1386,10 +1393,10 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 		array_init_size(&parameters, 1);
 		PHALCON_MM_ADD_ENTRY(&parameters);
-		phalcon_array_append(&parameters, action_name, PH_COPY);
+		phalcon_array_append(&parameters, &action_name, PH_COPY);
 		PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, &converter, &parameters);
 		PHALCON_MM_ADD_ENTRY(&tmp);
-		ZVAL_COPY_VALUE(action_name, &tmp);
+		ZVAL_COPY_VALUE(&action_name, &tmp);
 	}
 
 	PHALCON_MM_ZVAL_STRING(&converter_key, "namespace");
@@ -1400,22 +1407,22 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 
 		array_init_size(&parameters, 1);
 		PHALCON_MM_ADD_ENTRY(&parameters);
-		phalcon_array_append(&parameters, namespace_name, PH_COPY);
+		phalcon_array_append(&parameters, &namespace_name, PH_COPY);
 		PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, &converter, &parameters);
 		PHALCON_MM_ADD_ENTRY(&tmp);
-		ZVAL_COPY_VALUE(namespace_name, &tmp);
+		ZVAL_COPY_VALUE(&namespace_name, &tmp);
 	}
 
 	phalcon_read_property(&lower_case, getThis(), SL("_lowerCase"), PH_NOISY|PH_READONLY);
 
 	if (zend_is_true(&lower_case)) {
-		phalcon_fast_strtolower(&lower_controller_name, controller_name);
-		phalcon_fast_strtolower(&lower_action_name, action_name);
+		phalcon_fast_strtolower(&lower_controller_name, &controller_name);
+		phalcon_fast_strtolower(&lower_action_name, &action_name);
 		PHALCON_MM_ADD_ENTRY(&lower_controller_name);
 		PHALCON_MM_ADD_ENTRY(&lower_action_name);
 	} else {
-		ZVAL_COPY_VALUE(&lower_controller_name, controller_name);
-		ZVAL_COPY_VALUE(&lower_action_name, action_name);
+		ZVAL_COPY_VALUE(&lower_controller_name, &controller_name);
+		ZVAL_COPY_VALUE(&lower_action_name, &action_name);
 	}
 
 	/**
@@ -1431,10 +1438,10 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	if (zend_is_true(&enable_namespace_view)) {
 		zval lower_namespace_name = {};
 		if (zend_is_true(&lower_case)) {
-			phalcon_fast_strtolower(&lower_namespace_name, namespace_name);
+			phalcon_fast_strtolower(&lower_namespace_name, &namespace_name);
 			PHALCON_MM_ADD_ENTRY(&lower_namespace_name);
 		} else {
-			ZVAL_COPY_VALUE(&lower_namespace_name, namespace_name);
+			ZVAL_COPY_VALUE(&lower_namespace_name, &namespace_name);
 		}
 
 		PHALCON_STR_REPLACE(&ds_lower_namespace_name, &namespace_separator, &ds, &lower_namespace_name);
@@ -1490,7 +1497,7 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	PHALCON_MM_ZVAL_STRING(&event_name, "view:beforeRender");
 	PHALCON_MM_CALL_METHOD(&status, getThis(), "fireeventcancel", &event_name);
 	if (PHALCON_IS_FALSE(&status)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 	zval_ptr_dtor(&status);
 

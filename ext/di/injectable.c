@@ -254,6 +254,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		 * Send a notification to the events manager
 		 */
 		PHALCON_MM_CALL_METHOD(&status, &events_manager, "fire", &eventtype, getThis(), data, cancelable);
+		PHALCON_MM_ADD_ENTRY(&status);
 		PHALCON_MM_CALL_METHOD(&event, &events_manager, "getcurrentevent");
 		PHALCON_MM_ADD_ENTRY(&event);
 		if (Z_TYPE(event) == IS_OBJECT) {
@@ -275,6 +276,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 
 		PHALCON_MM_ADD_ENTRY(&arguments);
 		PHALCON_MM_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
+		PHALCON_MM_ADD_ENTRY(&status);
 
 		if (Z_TYPE(event) == IS_OBJECT) {
 			PHALCON_MM_CALL_METHOD(&is_stopped, &event, "isstopped");
@@ -291,9 +293,10 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEvent){
 		zval prev_data = {};
 		PHALCON_MM_ZVAL_COPY(&prev_data, &status);
 		PHALCON_MM_CALL_METHOD(&status, getThis(), Z_STRVAL(name), &event, data, &prev_data);
+		PHALCON_MM_ADD_ENTRY(&status);
 	}
 
-	RETURN_MM_NCTOR(&status);
+	RETURN_MM_CTOR(&status);
 }
 
 /**
@@ -352,14 +355,14 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		if (PHALCON_IS_FALSE(&status)){
 			RETURN_MM_FALSE;
 		}
-		zval_ptr_dtor(&status);
+		PHALCON_MM_ADD_ENTRY(&status);
 
 		PHALCON_MM_CALL_METHOD(&event, &events_manager, "getcurrentevent");
 		PHALCON_MM_ADD_ENTRY(&event);
 		if (Z_TYPE(event) == IS_OBJECT) {
 			PHALCON_MM_CALL_METHOD(&is_stopped, &event, "isstopped");
 			if (zend_is_true(&is_stopped)) {
-				RETURN_MM_NCTOR(&status);
+				RETURN_MM_CTOR(&status);
 			}
 		}
 	} else {
@@ -371,7 +374,7 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		array_init_size(&arguments, 2);
 		phalcon_array_append(&arguments, &event, PH_COPY);
 		phalcon_array_append(&arguments, data, PH_COPY);
-		phalcon_array_append(&arguments, &status, 0);
+		phalcon_array_append(&arguments, &status, PH_COPY);
 
 		PHALCON_MM_ADD_ENTRY(&arguments);
 		PHALCON_MM_CALL_USER_FUNC_ARRAY(&status, &callback, &arguments);
@@ -379,10 +382,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		if (PHALCON_IS_FALSE(&status)){
 			RETURN_MM_FALSE;
 		}
+		PHALCON_MM_ADD_ENTRY(&status);
 		if (Z_TYPE(event) == IS_OBJECT) {
 			PHALCON_MM_CALL_METHOD(&is_stopped, &event, "isstopped");
 			if (zend_is_true(&is_stopped)) {
-				RETURN_MM_NCTOR(&status);
+				RETURN_MM_CTOR(&status);
 			}
 		}
 	}
@@ -398,9 +402,10 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 		if (PHALCON_IS_FALSE(&status)){
 			RETURN_MM_FALSE;
 		}
+		PHALCON_MM_ADD_ENTRY(&status);
 	}
 
-	RETURN_MM_NCTOR(&status);
+	RETURN_MM_CTOR(&status);
 }
 
 /**

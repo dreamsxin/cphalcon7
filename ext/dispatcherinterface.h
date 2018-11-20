@@ -30,6 +30,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setactionsuffix, 0, 0
 	ZEND_ARG_TYPE_INFO(0, actionSuffix, IS_STRING, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_sethandlersuffix, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, handlerSuffix, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_dispatcherinterface_setdefaultmodule, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, module, IS_STRING, 1)
 ZEND_END_ARG_INFO()

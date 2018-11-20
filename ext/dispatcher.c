@@ -53,6 +53,9 @@ zend_class_entry *phalcon_dispatcher_ce;
 
 PHP_METHOD(Phalcon_Dispatcher, __construct);
 PHP_METHOD(Phalcon_Dispatcher, setActionSuffix);
+PHP_METHOD(Phalcon_Dispatcher, getActionSuffix);
+PHP_METHOD(Phalcon_Dispatcher, setHandlerSuffix);
+PHP_METHOD(Phalcon_Dispatcher, getHandlerSuffix);
 PHP_METHOD(Phalcon_Dispatcher, setDefaultModule);
 PHP_METHOD(Phalcon_Dispatcher, getDefaultModule);
 PHP_METHOD(Phalcon_Dispatcher, setDefaultNamespace);
@@ -108,6 +111,9 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Dispatcher, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Dispatcher, setActionSuffix, arginfo_phalcon_dispatcherinterface_setactionsuffix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getActionSuffix, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, setHandlerSuffix, arginfo_phalcon_dispatcherinterface_sethandlersuffix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Dispatcher, getHandlerSuffix, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultModule, arginfo_phalcon_dispatcherinterface_setdefaultmodule, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Dispatcher, setDefaultNamespace, arginfo_phalcon_dispatcherinterface_setdefaultnamespace, ZEND_ACC_PUBLIC)
@@ -221,6 +227,41 @@ PHP_METHOD(Phalcon_Dispatcher, setActionSuffix){
 
 	phalcon_update_property(getThis(), SL("_actionSuffix"), action_suffix);
 
+}
+
+/**
+ * Gets the default action suffix
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getActionSuffix){
+
+	RETURN_MEMBER(getThis(), "_actionSuffix");
+}
+
+/**
+ * Sets the default handler suffix
+ *
+ * @param string $handlerSuffix
+ */
+PHP_METHOD(Phalcon_Dispatcher, setHandlerSuffix){
+
+	zval *handler_suffix;
+
+	phalcon_fetch_params(0, 1, 0, &handler_suffix);
+
+	phalcon_update_property(getThis(), SL("_handlerSuffix"), handler_suffix);
+
+}
+
+/**
+ * Gets the default handler suffix
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Dispatcher, getHandlerSuffix){
+
+	RETURN_MEMBER(getThis(), "_handlerSuffix");
 }
 
 /**

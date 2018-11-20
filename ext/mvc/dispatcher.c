@@ -63,6 +63,7 @@
 zend_class_entry *phalcon_mvc_dispatcher_ce;
 
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerSuffix);
+PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerSuffix);
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setDefaultController);
 PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerName);
 PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerName);
@@ -76,6 +77,7 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getPreviousActionName);
 
 static const zend_function_entry phalcon_mvc_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Dispatcher, setControllerSuffix, arginfo_phalcon_mvc_dispatcherinterface_setcontrollersuffix, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerSuffix, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Dispatcher, setDefaultController, arginfo_phalcon_mvc_dispatcherinterface_setdefaultcontroller, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Dispatcher, setControllerName, arginfo_phalcon_mvc_dispatcherinterface_setcontrollername, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerName, NULL, ZEND_ACC_PUBLIC)
@@ -118,6 +120,16 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, setControllerSuffix){
 
 	phalcon_update_property(getThis(), SL("_handlerSuffix"), controller_suffix);
 
+}
+
+/**
+ * Gets the default controller suffix
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Dispatcher, getControllerSuffix){
+
+	RETURN_MEMBER(getThis(), "_handlerSuffix");
 }
 
 /**

@@ -98,6 +98,7 @@ zend_class_entry *phalcon_mvc_application_ce;
 
 PHP_METHOD(Phalcon_Mvc_Application, __construct);
 PHP_METHOD(Phalcon_Mvc_Application, useImplicitView);
+PHP_METHOD(Phalcon_Mvc_Application, autoSendHeader);
 PHP_METHOD(Phalcon_Mvc_Application, handle);
 PHP_METHOD(Phalcon_Mvc_Application, request);
 
@@ -106,7 +107,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_useimplicitview, 0, 0, 1)
-	ZEND_ARG_INFO(0, implicitView)
+	ZEND_ARG_TYPE_INFO(0, implicitView, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_autosendheader, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, autoSendHeader, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_application_request, 0, 0, 1)
@@ -118,6 +123,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_application_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Application, __construct, arginfo_phalcon_mvc_application___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Application, useImplicitView, arginfo_phalcon_mvc_application_useimplicitview, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Application, autoSendHeader, arginfo_phalcon_mvc_application_autosendheader, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, handle, arginfo_phalcon_application_handle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Application, request, arginfo_phalcon_mvc_application_request, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -131,6 +137,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Application){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc, Application, mvc_application, phalcon_application_ce, phalcon_mvc_application_method_entry, 0);
 
 	zend_declare_property_bool(phalcon_mvc_application_ce, SL("_implicitView"), 1, ZEND_ACC_PROTECTED);
+	zend_declare_property_bool(phalcon_mvc_application_ce, SL("_autoSendHeader"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -169,6 +176,22 @@ PHP_METHOD(Phalcon_Mvc_Application, useImplicitView){
 }
 
 /**
+ * Enable or disable sending cookies by each request
+ *
+ * @param boolean $autoSendHeader
+ * @return Phalcon\Mvc\Application
+ */
+PHP_METHOD(Phalcon_Mvc_Application, autoSendHeader){
+
+	zval *auto_send;
+
+	phalcon_fetch_params(0, 1, 0, &auto_send);
+
+	phalcon_update_property(getThis(), SL("_autoSendHeader"), auto_send);
+	RETURN_THIS();
+}
+
+/**
  * Handles a MVC request
  *
  * @param string $uri
@@ -179,7 +202,7 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 	zval *uri = NULL, dependency_injector = {}, event_name = {}, status = {}, service = {}, router = {}, module_name = {};
 	zval modules = {}, module = {}, module_namespace = {}, module_class = {}, class_name = {}, path = {}, module_object = {}, module_params = {};
 	zval implicit_view = {}, view = {}, namespace_name = {}, controller_name = {}, action_name = {}, params = {}, exact = {};
-	zval dispatcher = {}, controller = {}, possible_response = {}, returned_response = {}, response = {}, content = {};
+	zval dispatcher = {}, controller = {}, possible_response = {}, returned_response = {}, response = {}, content = {}, auto_send = {};
 	int f_implicit_view;
 
 	phalcon_fetch_params(1, 0, 1, &uri);
@@ -547,9 +570,13 @@ PHP_METHOD(Phalcon_Mvc_Application, handle){
 		PHALCON_MM_CALL_METHOD(NULL, &controller, "beforesendresponse", &response);
 	}
 
-	/* Headers & Cookies are automatically sent */
-	PHALCON_MM_CALL_METHOD(NULL, &response, "sendheaders");
-	PHALCON_MM_CALL_METHOD(NULL, &response, "sendcookies");
+	phalcon_read_property(&auto_send, getThis(), SL("_autoSendHeader"), PH_NOISY|PH_READONLY);
+
+	if (likely(zend_is_true(&auto_send))) {
+		/* Headers & Cookies are automatically sent */
+		PHALCON_MM_CALL_METHOD(NULL, &response, "sendheaders");
+		PHALCON_MM_CALL_METHOD(NULL, &response, "sendcookies");
+	}
 
 	PHALCON_MM_ZVAL_STRING(&event_name, "application:afterSendResponse");
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, &response);

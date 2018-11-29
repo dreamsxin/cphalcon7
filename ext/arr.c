@@ -28,6 +28,7 @@
 #include <ext/pcre/php_pcre.h>
 
 #include <Zend/zend_closures.h>
+#include <Zend/zend_hash.h>
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -73,6 +74,8 @@ PHP_METHOD(Phalcon_Arr, toArray);
 PHP_METHOD(Phalcon_Arr, aggr);
 PHP_METHOD(Phalcon_Arr, group);
 PHP_METHOD(Phalcon_Arr, flip);
+PHP_METHOD(Phalcon_Arr, getHashKey);
+PHP_METHOD(Phalcon_Arr, getHashValue);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
@@ -207,6 +210,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_flip, 0, 0, 2)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_gethashkey, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, pos, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_gethashvalue, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, pos, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, is_assoc, arginfo_phalcon_arr_is_assoc, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, is_array, arginfo_phalcon_arr_is_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -232,6 +245,8 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, aggr, arginfo_phalcon_arr_aggr, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, group, arginfo_phalcon_arr_group, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, flip, arginfo_phalcon_arr_flip, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, getHashKey, arginfo_phalcon_arr_gethashkey, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, getHashValue, arginfo_phalcon_arr_gethashvalue, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -2090,4 +2105,54 @@ PHP_METHOD(Phalcon_Arr, flip){
 			phalcon_array_update(return_value, &k, item, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
+}
+
+/**
+ * Gets the postion key of an array
+ *
+ * @param array $array
+ * @param int $pos
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Arr, getHashKey){
+
+	zval *array, *_pos = NULL;
+	HashTable *target_hash;
+	HashPosition pos = 0;
+
+	phalcon_fetch_params(0, 1, 1, &array, &_pos);
+
+	if (_pos && Z_TYPE_P(_pos) == IS_LONG) {
+		pos = Z_LVAL_P(_pos);
+	}
+
+	target_hash = Z_ARRVAL_P (array);
+	zend_hash_get_current_key_zval_ex(target_hash, return_value, &pos);
+}
+
+/**
+ * Gets the postion value of an array
+ *
+ * @param array $array
+ * @param int $pos
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Arr, getHashValue){
+
+	zval *array, *_pos = NULL, *item = NULL;
+	HashTable *target_hash;
+	HashPosition pos = 0;
+
+	phalcon_fetch_params(0, 1, 1, &array, &_pos);
+
+	if (_pos && Z_TYPE_P(_pos) == IS_LONG) {
+		pos = Z_LVAL_P(_pos);
+	}
+
+	target_hash = Z_ARRVAL_P (array);
+	item = zend_hash_get_current_data_ex(target_hash, &pos);
+	if (item) {
+		RETURN_CTOR(item);
+	}
+	RETURN_NULL();
 }

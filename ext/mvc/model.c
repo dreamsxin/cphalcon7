@@ -3876,7 +3876,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(attributes), field) {
 		zval attribute_field = {}, value = {}, field_type = {}, is_not_null = {}, message = {}, type = {}, field_size = {};
-		zval str_value = {}, length = {}, label = {}, pairs = {}, prepared = {};
+		zval length = {}, label = {}, pairs = {}, prepared = {};
 		/**
 		 * We don't check fields that must be omitted
 		 */
@@ -3989,17 +3989,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 					PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 					if (Z_TYPE(field_size) != IS_NULL) {
-#ifdef PHALCON_USE_PHP_MBSTRING
-						phalcon_strlen(&length, &value);
-#else
-						if (phalcon_function_exists_ex(SL("mb_strlen")) == SUCCESS) {
-							phalcon_strval(&str_value, &value);
-							PHALCON_MM_ADD_ENTRY(&str_value);
-							PHALCON_MM_CALL_FUNCTION(&length, "mb_strlen", &str_value);
-						} else {
-							phalcon_fast_strlen(&length, &value);
-						}
-#endif
+						phalcon_fast_strlen(&length, &value);
 
 						if (phalcon_greater(&length, &field_size)) {
 							PHALCON_MM_ZVAL_STRING(&type, "TooLong");
@@ -7187,6 +7177,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
  * phqlLiterals          — Enables/Disables literals in PHQL this improves the security of applications
  * propertyMethod        — Enables/Disables property method
  * autoConvert           — Enables/Disables auto convert
+ * strict                — Enables/Disables strict mode
  * strict                — Enables/Disables strict mode
  *
  * @param array $options

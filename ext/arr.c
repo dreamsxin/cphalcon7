@@ -2119,11 +2119,21 @@ PHP_METHOD(Phalcon_Arr, getHashKey){
 	zval *array, *_pos = NULL;
 	HashTable *target_hash;
 	HashPosition pos = 0;
+	int32_t idx;
 
 	phalcon_fetch_params(0, 1, 1, &array, &_pos);
 
 	if (_pos && Z_TYPE_P(_pos) == IS_LONG) {
 		pos = Z_LVAL_P(_pos);
+	}
+
+	idx = pos;
+	if (idx < 0) {
+		idx = zend_hash_num_elements(Z_ARRVAL_P(array)) + idx;
+		if (idx < 0) {
+			RETURN_NULL();
+		}
+		pos = idx;
 	}
 
 	target_hash = Z_ARRVAL_P (array);
@@ -2142,11 +2152,20 @@ PHP_METHOD(Phalcon_Arr, getHashValue){
 	zval *array, *_pos = NULL, *item = NULL;
 	HashTable *target_hash;
 	HashPosition pos = 0;
+	int32_t idx;
 
 	phalcon_fetch_params(0, 1, 1, &array, &_pos);
 
 	if (_pos && Z_TYPE_P(_pos) == IS_LONG) {
 		pos = Z_LVAL_P(_pos);
+	}
+	idx = pos;
+	if (idx < 0) {
+		idx = zend_hash_num_elements(Z_ARRVAL_P(array)) + idx;
+		if (idx < 0) {
+			RETURN_NULL();
+		}
+		pos = idx;
 	}
 
 	target_hash = Z_ARRVAL_P (array);

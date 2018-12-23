@@ -70,7 +70,7 @@ static uint64_t till_next_ms(uint64_t last_ts)
 static uint64_t key2int(char *key)
 {
     uint64_t v;
-    if (sscanf(key, "%ju", &v) == 0) {
+    if (sscanf(key, "%" PRIdMAX, &v) == 0) {
         return 0;
     }
     return v;

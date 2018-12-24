@@ -6,6 +6,7 @@ dist: trusty
 addons:
   apt:
     packages:
+      - beanstalkd
       - gdb
       - re2c
       - libpng12-dev

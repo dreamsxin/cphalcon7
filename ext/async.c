@@ -40,6 +40,8 @@ PHP_METHOD(Phalcon_Async, recv);
 PHP_METHOD(Phalcon_Async, recvAll);
 PHP_METHOD(Phalcon_Async, count);
 PHP_METHOD(Phalcon_Async, clear);
+PHP_METHOD(Phalcon_Async, setFilename);
+PHP_METHOD(Phalcon_Async, getFilename);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_call, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, closure, Closure, 0)
@@ -55,12 +57,18 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_recvall, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, flag, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_async_setfilename, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_async_method_entry[] = {
 	PHP_ME(Phalcon_Async, call, arginfo_phalcon_async_call, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, recv, arginfo_phalcon_async_recv, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, recvAll, arginfo_phalcon_async_recvall, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, count, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Async, clear, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Async, setFilename, arginfo_phalcon_async_setfilename, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Async, getFilename, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -318,4 +326,36 @@ PHP_METHOD(Phalcon_Async, clear){
 
 	PHALCON_MM_CALL_FUNCTION(return_value, "msg_remove_queue", &seg);
 	RETURN_MM();
+}
+
+/**
+ * Sets the filename to a System V IPC key
+ *
+ *<code>
+ * Phalcon\Async::setFilename('/tmp');
+ *</code>
+ *
+ * @param string $filename
+ */
+PHP_METHOD(Phalcon_Async, setFilename){
+
+	zval *filename;
+
+	phalcon_fetch_params(0, 1, 0, &filename);
+
+	phalcon_update_static_property_ce(phalcon_async_ce, SL("_filename"), filename);
+}
+
+/**
+ * Gets the filename
+ *
+ *<code>
+ * Phalcon\Async::getFilename();
+ *</code>
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Async, getFilename){
+
+	phalcon_read_static_property_ce(return_value, phalcon_async_ce, SL("_filename"), PH_COPY);
 }

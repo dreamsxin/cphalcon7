@@ -2815,7 +2815,10 @@ int phalcon_json_encode(zval *retval, zval *v, int opts)
 
 int phalcon_json_decode(zval *retval, zval *v, zend_bool assoc)
 {
-
+	if (Z_TYPE_P(v) == IS_NULL) {
+		ZVAL_NULL(retval);
+		return SUCCESS;
+	}
 #ifdef PHALCON_USE_PHP_JSON
 	if (Z_TYPE_P(v) != IS_STRING) {
 		convert_to_string_ex(v);

@@ -107,7 +107,7 @@ static const zend_function_entry phalcon_queue_beanstalk_method_entry[] = {
 	PHP_ME(Phalcon_Queue_Beanstalk, readStatus, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Queue_Beanstalk, readYaml, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Queue_Beanstalk, read, arginfo_phalcon_queue_beanstalk_read, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk, write, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Queue_Beanstalk, write, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Queue_Beanstalk, disconnect, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Queue_Beanstalk, __sleep, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Queue_Beanstalk, __wakeup, NULL, ZEND_ACC_PUBLIC)

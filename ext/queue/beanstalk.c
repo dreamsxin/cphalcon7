@@ -489,6 +489,7 @@ static inline void phalcon_queue_beanstalk_peek_common(zval *return_value, zval 
 
 	object_init_ex(return_value, phalcon_queue_beanstalk_job_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", this_ptr, &job_id, &body);
+	zval_ptr_dtor(&body);
 }
 
 /**
@@ -650,7 +651,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 	long int len;
 	char *buf;
 
-	phalcon_fetch_params(0, 0, 1, &length);
+	phalcon_fetch_params(1, 0, 1, &length);
 
 	if (!length) {
 		length = &PHALCON_GLOBAL(z_zero);
@@ -660,20 +661,21 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 
 	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_READONLY);
 	if (Z_TYPE(connection) != IS_RESOURCE) {
-		PHALCON_CALL_METHOD(&connection, getThis(), "connect");
+		PHALCON_MM_CALL_METHOD(&connection, getThis(), "connect");
+		PHALCON_MM_ADD_ENTRY(&connection);
 		if (Z_TYPE(connection) != IS_RESOURCE) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 	}
 
 	php_stream_from_zval_no_verify(stream, &connection);
 	if (!stream) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	if (zend_is_true(length)) {
 		if (php_stream_eof(stream)) {
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 
 		total_length = Z_LVAL_P(length) + 2;
@@ -682,8 +684,10 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		len = php_stream_read(stream, buf, total_length);
 
 		ZVAL_STRINGL(return_value, buf, len);
+		efree(buf);
 
 		array_init_size(&meta, 4);
+		PHALCON_MM_ADD_ENTRY(&meta);
 		if (php_stream_populate_meta_data(stream, &meta)) {
 			if (phalcon_array_isset_fetch_str(&timed_out, &meta, SL("timed_out"), PH_READONLY)) {
 				timeout = zend_is_true(&timed_out);
@@ -691,7 +695,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 		}
 
 		if (timeout) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Connection timed out");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_exception_ce, "Connection timed out");
 			return;
 		}
 	} else {
@@ -705,6 +709,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 			}
 
 			ZVAL_STRINGL(return_value, buf, line_len);
+			efree(buf);
 		} else {
 			efree(buf);
 			ZVAL_FALSE(return_value);
@@ -720,6 +725,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, read){
 			Z_STRLEN_P(return_value) -= 2;
 		}
 	}
+	RETURN_MM();
 }
 
 /**

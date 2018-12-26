@@ -67,6 +67,7 @@ void phalcon_fast_strlen(zval *return_value, zval *str)
 		zval_ptr_dtor(str);
 	}
 }
+
 void phalcon_strlen(zval *return_value, zval *str)
 {
 #ifdef PHALCON_USE_PHP_MBSTRING
@@ -101,7 +102,14 @@ void phalcon_strlen(zval *return_value, zval *str)
 		zval_ptr_dtor(&copy);
 	}
 #else
-	phalcon_fast_strlen(return_value, str);
+	int flag;
+	zval str_value = {};
+	phalcon_strval(&str_value, str);
+	PHALCON_CALL_FUNCTION_FLAG(flag, return_value, "mb_strlen", &str_value);
+	zval_ptr_dtor(&str_value);
+	if (flag != SUCCESS) {
+		ZVAL_FALSE(return_value);
+	}
 #endif
 }
 

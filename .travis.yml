@@ -71,14 +71,14 @@ before_install:
   - ./unit-tests/ci/setup_dbs.sh
 
 before_script:
-  - git submodule --quiet update --init --recursive
-  - (cd deps/libwebsockets && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
-  - (cd deps/libuv && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
-  - (cd deps/mongo-c-driver/src/libbson && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
-  - (cd deps/mongo-c-driver && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
-  - (cd deps/wiredtiger && ./autogen.sh && ./configure  --prefix=/usr && make --silent && sudo make install)
-  - (cd deps/libmdbx && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
-  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --enable-chart=yes --enable-qrcode=yes --enable-process=yes --enable-intrusive=yes --enable-cache-yac=yes --enable-storage-btree=yes --enable-storage-wiredtiger=yes --enable-storage-bloomfilter=yes --enable-storage-datrie=yes --enable-storage-lmdb=yes --enable-storage-libmdbx=yes --enable-storage-leveldb=yes --enable-server=yes && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
+  #- git submodule --quiet update --init --recursive
+  #- (cd deps/libwebsockets && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
+  #- (cd deps/libuv && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
+  #- (cd deps/mongo-c-driver/src/libbson && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
+  #- (cd deps/mongo-c-driver && ./autogen.sh && ./configure --prefix=/usr && make --silent && sudo make install)
+  #- (cd deps/wiredtiger && ./autogen.sh && ./configure  --prefix=/usr && make --silent && sudo make install)
+  #- (cd deps/libmdbx && cmake . -DCMAKE_INSTALL_PREFIX:PATH=/usr && make --silent && sudo make install)
+  - (cd ext; export CFLAGS="-g -O0 -std=gnu90 -Wall -Werror -Wno-error=uninitialized"; phpize && ./configure --enable-chart=yes --enable-qrcode=yes --enable-process=yes --enable-intrusive=yes --enable-storage-bloomfilter=yes --enable-storage-datrie=yes && make --silent -j4 > /dev/null && make --silent install && phpenv config-add ../unit-tests/ci/20-phalcon.ini)
   - ulimit -c unlimited -S || true
   - echo '/tmp/core_%e.%p' | sudo tee /proc/sys/kernel/core_pattern &> /dev/null
 

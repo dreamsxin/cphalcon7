@@ -3989,7 +3989,11 @@ PHP_METHOD(Phalcon_Mvc_Model, _preSave){
 
 					PHALCON_MM_CALL_METHOD(&field_size, getThis(), "getdatasize", field);
 					if (Z_TYPE(field_size) != IS_NULL) {
-						phalcon_fast_strlen(&length, &value);
+						if (PHALCON_GLOBAL(orm).use_mb_strlen) {
+							phalcon_strlen(&length, &value);
+						} else {
+							phalcon_fast_strlen(&length, &value);
+						}
 
 						if (phalcon_greater(&length, &field_size)) {
 							PHALCON_MM_ZVAL_STRING(&type, "TooLong");
@@ -7184,7 +7188,8 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
  */
 PHP_METHOD(Phalcon_Mvc_Model, setup){
 
-	zval *options, disable_events = {}, virtual_foreign_keys = {}, not_null_validations = {}, length_validations = {}, exception_on_failed_save = {};
+	zval *options, disable_events = {}, virtual_foreign_keys = {}, not_null_validations = {}, length_validations = {}, use_mb_strlen = {};
+	zval exception_on_failed_save = {};
 	zval phql_literals = {}, property_method = {}, auto_convert = {}, allow_update_primary = {}, enable_strict = {}, must_column = {};
 
 	phalcon_fetch_params(0, 1, 0, &options);
@@ -7220,6 +7225,9 @@ PHP_METHOD(Phalcon_Mvc_Model, setup){
 	 */
 	if (phalcon_array_isset_fetch_str(&length_validations, options, SL("lengthValidations"), PH_READONLY)) {
 		PHALCON_GLOBAL(orm).length_validations = zend_is_true(&length_validations);
+	}
+	if (phalcon_array_isset_fetch_str(&use_mb_strlen, options, SL("useMbStrlen"), PH_READONLY)) {
+		PHALCON_GLOBAL(orm).use_mb_strlen = zend_is_true(&use_mb_strlen);
 	}
 
 	/**

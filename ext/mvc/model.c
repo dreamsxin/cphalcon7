@@ -4362,7 +4362,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 
 	if (Z_TYPE(status) == IS_OBJECT) {
 		PHALCON_MM_CALL_METHOD(return_value, &status, "success");
-		if (zend_is_true(return_value) && identity_field_is_not_false) {
+		if (zend_is_true(return_value) && !ignore_last_lnsertid && identity_field_is_not_false) {
 			phalcon_update_property_zval_zval(getThis(), &column_name, return_value);
 		}
 	} else {

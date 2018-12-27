@@ -42,6 +42,7 @@ zend_class_entry *phalcon_snowflake_ce;
 
 PHP_METHOD(Phalcon_Snowflake, nextId);
 PHP_METHOD(Phalcon_Snowflake, parse);
+PHP_METHOD(Phalcon_Snowflake, parseID);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_snowflake_parse, 0, 0, 1)
 	ZEND_ARG_INFO(0, id)
@@ -50,6 +51,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_snowflake_method_entry[] = {
 	PHP_ME(Phalcon_Snowflake, nextId, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Snowflake, parse, arginfo_phalcon_snowflake_parse, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Snowflake, parseID, arginfo_phalcon_snowflake_parse, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -201,23 +203,41 @@ PHP_METHOD(Phalcon_Snowflake, nextId){
 PHP_METHOD(Phalcon_Snowflake, parse){
 
 	zval *value;
-	phalcon_snowflake_object *intern;
+	uint64_t id;
+	int node, ts;
 
 	phalcon_fetch_params(0, 1, 0, &value);
 
-	intern = phalcon_snowflake_object_from_obj(Z_OBJ_P(getThis()));
-	if (intern->data != NULL) {
-		uint64_t id;
-		int node, ts;
-		if(!(id = key2int(Z_STRVAL_P(value)))) {
-			RETURN_FALSE;
-		}
-		node = (id >> 12) & 0x3FF;
-		ts   = ((id >> 22) + PHALCON_GLOBAL(snowflake).epoch) / 1000ULL;	
-		array_init(return_value);
-		add_assoc_long(return_value, "node", node);
-		add_assoc_double(return_value, "timestamp", ts);
-	} else {
+	if(!(id = key2int(Z_STRVAL_P(value)))) {
 		RETURN_FALSE;
 	}
+	node = (id >> 12) & 0x3FF;
+	ts   = ((id >> 22) + PHALCON_GLOBAL(snowflake).epoch) / 1000ULL;	
+	array_init(return_value);
+	add_assoc_long(return_value, "node", node);
+	add_assoc_double(return_value, "timestamp", ts);
+}
+/**
+ * Parse a unique id value
+ *
+ *<code>
+ *  $desc = \Phalcon\Snowflake::parseID($id);
+ *</code>
+ */
+PHP_METHOD(Phalcon_Snowflake, parseID){
+
+	zval *value;
+	uint64_t id;
+	int node, ts;
+
+	phalcon_fetch_params(0, 1, 0, &value);
+
+	if(!(id = key2int(Z_STRVAL_P(value)))) {
+		RETURN_FALSE;
+	}
+	node = (id >> 12) & 0x3FF;
+	ts   = ((id >> 22) + PHALCON_GLOBAL(snowflake).epoch) / 1000ULL;	
+	array_init(return_value);
+	add_assoc_long(return_value, "node", node);
+	add_assoc_double(return_value, "timestamp", ts);
 }

@@ -45,7 +45,7 @@ PHP_METHOD(Phalcon_Snowflake, parse);
 PHP_METHOD(Phalcon_Snowflake, parseID);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_snowflake_parse, 0, 0, 1)
-	ZEND_ARG_INFO(0, id)
+	ZEND_ARG_TYPE_INFO(0, id, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_snowflake_method_entry[] = {

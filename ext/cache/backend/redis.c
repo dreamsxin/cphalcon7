@@ -548,32 +548,32 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, flush){
 
 	zval redis = {}, options = {}, special_key = {}, keys = {}, *value;
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
 
 	if (!phalcon_array_isset_fetch_str(&special_key, &options, SL("statsKey"), PH_READONLY) || !PHALCON_IS_NOT_EMPTY_STRING(&special_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Unexpected inconsistency in options");
 		return;
 	}
 
-	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_COPY);
+	phalcon_read_property(&redis, getThis(), SL("_redis"), PH_READONLY);
 	if (Z_TYPE(redis) != IS_OBJECT) {
-		PHALCON_CALL_METHOD(&redis, getThis(), "_connect");
+		PHALCON_MM_CALL_METHOD(&redis, getThis(), "_connect");
+		PHALCON_MM_ADD_ENTRY(&redis);
 	}
 
 	/* Get the key from redisd */
-	PHALCON_CALL_METHOD(&keys, &redis, "smembers", &special_key);
+	PHALCON_MM_CALL_METHOD(&keys, &redis, "smembers", &special_key);
+	PHALCON_MM_ADD_ENTRY(&keys);
 	if (Z_TYPE(keys) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(keys), value) {
-			PHALCON_CALL_METHOD(NULL, &redis, "delete", value);
-			PHALCON_CALL_METHOD(NULL, &redis, "srem", &special_key, value);
+			PHALCON_MM_CALL_METHOD(NULL, &redis, "delete", value);
+			PHALCON_MM_CALL_METHOD(NULL, &redis, "srem", &special_key, value);
 		} ZEND_HASH_FOREACH_END();
-
-		zend_hash_clean(Z_ARRVAL(keys));
 	}
-	zval_ptr_dtor(&keys);
-	zval_ptr_dtor(&redis);
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**

@@ -77,6 +77,9 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_message_group_appendmessage, 0, 0, 1)
 	ZEND_ARG_INFO(0, message)
+	ZEND_ARG_INFO(0, field)
+	ZEND_ARG_INFO(0, type)
+	ZEND_ARG_INFO(0, code)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_message_group_appendmessages, 0, 0, 1)
@@ -228,11 +231,33 @@ PHP_METHOD(Phalcon_Validation_Message_Group, offsetUnset){
  */
 PHP_METHOD(Phalcon_Validation_Message_Group, appendMessage){
 
-	zval *message;
+	zval *message, *field = NULL, *type = NULL, *code = NULL;
 
-	phalcon_fetch_params(0, 1, 0, &message);
-	PHALCON_VERIFY_INTERFACE_EX(message, phalcon_validation_messageinterface_ce, phalcon_validation_exception_ce);
-	phalcon_update_property_array_append(getThis(), SL("_messages"), message);
+	phalcon_fetch_params(1, 1, 3, &message, &field, &type, &code);
+
+	if (!field) {
+		field = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!type) {
+		type = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!code) {
+		code = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(message) == IS_OBJECT) {
+		PHALCON_MM_VERIFY_INTERFACE_EX(message, phalcon_validation_messageinterface_ce, phalcon_validation_exception_ce);
+		phalcon_update_property_array_append(getThis(), SL("_messages"), message);
+	} else {
+		zval new_message = {};
+		object_init_ex(&new_message, phalcon_validation_message_ce);
+		PHALCON_MM_CALL_METHOD(NULL, &new_message, "__construct", message, field, type, code);
+		PHALCON_MM_ADD_ENTRY(&new_message);
+		phalcon_update_property_array_append(getThis(), SL("_errorMessages"), &new_message);
+	}
+	RETURN_MM_THIS();
 }
 
 /**

@@ -27,6 +27,7 @@
 #include "kernel/fcall.h"
 #include "kernel/array.h"
 #include "kernel/concat.h"
+#include "kernel/object.h"
 
 /**
  * Phalcon\Logger\Formatter\Json
@@ -35,9 +36,15 @@
  */
 zend_class_entry *phalcon_logger_formatter_json_ce;
 
+PHP_METHOD(Phalcon_Logger_Formatter_Json, __construct);
 PHP_METHOD(Phalcon_Logger_Formatter_Json, format);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_logger_formatter_json___construct, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_logger_formatter_json_method_entry[] = {
+	PHP_ME(Phalcon_Logger_Formatter_Json, __construct, arginfo_phalcon_logger_formatter_json___construct, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Formatter_Json, format, arginfo_phalcon_logger_formatterinterface_format, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -49,9 +56,28 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Json){
 
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Logger\\Formatter, Json, logger_formatter_json, phalcon_logger_formatter_ce, phalcon_logger_formatter_json_method_entry, 0);
 
+	zend_declare_property_long(phalcon_logger_formatter_json_ce, SL("_options"), 0, ZEND_ACC_PROTECTED);
+
 	zend_class_implements(phalcon_logger_formatter_json_ce, 1, phalcon_logger_formatterinterface_ce);
 
 	return SUCCESS;
+}
+
+/**
+ * Phalcon\Logger\Formatter\Json constructor
+ *
+ * @param int $options
+ */
+PHP_METHOD(Phalcon_Logger_Formatter_Json, __construct){
+
+	zval *options = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &options);
+
+	if (options && Z_TYPE_P(options) == IS_LONG) {
+		phalcon_update_property(getThis(), SL("_options"), options);
+	}
+
 }
 
 /**
@@ -65,7 +91,7 @@ PHALCON_INIT_CLASS(Phalcon_Logger_Formatter_Json){
  */
 PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 
-	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, log = {}, json = {};
+	zval *message, *type, *timestamp, *context, interpolated = {}, type_str = {}, log = {}, options = {}, json = {};
 
 	phalcon_fetch_params(1, 4, 0, &message, &type, &timestamp, &context);
 
@@ -85,7 +111,9 @@ PHP_METHOD(Phalcon_Logger_Formatter_Json, format){
 	phalcon_array_update_str(&log, SL("message"), &interpolated, PH_COPY);
 	phalcon_array_update_str(&log, SL("timestamp"), timestamp, PH_COPY);
 
-	RETURN_MM_ON_FAILURE(phalcon_json_encode(&json, &log, 0));
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
+
+	RETURN_MM_ON_FAILURE(phalcon_json_encode(&json, &log, Z_LVAL(options)));
 	PHALCON_MM_ADD_ENTRY(&json);
 
 	PHALCON_CONCAT_VS(return_value, &json, PHP_EOL);

@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Cli_Options, __construct){
 PHP_METHOD(Phalcon_Cli_Options, add){
 
 	zval *arg, *_name = NULL, *_short_name = NULL, *_required = NULL, *_desc = NULL, *_help = NULL, *_default_value = NULL;
-	zval type = {}, name = {}, short_name = {}, required = {}, desc = {}, help = {}, default_value = {};
+	zval type = {}, names = {}, short_names = {}, name = {}, short_name = {}, required = {}, desc = {}, help = {}, default_value = {};
 	zval key = {};
 	int t = 0;
 
@@ -287,10 +287,20 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 	if (zend_is_true(&required)) {
 		phalcon_update_property_array_append(getThis(), SL("_required"), &name);
 	}
-
+	
+	phalcon_read_property(&names, getThis(), SL("_names"), PH_READONLY);
 	if (Z_TYPE(short_name) == IS_STRING) {
 		if (Z_STRLEN(short_name) != 1) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_options_exception_ce, "short name not exceed 1 characters long");
+			return;
+		}
+		if (phalcon_array_isset(&names, &short_name)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_options_exception_ce, "duplicate short name exists");
+			return;
+		}
+		phalcon_read_property(&short_names, getThis(), SL("_shortNames"), PH_READONLY);
+		if (phalcon_array_isset(&short_names, &name)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_options_exception_ce, "duplicate name exists");
 			return;
 		}
 
@@ -307,6 +317,10 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 		phalcon_update_property_array_append(getThis(), SL("_options"), &key);
 		zval_ptr_dtor(&key);
 	} else {
+		if (phalcon_array_isset(&names, &name)) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_cli_options_exception_ce, "duplicate name exists");
+			return;
+		}
 		phalcon_update_property_array(getThis(), SL("_names"), &name, &name);
 	}
 

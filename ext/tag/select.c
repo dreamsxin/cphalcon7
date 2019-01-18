@@ -74,7 +74,7 @@ PHALCON_INIT_CLASS(Phalcon_Tag_Select){
 PHP_METHOD(Phalcon_Tag_Select, selectField)
 {
 	zval *parameters, *data = NULL, params = {}, default_params = {}, id = {}, name = {}, value = {}, use_empty = {}, empty_value = {};
-	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, label = {};
+	zval empty_text = {}, code = {}, close_option = {}, options = {}, using = {}, callback = {}, label = {};
 
 	phalcon_fetch_params(1, 1, 1, &parameters, &data);
 
@@ -142,6 +142,17 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		PHALCON_MM_ADD_ENTRY(&using);
 	} else {
 		ZVAL_NULL(&using);
+	}
+
+	if (phalcon_array_isset_fetch_str(&callback, &params, SL("callback"), PH_COPY)) {
+		phalcon_array_unset_str(&params, SL("callback"), 0);
+		PHALCON_MM_ADD_ENTRY(&callback);
+		if (Z_TYPE(callback) != IS_NULL && !phalcon_is_callable(&callback)) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "The 'callback' parameter must be callable");
+			return;
+		}
+	} else {
+		ZVAL_NULL(&callback);
 	}
 
 	if (phalcon_array_isset_fetch_str(&label, &params, SL("label"), PH_READONLY) && zend_is_true(&label)) {
@@ -213,7 +224,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		/**
 		 * Create the SELECT's option from a resultset
 		 */
-		PHALCON_MM_CALL_CE_STATIC(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option);
+		PHALCON_MM_CALL_CE_STATIC(&resultset_options, phalcon_tag_select_ce, "_optionsfromresultset", &options, &using, &value, &close_option, &callback);
 		phalcon_concat_self(&code, &resultset_options);
 		PHALCON_MM_ADD_ENTRY(&code);
 		zval_ptr_dtor(&resultset_options);
@@ -222,7 +233,7 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		/**
 		 * Create the SELECT's option from an array
 		 */
-		PHALCON_MM_CALL_CE_STATIC(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &using, &value, &close_option);
+		PHALCON_MM_CALL_CE_STATIC(&array_options, phalcon_tag_select_ce, "_optionsfromarray",  &options, &using, &value, &close_option, &callback);
 		phalcon_concat_self(&code, &array_options);
 		PHALCON_MM_ADD_ENTRY(&code);
 		zval_ptr_dtor(&array_options);
@@ -246,9 +257,9 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
  */
 PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 {
-	zval *resultset, *using, *value, *close_option, using_zero = {}, using_one = {}, code = {};
+	zval *resultset, *using, *value, *close_option, *callback, using_zero = {}, using_one = {}, code = {};
 
-	phalcon_fetch_params(1, 4, 0, &resultset, &using, &value, &close_option);
+	phalcon_fetch_params(1, 5, 0, &resultset, &using, &value, &close_option, &callback);
 
 	if (Z_TYPE_P(value) != IS_ARRAY) {
 		PHALCON_SEPARATE_PARAM(value);
@@ -357,7 +368,20 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
 			 */
 			phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 			PHALCON_MM_ADD_ENTRY(&escaped);
-			if (Z_TYPE_P(value) == IS_ARRAY) {
+			if (phalcon_is_callable(callback)) {
+				zval tmp = {};
+				array_init(&params);
+				phalcon_array_update_long(&params, 0, &option_value, PH_COPY);
+				phalcon_array_update_long(&params, 1, value, PH_COPY);
+				PHALCON_MM_ADD_ENTRY(&params);
+				PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, callback, &params);
+				PHALCON_MM_ADD_ENTRY(&tmp);
+				if (zend_is_true(&tmp)) {
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &option_text, close_option);
+				} else {
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", &option_text, close_option);
+				}
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				if (phalcon_fast_in_array(&option_value, value)) {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &option_text, close_option);
 				} else {
@@ -404,11 +428,11 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromResultset)
  */
 PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 
-	zval *data, *using, *value, *close_option, using_zero = {}, using_one = {}, code = {}, *option_text;
+	zval *data, *using, *value, *close_option, *callback, using_zero = {}, using_one = {}, code = {}, *option_text;
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(1, 4, 0, &data, &using, &value, &close_option);
+	phalcon_fetch_params(1, 5, 0, &data, &using, &value, &close_option, &callback);
 
 	if (Z_TYPE_P(using) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch_long(&using_zero, using, 0, PH_READONLY)) {
@@ -441,7 +465,20 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 
 				phalcon_htmlspecialchars(&escaped, &op_value, NULL, NULL);
 				PHALCON_MM_ADD_ENTRY(&escaped);
-				if (Z_TYPE_P(value) == IS_ARRAY) {
+				if (phalcon_is_callable(callback)) {
+					zval tmp = {}, params = {};
+					array_init(&params);
+					phalcon_array_update_long(&params, 0, &op_value, PH_COPY);
+					phalcon_array_update_long(&params, 1, value, PH_COPY);
+					PHALCON_MM_ADD_ENTRY(&params);
+					PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, callback, &params);
+					PHALCON_MM_ADD_ENTRY(&tmp);
+					if (zend_is_true(&tmp)) {
+						PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &op_text, close_option);
+					} else {
+						PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", &op_text, close_option);
+					}
+				} else if (Z_TYPE_P(value) == IS_ARRAY) {
 					if (phalcon_fast_in_array(&op_value, value)) {
 						PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", &op_text, close_option);
 					} else {
@@ -467,7 +504,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 				zval array_options = {}, escaped = {};
 				phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 				PHALCON_MM_ADD_ENTRY(&escaped);
-				PHALCON_MM_CALL_SELF(&array_options, "_optionsfromarray", option_text, using, value, close_option);
+				PHALCON_MM_CALL_SELF(&array_options, "_optionsfromarray", option_text, using, value, close_option, callback);
 				PHALCON_SCONCAT_SVSVS(&code, "\t<optgroup label=\"", &escaped, "\">" PHP_EOL, &array_options, "\t</optgroup>" PHP_EOL);
 				PHALCON_MM_ADD_ENTRY(&code);
 				zval_ptr_dtor(&array_options);
@@ -476,7 +513,20 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 			zval escaped = {};
 			phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 			PHALCON_MM_ADD_ENTRY(&escaped);
-			if (Z_TYPE_P(value) == IS_ARRAY) {
+			if (phalcon_is_callable(callback)) {
+				zval tmp = {}, params = {};
+				array_init(&params);
+				phalcon_array_update_long(&params, 0, &option_value, PH_COPY);
+				phalcon_array_update_long(&params, 1, value, PH_COPY);
+				PHALCON_MM_ADD_ENTRY(&params);
+				PHALCON_MM_CALL_USER_FUNC_ARRAY(&tmp, callback, &params);
+				PHALCON_MM_ADD_ENTRY(&tmp);
+				if (zend_is_true(&tmp)) {
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", option_text, close_option);
+				} else {
+					PHALCON_SCONCAT_SVSVV(&code, "\t<option value=\"", &escaped, "\">", option_text, close_option);
+				}
+			} else if (Z_TYPE_P(value) == IS_ARRAY) {
 				if (phalcon_fast_in_array(&option_value, value)) {
 					PHALCON_SCONCAT_SVSVV(&code, "\t<option selected=\"selected\" value=\"", &escaped, "\">", option_text, close_option);
 				} else {

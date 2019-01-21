@@ -276,7 +276,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 
 	zval *auto_begin = NULL, dependency_injector = {}, number = {}, transactions = {}, *transaction, service = {};
 
-	phalcon_fetch_params(0, 0, 1, &auto_begin);
+	phalcon_fetch_params(1, 0, 1, &auto_begin);
 
 	if (!auto_begin) {
 		auto_begin = &PHALCON_GLOBAL(z_true);
@@ -288,29 +288,30 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction_Manager, getOrCreateTransaction){
 		if (Z_TYPE(transactions) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(transactions), transaction) {
 				if (Z_TYPE_P(transaction) == IS_OBJECT) {
-					PHALCON_CALL_METHOD(NULL, transaction, "setisnewtransaction", &PHALCON_GLOBAL(z_false));
-					RETURN_CTOR(transaction);
+					PHALCON_MM_CALL_METHOD(NULL, transaction, "setisnewtransaction", &PHALCON_GLOBAL(z_false));
+					RETURN_MM_CTOR(transaction);
 				}
 			} ZEND_HASH_FOREACH_END();
 
 		}
 	}
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_transaction_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
 	phalcon_read_property(&service, getThis(), SL("_service"), PH_NOISY|PH_READONLY);
 
 	object_init_ex(return_value, phalcon_mvc_model_transaction_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &dependency_injector, auto_begin, &service);
-	zval_ptr_dtor(&dependency_injector);
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", &dependency_injector, auto_begin, &service);
 
-	PHALCON_CALL_METHOD(NULL, return_value, "settransactionmanager", getThis());
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "settransactionmanager", getThis());
 	phalcon_update_property_array_append(getThis(), SL("_transactions"), return_value);
 	phalcon_property_incr(getThis(), SL("_number"));
+	RETURN_MM();
 }
 
 /**

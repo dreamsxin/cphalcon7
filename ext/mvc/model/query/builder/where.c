@@ -308,19 +308,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 	zval model_instance = {}, primary_keys = {}, first_primary_key = {}, column_map = {}, attribute_field = {}, exception_message = {};
 	zend_class_entry *ce0;
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
 
 	if (phalcon_is_numeric(&conditions)) {
-		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 		phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
 		if (Z_TYPE(models) == IS_ARRAY) {
 			if (!phalcon_fast_count_ev(&models)) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 				return;
 			}
 		} else if (!zend_is_true(&models)) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "At least one model is required to build the query");
 			return;
 		}
 
@@ -330,9 +333,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 		 */
 		if (Z_TYPE(models) == IS_ARRAY) {
 			phalcon_fast_count(&number_models, &models);
+			PHALCON_MM_ADD_ENTRY(&number_models);
 			is_smaller_function(&invalid_condition, &PHALCON_GLOBAL(z_one), &number_models);
 			if (PHALCON_IS_TRUE(&invalid_condition)) {
-				PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Cannot build the query. Invalid condition");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Cannot build the query. Invalid condition");
 				return;
 			}
 
@@ -343,70 +347,64 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getConditions){
 
 		ZVAL_STR(&service_name, IS(modelsMetadata));
 
-		PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+		PHALCON_MM_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+		PHALCON_MM_ADD_ENTRY(&has);
 		if (zend_is_true(&has)) {
 			/**
 			 * Get the models metadata service to obtain the column names, column map and
 			 * primary key
 			 */
-			PHALCON_CALL_METHOD(&meta_data, &dependency_injector, "getshared", &service_name);
-			PHALCON_VERIFY_INTERFACE(&meta_data, phalcon_mvc_model_metadatainterface_ce);
+			PHALCON_MM_CALL_METHOD(&meta_data, &dependency_injector, "getshared", &service_name);
+			PHALCON_MM_ADD_ENTRY(&meta_data);
+			PHALCON_MM_VERIFY_INTERFACE(&meta_data, phalcon_mvc_model_metadatainterface_ce);
 		} else {
 			object_init_ex(&meta_data, phalcon_mvc_model_metadata_memory_ce);
+			PHALCON_MM_ADD_ENTRY(&meta_data);
 		}
 
 		ce0 = phalcon_fetch_class(&model, ZEND_FETCH_CLASS_DEFAULT);
 
 		PHALCON_OBJECT_INIT(&model_instance, ce0);
+		PHALCON_MM_ADD_ENTRY(&model_instance);
 		if (phalcon_has_constructor(&model_instance)) {
-			PHALCON_CALL_METHOD(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
+			PHALCON_MM_CALL_METHOD(NULL, &model_instance, "__construct", &PHALCON_GLOBAL(z_null), &dependency_injector);
 		}
-		zval_ptr_dtor(&dependency_injector);
 
-		PHALCON_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
+		PHALCON_MM_CALL_METHOD(&primary_keys, &meta_data, "getprimarykeyattributes", &model_instance);
+		PHALCON_MM_ADD_ENTRY(&primary_keys);
 		if (phalcon_fast_count_ev(&primary_keys)) {
-			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_COPY)) {
-				zval_ptr_dtor(&primary_keys);
+			if (phalcon_array_isset_fetch_long(&first_primary_key, &primary_keys, 0, PH_READONLY)) {
 				/**
 				 * The PHQL contains the renamed columns if available
 				 */
-				PHALCON_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
-				zval_ptr_dtor(&model_instance);
+				PHALCON_MM_CALL_METHOD(&column_map, &meta_data, "getcolumnmap", &model_instance);
+				PHALCON_MM_ADD_ENTRY(&column_map);
 
 				if (Z_TYPE(column_map) == IS_ARRAY) {
 					if (!phalcon_array_isset_fetch(&attribute_field, &column_map, &first_primary_key, PH_COPY)) {
 						PHALCON_CONCAT_SVS(&exception_message, "Column '", &first_primary_key, "\" isn't part of the column map");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
-						zval_ptr_dtor(&column_map);
-						zval_ptr_dtor(&first_primary_key);
-						zval_ptr_dtor(&meta_data);
+						PHALCON_MM_ADD_ENTRY(&exception_message);
+						PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_query_exception_ce, &exception_message);
 						return;
 					}
-					zval_ptr_dtor(&column_map);
 				} else {
-					ZVAL_COPY(&attribute_field, &first_primary_key);
+					ZVAL_COPY_VALUE(&attribute_field, &first_primary_key);
 				}
-				zval_ptr_dtor(&first_primary_key);
 
 				PHALCON_CONCAT_SVSVSV(return_value, "[", &model, "].[", &attribute_field, "] = ", &conditions);
 				phalcon_update_property(getThis(), SL("_conditions"), return_value);
-				zval_ptr_dtor(&attribute_field);
-				zval_ptr_dtor(&meta_data);
-				return;
+				RETURN_MM();
 			}
 		}
-		zval_ptr_dtor(&primary_keys);
-		zval_ptr_dtor(&model_instance);
-		zval_ptr_dtor(&meta_data);
 
 		/**
 		 * A primary key is mandatory in these cases
 		 */
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Source related to this model does not have a primary key defined");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Source related to this model does not have a primary key defined");
 		return;
 	}
 
-	RETURN_CTOR(&conditions);
+	RETURN_MM_CTOR(&conditions);
 }
 
 /**
@@ -827,47 +825,52 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, getQuery){
 
 	zval phql = {}, bind_params = {}, bind_types = {}, dependency_injector = {}, service_name = {}, has = {}, args = {}, query = {};
 
+	PHALCON_MM_INIT();
+
 	/**
 	 * Process the PHQL
 	 */
-	PHALCON_CALL_METHOD(&phql, getThis(), "getphql");
+	PHALCON_MM_CALL_METHOD(&phql, getThis(), "getphql");
+	PHALCON_MM_ADD_ENTRY(&phql);
 
 	phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi", &PHALCON_GLOBAL(z_true));
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 	ZVAL_STR(&service_name, IS(modelsQuery));
 
-	PHALCON_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+	PHALCON_MM_CALL_METHOD(&has, &dependency_injector, "has", &service_name);
+	PHALCON_MM_ADD_ENTRY(&has);
 
 	if (zend_is_true(&has)) {;
 		array_init(&args);
 		phalcon_array_append(&args, &phql, PH_COPY);
 		phalcon_array_append(&args, &dependency_injector, PH_COPY);
+		PHALCON_MM_ADD_ENTRY(&args);
 
-		PHALCON_CALL_METHOD(&query, &dependency_injector, "get", &service_name, &args);
-		zval_ptr_dtor(&args);
+		PHALCON_MM_CALL_METHOD(&query, &dependency_injector, "get", &service_name, &args);
+		PHALCON_MM_ADD_ENTRY(&query);
 	} else {
 		object_init_ex(&query, phalcon_mvc_model_query_ce);
-		PHALCON_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
+		PHALCON_MM_ADD_ENTRY(&query);
+		PHALCON_MM_CALL_METHOD(NULL, &query, "__construct", &phql, &dependency_injector);
 	}
-	zval_ptr_dtor(&dependency_injector);
-	zval_ptr_dtor(&phql);
 
 	/**
 	 * Set default bind params
 	 */
 	if (Z_TYPE(bind_params) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
+		PHALCON_MM_CALL_METHOD(NULL, &query, "setbindparams", &bind_params);
 	}
 
 	/**
 	 * Set default bind params
 	 */
 	if (Z_TYPE(bind_types) == IS_ARRAY) {
-		PHALCON_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
+		PHALCON_MM_CALL_METHOD(NULL, &query, "setbindtypes", &bind_types);
 	}
 
-	RETVAL_ZVAL(&query, 0, 0);
+	RETURN_MM_CTOR(&query);
 }

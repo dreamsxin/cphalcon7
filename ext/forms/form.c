@@ -555,7 +555,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 2, &data, &entity, &whitelist);
+	phalcon_fetch_params(1, 1, 2, &data, &entity, &whitelist);
 
 	if (!entity) {
 		entity = &PHALCON_GLOBAL(z_null);
@@ -565,24 +565,26 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		whitelist = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "setentity", entity);
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "setentity", entity);
 
 	phalcon_read_property(&elements, getThis(), SL("_elements"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(elements) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "There are no elements in the form");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_forms_exception_ce, "There are no elements in the form");
 		return;
 	}
 
 	ZVAL_STR(&service_name, IS(filter));
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	PHALCON_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
+	PHALCON_MM_VERIFY_INTERFACE(&dependency_injector, phalcon_diinterface_ce);
 
-	PHALCON_CALL_METHOD(&filter, &dependency_injector, "getshared", &service_name);
-	PHALCON_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
-	zval_ptr_dtor(&dependency_injector);
+	PHALCON_MM_CALL_METHOD(&filter, &dependency_injector, "getshared", &service_name);
+	PHALCON_MM_ADD_ENTRY(&filter);
+	PHALCON_MM_VERIFY_INTERFACE(&filter, phalcon_filterinterface_ce);
 
 	array_init(&filter_data);
+	PHALCON_MM_ADD_ENTRY(&filter_data);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(data), idx, str_key, value) {
 		zval key = {}, element = {}, filters = {}, filtered_value = {}, method = {};
@@ -608,31 +610,30 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		/**
 		 * Check if the method has filters
 		 */
-		PHALCON_CALL_METHOD(&filters, &element, "getfilters");
+		PHALCON_MM_CALL_METHOD(&filters, &element, "getfilters");
+		PHALCON_MM_ADD_ENTRY(&filters);
 		if (zend_is_true(&filters)) {
 			/**
 			 * Sanitize the filters
 			 */
-			PHALCON_CALL_METHOD(&filtered_value, &filter, "sanitize", value, &filters);
+			PHALCON_MM_CALL_METHOD(&filtered_value, &filter, "sanitize", value, &filters);
+			PHALCON_MM_ADD_ENTRY(&filtered_value);
 		} else {
-			ZVAL_COPY(&filtered_value, value);
+			ZVAL_COPY_VALUE(&filtered_value, value);
 		}
-		zval_ptr_dtor(&filters);
 
 		if (Z_TYPE_P(entity) == IS_OBJECT) {
 			PHALCON_CONCAT_SV(&method, "set", &key);
+			PHALCON_MM_ADD_ENTRY(&method);
 			zend_str_tolower(Z_STRVAL(method), Z_STRLEN(method));
 
 			/**
 			 * Use the setter if any available
 			 */
 			if (phalcon_method_exists(entity, &method) == SUCCESS) {
-				PHALCON_CALL_METHOD(NULL, entity, Z_STRVAL(method), &filtered_value);
-				zval_ptr_dtor(&method);
-				zval_ptr_dtor(&filtered_value);
+				PHALCON_MM_CALL_METHOD(NULL, entity, Z_STRVAL(method), &filtered_value);
 				continue;
 			}
-			zval_ptr_dtor(&method);
 
 			/**
 			 * Use the public property if it doesn't have a setter
@@ -641,13 +642,11 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 		} else {
 			phalcon_array_update(&filter_data, &key, &filtered_value, PH_COPY);
 		}
-		zval_ptr_dtor(&filtered_value);
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&filter);
 
 	phalcon_update_property(getThis(), SL("_filterData"), &filter_data);
 	phalcon_update_property(getThis(), SL("_data"), data);
-	zval_ptr_dtor(&filter_data);
+	RETURN_MM();
 }
 
 /**

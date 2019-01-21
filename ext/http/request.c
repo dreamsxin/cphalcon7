@@ -551,7 +551,7 @@ PHP_METHOD(Phalcon_Http_Request, getParam){
 
 	zval *param, *filters = NULL, *default_value = NULL, dependency_injector = {}, service = {}, dispatcher = {};
 
-	phalcon_fetch_params(0, 1, 2, &param, &filters, &default_value);
+	phalcon_fetch_params(1, 1, 2, &param, &filters, &default_value);
 
 	if (!filters) {
 		filters = &PHALCON_GLOBAL(z_null);
@@ -561,17 +561,20 @@ PHP_METHOD(Phalcon_Http_Request, getParam){
 		default_value = &PHALCON_GLOBAL(z_null);
 	}
 
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_http_request_exception_ce, "A dependency injection object is required to access the 'filter' service");
 		return;
 	}
 
 	ZVAL_STR(&service, IS(dispatcher));
 
-	PHALCON_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
+	PHALCON_MM_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
+	PHALCON_MM_ADD_ENTRY(&dispatcher);
 
-	PHALCON_CALL_METHOD(NULL, &dispatcher, "getparam", param, filters, default_value);
+	PHALCON_MM_CALL_METHOD(NULL, &dispatcher, "getparam", param, filters, default_value);
+	RETURN_MM();
 }
 
 /**

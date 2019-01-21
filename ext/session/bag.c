@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -166,24 +167,29 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 
 	zval session = {}, dependency_injector = {}, service = {}, name = {}, data = {};
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&session, getThis(), SL("_session"), PH_READONLY);
 	if (Z_TYPE(session) != IS_OBJECT) {
-		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_session_exception_ce, "A dependency injection object is required to access the 'session' service");
 			return;
 		}
 
 		ZVAL_STR(&service, IS(session));
 
-		PHALCON_CALL_METHOD(&session, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
+		PHALCON_MM_CALL_METHOD(&session, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&session);
+		PHALCON_MM_VERIFY_INTERFACE(&session, phalcon_session_adapterinterface_ce);
 		phalcon_update_property(getThis(), SL("_session"), &session);
 	}
 
 	phalcon_read_property(&name, getThis(), SL("_name"), PH_READONLY);
 
-	PHALCON_CALL_METHOD(&data, &session, "__get", &name);
+	PHALCON_MM_CALL_METHOD(&data, &session, "__get", &name);
+	PHALCON_MM_ADD_ENTRY(&data);
 
 	if (Z_TYPE(data) != IS_ARRAY) {
 		phalcon_update_property_empty_array(getThis(), SL("_data"));
@@ -192,6 +198,7 @@ PHP_METHOD(Phalcon_Session_Bag, initialize){
 	}
 
 	phalcon_update_property_bool(getThis(), SL("_initialized"), 1);
+	RETURN_MM();
 }
 
 /**
@@ -279,7 +286,7 @@ PHP_METHOD(Phalcon_Session_Bag, get){
 
 	/* Retrieve the data */
 	phalcon_read_property(&data, getThis(), SL("_data"), PH_NOISY|PH_READONLY);
-	if (phalcon_array_isset_fetch(&value, &data, property, 0)) {
+	if (phalcon_array_isset_fetch(&value, &data, property, PH_READONLY)) {
 		RETURN_CTOR(&value);
 	}
 

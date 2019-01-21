@@ -184,10 +184,10 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	zval expire = {}, path = {}, secure = {}, domain = {}, http_only = {}, cookies = {}, encryption = {};
 	zval dependency_injector = {}, cookie = {}, registered = {}, service = {}, response = {};
 
-	phalcon_fetch_params(0, 1, 6, &name, &value, &_expire, &_path, &_secure, &_domain, &_http_only);
+	phalcon_fetch_params(1, 1, 6, &name, &value, &_expire, &_path, &_secure, &_domain, &_http_only);
 
 	if (Z_TYPE_P(name) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "The cookie name must be string");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "The cookie name must be string");
 		return;
 	}
 
@@ -227,40 +227,41 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY|PH_READONLY);
-	PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 	/**
 	 * Check if the cookie needs to be updated or
 	 */
 	if (!phalcon_array_isset_fetch(&cookie, &cookies, name, PH_READONLY)) {
 		object_init_ex(&cookie, phalcon_http_cookie_ce);
+		PHALCON_MM_ADD_ENTRY(&cookie);
 
-		PHALCON_CALL_METHOD(NULL, &cookie, "__construct", name, value, &expire, &path, &secure, &domain, &http_only);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "__construct", name, value, &expire, &path, &secure, &domain, &http_only);
 
 		/**
 		 * Pass the DI to created cookies
 		 */
-		PHALCON_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
 
 		/**
 		 * Enable encryption in the cookie
 		 */
 		if (zend_is_true(&encryption)) {
-			PHALCON_CALL_METHOD(NULL, &cookie, "useencryption", &encryption);
+			PHALCON_MM_CALL_METHOD(NULL, &cookie, "useencryption", &encryption);
 		}
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, &cookie);
-		zval_ptr_dtor(&cookie);
 	} else {
 		/**
 		 * Override any settings in the cookie
 		 */
-		PHALCON_CALL_METHOD(NULL, &cookie, "setvalue", value);
-		PHALCON_CALL_METHOD(NULL, &cookie, "setexpiration", &expire);
-		PHALCON_CALL_METHOD(NULL, &cookie, "setpath", &path);
-		PHALCON_CALL_METHOD(NULL, &cookie, "setsecure", &secure);
-		PHALCON_CALL_METHOD(NULL, &cookie, "setdomain", &domain);
-		PHALCON_CALL_METHOD(NULL, &cookie, "sethttponly", &http_only);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setvalue", value);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setexpiration", &expire);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setpath", &path);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setsecure", &secure);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setdomain", &domain);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "sethttponly", &http_only);
 	}
 
 	/**
@@ -269,25 +270,24 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, set){
 	phalcon_read_property(&registered, getThis(), SL("_registered"), PH_NOISY|PH_READONLY);
 	if (PHALCON_IS_FALSE(&registered)) {
 		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'response' service");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "A dependency injection object is required to access the 'response' service");
 			return;
 		}
 
 		ZVAL_STR(&service, IS(response));
 
-		PHALCON_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
-		PHALCON_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
+		PHALCON_MM_CALL_METHOD(&response, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&response);
+		PHALCON_MM_VERIFY_INTERFACE(&response, phalcon_http_responseinterface_ce);
 
 		/**
 		 * Pass the cookies bag to the response so it can send the headers at the of the
 		 * request
 		 */
-		PHALCON_CALL_METHOD(NULL, &response, "setcookies", getThis());
-		zval_ptr_dtor(&response);
+		PHALCON_MM_CALL_METHOD(NULL, &response, "setcookies", getThis());
 	}
-	zval_ptr_dtor(&dependency_injector);
 
-	RETURN_THIS();
+	RETURN_MM_THIS();
 }
 
 /**
@@ -300,10 +300,10 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 
 	zval *name, cookies = {}, dependency_injector = {}, encryption = {};
 
-	phalcon_fetch_params(0, 1, 0, &name);
+	phalcon_fetch_params(1, 1, 0, &name);
 
 	if (Z_TYPE_P(name) != IS_STRING) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "The cookie name must be string");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_http_cookie_exception_ce, "The cookie name must be string");
 		return;
 	}
 
@@ -313,21 +313,22 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, get){
 		 * Create the cookie if the it does not exist
 		 */
 		object_init_ex(return_value, phalcon_http_cookie_ce);
-		PHALCON_CALL_METHOD(NULL, return_value, "__construct", name);
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", name);
 
-		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 		if (Z_TYPE(dependency_injector) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(NULL, return_value, "setdi", &dependency_injector);
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "setdi", &dependency_injector);
 
 			phalcon_read_property(&encryption, getThis(), SL("_useEncryption"), PH_NOISY|PH_READONLY);
 			if (zend_is_true(&encryption)) {
-				PHALCON_CALL_METHOD(NULL, return_value, "useencryption", &encryption);
+				PHALCON_MM_CALL_METHOD(NULL, return_value, "useencryption", &encryption);
 			}
 		}
-		zval_ptr_dtor(&dependency_injector);
 
 		phalcon_update_property_array(getThis(), SL("_cookies"), name, return_value);
 	}
+	RETURN_MM();
 }
 
 /**
@@ -365,7 +366,7 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 
 	zval *name, cookies = {}, cookie = {}, *_COOKIE, dependency_injector = {};
 
-	phalcon_fetch_params(0, 1, 0, &name);
+	phalcon_fetch_params(1, 1, 0, &name);
 
 	phalcon_read_property(&cookies, getThis(), SL("_cookies"), PH_NOISY|PH_READONLY);
 
@@ -373,26 +374,27 @@ PHP_METHOD(Phalcon_Http_Response_Cookies, delete){
 	 * Check the internal bag
 	 */
 	if (phalcon_array_isset_fetch(&cookie, &cookies, name, PH_READONLY)) {
-		PHALCON_CALL_METHOD(NULL, &cookie, "delete");
-		RETURN_TRUE;
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "delete");
+		RETURN_MM_TRUE;
 	}
 
 	_COOKIE = phalcon_get_global_str(SL("_COOKIE"));
 	if (phalcon_array_isset(_COOKIE, name)) {
-		PHALCON_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
 
 		object_init_ex(&cookie, phalcon_http_cookie_ce);
+		PHALCON_MM_ADD_ENTRY(&cookie);
 
-		PHALCON_CALL_METHOD(NULL, &cookie, "__construct", name);
-		PHALCON_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
-		PHALCON_CALL_METHOD(NULL, &cookie, "restore");
-		PHALCON_CALL_METHOD(NULL, &cookie, "delete");
-		zval_ptr_dtor(&cookie);
-		zval_ptr_dtor(&dependency_injector);
-		RETURN_TRUE;
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "__construct", name);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "setdi", &dependency_injector);
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "restore");
+		PHALCON_MM_CALL_METHOD(NULL, &cookie, "delete");
+
+		RETURN_MM_TRUE;
 	}
 
-	RETURN_FALSE;
+	RETURN_MM_FALSE;
 }
 
 /**

@@ -273,6 +273,14 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 
 		PHALCON_MM_ZVAL_STRING(&option, "content");
 		PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &data);
+
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			zval debug_message = {};
+			ZVAL_STRING(&debug_message, "HTTP REQUEST BODY:");
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_DEBUG_LOG(&data);
+		}
 	} else {
 
 		PHALCON_MM_CALL_FUNCTION(&uniqid, "uniqid");
@@ -336,11 +344,26 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 			PHALCON_MM_ZVAL_STRING(&option, "content");
 			PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &body);
 		}
+		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+			zval debug_message = {};
+			ZVAL_STRING(&debug_message, "HTTP REQUEST BODY:");
+			PHALCON_DEBUG_LOG(&debug_message);
+			zval_ptr_dtor(&debug_message);
+			PHALCON_DEBUG_LOG(&body);
+		}
 	}
 	ZVAL_LONG(&option, PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
 
 	PHALCON_MM_CALL_METHOD(&headers, &header, "build", &option);
 	PHALCON_MM_ADD_ENTRY(&headers);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		zval debug_message = {};
+		ZVAL_STRING(&debug_message, "HTTP REQUEST HEADERS:");
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+		PHALCON_DEBUG_LOG(&headers);
+	}
 
 	PHALCON_MM_ZVAL_STRING(&option, "header");
 	PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &headers);
@@ -373,6 +396,13 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 	PHALCON_MM_ADD_ENTRY(&uri);
 	PHALCON_MM_CALL_METHOD(&url, &uri, "build");
 	PHALCON_MM_ADD_ENTRY(&url);
+
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		zval debug_message = {};
+		PHALCON_CONCAT_SV(&debug_message, "HTTP REQUEST URL: ", &url);
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+	}
 
 	PHALCON_MM_ZVAL_STRING(&http, "http");
 	PHALCON_MM_ZVAL_STRING(&option, "method");

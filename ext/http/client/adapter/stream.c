@@ -353,58 +353,63 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, sendInternal)
 	zval stream = {}, header = {}, method = {}, useragent = {}, timeout = {}, uri = {}, url = {}, http = {}, option = {}, handler = {};
 	zval fp = {}, meta = {}, wrapper_data = {}, bodystr = {}, response = {};
 
+	PHALCON_MM_INIT();
+
 	phalcon_read_property(&stream, getThis(), SL("_stream"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&header, getThis(), SL("_header"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&useragent, getThis(), SL("_useragent"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&timeout, getThis(), SL("_timeout"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_METHOD(&uri, getThis(), "geturi");
-	PHALCON_CALL_METHOD(&url, &uri, "build");
-	zval_ptr_dtor(&uri);
+	PHALCON_MM_CALL_METHOD(&uri, getThis(), "geturi");
+	PHALCON_MM_ADD_ENTRY(&uri);
+	PHALCON_MM_CALL_METHOD(&url, &uri, "build");
+	PHALCON_MM_ADD_ENTRY(&url);
 
-	ZVAL_STRING(&http, "http");
-	ZVAL_STRING(&option, "method");
+	PHALCON_MM_ZVAL_STRING(&http, "http");
+	PHALCON_MM_ZVAL_STRING(&option, "method");
 
-	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &method);
+	PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &method);
 
 	if (PHALCON_IS_NOT_EMPTY(&useragent)) {
-		ZVAL_STRING(&option, "User-Agent");
-
-		PHALCON_CALL_METHOD(NULL, &header, "set", &option, &useragent);
-
-		PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &useragent);
+		PHALCON_MM_ZVAL_STRING(&option, "User-Agent");
+		PHALCON_MM_CALL_METHOD(NULL, &header, "set", &option, &useragent);
+		PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &useragent);
 	}
 
-	ZVAL_STRING(&option, "timeout");
+	PHALCON_MM_ZVAL_STRING(&option, "timeout");
 
-	PHALCON_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &timeout);
+	PHALCON_MM_CALL_FUNCTION(NULL, "stream_context_set_option", &stream, &http, &option, &timeout);
 
-	PHALCON_CALL_SELF(NULL, "buildBody");
+	PHALCON_MM_CALL_SELF(NULL, "buildBody");
 
 	array_init_size(&handler, 2);
 	phalcon_array_append(&handler, getThis(), PH_COPY);
 	add_next_index_stringl(&handler, SL("errorHandler"));
+	PHALCON_MM_ADD_ENTRY(&handler);
 
-	PHALCON_CALL_FUNCTION(NULL, "set_error_handler", &handler);
+	PHALCON_MM_CALL_FUNCTION(NULL, "set_error_handler", &handler);
 
-	ZVAL_STRING(&option, "r");
-	PHALCON_CALL_FUNCTION(&fp, "fopen", &url, &option, &PHALCON_GLOBAL(z_false), &stream);
+	PHALCON_MM_ZVAL_STRING(&option, "r");
+	PHALCON_MM_CALL_FUNCTION(&fp, "fopen", &url, &option, &PHALCON_GLOBAL(z_false), &stream);
 
-	PHALCON_CALL_FUNCTION(NULL, "restore_error_handler");
+	PHALCON_MM_CALL_FUNCTION(NULL, "restore_error_handler");
 
-	PHALCON_CALL_FUNCTION(&meta, "stream_get_meta_data", &fp);
-	PHALCON_CALL_FUNCTION(&bodystr, "stream_get_contents", &fp);
-	PHALCON_CALL_FUNCTION(NULL, "fclose", &fp);
+	PHALCON_MM_CALL_FUNCTION(&meta, "stream_get_meta_data", &fp);
+	PHALCON_MM_ADD_ENTRY(&meta);
+	PHALCON_MM_CALL_FUNCTION(&bodystr, "stream_get_contents", &fp);
+	PHALCON_MM_ADD_ENTRY(&bodystr);
+	PHALCON_MM_CALL_FUNCTION(NULL, "fclose", &fp);
 
 	object_init_ex(&response, phalcon_http_client_response_ce);
-	PHALCON_CALL_METHOD(NULL, &response, "__construct");
+	PHALCON_MM_ADD_ENTRY(&response);
+	PHALCON_MM_CALL_METHOD(NULL, &response, "__construct");
 
 	if (phalcon_array_isset_fetch_str(&wrapper_data, &meta, SL("wrapper_data"), PH_READONLY)) {
-		PHALCON_CALL_METHOD(NULL, &response, "setHeader", &wrapper_data);
+		PHALCON_MM_CALL_METHOD(NULL, &response, "setHeader", &wrapper_data);
 	}
 
-	PHALCON_CALL_METHOD(NULL, &response, "setbody", &bodystr);
+	PHALCON_MM_CALL_METHOD(NULL, &response, "setbody", &bodystr);
 
-	RETURN_CTOR(&response);
+	RETURN_MM_CTOR(&response);
 }

@@ -409,7 +409,7 @@ PHP_METHOD(Phalcon_Validation, add){
 				PHALCON_MM_ZVAL_COPY(&class_name, &name);
 			}
 
-			PHALCON_MM_CALL_METHOD(&object, getThis(), "getresolveservice", &class_name, &options);
+			PHALCON_MM_CALL_METHOD(&object, getThis(), "getresolveservice", &class_name, &options, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true));
 			PHALCON_MM_ADD_ENTRY(&object);
 			if (Z_TYPE(object) != IS_OBJECT) {
 				PHALCON_MM_THROW_EXCEPTION_FORMAT(phalcon_validation_exception_ce, "Validator %s is invalid", Z_STRVAL(name));

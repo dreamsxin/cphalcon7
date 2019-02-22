@@ -33,6 +33,8 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_transactioninterface_rollback, 0, 0, 0)
 	ZEND_ARG_INFO(0, rollbackMessage)
 	ZEND_ARG_INFO(0, rollbackRecord)
+	ZEND_ARG_INFO(0, rollbackCode)
+	ZEND_ARG_INFO(0, throwError)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_transactioninterface_setisnewtransaction, 0, 0, 1)

@@ -83,6 +83,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, isManaged);
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, getMessages);
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, isValid);
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackedRecord);
+PHP_METHOD(Phalcon_Mvc_Model_Transaction, getRollbackedRecord);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_transaction___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, dependencyInjector)
@@ -103,6 +104,7 @@ static const zend_function_entry phalcon_mvc_model_transaction_method_entry[] = 
 	PHP_ME(Phalcon_Mvc_Model_Transaction, getMessages, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Transaction, isValid, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Transaction, setRollbackedRecord, arginfo_phalcon_mvc_model_transactioninterface_setrollbackedrecord, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Transaction, getRollbackedRecord, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -215,13 +217,15 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, commit){
  *
  * @param  string $rollbackMessage
  * @param  Phalcon\Mvc\ModelInterface $rollbackRecord
+ * @param  int $rollbackCode
+ * @param  boolean $noThrowError
  * @return boolean
  */
 PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 
-	zval *message = NULL, *_rollback_record = NULL, *rollback_code = NULL, rollback_record = {}, rollback_message = {}, manager = {}, connection = {}, success = {}, i0 = {};
+	zval *message = NULL, *_rollback_record = NULL, *rollback_code = NULL, *nothrowerror = NULL, rollback_record = {}, rollback_message = {}, manager = {}, connection = {}, success = {}, i0 = {};
 
-	phalcon_fetch_params(0, 0, 4, &message, &rollback_record, &rollback_code);
+	phalcon_fetch_params(0, 0, 4, &message, &rollback_record, &rollback_code, &nothrowerror);
 
 	if (!message || !zend_is_true(message)) {
 		ZVAL_STRING(&rollback_message, "Transaction aborted");
@@ -239,6 +243,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 		rollback_code = &PHALCON_GLOBAL(z_zero);
 	}
 
+	if (!nothrowerror) {
+		nothrowerror = &PHALCON_GLOBAL(z_false);
+	}
+
 	phalcon_read_property(&manager, getThis(), SL("_manager"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(manager) == IS_OBJECT) {
 		PHALCON_CALL_METHOD(NULL, &manager, "notifyrollback", getThis());
@@ -248,7 +256,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, rollback){
 
 	PHALCON_CALL_METHOD(&success, &connection, "rollback");
 
-	if (zend_is_true(&success)) {
+	if (!zend_is_true(nothrowerror) && zend_is_true(&success)) {
 		object_init_ex(&i0, phalcon_mvc_model_transaction_failed_ce);
 		PHALCON_CALL_METHOD(NULL, &i0, "__construct", &rollback_message, &rollback_record, rollback_code);
 		phalcon_throw_exception(&i0);
@@ -361,5 +369,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, setRollbackedRecord){
 	phalcon_fetch_params(0, 1, 0, &record);
 
 	phalcon_update_property(getThis(), SL("_rollbackRecord"), record);
+
+}
+
+/**
+ * Gets object which generates rollback action
+ *
+ * @return Phalcon\Mvc\ModelInterface
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Transaction, getRollbackedRecord){
+
+
+	RETURN_MEMBER(getThis(), "_rollbackRecord");
 
 }

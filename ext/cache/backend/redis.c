@@ -325,10 +325,10 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 	 */
 	if (!lifetime || Z_TYPE_P(lifetime) != IS_LONG) {
 		PHALCON_MM_CALL_METHOD(&ttl, getThis(), "getlifetime");
+		PHALCON_MM_ADD_ENTRY(&ttl);
 	} else {
-		ZVAL_COPY(&ttl, lifetime);
+		ZVAL_COPY_VALUE(&ttl, lifetime);
 	}
-	PHALCON_MM_ADD_ENTRY(&ttl);
 
 	if (phalcon_is_numeric(&cached_content)) {
 		PHALCON_MM_CALL_METHOD(&success, &redis, "set", &prefixed_key, &cached_content);
@@ -341,6 +341,11 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		PHALCON_MM_ADD_ENTRY(&prepared_content);
 		PHALCON_MM_CALL_METHOD(&success, &redis, "set", &prefixed_key, &prepared_content);
 		PHALCON_MM_ADD_ENTRY(&success);
+	}
+
+	if (!zend_is_true(&success)) {
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_cache_exception_ce, "Failed to store data in redisd");
+		return;
 	}
 
 	if (zend_is_true(&ttl)) {

@@ -57,6 +57,7 @@ zend_class_entry *phalcon_mvc_model_metadata_ce;
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, _initialize);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, setStrategy);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy);
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, getCacheKey);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex);
@@ -93,10 +94,17 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getRealAttribute);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, isEmpty);
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, reset);
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_metadata_getcachekey, 0, 0, 3)
+	ZEND_ARG_INFO(0, model)
+	ZEND_ARG_INFO(0, table)
+	ZEND_ARG_INFO(0, schema)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_metadata_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_MetaData, _initialize, NULL, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, setStrategy, arginfo_phalcon_mvc_model_metadatainterface_setstrategy, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, getStrategy, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData, getCacheKey, arginfo_phalcon_mvc_model_metadata_getcachekey, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, readMetaData, arginfo_phalcon_mvc_model_metadatainterface_readmetadata, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, readMetaDataIndex, arginfo_phalcon_mvc_model_metadatainterface_readmetadataindex, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex, arginfo_phalcon_mvc_model_metadatainterface_writemetadataindex, ZEND_ACC_PUBLIC)
@@ -332,6 +340,54 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
 }
 
 /**
+ * Return the meta data cache key
+ *
+ * @param Phalcon\Mvc\Model model
+ * @param string table
+ * @param string schema
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_MetaData, getCacheKey){
+
+	zval *model, *table, *schema, key = {}, event_name = {};
+
+	phalcon_fetch_params(1, 3, 0, &model, &table, &schema);
+	PHALCON_MM_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
+
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeGetCacheKey");
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, model);
+
+	if (Z_TYPE_P(return_value) == IS_STRING) {
+		RETURN_MM();
+	}
+
+	if (phalcon_method_exists_ex(model, SL("getcachekey")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(&key, model, "getcachekey");
+		PHALCON_MM_ADD_ENTRY(&key);
+	}
+
+	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
+		zval class_name = {};
+		phalcon_get_class(&class_name, model, 1);
+		PHALCON_MM_ADD_ENTRY(&class_name);
+
+		/**
+		 * Unique key for meta-data is created using class-name-schema-table
+		 */
+		PHALCON_CONCAT_VSVV(&key, &class_name, "-", schema, table);
+		PHALCON_MM_ADD_ENTRY(&key);
+	}
+
+	PHALCON_MM_ZVAL_STRING(&event_name, "afterGetCacheKey");
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &key);
+
+	if (Z_TYPE_P(return_value) == IS_STRING) {
+		RETURN_MM();
+	}
+	RETURN_MM_CTOR(&key);
+}
+
+/**
  * Reads the complete meta-data for certain model
  *
  *<code>
@@ -343,7 +399,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getStrategy){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 
-	zval *model, table = {}, schema = {}, class_name = {}, key = {}, meta_data = {};
+	zval *model, table = {}, schema = {}, key = {}, meta_data = {};
 
 	phalcon_fetch_params(1, 1, 0, &model);
 	PHALCON_MM_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
@@ -353,21 +409,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
 	PHALCON_MM_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_MM_ADD_ENTRY(&schema);
 
-	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
-
-	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
-		phalcon_get_class(&class_name, model, 1);
-		PHALCON_MM_ADD_ENTRY(&class_name);
-
-		/**
-		 * Unique key for meta-data is created using class-name-schema-table
-		 */
-		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
+	PHALCON_MM_CALL_METHOD(&key, getThis(), "getcachekey", model, &table, &schema);
+	PHALCON_MM_ADD_ENTRY(&key);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
@@ -394,7 +437,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaData){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 
-	zval *model, *index, table = {}, schema = {}, class_name = {}, key = {}, meta_data = {}, meta_data_index = {};
+	zval *model, *index, table = {}, schema = {}, key = {}, meta_data = {}, meta_data_index = {};
 
 	phalcon_fetch_params(1, 2, 0, &model, &index);
 	PHALCON_MM_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
@@ -405,21 +448,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
 	PHALCON_MM_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_MM_ADD_ENTRY(&schema);
 
-	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
-
-	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
-		phalcon_get_class(&class_name, model, 1);
-		PHALCON_MM_ADD_ENTRY(&class_name);
-
-		/**
-		 * Unique key for meta-data is created using class-name-schema-table
-		 */
-		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
+	PHALCON_MM_CALL_METHOD(&key, getThis(), "getcachekey", model, &table, &schema);
+	PHALCON_MM_ADD_ENTRY(&key);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 
@@ -448,7 +478,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 
-	zval *model, *index, *data, *replace, table = {}, schema = {}, class_name = {}, key = {}, meta_data = {}, arr = {}, value = {}, *v;
+	zval *model, *index, *data, *replace, table = {}, schema = {}, key = {}, meta_data = {}, arr = {}, value = {}, *v;
 	zend_string *str_key;
 	ulong idx;
 
@@ -470,21 +500,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
 	PHALCON_MM_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_MM_ADD_ENTRY(&schema);
 
-	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
-
-	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
-		phalcon_get_class(&class_name, model, 1);
-		PHALCON_MM_ADD_ENTRY(&class_name);
-
-		/**
-		 * Unique key for meta-data is created using class-name-schema-table
-		 */
-		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
+	PHALCON_MM_CALL_METHOD(&key, getThis(), "getcachekey", model, &table, &schema);
+	PHALCON_MM_ADD_ENTRY(&key);
 
 	phalcon_read_property(&meta_data, getThis(), SL("_metaData"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&meta_data, &key)) {
@@ -526,7 +543,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, writeMetaDataIndex){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 
-	zval *model, table = {}, schema = {}, class_name = {}, key = {}, column_map = {}, data = {};
+	zval *model, table = {}, schema = {}, key = {}, column_map = {}, data = {};
 
 	phalcon_fetch_params(1, 1, 0, &model);
 	PHALCON_MM_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
@@ -536,21 +553,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
 	PHALCON_MM_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_MM_ADD_ENTRY(&schema);
 
-	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
-
-	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
-		phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
-		PHALCON_MM_ADD_ENTRY(&class_name);
-
-		/**
-		 * Unique key for map is created using class-name-schema-table
-		 */
-		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
+	PHALCON_MM_CALL_METHOD(&key, getThis(), "getcachekey", model, &table, &schema);
+	PHALCON_MM_ADD_ENTRY(&key);
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {
@@ -575,7 +579,7 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMap){
  */
 PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 
-	zval *model, *index, table = {}, schema = {}, class_name = {}, key = {}, column_map = {}, column_map_model = {}, attributes = {};
+	zval *model, *index, table = {}, schema = {}, key = {}, column_map = {}, column_map_model = {}, attributes = {};
 
 	phalcon_fetch_params(1, 2, 0, &model, &index);
 	PHALCON_MM_VERIFY_INTERFACE_EX(model, phalcon_mvc_modelinterface_ce, phalcon_mvc_model_exception_ce);
@@ -586,21 +590,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, readColumnMapIndex){
 	PHALCON_MM_CALL_METHOD(&schema, model, "getschema");
 	PHALCON_MM_ADD_ENTRY(&schema);
 
-	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
-
-	if (Z_TYPE(key) != IS_STRING || PHALCON_IS_EMPTY(&key)) {
-		phalcon_get_class(&class_name, model, 1 TSRMLS_CC);
-		PHALCON_MM_ADD_ENTRY(&class_name);
-
-		/**
-		 * Unique key for map is created using class-name-schema-table
-		 */
-		PHALCON_CONCAT_VSVV(&key, &class_name, "-", &schema, &table);
-		PHALCON_MM_ADD_ENTRY(&key);
-	}
+	PHALCON_MM_CALL_METHOD(&key, getThis(), "getcachekey", model, &table, &schema);
+	PHALCON_MM_ADD_ENTRY(&key);
 
 	phalcon_read_property(&column_map, getThis(), SL("_columnMap"), PH_NOISY|PH_READONLY);
 	if (!phalcon_array_isset(&column_map, &key)) {

@@ -7032,7 +7032,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 	zval *value;
 	zend_string *key;
 
-	phalcon_fetch_params(0, 0, 3, &columns, &must_column, &negate);
+	phalcon_fetch_params(1, 0, 3, &columns, &must_column, &negate);
 
 	if (!columns) {
 		columns = &PHALCON_GLOBAL(z_null);
@@ -7046,18 +7046,19 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		negate = &PHALCON_GLOBAL(z_false);
 	}
 
-	ZVAL_STRING(&event_name, "beforeToArray");
-	PHALCON_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
-	zval_ptr_dtor(&event_name);
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeToArray");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	array_init(&data);
+	PHALCON_MM_ADD_ENTRY(&data);
 
 	if (zend_is_true(must_column)) {
 		zval *attribute;
 		/**
 		 * Reverse column map
 		 */
-		PHALCON_CALL_SELF(&column_map, "getcolumnmap");
+		PHALCON_MM_CALL_SELF(&column_map, "getcolumnmap");
+		PHALCON_MM_ADD_ENTRY(&column_map);
 
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(column_map), attribute) {
 			zval attribute_value = {};
@@ -7078,16 +7079,16 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 				zval possible_getter = {};
 				PHALCON_CONCAT_SV(&possible_getter, "__get", attribute);
 				phalcon_strtolower_inplace(&possible_getter);
+				PHALCON_MM_ADD_ENTRY(&possible_getter);
 				if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
 					zval possible_value = {};
-					PHALCON_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
+					PHALCON_MM_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
 					phalcon_array_update(&data, attribute, &possible_value, 0);
 				} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute, PH_READONLY)) {
 					phalcon_array_update(&data, attribute, &attribute_value, PH_COPY);
 				} else {
 					phalcon_array_update(&data, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
 				}
-				zval_ptr_dtor(&possible_getter);
 			} else if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute, PH_READONLY)) {
 				phalcon_array_update(&data, attribute, &attribute_value, PH_COPY);
 			} else {
@@ -7098,7 +7099,8 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		/**
 		 * Reverse column map
 		 */
-		PHALCON_CALL_SELF(&column_map, "getreversecolumnmap");
+		PHALCON_MM_CALL_SELF(&column_map, "getreversecolumnmap");
+		PHALCON_MM_ADD_ENTRY(&column_map);
 
 		properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
 
@@ -7108,9 +7110,11 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 				if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
 					value = Z_REFVAL_P(value);
 				}
+				/*
 				if (Z_REFCOUNTED_P(value)) {
 					Z_ADDREF_P(value);
 				}
+				*/
 				if (ZSTR_VAL(key)[0] == 0) {
 					const char *prop_name, *class_name;
 					size_t prop_len;
@@ -7119,6 +7123,7 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 				} else {
 					ZVAL_STR(&field, zend_string_dup(key, 0));
 				}
+				PHALCON_MM_ADD_ENTRY(&field);
 
 				if (Z_TYPE_P(columns) == IS_ARRAY) {
 					if (likely(!zend_is_true(negate))) {
@@ -7137,37 +7142,31 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 						zval possible_getter = {};
 						PHALCON_CONCAT_SV(&possible_getter, "__get", &field);
 						phalcon_strtolower_inplace(&possible_getter);
+						PHALCON_MM_ADD_ENTRY(&possible_getter);
 						if (phalcon_method_exists(getThis(), &possible_getter) == SUCCESS) {
 							zval possible_value = {};
-							PHALCON_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
+							PHALCON_MM_CALL_ZVAL_METHOD(&possible_value, getThis(), &possible_getter);
 							phalcon_array_update(&data, &field, &possible_value, 0);
 						} else {
 							phalcon_array_update(&data, &field, value, PH_COPY);
 						}
-						zval_ptr_dtor(&possible_getter);
 					} else {
 						phalcon_array_update(&data, &field, value, PH_COPY);
 					}
 				} else if (!zend_is_true(must_column) && phalcon_property_exists(getThis(), Z_STRVAL(field), Z_STRLEN(field), PH_DYNAMIC)) {
 					phalcon_array_update(&data, &field, value, PH_COPY);
 				}
-				zval_ptr_dtor(&field);
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	zval_ptr_dtor(&column_map);
+	PHALCON_MM_ZVAL_STRING(&event_name, "afterToArray");
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &data);
 
-	ZVAL_STRING(&event_name, "afterToArray");
-	PHALCON_CALL_METHOD(return_value, getThis(), "fireevent", &event_name, &data);
-	zval_ptr_dtor(&event_name);
-
-	if (Z_TYPE_P(return_value) != IS_ARRAY) {
-		zval_ptr_dtor(return_value);
-		RETVAL_ZVAL(&data, 0, 0);
-		return;
+	if (Z_TYPE_P(return_value) == IS_ARRAY) {
+		RETURN_MM();
 	}
-	zval_ptr_dtor(&data);
+	RETURN_MM_CTOR(&data);
 }
 
 /**

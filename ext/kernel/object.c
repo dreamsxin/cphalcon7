@@ -539,7 +539,7 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 							zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
 							zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
 						} else {
-							zend_symtable_add_new(Z_ARRVAL_P(result), key, value);
+							zend_hash_add_new(Z_ARRVAL_P(result), key, value);
 						}
 					}
 				}

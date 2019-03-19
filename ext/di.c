@@ -430,10 +430,10 @@ PHP_METHOD(Phalcon_Di, getService){
  */
 PHP_METHOD(Phalcon_Di, get){
 
-	zval *name, *parameters = NULL, *noerror = NULL, events_manager = {}, event_name = {}, event_data = {}, service = {};
+	zval *_name, *parameters = NULL, *noerror = NULL, events_manager = {}, event_name = {}, event_data = {}, name = {}, service = {};
 	zend_class_entry *ce;
 
-	phalcon_fetch_params(1, 1, 2, &name, &parameters, &noerror);
+	phalcon_fetch_params(1, 1, 2, &_name, &parameters, &noerror);
 
 	if (!parameters) {
 		parameters = &PHALCON_GLOBAL(z_null);
@@ -448,25 +448,31 @@ PHP_METHOD(Phalcon_Di, get){
 		PHALCON_MM_ZVAL_STRING(&event_name, "di:beforeServiceResolve");
 
 		array_init(&event_data);
-		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("name"), _name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 
 		PHALCON_MM_ADD_ENTRY(&event_data);
-		PHALCON_MM_CALL_METHOD(NULL, &events_manager, "fire", &event_name, getThis(), &event_data);
+
+		PHALCON_MM_CALL_METHOD(&name, &events_manager, "fire", &event_name, getThis(), &event_data);
+		PHALCON_MM_ADD_ENTRY(&name);
 	}
 
-	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), name, PH_READONLY)) {
+	if (Z_TYPE(name) != IS_STRING || !Z_STRLEN(name)) {
+		ZVAL_COPY_VALUE(&name, _name);
+	}
+
+	if (phalcon_property_array_isset_fetch(&service, getThis(), SL("_services"), &name, PH_READONLY)) {
 		PHALCON_MM_CALL_METHOD(return_value, &service, "resolve", parameters, getThis());
 		ce = (Z_TYPE_P(return_value) == IS_OBJECT) ? Z_OBJCE_P(return_value) : NULL;
 	} else {
 		/* The DI also acts as builder for any class even if it isn't defined in the DI */
-		if ((ce = phalcon_class_exists_ex(name, 1)) != NULL) {
+		if ((ce = phalcon_class_exists_ex(&name, 1)) != NULL) {
 			if (FAILURE == phalcon_create_instance_params_ce(return_value, ce, parameters)) {
 				return;
 			}
 		} else {
 			if(!zend_is_true(noerror)) {
-				zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(name));
+				zend_throw_exception_ex(phalcon_di_exception_ce, 0, "Service '%s' was not found in the dependency injection container", Z_STRVAL_P(_name));
 			}
 			RETURN_MM_NULL();
 		}
@@ -483,7 +489,7 @@ PHP_METHOD(Phalcon_Di, get){
 		PHALCON_MM_ZVAL_STRING(&event_name, "di:afterServiceResolve");
 
 		array_init(&event_data);
-		phalcon_array_update_str(&event_data, SL("name"), name, PH_COPY);
+		phalcon_array_update_str(&event_data, SL("name"), _name, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("parameters"), parameters, PH_COPY);
 		phalcon_array_update_str(&event_data, SL("instance"), return_value, PH_COPY);
 

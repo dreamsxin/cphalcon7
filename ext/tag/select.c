@@ -499,7 +499,6 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 					PHALCON_MM_ADD_ENTRY(&code);
 					zval_ptr_dtor(&v);
 				}
-				zval_ptr_dtor(&escaped);
 			} else {
 				zval array_options = {}, escaped = {};
 				phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);

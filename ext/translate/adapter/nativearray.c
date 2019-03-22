@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -111,7 +112,7 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 1, &index, &placeholders);
+	phalcon_fetch_params(1, 1, 1, &index, &placeholders);
 
 	if (!placeholders) {
 		placeholders = &PHALCON_GLOBAL(z_null);
@@ -132,14 +133,16 @@ PHP_METHOD(Phalcon_Translate_Adapter_NativeArray, query){
 			}
 
 			PHALCON_CONCAT_SVS(&key_placeholder, "%", &key, "%");
+			PHALCON_MM_ADD_ENTRY(&key_placeholder);
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
+			PHALCON_MM_ADD_ENTRY(&replaced);
 
 			ZVAL_COPY_VALUE(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CTOR(&translation);
+	RETURN_MM_CTOR(&translation);
 }
 
 /**

@@ -14,6 +14,7 @@
   +------------------------------------------------------------------------+
   | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
   |          Eduar Carvajal <eduar@phalconphp.com>                         |
+  |          ZhuZongXin <dreamsxin@qq.com>                                 |
   +------------------------------------------------------------------------+
 */
 
@@ -164,13 +165,14 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 2, &index, &placeholders, &domain);
+	phalcon_fetch_params(1, 1, 2, &index, &placeholders, &domain);
 
 	if (!domain) {
-		PHALCON_CALL_FUNCTION(&translation, "gettext", index);
+		PHALCON_MM_CALL_FUNCTION(&translation, "gettext", index);
 	} else {
-		PHALCON_CALL_FUNCTION(&translation, "dgettext", domain, index);
+		PHALCON_MM_CALL_FUNCTION(&translation, "dgettext", domain, index);
 	}
+	PHALCON_MM_ADD_ENTRY(&translation);
 
 	if (placeholders && Z_TYPE_P(placeholders) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL_P(placeholders))) {
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(placeholders), idx, str_key, value) {
@@ -182,14 +184,16 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, query){
 			}
 
 			PHALCON_CONCAT_SVS(&key_placeholder, "%", &key, "%");
+			PHALCON_MM_ADD_ENTRY(&key_placeholder);
 
 			PHALCON_STR_REPLACE(&replaced, &key_placeholder, value, &translation);
+			PHALCON_MM_ADD_ENTRY(&replaced);
 
 			ZVAL_COPY_VALUE(&translation, &replaced);
 		} ZEND_HASH_FOREACH_END();
 	}
 
-	RETURN_CTOR(&translation);
+	RETURN_MM_CTOR(&translation);
 }
 
 /**
@@ -202,17 +206,18 @@ PHP_METHOD(Phalcon_Translate_Adapter_Gettext, exists){
 
 	zval *index, *domain = NULL, translation = {};
 
-	phalcon_fetch_params(0, 1, 1, &index, &domain);
+	phalcon_fetch_params(1, 1, 1, &index, &domain);
 
 	if (!domain) {
-		PHALCON_CALL_FUNCTION(&translation, "gettext", index);
+		PHALCON_MM_CALL_FUNCTION(&translation, "gettext", index);
 	} else {
-		PHALCON_CALL_FUNCTION(&translation, "dgettext", domain, index);
+		PHALCON_MM_CALL_FUNCTION(&translation, "dgettext", domain, index);
 	}
+	PHALCON_MM_ADD_ENTRY(&translation);
 
 	if (Z_STRLEN(translation) > 0) {
-		RETURN_TRUE;
+		RETURN_MM_TRUE;
 	}
 
-	RETURN_FALSE;
+	RETURN_MM_FALSE;
 }

@@ -207,7 +207,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	zval *descriptor, connection_consecutive = {}, next_consecutive = {}, dialect_type = {}, dialect_class = {}, dialect_object = {};
 	zend_class_entry *ce0;
 
-	phalcon_fetch_params(0, 1, 0, &descriptor);
+	phalcon_fetch_params(1, 1, 0, &descriptor);
 
 	/**
 	 * Every new connection created obtain a consecutive number from the static
@@ -222,10 +222,11 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	/**
 	 * Dialect class can override the default dialectwo
 	 */
-	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"), PH_COPY)) {
+	if (!phalcon_array_isset_fetch_str(&dialect_class, descriptor, SL("dialectClass"), PH_READONLY)) {
 		phalcon_read_property(&dialect_type, getThis(), SL("_dialectType"), PH_NOISY|PH_READONLY);
 
 		PHALCON_CONCAT_SV(&dialect_class, "phalcon\\db\\dialect\\", &dialect_type);
+		PHALCON_MM_ADD_ENTRY(&dialect_class);
 	}
 
 	/**
@@ -234,17 +235,17 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	if (likely(Z_TYPE(dialect_class) == IS_STRING)) {
 		ce0 = phalcon_fetch_class(&dialect_class, ZEND_FETCH_CLASS_DEFAULT);
 		PHALCON_OBJECT_INIT(&dialect_object, ce0);
+		PHALCON_MM_ADD_ENTRY(&dialect_object);
 		if (phalcon_has_constructor(&dialect_object)) {
-			PHALCON_CALL_METHOD(NULL, &dialect_object, "__construct");
+			PHALCON_MM_CALL_METHOD(NULL, &dialect_object, "__construct");
 		}
-		PHALCON_CALL_METHOD(NULL, getThis(), "setdialect", &dialect_object);
-		zval_ptr_dtor(&dialect_object);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setdialect", &dialect_object);
 	} else if (Z_TYPE(dialect_class) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(NULL, getThis(),  "setdialect", &dialect_class);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(),  "setdialect", &dialect_class);
 	}
-	zval_ptr_dtor(&dialect_class);
 
 	phalcon_update_property(getThis(), SL("_descriptor"), descriptor);
+	RETURN_MM();
 }
 
 /**

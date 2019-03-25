@@ -191,13 +191,14 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 0, 1, &desc);
+	phalcon_fetch_params(1, 0, 1, &desc);
 
 	if (!desc || Z_TYPE_P(desc) == IS_NULL) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_CTOR);
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_SEPARATE);
 	} else {
 		ZVAL_DUP(&descriptor, desc);
 	}
+	PHALCON_MM_ADD_ENTRY(&descriptor);
 
 	/**
 	 * Check for a username or use null as default
@@ -221,6 +222,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	} else {
 		array_init(&options);
 	}
+	PHALCON_MM_ADD_ENTRY(&options);
 
 	/**
 	 * Remove the dialectClass from the descriptor if any
@@ -247,7 +249,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check if the user has defined a custom dsn
 	 */
-	if (!phalcon_array_isset_fetch_str(&dsn_attributes, &descriptor, SL("dsn"), PH_COPY)) {
+	if (!phalcon_array_isset_fetch_str(&dsn_attributes, &descriptor, SL("dsn"), PH_READONLY)) {
 		array_init(&dsn_parts);
 
 		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(descriptor), idx, str_key, value) {
@@ -263,14 +265,13 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 
 		phalcon_fast_join_str(&dsn_attributes, SL(";"), &dsn_parts);
 		zval_ptr_dtor(&dsn_parts);
+		PHALCON_MM_ADD_ENTRY(&dsn_attributes);
 	}
-
-	zval_ptr_dtor(&descriptor);
 
 	phalcon_read_property(&pdo_type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CONCAT_VSV(&dsn, &pdo_type, ":", &dsn_attributes);
-	zval_ptr_dtor(&dsn_attributes);
+	PHALCON_MM_ADD_ENTRY(&dsn);
 
 	/**
 	 * Create the connection using PDO
@@ -278,14 +279,11 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	ce = phalcon_fetch_str_class(SL("PDO"), ZEND_FETCH_CLASS_AUTO);
 
 	PHALCON_OBJECT_INIT(&pdo, ce);
-	PHALCON_CALL_METHOD(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
-	zval_ptr_dtor(&dsn);
-	zval_ptr_dtor(&username);
-	zval_ptr_dtor(&password);
-	zval_ptr_dtor(&options);
+	PHALCON_MM_ADD_ENTRY(&pdo);
+	PHALCON_MM_CALL_METHOD(NULL, &pdo, "__construct", &dsn, &username, &password, &options);
 
 	phalcon_update_property(getThis(), SL("_pdo"), &pdo);
-	zval_ptr_dtor(&pdo);
+	RETURN_MM();
 }
 
 /**

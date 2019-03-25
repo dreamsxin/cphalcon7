@@ -1091,7 +1091,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 
 	zval *collection_name = NULL, *args = NULL, collection = {}, callback = {}, type = {};
 
-	phalcon_fetch_params(0, 0, 2, &collection_name, &args);
+	phalcon_fetch_params(1, 0, 2, &collection_name, &args);
 
 	if (!collection_name) {
 		collection_name = &PHALCON_GLOBAL(z_null);
@@ -1102,21 +1102,22 @@ PHP_METHOD(Phalcon_Assets_Manager, outputCss){
 	}
 
 	if (PHALCON_IS_EMPTY(collection_name)) {
-		PHALCON_CALL_METHOD(&collection, getThis(), "getcss");
+		PHALCON_MM_CALL_METHOD(&collection, getThis(), "getcss");
 	} else {
-		PHALCON_CALL_METHOD(&collection, getThis(), "get", collection_name);
+		PHALCON_MM_CALL_METHOD(&collection, getThis(), "get", collection_name);
 	}
+	PHALCON_MM_ADD_ENTRY(&collection);
 
 	array_init_size(&callback, 2);
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("stylesheetLink"));
 
-	ZVAL_STRING(&type, "css");
+	PHALCON_MM_ADD_ENTRY(&callback);
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
-	zval_ptr_dtor(&collection);
-	zval_ptr_dtor(&callback);
-	zval_ptr_dtor(&type);
+	PHALCON_MM_ZVAL_STRING(&type, "css");
+
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	RETURN_MM();
 }
 
 /**
@@ -1129,7 +1130,7 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 
 	zval *collection_name = NULL, *args = NULL, collection = {}, callback = {}, type = {};
 
-	phalcon_fetch_params(0, 0, 2, &collection_name, &args);
+	phalcon_fetch_params(1, 0, 2, &collection_name, &args);
 
 	if (!collection_name) {
 		collection_name = &PHALCON_GLOBAL(z_null);
@@ -1140,19 +1141,20 @@ PHP_METHOD(Phalcon_Assets_Manager, outputJs){
 	}
 
 	if (PHALCON_IS_EMPTY(collection_name)) {
-		PHALCON_CALL_METHOD(&collection, getThis(), "getjs");
+		PHALCON_MM_CALL_METHOD(&collection, getThis(), "getjs");
 	} else {
-		PHALCON_CALL_METHOD(&collection, getThis(), "get", collection_name);
+		PHALCON_MM_CALL_METHOD(&collection, getThis(), "get", collection_name);
 	}
+	PHALCON_MM_ADD_ENTRY(&collection);
 
 	array_init_size(&callback, 2);
 	add_next_index_stringl(&callback, SL("Phalcon\\Tag"));
 	add_next_index_stringl(&callback, SL("javascriptInclude"));
 
-	ZVAL_STRING(&type, "js");
+	PHALCON_MM_ADD_ENTRY(&callback);
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
-	zval_ptr_dtor(&collection);
-	zval_ptr_dtor(&callback);
-	zval_ptr_dtor(&type);
+	PHALCON_MM_ZVAL_STRING(&type, "js");
+
+	PHALCON_MM_CALL_METHOD(return_value, getThis(), "output", &collection, &callback, &type, args);
+	RETURN_MM();
 }

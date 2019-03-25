@@ -105,6 +105,8 @@ PHP_METHOD(Phalcon_Tag, getDefault);
 PHP_METHOD(Phalcon_Tag, getDefaults);
 PHP_METHOD(Phalcon_Tag, setDefaultParams);
 PHP_METHOD(Phalcon_Tag, getDefaultParams);
+PHP_METHOD(Phalcon_Tag, setDefaultFormParams);
+PHP_METHOD(Phalcon_Tag, getDefaultFormParams);
 PHP_METHOD(Phalcon_Tag, choice);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_setdi, 0, 0, 1)
@@ -228,6 +230,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_setdefaultparams, 0, 0, 1)
 	ZEND_ARG_INFO(0, params)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_setdefaultformparams, 0, 0, 1)
+	ZEND_ARG_INFO(0, params)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_tag_choice, 0, 0, 2)
 	ZEND_ARG_INFO(0, expression)
 	ZEND_ARG_INFO(0, value1)
@@ -293,6 +299,8 @@ static const zend_function_entry phalcon_tag_method_entry[] = {
 	PHP_ME(Phalcon_Tag, getDefaults, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, setDefaultParams, arginfo_phalcon_tag_setdefaultparams, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, getDefaultParams, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Tag, setDefaultFormParams, arginfo_phalcon_tag_setdefaultformparams, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Tag, getDefaultFormParams, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Tag, choice, arginfo_phalcon_tag_choice, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Tag, color, colorField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Tag, text, textField, arginfo_phalcon_tag_generic_field, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
@@ -334,6 +342,7 @@ PHALCON_INIT_CLASS(Phalcon_Tag){
 	zend_declare_property_null(phalcon_tag_ce, SL("_escaperService"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_bool(phalcon_tag_ce, SL("_autoEscape"), 1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_tag_ce, SL("_defaultParams"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
+	zend_declare_property_null(phalcon_tag_ce, SL("_defaultFormParams"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_declare_class_constant_long(phalcon_tag_ce, SL("HTML32"), 1);
 	zend_declare_class_constant_long(phalcon_tag_ce, SL("HTML401_STRICT"), 2);
@@ -2207,12 +2216,10 @@ PHP_METHOD(Phalcon_Tag, getDefaults){
 	phalcon_read_static_property_ce(return_value, phalcon_tag_ce, SL("_displayValues"), PH_COPY);
 }
 
-
 /**
  * Set default parameters
  *
- * @param array $bindParams
- * @return Phalcon\Mvc\Model\Query
+ * @param array $params
  */
 PHP_METHOD(Phalcon_Tag, setDefaultParams){
 
@@ -2237,6 +2244,36 @@ PHP_METHOD(Phalcon_Tag, getDefaultParams)
 {
 
 	phalcon_read_static_property_ce(return_value, phalcon_tag_ce, SL("_defaultParams"), PH_COPY);
+}
+
+/**
+ * Set default form parameters
+ *
+ * @param array $params
+ */
+PHP_METHOD(Phalcon_Tag, setDefaultFormParams){
+
+	zval *params;
+
+	phalcon_fetch_params(0, 1, 0, &params);
+
+	if (Z_TYPE_P(params) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_tag_exception_ce, "Default parameters must be an array");
+		return;
+	}
+
+	phalcon_update_static_property_ce(phalcon_tag_ce, SL("_defaultFormParams"), params);
+}
+
+/**
+ * Returns default params
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Tag, getDefaultFormParams)
+{
+
+	phalcon_read_static_property_ce(return_value, phalcon_tag_ce, SL("_defaultFormParams"), PH_COPY);
 }
 
 PHP_METHOD(Phalcon_Tag, choice){

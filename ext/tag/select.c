@@ -96,6 +96,11 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 		phalcon_array_merge_recursive_n(&params, &default_params);
 	}
 
+	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultFormParams"), PH_READONLY);
+	if (Z_TYPE(default_params) == IS_ARRAY) {
+		phalcon_array_merge_recursive_n(&params, &default_params);
+	}
+
 	if (!phalcon_array_isset_fetch_str(&id, &params, SL("id"), PH_READONLY)) {
 		if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
 			ZVAL_NULL(&id);

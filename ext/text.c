@@ -49,6 +49,7 @@ PHP_METHOD(Phalcon_Text, reduceSlashes);
 PHP_METHOD(Phalcon_Text, concat);
 PHP_METHOD(Phalcon_Text, underscore);
 PHP_METHOD(Phalcon_Text, humanize);
+PHP_METHOD(Phalcon_Text, limitChars);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_camelize, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
@@ -118,6 +119,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_humanize, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_text_limitchars, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, limit, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, end, IS_STRING, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_text_method_entry[] = {
 	PHP_ME(Phalcon_Text, camelize, arginfo_phalcon_text_camelize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, uncamelize, arginfo_phalcon_text_uncamelize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
@@ -133,6 +140,7 @@ static const zend_function_entry phalcon_text_method_entry[] = {
 	PHP_ME(Phalcon_Text, concat, arginfo_phalcon_text_concat, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, underscore, arginfo_phalcon_text_underscore, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Text, humanize, arginfo_phalcon_text_humanize, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Text, limitChars, arginfo_phalcon_text_limitchars, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -617,4 +625,42 @@ PHP_METHOD(Phalcon_Text, humanize)
 	zval_ptr_dtor(&pattern);
 	zval_ptr_dtor(&replacement);
 	zval_ptr_dtor(&trimmed);
+}
+
+/**
+ * Limits a phrase to a given number of characters.
+ *
+ * <code>
+ *   $text = Phalcon\Text::limitChars($text, 30);
+ * </code>
+ *
+ * @param string $str
+ * @param int $limit
+ * @param string $end
+ * @return string
+ */
+PHP_METHOD(Phalcon_Text, limitChars)
+{
+	zval *str, *limit, *end = NULL, length = {}, substr = {};
+
+	phalcon_fetch_params(1, 2, 1, &str, &limit, &end);
+
+	if (!end) {
+		end = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (PHALCON_IS_EMPTY(str) || PHALCON_LE_LONG(limit, 0)) {
+		RETURN_MM_CTOR(str);
+	}
+
+	PHALCON_MM_CALL_FUNCTION(&length, "mb_strlen", str);
+
+	if (PHALCON_GE(limit, &length)) {
+		RETURN_MM_CTOR(str);
+	}
+
+	PHALCON_MM_CALL_FUNCTION(&substr, "mb_substr", str, &PHALCON_GLOBAL(z_zero), limit);
+	PHALCON_MM_ADD_ENTRY(&substr);
+	PHALCON_CONCAT_VV(return_value, &substr, end);
+	RETURN_MM();
 }

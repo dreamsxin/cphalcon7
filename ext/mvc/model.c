@@ -216,6 +216,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __isset);
 PHP_METHOD(Phalcon_Mvc_Model, serialize);
 PHP_METHOD(Phalcon_Mvc_Model, unserialize);
 PHP_METHOD(Phalcon_Mvc_Model, dump);
+PHP_METHOD(Phalcon_Mvc_Model, getFieldValues);
 PHP_METHOD(Phalcon_Mvc_Model, toArray);
 PHP_METHOD(Phalcon_Mvc_Model, setup);
 PHP_METHOD(Phalcon_Mvc_Model, remove);
@@ -479,6 +480,7 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, serialize, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, unserialize, arginfo_phalcon_mvc_model_unserialize, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, dump, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model, getFieldValues, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, toArray, arginfo_phalcon_mvc_model_toarray, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, setup, arginfo_phalcon_mvc_model_setup, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, remove, arginfo_phalcon_mvc_modelinterface_remove, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -1635,6 +1637,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	zval *base, *data, *column_map, *dirty_state = NULL, *source_model = NULL;
 	zval data_types = {}, connection = {}, *value, exception_message = {};
+	zval snapshot_data = {};
 	zend_string *str_key;
 
 	phalcon_fetch_params(1, 3, 3, &base, &data, &column_map, &dirty_state, &source_model);
@@ -1664,6 +1667,9 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 	 * Change the dirty state to persistent
 	 */
 	PHALCON_MM_CALL_METHOD(NULL, return_value, "setdirtystate", dirty_state);
+
+	array_init(&snapshot_data);
+	PHALCON_MM_ADD_ENTRY(&snapshot_data);
 
 	ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(data), str_key, value) {
 		zval key = {}, field_type = {}, convert_value = {}, attribute = {};
@@ -1712,11 +1718,12 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 			} else {
 				phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 			}
+			phalcon_array_update(&snapshot_data, &key, &convert_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
 
 	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
-		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", data, column_map);
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", &snapshot_data, column_map);
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
 	}
 
@@ -2432,10 +2439,41 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
 	PHALCON_MM_ADD_ENTRY(&model);
 
 	if (Z_TYPE(model) == IS_OBJECT) {
+		zval changed = {}, *value = NULL;
+		zend_string *str_key = NULL;
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
 		PHALCON_MM_CALL_METHOD(&snapshot, &model, "getsnapshotdata");
 		PHALCON_MM_ADD_ENTRY(&snapshot);
-		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot);
+		PHALCON_MM_CALL_METHOD(&changed, getThis(), "getchangedfields");
+		PHALCON_MM_ADD_ENTRY(&changed);
+
+		if (phalcon_fast_count_ev(&changed)) {
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(snapshot), str_key, value) {
+				zval key = {};
+				if (!str_key) {
+					continue;
+				}
+				ZVAL_STR(&key, str_key);
+				if (!zend_is_true(force) && phalcon_fast_in_array(&key, &changed)) {
+					continue;
+				}
+
+				phalcon_update_property_zval_zval(getThis(), &key, value);
+			} ZEND_HASH_FOREACH_END();
+		} else {
+			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(snapshot), str_key, value) {
+				zval key = {};
+				if (!str_key) {
+					continue;
+				}
+				ZVAL_STR(&key, str_key);
+
+				phalcon_update_property_zval_zval(getThis(), &key, value);
+			} ZEND_HASH_FOREACH_END();
+		
+		}
+
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot);
 		RETVAL_TRUE;
 	} else {
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
@@ -4940,7 +4978,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 
 	zval *data = NULL, *white_list = NULL, *_exists = NULL, *exists_check = NULL, exists = {}, attributes = {}, bind_params = {}, *attribute;
 	zval type = {}, message = {}, event_name = {}, status = {}, transaction = {}, write_connection = {}, related = {}, identity_field = {};
-	zval success = {}, new_success = {}, snapshot_data = {};
+	zval success = {}, new_success = {};
 	zend_string *str_key;
 	ulong idx;
 
@@ -5177,8 +5215,9 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	 * Change the dirty state to persistent
 	 */
 	if (zend_is_true(&new_success)) {
+		zval snapshot_data = {};
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
-		PHALCON_MM_CALL_METHOD(&snapshot_data, getThis(), "toarray");
+		PHALCON_MM_CALL_METHOD(&snapshot_data, getThis(), "getfieldvalues");
 		PHALCON_MM_ADD_ENTRY(&snapshot_data);
 		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot_data);
 
@@ -5467,7 +5506,7 @@ PHP_METHOD(Phalcon_Mvc_Model, getOperationMade){
  */
 PHP_METHOD(Phalcon_Mvc_Model, refresh){
 
-	zval *force = NULL, dirty_state = {}, exists = {}, row = {};
+	zval *force = NULL, dirty_state = {};
 
 	phalcon_fetch_params(1, 0, 1, &force);
 
@@ -5482,25 +5521,7 @@ PHP_METHOD(Phalcon_Mvc_Model, refresh){
 		return;
 	}
 
-	PHALCON_MM_CALL_METHOD(&exists, getThis(), "exists", &PHALCON_GLOBAL(z_true));
-
-	/**
-	 * We need to check if the record exists
-	 */
-	if (!zend_is_true(&exists)) {
-		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record cannot be refreshed because it does not exist or is deleted2");
-		return;
-	}
-
-	PHALCON_MM_CALL_METHOD(&row, getThis(), "getsnapshotdata");
-	PHALCON_MM_ADD_ENTRY(&row);
-
-	/**
-	 * Assign the resulting array to the this_ptr object
-	 */
-	if (Z_TYPE(row) == IS_ARRAY) {
-		PHALCON_MM_CALL_METHOD(NULL, getThis(), "assign", &row);
-	}
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "exists", &PHALCON_GLOBAL(z_true));
 
 	if (phalcon_method_exists_ex(return_value, SL("afterrefresh")) == SUCCESS) {
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "afterrefresh");
@@ -6187,10 +6208,14 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
 	zend_string *str_key;
 	ulong idx;
 
+	PHALCON_MM_INIT();
+
+	array_init(&changed);
+	PHALCON_MM_ADD_ENTRY(&changed);
+
 	phalcon_read_property(&snapshot, getThis(), SL("_snapshot"), PH_READONLY);
 	if (Z_TYPE(snapshot) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The record doesn't have a valid data snapshot");
-		return;
+		RETURN_MM_CTOR(&changed);
 	}
 
 	phalcon_read_property(&dirty_state, getThis(), SL("_dirtyState"), PH_READONLY);
@@ -6199,26 +6224,26 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
 	 * Dirty state must be DIRTY_PERSISTENT to make the checking
 	 */
 	if (!PHALCON_IS_LONG(&dirty_state, 0)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Change checking cannot be performed because the object has not been persisted or is deleted");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "Change checking cannot be performed because the object has not been persisted or is deleted");
 		return;
 	}
 
 	/**
 	 * The reversed column map is an array if the model has a column map
 	 */
-	PHALCON_CALL_METHOD(&column_map, getThis(), "getreversecolumnmap");
+	PHALCON_MM_CALL_METHOD(&column_map, getThis(), "getreversecolumnmap");
+	PHALCON_MM_ADD_ENTRY(&column_map);
 
 	/**
 	 * Data types are field indexed
 	 */
 	if (Z_TYPE(column_map) != IS_ARRAY) {
-		PHALCON_CALL_METHOD(&attributes, getThis(), "getdatatypes");
+		PHALCON_MM_CALL_METHOD(&attributes, getThis(), "getdatatypes");
+		PHALCON_MM_ADD_ENTRY(&attributes);
 		ZVAL_COPY_VALUE(&all_attributes, &attributes);
 	} else {
 		ZVAL_COPY_VALUE(&all_attributes, &column_map);
 	}
-
-	array_init(&changed);
 
 	/**
 	 * Check every attribute in the model
@@ -6258,9 +6283,8 @@ PHP_METHOD(Phalcon_Mvc_Model, getChangedFields){
 			continue;
 		}
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&all_attributes);
 
-	RETVAL_ZVAL(&changed, 0, 0);
+	RETURN_MM_CTOR(&changed);
 }
 
 /**
@@ -7011,6 +7035,32 @@ PHP_METHOD(Phalcon_Mvc_Model, unserialize){
 PHP_METHOD(Phalcon_Mvc_Model, dump){
 
 	phalcon_get_object_vars(return_value, getThis(), 1);
+}
+
+PHP_METHOD(Phalcon_Mvc_Model, getFieldValues){
+
+	zval *attribute = NULL, column_map = {};
+
+	PHALCON_MM_INIT();
+
+	array_init(return_value);
+
+	/**
+	 * Reverse column map
+	 */
+	PHALCON_MM_CALL_SELF(&column_map, "getcolumnmap");
+	PHALCON_MM_ADD_ENTRY(&column_map);
+
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(column_map), attribute) {
+		zval attribute_value = {};
+		if (phalcon_property_isset_fetch_zval(&attribute_value, getThis(), attribute, PH_READONLY)) {
+			phalcon_array_update(return_value, attribute, &attribute_value, PH_COPY);
+		} else {
+			phalcon_array_update(return_value, attribute, &PHALCON_GLOBAL(z_null), PH_COPY);
+		}
+	} ZEND_HASH_FOREACH_END();
+
+	RETURN_MM();
 }
 
 /**

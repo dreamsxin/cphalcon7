@@ -93,12 +93,12 @@ PHP_METHOD(Phalcon_Tag_Select, selectField)
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultFormParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_fetch_str(&id, &params, SL("id"), PH_READONLY)) {

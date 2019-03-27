@@ -748,7 +748,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_fetch_long(&action, &params, 0, PH_COPY)) {
@@ -841,7 +841,7 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n2(&params, &default_params, PH_READONLY);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (PHALCON_IS_FALSE(as_value)) {
@@ -955,7 +955,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
@@ -1410,7 +1410,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_fetch_long(&id, &params, 0, PH_READONLY)) {
@@ -1488,7 +1488,7 @@ PHP_METHOD(Phalcon_Tag, form){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_fetch_long(&params_action, &params, 0, PH_READONLY)) {
@@ -1714,7 +1714,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_str(&params, SL("href"))) {
@@ -1833,7 +1833,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_str(&params, SL("src"))) {
@@ -1937,7 +1937,7 @@ PHP_METHOD(Phalcon_Tag, imageInput){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	if (!phalcon_array_isset_str(&params, SL("src"))) {
@@ -2118,7 +2118,7 @@ PHP_METHOD(Phalcon_Tag, tagHtml){
 
 	phalcon_read_static_property_ce(&default_params, phalcon_tag_ce, SL("_defaultParams"), PH_READONLY);
 	if (Z_TYPE(default_params) == IS_ARRAY) {
-		phalcon_array_merge_recursive_n(&params, &default_params);
+		phalcon_array_merge_recursive_n2(&params, &default_params, PH_COPY);
 	}
 
 	PHALCON_CONCAT_SV(&local_code, "<", tag_name);

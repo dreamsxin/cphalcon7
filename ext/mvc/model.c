@@ -2432,9 +2432,27 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
 	PHALCON_MM_ADD_ENTRY(&model);
 
 	if (Z_TYPE(model) == IS_OBJECT) {
+		zval changed = {}, *value = NULL;
+		zend_string *str_key;
 		phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_PERSISTEN);
 		PHALCON_MM_CALL_METHOD(&snapshot, &model, "getsnapshotdata");
 		PHALCON_MM_ADD_ENTRY(&snapshot);
+		PHALCON_MM_CALL_METHOD(&changed, &model, "getchangedfields");
+		PHALCON_MM_ADD_ENTRY(&changed);
+
+		ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL(snapshot), str_key, value) {
+			zval key = {};
+			if (!str_key) {
+				continue;
+			}
+			ZVAL_STR(&key, str_key);
+			if (phalcon_fast_in_array(&key, &changed)) {
+				continue;
+			}
+
+			phalcon_update_property_zval_zval(getThis(), &key, value);
+		} ZEND_HASH_FOREACH_END();
+
 		PHALCON_CALL_METHOD(NULL, getThis(), "setsnapshotdata", &snapshot);
 		RETVAL_TRUE;
 	} else {

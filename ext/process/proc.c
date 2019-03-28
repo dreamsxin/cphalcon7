@@ -344,7 +344,9 @@ PHP_METHOD(Phalcon_Process_Proc, isPtySupported){
 
 	zval command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process = {};
 
-	ZVAL_STRING(&command, "echo 1");
+	PHALCON_MM_INIT();
+
+	PHALCON_MM_ZVAL_STRING(&command, "echo 1");
 
 	array_init_size(&stdin, 2);
 	phalcon_array_append_str(&stdin, SL("pipe"), 0);
@@ -361,14 +363,16 @@ PHP_METHOD(Phalcon_Process_Proc, isPtySupported){
 	phalcon_array_append(&descriptors, &stdout, 0);
 	phalcon_array_append(&descriptors, &stderr, 0);
 
-	PHALCON_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes);
-	zval_ptr_dtor(&command);
-	zval_ptr_dtor(&descriptors);
+	PHALCON_MM_ADD_ENTRY(&descriptors);
+
+	PHALCON_MM_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes);
+	PHALCON_MM_ADD_ENTRY(&process);
+
 	if (Z_TYPE(process) != IS_RESOURCE) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
-	zval_ptr_dtor(&process);
-	RETURN_TRUE;
+
+	RETURN_MM_TRUE;
 }
 
 /**
@@ -398,7 +402,10 @@ PHP_METHOD(Phalcon_Process_Proc, start){
 		return;
 	}
 
-	PHALCON_CALL_METHOD(&descriptors, getThis(), "getdescriptors");
+	PHALCON_MM_INIT();
+
+	PHALCON_MM_CALL_METHOD(&descriptors, getThis(), "getdescriptors");
+	PHALCON_MM_ADD_ENTRY(&descriptors);
 
 	phalcon_read_property(&command, getThis(), SL("_command"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
@@ -407,24 +414,24 @@ PHP_METHOD(Phalcon_Process_Proc, start){
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	phalcon_time(&starttime);
+	PHALCON_MM_ADD_ENTRY(&starttime);
 
 	ZVAL_MAKE_REF(&pipes);
-	PHALCON_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes, &cwd, &env, &options);
+	PHALCON_MM_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes, &cwd, &env, &options);
 	ZVAL_UNREF(&pipes);
-	zval_ptr_dtor(&descriptors);
+	PHALCON_MM_ADD_ENTRY(&process);
+
     if (Z_TYPE(process) != IS_RESOURCE) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
     }
 	phalcon_update_property(getThis(), SL("_process"), &process);
-	zval_ptr_dtor(&process);
 	phalcon_update_property(getThis(), SL("_pipes"), &pipes);
-	zval_ptr_dtor(&pipes);
 	phalcon_update_property(getThis(), SL("_startTime"), &starttime);
-	zval_ptr_dtor(&starttime);
 	phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STARTED);
-	PHALCON_CALL_METHOD(NULL, getThis(), "update");
 
-	RETURN_TRUE;
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "update");
+
+	RETURN_MM_TRUE;
 }
 
 /**
@@ -440,11 +447,11 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 	zval ret = {}, pattern = {}, pids = {}, *pid, status = {}, isrunning = {};
 	double mtime, curtime;
 
-	phalcon_fetch_params(0, 0, 2, &timeout, &_signal);
+	phalcon_fetch_params(1, 0, 2, &timeout, &_signal);
 
 	phalcon_read_property(&status, getThis(), SL("_status"), PH_NOISY|PH_READONLY);
 	if (!PHALCON_IS_LONG(&status, PHALCON_PROCESS_STATUS_STARTED)) {
-		RETURN_TRUE;
+		RETURN_MM_TRUE;
 	}
 
 	if (!timeout){
@@ -464,59 +471,60 @@ PHP_METHOD(Phalcon_Process_Proc, stop){
 
 	if (zend_is_true(&ppid)) {
 		PHALCON_CONCAT_SV(&command, "ps -o pid --no-heading --ppid ", &ppid);
-		PHALCON_CALL_FUNCTION(&ret, "shell_exec", &command);
-		zval_ptr_dtor(&command);
+		PHALCON_MM_ADD_ENTRY(&command);
+		PHALCON_MM_CALL_FUNCTION(&ret, "shell_exec", &command);
+		PHALCON_MM_ADD_ENTRY(&ret);
+
 		if (zend_is_true(&ret)) {
-			ZVAL_STRING(&pattern, "/\\s+/");
-			PHALCON_CALL_FUNCTION(&pids, "preg_split", &pattern, &ret);
+			PHALCON_MM_ZVAL_STRING(&pattern, "/\\s+/");
+			PHALCON_MM_CALL_FUNCTION(&pids, "preg_split", &pattern, &ret);
+			PHALCON_MM_ADD_ENTRY(&pids);
 			if (Z_TYPE(pids) == IS_ARRAY) {
 				ZEND_HASH_FOREACH_VAL(Z_ARRVAL(pids), pid) {
-					zend_print_zval_r(pid, 0);
 					PHALCON_CONCAT_SV(&command, "kill -9 ", pid);
-					PHALCON_CALL_FUNCTION(NULL, "exec", &command);
-					zval_ptr_dtor(&command);
+					PHALCON_MM_ADD_ENTRY(&command);
+					PHALCON_MM_CALL_FUNCTION(NULL, "exec", &command);
 				} ZEND_HASH_FOREACH_END();
 			}
-			zval_ptr_dtor(&pattern);
 		}
 	}
 
 	if (zend_is_true(&process)) {
-		PHALCON_CALL_METHOD(&isrunning, getThis(), "close");
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "close");
 
 		curtime = phalcon_get_time();
 		mtime = mtime + curtime;
 		do {
-			PHALCON_CALL_FUNCTION(NULL, "proc_terminate", &process, &signal);
-			PHALCON_CALL_METHOD(&isrunning, getThis(), "isrunning");
+			PHALCON_MM_CALL_FUNCTION(NULL, "proc_terminate", &process, &signal);
+			PHALCON_MM_CALL_METHOD(&isrunning, getThis(), "isrunning");
 			if (zend_is_true(&isrunning)) {
 				usleep(1000);
 			}
 		} while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
-		PHALCON_CALL_FUNCTION(NULL, "proc_close", &process);
+		PHALCON_MM_CALL_FUNCTION(NULL, "proc_close", &process);
 	} else {
 		PHALCON_CONCAT_SVSV(&command, "kill -", &signal, " ", &ppid);
+		PHALCON_MM_ADD_ENTRY(&command);
 		curtime = phalcon_get_time();
 		mtime = mtime + curtime;
 		do {
-			PHALCON_CALL_FUNCTION(NULL, "exec", &command);
-			PHALCON_CALL_METHOD(&isrunning, getThis(), "isrunning");
+			PHALCON_MM_CALL_FUNCTION(NULL, "exec", &command);
+			PHALCON_MM_CALL_METHOD(&isrunning, getThis(), "isrunning");
 			if (zend_is_true(&isrunning)) {
 				usleep(1000);
 			}
 		} while (zend_is_true(&isrunning) && phalcon_get_time() < mtime);
-		zval_ptr_dtor(&command);
 
 		if (zend_is_true(&isrunning)) {
 			PHALCON_CONCAT_SV(&command, "kill -9 ", &ppid);
-			PHALCON_CALL_FUNCTION(NULL, "exec", &command);
-			zval_ptr_dtor(&command);
+			PHALCON_MM_ADD_ENTRY(&command);
+			PHALCON_MM_CALL_FUNCTION(NULL, "exec", &command);
 		}
 	}
 
-	PHALCON_CALL_METHOD(NULL, getThis(), "update");
+	PHALCON_MM_CALL_METHOD(NULL, getThis(), "update");
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 PHP_METHOD(Phalcon_Process_Proc, close){
@@ -538,10 +546,8 @@ PHP_METHOD(Phalcon_Process_Proc, close){
  */
 PHP_METHOD(Phalcon_Process_Proc, reStart){
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "stop");
-	if (zend_is_true(return_value)) {
-		PHALCON_CALL_METHOD(return_value, getThis(), "start");
-	}
+	PHALCON_CALL_METHOD(NULL, getThis(), "stop");
+	PHALCON_CALL_METHOD(return_value, getThis(), "start");
 }
 
 /**
@@ -566,6 +572,8 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 	zval *blocking = NULL, pid = {}, pid_file = {}, process = {}, information = {}, running = {}, exitcode = {};
 	zval signaled = {}, termsig = {}, stopped = {}, stopsig = {}, ret = {};
 
+	PHALCON_MM_INIT();
+
 	if (!blocking) {
 		blocking = &PHALCON_GLOBAL(z_false);
 	}
@@ -573,13 +581,14 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 	phalcon_read_property(&process, getThis(), SL("_process"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(process) != IS_NULL) {
 		PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
+		PHALCON_MM_ADD_ENTRY(&information);
 		if (Z_TYPE(information) == IS_ARRAY) {
 			phalcon_array_fetch_str(&pid, &information, SL("pid"), PH_NOISY|PH_READONLY);
 			phalcon_update_property(getThis(), SL("_pid"), &pid);
 
 			phalcon_read_property(&pid_file, getThis(), SL("_pidFile"), PH_NOISY|PH_READONLY);
 			if (zend_is_true(&pid) && zend_is_true(&pid_file)) {
-				PHALCON_CALL_FUNCTION(NULL, "file_put_contents", &pid_file, &pid);
+				PHALCON_MM_CALL_FUNCTION(NULL, "file_put_contents", &pid_file, &pid);
 			}
 
 			phalcon_array_fetch_str(&running, &information, SL("running"), PH_NOISY|PH_READONLY);
@@ -611,18 +620,17 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 				}
 			}
 		}
-		zval_ptr_dtor(&information);
 	} else {
-		phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY|PH_COPY);
+		phalcon_read_property(&pid, getThis(), SL("_pid"), PH_NOISY|PH_READONLY);
 		phalcon_read_property(&pid_file, getThis(), SL("_pidFile"), PH_NOISY|PH_READONLY);
 		if (!zend_is_true(&pid) && zend_is_true(&pid_file)) {
-			zval_ptr_dtor(&pid);
-			PHALCON_CALL_FUNCTION(&pid, "file_get_contents", &pid_file);
+			PHALCON_MM_CALL_FUNCTION(&pid, "file_get_contents", &pid_file);
+			PHALCON_MM_ADD_ENTRY(&pid);
 			phalcon_update_property(getThis(), SL("_pid"), &pid);
 		}
 
-		PHALCON_CALL_METHOD(&ret, getThis(), "getstatforpid", &pid);
-		zval_ptr_dtor(&pid);
+		PHALCON_MM_CALL_METHOD(&ret, getThis(), "getstatforpid", &pid);
+		PHALCON_MM_ADD_ENTRY(&ret);
 		if (zend_is_true(&ret)) {
 			phalcon_update_property_long(getThis(), SL("_status"), PHALCON_PROCESS_STATUS_STARTED);
 			phalcon_update_property_bool(getThis(), SL("_running"), 1);
@@ -632,7 +640,7 @@ PHP_METHOD(Phalcon_Process_Proc, update){
 		}
 	}
 
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 PHP_METHOD(Phalcon_Process_Proc, getCommandForPid){
@@ -640,63 +648,62 @@ PHP_METHOD(Phalcon_Process_Proc, getCommandForPid){
 	zval *pid, command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
 	zval running = {}, pipe = {}, ret = {};
 
-	phalcon_fetch_params(0, 1, 0, &pid);
+	phalcon_fetch_params(1, 1, 0, &pid);
 
 	// ps eh -o args -p pid
 	PHALCON_CONCAT_SV(&command, "ps -o args -p ", pid);
+	PHALCON_MM_ADD_ENTRY(&command);
+
 	array_init_size(&stdin, 2);
 	phalcon_array_append_str(&stdin, SL("pipe"), 0);
 	phalcon_array_append_str(&stdin, SL("r"), 0);
+	PHALCON_MM_ADD_ENTRY(&stdin);
+
 	array_init_size(&stdout, 2);
 	phalcon_array_append_str(&stdout, SL("pipe"), 0);
 	phalcon_array_append_str(&stdout, SL("w"), 0);
+	PHALCON_MM_ADD_ENTRY(&stdout);
+
 	array_init_size(&stderr, 2);
 	phalcon_array_append_str(&stderr, SL("pipe"), 0);
 	phalcon_array_append_str(&stderr, SL("w"), 0);
+	PHALCON_MM_ADD_ENTRY(&stderr);
 
 	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, 0);
 	phalcon_array_append(&descriptors, &stdout, 0);
 	phalcon_array_append(&descriptors, &stderr, 0);
+	PHALCON_MM_ADD_ENTRY(&descriptors);
 
 	ZVAL_MAKE_REF(&pipes);
-	PHALCON_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes);
+	PHALCON_MM_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes);
 	ZVAL_UNREF(&pipes);
-	zval_ptr_dtor(&command);
-	zval_ptr_dtor(&descriptors);
+
+	PHALCON_MM_ADD_ENTRY(&process);
+
 	if (Z_TYPE(process) != IS_RESOURCE) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
-	PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
+	PHALCON_MM_CALL_FUNCTION(&information, "proc_get_status", &process);
+	PHALCON_MM_ADD_ENTRY(&information);
 	if (Z_TYPE(information) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running"), PH_READONLY) || !zend_is_true(&running)) {
-			zval_ptr_dtor(&pipes);
-			zval_ptr_dtor(&process);
-			zval_ptr_dtor(&information);
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2, PH_READONLY)) {
-			PHALCON_CALL_FUNCTION(&ret, "fgets", &pipe);
+			PHALCON_MM_CALL_FUNCTION(&ret, "fgets", &pipe);
+			PHALCON_MM_ADD_ENTRY(&ret);
 			if (!PHALCON_IS_FALSE(&ret)) {
-				zval_ptr_dtor(&ret);
-				zval_ptr_dtor(&pipes);
-				zval_ptr_dtor(&process);
-				zval_ptr_dtor(&information);
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 		}
 		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1, PH_READONLY)) {
-			zval_ptr_dtor(&pipes);
-			zval_ptr_dtor(&process);
-			zval_ptr_dtor(&information);
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
-		PHALCON_CALL_FUNCTION(NULL, "fgets", &pipe);
-		PHALCON_CALL_FUNCTION(return_value, "fgets", &pipe);
+		PHALCON_MM_CALL_FUNCTION(NULL, "fgets", &pipe);
+		PHALCON_MM_CALL_FUNCTION(return_value, "fgets", &pipe);
 	}
-	zval_ptr_dtor(&pipes);
-	zval_ptr_dtor(&process);
-	zval_ptr_dtor(&information);
+	RETURN_MM();
 }
 
 PHP_METHOD(Phalcon_Process_Proc, getStarttimeForPid){
@@ -713,65 +720,62 @@ PHP_METHOD(Phalcon_Process_Proc, getStatForPid){
 	zval *pid, command = {}, stdin = {}, stdout = {}, stderr = {}, descriptors = {}, pipes = {}, process ={}, information ={};
 	zval running = {}, pipe = {}, ret = {};
 
-	phalcon_fetch_params(0, 1, 0, &pid);
+	phalcon_fetch_params(1, 1, 0, &pid);
 
 	PHALCON_CONCAT_SV(&command, "ps h -o stat -p ", pid);
+	PHALCON_MM_ADD_ENTRY(&command);
+
 	array_init_size(&stdin, 2);
 	phalcon_array_append_str(&stdin, SL("pipe"), 0);
 	phalcon_array_append_str(&stdin, SL("r"), 0);
+	PHALCON_MM_ADD_ENTRY(&stdin);
+
 	array_init_size(&stdout, 2);
 	phalcon_array_append_str(&stdout, SL("pipe"), 0);
 	phalcon_array_append_str(&stdout, SL("w"), 0);
+	PHALCON_MM_ADD_ENTRY(&stdout);
+
 	array_init_size(&stderr, 2);
 	phalcon_array_append_str(&stderr, SL("pipe"), 0);
 	phalcon_array_append_str(&stderr, SL("w"), 0);
+	PHALCON_MM_ADD_ENTRY(&stderr);
 
 	array_init_size(&descriptors, 3);
 	phalcon_array_append(&descriptors, &stdin, 0);
 	phalcon_array_append(&descriptors, &stdout, 0);
 	phalcon_array_append(&descriptors, &stderr, 0);
+	PHALCON_MM_ADD_ENTRY(&descriptors);
 
 	ZVAL_MAKE_REF(&pipes);
 	PHALCON_CALL_FUNCTION(&process, "proc_open", &command, &descriptors, &pipes);
 	ZVAL_UNREF(&pipes);
-	zval_ptr_dtor(&command);
-	zval_ptr_dtor(&descriptors);
+	PHALCON_MM_ADD_ENTRY(&process);
+
 	if (Z_TYPE(process) != IS_RESOURCE) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
-	PHALCON_CALL_FUNCTION(&information, "proc_get_status", &process);
+	PHALCON_MM_CALL_FUNCTION(&information, "proc_get_status", &process);
 	if (Z_TYPE(information) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch_str(&running, &information, SL("running"), PH_READONLY) || !zend_is_true(&running)) {
-			zval_ptr_dtor(&pipes);
-			zval_ptr_dtor(&process);
-			zval_ptr_dtor(&information);
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
 		if (phalcon_array_isset_fetch_long(&pipe, &pipes, 2, PH_READONLY)) {
-			PHALCON_CALL_FUNCTION(&ret, "fgets", &pipe);
+			PHALCON_MM_CALL_FUNCTION(&ret, "fgets", &pipe);
+			PHALCON_MM_ADD_ENTRY(&ret);
 			if (!PHALCON_IS_FALSE(&ret)) {
-				zval_ptr_dtor(&ret);
-				zval_ptr_dtor(&pipes);
-				zval_ptr_dtor(&process);
-				zval_ptr_dtor(&information);
-				RETURN_FALSE;
+				RETURN_MM_FALSE;
 			}
 		}
 		if (!phalcon_array_isset_fetch_long(&pipe, &pipes, 1, PH_READONLY)) {
-			zval_ptr_dtor(&pipes);
-			zval_ptr_dtor(&process);
-			zval_ptr_dtor(&information);
-			RETURN_FALSE;
+			RETURN_MM_FALSE;
 		}
-		PHALCON_CALL_FUNCTION(&ret, "fgets", &pipe);
+		PHALCON_MM_CALL_FUNCTION(&ret, "fgets", &pipe);
+		PHALCON_MM_ADD_ENTRY(&ret);
 		if (zend_is_true(&ret)) {
-			zval_ptr_dtor(&ret);
-			RETVAL_TRUE;
+			RETURN_MM_TRUE;
 		}
 	}
-	zval_ptr_dtor(&pipes);
-	zval_ptr_dtor(&process);
-	zval_ptr_dtor(&information);
+	RETURN_MM_FALSE;
 }
 
 /**
@@ -932,49 +936,49 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 
 	zval *_onrecv, *_onsend = NULL, *_onerror = NULL, *_ontimeout = NULL, *timeout = NULL;
 	zval isrunning = {}, onrecv = {}, onsend = {}, onerror = {}, ontimeout = {}, pipes = {}, maxlen = {};
+	int flag;
 
-	phalcon_fetch_params(0, 0, 5, &_onrecv, &_onsend, &_onerror, &_ontimeout, &timeout);
-
-	PHALCON_CALL_METHOD(&isrunning, getThis(), "isrunning");
-	if (!zend_is_true(&isrunning)) {
-		RETURN_FALSE;
-	}
+	phalcon_fetch_params(1, 0, 5, &_onrecv, &_onsend, &_onerror, &_ontimeout, &timeout);
 
 	phalcon_read_property(&pipes, getThis(), SL("_pipes"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(pipes) != IS_ARRAY || !phalcon_fast_count_ev(&pipes)) {
-		RETURN_FALSE;
+		RETURN_MM_FALSE;
 	}
 
 	if (_onrecv) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
-			PHALCON_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
+		if (Z_TYPE_P(_onrecv) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onrecv), zend_ce_closure, 0)) {
+			PHALCON_MM_CALL_CE_STATIC(&onrecv, zend_ce_closure, "bind", _onrecv, getThis());
 		} else {
 			ZVAL_COPY(&onrecv, _onrecv);
 		}
+		PHALCON_MM_ADD_ENTRY(&onrecv);
 	}
 
 	if (_onsend) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
-			PHALCON_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
+		if (Z_TYPE_P(_onsend) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onsend), zend_ce_closure, 0)) {
+			PHALCON_MM_CALL_CE_STATIC(&onsend, zend_ce_closure, "bind", _onsend, getThis());
 		} else {
 			ZVAL_COPY(&onsend, _onsend);
 		}
+		PHALCON_MM_ADD_ENTRY(&onsend);
 	}
 
 	if (_onerror) {
-		if (instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
-			PHALCON_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
+		if (Z_TYPE_P(_onerror) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_onerror), zend_ce_closure, 0)) {
+			PHALCON_MM_CALL_CE_STATIC(&onerror, zend_ce_closure, "bind", _onerror, getThis());
 		} else {
 			ZVAL_COPY(&onerror, _onerror);
 		}
+		PHALCON_MM_ADD_ENTRY(&onerror);
 	}
 
 	if (_ontimeout) {
-		if (instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
-			PHALCON_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
+		if (Z_TYPE_P(_ontimeout) == IS_OBJECT && instanceof_function_ex(Z_OBJCE_P(_ontimeout), zend_ce_closure, 0)) {
+			PHALCON_MM_CALL_CE_STATIC(&ontimeout, zend_ce_closure, "bind", _ontimeout, getThis());
 		} else {
 			ZVAL_COPY(&ontimeout, _ontimeout);
 		}
+		PHALCON_MM_ADD_ENTRY(&ontimeout);
 	}
 
 	if (!timeout) {
@@ -985,7 +989,7 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 	while(1) {
 		zval r_array = {}, w_array = {}, e_array = {}, ret = {}, stdin = {}, stdout = {}, stderr = {}, *s;
 
-		PHALCON_CALL_METHOD(&isrunning, getThis(), "isrunning");
+		PHALCON_MM_CALL_METHOD(&isrunning, getThis(), "isrunning");
 		if (!zend_is_true(&isrunning)) {
 			break;
 		}
@@ -1009,81 +1013,88 @@ PHP_METHOD(Phalcon_Process_Proc, handle){
 		ZVAL_MAKE_REF(&r_array);
 		ZVAL_MAKE_REF(&w_array);
 		ZVAL_MAKE_REF(&e_array);
-		PHALCON_CALL_FUNCTION(&ret, "stream_select", &r_array, &w_array, &e_array, timeout, &PHALCON_GLOBAL(z_zero));
+		PHALCON_MM_CALL_FUNCTION(&ret, "stream_select", &r_array, &w_array, &e_array, timeout, &PHALCON_GLOBAL(z_zero));
 		ZVAL_UNREF(&r_array);
 		ZVAL_UNREF(&w_array);
 		ZVAL_UNREF(&e_array);
 		if (PHALCON_IS_FALSE(&ret)) {
-			RETURN_FALSE;
+			goto error;
 		}
 		if (PHALCON_IS_LONG_IDENTICAL(&ret, 0)) {
 			if (phalcon_method_exists_ex(getThis(), SL("ontimeout")) == SUCCESS) {
-				PHALCON_CALL_METHOD(NULL, getThis(), "ontimeout");
+				PHALCON_CALL_METHOD_FLAG(flag, NULL, getThis(), "ontimeout");
 			}
 			if (Z_TYPE(ontimeout) > IS_NULL) {
-				PHALCON_CALL_USER_FUNC(NULL, &ontimeout);
+				PHALCON_CALL_USER_FUNC_FLAG(flag, NULL, &ontimeout);
 			}
-			continue;
+			goto next;
 		}
 		if (Z_TYPE(r_array) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(r_array), s) {
-				zval data = {}, *args;
+				zval data = {};
 				do {
-					PHALCON_CALL_FUNCTION(&data, "fgets", s);
-					if (!zend_is_true(&data)) {
+					PHALCON_CALL_FUNCTION_FLAG(flag, &data, "fgets", s);
+					if (flag == FAILURE || !zend_is_true(&data)) {
+						goto error;
 						break;
 					}
 					if (phalcon_method_exists_ex(getThis(), SL("onrecv")) == SUCCESS) {
-						PHALCON_CALL_METHOD(NULL, getThis(), "onrecv", s, &data);
+						PHALCON_CALL_METHOD_FLAG(flag, NULL, getThis(), "onrecv", s, &data);
 					}
 					if (Z_TYPE(onrecv) > IS_NULL) {
-						args = (zval *)safe_emalloc(2, sizeof(zval), 0);
-						ZVAL_COPY(&args[0], s);
+						zval args[2] = {};
+						ZVAL_COPY_VALUE(&args[0], s);
 						ZVAL_COPY_VALUE(&args[1], &data);
-						PHALCON_CALL_USER_FUNC_ARGS(NULL, &onrecv, args, 2);
+						PHALCON_CALL_USER_FUNC_ARGS_FLAG(flag, NULL, &onrecv, args, 2);
 					}
 				} while (zend_is_true(&data));
 			} ZEND_HASH_FOREACH_END();
 		}
 		if (Z_TYPE(w_array) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(w_array), s) {
-				zval *args;
 				if (phalcon_method_exists_ex(getThis(), SL("onsend")) == SUCCESS) {
-					PHALCON_CALL_METHOD(NULL, getThis(), "onsend", s);
+					PHALCON_CALL_METHOD_FLAG(flag, NULL, getThis(), "onsend", s);
 				}
 				if (Z_TYPE(onsend) > IS_NULL) {
-					args = (zval *)safe_emalloc(1, sizeof(zval), 0);
-					ZVAL_COPY(&args[0], s);
-					PHALCON_CALL_USER_FUNC_ARGS(NULL, &onsend, args, 1);
+					zval args[1] = {};
+					ZVAL_COPY_VALUE(&args[0], s);
+					PHALCON_CALL_USER_FUNC_ARGS_FLAG(flag, NULL, &onsend, args, 1);
 				}
 			} ZEND_HASH_FOREACH_END();
 		}
 		if (Z_TYPE(e_array) == IS_ARRAY) {
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(e_array), s) {
-				zval data = {}, *args;
+				zval data = {};
 				do {
-					PHALCON_CALL_FUNCTION(&data, "fgets", s);
+					PHALCON_CALL_FUNCTION_FLAG(flag, &data, "fgets", s);
 					if (!zend_is_true(&data)) {
+						goto error;
 						break;
 					}
 					if (phalcon_method_exists_ex(getThis(), SL("onerror")) == SUCCESS) {
 						PHALCON_CALL_METHOD(NULL, getThis(), "onerror", s, &data);
 					}
 					if (Z_TYPE(onerror) > IS_NULL) {
-						args = (zval *)safe_emalloc(2, sizeof(zval), 0);
-						ZVAL_COPY(&args[0], s);
+						zval args[2] = {};
+						ZVAL_COPY_VALUE(&args[0], s);
 						ZVAL_COPY_VALUE(&args[1], &data);
-						PHALCON_CALL_USER_FUNC_ARGS(NULL, &onerror, args, 2);
+						PHALCON_CALL_USER_FUNC_ARGS_FLAG(flag, NULL, &onerror, args, 2);
 					}
 				} while (zend_is_true(&data));
 			} ZEND_HASH_FOREACH_END();
 		}
+next:
+		zval_ptr_dtor(&r_array);
+		zval_ptr_dtor(&w_array);
+		zval_ptr_dtor(&e_array);
+		continue;
+error:
+		zval_ptr_dtor(&r_array);
+		zval_ptr_dtor(&w_array);
+		zval_ptr_dtor(&e_array);
+		break;
 	}
-	zval_ptr_dtor(&onrecv);
-	zval_ptr_dtor(&onsend);
-	zval_ptr_dtor(&onerror);
-	zval_ptr_dtor(&ontimeout);
-	RETURN_TRUE;
+	RETURN_MM_TRUE;
 }
 
 /**
@@ -1099,8 +1110,9 @@ PHP_METHOD(Phalcon_Process_Proc, hasSystemCallBeenInterrupted){
 	if (Z_TYPE(last_error) == IS_ARRAY && phalcon_array_isset_fetch_str(&message, &last_error, SL("message"), PH_READONLY)) {
 		phalcon_fast_stripos_str(return_value, &message, SL("interrupted system call"));
 	} else {
-		RETURN_FALSE;
+		RETVAL_FALSE;
 	}
+	zval_ptr_dtor(&last_error);
 }
 
 /**

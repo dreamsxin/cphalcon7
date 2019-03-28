@@ -135,20 +135,24 @@ void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
 
 	if (PHALCON_IS_NOT_EMPTY(group)) {
 		PHALCON_MM_INIT();
-		if (Z_TYPE_P(group) == IS_ARRAY) {
+		if (phalcon_is_numeric(group)) {
+			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
+			PHALCON_MM_ADD_ENTRY(return_value);
+		} else if (Z_TYPE_P(group) == IS_ARRAY) {
 			array_init(&group_items);
 			PHALCON_MM_ADD_ENTRY(&group_items);
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(group), group_item) {
 				zval escaped_item = {};
-				if (phalcon_is_numeric(group_item)) {
+				if (
+					phalcon_is_numeric(group_item)
+					|| phalcon_memnstr_str(group_item, SL("."))
+					|| phalcon_memnstr_str(group_item, SL("["))
+					|| phalcon_memnstr_str(group_item, SL("("))
+				) {
 					phalcon_array_append(&group_items, group_item, PH_COPY);
 				} else {
-					if (phalcon_memnstr_str(group_item, SL("."))) {
-						phalcon_array_append(&group_items, group_item, PH_COPY);
-					} else {
-						PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
-						phalcon_array_append(&group_items, &escaped_item, 0);
-					}
+					PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
+					phalcon_array_append(&group_items, &escaped_item, 0);
 				}
 			} ZEND_HASH_FOREACH_END();
 
@@ -156,26 +160,44 @@ void phalcon_orm_phql_build_group(zval *return_value, zval *group) {
 			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", &joined_items);
 			zval_ptr_dtor(&joined_items);
 			PHALCON_MM_ADD_ENTRY(return_value);
-		} else {
-			if (phalcon_is_numeric(group)) {
-				PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
-				PHALCON_MM_ADD_ENTRY(return_value);
-			} else {
-				if (phalcon_memnstr_str(group, SL("."))) {
-					PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
-					PHALCON_MM_ADD_ENTRY(return_value);
-				} else if (phalcon_memnstr_str(group, SL(","))) {
-					phalcon_fast_explode_str(&group_items, SL(", "), group);
-					phalcon_fast_join_str(&joined_items, SL("], ["), &group_items);
-					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", &joined_items, "]");
-					zval_ptr_dtor(&joined_items);
-					PHALCON_MM_ADD_ENTRY(return_value);
+		} else if (phalcon_memnstr_str(group, SL(","))) {
+			zval escaped_items = {};
+			array_init(&escaped_items);
+			PHALCON_MM_ADD_ENTRY(&escaped_items);
+
+			phalcon_fast_explode_str(&group_items, SL(", "), group);
+			PHALCON_MM_ADD_ENTRY(&group_items);
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group_items), group_item) {
+				zval escaped_item = {};
+				if (
+					phalcon_is_numeric(group_item)
+					|| phalcon_memnstr_str(group_item, SL("."))
+					|| phalcon_memnstr_str(group_item, SL("["))
+					|| phalcon_memnstr_str(group_item, SL("("))
+				) {
+					phalcon_array_append(&escaped_items, group_item, PH_COPY);
 				} else {
-					PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", group, "]");
-					PHALCON_MM_ADD_ENTRY(return_value);
+					PHALCON_CONCAT_SVS(&escaped_item, "[", group_item, "]");
+					phalcon_array_append(&escaped_items, &escaped_item, 0);
 				}
-			}
+			} ZEND_HASH_FOREACH_END();
+
+			phalcon_fast_join_str(&joined_items, SL(", "), &escaped_items);
+			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", &joined_items);
+			zval_ptr_dtor(&joined_items);
+			PHALCON_MM_ADD_ENTRY(return_value);
+		} else if (
+			phalcon_memnstr_str(group, SL("."))
+			|| phalcon_memnstr_str(group, SL("["))
+			|| phalcon_memnstr_str(group, SL("("))
+		) {
+			PHALCON_SCONCAT_SV(return_value, " GROUP BY ", group);
+			PHALCON_MM_ADD_ENTRY(return_value);
+		} else {
+			PHALCON_SCONCAT_SVS(return_value, " GROUP BY [", group, "]");
+			PHALCON_MM_ADD_ENTRY(return_value);
 		}
+
 		Z_TRY_ADDREF_P(return_value);
 		RETURN_MM();
 	}

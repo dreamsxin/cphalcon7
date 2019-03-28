@@ -24,6 +24,7 @@ class ProcessTest extends PHPUnit\Framework\TestCase
 	public function testNormal()
 	{
 		$this->markTestSkipped('Skip');
+		return false;
 		if (!class_exists('Phalcon\Process\Proc')) {
 			$this->markTestSkipped('Class `Phalcon\Process\Proc` is not exists');
 			return false;
@@ -39,6 +40,7 @@ class ProcessTest extends PHPUnit\Framework\TestCase
 	public function testHandle()
 	{
 		$this->markTestSkipped('Skip');
+		return false;
 		if (!class_exists('Phalcon\Process\Proc')) {
 			$this->markTestSkipped('Class `Phalcon\Process\Proc` is not exists');
 			return false;

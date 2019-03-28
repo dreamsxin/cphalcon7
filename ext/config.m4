@@ -72,7 +72,7 @@ else
 fi
 
 PHP_ARG_ENABLE(process, whether to enable process support,
-[  --enable-process   Enable process support], no, no)
+[  --enable-process   Enable process support], yes, no)
 
 AC_MSG_CHECKING([Include process])
 if test "$PHP_PROCESS" = "yes"; then

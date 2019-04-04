@@ -12,9 +12,16 @@ foreach ([$a, $b] as $r) {
 $watcher = new Phalcon\Async\StreamWatcher($b);
 
 Phalcon\Async\Task::async(function () use ($a, $watcher) {
-    (new Phalcon\Async\Timer(700))->awaitTimeout();
+    (new Phalcon\Async\Timer(500))->awaitTimeout();
 
     fwrite($a, 'Hello Socket :)');
+    echo 'EOF!'.PHP_EOL;
+});
+
+Phalcon\Async\Task::async(function () use ($a, $watcher) {
+    (new Phalcon\Async\Timer(700))->awaitTimeout();
+
+    fwrite($a, 'Second Hello Socket :)');
     fclose($a);
     echo 'EOF!'.PHP_EOL;
 });

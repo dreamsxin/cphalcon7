@@ -22,3 +22,6 @@ $result = Phalcon\Async\TaskScheduler::run(function () {
     print_r($tasks);
 });
 
+$timer = new Phalcon\Async\Timer(500);
+$timer->awaitTimeout();
+var_dump($result);

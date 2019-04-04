@@ -877,7 +877,6 @@ registry.c \
 async.c \
 async/core.c \
 async/fiber/stack.c \
-async/fiber/ucontext.c \
 async/context.c \
 async/deferred.c \
 async/timer.c \
@@ -1240,11 +1239,64 @@ aop.c"
 		fi
 	done
 
+  
+	async_use_asm="yes"
 	async_use_ucontext="no"
 
 	AC_CHECK_HEADER(ucontext.h, [
 		async_use_ucontext="yes"
 	])
+  
+	AS_CASE([$host_cpu],
+		[x86_64*], [async_cpu="x86_64"],
+		[x86*], [async_cpu="x86"],
+		[arm*], [async_cpu="arm"],
+		[arm64*], [async_cpu="arm64"],
+		[async_cpu="unknown"]
+	)
+	
+	AS_CASE([$host_os],
+		[darwin*], [async_os="MAC"],
+		[cygwin*], [async_os="WIN"],
+		[mingw*], [async_os="WIN"],
+		[async_os="LINUX"]
+	)
+
+	if test "$async_cpu" = 'x86_64'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="x86_64_sysv_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="x86_64_sysv_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	elif test "$async_cpu" = 'x86'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="i386_sysv_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="i386_sysv_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	elif test "$async_cpu" = 'arm'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="arm_aapcs_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="arm_aapcs_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	else
+		async_use_asm="no"
+	fi
+	
+	if test "$async_use_asm" = 'yes'; then
+		async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
+	elif test "$async_use_ucontext" = 'yes'; then
+		async_source_files="async/fiber/ucontext.c"
+	else
+		async_source_files=""
+	fi
 
 	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then
 		AC_MSG_CHECKING([checking libuv support])
@@ -1255,6 +1307,7 @@ aop.c"
 				[
 					PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+					phalcon_sources="$phalcon_sources $async_source_files"
 				],[
 					AC_MSG_RESULT([Wrong uv version or library not found])
 				],[

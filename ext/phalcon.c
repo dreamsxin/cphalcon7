@@ -236,8 +236,12 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_stream_ce_register();
 	async_socket_ce_register();
 
+	async_channel_ce_register();
+	async_console_ce_register();
 	async_context_ce_register();
 	async_deferred_ce_register();
+	async_process_ce_register();
+	async_signal_watcher_ce_register();
 	async_stream_watcher_ce_register();
 	async_task_ce_register();
 	async_timer_ce_register();

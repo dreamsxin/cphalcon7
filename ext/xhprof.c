@@ -31,8 +31,8 @@
 
 #include "interned-strings.h"
 
-extern ZEND_API void (*_zend_execute_internal)(zend_execute_data*, zval*);
-extern ZEND_API void (*_zend_execute_ex)(zend_execute_data*);
+extern ZEND_API void (*xhprof_orig_zend_execute_internal)(zend_execute_data*, zval*);
+extern ZEND_API void (*xhprof_orig_zend_execute_ex)(zend_execute_data*);
 
 /**
  * Phalcon\Xhprof
@@ -89,10 +89,10 @@ ZEND_API void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, z
 
     is_profiling = tracing_enter_frame_callgraph(NULL, execute_data);
 
-    if (!_zend_execute_internal) {
+    if (!xhprof_orig_zend_execute_internal) {
         execute_internal(execute_data, return_value);
     } else {
-        _zend_execute_internal(execute_data, return_value);
+        xhprof_orig_zend_execute_internal(execute_data, return_value);
     }
 
 	--TXRG(nesting_current_level);
@@ -107,7 +107,7 @@ ZEND_API void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
     int is_profiling = 0;
 
     if (!TXRG(enabled)) {
-        _zend_execute_ex(execute_data);
+        xhprof_orig_zend_execute_ex(execute_data);
         return;
     }
 
@@ -120,7 +120,7 @@ ZEND_API void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
 
     is_profiling = tracing_enter_frame_callgraph(NULL, real_execute_data);
 
-    _zend_execute_ex(execute_data);
+    xhprof_orig_zend_execute_ex(execute_data);
 
 	--TXRG(nesting_current_level);
 

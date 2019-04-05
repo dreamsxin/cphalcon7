@@ -208,6 +208,65 @@ typedef struct _phalcon_aop_options {
 	zval *property_value;
 } phalcon_aop_options;
 
+#if PHALCON_USE_UV
+
+typedef struct _async_cancel_cb                     async_cancel_cb;
+typedef struct _async_cancellation_handler          async_cancellation_handler;
+typedef struct _async_context                       async_context;
+typedef struct _async_context_cancellation          async_context_cancellation;
+typedef struct _async_context_timeout               async_context_timeout;
+typedef struct _async_context_var                   async_context_var;
+typedef struct _async_deferred                      async_deferred;
+typedef struct _async_deferred_awaitable            async_deferred_awaitable;
+typedef struct _async_deferred_custom_awaitable     async_deferred_custom_awaitable;
+typedef struct _async_deferred_state                async_deferred_state;
+typedef struct _async_fiber                         async_fiber;
+typedef struct _async_op                            async_op;
+typedef struct _async_task                          async_task;
+typedef struct _async_task_scheduler                async_task_scheduler;
+
+typedef struct _phalcon_async_options {
+	/* Root fiber context used by the VM. */
+	async_fiber *root;
+	
+	/* Root task scheduler used by the VM. */
+	async_task_scheduler *executor;
+	
+	/* Reference to the running fiber (might be root). */
+	async_fiber *fiber;
+
+	/* Running task scheduler. */
+	async_task_scheduler *scheduler;
+
+	/* Current task being run. */
+	async_task *task;
+	
+	/* Current async context. */
+	async_context *context;
+
+	/* Root context for all foreground contexts. */
+	async_context *foreground;
+	
+	/* Root context for all background contexts. */
+	async_context *background;
+	
+	/* Is set when the SAPI is cli. */
+	zend_bool cli;
+
+	/* Will be populated when bailout is requested. */
+	zend_bool exit;
+	
+	/* INI settings. */
+	zend_bool dns_enabled;
+	zend_bool fs_enabled;
+	zend_long stack_size;
+	zend_bool tcp_enabled;
+	zend_long threads;
+	zend_bool timer_enabled;
+	zend_bool udp_enabled;
+} phalcon_async_options;
+#endif
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -254,6 +313,11 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	phalcon_aop_options aop;
 
+#if PHALCON_USE_UV
+	/** Async */
+	phalcon_async_options async;
+#endif
+
 ZEND_END_MODULE_GLOBALS(phalcon)
 
 
@@ -268,6 +332,10 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 #endif
 
 #define TXRG(v) (PHALCON_GLOBAL(xhprof).v)
+
+#ifdef PHALCON_USE_UV
+#define ASYNC_G(v) (PHALCON_GLOBAL(async).v)
+#endif
 
 extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry

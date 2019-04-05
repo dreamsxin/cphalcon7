@@ -39,16 +39,5 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_handle, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
-/*
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_phalcon_application_handle, 0, 0, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_application_handle, 0, 0, IS_OBJECT, "Phalcon\\Http\\ResponseInterface", 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-#endif
-*/
 
 #endif /* PHALCON_APPLICATION_H */

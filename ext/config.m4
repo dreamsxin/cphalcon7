@@ -875,6 +875,28 @@ image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
 async.c \
+async/core.c \
+async/fiber/stack.c \
+async/stream.c \
+async/socket.c \
+async/ssl.c \
+async/ssl/bio.c \
+async/channel.c \
+async/console.c \
+async/context.c \
+async/deferred.c \
+async/dns.c \
+async/process.c \
+async/signal_watcher.c \
+async/timer.c \
+async/filesystem.c \
+async/stream_watcher.c \
+async/task.c \
+async/tcp.c \
+async/udp.c \
+async/xp/socket.c \
+async/xp/tcp.c \
+async/xp/udp.c \
 thread/exception.c \
 thread/pool.c \
 chart/exception.c \
@@ -980,6 +1002,19 @@ aop.c"
 		],
 		,
 		[[#include "php_config.h"]]
+	)
+
+	PHP_SOCKETS='no'
+
+	AC_CHECK_HEADERS(
+		[ext/sockets/php_sockets.h],
+		[
+			PHP_SOCKETS='yes'
+			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
+			AC_DEFINE([PHALCON_USE_PHP_SOCKETS], [1], [Whether PHP sockets extension is present at compile time])
+		],
+		,
+		[[#include "main/php.h"]]
 	)
 
 	AC_CHECK_DECL(
@@ -1197,19 +1232,98 @@ aop.c"
 		done
 	fi
 
-	if test "$PHP_SOCKET" = "yes"; then
+	AC_MSG_CHECKING([checking SSL support])
+	for i in /usr/local /usr; do
+		if test -r $i/include/openssl/evp.h; then
+			PHP_ADD_INCLUDE($i/include)
+			PHP_CHECK_LIBRARY(ssl, SSL_is_init_finished,
+			[
+				PHP_ADD_LIBRARY_WITH_PATH(ssl, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+				AC_DEFINE(HAVE_ASYNC_SSL, 1, [Have SSL support])
+			],[
+				AC_MSG_RESULT([SSL library not found])
+			],[
+				-L$i/$PHP_LIBDIR
+			])
+			break
+		else
+			AC_MSG_RESULT([no, found in $i])
+		fi
+	done
+
+  
+	async_use_asm="yes"
+	async_use_ucontext="no"
+
+	AC_CHECK_HEADER(ucontext.h, [
+		async_use_ucontext="yes"
+	])
+  
+	AS_CASE([$host_cpu],
+		[x86_64*], [async_cpu="x86_64"],
+		[x86*], [async_cpu="x86"],
+		[arm*], [async_cpu="arm"],
+		[arm64*], [async_cpu="arm64"],
+		[async_cpu="unknown"]
+	)
+	
+	AS_CASE([$host_os],
+		[darwin*], [async_os="MAC"],
+		[cygwin*], [async_os="WIN"],
+		[mingw*], [async_os="WIN"],
+		[async_os="LINUX"]
+	)
+
+	if test "$async_cpu" = 'x86_64'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="x86_64_sysv_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="x86_64_sysv_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	elif test "$async_cpu" = 'x86'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="i386_sysv_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="i386_sysv_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	elif test "$async_cpu" = 'arm'; then
+		if test "$async_os" = 'LINUX'; then
+			async_asm_file="arm_aapcs_elf_gas.S"
+		elif test "$async_os" = 'MAC'; then
+			async_asm_file="arm_aapcs_macho_gas.S"
+		else
+			async_use_asm="no"
+		fi
+	else
+		async_use_asm="no"
+	fi
+	
+	if test "$async_use_asm" = 'yes'; then
+		async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
+	elif test "$async_use_ucontext" = 'yes'; then
+		async_source_files="async/fiber/ucontext.c"
+	else
+		async_source_files=""
+	fi
+
+	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then
 		AC_MSG_CHECKING([checking libuv support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/uv.h; then
 				PHP_ADD_INCLUDE($i/include)
-				PHP_CHECK_LIBRARY(uv, uv_version,
+				PHP_CHECK_LIBRARY(uv, uv_fs_open,
 				[
 					PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+					phalcon_sources="$phalcon_sources $async_source_files"
 				],[
-					AC_MSG_ERROR([Wrong uv version or library not found])
+					AC_MSG_RESULT([Wrong uv version or library not found])
 				],[
-					-L$i/$PHP_LIBDIR -lm
+					-L$i/$PHP_LIBDIR -lpthread
 				])
 				break
 			else
@@ -1440,7 +1554,7 @@ aop.c"
 		LIBS="$LIBS ${PYTHON_LDFLAGS}"
 
 		AC_TRY_LINK([
-            #include <Python.h>
+			#include <Python.h>
 		],[
 			Py_Initialize();
 		],[

@@ -445,6 +445,7 @@
 #include "chart/exception.h"
 
 #include "async.h"
+#include "async/core.h"
 
 #include "thread/exception.h"
 #include "thread/pool.h"

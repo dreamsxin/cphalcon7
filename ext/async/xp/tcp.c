@@ -399,9 +399,13 @@ static zend_string *parse_host(const char *resource, size_t rlen)
 	host = NULL;
 
 	if (url->host) {
+#if PHP_VERSION_ID >= 70300
 		tmp = ZSTR_VAL(url->host);
 		len = ZSTR_LEN(url->host);
-		
+#else
+		tmp = (const char *)url->host;
+		len = strlen(url->host);
+#endif
 		while (len && tmp[len - 1] == '.') {
 			len--;
 		}

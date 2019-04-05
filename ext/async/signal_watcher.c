@@ -303,6 +303,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_signal_watcher_ctor, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_close, 0, 0, IS_VOID, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
 ZEND_END_ARG_INFO()
@@ -313,6 +314,18 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_is_supported, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_close, 0, 0, IS_VOID, NULL, 0)
+	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_await_signal, 0, 0, IS_VOID, NULL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_is_supported, 0, 1, _IS_BOOL, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 static const zend_function_entry async_signal_watcher_functions[] = {
 	ZEND_ME(SignalWatcher, __construct, arginfo_signal_watcher_ctor, ZEND_ACC_PUBLIC)

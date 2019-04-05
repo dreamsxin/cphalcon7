@@ -18,26 +18,21 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_APPLICATION_H
-#define PHALCON_APPLICATION_H
+#ifndef ZEND_ARG_VARIADIC_TYPE_INFO
+#define ZEND_ARG_VARIADIC_TYPE_INFO(pass_by_ref, name, type_hint, allow_null) { #name, NULL, type_hint, pass_by_ref, allow_null, 1 },
+#endif
 
-#include "php_phalcon.h"
+#ifndef ZEND_ARG_VARIADIC_OBJ_INFO
+# define ZEND_ARG_VARIADIC_OBJ_INFO(pass_by_ref, name, classname, allow_null)  { #name, #classname, IS_OBJECT, pass_by_ref, allow_null, 1 },
+#endif
 
-extern zend_class_entry *phalcon_application_ce;
+#ifndef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX
+# define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, return_reference, required_num_args, class_name, allow_null) \
+	static const zend_internal_arg_info name[] = { \
+	   	{ (const char*)(zend_uintptr_t)(required_num_args), #class_name, IS_OBJECT, return_reference, allow_null, 0 },
+#endif
 
-PHALCON_INIT_CLASS(Phalcon_Application);
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_registermodules, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, modules, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_setdefaultmodule, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, defaultModule, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_application_handle, 0, 0, 0)
-	ZEND_ARG_INFO(0, data)
-ZEND_END_ARG_INFO()
-
-#endif /* PHALCON_APPLICATION_H */
+#ifndef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO
+#define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO(name, class_name, allow_null) \
+	ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, 0, -1, class_name, allow_null)
+#endif

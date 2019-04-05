@@ -23,6 +23,8 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
+
 ASYNC_API zend_class_entry *async_deferred_ce;
 ASYNC_API zend_class_entry *async_deferred_awaitable_ce;
 
@@ -795,7 +797,6 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO(arginfo_deferred_debug_info, 0)
 ZEND_END_ARG_INFO()
 
-#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_deferred_awaitable, 0, 0, Phalcon\\Async\\Awaitable, 0)
 ZEND_END_ARG_INFO()
 
@@ -803,9 +804,15 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_deferred_resolve, 0, 0, 0)
 	ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_fail, 0, 0, IS_VOID, 1)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_fail, 0, 0, IS_VOID, NULL, 1)
+	ZEND_ARG_OBJ_INFO(0, error, Throwable, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_deferred_value, 0, 0, Phalcon\\Async\\Awaitable, 0)
 	ZEND_ARG_INFO(0, value)
@@ -824,36 +831,6 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_deferred_transform, 0, 2, Phalcon
 	ZEND_ARG_OBJ_INFO(0, awaitable, Phalcon\\Async\\Awaitable, 0)
 	ZEND_ARG_CALLABLE_INFO(0, continuation, 0)
 ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_awaitable, 0, 0, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_deferred_resolve, 0, 0, 0)
-	ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_fail, 0, 0, IS_VOID, NULL, 1)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_value, 0, 0, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
-	ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_error, 0, 1, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_combine, 0, 2, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
-	ZEND_ARG_ARRAY_INFO(0, awaitables, 0)
-	ZEND_ARG_CALLABLE_INFO(0, continuation, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_deferred_transform, 0, 2, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
-	ZEND_ARG_OBJ_INFO(0, awaitable, Phalcon\\Async\\Awaitable, 0)
-	ZEND_ARG_CALLABLE_INFO(0, continuation, 0)
-ZEND_END_ARG_INFO()
-#endif
 
 static const zend_function_entry deferred_functions[] = {
 	ZEND_ME(Deferred, __construct, arginfo_deferred_ctor, ZEND_ACC_PUBLIC)

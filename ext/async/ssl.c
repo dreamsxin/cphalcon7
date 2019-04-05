@@ -23,6 +23,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_ssl.h"
 
 ASYNC_API zend_class_entry *async_tls_client_encryption_ce;
@@ -1387,8 +1388,8 @@ ZEND_METHOD(TlsInfo, __debugInfo)
 	if (USED_RET()) {
 		array_init(return_value);
 		
-		add_assoc_string(return_value, "protocol", info->protocol);
-		add_assoc_string(return_value, "cipher_name", info->cipher_name);
+		add_assoc_string(return_value, "protocol", (char*)info->protocol);
+		add_assoc_string(return_value, "cipher_name", (char*)info->cipher_name);
 		add_assoc_long(return_value, "cipher_bits", info->cipher_bits);
 		
 		if (info->alpn == NULL) {

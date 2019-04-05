@@ -23,6 +23,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_stream.h"
 
 ASYNC_API zend_class_entry *async_process_builder_ce;
@@ -756,6 +757,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_process_builder_ctor, 0, 0, 1)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_set_directory, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, dir, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -786,6 +788,38 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, IS_LONG, 0)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_set_directory, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, dir, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_inherit_env, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, inherit, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_set_env, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, env, IS_ARRAY, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_configure_stdin, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_configure_stdout, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_configure_stderr, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, IS_LONG, NULL, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phalcon\\Async\\Process\\Process, 0)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
@@ -1017,11 +1051,19 @@ static ZEND_METHOD(Process, join)
 ZEND_BEGIN_ARG_INFO(arginfo_process_debug_info, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_is_running, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_get_pid, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_is_running, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_get_pid, 0, 0, IS_LONG, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_get_stdin, 0, 0, Phalcon\\Async\\Stream\\WritableStream, 0)
 ZEND_END_ARG_INFO()
@@ -1032,12 +1074,21 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_get_stderr, 0, 0, Phalcon\\Async\\Stream\\ReadableStream, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_signal, 0, 1, IS_VOID, 0)
 	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_join, 0, 0, IS_LONG, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_signal, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_join, 0, 0, IS_LONG, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 static const zend_function_entry async_process_functions[] = {
 	ZEND_ME(Process, __debugInfo, arginfo_process_debug_info, ZEND_ACC_PUBLIC)

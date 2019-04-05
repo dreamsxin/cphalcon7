@@ -23,6 +23,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_ssl.h"
 #include "async/async_stream.h"
 #include "async/async_socket.h"
@@ -734,8 +735,13 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tcp_socket_connect, 0, 2, Phalcon
 	ZEND_ARG_OBJ_INFO(0, tls, Phalcon\\Async\\Network\\TlsClientEncryption, 1)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tcp_socket_pair, 0, 0, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tcp_socket_pair, 0, 0, IS_ARRAY, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tcp_socket_encrypt, 0, 0, Phalcon\\Async\\Network\\TlsInfo, 0)
 ZEND_END_ARG_INFO()

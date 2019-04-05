@@ -23,6 +23,8 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
+
 ASYNC_API zend_class_entry *async_timeout_exception_ce;
 ASYNC_API zend_class_entry *async_timer_ce;
 
@@ -365,10 +367,6 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_await_timeout, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_timer_timeout, 0, 1, Phalcon\\Async\\Awaitable, 0)
-	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
-ZEND_END_ARG_INFO()
 #else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_close, 0, 0, IS_VOID, NULL, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
@@ -376,11 +374,11 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_await_timeout, 0, 0, IS_VOID, NULL, 0)
 ZEND_END_ARG_INFO()
+#endif
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_timeout, 0, 1, IS_OBJECT, "Phalcon\\Async\\Awaitable", 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_timer_timeout, 0, 1, Phalcon\\Async\\Awaitable, 0)
 	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
 ZEND_END_ARG_INFO()
-#endif
 
 static const zend_function_entry async_timer_functions[] = {
 	ZEND_ME(Timer, __construct, arginfo_timer_ctor, ZEND_ACC_PUBLIC)

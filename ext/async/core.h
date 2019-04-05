@@ -23,6 +23,8 @@
 
 #include "php_phalcon.h"
 
+#include "kernel/memory.h"
+
 # if PHALCON_USE_UV
 #ifdef HAVE_ASYNC_SSL
 #include <openssl/opensslv.h>
@@ -103,13 +105,6 @@ typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 
 #ifndef ZEND_PARSE_PARAMETERS_NONE
 #define ZEND_PARSE_PARAMETERS_NONE() 
-#endif
-
-#ifndef GC_ADDREF
-# define GC_ADDREF(p) (++GC_REFCOUNT(p))
-#endif
-#ifndef GC_DELREF
-# define GC_DELREF(p) (GC_REFCOUNT(p)--)
 #endif
 
 #ifndef ZEND_PROPERTY_EXISTS

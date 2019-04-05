@@ -22,6 +22,8 @@
 #include "async/core.h"
 
 #if PHALCON_USE_UV
+
+#include "kernel/backend.h"
 #include "async/async_fiber.h"
 
 ASYNC_API zend_class_entry *async_context_ce;
@@ -513,7 +515,6 @@ static ZEND_METHOD(Context, background)
 ZEND_BEGIN_ARG_INFO(arginfo_context_ctor, 0)
 ZEND_END_ARG_INFO()
 
-#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_with, 0, 2, Phalcon\\Async\\Context, 0)
 	ZEND_ARG_OBJ_INFO(0, var, Phalcon\\Async\\ContextVar, 0)
 	ZEND_ARG_INFO(0, value)
@@ -533,8 +534,13 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_shield, 0, 0, Phalcon\\Async\\Context, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_throw_if_cancelled, 0, 0, IS_VOID, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_throw_if_cancelled, 0, 0, IS_VOID, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_context_run, 0, 0, 1)
 	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
@@ -546,40 +552,6 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_background, 0, 0, Phalcon\\Async\\Context, 0)
 ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_with, 0, 2, IS_OBJECT,  "Phalcon\\Async\\Context", 0)
-	ZEND_ARG_OBJ_INFO(0, var, Phalcon\\Async\\ContextVar, 0)
-	ZEND_ARG_INFO(0, value)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_with_isolated_output, 0, 0, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_with_timeout, 0, 1, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_with_cancel, 0, 1, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-	ZEND_ARG_INFO(1, cancel)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_shield, 0, 0, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_throw_if_cancelled, 0, 0, IS_VOID, NULL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_context_run, 0, 0, 1)
-	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
-	ZEND_ARG_VARIADIC_INFO(0, arguments)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_current, 0, 0, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_context_background, 0, 0, IS_OBJECT, "Phalcon\\Async\\Context", 0)
-ZEND_END_ARG_INFO()
-#endif
 
 static const zend_function_entry async_context_functions[] = {
 	ZEND_ME(Context, __construct, arginfo_context_ctor, ZEND_ACC_PRIVATE)

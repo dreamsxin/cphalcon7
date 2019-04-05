@@ -23,6 +23,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_stream.h"
 #include "async/async_socket.h"
 
@@ -707,6 +708,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_udp_socket_receive, 0, 0, Phalcon\\Async\\Network\\UdpDatagram, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_socket_send, 0, 1, IS_VOID, 0)
 	ZEND_ARG_OBJ_INFO(0, datagram, Phalcon\\Async\\Network\\UdpDatagram, 0)
 ZEND_END_ARG_INFO()
@@ -714,6 +716,15 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_socket_send_async, 0, 1, IS_LONG, 0)
 	ZEND_ARG_OBJ_INFO(0, datagram, Phalcon\\Async\\Network\\UdpDatagram, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_socket_send, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_OBJ_INFO(0, datagram, Phalcon\\Async\\Network\\UdpDatagram, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_socket_send_async, 0, 1, IS_LONG, NULL, 0)
+	ZEND_ARG_OBJ_INFO(0, datagram, Phalcon\\Async\\Network\\UdpDatagram, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 static const zend_function_entry async_udp_socket_functions[] = {
 	ZEND_ME(UdpSocket, bind, arginfo_udp_socket_bind, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -916,8 +927,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_udp_datagram_ctor, 0, 0, 3)
 	ZEND_ARG_TYPE_INFO(0, port, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_datagram_debug_info, 0, 0, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_udp_datagram_debug_info, 0, 0, IS_ARRAY, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_udp_datagram_with_data, 0, 1, Phalcon\\Async\\Network\\UdpDatagram, 0)
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)

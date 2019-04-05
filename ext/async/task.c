@@ -26,6 +26,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_fiber.h"
 
 ASYNC_API zend_class_entry *async_task_ce;
@@ -893,7 +894,6 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO(arginfo_task_debug_info, 0)
 ZEND_END_ARG_INFO()
 
-#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_task_async, 0, 1, Phalcon\\Async\\Task, 0)
 	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 	ZEND_ARG_VARIADIC_INFO(0, arguments)
@@ -904,18 +904,6 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_task_async_with_context, 0, 2, Ph
 	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 	ZEND_ARG_VARIADIC_INFO(0, arguments)
 ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_task_async, 0, 1, IS_OBJECT, "Phalcon\\Async\\Task", 0)
-	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
-	ZEND_ARG_VARIADIC_INFO(0, arguments)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_task_async_with_context, 0, 2, IS_OBJECT, "Phalcon\\Async\\Task", 0)
-	ZEND_ARG_OBJ_INFO(0, context, Phalcon\\Async\\Context, 0)
-	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
-	ZEND_ARG_VARIADIC_INFO(0, arguments)
-ZEND_END_ARG_INFO()
-#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_task_await, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, awaitable, Phalcon\\Async\\Awaitable, 0)

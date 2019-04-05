@@ -23,7 +23,15 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include <ext/standard/php_mt_rand.h>
+
+#if PHP_VERSION_ID < 70200
+#include <ext/spl/spl_iterators.h>
+#ifndef zend_ce_countable
+#define zend_ce_countable     spl_ce_Countable
+#endif
+#endif
 
 ASYNC_API zend_class_entry *async_channel_ce;
 ASYNC_API zend_class_entry *async_channel_closed_exception_ce;
@@ -527,6 +535,7 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_get_iterator, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_close, 0, 0, IS_VOID, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
 ZEND_END_ARG_INFO()
@@ -543,6 +552,24 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_send, 0, 1, IS_VOID, 0)
 	ZEND_ARG_INFO(0, message)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_close, 0, 0, IS_VOID, NULL, 0)
+	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_closed, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_receive, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_send, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_send, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_INFO(0, message)
+ZEND_END_ARG_INFO()
+#endif
 
 static const zend_function_entry channel_functions[] = {
 	ZEND_ME(Channel, __construct, arginfo_channel_ctor, ZEND_ACC_PUBLIC)
@@ -718,9 +745,12 @@ static ZEND_METHOD(ChannelGroup, __construct)
 				zend_throw_error(NULL, "Select requires all inputs to be channel iterators or provide such an iterator via IteratorAggregate");
 				return;
 			}
-			
+
+#if PHP_VERSION_ID >= 70300
 			zend_call_method_with_0_params(entry, Z_OBJCE_P(entry), &Z_OBJCE_P(entry)->iterator_funcs_ptr->zf_new_iterator, "getiterator", &tmp);
-			
+#else
+			zend_call_method_with_0_params(entry, Z_OBJCE_P(entry), &Z_OBJCE_P(entry)->iterator_funcs.zf_new_iterator, "getiterator", &tmp);
+#endif
 			if (UNEXPECTED(EG(exception) || Z_TYPE_P(&tmp) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(&tmp), async_channel_iterator_ce))) {
 				zval_ptr_dtor(&tmp);
 				

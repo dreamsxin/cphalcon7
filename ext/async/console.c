@@ -23,6 +23,7 @@
 
 #if PHALCON_USE_UV
 
+#include "kernel/backend.h"
 #include "async/async_stream.h"
 
 ASYNC_API zend_class_entry *async_readable_pipe_ce;
@@ -89,9 +90,13 @@ typedef struct {
 	zval error;
 } async_writable_pipe;
 
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_is_terminal, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
-
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_is_terminal, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
+#endif
 
 ASYNC_CALLBACK read_close_file_cb(uv_fs_t* req)
 {

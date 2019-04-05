@@ -1,8 +1,6 @@
 <?php
 
-namespace Concurrent;
-
-$signal = new SignalWatcher(SignalWatcher::SIGINT);
+$signal = new Phalcon\Async\SignalWatcher(Phalcon\Async\SignalWatcher::SIGINT);
 var_dump(getenv('PATH'));
 echo "START: \"", getenv('MY_TITLE'), "\"\n";
 

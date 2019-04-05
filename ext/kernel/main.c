@@ -34,7 +34,6 @@
 void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 
 	HashTable *constants = EG(zend_constants);
-	memset(phalcon_globals, 0, sizeof(zend_phalcon_globals));
 
 	phalcon_globals->initialized = 0;
 

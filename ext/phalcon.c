@@ -247,7 +247,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 
 #ifdef PHALCON_USE_UV
-	ASYNC_G(cli) = (strncmp(sapi_module.name, "cli", sizeof("cli")-1) == SUCCESS);
+	ASYNC_G(cli) = !strcmp(sapi_module.name, "cli");
 	if (ASYNC_G(cli)) {
 		uv_work_t *req = emalloc(sizeof(uv_work_t));
 		char entry[4];
@@ -1091,7 +1091,9 @@ static PHP_MINFO_FUNCTION(phalcon)
 
 static PHP_GINIT_FUNCTION(phalcon)
 {
+	memset(phalcon_globals, 0, sizeof(zend_phalcon_globals));
 	php_phalcon_init_globals(phalcon_globals);
+
 #ifdef PHALCON_CACHE_YAC
 	/* Cache options */
 	phalcon_globals->cache.enable_yac = 1;

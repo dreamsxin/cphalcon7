@@ -82,7 +82,7 @@ static int maybe_new_socket(uv_tcp_t* handle, int domain, unsigned long flags) {
         handle->flags |= flags;
         return 0;
       }
-      
+  
       /* Query to see if tcp socket is bound. */
       slen = sizeof(saddr);
       memset(&saddr, 0, sizeof(saddr));

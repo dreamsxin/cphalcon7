@@ -148,14 +148,14 @@ typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #endif
 
 ASYNC_API extern zend_class_entry *async_awaitable_ce;
-//ASYNC_API extern zend_class_entry *async_cancellation_exception_ce;
-//ASYNC_API extern zend_class_entry *async_cancellation_handler_ce;
-//ASYNC_API extern zend_class_entry *async_channel_ce;
-//ASYNC_API extern zend_class_entry *async_channel_closed_exception_ce;
-//ASYNC_API extern zend_class_entry *async_channel_group_ce;
-//ASYNC_API extern zend_class_entry *async_channel_iterator_ce;
-//ASYNC_API extern zend_class_entry *async_context_ce;
-//ASYNC_API extern zend_class_entry *async_context_var_ce;
+ASYNC_API extern zend_class_entry *async_cancellation_exception_ce;
+ASYNC_API extern zend_class_entry *async_cancellation_handler_ce;
+ASYNC_API extern zend_class_entry *async_channel_ce;
+ASYNC_API extern zend_class_entry *async_channel_closed_exception_ce;
+ASYNC_API extern zend_class_entry *async_channel_group_ce;
+ASYNC_API extern zend_class_entry *async_channel_iterator_ce;
+ASYNC_API extern zend_class_entry *async_context_ce;
+ASYNC_API extern zend_class_entry *async_context_var_ce;
 ASYNC_API extern zend_class_entry *async_deferred_ce;
 ASYNC_API extern zend_class_entry *async_deferred_awaitable_ce;
 ASYNC_API extern zend_class_entry *async_duplex_stream_ce;
@@ -179,17 +179,15 @@ ASYNC_API extern zend_class_entry *async_signal_watcher_ce;
 ASYNC_API extern zend_class_entry *async_stream_watcher_ce;
 ASYNC_API extern zend_class_entry *async_task_ce;
 ASYNC_API extern zend_class_entry *async_task_scheduler_ce;
-/*
 ASYNC_API extern zend_class_entry *async_tcp_server_ce;
 ASYNC_API extern zend_class_entry *async_tcp_socket_ce;
 ASYNC_API extern zend_class_entry *async_tls_client_encryption_ce;
 ASYNC_API extern zend_class_entry *async_tls_info_ce;
 ASYNC_API extern zend_class_entry *async_tls_server_encryption_ce;
-ASYNC_API extern zend_class_entry *async_udp_datagram_ce;
-ASYNC_API extern zend_class_entry *async_udp_socket_ce;
-*/
 ASYNC_API extern zend_class_entry *async_timeout_exception_ce;
 ASYNC_API extern zend_class_entry *async_timer_ce;
+ASYNC_API extern zend_class_entry *async_udp_datagram_ce;
+ASYNC_API extern zend_class_entry *async_udp_socket_ce;
 ASYNC_API extern zend_class_entry *async_writable_console_stream_ce;
 ASYNC_API extern zend_class_entry *async_writable_pipe_ce;
 ASYNC_API extern zend_class_entry *async_writable_process_pipe_ce;

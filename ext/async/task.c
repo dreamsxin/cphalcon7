@@ -749,7 +749,7 @@ static int has_task_property(zval *object, zval *member, int has_set_exists, voi
 	zval *val;
 
     val = read_task_property(object, member, 0, cache_slot, &rv);
-    
+
     if (val == &EG(uninitialized_zval)) {
     	return 0;
     }
@@ -762,7 +762,7 @@ static int has_task_property(zval *object, zval *member, int has_set_exists, voi
     }
  
     convert_to_boolean(val);
-    
+
     return (Z_TYPE_P(val) == IS_TRUE) ? 1 : 0;
 }
 
@@ -1194,7 +1194,7 @@ ASYNC_CALLBACK walk_loop_cb(uv_handle_t *handle, void *arg)
 static zend_always_inline int debug_handles(uv_loop_t *loop)
 {
     int pending;
-    
+
     pending = 0;
 
 	uv_walk(loop, walk_loop_cb, &pending);

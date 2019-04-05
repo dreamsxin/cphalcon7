@@ -258,20 +258,20 @@ static int has_context_prop(zval *object, zval *member, int has_set_exists, void
 	zval *val;
 
     val = read_context_prop(object, member, 0, cache_slot, &rv);
-    
+
     if (val == &EG(uninitialized_zval)) {
     	return 0;
     }
-    
+
     switch (has_set_exists) {
     	case ZEND_PROPERTY_EXISTS:
     	case ZEND_PROPERTY_ISSET:
     		zval_ptr_dtor(val);
     		return 1;
     }
-    
+
     convert_to_boolean(val);
-    
+
     return (Z_TYPE_P(val) == IS_TRUE) ? 1 : 0;
 }
 

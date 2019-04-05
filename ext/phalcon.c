@@ -50,6 +50,7 @@ ZEND_API void (*async_orig_execute_ex)(zend_execute_data *exec);
 
 ZEND_DECLARE_MODULE_GLOBALS(phalcon)
 
+#ifdef PHALCON_CACHE_YAC
 static PHP_INI_MH(OnChangeKeysMemoryLimit) {
 	if (new_value) {
 		PHALCON_GLOBAL(cache).yac_keys_size = zend_atol(ZSTR_VAL(new_value), ZSTR_LEN(new_value));
@@ -63,6 +64,35 @@ static PHP_INI_MH(OnChangeValsMemoryLimit) {
 	}
 	return SUCCESS;
 }
+#endif
+
+#if PHALCON_USE_UV
+static PHP_INI_MH(OnUpdateFiberStackSize)
+{
+	OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
+
+	if (ASYNC_G(stack_size) < 0) {
+		ASYNC_G(stack_size) = 0;
+	}
+
+	return SUCCESS;
+}
+
+static PHP_INI_MH(OnUpdateThreadCount)
+{
+	OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
+
+	if (ASYNC_G(threads) < 4) {
+		ASYNC_G(threads) = 4;
+	}
+
+	if (ASYNC_G(threads) > 128) {
+		ASYNC_G(threads) = 128;
+	}
+
+	return SUCCESS;
+}
+#endif
 
 PHP_INI_BEGIN()
 	/* Enables/Disables debug */
@@ -91,11 +121,13 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.validation.allow_empty",       "0",    PHP_INI_ALL,    OnUpdateBool, validation.allow_empty,       zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables auttomatic escape */
 	STD_PHP_INI_BOOLEAN("phalcon.db.escape_identifiers",        "1",    PHP_INI_ALL,    OnUpdateBool, db.escape_identifiers,        zend_phalcon_globals, phalcon_globals)
+#ifdef PHALCON_CACHE_YAC
 	/* Enables/Disables cache memory */
 	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_yac",             "1",   PHP_INI_ALL,    OnUpdateBool, cache.enable_yac,          zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.cache.enable_yac_cli",         "0",   PHP_INI_ALL,    OnUpdateBool, cache.enable_yac_cli,      zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.cache.yac_keys_size",            "4M",  PHP_INI_SYSTEM, OnChangeKeysMemoryLimit, cache.yac_keys_size,       zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.cache.yac_values_size",          "64M", PHP_INI_SYSTEM, OnChangeValsMemoryLimit, cache.yac_values_size,     zend_phalcon_globals, phalcon_globals)
+#endif
 	/* Enables/Disables xhprof */
 	STD_PHP_INI_ENTRY("phalcon.xhprof.nesting_max_level", "0",  PHP_INI_ALL, OnUpdateLong, xhprof.nesting_maximum_level,	zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_SYSTEM, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
@@ -103,7 +135,13 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("phalcon.snowflake.node", "0", PHP_INI_SYSTEM, OnUpdateLong, snowflake.node,  zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.aop.enable_aop",   "0", PHP_INI_SYSTEM, OnUpdateBool, aop.enable_aop, zend_phalcon_globals, phalcon_globals)
 #if PHALCON_USE_UV
+	STD_PHP_INI_ENTRY("phalcon.async.dns",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.dns_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.fs_enabled", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.stack_size", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateFiberStackSize, async.stack_size, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.tcp",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.tcp_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.threads",    "4", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateThreadCount, async.threads, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.timer",      "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.timer_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.udp",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.udp_enabled, zend_phalcon_globals, phalcon_globals)
 #endif
 PHP_INI_END()
 
@@ -240,12 +278,16 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_console_ce_register();
 	async_context_ce_register();
 	async_deferred_ce_register();
+	async_dns_ce_register();
 	async_process_ce_register();
 	async_signal_watcher_ce_register();
+	async_ssl_ce_register();
 	async_stream_watcher_ce_register();
 	async_task_ce_register();
+	async_tcp_ce_register();
 	async_timer_ce_register();
-
+	async_udp_socket_ce_register();
+	
 	async_orig_execute_ex = zend_execute_ex;
 	zend_execute_ex = async_execute_ex;
 #endif
@@ -851,6 +893,8 @@ static PHP_RINIT_FUNCTION(phalcon){
 	}
 	
 	async_filesystem_init();
+	async_tcp_socket_init();
+	async_udp_socket_init();
 #endif
 	return SUCCESS;
 }
@@ -914,12 +958,17 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 #endif
 
 #if PHALCON_USE_UV
-	
+	if (ASYNC_G(dns_enabled)) {
+		async_dns_shutdown();
+	}
+
 	if (ASYNC_G(timer_enabled)) {
 		async_timer_shutdown();
 	}
-	
+
 	async_filesystem_shutdown();
+	async_tcp_socket_shutdown();
+	async_udp_socket_shutdown();
 
 	async_task_scheduler_shutdown();
 	async_context_shutdown();

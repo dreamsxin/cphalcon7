@@ -669,7 +669,7 @@ int options, zend_string **opened_path, php_stream_context *context STREAMS_DC)
 		if (options & REPORT_ERRORS) {
 			php_error_docref(NULL, E_WARNING, "'%s' is not a valid mode for fopen", mode);
         }
-        
+
 		return NULL;
 	}
 

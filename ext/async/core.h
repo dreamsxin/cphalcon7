@@ -225,21 +225,6 @@ void async_udp_socket_shutdown();
 
 void async_task_scheduler_run();
 
-typedef struct _async_cancel_cb                     async_cancel_cb;
-typedef struct _async_cancellation_handler          async_cancellation_handler;
-typedef struct _async_context                       async_context;
-typedef struct _async_context_cancellation          async_context_cancellation;
-typedef struct _async_context_timeout               async_context_timeout;
-typedef struct _async_context_var                   async_context_var;
-typedef struct _async_deferred                      async_deferred;
-typedef struct _async_deferred_awaitable            async_deferred_awaitable;
-typedef struct _async_deferred_custom_awaitable     async_deferred_custom_awaitable;
-typedef struct _async_deferred_state                async_deferred_state;
-typedef struct _async_fiber                         async_fiber;
-typedef struct _async_op                            async_op;
-typedef struct _async_task                          async_task;
-typedef struct _async_task_scheduler                async_task_scheduler;
-
 #define ASYNC_FIBER_FLAG_QUEUED 1
 
 struct _async_fiber {

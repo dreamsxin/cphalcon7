@@ -438,7 +438,7 @@ if test "$PHP_PHALCON" = "yes"; then
 	if test "$phalcon_php_version" -lt "7000000"; then
 		AC_MSG_ERROR([You need at least PHP 7.0 to be able to use this version of Phalcon/Dao7. PHP $php_version found])
 	else
-		AC_MSG_RESULT([$php_version, ok])
+		AC_MSG_RESULT([$php_version, ok.])
 	fi
 
 	AC_DEFINE(HAVE_PHALCON, 1, [Whether you have Phalcon Framework])
@@ -1302,7 +1302,7 @@ aop.c"
 		async_use_asm="no"
 	fi
 
-	if test "$phalcon_php_version" -gt "7010000"; then
+	if test "$phalcon_php_version" -ge "7001000"; then
 		if test "$async_use_asm" = 'yes'; then
 			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
 		elif test "$async_use_ucontext" = 'yes'; then
@@ -1310,6 +1310,8 @@ aop.c"
 		else
 			async_source_files=""
 		fi
+	else
+		async_use_ucontext="no"
 	fi
 
 	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then

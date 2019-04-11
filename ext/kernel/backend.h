@@ -23,6 +23,10 @@
 
 #include <Zend/zend_types.h>
 
+#ifndef IS_VOID
+#define IS_VOID 0
+#endif
+
 #ifndef ZEND_ARG_VARIADIC_TYPE_INFO
 #define ZEND_ARG_VARIADIC_TYPE_INFO(pass_by_ref, name, type_hint, allow_null) { #name, NULL, type_hint, pass_by_ref, allow_null, 1 },
 #endif

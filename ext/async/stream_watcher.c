@@ -20,6 +20,7 @@
 */
 
 #include "async/core.h"
+#include "kernel/backend.h"
 
 #if PHALCON_USE_UV
 

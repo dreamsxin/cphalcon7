@@ -1301,13 +1301,15 @@ aop.c"
 	else
 		async_use_asm="no"
 	fi
-	
-	if test "$async_use_asm" = 'yes'; then
-		async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
-	elif test "$async_use_ucontext" = 'yes'; then
-		async_source_files="async/fiber/ucontext.c"
-	else
-		async_source_files=""
+
+	if test "$phalcon_php_version" -gt "7010000"; then
+		if test "$async_use_asm" = 'yes'; then
+			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
+		elif test "$async_use_ucontext" = 'yes'; then
+			async_source_files="async/fiber/ucontext.c"
+		else
+			async_source_files=""
+		fi
 	fi
 
 	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then

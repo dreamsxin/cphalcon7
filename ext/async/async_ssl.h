@@ -22,6 +22,7 @@
 #ifndef ASYNC_SSL_H
 #define ASYNC_SSL_H
 
+#include "async/core.h"
 #include "async/async_buffer.h"
 
 #define ASYNC_SSL_MODE_SERVER 0

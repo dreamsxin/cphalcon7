@@ -21,12 +21,13 @@
 
 #include "async/core.h"
 
-#include "kernel/main.h"
-#include "kernel/backend.h"
-
 #if PHALCON_USE_UV
+#if HAVE_ASYNC_SSL
 
 #include "async/async_ssl.h"
+
+#include "kernel/main.h"
+#include "kernel/backend.h"
 
 static BIO_METHOD *php_method;
 
@@ -146,4 +147,5 @@ void async_ssl_bio_init()
 	BIO_meth_set_destroy(php_method, bio_php_free);
 }
 
+#endif
 #endif

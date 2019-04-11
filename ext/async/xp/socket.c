@@ -690,7 +690,7 @@ static int async_xp_socket_set_option(php_stream *stream, int option, int value,
 			
 			cipher = SSL_get_current_cipher(data->astream->ssl.ssl);
 			
-			add_assoc_string(&crypto, "protocol", SSL_get_version(data->astream->ssl.ssl));
+			add_assoc_string(&crypto, "protocol", (char*)SSL_get_version(data->astream->ssl.ssl));
 			add_assoc_string(&crypto, "cipher_name", (char *) SSL_CIPHER_get_name(cipher));
 			add_assoc_long(&crypto, "cipher_bits", SSL_CIPHER_get_bits(cipher, NULL));
 			add_assoc_string(&crypto, "cipher_version", cipher_get_version(cipher, cipher_version, 32));

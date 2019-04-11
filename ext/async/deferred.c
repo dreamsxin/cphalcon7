@@ -622,7 +622,10 @@ static ZEND_METHOD(Deferred, combine)
 	count = zend_array_count(Z_ARRVAL_P(args));
 
 	if (UNEXPECTED(count == 0)) {
-		zend_throw_error(zend_ce_argument_count_error, "At least one awaitable is required");
+#if PHP_VERSION_ID < 70100
+#else
+		zend_throw_error(zend_ce_error, "At least one awaitable is required");
+#endif
 		return;
 	}
 

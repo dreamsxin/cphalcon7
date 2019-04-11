@@ -25,6 +25,8 @@
 #include "async/async_buffer.h"
 #include "async/async_ssl.h"
 
+#include "kernel/backend.h"
+
 #define ASYNC_STREAM_EOF 1
 #define ASYNC_STREAM_CLOSED (1 << 1)
 #define ASYNC_STREAM_SHUT_RD (1 << 2)

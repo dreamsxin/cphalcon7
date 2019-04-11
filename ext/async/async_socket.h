@@ -22,6 +22,8 @@
 #ifndef ASYNC_SOCKET_H
 #define ASYNC_SOCKET_H
 
+#include "kernel/backend.h"
+
 static zend_always_inline int async_socket_addr_size(const struct sockaddr *addr)
 {
 #ifdef HAVE_IPV6

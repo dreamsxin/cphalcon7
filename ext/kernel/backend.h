@@ -18,6 +18,11 @@
   +------------------------------------------------------------------------+
 */
 
+#ifndef PHALCON_KERNEL_BACKEND_H
+#define PHALCON_KERNEL_BACKEND_H
+
+#include <Zend/zend_types.h>
+
 #ifndef ZEND_ARG_VARIADIC_TYPE_INFO
 #define ZEND_ARG_VARIADIC_TYPE_INFO(pass_by_ref, name, type_hint, allow_null) { #name, NULL, type_hint, pass_by_ref, allow_null, 1 },
 #endif
@@ -35,4 +40,6 @@
 #ifndef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO
 #define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO(name, class_name, allow_null) \
 	ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, 0, -1, class_name, allow_null)
+#endif
+
 #endif

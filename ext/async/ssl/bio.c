@@ -21,6 +21,9 @@
 
 #include "async/core.h"
 
+#include "kernel/main.h"
+#include "kernel/backend.h"
+
 #if PHALCON_USE_UV
 
 #include "async/async_ssl.h"

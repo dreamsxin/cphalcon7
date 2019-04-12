@@ -53,6 +53,7 @@ set(uv_test_sources
     test/test-fs-event.c
     test/test-fs-poll.c
     test/test-fs.c
+    test/test-fs-readdir.c
     test/test-get-currentexe.c
     test/test-get-loadavg.c
     test/test-get-memory.c
@@ -62,6 +63,7 @@ set(uv_test_sources
     test/test-getnameinfo.c
     test/test-getsockname.c
     test/test-getters-setters.c
+    test/test-gettimeofday.c
     test/test-handle-fileno.c
     test/test-homedir.c
     test/test-hrtime.c
@@ -153,6 +155,7 @@ set(uv_test_sources
     test/test-tty.c
     test/test-udp-alloc-cb-fail.c
     test/test-udp-bind.c
+    test/test-udp-connect.c
     test/test-udp-create-socket-early.c
     test/test-udp-dgram-too-big.c
     test/test-udp-ipv6.c
@@ -261,7 +264,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "Android")
        src/unix/sysinfo-memory.c)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Android|Darwin|Linux|OS/390")
+if(APPLE OR CMAKE_SYSTEM_NAME MATCHES "Android|Linux|OS/390")
   list(APPEND uv_sources src/unix/proctitle.c)
 endif()
 
@@ -274,11 +277,11 @@ if(CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|NetBSD|OpenBSD")
   list(APPEND uv_libraries kvm)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin|DragonFly|FreeBSD|NetBSD|OpenBSD")
+if(APPLE OR CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|NetBSD|OpenBSD")
   list(APPEND uv_sources src/unix/bsd-ifaddrs.c src/unix/kqueue.c)
 endif()
 
-if(CMAKE_SYSTEM_NAME STREQUAL "Darwin")
+if(APPLE)
   list(APPEND uv_defines _DARWIN_UNLIMITED_SELECT=1 _DARWIN_USE_64_BIT_INODE=1)
   list(APPEND uv_sources
        src/unix/darwin-proctitle.c
@@ -332,7 +335,7 @@ if(CMAKE_SYSTEM_NAME STREQUAL "SunOS")
   list(APPEND uv_sources src/unix/no-proctitle.c src/unix/sunos.c)
 endif()
 
-if(CMAKE_SYSTEM_NAME MATCHES "Darwin|DragonFly|FreeBSD|Linux|NetBSD|OpenBSD")
+if(APPLE OR CMAKE_SYSTEM_NAME MATCHES "DragonFly|FreeBSD|Linux|NetBSD|OpenBSD")
   list(APPEND uv_test_libraries util)
 endif()
 
@@ -351,7 +354,8 @@ target_link_libraries(uv_a ${uv_libraries})
 if(BUILD_TESTING)
   include(CTest)
   add_executable(uv_run_tests ${uv_test_sources})
-  target_compile_definitions(uv_run_tests PRIVATE ${uv_defines})
+  target_compile_definitions(uv_run_tests
+                             PRIVATE ${uv_defines} USING_UV_SHARED=1)
   target_compile_options(uv_run_tests PRIVATE ${uv_cflags})
   target_include_directories(uv_run_tests PRIVATE include)
   target_link_libraries(uv_run_tests uv ${uv_test_libraries})
@@ -383,7 +387,7 @@ if(UNIX)
 
   install(DIRECTORY include/ DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
   install(FILES LICENSE DESTINATION ${CMAKE_INSTALL_DOCDIR})
-  install(FILES LICENSE ${CMAKE_CURRENT_BINARY_DIR}/libuv.pc
+  install(FILES ${CMAKE_CURRENT_BINARY_DIR}/libuv.pc
           DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig)
   install(TARGETS uv LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR})
   install(TARGETS uv_a ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR})

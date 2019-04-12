@@ -1,6 +1,6 @@
 # Libuv Integration
 
-Libuv `1.26.0` is bundled with the extension for static linking.
+Libuv `1.27.0` is bundled with the extension for static linking.
 
 ## Linux
 

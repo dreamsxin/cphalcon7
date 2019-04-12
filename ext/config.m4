@@ -173,6 +173,15 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(uv, whether to enable libuv support,
+[  --enable-uv   Enable libuv support], yes, no)
+
+if test "$PHP_UV" = "yes"; then
+	AC_MSG_RESULT([yes, libuv])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(python, for python support,
 [  --enable-python   Include python support], no, no)
 
@@ -1302,7 +1311,7 @@ aop.c"
 		async_use_asm="no"
 	fi
 
-	if test "$phalcon_php_version" -ge "7001000"; then
+	if test "$PHP_UV" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
 		if test "$async_use_asm" = 'yes'; then
 			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
 		elif test "$async_use_ucontext" = 'yes'; then
@@ -1315,25 +1324,52 @@ aop.c"
 	fi
 
 	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then
-		AC_MSG_CHECKING([checking libuv support])
-		for i in /usr/local /usr; do
-			if test -r $i/include/uv.h; then
-				PHP_ADD_INCLUDE($i/include)
-				PHP_CHECK_LIBRARY(uv, uv_fs_open,
-				[
-					PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-					AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
-					phalcon_sources="$phalcon_sources $async_source_files"
-				],[
-					AC_MSG_RESULT([Wrong uv version or library not found])
-				],[
-					-L$i/$PHP_LIBDIR -lpthread
-				])
-				break
-			else
-				AC_MSG_RESULT([no, found in $i])
-			fi
-		done
+		AC_MSG_CHECKING(for static libuv)
+		DIR="${srcdir}/async/thirdparty"
+		if test "$async_os" = 'LINUX' && test ! -s "${DIR}/lib/libuv.a"; then
+			AC_MSG_RESULT(no)
+			TMP=$(mktemp -d)
+			cp -r ${DIR}/libuv $TMP
+			pushd ${TMP}/libuv
+			./autogen.sh
+			./configure --disable-shared --prefix=${TMP}/build CFLAGS="$(CFLAGS) -fPIC -DPIC -g -O2"
+			make install
+			popd
+			mv ${TMP}/build/lib/libuv.a ${DIR}/lib
+			rm -rf $TMP
+		else
+			AC_MSG_RESULT(yes)
+		fi
+
+		if test "$async_os" = 'LINUX' && test -s "${DIR}/lib/libuv.a"; then
+			AC_MSG_CHECKING([checking static libuv])
+			PHP_ADD_INCLUDE("${DIR}/libuv/include")
+			PHP_ADD_LIBRARY_WITH_PATH(uv, ${DIR}/lib, PHALCON_SHARED_LIBADD)
+			AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+			phalcon_sources="$phalcon_sources $async_source_files"
+			AC_MSG_RESULT([yes, static])
+			CPPFLAGS="${CPPFLAGS} -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
+		else
+			AC_MSG_CHECKING([checking libuv support])
+			for i in /usr/local /usr; do
+				if test -r $i/include/uv.h; then
+					PHP_ADD_INCLUDE($i/include)
+					PHP_CHECK_LIBRARY(uv, uv_fs_open,
+					[
+						PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+						AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
+						phalcon_sources="$phalcon_sources $async_source_files"
+					],[
+						AC_MSG_RESULT([Wrong uv version or library not found])
+					],[
+						-L$i/$PHP_LIBDIR -lpthread
+					])
+					break
+				else
+					AC_MSG_RESULT([no, found in $i])
+				fi
+			done
+		fi
 	fi
 
 	if test "$PHP_WEBSOCKET" = "yes"; then

@@ -1,0 +1,12 @@
+[submodule "libuv"]
+	path = deps/libuv
+	url = https://github.com/libuv/libuv.git
+[submodule "luajit"]
+	path = deps/luajit
+	url = https://github.com/LuaJIT/LuaJIT.git
+[submodule "lua"]
+	path = deps/lua
+	url = https://github.com/lua/lua
+[submodule "lua-compat-5.3"]
+	path = deps/lua-compat-5.3
+	url = https://github.com/keplerproject/lua-compat-5.3.git

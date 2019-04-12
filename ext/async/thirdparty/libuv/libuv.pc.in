@@ -10,4 +10,3 @@ URL: http://libuv.org/
 
 Libs: -L${libdir} -luv @LIBS@
 Cflags: -I${includedir}
-

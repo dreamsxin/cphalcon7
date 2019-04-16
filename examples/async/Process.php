@@ -41,7 +41,7 @@ $code = $process->join();
 
 echo "\nEXIT CODE: ", $code, "\n";
 
-$reader = function (Phalcon\Async\ReadablePipe $pipe, int $len) {
+$reader = function (Phalcon\Async\Process\ReadablePipe $pipe, int $len) {
     try {
         while (null !== ($chunk = $pipe->read($len))) {
             var_dump($chunk);
@@ -50,3 +50,18 @@ $reader = function (Phalcon\Async\ReadablePipe $pipe, int $len) {
         $pipe->close();
     }
 };
+
+$builder = new Phalcon\Async\Process\Builder('ls');
+$builder->setDirectory(__DIR__);
+$builder->configureStdout(Phalcon\Async\Process\Builder::STDIO_PIPE);
+$builder->configureStderr(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDERR);
+
+$process = $builder->start(...\array_slice($_SERVER['argv'], 1));
+
+// \Concurrent\Task::async($reader, $process->getStdout(), 256);
+
+$reader($process->getStdout(), 256);
+
+$code = $process->join();
+
+echo "\nEXIT CODE: ", $code, "\n";

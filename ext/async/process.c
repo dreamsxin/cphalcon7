@@ -73,6 +73,7 @@ typedef struct {
 
 	/* STDIO pipe definitions for STDIN, STDOUT and STDERR. */
 	uv_stdio_container_t stdio[3];
+
 } async_process_builder;
 
 typedef struct {
@@ -125,6 +126,9 @@ struct _async_process {
 
 	/* Exit code / process termination observers. */
 	async_op_list observers;
+
+	/* Use UV_PROCESS_DETACHED */
+	zend_bool detached;
 };
 
 typedef struct {
@@ -315,11 +319,13 @@ ASYNC_CALLBACK shutdown_process(void *obj, zval *error)
 
 	proc->cancel.func = NULL;
 
+	if (!proc->detached) {
 #ifdef PHP_WIN32
-	uv_process_kill(&proc->handle, ASYNC_SIGNAL_SIGINT);
+		uv_process_kill(&proc->handle, ASYNC_SIGNAL_SIGINT);
 #else
-	uv_process_kill(&proc->handle, ASYNC_SIGNAL_SIGKILL);
+		uv_process_kill(&proc->handle, ASYNC_SIGNAL_SIGKILL);
 #endif
+	}
 
 	ASYNC_ADDREF(&proc->std);
 
@@ -417,7 +423,11 @@ static void prepare_process(async_process_builder *builder, async_process *proc,
 	proc->options.stdio_count = 3;
 	proc->options.stdio = builder->stdio;
 	proc->options.exit_cb = exit_process;
-	proc->options.flags = UV_PROCESS_WINDOWS_HIDE;
+	if (proc->detached) {
+		proc->options.flags = UV_PROCESS_WINDOWS_HIDE|UV_PROCESS_DETACHED;
+	} else {
+		proc->options.flags = UV_PROCESS_WINDOWS_HIDE;
+	}
 
 	if (builder->cwd != NULL) {
 		proc->options.cwd = ZSTR_VAL(builder->cwd);
@@ -631,7 +641,7 @@ static ZEND_METHOD(ProcessBuilder, execute)
 		}
 	}
 
-	proc = async_process_object_create();
+	proc = async_process_object_create(0);
 
 	prepare_process(builder, proc, params, count, return_value, execute_data);
 
@@ -704,7 +714,73 @@ static ZEND_METHOD(ProcessBuilder, start)
 	ZEND_PARSE_PARAMETERS_END();
 
 	builder = (async_process_builder *) Z_OBJ_P(getThis());
-	proc = async_process_object_create();
+	proc = async_process_object_create(0);
+
+	prepare_process(builder, proc, params, count, return_value, execute_data);
+
+	if (proc->options.stdio[0].flags & UV_CREATE_PIPE) {
+		create_writable_state(proc, &proc->stdin_state, 0);
+	}
+
+	if (proc->options.stdio[1].flags & UV_CREATE_PIPE) {
+		create_readable_state(proc, &proc->stdout_state, 1);
+	}
+
+	if (proc->options.stdio[2].flags & UV_CREATE_PIPE) {
+		create_readable_state(proc, &proc->stderr_state, 2);
+	}
+
+	code = uv_spawn(&proc->scheduler->loop, &proc->handle, &proc->options);
+
+	efree(proc->options.args);
+
+	if (proc->options.env != NULL) {
+		x = 0;
+
+		while (proc->options.env[x] != NULL) {
+			efree(proc->options.env[x++]);
+		}
+
+		efree(proc->options.env);
+	}
+
+	if (UNEXPECTED(code != 0)) {
+		zend_throw_error(NULL, "Failed to launch process \"%s\": %s", ZSTR_VAL(builder->command), uv_strerror(code));
+		ASYNC_DELREF(&proc->std);
+		
+		return;
+	}
+
+	uv_unref((uv_handle_t *) &proc->handle);
+
+	ASYNC_LIST_APPEND(&proc->scheduler->shutdown, &proc->cancel);
+
+	proc->pid = proc->handle.pid;
+
+	ZVAL_OBJ(&obj, &proc->std);
+
+	RETURN_ZVAL(&obj, 1, 1);
+}
+
+static ZEND_METHOD(ProcessBuilder, daemon)
+{
+	async_process_builder *builder;
+	async_process *proc;
+
+	uint32_t count;
+	zval *params;
+	zval obj;
+
+	int code;
+	int x;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, -1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_VARIADIC('+', params, count)
+	ZEND_PARSE_PARAMETERS_END();
+
+	builder = (async_process_builder *) Z_OBJ_P(getThis());
+	proc = async_process_object_create(1);
 
 	prepare_process(builder, proc, params, count, return_value, execute_data);
 
@@ -825,6 +901,10 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phal
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_daemon, 0, 0, Phalcon\\Async\\Process\\Process, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry async_process_builder_functions[] = {
 	ZEND_ME(ProcessBuilder, __construct, arginfo_process_builder_ctor, ZEND_ACC_PUBLIC)
 	ZEND_ME(ProcessBuilder, setDirectory, arginfo_process_builder_set_directory, ZEND_ACC_PUBLIC)
@@ -835,10 +915,11 @@ static const zend_function_entry async_process_builder_functions[] = {
 	ZEND_ME(ProcessBuilder, configureStderr, arginfo_process_builder_configure_stderr, ZEND_ACC_PUBLIC)
 	ZEND_ME(ProcessBuilder, execute, arginfo_process_builder_execute, ZEND_ACC_PUBLIC)
 	ZEND_ME(ProcessBuilder, start, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
+	ZEND_ME(ProcessBuilder, daemon, arginfo_process_builder_daemon, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
 
-static async_process *async_process_object_create()
+static async_process *async_process_object_create(unsigned int detached)
 {
 	async_process *proc;
 
@@ -859,6 +940,8 @@ static async_process *async_process_object_create()
 	ZVAL_UNDEF(&proc->stdin_state.error);
 	ZVAL_UNDEF(&proc->stdout_state.error);
 	ZVAL_UNDEF(&proc->stderr_state.error);
+
+	proc->detached = detached;
 
 	return proc;
 }

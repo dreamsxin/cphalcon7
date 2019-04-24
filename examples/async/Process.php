@@ -1,12 +1,12 @@
 <?php
 
 $builder = new Phalcon\Async\Process\Builder(PHP_BINARY);
-$builder->configureStdout(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDOUT);
-$builder->configureStderr(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDERR);
+$builder->withStdoutInherited();
+$builder->withStderrInherited();
 
-$builder->setEnv([
+$builder = $builder->withEnv([
     'MY_TITLE' => 'TEST'
-]);
+], true);
 
 $process = $builder->start(__DIR__ . '/process/p2.php');
 
@@ -20,8 +20,7 @@ $code = $process->join();
 
 echo "\nEXIT CODE: ", $code, "\n";
 
-$builder->configureStdin(Phalcon\Async\Process\Builder::STDIO_PIPE);
-
+$builder = $builder->withStdinPipe();
 $process = $builder->start(__DIR__ . '/process/p1.php');
 
 $stdin = $process->getStdin();
@@ -51,16 +50,14 @@ $reader = function (Phalcon\Async\Process\ReadablePipe $pipe, int $len) {
     }
 };
 
-$builder = new Phalcon\Async\Process\Builder('ls');
-$builder->setDirectory(__DIR__);
-$builder->configureStdout(Phalcon\Async\Process\Builder::STDIO_PIPE);
-$builder->configureStderr(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDERR);
+$builder = Phalcon\Async\Process\Builder::shell();
+$builder = $builder->withCwd(__DIR__);
+$builder = $builder->withStdoutPipe();
+$builder = $builder->withStderrInherited();
 
-$process = $builder->start(...\array_slice($_SERVER['argv'], 1));
+$process = $builder->start((\DIRECTORY_SEPARATOR == '\\') ? 'dir' : 'ls');
 
-// \Concurrent\Task::async($reader, $process->getStdout(), 256);
-
-$reader($process->getStdout(), 256);
+Phalcon\Async\Task::async($reader, $process->getStdout(), 256);
 
 $code = $process->join();
 

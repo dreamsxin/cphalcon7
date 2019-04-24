@@ -125,7 +125,7 @@ static zend_always_inline size_t async_ring_buffer_read_string(async_ring_buffer
 
 static zend_always_inline void async_ring_buffer_write_move(async_ring_buffer *buffer, size_t offset)
 {
-	ZEND_ASSERT(offset > 0);
+	ZEND_ASSERT(offset >= 0);
 	ZEND_ASSERT(offset <= buffer->size);
 
 	buffer->wpos = buffer->base + ((buffer->wpos - buffer->base) + offset) % buffer->size;

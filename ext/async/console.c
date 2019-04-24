@@ -33,10 +33,10 @@ static zend_object_handlers async_readable_pipe_handlers;
 static zend_object_handlers async_writable_pipe_handlers;
 
 #define ASYNC_CONSOLE_FLAG_TTY 1
-#define ASYNC_CONSOLE_FLAG_PIPE 2
-#define ASYNC_CONSOLE_FLAG_FILE 4
+#define ASYNC_CONSOLE_FLAG_PIPE (1 << 1)
+#define ASYNC_CONSOLE_FLAG_FILE (1 << 2)
 
-#define ASYNC_CONSOLE_FLAG_EOF 32
+#define ASYNC_CONSOLE_FLAG_EOF (1 << 5)
 
 typedef struct {
 	zend_object std;	
@@ -156,10 +156,10 @@ ASYNC_CALLBACK readable_pipe_shutdown(void *object, zval *error)
 static async_readable_pipe* async_readable_pipe_object_create(uv_file file, uv_handle_type type)
 {
 	async_readable_pipe *pipe;
-	
+	int code;
 	pipe = ecalloc(1, sizeof(async_readable_pipe));
 	
-	pipe->scheduler = async_task_scheduler_ref();
+	pipe->scheduler = async_task_scheduler_get();
 	
 	if (type == UV_TTY) {
 		pipe->flags |= ASYNC_CONSOLE_FLAG_TTY;
@@ -170,8 +170,21 @@ static async_readable_pipe* async_readable_pipe_object_create(uv_file file, uv_h
 	} else if (type == UV_NAMED_PIPE) {
 		pipe->flags |= ASYNC_CONSOLE_FLAG_PIPE;
 	
-		uv_pipe_init(&pipe->scheduler->loop, &pipe->handle.pipe.handle, 0);
-		uv_pipe_open(&pipe->handle.pipe.handle, file);
+		code = uv_pipe_init(&pipe->scheduler->loop, &pipe->handle.pipe.handle, 0);
+		
+		if (UNEXPECTED(code < 0)) {
+			efree(pipe);
+			zend_throw_error(NULL, "Failed to init pipe: %s", uv_strerror(code));
+			return NULL;
+		}
+		
+		code = uv_pipe_open(&pipe->handle.pipe.handle, file);
+
+		if (UNEXPECTED(code < 0)) {
+			efree(pipe);
+			zend_throw_error(NULL, "Failed to open pipe [%d]: %s", (int) file, uv_strerror(code));
+			return NULL;
+		}
 		
 		pipe->handle.pipe.stream = async_stream_init((uv_stream_t *) &pipe->handle.pipe.handle, 0);
 	} else if (type == UV_FILE) {
@@ -182,12 +195,12 @@ static async_readable_pipe* async_readable_pipe_object_create(uv_file file, uv_h
 		pipe->handle.file.buffer = emalloc(pipe->handle.file.size);
 		pipe->handle.file.offset = pipe->handle.file.buffer;
 	} else {
-		async_task_scheduler_unref(pipe->scheduler);
-		
 		efree(pipe);
 		
 		return NULL;
 	}
+
+	ASYNC_ADDREF(&pipe->scheduler->std);
 	
 	zend_object_std_init(&pipe->std, async_readable_pipe_ce);
 	pipe->std.handlers = &async_readable_pipe_handlers;
@@ -241,8 +254,6 @@ static ZEND_METHOD(ReadablePipe, getStdin)
 	uv_file file;
 	uv_handle_type type;
 	
-	zval obj;
-	
 	ZEND_PARSE_PARAMETERS_NONE();
 	
 	ASYNC_CHECK_ERROR(!ASYNC_G(cli), "Cannot access STDIN when not running in cli mode");
@@ -253,13 +264,12 @@ static ZEND_METHOD(ReadablePipe, getStdin)
 	pipe = async_readable_pipe_object_create(file, type);
 	
 	if (UNEXPECTED(pipe == NULL)) {
+		ASYNC_RETURN_ON_ERROR();
 		zend_throw_error(NULL, "STDIN cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-	
-	ZVAL_OBJ(&obj, &pipe->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&pipe->std);
 }
 
 static ZEND_METHOD(ReadablePipe, isTerminal)
@@ -413,7 +423,9 @@ static ZEND_METHOD(ReadablePipe, read)
 	
 	read.in.len = len;
 	read.in.buffer = NULL;
+	read.in.handle = NULL;
 	read.in.timeout = 0;
+	read.in.flags = 0;
 	
 	if (EXPECTED(SUCCESS == async_stream_read(stream, &read))) {
 		if (EXPECTED(read.out.len)) {
@@ -578,8 +590,6 @@ static ZEND_METHOD(WritablePipe, getStdout)
 	uv_file file;
 	uv_handle_type type;
 	
-	zval obj;
-	
 	ZEND_PARSE_PARAMETERS_NONE();
 	
 	ASYNC_CHECK_ERROR(!ASYNC_G(cli), "Cannot access STDOUT when not running in cli mode");
@@ -593,10 +603,8 @@ static ZEND_METHOD(WritablePipe, getStdout)
 		zend_throw_error(NULL, "STDOUT cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-	
-	ZVAL_OBJ(&obj, &pipe->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&pipe->std);
 }
 
 static ZEND_METHOD(WritablePipe, getStderr)
@@ -605,8 +613,6 @@ static ZEND_METHOD(WritablePipe, getStderr)
 	
 	uv_file file;
 	uv_handle_type type;
-	
-	zval obj;
 	
 	ZEND_PARSE_PARAMETERS_NONE();
 	
@@ -621,10 +627,8 @@ static ZEND_METHOD(WritablePipe, getStderr)
 		zend_throw_error(NULL, "STDERR cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-	
-	ZVAL_OBJ(&obj, &pipe->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&pipe->std);
 }
 
 static ZEND_METHOD(WritablePipe, isTerminal)
@@ -746,6 +750,7 @@ static ZEND_METHOD(WritablePipe, write)
 	
 	write.in.len = ZSTR_LEN(data);
 	write.in.buffer = ZSTR_VAL(data);
+	write.in.handle = NULL;
 	write.in.str = data;
 	write.in.ref = getThis();
 	write.in.flags = 0;

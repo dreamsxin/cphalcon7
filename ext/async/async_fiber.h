@@ -32,6 +32,9 @@ typedef LPFIBER_START_ROUTINE async_fiber_cb;
 typedef void (* async_fiber_cb)(void *arg);
 #endif
 
+#define BACKUP_EG(name) (fiber)->name = EG(name)
+#define RESTORE_EG(name) EG(name) = (fiber)->name
+
 typedef enum {
 	ASYNC_FIBER_SUSPEND_NONE,
 	ASYNC_FIBER_SUSPEND_PREPEND,
@@ -74,16 +77,18 @@ static zend_always_inline void async_fiber_capture_state(async_fiber *fiber)
 	fiber->context = ASYNC_G(context);
 	fiber->task = ASYNC_G(task);
 	
-	fiber->stack = EG(vm_stack);
-	fiber->stack->top = EG(vm_stack_top);
-	fiber->stack->end = EG(vm_stack_end);
+	BACKUP_EG(vm_stack);
 #if PHP_VERSION_ID >= 70300
-	fiber->stack_page_size = EG(vm_stack_page_size);
+	BACKUP_EG(vm_stack_page_size);
 #endif
-	fiber->exec = EG(current_execute_data);
-	fiber->exception_class = EG(exception_class);
-	fiber->error_handling = EG(error_handling);
-	fiber->bailout = EG(bailout);
+	BACKUP_EG(current_execute_data);
+	BACKUP_EG(exception_class);
+	BACKUP_EG(error_handling);
+	BACKUP_EG(error_reporting);
+	BACKUP_EG(bailout);
+	
+	fiber->vm_stack->top = EG(vm_stack_top);
+	fiber->vm_stack->end = EG(vm_stack_end);
 	
 	async_fiber_capture_og(fiber->context);
 }
@@ -94,16 +99,18 @@ static zend_always_inline void async_fiber_restore_state(async_fiber *fiber)
 	ASYNC_G(context) = fiber->context;
 	ASYNC_G(task) = fiber->task;
 	
-	EG(vm_stack) = fiber->stack;
-	EG(vm_stack_top) = fiber->stack->top;
-	EG(vm_stack_end) = fiber->stack->end;
+	RESTORE_EG(vm_stack);
 #if PHP_VERSION_ID >= 70300
-	EG(vm_stack_page_size) = fiber->stack_page_size;
+	RESTORE_EG(vm_stack_page_size);
 #endif
-	EG(current_execute_data) = fiber->exec;
-	EG(exception_class) = fiber->exception_class;
-	EG(error_handling) = fiber->error_handling;
-	EG(bailout) = fiber->bailout;
+	RESTORE_EG(current_execute_data);
+	RESTORE_EG(exception_class);
+	RESTORE_EG(error_handling);
+	RESTORE_EG(error_reporting);
+	RESTORE_EG(bailout);
+	
+	EG(vm_stack_top) = fiber->vm_stack->top;
+	EG(vm_stack_end) = fiber->vm_stack->end;
 	
 	async_fiber_restore_og(fiber->context);
 }

@@ -1,9 +1,8 @@
 <?php
 
 $builder = new Phalcon\Async\Process\Builder(PHP_BINARY);
-$builder->configureStdout(Phalcon\Async\Process\Builder::STDIO_PIPE);
-//$builder->configureStdout(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDOUT);
-$builder->configureStderr(Phalcon\Async\Process\Builder::STDIO_INHERIT, Phalcon\Async\Process\Builder::STDERR);
+$builder = $builder->withStdoutPipe();
+$builder->withStderrInherited();
 
 $proc = $builder->daemon(__DIR__.'/process/daemon.php');
 if ($proc->isRunning()) {

@@ -395,18 +395,14 @@ static ZEND_METHOD(Channel, getIterator)
 {
 	async_channel *channel;
 	async_channel_iterator *it;
-	
-	zval obj;
-	
+
 	ZEND_PARSE_PARAMETERS_NONE();
 	
 	channel = (async_channel *) Z_OBJ_P(getThis());
 	
 	it = async_channel_iterator_object_create(channel->state);
-	
-	ZVAL_OBJ(&obj, &it->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&it->std);
 }
 
 static ZEND_METHOD(Channel, close)
@@ -1457,4 +1453,4 @@ void async_channel_ce_register()
 	zend_do_inheritance(async_channel_closed_exception_ce, zend_ce_exception);
 }
 
-#endif
+#endif /* PHALCON_USE_UV */

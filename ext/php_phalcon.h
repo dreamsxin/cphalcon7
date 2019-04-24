@@ -258,6 +258,7 @@ typedef struct _phalcon_async_options {
 	
 	/* INI settings. */
 	zend_bool dns_enabled;
+	zend_bool forked;
 	zend_bool fs_enabled;
 	zend_long stack_size;
 	zend_bool tcp_enabled;

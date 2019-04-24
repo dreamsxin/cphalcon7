@@ -37,19 +37,25 @@
 #define ASYNC_STREAM_DELAY_SHUTDOWN (1 << 7)
 #define ASYNC_STREAM_WRITING (1 << 8)
 #define ASYNC_STREAM_SSL_FATAL (1 << 9)
+#define ASYNC_STREAM_IPC (1 << 10)
 
 #define ASYNC_STREAM_SHUT_RDWR (ASYNC_STREAM_SHUT_RD | ASYNC_STREAM_SHUT_WR)
 
 typedef struct _async_stream async_stream;
+typedef struct _async_stream_import async_stream_import;
 
 typedef void (* async_stream_write_cb)(void *arg);
 typedef void (* async_stream_dispose_cb)(void *arg);
+
+#define ASYNC_STREAM_READ_REQ_FLAG_IMPORT 1
 
 typedef struct {
 	struct {
 		size_t len;
 		char *buffer;
+		uv_stream_t *handle;
 		uint64_t timeout;
+		uint8_t flags;
 	} in;
 	struct {
 		size_t len;
@@ -62,11 +68,13 @@ typedef struct {
 } async_stream_read_req;
 
 #define ASYNC_STREAM_WRITE_REQ_FLAG_ASYNC 1
+#define ASYNC_STREAM_WRITE_REQ_FLAG_EXPORT (1 << 1)
 
 typedef struct {
 	struct {
 		size_t len;
 		char *buffer;
+		uv_stream_t *handle;
 		zend_string *str;
 		zval *ref;
 		uint8_t flags;
@@ -103,13 +111,16 @@ struct _async_stream {
 	zval read_error;
 	zval write_error;
 	zval ref;
+#ifdef HAVE_ASYNC_SSL
 	async_stream_dispose_cb dispose;
 	void *arg;
+#endif
 };
 
 #define ASYNC_STREAM_WRITE_OP_FLAG_NEEDS_FREE 1
 #define ASYNC_STREAM_WRITE_OP_FLAG_ASYNC (1 << 1)
 #define ASYNC_STREAM_WRITE_OP_FLAG_STARTED (1 << 2)
+#define ASYNC_STREAM_WRITE_OP_FLAG_EXPORT (1 << 3)
 
 typedef struct {
 	size_t size;
@@ -127,6 +138,7 @@ typedef struct {
 	int ssl_error;
 #endif
 	uv_write_t req;
+	uv_stream_t *handle;
 	zend_string *str;
 	zval ref;
 	async_stream_write_buf in;
@@ -179,7 +191,7 @@ static void zend_always_inline forward_stream_read_error(async_stream_read_req *
 #endif
 
 	ASYNC_CHECK_EXCEPTION(req->out.error == UV_EALREADY, async_pending_read_exception_ce, "Cannot read while another read is pending");
-
+	
 	zend_throw_exception_ex(async_stream_exception_ce, 0, "Read operation failed: %s", uv_strerror(req->out.error));
 }
 
@@ -224,7 +236,9 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 
 	read.in.len = len;
 	read.in.buffer = NULL;
+	read.in.handle = NULL;
 	read.in.timeout = 0;
+	read.in.flags = 0;
 
 	if (EXPECTED(SUCCESS == async_stream_read(stream, &read))) {
 		if (EXPECTED(read.out.len)) {
@@ -254,6 +268,7 @@ static zend_always_inline void async_stream_call_write(async_stream *stream, zva
 
 	write.in.len = ZSTR_LEN(data);
 	write.in.buffer = ZSTR_VAL(data);
+	write.in.handle = NULL;
 	write.in.str = data;
 	write.in.ref = getThis();
 	write.in.flags = 0;

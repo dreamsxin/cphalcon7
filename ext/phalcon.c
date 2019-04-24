@@ -137,6 +137,7 @@ PHP_INI_BEGIN()
 #if PHALCON_USE_UV
 	STD_PHP_INI_ENTRY("phalcon.async.dns",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.dns_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.fs_enabled", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.forked",     "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.forked, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.stack_size", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateFiberStackSize, async.stack_size, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.tcp",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.tcp_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.threads",    "4", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateThreadCount, async.threads, zend_phalcon_globals, phalcon_globals)
@@ -279,6 +280,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_context_ce_register();
 	async_deferred_ce_register();
 	async_dns_ce_register();
+	async_pipe_ce_register();
 	async_process_ce_register();
 	async_signal_watcher_ce_register();
 	async_ssl_ce_register();

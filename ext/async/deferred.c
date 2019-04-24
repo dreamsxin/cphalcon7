@@ -125,8 +125,8 @@ static zend_always_inline void release_state(async_deferred_state *state)
 
 	zval_ptr_dtor(&state->result);
 
-	async_task_scheduler_unref(state->scheduler);
 	ASYNC_DELREF(&state->context->std);
+	async_task_scheduler_unref(state->scheduler);
 
 	efree(state);
 }
@@ -353,15 +353,11 @@ static ZEND_METHOD(Deferred, awaitable)
 {
 	async_deferred *defer;
 
-	zval obj;
-
 	ZEND_PARSE_PARAMETERS_NONE();
 
 	defer = (async_deferred *) Z_OBJ_P(getThis());
 
-	ZVAL_OBJ(&obj, &async_deferred_awaitable_object_create(defer->state)->std);
-
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&async_deferred_awaitable_object_create(defer->state)->std);
 }
 
 static ZEND_METHOD(Deferred, resolve)
@@ -432,7 +428,6 @@ static ZEND_METHOD(Deferred, value)
 	async_deferred_awaitable *awaitable;
 
 	zval *val;
-	zval obj;
 
 	val = NULL;
 
@@ -458,9 +453,7 @@ static ZEND_METHOD(Deferred, value)
 		ZVAL_COPY(&state->result, val);
 	}
 
-	ZVAL_OBJ(&obj, &awaitable->std);
-
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&awaitable->std);
 }
 
 static ZEND_METHOD(Deferred, error)
@@ -469,7 +462,6 @@ static ZEND_METHOD(Deferred, error)
 	async_deferred_awaitable *awaitable;
 
 	zval *error;
-	zval obj;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_ZVAL(error)
@@ -483,9 +475,7 @@ static ZEND_METHOD(Deferred, error)
 
 	ZVAL_COPY(&state->result, error);
 
-	ZVAL_OBJ(&obj, &awaitable->std);
-
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&awaitable->std);
 }
 
 typedef struct {
@@ -612,7 +602,6 @@ static ZEND_METHOD(Deferred, combine)
 	zend_ulong i;
 	zend_string *k;
 	zval *entry;
-	zval obj;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_ARRAY(args)
@@ -642,8 +631,6 @@ static ZEND_METHOD(Deferred, combine)
 
 	defer = (async_deferred *) async_deferred_object_create(async_deferred_ce);
 	awaitable = async_deferred_awaitable_object_create(defer->state);
-
-	ZVAL_OBJ(&obj, &awaitable->std);
 
 	combined = emalloc(sizeof(async_defer_combine));
 	combined->defer = defer;
@@ -680,7 +667,7 @@ static ZEND_METHOD(Deferred, combine)
 		}
 	} ZEND_HASH_FOREACH_END();
 
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&awaitable->std);
 }
 
 typedef struct {
@@ -761,7 +748,6 @@ static ZEND_METHOD(Deferred, transform)
 	zend_fcall_info_cache fcc;
 
 	zval *val;
-	zval obj;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_ZVAL(val)
@@ -770,8 +756,6 @@ static ZEND_METHOD(Deferred, transform)
 
 	state = create_state(async_context_get());
 	awaitable = async_deferred_awaitable_object_create(state);
-
-	ZVAL_OBJ(&obj, &awaitable->std);
 	
 	ASYNC_ALLOC_CUSTOM_OP(op, sizeof(async_defer_transform_op));
 	
@@ -790,7 +774,7 @@ static ZEND_METHOD(Deferred, transform)
 		register_defer_op((async_op *) op, ((async_deferred_awaitable *) Z_OBJ_P(val))->state);
 	}
 
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&awaitable->std);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_deferred_ctor, 0, 0, 0)

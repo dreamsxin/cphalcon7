@@ -22,7 +22,6 @@
 #define PHALCON_ASYNC_CORE_H
 
 #include "php_phalcon.h"
-
 #include "kernel/memory.h"
 
 # if PHALCON_USE_UV
@@ -68,7 +67,7 @@ typedef size_t uv_buf_size_t;
 	int len; \
 	len = ap_php_asprintf(&buf, message ASYNC_VA_ARGS(__VA_ARGS__)); \
 	target = zend_string_init(buf, len, 0); \
-	efree(buf); \
+	free(buf); \
 } while (0)
 
 #ifdef PHP_WIN32
@@ -155,6 +154,8 @@ ASYNC_API extern zend_class_entry *async_deferred_ce;
 ASYNC_API extern zend_class_entry *async_deferred_awaitable_ce;
 ASYNC_API extern zend_class_entry *async_duplex_stream_ce;
 ASYNC_API extern zend_class_entry *async_pending_read_exception_ce;
+ASYNC_API extern zend_class_entry *async_pipe_ce;
+ASYNC_API extern zend_class_entry *async_pipe_server_ce;
 ASYNC_API extern zend_class_entry *async_process_builder_ce;
 ASYNC_API extern zend_class_entry *async_process_ce;
 ASYNC_API extern zend_class_entry *async_readable_console_stream_ce;
@@ -194,6 +195,7 @@ void async_console_ce_register();
 void async_context_ce_register();
 void async_deferred_ce_register();
 void async_dns_ce_register();
+void async_pipe_ce_register();
 void async_process_ce_register();
 void async_signal_watcher_ce_register();
 void async_socket_ce_register();
@@ -235,11 +237,12 @@ struct _async_fiber {
 	async_task_scheduler *scheduler;
 	async_context *context;
 	async_task *task;
-	zend_execute_data *exec;
-	zend_vm_stack stack;
-	size_t stack_page_size;
+	zend_execute_data *current_execute_data;
+	zend_vm_stack vm_stack;
+	size_t vm_stack_page_size;
 	zend_class_entry *exception_class;
 	zend_error_handling_t error_handling;
+	int error_reporting;
 	JMP_BUF *bailout;
 };
 
@@ -803,6 +806,18 @@ ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int p
 #define ASYNC_RETURN_ON_ERROR() do { \
 	if (UNEXPECTED(EG(exception))) { \
 		return; \
+	} \
+} while (0)
+
+#define ASYNC_BREAK_ON_ERROR() do { \
+	if (UNEXPECTED(EG(exception))) { \
+		break; \
+	} \
+} while (0)
+
+#define ASYNC_CONTINUE_ON_ERROR() do { \
+	if (UNEXPECTED(EG(exception))) { \
+		continue; \
 	} \
 } while (0)
 

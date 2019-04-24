@@ -196,9 +196,8 @@ static ZEND_METHOD(UdpSocket, bind)
 	zend_string *name;
 	zend_long port;
 
-	uv_os_fd_t sock;	
-	zval obj;
-	
+	uv_os_fd_t sock;
+
 	php_sockaddr_storage dest;
 	int code;
 	
@@ -232,10 +231,8 @@ static ZEND_METHOD(UdpSocket, bind)
 		ASYNC_DELREF(&socket->std);
 		return;
 	}
-	
-	ZVAL_OBJ(&obj, &socket->std);
 
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&socket->std);
 }
 
 static ZEND_METHOD(UdpSocket, multicast)
@@ -246,7 +243,6 @@ static ZEND_METHOD(UdpSocket, multicast)
 	zend_long port;
 	
 	uv_os_fd_t sock;
-	zval obj;
 	
 	struct sockaddr_in dest;
 	int code;
@@ -292,10 +288,8 @@ static ZEND_METHOD(UdpSocket, multicast)
 		ASYNC_DELREF(&socket->std);
 		return;
 	}
-	
-	ZVAL_OBJ(&obj, &socket->std);
 
-	RETURN_ZVAL(&obj, 1, 1);
+	RETURN_OBJ(&socket->std);
 }
 
 static ZEND_METHOD(UdpSocket, close)
@@ -870,8 +864,6 @@ static ZEND_METHOD(UdpDatagram, withData)
 	
 	zend_string *data;
 	
-	zval obj;
-	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_STR(data)
 	ZEND_PARSE_PARAMETERS_END();
@@ -881,10 +873,8 @@ static ZEND_METHOD(UdpDatagram, withData)
 	
 	result->data = zend_string_copy(data);
 	result->peer = datagram->peer;
-	
-	ZVAL_OBJ(&obj, &result->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&result->std);
 }
 
 static ZEND_METHOD(UdpDatagram, withPeer)
@@ -894,9 +884,7 @@ static ZEND_METHOD(UdpDatagram, withPeer)
 	
 	zend_string *address;
 	zend_long port;
-	
-	zval obj;
-	
+
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
 		Z_PARAM_STR(address)
 		Z_PARAM_LONG(port)
@@ -915,10 +903,8 @@ static ZEND_METHOD(UdpDatagram, withPeer)
 	async_socket_set_port((struct sockaddr *) &result->peer, port);
 	
 	result->data = zend_string_copy(datagram->data);
-	
-	ZVAL_OBJ(&obj, &result->std);
-	
-	RETURN_ZVAL(&obj, 1, 1);
+
+	RETURN_OBJ(&result->std);
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_udp_datagram_ctor, 0, 0, 3)

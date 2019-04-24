@@ -267,37 +267,56 @@ ZEND_METHOD(SignalWatcher, awaitSignal)
 	ASYNC_FREE_OP(op);
 }
 
+static int is_signal_supported(int signum)
+{
+	if (EXPECTED(signum > 0 && ASYNC_G(cli))) {
+		switch (signum) {
+		case ASYNC_SIGNAL_SIGHUP:
+		case ASYNC_SIGNAL_SIGINT:
+		case ASYNC_SIGNAL_SIGQUIT:
+		case ASYNC_SIGNAL_SIGKILL:
+		case ASYNC_SIGNAL_SIGTERM:
+		case ASYNC_SIGNAL_SIGUSR1:
+		case ASYNC_SIGNAL_SIGUSR2:
+			return 1;
+		}
+	}
+	
+	return 0;
+}
+
 ZEND_METHOD(SignalWatcher, isSupported)
 {
 	zend_long tmp;
-	int signum;
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_LONG(tmp)
 	ZEND_PARSE_PARAMETERS_END();
 
-	if (!ASYNC_G(cli)) {
-		RETURN_FALSE;
-	}
-
-	signum = (int) tmp;
-
-	if (UNEXPECTED(signum < 1)) {
-		RETURN_FALSE;
-	}
-	
-	switch (signum) {
-	case ASYNC_SIGNAL_SIGHUP:
-	case ASYNC_SIGNAL_SIGINT:
-	case ASYNC_SIGNAL_SIGQUIT:
-	case ASYNC_SIGNAL_SIGKILL:
-	case ASYNC_SIGNAL_SIGTERM:
-	case ASYNC_SIGNAL_SIGUSR1:
-	case ASYNC_SIGNAL_SIGUSR2:
+	if (is_signal_supported((int) tmp)) {
 		RETURN_TRUE;
 	}
-
+	
 	RETURN_FALSE;
+}
+
+ZEND_METHOD(SignalWatcher, raise)
+{
+	zend_long tmp;
+	
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_LONG(tmp)
+	ZEND_PARSE_PARAMETERS_END();
+	
+#ifdef PHP_WIN32
+	zend_throw_error(NULL, "Cannot raise a signal when running on Windows");
+#else
+	int code;
+	
+	code = raise((int) tmp);
+	
+	ASYNC_CHECK_ERROR(code != 0, "Failed to raise signal %d: %s", (int) tmp, uv_strerror(uv_translate_sys_error(code)));
+#endif
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_signal_watcher_ctor, 0, 0, 1)
@@ -315,6 +334,10 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_is_supported, 0, 1, _IS_BOOL, 0)
 	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
 ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_raise, 0, 1, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO()
 #else
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_close, 0, 0, IS_VOID, NULL, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
@@ -326,16 +349,19 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_is_supported, 0, 1, _IS_BOOL, NULL, 0)
 	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
 ZEND_END_ARG_INFO()
-#endif
 
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_watcher_raise, 0, 1, IS_VOID, NULL, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+#endif
 static const zend_function_entry async_signal_watcher_functions[] = {
 	ZEND_ME(SignalWatcher, __construct, arginfo_signal_watcher_ctor, ZEND_ACC_PUBLIC)
 	ZEND_ME(SignalWatcher, close, arginfo_signal_watcher_close, ZEND_ACC_PUBLIC)
 	ZEND_ME(SignalWatcher, awaitSignal, arginfo_signal_watcher_await_signal, ZEND_ACC_PUBLIC)
 	ZEND_ME(SignalWatcher, isSupported, arginfo_signal_watcher_is_supported, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	ZEND_ME(SignalWatcher, raise, arginfo_signal_watcher_raise, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	ZEND_FE_END
 };
-
 
 void async_signal_watcher_ce_register()
 {

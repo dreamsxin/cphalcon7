@@ -52,6 +52,7 @@ ASYNC_API BIO_METHOD *BIO_s_php();
 ASYNC_API BIO *BIO_new_php(size_t size);
 
 void async_ssl_bio_init();
+void async_ssl_engine_init();
 
 #if OPENSSL_VERSION_NUMBER < 0x10100000L
 
@@ -209,9 +210,7 @@ typedef struct {
 #ifdef HAVE_ASYNC_SSL
 
 SSL_CTX *async_ssl_create_context();
-int async_ssl_create_engine(async_ssl_engine *engine);
-int async_ssl_create_buffer_engine(async_ssl_engine *engine, size_t size);
-int async_ssl_create_socket_engine(async_ssl_engine *engine, php_socket_t sock);
+int async_ssl_create_buffered_engine(async_ssl_engine *engine, size_t size);
 void async_ssl_dispose_engine(async_ssl_engine *engine, zend_bool ctx);
 
 async_tls_server_encryption *async_ssl_create_server_encryption();
@@ -224,6 +223,9 @@ void async_ssl_setup_server_alpn(SSL_CTX *ctx, async_tls_server_encryption *encr
 
 void async_ssl_setup_verify_callback(SSL_CTX *ctx, async_ssl_settings *settings);
 int async_ssl_setup_encryption(SSL *ssl, async_ssl_settings *settings);
+
+int async_ssl_cert_passphrase_cb(char *buf, int size, int rwflag, void *obj);
+
 #endif
 
 async_tls_client_encryption *async_clone_client_encryption(async_tls_client_encryption *encryption);

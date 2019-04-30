@@ -306,6 +306,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Cache_Exception);
 	PHALCON_INIT(Phalcon_Crypt_Exception);
 	PHALCON_INIT(Phalcon_Db_Exception);
+	PHALCON_INIT(Phalcon_Db_Builder_Exception);
 	PHALCON_INIT(Phalcon_Di_Exception);
 	PHALCON_INIT(Phalcon_Escaper_Exception);
 	PHALCON_INIT(Phalcon_Events_Exception);
@@ -545,6 +546,13 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Db_RawValue);
 	PHALCON_INIT(Phalcon_Db_Reference);
 	PHALCON_INIT(Phalcon_Db_Result_Pdo);
+	PHALCON_INIT(Phalcon_Db_Builder);
+	PHALCON_INIT(Phalcon_Db_Builder_Where);
+	PHALCON_INIT(Phalcon_Db_Builder_Join);
+	PHALCON_INIT(Phalcon_Db_Builder_Select);
+	PHALCON_INIT(Phalcon_Db_Builder_Update);
+	PHALCON_INIT(Phalcon_Db_Builder_Insert);
+	PHALCON_INIT(Phalcon_Db_Builder_Delete);
 	PHALCON_INIT(Phalcon_Kernel);
 	PHALCON_INIT(Phalcon_Debug);
 	PHALCON_INIT(Phalcon_Debug_Dump);
@@ -980,11 +988,15 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 
 static PHP_MINFO_FUNCTION(phalcon)
 {
+#ifdef PHALCON_USE_UV
+	char uv_version[20];
+#endif
 	php_info_print_table_start();
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
 #ifdef PHALCON_USE_UV
+	sprintf(uv_version, "%d.%d", UV_VERSION_MAJOR, UV_VERSION_MINOR);
 	php_info_print_table_row(2, "Libuv version", uv_version);
 #endif
 	if (PHALCON_GLOBAL(aop).enable_aop) {

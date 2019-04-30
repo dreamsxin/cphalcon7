@@ -189,8 +189,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, innerJoin){
 	phalcon_array_append(&join, model, PH_COPY);
 	phalcon_array_append(&join, conditions, PH_COPY);
 	phalcon_array_append(&join, alias, PH_COPY);
-	phalcon_array_append(&join, &type, PH_COPY);
+	phalcon_array_append(&join, &type, 0);
 	phalcon_update_property_array_append(getThis(), SL("_joins"), &join);
+	zval_ptr_dtor(&join);
 	RETURN_THIS();
 }
 
@@ -226,8 +227,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Join, leftJoin){
 	phalcon_array_append(&join, model, PH_COPY);
 	phalcon_array_append(&join, conditions, PH_COPY);
 	phalcon_array_append(&join, alias, PH_COPY);
-	phalcon_array_append(&join, &type, PH_COPY);
+	phalcon_array_append(&join, &type, 0);
 	phalcon_update_property_array_append(getThis(), SL("_joins"), &join);
+	zval_ptr_dtor(&join);
 	RETURN_THIS();
 }
 

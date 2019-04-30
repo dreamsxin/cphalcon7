@@ -540,6 +540,14 @@ db/dialect.c \
 db/adapter.c \
 db/rawvalue.c \
 db/columninterface.c \
+db/builder.c \
+db/builder/exception.c \
+db/builder/where.c \
+db/builder/join.c \
+db/builder/select.c \
+db/builder/update.c \
+db/builder/insert.c \
+db/builder/delete.c \
 forms/form.c \
 forms/manager.c \
 forms/element/file.c \

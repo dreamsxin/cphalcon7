@@ -246,24 +246,34 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 	zend_string *str_key;
 	ulong idx;
 
-	PHALCON_CALL_SELF(&table, "gettable");
+	PHALCON_MM_INIT();
 
-	PHALCON_CALL_SELF(&conditions, "getconditions");
-	PHALCON_CALL_SELF(&set, "getset");
+	PHALCON_MM_CALL_SELF(&table, "gettable");
+	PHALCON_MM_ADD_ENTRY(&table);
+
+	PHALCON_MM_CALL_SELF(&conditions, "getconditions");
+	PHALCON_MM_ADD_ENTRY(&conditions);
+
+	PHALCON_MM_CALL_SELF(&set, "getset");
+	PHALCON_MM_ADD_ENTRY(&set);
 
 	PHALCON_CONCAT_SVS(&phql, "UPDATE [", &table, "] SET ");
+	PHALCON_MM_ADD_ENTRY(&phql);
 
 	if (Z_TYPE(set) != IS_ARRAY) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be array");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "Values must be array");
 		return;
 	}
 
-	PHALCON_CALL_SELF(&bind_params, "getbindparams");
+	PHALCON_MM_CALL_SELF(&bind_params, "getbindparams");
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 	if (Z_TYPE(bind_params) != IS_ARRAY) {
 		array_init(&bind_params);
+		PHALCON_MM_ADD_ENTRY(&bind_params);
 	}
 
 	array_init(&update_columns);
+	PHALCON_MM_ADD_ENTRY(&update_columns);
 
 	ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(set), idx, str_key, value) {
 		zval column = {}, key = {}, update_column = {};
@@ -276,32 +286,31 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Update, _compile){
 		PHALCON_CONCAT_SV(&key, "phu_", &column);
 
 		PHALCON_CONCAT_SVSVSVS(&update_column, "[", &table, "].", &column, " = :", &key, ":");
+		phalcon_array_append(&update_columns, &update_column, 0);
 
-		phalcon_array_append(&update_columns, &update_column, PH_COPY);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
+		zval_ptr_dtor(&key);
 	} ZEND_HASH_FOREACH_END();
-	zval_ptr_dtor(&table);
 
 	phalcon_fast_join_str(&joined_columns, SL(", "), &update_columns);
-	zval_ptr_dtor(&update_columns);
 	phalcon_concat_self(&phql, &joined_columns);
 	zval_ptr_dtor(&joined_columns);
+	PHALCON_MM_ADD_ENTRY(&phql);
 
 	/**
 	 * Only append conditions if it's string
 	 */
 	if (Z_TYPE(conditions) == IS_STRING && PHALCON_IS_NOT_EMPTY(&conditions)) {
 		PHALCON_SCONCAT_SV(&phql, " WHERE ", &conditions);
+		PHALCON_MM_ADD_ENTRY(&phql);
 	}
-	zval_ptr_dtor(&conditions);
 
 	phalcon_update_property(getThis(), SL("_mergeBindParams"), &bind_params);
-	zval_ptr_dtor(&bind_params);
 
-	PHALCON_CALL_SELF(&bind_types, "getbindtypes");
+	PHALCON_MM_CALL_SELF(&bind_types, "getbindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 	phalcon_update_property(getThis(), SL("_mergeBindTypes"), &bind_types);
-	zval_ptr_dtor(&bind_types);
 
 	phalcon_update_property(getThis(), SL("_phql"), &phql);
-	zval_ptr_dtor(&phql);
+	RETURN_MM();
 }

@@ -583,47 +583,47 @@ ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_fork, 0, 1, Phalc
 	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_shell, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_shell, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, interactive, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_cwd, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_cwd, 0, 1, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, directory, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_env, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_env, 0, 1, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, env, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, inherit, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdin, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdin, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdout, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdout, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stderr, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stderr, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
 ZEND_END_ARG_INFO()
 
 
@@ -637,7 +637,7 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, I
 ZEND_END_ARG_INFO()
 #endif
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phalcon\\Async\\Process\\Process, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phalcon\\Async\\Process, 0)
 	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 

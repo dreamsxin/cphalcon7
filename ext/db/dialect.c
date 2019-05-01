@@ -738,6 +738,11 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			PHALCON_MM_ADD_ENTRY(&selected_columns);
 			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(columns), column) {
 				zval column_item = {}, column_sql = {}, column_domain = {}, column_domain_sql = {}, column_alias = {}, column_alias_sql = {};
+				if (Z_TYPE_P(column) == IS_STRING) {
+					phalcon_array_append(&selected_columns, column, PH_COPY);
+					continue;
+				}
+
 				/**
 				 * Escape column name
 				 */
@@ -757,7 +762,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 						ZVAL_COPY_VALUE(&column_sql, &column_item);
 					}
 				} else {
-					PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid SELECT definition");
+					PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_exception_ce, "Invalid columns");
 					return;
 				}
 

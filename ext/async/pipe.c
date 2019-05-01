@@ -1159,18 +1159,18 @@ static ZEND_METHOD(PipeServer, accept)
 	RETURN_OBJ(&pipe->std);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_bind, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_bind, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_listen, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_listen, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_import, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\PipeServer, 0)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_import, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
+	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe\\Server, 0)
 	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 

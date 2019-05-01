@@ -1325,7 +1325,9 @@ aop.c"
 		async_use_asm="no"
 	fi
 
+	AC_MSG_CHECKING(checking php version >= 7.1)
 	if test "$PHP_UV" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
+		AC_MSG_RESULT(yes)
 		if test "$async_use_asm" = 'yes'; then
 			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
 		elif test "$async_use_ucontext" = 'yes'; then
@@ -1337,8 +1339,8 @@ aop.c"
 		async_use_ucontext="no"
 	fi
 
+	AC_MSG_CHECKING([checking libuv support])
 	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then
-		AC_MSG_CHECKING(for static libuv)
 		DIR="${srcdir}/async/thirdparty"
 		if test "$async_os" = 'LINUX' && test ! -s "${DIR}/lib/libuv.a"; then
 			AC_MSG_RESULT(no)

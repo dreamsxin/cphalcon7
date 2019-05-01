@@ -25,6 +25,10 @@
 #include "db/rawvalue.h"
 #include "db/reference.h"
 #include "di/injectable.h"
+#include "db/builder/select.h"
+#include "db/builder/update.h"
+#include "db/builder/insert.h"
+#include "db/builder/delete.h"
 
 #include <ext/pdo/php_pdo_driver.h>
 
@@ -100,6 +104,10 @@ PHP_METHOD(Phalcon_Db_Adapter, getSQLVariables);
 PHP_METHOD(Phalcon_Db_Adapter, getSQLBindTypes);
 PHP_METHOD(Phalcon_Db_Adapter, getType);
 PHP_METHOD(Phalcon_Db_Adapter, getDialectType);
+PHP_METHOD(Phalcon_Db_Adapter, createSelectBuilder);
+PHP_METHOD(Phalcon_Db_Adapter, createUpdateBuilder);
+PHP_METHOD(Phalcon_Db_Adapter, createInsertBuilder);
+PHP_METHOD(Phalcon_Db_Adapter, createDeleteBuilder);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_setprofiler, 0, 0, 1)
 	ZEND_ARG_INFO(0, profiler)
@@ -113,6 +121,22 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_insertasdict, 0, 0, 2)
 	ZEND_ARG_INFO(0, table)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, dataTypes)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_createselectbuilder, 0, 0, 1)
+	ZEND_ARG_INFO(0, tables)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_createupdatebuilder, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_createinsertbuilder, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_adapter_createdeletebuilder, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_db_adapter_method_entry[] = {
@@ -169,6 +193,10 @@ static const zend_function_entry phalcon_db_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Db_Adapter, getSQLBindTypes, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getType, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Adapter, getDialectType, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter, createSelectBuilder, arginfo_phalcon_db_adapter_createselectbuilder, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter, createUpdateBuilder, arginfo_phalcon_db_adapter_createupdatebuilder, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter, createInsertBuilder, arginfo_phalcon_db_adapter_createinsertbuilder, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Adapter, createDeleteBuilder, arginfo_phalcon_db_adapter_createdeletebuilder, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1965,4 +1993,60 @@ PHP_METHOD(Phalcon_Db_Adapter, getDialectType){
 
 
 	RETURN_MEMBER(getThis(), "_dialectType");
+}
+
+/**
+ * Create a select builder
+ *
+ * @return Phalcon\Db\Builder\Select
+ */
+PHP_METHOD(Phalcon_Db_Adapter, createSelectBuilder){
+	zval *table;
+
+	phalcon_fetch_params(0, 1, 0, &table);
+
+	object_init_ex(return_value, phalcon_db_builder_select_ce);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, getThis());
+}
+
+/**
+ * Create a update builder
+ *
+ * @return Phalcon\Db\Builder\Update
+ */
+PHP_METHOD(Phalcon_Db_Adapter, createUpdateBuilder){
+	zval *table;
+
+	phalcon_fetch_params(0, 1, 0, &table);
+
+	object_init_ex(return_value, phalcon_db_builder_update_ce);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, getThis());
+}
+
+/**
+ * Create a insert builder
+ *
+ * @return Phalcon\Db\Builder\Insert
+ */
+PHP_METHOD(Phalcon_Db_Adapter, createInsertBuilder){
+	zval *table;
+
+	phalcon_fetch_params(0, 1, 0, &table);
+
+	object_init_ex(return_value, phalcon_db_builder_insert_ce);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, getThis());
+}
+
+/**
+ * Create a delete builder
+ *
+ * @return Phalcon\Db\Builder\Delete
+ */
+PHP_METHOD(Phalcon_Db_Adapter, createDeleteBuilder){
+	zval *table;
+
+	phalcon_fetch_params(0, 1, 0, &table);
+
+	object_init_ex(return_value, phalcon_db_builder_delete_ce);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, getThis());
 }

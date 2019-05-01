@@ -20,6 +20,7 @@
 #include "db/builder/select.h"
 #include "db/builder/join.h"
 #include "db/builder/exception.h"
+#include "db/adapterinterface.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -47,6 +48,7 @@ PHP_METHOD(Phalcon_Db_Builder_Select, limit);
 PHP_METHOD(Phalcon_Db_Builder_Select, offset);
 PHP_METHOD(Phalcon_Db_Builder_Select, groupBy);
 PHP_METHOD(Phalcon_Db_Builder_Select, _execute);
+PHP_METHOD(Phalcon_Db_Builder_Select, count);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_select___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, tables)
@@ -92,6 +94,7 @@ static const zend_function_entry phalcon_db_builder_select_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder_Select, offset, arginfo_phalcon_db_builder_select_offset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Select, groupBy, arginfo_phalcon_db_builder_select_groupby, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Select, _execute, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Db_Builder_Select, count, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -113,7 +116,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Builder_Select){
  */
 PHP_METHOD(Phalcon_Db_Builder_Select, __construct){
 
-	zval *tables = NULL, *db = NULL, columns = {};
+	zval *tables, *db = NULL, columns = {};
 
 	phalcon_fetch_params(0, 1, 1, &tables, &db);
 
@@ -262,18 +265,26 @@ PHP_METHOD(Phalcon_Db_Builder_Select, groupBy){
  */
 PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
 
-	zval definition = {}, conditions = {}, joins = {}, bind_params = {}, bind_types = {}, service = {}, dependency_injector = {}, connection = {}, dialect = {}, sql_select = {};
+	zval *count = NULL, definition = {}, conditions = {}, joins = {}, bind_params = {}, bind_types = {}, service = {}, dependency_injector = {}, connection = {}, dialect = {}, sql_select = {};
 
-	PHALCON_MM_INIT();
+	phalcon_fetch_params(1, 0, 1, &count);
 
-	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_COPY);
+	if (!count) {
+		count = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_SEPARATE);
 	PHALCON_MM_ADD_ENTRY(&definition);
 
 	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
-	phalcon_array_update_str(&definition, SL("where"), &conditions, PH_COPY);
+	if (PHALCON_IS_NOT_EMPTY(&conditions)) {
+		phalcon_array_update_str(&definition, SL("where"), &conditions, PH_COPY);
+	}
 
 	phalcon_read_property(&joins, getThis(), SL("_joins"), PH_READONLY);
-	phalcon_array_update_str(&definition, SL("joins"), &joins, PH_COPY);
+	if (PHALCON_IS_NOT_EMPTY(&joins)) {
+		phalcon_array_update_str(&definition, SL("joins"), &joins, PH_COPY);
+	}
 
 	PHALCON_MM_CALL_SELF(&bind_params, "getbindparams");
 	PHALCON_MM_ADD_ENTRY(&bind_params);
@@ -282,32 +293,37 @@ PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
 	PHALCON_MM_ADD_ENTRY(&bind_types);
 
 	phalcon_read_property(&service, getThis(), SL("_defaultConnectionService"), PH_READONLY);
-	if (PHALCON_IS_EMPTY(&service)) {
-		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
-		return;
-	}
+	if (Z_TYPE(service) != IS_OBJECT) {
+		if (PHALCON_IS_EMPTY(&service)) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
+			return;
+		}
 
-	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	PHALCON_MM_ADD_ENTRY(&dependency_injector);
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-		return;
-	}
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+			return;
+		}
 
-	/**
-	 * Request the connection service from the DI
-	 */
-	PHALCON_MM_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
-	PHALCON_MM_ADD_ENTRY(&connection);
-	if (Z_TYPE(connection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
-		return;
+		/**
+		 * Request the connection service from the DI
+		 */
+		PHALCON_MM_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&connection);
+		if (Z_TYPE(connection) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
+			return;
+		}
+	} else {
+		ZVAL_COPY_VALUE(&connection, &service);
+		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
 	}
 
 	PHALCON_MM_CALL_METHOD(&dialect, &connection, "getdialect");
 	PHALCON_MM_ADD_ENTRY(&dialect);
 
-	PHALCON_MM_CALL_METHOD(&sql_select, &dialect, "select", &definition);
+	PHALCON_MM_CALL_METHOD(&sql_select, &dialect, "select", &definition, count);
 	PHALCON_MM_ADD_ENTRY(&sql_select);
 
 	/**
@@ -316,4 +332,14 @@ PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
 	PHALCON_MM_CALL_METHOD(return_value, &connection, "query", &sql_select, &bind_params, &bind_types);
 
 	RETURN_MM();
+}
+
+/**
+ * Returns a PHQL statement built based on the builder parameters
+ *
+ * @return Phalcon\Db\ResultInterface
+ */
+PHP_METHOD(Phalcon_Db_Builder_Select, count){
+
+	PHALCON_CALL_METHOD(return_value, getThis(), "_execute", &PHALCON_GLOBAL(z_true));
 }

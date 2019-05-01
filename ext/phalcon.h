@@ -111,6 +111,7 @@
 #include "db/referenceinterface.h"
 #include "db/resultinterface.h"
 #include "db/result/pdo.h"
+#include "db/builderinterface.h"
 #include "db/builder.h"
 #include "db/builder/exception.h"
 #include "db/builder/where.h"
@@ -357,6 +358,7 @@
 #include "paginator/adapter/model.h"
 #include "paginator/adapter/nativearray.h"
 #include "paginator/adapter/querybuilder.h"
+#include "paginator/adapter/dbbuilder.h"
 #include "paginator/adapter/sql.h"
 #include "paginator/exception.h"
 

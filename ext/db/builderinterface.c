@@ -18,13 +18,29 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H
-#define PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H
+#include "mvc/model/query/builderinterface.h"
+#include "kernel/main.h"
 
-#include "php_phalcon.h"
+zend_class_entry *phalcon_db_builderinterface_ce;
 
-extern zend_class_entry *phalcon_paginator_adapter_querybuilder_ce;
+static const zend_function_entry phalcon_db_builderinterface_method_entry[] = {
+	PHP_ABSTRACT_ME(Phalcon_Db_BuilderInterface, execute, NULL)
+	PHP_FE_END
+};
 
-PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder);
+/**
+ * Phalcon\Mvc\Model\Query\BuilderInterface initializer
+ */
+PHALCON_INIT_CLASS(Phalcon_Db_BuilderInterface){
 
-#endif /* PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H */
+	PHALCON_REGISTER_INTERFACE(Phalcon\\Db, BuilderInterface, db_builderinterface, phalcon_db_builderinterface_method_entry);
+
+	return SUCCESS;
+}
+
+/**
+ * Execute query
+ *
+ * @return Phalcon\Db\ResultInterface|boolean
+ */
+PHALCON_DOC_METHOD(Phalcon_Db_BuilderInterface, execute);

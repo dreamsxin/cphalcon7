@@ -18,13 +18,13 @@
   +------------------------------------------------------------------------+
 */
 
-#ifndef PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H
-#define PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H
+#ifndef PHALCON_DB_BUILDERINTERFACE_H
+#define PHALCON_DB_BUILDERINTERFACE_H
 
 #include "php_phalcon.h"
 
-extern zend_class_entry *phalcon_paginator_adapter_querybuilder_ce;
+extern zend_class_entry *phalcon_db_builderinterface_ce;
 
-PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_QueryBuilder);
+PHALCON_INIT_CLASS(Phalcon_Db_BuilderInterface);
 
-#endif /* PHALCON_PAGINATOR_ADAPTER_QUERYBUILDER_H */
+#endif /* PHALCON_DB_BUILDERINTERFACE_H */

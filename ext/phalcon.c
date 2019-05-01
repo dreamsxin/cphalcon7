@@ -405,6 +405,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Logger_FormatterInterface);
 
 	PHALCON_INIT(Phalcon_RouterInterface);
+	PHALCON_INIT(Phalcon_Db_BuilderInterface);
 	PHALCON_INIT(Phalcon_Mvc_ControllerInterface);
 	PHALCON_INIT(Phalcon_Mvc_DispatcherInterface);
 	PHALCON_INIT(Phalcon_Mvc_Micro_CollectionInterface);
@@ -506,6 +507,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Paginator_Adapter_Model);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_NativeArray);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_QueryBuilder);
+	PHALCON_INIT(Phalcon_Paginator_Adapter_DbBuilder);
 	PHALCON_INIT(Phalcon_Paginator_Adapter_Sql);
 	PHALCON_INIT(Phalcon_Validation);
 	PHALCON_INIT(Phalcon_Validation_Validator);

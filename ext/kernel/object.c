@@ -1245,8 +1245,8 @@ int phalcon_update_property_array_str(zval *object, const char *property, uint32
 	int status = 0;
 
 	ZVAL_STRINGL(&tmp, index, index_length);
-	Z_SET_REFCOUNT(tmp, 0);
 	status = phalcon_update_property_array(object, property, property_length, &tmp, value);
+	zval_ptr_dtor(&tmp);
 	return status;
 }
 

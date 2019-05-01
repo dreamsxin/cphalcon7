@@ -854,7 +854,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 	/**
 	 * Check for joins
 	 */
-	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"), PH_READONLY)) {
+	if (phalcon_array_isset_fetch_str(&joins, definition, SL("joins"), PH_READONLY) && Z_TYPE(joins) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(joins), join) {
 			zval type = {}, source = {}, sql_table = {}, sql_join = {}, join_conditions_array = {};
 			zval *join_condition, join_expressions = {}, join_conditions = {};
@@ -892,7 +892,6 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			phalcon_concat_self(&sql, &sql_join);
 			PHALCON_MM_ADD_ENTRY(&sql);
 		} ZEND_HASH_FOREACH_END();
-
 	}
 
 	/* Check for a WHERE clause */
@@ -902,7 +901,7 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_expression);
 			zval_ptr_dtor(&where_expression);
 			PHALCON_MM_ADD_ENTRY(&sql);
-		} else {
+		} else if (PHALCON_IS_NOT_EMPTY(&where_conditions)) {
 			PHALCON_SCONCAT_SV(&sql, " WHERE ", &where_conditions);
 			PHALCON_MM_ADD_ENTRY(&sql);
 		}

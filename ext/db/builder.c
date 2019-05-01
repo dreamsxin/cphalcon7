@@ -18,6 +18,7 @@
 */
 
 #include "db/builder.h"
+#include "db/builderinterface.h"
 #include "db/builder/select.h"
 #include "db/builder/update.h"
 #include "db/builder/insert.h"
@@ -55,18 +56,22 @@ PHP_METHOD(Phalcon_Db_Builder, execute);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_select, 0, 0, 1)
 	ZEND_ARG_INFO(0, tables)
+	ZEND_ARG_INFO(0, db)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_update, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
+	ZEND_ARG_INFO(0, db)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_insert, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
+	ZEND_ARG_INFO(0, db)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_delete, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 0)
+	ZEND_ARG_INFO(0, db)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_setbindparams, 0, 0, 1)
@@ -104,6 +109,8 @@ PHALCON_INIT_CLASS(Phalcon_Db_Builder){
 	zend_declare_property_null(phalcon_db_builder_ce, SL("_bindParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_builder_ce, SL("_bindTypes"), ZEND_ACC_PROTECTED);
 
+	zend_class_implements(phalcon_db_builder_ce, 1, phalcon_db_builderinterface_ce);
+
 	return SUCCESS;
 }
 
@@ -122,7 +129,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Builder){
  * @return Phalcon\Db\Builder\Select
  */
 PHP_METHOD(Phalcon_Db_Builder, select){
-	zval *table = NULL, *db = NULL;
+	zval *table, *db = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &table, &db);
 
@@ -147,16 +154,16 @@ PHP_METHOD(Phalcon_Db_Builder, select){
  * @return Phalcon\Db\Builder\Update
  */
 PHP_METHOD(Phalcon_Db_Builder, update){
-	zval *table = NULL;
+	zval *table, *db = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &table);
+	phalcon_fetch_params(0, 1, 1, &table, &db);
 
-	if (!table) {
-		table = &PHALCON_GLOBAL(z_null);
+	if (!db) {
+		db = &PHALCON_GLOBAL(z_null);
 	}
 
 	object_init_ex(return_value, phalcon_db_builder_update_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, db);
 }
 
 /**
@@ -171,16 +178,16 @@ PHP_METHOD(Phalcon_Db_Builder, update){
  * @return Phalcon\Db\Builder\Insert
  */
 PHP_METHOD(Phalcon_Db_Builder, insert){
-	zval *table = NULL;
+	zval *table = NULL, *db = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &table);
+	phalcon_fetch_params(0, 1, 1, &table, &db);
 
-	if (!table) {
-		table = &PHALCON_GLOBAL(z_null);
+	if (!db) {
+		db = &PHALCON_GLOBAL(z_null);
 	}
 
 	object_init_ex(return_value, phalcon_db_builder_insert_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, db);
 }
 
 /**
@@ -195,16 +202,16 @@ PHP_METHOD(Phalcon_Db_Builder, insert){
  * @return Phalcon\Db\Builder\Delete
  */
 PHP_METHOD(Phalcon_Db_Builder, delete){
-	zval *table = NULL;
+	zval *table, *db = NULL;
 
-	phalcon_fetch_params(0, 0, 1, &table);
+	phalcon_fetch_params(0, 1, 1, &table, &db);
 
-	if (!table) {
-		table = &PHALCON_GLOBAL(z_null);
+	if (!db) {
+		db = &PHALCON_GLOBAL(z_null);
 	}
 
 	object_init_ex(return_value, phalcon_db_builder_delete_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table);
+	PHALCON_CALL_METHOD(NULL, return_value, "__construct", table, db);
 }
 
 /**

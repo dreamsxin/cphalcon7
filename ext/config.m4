@@ -540,6 +540,7 @@ db/dialect.c \
 db/adapter.c \
 db/rawvalue.c \
 db/columninterface.c \
+db/builderinterface.c \
 db/builder.c \
 db/builder/exception.c \
 db/builder/where.c \
@@ -821,6 +822,7 @@ paginator/adapter.c \
 paginator/adapter/model.c \
 paginator/adapter/nativearray.c \
 paginator/adapter/querybuilder.c \
+paginator/adapter/dbbuilder.c \
 paginator/adapter/sql.c \
 paginator/exception.c \
 paginator/adapterinterface.c \

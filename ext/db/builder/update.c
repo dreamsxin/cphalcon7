@@ -20,6 +20,7 @@
 #include "db/builder/update.h"
 #include "db/builder/where.h"
 #include "db/builder/exception.h"
+#include "db/adapterinterface.h"
 #include "di/injectable.h"
 
 #include "kernel/main.h"
@@ -76,7 +77,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Builder_Update){
  */
 PHP_METHOD(Phalcon_Db_Builder_Update, __construct){
 
-	zval *tables = NULL, *db = NULL;
+	zval *tables, *db = NULL;
 
 	phalcon_fetch_params(0, 1, 1, &tables, &db);
 
@@ -125,11 +126,13 @@ PHP_METHOD(Phalcon_Db_Builder_Update, _execute){
 
 	PHALCON_MM_INIT();
 
-	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_COPY);
+	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_SEPARATE);
 	PHALCON_MM_ADD_ENTRY(&definition);
 
 	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);
-	phalcon_array_update_str(&definition, SL("where"), &conditions, PH_COPY);
+	if (PHALCON_IS_NOT_EMPTY(&conditions)) {
+		phalcon_array_update_str(&definition, SL("where"), &conditions, PH_COPY);
+	}
 
 	phalcon_read_property(&set, getThis(), SL("_set"), PH_READONLY);
 
@@ -170,26 +173,32 @@ PHP_METHOD(Phalcon_Db_Builder_Update, _execute){
 	phalcon_array_update_str(&definition, SL("sets"), &columns, PH_COPY);
 
 	phalcon_read_property(&service, getThis(), SL("_defaultConnectionService"), PH_READONLY);
-	if (PHALCON_IS_EMPTY(&service)) {
-		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
-		return;
-	}
+	
+	if (Z_TYPE(service) != IS_OBJECT) {
+		if (PHALCON_IS_EMPTY(&service)) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
+			return;
+		}
 
-	PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
-	PHALCON_MM_ADD_ENTRY(&dependency_injector);
-	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
-		return;
-	}
+		PHALCON_MM_CALL_METHOD(&dependency_injector, getThis(), "getdi");
+		PHALCON_MM_ADD_ENTRY(&dependency_injector);
+		if (Z_TYPE(dependency_injector) != IS_OBJECT) {
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+			return;
+		}
 
-	/**
-	 * Request the connection service from the DI
-	 */
-	PHALCON_MM_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
-	PHALCON_MM_ADD_ENTRY(&connection);
-	if (Z_TYPE(connection) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
-		return;
+		/**
+		 * Request the connection service from the DI
+		 */
+		PHALCON_MM_CALL_METHOD(&connection, &dependency_injector, "getshared", &service);
+		PHALCON_MM_ADD_ENTRY(&connection);
+		if (Z_TYPE(connection) != IS_OBJECT) {
+			PHALCON_THROW_EXCEPTION_STR(phalcon_db_builder_exception_ce, "Invalid injected connection service");
+			return;
+		}
+	} else {
+		ZVAL_COPY_VALUE(&connection, &service);
+		PHALCON_MM_VERIFY_INTERFACE(&connection, phalcon_db_adapterinterface_ce);
 	}
 
 	PHALCON_MM_CALL_METHOD(&dialect, &connection, "getdialect");

@@ -120,11 +120,15 @@ PHP_METHOD(Phalcon_Db_Builder_Update, set){
  */
 PHP_METHOD(Phalcon_Db_Builder_Update, _execute){
 
-	zval definition = {}, conditions = {}, set = {}, *value, columns = {}, bind_params = {}, bind_types = {};
+	zval *pretreatment = NULL, definition = {}, conditions = {}, set = {}, *value, columns = {}, bind_params = {}, bind_types = {};
 	zval service = {}, dependency_injector = {}, connection = {}, dialect = {}, sql_update = {};
 	zend_string *str_key;
 
-	PHALCON_MM_INIT();
+	phalcon_fetch_params(1, 0, 1, &pretreatment);
+
+	if (!pretreatment) {
+		pretreatment = &PHALCON_GLOBAL(z_false);
+	}
 
 	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_SEPARATE);
 	PHALCON_MM_ADD_ENTRY(&definition);
@@ -207,10 +211,17 @@ PHP_METHOD(Phalcon_Db_Builder_Update, _execute){
 	PHALCON_MM_CALL_METHOD(&sql_update, &dialect, "update", &definition);
 	PHALCON_MM_ADD_ENTRY(&sql_update);
 
-	/**
-	 * Execute the query
-	 */
-	PHALCON_MM_CALL_METHOD(return_value, &connection, "execute", &sql_update, &bind_params, &bind_types);
+	if (zend_is_true(pretreatment)) {
+		array_init(return_value);
+		phalcon_array_update_str(return_value, SL("sql"), &sql_update, PH_COPY);
+		phalcon_array_update_str(return_value, SL("variables"), &bind_params, PH_COPY);
+		phalcon_array_update_str(return_value, SL("types"), &bind_types, PH_COPY);
+	} else {
+		/**
+		 * Execute the query
+		 */
+		PHALCON_MM_CALL_METHOD(return_value, &connection, "execute", &sql_update, &bind_params, &bind_types);
+	}
 
 	RETURN_MM();
 }

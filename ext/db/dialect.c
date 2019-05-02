@@ -700,8 +700,7 @@ PHP_METHOD(Phalcon_Db_Dialect, getSqlTable){
 PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	zval *definition, *count = NULL, escape_char = {}, columns = {}, distinct = {}, index = {}, *column, columns_sql = {}, tables = {}, *table;
-	zval tables_sql = {}, sql = {}, joins = {}, *join = NULL, where_conditions = {}, where_expression = {}, group_fields = {};
-	zval having_conditions = {}, having_expression = {}, order_fields = {};
+	zval tables_sql = {}, sql = {}, joins = {}, *join = NULL, where_conditions = {}, where_expression = {}, group_fields = {}, order_fields = {};
 	zval tmp1 = {}, tmp2 = {}, limit_value = {}, number = {}, offset = {};
 
 	phalcon_fetch_params(1, 1, 1, &definition, &count);
@@ -914,28 +913,42 @@ PHP_METHOD(Phalcon_Db_Dialect, select){
 
 	/* Check for a GROUP clause */
 	if (phalcon_array_isset_fetch_str(&group_fields, definition, SL("group"), PH_READONLY)) {
-		zval group_items = {}, *group_field, group_clause = {}, group_sql = {};
-		array_init(&group_items);
-		PHALCON_MM_ADD_ENTRY(&group_items);
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group_fields), group_field) {
-			zval group_expression = {};
-			PHALCON_MM_CALL_METHOD(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
-			phalcon_array_append(&group_items, &group_expression, 0);
-		} ZEND_HASH_FOREACH_END();
+		zval having_conditions = {}, having_expression = {};
+		if (Z_TYPE(group_fields) == IS_ARRAY) {
+			zval group_items = {}, *group_field, group_clause = {}, group_sql = {};
+			array_init(&group_items);
+			PHALCON_MM_ADD_ENTRY(&group_items);
+			ZEND_HASH_FOREACH_VAL(Z_ARRVAL(group_fields), group_field) {
+				zval group_expression = {};
+				PHALCON_MM_CALL_METHOD(&group_expression, getThis(), "getsqlexpression", group_field, &escape_char);
+				phalcon_array_append(&group_items, &group_expression, 0);
+			} ZEND_HASH_FOREACH_END();
 
-		phalcon_fast_join_str(&group_sql, SL(", "), &group_items);
-		PHALCON_CONCAT_SV(&group_clause, " GROUP BY ", &group_sql);
-		zval_ptr_dtor(&group_sql);
-		phalcon_concat_self(&sql, &group_clause);
-		zval_ptr_dtor(&group_clause);
-		PHALCON_MM_ADD_ENTRY(&sql);
-
-		/* Check for a HAVING clause */
-		if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"), PH_READONLY)) {
-			PHALCON_MM_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
-			PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
-			zval_ptr_dtor(&having_expression);
+			phalcon_fast_join_str(&group_sql, SL(", "), &group_items);
+			PHALCON_CONCAT_SV(&group_clause, " GROUP BY ", &group_sql);
+			zval_ptr_dtor(&group_sql);
+			phalcon_concat_self(&sql, &group_clause);
+			zval_ptr_dtor(&group_clause);
 			PHALCON_MM_ADD_ENTRY(&sql);
+
+			/* Check for a HAVING clause */
+			if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"), PH_READONLY)) {
+				PHALCON_MM_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
+				PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
+				zval_ptr_dtor(&having_expression);
+				PHALCON_MM_ADD_ENTRY(&sql);
+			}
+		} else if (PHALCON_IS_NOT_EMPTY(&group_fields)) {
+			PHALCON_SCONCAT_SV(&sql, " GROUP BY ", &group_fields);
+			PHALCON_MM_ADD_ENTRY(&sql);
+
+			/* Check for a HAVING clause */
+			if (phalcon_array_isset_fetch_str(&having_conditions, definition, SL("having"), PH_READONLY)) {
+				PHALCON_MM_CALL_METHOD(&having_expression, getThis(), "getsqlexpression", &having_conditions, &escape_char);
+				PHALCON_SCONCAT_SV(&sql, " HAVING ", &having_expression);
+				zval_ptr_dtor(&having_expression);
+				PHALCON_MM_ADD_ENTRY(&sql);
+			}
 		}
 	}
 

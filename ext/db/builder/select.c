@@ -265,9 +265,13 @@ PHP_METHOD(Phalcon_Db_Builder_Select, groupBy){
  */
 PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
 
-	zval *count = NULL, definition = {}, conditions = {}, joins = {}, bind_params = {}, bind_types = {}, service = {}, dependency_injector = {}, connection = {}, dialect = {}, sql_select = {};
+	zval *pretreatment = NULL, *count = NULL, definition = {}, conditions = {}, joins = {}, bind_params = {}, bind_types = {}, service = {}, dependency_injector = {}, connection = {}, dialect = {}, sql_select = {};
 
-	phalcon_fetch_params(1, 0, 1, &count);
+	phalcon_fetch_params(1, 0, 2, &pretreatment, &count);
+
+	if (!pretreatment) {
+		pretreatment = &PHALCON_GLOBAL(z_false);
+	}
 
 	if (!count) {
 		count = &PHALCON_GLOBAL(z_false);
@@ -326,10 +330,17 @@ PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
 	PHALCON_MM_CALL_METHOD(&sql_select, &dialect, "select", &definition, count);
 	PHALCON_MM_ADD_ENTRY(&sql_select);
 
-	/**
-	 * Execute the query
-	 */
-	PHALCON_MM_CALL_METHOD(return_value, &connection, "query", &sql_select, &bind_params, &bind_types);
+	if (zend_is_true(pretreatment)) {
+		array_init(return_value);
+		phalcon_array_update_str(return_value, SL("sql"), &sql_select, PH_COPY);
+		phalcon_array_update_str(return_value, SL("variables"), &bind_params, PH_COPY);
+		phalcon_array_update_str(return_value, SL("types"), &bind_types, PH_COPY);
+	} else {
+		/**
+		 * Execute the query
+		 */
+		PHALCON_MM_CALL_METHOD(return_value, &connection, "query", &sql_select, &bind_params, &bind_types);
+	}
 
 	RETURN_MM();
 }
@@ -341,5 +352,5 @@ PHP_METHOD(Phalcon_Db_Builder_Select, _execute){
  */
 PHP_METHOD(Phalcon_Db_Builder_Select, count){
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "_execute", &PHALCON_GLOBAL(z_true));
+	PHALCON_CALL_METHOD(return_value, getThis(), "_execute", &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true));
 }

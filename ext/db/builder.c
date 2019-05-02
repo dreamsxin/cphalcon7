@@ -84,6 +84,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_setbindtypes, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, merge, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_db_builder_execute, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, pretreatment, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_db_builder_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder, select, arginfo_phalcon_db_builder_select, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Db_Builder, update, arginfo_phalcon_db_builder_update, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -93,7 +97,7 @@ static const zend_function_entry phalcon_db_builder_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder, getBindParams, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder, setBindTypes, arginfo_phalcon_db_builder_setbindtypes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder, getBindTypes, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder, execute, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Builder, execute, arginfo_phalcon_db_builder_execute, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -305,9 +309,17 @@ PHP_METHOD(Phalcon_Db_Builder, getBindTypes){
 /**
  * Execute query
  *
- * @return Phalcon\Db\ResultInterface|boolean
+ * @return Phalcon\Db\ResultInterface|boolean|array
  */
 PHP_METHOD(Phalcon_Db_Builder, execute){
 
-	PHALCON_CALL_METHOD(return_value, getThis(), "_execute");
+	zval *pretreatment = NULL;
+
+	phalcon_fetch_params(0, 0, 1, &pretreatment);
+
+	if (!pretreatment) {
+		pretreatment = &PHALCON_GLOBAL(z_false);
+	}
+
+	PHALCON_CALL_METHOD(return_value, getThis(), "_execute", pretreatment);
 }

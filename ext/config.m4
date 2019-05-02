@@ -37,15 +37,10 @@ PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
 [  --enable-qrcode         Enable qrcode], yes, no)
 
 AC_MSG_CHECKING([Include qrcode])
-if test "$PHP_CHART" = "yes"; then
-	if test "$PHP_QRCODE" = "yes"; then
-		AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
-		AC_MSG_RESULT([yes, qrcode])
-	else
-		AC_MSG_RESULT([no])
-	fi
+if test "$PHP_QRCODE" = "yes"; then
+	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
+	AC_MSG_RESULT([yes, qrcode])
 else
-	PHP_QRCODE="no"
 	AC_MSG_RESULT([no])
 fi
 

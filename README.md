@@ -35,7 +35,7 @@ Ubuntu:
 
 ```bash
 # if enable qrcode
-sudo apt-get install libqrencode-dev libzbar-dev imagemagick libmagick++-dev libmagickwand-dev libmagickcore-dev libpng12-dev
+sudo apt-get install libqrencode-dev libzbar-dev libmagickwand-dev libmagickcore-dev libpng12-dev
 sudo ln -s /usr/include/ImageMagick-6/ /usr/include/ImageMagick
 
 sudo add-apt-repository ppa:ondrej/php

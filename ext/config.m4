@@ -1335,7 +1335,7 @@ aop.c"
 	fi
 
 	AC_MSG_CHECKING([checking libuv support])
-	if test "$async_use_ucontext" = "yes" && test "$PHP_SOCKETS" = "yes"; then
+	if test "$async_use_ucontext" = "yes"; then
 		DIR="${srcdir}/async/thirdparty"
 		if test "$async_os" = 'LINUX' && test ! -s "${DIR}/lib/libuv.a"; then
 			AC_MSG_RESULT(no)

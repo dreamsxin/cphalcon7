@@ -81,13 +81,13 @@ typedef size_t uv_buf_size_t;
 #include <Zend/zend_inheritance.h>
 #include <Zend/zend_vm.h>
 
-#if !defined(PHP_WIN32) || (defined(HAVE_SOCKETS) && !defined(COMPILE_DL_SOCKETS))
+#if !defined(PHP_WIN32) || (defined(PHALCON_USE_PHP_SOCKETS) && !defined(COMPILE_DL_SOCKETS))
 #define ASYNC_SOCKETS 1
 #else
 #define ASYNC_SOCKETS 0
 #endif
 
-#if defined(HAVE_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
+#if defined(PHALCON_USE_PHP_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
 #include <ext/sockets/php_sockets.h>
 #elif !defined(PHP_WIN32)
 typedef struct {

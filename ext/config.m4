@@ -34,7 +34,7 @@ else
 fi
 
 PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
-[  --enable-qrcode         Enable qrcode], yes, no)
+[  --enable-qrcode         Enable qrcode], no, no)
 
 AC_MSG_CHECKING([Include qrcode])
 if test "$PHP_QRCODE" = "yes"; then

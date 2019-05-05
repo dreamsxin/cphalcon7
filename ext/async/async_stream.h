@@ -111,10 +111,8 @@ struct _async_stream {
 	zval read_error;
 	zval write_error;
 	zval ref;
-#ifdef HAVE_ASYNC_SSL
 	async_stream_dispose_cb dispose;
 	void *arg;
-#endif
 };
 
 #define ASYNC_STREAM_WRITE_OP_FLAG_NEEDS_FREE 1

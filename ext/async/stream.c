@@ -221,9 +221,11 @@ ASYNC_CALLBACK close_stream_cb(uv_handle_t *handle)
 
 	ZEND_ASSERT(stream != NULL);
 
+#ifdef HAVE_ASYNC_SSL
 	if (stream->dispose) {
 		stream->dispose(stream->arg);
 	}
+#endif
 }
 
 ASYNC_CALLBACK dispose_read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
@@ -333,7 +335,6 @@ void async_stream_close_cb(async_stream *stream, async_stream_dispose_cb callbac
 	}
 	
 	stream->flags |= ASYNC_STREAM_CLOSED | ASYNC_STREAM_EOF | ASYNC_STREAM_SHUT_RDWR;
-	
 	stream->dispose = callback;
 	stream->arg = data;
 

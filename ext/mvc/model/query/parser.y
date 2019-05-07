@@ -438,6 +438,21 @@ static void phql_ret_func_call(zval *ret, phql_parser_token *name, zval *argumen
 	}
 }
 
+static void phql_ret_func_call2(zval *ret, char *name, zval *arguments, zval *distinct)
+{
+	array_init_size(ret, 4);
+	add_assoc_long(ret, ISV(type), PHQL_T_FCALL);
+	add_assoc_stringl(ret, ISV(name), name, strlen(name));
+
+	if (arguments && Z_TYPE_P(arguments) != IS_UNDEF) {
+		add_assoc_zval(ret, ISV(arguments), arguments);
+	}
+
+	if (distinct && Z_TYPE_P(distinct) != IS_UNDEF) {
+		add_assoc_zval(ret, ISV(distinct), distinct);
+	}
+}
+
 }
 
 %syntax_error {
@@ -1067,6 +1082,14 @@ when_clause(R) ::= ELSE expr(E) . {
 
 expr(R) ::= function_call(F) . {
 	R = F;
+}
+
+function_call(R) ::= LEFT PARENTHESES_OPEN distinct_or_null(D) argument_list_or_null(L) PARENTHESES_CLOSE . {
+	phql_ret_func_call2(&R, "LEFT", &L, &D);
+}
+
+function_call(R) ::= RIGHT PARENTHESES_OPEN distinct_or_null(D) argument_list_or_null(L) PARENTHESES_CLOSE . {
+	phql_ret_func_call2(&R, "RIGHT", &L, &D);
 }
 
 function_call(R) ::= IDENTIFIER(I) PARENTHESES_OPEN distinct_or_null(D) argument_list_or_null(L) PARENTHESES_CLOSE . {

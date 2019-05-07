@@ -431,6 +431,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindParams){
 	} else {
 		phalcon_update_property(getThis(), SL("_bindParams"), bind_params);
 	}
+
+	RETURN_THIS();
 }
 
 /**
@@ -486,6 +488,8 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder, setBindTypes){
 	} else {
 		phalcon_update_property(getThis(), SL("_bindTypes"), bind_types);
 	}
+
+	RETURN_THIS();
 }
 
 /**

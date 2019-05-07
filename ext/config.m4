@@ -1206,10 +1206,6 @@ aop.c"
 	done
 
 	if test "$PHP_QRCODE" = "yes"; then
-		if test -z "$WAND_CFLAGS"; then
-			AC_MSG_ERROR([Incorrect ImageMagick MagickWand library])
-		fi
-
 		AC_MSG_CHECKING([checking libqrencode support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/qrencode.h; then
@@ -1230,24 +1226,26 @@ aop.c"
 			fi
 		done
 
-		AC_MSG_CHECKING([checking libzbar support])
-		for i in /usr/local /usr; do
-			if test -r $i/include/zbar.h; then
-				PHP_ADD_INCLUDE($i/include)
-				PHP_CHECK_LIBRARY(zbar, zbar_scan_image,
-				[
-					PHP_ADD_LIBRARY_WITH_PATH(zbar, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-					AC_DEFINE(PHALCON_USE_ZBAR, 1, [Have libzbar support])
-				],[
-					AC_MSG_ERROR([Wrong zbar version or library not found])
-				],[
-					-L$i/$PHP_LIBDIR -lm
-				])
-				break
-			else
-				AC_MSG_RESULT([no, found in $i])
-			fi
-		done
+		if test -n "$WAND_CFLAGS"; then
+			AC_MSG_CHECKING([checking libzbar support])
+			for i in /usr/local /usr; do
+				if test -r $i/include/zbar.h; then
+					PHP_ADD_INCLUDE($i/include)
+					PHP_CHECK_LIBRARY(zbar, zbar_scan_image,
+					[
+						PHP_ADD_LIBRARY_WITH_PATH(zbar, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
+						AC_DEFINE(PHALCON_USE_ZBAR, 1, [Have libzbar support])
+					],[
+						AC_MSG_ERROR([Wrong zbar version or library not found])
+					],[
+						-L$i/$PHP_LIBDIR -lm
+					])
+					break
+				else
+					AC_MSG_RESULT([no, found in $i])
+				fi
+			done
+		fi
 	fi
 
 	AC_MSG_CHECKING([checking SSL support])

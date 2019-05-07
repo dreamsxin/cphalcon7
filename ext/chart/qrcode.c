@@ -25,8 +25,8 @@
 #include "phalcon.h"
 
 #if PHALCON_USE_QRENCODE
-# include <wand/MagickWand.h>
 # ifdef PHALCON_USE_ZBAR
+#  include <wand/MagickWand.h>
 #  include <zbar.h>
 # endif
 # include <qrencode.h>
@@ -71,7 +71,10 @@ PHP_METHOD(Phalcon_Chart_QRcode, __construct);
 PHP_METHOD(Phalcon_Chart_QRcode, generate);
 PHP_METHOD(Phalcon_Chart_QRcode, render);
 PHP_METHOD(Phalcon_Chart_QRcode, save);
+
+#if PHALCON_USE_ZBAR
 PHP_METHOD(Phalcon_Chart_QRcode, scan);
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_qrcode_generate, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
@@ -105,7 +108,10 @@ static const zend_function_entry phalcon_chart_qrcode_method_entry[] = {
 	PHP_ME(Phalcon_Chart_QRcode, generate, arginfo_phalcon_chart_qrcode_generate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_QRcode, render, arginfo_phalcon_chart_qrcode_render, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_QRcode, save, arginfo_phalcon_chart_qrcode_save, ZEND_ACC_PUBLIC)
+
+#if PHALCON_USE_ZBAR
 	PHP_ME(Phalcon_Chart_QRcode, scan, arginfo_phalcon_chart_qrcode_scan, ZEND_ACC_PUBLIC)
+#endif
 	PHP_FE_END
 };
 
@@ -647,7 +653,6 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		phalcon_array_append(return_array, &symbol_array, PH_COPY);
 	}
 }
-#endif
 
 /**
  * Scan the image.
@@ -660,7 +665,6 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
  */
 PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
-#if PHALCON_USE_ZBAR
 	zval *filename, *enhance = NULL, *extended = NULL;
 	MagickWand *magick_wand;
 	zbar_image_scanner_t *zbar_scanner;
@@ -752,5 +756,5 @@ PHP_METHOD(Phalcon_Chart_QRcode, scan){
 
 	zbar_image_scanner_destroy(zbar_scanner);
 	DestroyMagickWand(magick_wand);
-#endif
 }
+#endif

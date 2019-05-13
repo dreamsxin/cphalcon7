@@ -5445,7 +5445,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		return;
 	}
 
-	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection");
+	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
 	PHALCON_MM_ADD_ENTRY(&write_connection);
 
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);

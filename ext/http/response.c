@@ -834,7 +834,7 @@ PHP_METHOD(Phalcon_Http_Response, send){
 			PHALCON_MM_CALL_FUNCTION(&filesize, "filesize", &file);
 			PHALCON_MM_ADD_ENTRY(&filesize);
 			_SERVER = phalcon_get_global_str(SL("_SERVER"));
-			if (phalcon_array_isset_fetch_str(&http_range, _SERVER, SL("HTTP_RANGE"), PH_READONLY)) {
+			if (Z_LVAL(filesize) > 0 && phalcon_array_isset_fetch_str(&http_range, _SERVER, SL("HTTP_RANGE"), PH_READONLY)) {
 				zval pattern = {}, matched = {}, matches = {};
 				PHALCON_MM_ZVAL_STRING(&pattern, "#bytes=(\\d+)-(\\d+)?#i");
 				RETURN_MM_ON_FAILURE(phalcon_preg_match(&matched, &pattern, &http_range, &matches, 0, 0));
@@ -985,6 +985,6 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 	}
 
 	phalcon_update_property(getThis(), SL("_file"), file_path);
-
+	phalcon_update_property_null(getThis(), SL("_content"));
 	RETURN_THIS();
 }

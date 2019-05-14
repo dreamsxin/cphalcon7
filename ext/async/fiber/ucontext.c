@@ -133,9 +133,6 @@ void async_fiber_destroy(async_fiber *fiber)
 {
 	async_fiber_ucontext *impl;
 
-	if (UNEXPECTED(impl == NULL)) {
-		return;
-	}
 	impl = (async_fiber_ucontext *) fiber;
 
 	if (EXPECTED(impl != NULL)) {

@@ -28,7 +28,12 @@
 
 ASYNC_API zend_class_entry *async_server_ce;
 ASYNC_API zend_class_entry *async_socket_ce;
+ASYNC_API zend_class_entry *async_socket_accept_exception_ce;
+ASYNC_API zend_class_entry *async_socket_bind_exception_ce;
+ASYNC_API zend_class_entry *async_socket_connect_exception_ce;
+ASYNC_API zend_class_entry *async_socket_disconnect_exception_ce;
 ASYNC_API zend_class_entry *async_socket_exception_ce;
+ASYNC_API zend_class_entry *async_socket_listen_exception_ce;
 ASYNC_API zend_class_entry *async_socket_stream_ce;
 
 
@@ -48,6 +53,7 @@ static const zend_function_entry async_socket_functions[] = {
 
 ZEND_METHOD(SocketStream, getRemoteAddress) { }
 ZEND_METHOD(SocketStream, getRemotePort) { }
+ZEND_METHOD(SocketStream, isAlive) { }
 ZEND_METHOD(SocketStream, flush) { }
 ZEND_METHOD(SocketStream, writeAsync) { }
 ZEND_METHOD(SocketStream, getWriteQueueSize) { }
@@ -55,6 +61,7 @@ ZEND_METHOD(SocketStream, getWriteQueueSize) { }
 static const zend_function_entry async_socket_stream_functions[] = {
 	ZEND_ME(SocketStream, getRemoteAddress, arginfo_socket_stream_get_remote_address, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
 	ZEND_ME(SocketStream, getRemotePort, arginfo_socket_stream_get_remote_port, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
+	ZEND_ME(SocketStream, isAlive, arginfo_socket_stream_is_alive, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
 	ZEND_ME(SocketStream, flush, arginfo_socket_stream_flush, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
 	ZEND_ME(SocketStream, writeAsync, arginfo_socket_stream_write_async, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
 	ZEND_ME(SocketStream, getWriteQueueSize, arginfo_socket_get_write_queue_size, ZEND_ACC_PUBLIC | ZEND_ACC_ABSTRACT)
@@ -96,6 +103,31 @@ void async_socket_ce_register()
 	async_socket_exception_ce = zend_register_internal_class(&ce);
 
 	zend_do_inheritance(async_socket_exception_ce, async_stream_exception_ce);
+	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\SocketAcceptException", empty_funcs);
+	async_socket_accept_exception_ce = zend_register_internal_class(&ce);
+
+	zend_do_inheritance(async_socket_accept_exception_ce, async_socket_exception_ce);
+	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\SocketBindException", empty_funcs);
+	async_socket_bind_exception_ce = zend_register_internal_class(&ce);
+
+	zend_do_inheritance(async_socket_bind_exception_ce, async_socket_exception_ce);
+	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\SocketConnectException", empty_funcs);
+	async_socket_connect_exception_ce = zend_register_internal_class(&ce);
+
+	zend_do_inheritance(async_socket_connect_exception_ce, async_socket_exception_ce);
+	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\SocketDisconnectException", empty_funcs);
+	async_socket_disconnect_exception_ce = zend_register_internal_class(&ce);
+
+	zend_do_inheritance(async_socket_disconnect_exception_ce, async_socket_exception_ce);
+	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\SocketListenException", empty_funcs);
+	async_socket_listen_exception_ce = zend_register_internal_class(&ce);
+
+	zend_do_inheritance(async_socket_listen_exception_ce, async_socket_exception_ce);
 }
 
 #endif

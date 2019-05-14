@@ -218,7 +218,7 @@ static ZEND_METHOD(UdpSocket, bind)
 	code = uv_udp_bind(&socket->handle, (const struct sockaddr *) &dest, UV_UDP_REUSEADDR);
 	
 	if (UNEXPECTED(code != 0)) {
-		zend_throw_exception_ex(async_socket_exception_ce, 0, "Failed to bind UDP socket: %s", uv_strerror(code));
+		zend_throw_exception_ex(async_socket_bind_exception_ce, 0, "Failed to bind UDP socket: %s", uv_strerror(code));
 		ASYNC_DELREF(&socket->std);
 		return;
 	}
@@ -267,7 +267,7 @@ static ZEND_METHOD(UdpSocket, multicast)
 	code = uv_udp_bind(&socket->handle, (const struct sockaddr *) &dest, UV_UDP_REUSEADDR);
 	
 	if (UNEXPECTED(code != 0)) {
-		zend_throw_exception_ex(async_socket_exception_ce, 0, "Failed to bind UDP socket: %s", uv_strerror(code));
+		zend_throw_exception_ex(async_socket_bind_exception_ce, 0, "Failed to bind UDP socket: %s", uv_strerror(code));
 		ASYNC_DELREF(&socket->std);
 		return;
 	}

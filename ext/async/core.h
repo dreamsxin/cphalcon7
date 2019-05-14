@@ -148,14 +148,18 @@ ASYNC_API extern zend_class_entry *async_channel_ce;
 ASYNC_API extern zend_class_entry *async_channel_closed_exception_ce;
 ASYNC_API extern zend_class_entry *async_channel_group_ce;
 ASYNC_API extern zend_class_entry *async_channel_iterator_ce;
+ASYNC_API extern zend_class_entry *async_channel_select_ce;
 ASYNC_API extern zend_class_entry *async_context_ce;
 ASYNC_API extern zend_class_entry *async_context_var_ce;
 ASYNC_API extern zend_class_entry *async_deferred_ce;
 ASYNC_API extern zend_class_entry *async_deferred_awaitable_ce;
 ASYNC_API extern zend_class_entry *async_duplex_stream_ce;
+ASYNC_API extern zend_class_entry *async_monitor_ce;
+ASYNC_API extern zend_class_entry *async_monitor_event_ce;
 ASYNC_API extern zend_class_entry *async_pending_read_exception_ce;
 ASYNC_API extern zend_class_entry *async_pipe_ce;
 ASYNC_API extern zend_class_entry *async_pipe_server_ce;
+ASYNC_API extern zend_class_entry *async_poll_ce;
 ASYNC_API extern zend_class_entry *async_process_builder_ce;
 ASYNC_API extern zend_class_entry *async_process_ce;
 ASYNC_API extern zend_class_entry *async_readable_console_stream_ce;
@@ -164,15 +168,19 @@ ASYNC_API extern zend_class_entry *async_readable_process_pipe_ce;
 ASYNC_API extern zend_class_entry *async_readable_stream_ce;
 ASYNC_API extern zend_class_entry *async_server_ce;
 ASYNC_API extern zend_class_entry *async_socket_ce;
+ASYNC_API extern zend_class_entry *async_socket_accept_exception_ce;
+ASYNC_API extern zend_class_entry *async_socket_bind_exception_ce;
+ASYNC_API extern zend_class_entry *async_socket_connect_exception_ce;
+ASYNC_API extern zend_class_entry *async_socket_disconnect_exception_ce;
 ASYNC_API extern zend_class_entry *async_socket_exception_ce;
+ASYNC_API extern zend_class_entry *async_socket_listen_exception_ce;
 ASYNC_API extern zend_class_entry *async_socket_stream_ce;
-
 ASYNC_API extern zend_class_entry *async_stream_closed_exception_ce;
 ASYNC_API extern zend_class_entry *async_stream_exception_ce;
 ASYNC_API extern zend_class_entry *async_stream_reader_ce;
 ASYNC_API extern zend_class_entry *async_stream_writer_ce;
-ASYNC_API extern zend_class_entry *async_signal_watcher_ce;
-ASYNC_API extern zend_class_entry *async_stream_watcher_ce;
+ASYNC_API extern zend_class_entry *async_signal_ce;
+ASYNC_API extern zend_class_entry *async_sync_condition_ce;
 ASYNC_API extern zend_class_entry *async_task_ce;
 ASYNC_API extern zend_class_entry *async_task_scheduler_ce;
 ASYNC_API extern zend_class_entry *async_tcp_server_ce;
@@ -195,18 +203,22 @@ void async_console_ce_register();
 void async_context_ce_register();
 void async_deferred_ce_register();
 void async_dns_ce_register();
+void async_monitor_ce_register();
 void async_pipe_ce_register();
+void async_poll_ce_register();
 void async_process_ce_register();
-void async_signal_watcher_ce_register();
+void async_signal_ce_register();
 void async_socket_ce_register();
 void async_ssl_ce_register();
 void async_stream_ce_register();
-void async_stream_watcher_ce_register();
+void async_sync_init();
 void async_task_ce_register();
 void async_tcp_ce_register();
 void async_timer_ce_register();
 void async_udp_socket_ce_register();
 
+void async_channel_ce_unregister();
+void async_monitor_ce_unregister();
 void async_task_ce_unregister();
 
 void async_context_init();
@@ -383,7 +395,7 @@ struct _async_context_timeout {
 	/* Task scheduler instance (only != NULL if timeout is active). */
 	async_task_scheduler *scheduler;
 
-	/* Timeout instance (watcher is never referenced within libuv). */
+	/* Timeout instance (unreferenced). */
 	uv_timer_t timer;
 };
 
@@ -417,7 +429,8 @@ struct _async_deferred_awaitable {
 
 struct _async_deferred_custom_awaitable {
 	async_deferred_awaitable base;	
-	void (* dtor)(async_deferred_awaitable *awaitable);
+	void (* dtor)(async_deferred_custom_awaitable *awaitable);
+	void *arg;
 };
 
 struct _async_deferred_state {
@@ -550,7 +563,7 @@ struct _async_task_scheduler {
 	if ((fci).object) { \
 		ASYNC_DELREF((fci).object); \
 	} \
-	Z_TRY_DELREF((fci).function_name); \
+	zval_ptr_dtor(&(fci).function_name); \
 } while (0)
 
 static zend_always_inline char *async_status_label(zend_uchar status)
@@ -598,7 +611,7 @@ static zend_always_inline async_context *async_context_ref()
 ASYNC_API int async_await_op(async_op *op);
 ASYNC_API int async_call_nowait(zend_fcall_info *fci, zend_fcall_info_cache *fcc);
 
-ASYNC_API void async_init_awaitable(async_deferred_custom_awaitable *awaitable, void (* dtor)(async_deferred_awaitable *awaitable), async_context *context);
+ASYNC_API void async_init_awaitable(async_deferred_custom_awaitable *awaitable, void (* dtor)(async_deferred_custom_awaitable *awaitable), async_context *context);
 ASYNC_API void async_resolve_awaitable(async_deferred_awaitable *awaitable, zval *val);
 ASYNC_API void async_fail_awaitable(async_deferred_awaitable *awaitable, zval *error);
 

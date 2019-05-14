@@ -269,7 +269,7 @@ static int async_xp_socket_close(php_stream *stream, int close_handle)
 	data = (async_xp_socket_data *) stream->abstract;
 	
 	if (data->astream == NULL) {
-		if (uv_is_closing(&data->handle)) {
+		if (!(data->flags & ASYNC_XP_SOCKET_FLAG_INIT) || uv_is_closing(&data->handle)) {
 			if (data->peer != NULL) {
 				zend_string_release(data->peer);
 				data->peer = NULL;
@@ -715,6 +715,12 @@ static int async_xp_socket_set_option(php_stream *stream, int option, int value,
 		}
 
 		return PHP_STREAM_OPTION_RETURN_OK;
+	case PHP_STREAM_OPTION_CHECK_LIVENESS:		
+		if (EXPECTED(data->astream != NULL && async_socket_is_alive(data->astream))) {
+			return PHP_STREAM_OPTION_RETURN_OK;
+		}
+		
+		return PHP_STREAM_OPTION_RETURN_ERR;
 	case PHP_STREAM_OPTION_READ_TIMEOUT: {		
 		struct timeval tv = *(struct timeval *) ptrparam;
 		
@@ -737,12 +743,6 @@ static int async_xp_socket_set_option(php_stream *stream, int option, int value,
 		}
 
 		return PHP_STREAM_OPTION_RETURN_OK;
-	case PHP_STREAM_OPTION_CHECK_LIVENESS:
-		if (ASYNC_XP_SOCKET_EOF(data)) {
-			return PHP_STREAM_OPTION_RETURN_ERR;
-		}
-		
-		return uv_is_readable((const uv_stream_t *) &data->handle) ? PHP_STREAM_OPTION_RETURN_OK : PHP_STREAM_OPTION_RETURN_ERR;
 	}
 
 	return PHP_STREAM_OPTION_RETURN_NOTIMPL;

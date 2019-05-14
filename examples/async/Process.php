@@ -13,7 +13,7 @@ $process = $builder->start(__DIR__ . '/process/p2.php');
 Phalcon\Async\Task::async(function () use ($process) {
     (new Phalcon\Async\Timer(400))->awaitTimeout();
     var_dump('SIGNAL!');
-    $process->signal(Phalcon\Async\SignalWatcher::SIGINT);
+    $process->signal(Phalcon\Async\Signal::SIGINT);
 });
 
 $code = $process->join();

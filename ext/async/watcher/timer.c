@@ -20,10 +20,11 @@
 */
 
 #include "async/core.h"
+#include "kernel/backend.h"
+
+#include <Zend/zend_inheritance.h>
 
 #if PHALCON_USE_UV
-
-#include "kernel/backend.h"
 
 ASYNC_API zend_class_entry *async_timeout_exception_ce;
 ASYNC_API zend_class_entry *async_timer_ce;
@@ -37,7 +38,7 @@ typedef struct {
 	/* PHP object handle. */
 	zend_object std;
 
-	/* Error being set as the watcher was closed (undef by default). */
+	/* Error if timer was closed (undef by default). */
 	zval error;
 
 	/* Timer interval in milliseconds. */
@@ -305,7 +306,7 @@ ASYNC_CALLBACK timeout_cb(uv_timer_t *timer)
 	uv_close((uv_handle_t *) timer, timeout_close_cb);
 }
 
-ASYNC_CALLBACK timeout_dispose_cb(async_deferred_awaitable *obj)
+ASYNC_CALLBACK timeout_dispose_cb(async_deferred_custom_awaitable *obj)
 {
 	async_timeout_awaitable *awaitable;
 	
@@ -349,7 +350,7 @@ ZEND_METHOD(Timer, timeout)
 	}
 	
 	uv_timer_start(&awaitable->timer, timeout_cb, delay, 0);
-
+	
 	RETURN_OBJ(&awaitable->base.base.std);
 }
 

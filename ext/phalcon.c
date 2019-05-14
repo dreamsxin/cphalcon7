@@ -280,11 +280,13 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_context_ce_register();
 	async_deferred_ce_register();
 	async_dns_ce_register();
+	async_monitor_ce_register();
 	async_pipe_ce_register();
+	async_poll_ce_register();
 	async_process_ce_register();
-	async_signal_watcher_ce_register();
+	async_signal_ce_register();
 	async_ssl_ce_register();
-	async_stream_watcher_ce_register();
+	async_sync_init();
 	async_task_ce_register();
 	async_tcp_ce_register();
 	async_timer_ce_register();
@@ -843,6 +845,8 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 #endif
 
 #if PHALCON_USE_UV
+	async_channel_ce_unregister();
+	async_monitor_ce_unregister();
 	async_task_ce_unregister();
 #endif
 
@@ -899,6 +903,10 @@ static PHP_RINIT_FUNCTION(phalcon){
 #if PHALCON_USE_UV
 	async_context_init();
 	async_task_scheduler_init();
+
+	if (ASYNC_G(dns_enabled)) {
+		async_dns_init();
+	}
 	
 	if (ASYNC_G(timer_enabled)) {
 		async_timer_init();

@@ -959,7 +959,7 @@ PHP_METHOD(Phalcon_Http_Response, setFileToSend){
 		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_description);
 		zval_ptr_dtor(&content_description);
 
-		PHALCON_CONCAT_SV(&content_disposition, "Content-Disposition: attachment; filename=", &base_path);
+		PHALCON_CONCAT_SVS(&content_disposition, "Content-Disposition: attachment; filename=\"", &base_path, "\"");
 		PHALCON_CALL_METHOD(NULL, &headers, "setraw", &content_disposition);
 		zval_ptr_dtor(&content_disposition);
 

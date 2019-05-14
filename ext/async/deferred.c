@@ -611,10 +611,7 @@ static ZEND_METHOD(Deferred, combine)
 	count = zend_array_count(Z_ARRVAL_P(args));
 
 	if (UNEXPECTED(count == 0)) {
-#if PHP_VERSION_ID < 70100
-#else
-		zend_throw_error(zend_ce_error, "At least one awaitable is required");
-#endif
+		zend_throw_error(zend_ce_argument_count_error, "At least one awaitable is required");
 		return;
 	}
 
@@ -833,7 +830,7 @@ static const zend_function_entry deferred_functions[] = {
 };
 
 
-ASYNC_API void async_init_awaitable(async_deferred_custom_awaitable *awaitable, void (* dtor)(async_deferred_awaitable *awaitable), async_context *context)
+ASYNC_API void async_init_awaitable(async_deferred_custom_awaitable *awaitable, void (* dtor)(async_deferred_custom_awaitable *awaitable), async_context *context)
 {
 	if (EXPECTED(context == NULL)) {
 		context = async_context_get();
@@ -879,7 +876,7 @@ static void async_deferred_custom_awaitable_object_destroy(zend_object *object)
 	awaitable = (async_deferred_custom_awaitable *) object;
 	
 	if (UNEXPECTED(awaitable->base.state->status == ASYNC_DEFERRED_STATUS_PENDING)) {
-		awaitable->dtor((async_deferred_awaitable *) awaitable);
+		awaitable->dtor(awaitable);
 	}
 }
 

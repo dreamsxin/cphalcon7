@@ -435,7 +435,7 @@ static ZEND_METHOD(ReadablePipe, read)
 		return;
 	}
 
-	forward_stream_read_error(&read);
+	forward_stream_read_error(stream, &read);
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_readable_console_stream_get_stdin, 0, 0, Phalcon\\Async\\Stream\\ReadablePipe, 0)
@@ -756,7 +756,7 @@ static ZEND_METHOD(WritablePipe, write)
 	write.in.flags = 0;
 	
 	if (UNEXPECTED(FAILURE == async_stream_write(stream, &write))) {
-		forward_stream_write_error(&write);
+		forward_stream_write_error(stream, &write);
 	}
 }
 

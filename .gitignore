@@ -49,3 +49,4 @@ build/install2
 /vendor/
 composer.lock
 nbproject/private/
+ext/async/thirdparty/

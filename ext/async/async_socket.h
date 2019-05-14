@@ -22,6 +22,7 @@
 #ifndef ASYNC_SOCKET_H
 #define ASYNC_SOCKET_H
 
+#include "async/async_stream.h"
 #include "kernel/backend.h"
 
 static zend_always_inline int async_socket_addr_size(const struct sockaddr *addr)
@@ -178,6 +179,87 @@ static zend_always_inline int async_socket_parse_ipv6(const char *address, uint1
 }
 #endif
 
+static zend_always_inline int async_socket_set_reuseaddr(php_socket_t sock, int yes)
+{
+#ifdef PHP_WIN32
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, (const char *) &yes, sizeof(yes))) {
+    	return uv_translate_sys_error(php_socket_errno());
+    }
+#else
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEADDR, &yes, sizeof(yes))) {
+    	return uv_translate_sys_error(php_socket_errno());
+    }
+#endif
+
+	return 0;
+}
+
+static zend_always_inline int async_socket_set_reuseport(php_socket_t sock, int yes)
+{
+#ifndef PHP_WIN32
+	if (setsockopt(sock, SOL_SOCKET, SO_REUSEPORT, &yes, sizeof(yes))) {
+    	return uv_translate_sys_error(php_socket_errno());
+    }
+#endif
+
+	return 0;
+}
+
+static zend_always_inline int async_socket_is_alive(async_stream *stream)
+{
+	php_socket_t sock;
+	struct timeval tv;
+	
+	char buf;
+	int error;
+	
+#ifdef PHP_WIN32
+	int code;
+#else
+	ssize_t code;
+#endif
+
+	if (UNEXPECTED(stream->flags & ASYNC_STREAM_CLOSED)) {
+		return 0;
+	}
+	
+	if (UNEXPECTED(stream->buffer.len > 0)) {
+		return 1;
+	}
+	
+#ifdef HAVE_ASYNC_SSL
+	if (stream->ssl.ssl != NULL) {
+		if (UNEXPECTED(stream->flags & ASYNC_STREAM_SSL_FATAL || SSL_get_shutdown(stream->ssl.ssl) & SSL_RECEIVED_SHUTDOWN)) {
+			return 0;
+		}
+	}
+#endif
+	
+	if (UNEXPECTED(0 != uv_fileno((const uv_handle_t *) stream->handle, (uv_os_fd_t *) &sock))) {
+		return 0;
+	}
+	
+	if (UNEXPECTED(sock == -1)) {
+		return 0;
+	}
+	
+	tv.tv_sec = 0;
+	tv.tv_usec = 0;
+	
+	if (php_pollfd_for(sock, PHP_POLLREADABLE | POLLPRI, &tv) < 1) {
+		return 1;
+	}
+	
+	code = recv(sock, &buf, sizeof(buf), MSG_PEEK);
+	error = php_socket_errno();
+	
+	if (code > 0) {
+		return 1;
+	}
+	
+	return (code < 0 && (error == EWOULDBLOCK || error == EAGAIN || error == EMSGSIZE)) ? 1 : 0;
+}
+
 // Socket
 
 #if PHP_VERSION_ID >= 70200
@@ -193,6 +275,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_set_option, 0, 2, _IS_BOO
 ZEND_END_ARG_INFO()
 
 // SocketStream
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_stream_is_alive, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_stream_get_remote_address, 0, 0, IS_STRING, 0)
 ZEND_END_ARG_INFO()
@@ -227,6 +312,9 @@ ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_set_option, 0, 2, _IS_BOO
 ZEND_END_ARG_INFO()
 
 // SocketStream
+
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_stream_is_alive, 0, 0, _IS_BOOL, NULL, 0)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_socket_stream_get_remote_address, 0, 0, IS_STRING, NULL, 0)
 ZEND_END_ARG_INFO()

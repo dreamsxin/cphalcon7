@@ -180,7 +180,61 @@ static zend_always_inline void set_stream_send_buffer(async_stream *stream, int 
 	uv_send_buffer_size((uv_handle_t *) stream->handle, &v);
 }
 
-static void zend_always_inline forward_stream_read_error(async_stream_read_req *req)
+static zend_always_inline int async_stream_call_close(zval *stream)
+{
+	zval tmp;
+	
+	if (stream == NULL) {
+		return 0;
+	}
+	
+	ZVAL_UNDEF(&tmp);
+	zend_call_method_with_0_params(stream, Z_OBJCE_P(stream), NULL, "close", &tmp);
+	zval_ptr_dtor(&tmp);
+	
+	return 1;
+}
+
+static zend_always_inline int async_stream_call_close_obj(zend_object *object)
+{
+	zval obj;
+	zval tmp;
+	
+	if (object == NULL) {
+		return 0;
+	}
+	
+	ZVAL_OBJ(&obj, object);
+	ZVAL_UNDEF(&tmp);
+
+	zend_call_method_with_0_params(&obj, Z_OBJCE_P(&obj), NULL, "close", &tmp);
+	zval_ptr_dtor(&tmp);
+	
+	return 1;
+}
+
+static zend_always_inline zend_bool is_socket_disconnect_error(uv_handle_t *handle, int error)
+{
+	if (handle->type != UV_TCP && handle->type != UV_NAMED_PIPE) {
+		return 0;
+	}
+
+	switch (error) {
+	case UV_ECONNABORTED:
+	case UV_ECONNRESET:
+	case UV_ENETDOWN:
+	case UV_ENETUNREACH:
+	case UV_ENOTCONN:
+	case UV_ESHUTDOWN:
+	case UV_ETIMEDOUT:
+	case UV_EOF:
+		return 1;
+	}
+	
+	return 0;
+}
+
+static zend_always_inline void forward_stream_read_error(async_stream *stream, async_stream_read_req *req)
 {
 	ASYNC_RETURN_ON_ERROR();
 	
@@ -190,10 +244,14 @@ static void zend_always_inline forward_stream_read_error(async_stream_read_req *
 
 	ASYNC_CHECK_EXCEPTION(req->out.error == UV_EALREADY, async_pending_read_exception_ce, "Cannot read while another read is pending");
 	
-	zend_throw_exception_ex(async_stream_exception_ce, 0, "Read operation failed: %s", uv_strerror(req->out.error));
+	if (is_socket_disconnect_error((uv_handle_t *) stream->handle, req->out.error)) {
+		zend_throw_exception_ex(async_socket_disconnect_exception_ce, 0, "Read operation failed: %s", uv_strerror(req->out.error));
+	} else {
+		zend_throw_exception_ex(async_stream_exception_ce, 0, "Read operation failed: %s", uv_strerror(req->out.error));
+	}
 }
 
-static void zend_always_inline forward_stream_write_error(async_stream_write_req *req)
+static zend_always_inline void forward_stream_write_error(async_stream *stream, async_stream_write_req *req)
 {
 	ASYNC_RETURN_ON_ERROR();
 	
@@ -201,7 +259,11 @@ static void zend_always_inline forward_stream_write_error(async_stream_write_req
 	ASYNC_CHECK_EXCEPTION(req->out.ssl_error, async_stream_exception_ce, "Write operation failed: SSL %s", ERR_reason_error_string(req->out.ssl_error));
 #endif
 
-	zend_throw_exception_ex(async_stream_exception_ce, 0, "Write operation failed: %s", uv_strerror(req->out.error));
+	if (is_socket_disconnect_error((uv_handle_t *) stream->handle, req->out.error)) {
+		zend_throw_exception_ex(async_socket_disconnect_exception_ce, 0, "Write operation failed: %s", uv_strerror(req->out.error));
+	} else {	
+		zend_throw_exception_ex(async_stream_exception_ce, 0, "Write operation failed: %s", uv_strerror(req->out.error));
+	}
 }
 
 static zend_always_inline void async_stream_call_read(async_stream *stream, zval *error, zval *return_value, zend_execute_data *execute_data)
@@ -246,7 +308,7 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 		return;
 	}
 
-	forward_stream_read_error(&read);
+	forward_stream_read_error(stream, &read);
 }
 
 static zend_always_inline void async_stream_call_write(async_stream *stream, zval *error, zval *return_value, zend_execute_data *execute_data)
@@ -272,7 +334,7 @@ static zend_always_inline void async_stream_call_write(async_stream *stream, zva
 	write.in.flags = 0;
 
 	if (UNEXPECTED(FAILURE == async_stream_write(stream, &write))) {
-		forward_stream_write_error(&write);
+		forward_stream_write_error(stream, &write);
 	}
 }
 

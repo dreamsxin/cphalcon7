@@ -221,7 +221,7 @@ static void async_context_object_destroy(zend_object *object)
 			async_fiber_copy_og(&OG(handlers), context->output.handler);
 			
 			if (OG(active)) {
-				php_output_end_all();
+				php_output_discard_all();
 			}
 			
 			php_output_deactivate();
@@ -339,6 +339,8 @@ static ZEND_METHOD(Context, withIsolatedOutput)
 	}
 	
 	context->output.context = context;
+	
+	ASYNC_ADDREF(&current->std);
 	
 	RETURN_OBJ(&context->std);
 }

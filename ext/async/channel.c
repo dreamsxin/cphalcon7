@@ -37,10 +37,15 @@ ASYNC_API zend_class_entry *async_channel_ce;
 ASYNC_API zend_class_entry *async_channel_closed_exception_ce;
 ASYNC_API zend_class_entry *async_channel_group_ce;
 ASYNC_API zend_class_entry *async_channel_iterator_ce;
+ASYNC_API zend_class_entry *async_channel_select_ce;
 
 static zend_object_handlers async_channel_handlers;
 static zend_object_handlers async_channel_group_handlers;
 static zend_object_handlers async_channel_iterator_handlers;
+static zend_object_handlers async_channel_select_handlers;
+
+static zend_string *str_key;
+static zend_string *str_value;
 
 #define ASYNC_CHANNEL_FLAG_CLOSED 1
 
@@ -176,12 +181,15 @@ typedef struct {
 	/* Basic select operation being used to suspend the calling task. */
 	async_channel_group_select_op select;
 	
-	/* Timeout paramter, -1 when a blocking call is requested. */
-	zend_long timeout;
-	
 	/* Timer being used to stop select, only initialized if timeout > 0. */
 	uv_timer_t timer;
 } async_channel_group;
+
+typedef struct {
+	zval key;
+	zval value;
+	zend_object std;
+} async_channel_select;
 
 static async_channel_iterator *async_channel_iterator_object_create(async_channel_state *state);
 
@@ -366,6 +374,10 @@ static void async_channel_object_destroy(zend_object *object)
 	zend_object_std_dtor(&channel->std);
 }
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_ctor, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, capacity, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
 static ZEND_METHOD(Channel, __construct)
 {
 	async_channel *channel;
@@ -390,6 +402,9 @@ static ZEND_METHOD(Channel, __construct)
 		channel->state->buffer.data = ecalloc(channel->state->buffer.size, sizeof(zval));
 	}
 }
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_get_iterator, 0, 0, 0)
+ZEND_END_ARG_INFO()
 
 static ZEND_METHOD(Channel, getIterator)
 {
@@ -524,25 +539,12 @@ static ZEND_METHOD(Channel, send)
 	ASYNC_FREE_OP(send);
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_ctor, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO(0, capacity, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_get_iterator, 0, 0, 0)
-ZEND_END_ARG_INFO()
-
 #if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_close, 0, 0, IS_VOID, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_closed, 0, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_receive, 0, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_send, 0, 0, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_send, 0, 1, IS_VOID, 0)
@@ -556,12 +558,6 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_closed, 0, 0, _IS_BOOL, NULL, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_receive, 0, 0, _IS_BOOL, NULL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_is_ready_for_send, 0, 0, _IS_BOOL, NULL, 0)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_send, 0, 1, IS_VOID, NULL, 0)
 	ZEND_ARG_INFO(0, message)
 ZEND_END_ARG_INFO()
@@ -572,11 +568,52 @@ static const zend_function_entry channel_functions[] = {
 	ZEND_ME(Channel, getIterator, arginfo_channel_get_iterator, ZEND_ACC_PUBLIC)
 	ZEND_ME(Channel, close, arginfo_channel_close, ZEND_ACC_PUBLIC)
 	ZEND_ME(Channel, isClosed, arginfo_channel_is_closed, ZEND_ACC_PUBLIC)
-	ZEND_ME(Channel, isReadyForReceive, arginfo_channel_is_ready_for_receive, ZEND_ACC_PUBLIC)
-	ZEND_ME(Channel, isReadyForSend, arginfo_channel_is_ready_for_send, ZEND_ACC_PUBLIC)
 	ZEND_ME(Channel, send, arginfo_channel_send, ZEND_ACC_PUBLIC)
 	ZEND_FE_END
 };
+
+
+static zend_always_inline async_channel_select *async_channel_select_obj(zend_object *object)
+{
+	return (async_channel_select *)((char *) object - XtOffsetOf(async_channel_select, std));
+}
+
+static zend_always_inline uint32_t async_monitor_event_prop_offset(zend_string *name)
+{
+	return zend_get_property_info(async_channel_select_ce, name, 1)->offset;
+}
+
+static async_channel_select *async_channel_select_object_create(zval *key, zval *value)
+{
+	async_channel_select *select;
+	
+	select = ecalloc(1, sizeof(async_channel_select) + zend_object_properties_size(async_channel_select_ce));
+	
+	zend_object_std_init(&select->std, async_channel_select_ce);	
+	select->std.handlers = &async_channel_select_handlers;
+	
+	object_properties_init(&select->std, async_channel_select_ce);
+	
+	ZVAL_COPY(&select->key, key);
+	ZVAL_COPY(&select->value, value);
+	
+	ZVAL_COPY(OBJ_PROP(&select->std, async_monitor_event_prop_offset(str_key)), key);
+	ZVAL_COPY(OBJ_PROP(&select->std, async_monitor_event_prop_offset(str_value)), value);
+	
+	return select;
+}
+
+static void async_channel_select_object_destroy(zend_object *object)
+{
+	async_channel_select *select;
+	
+	select = async_channel_select_obj(object);
+	
+	zval_ptr_dtor(&select->key);
+	zval_ptr_dtor(&select->value);
+	
+	zend_object_std_dtor(&select->std);
+}
 
 
 /* Performs a Fisher–Yates shuffle to randomize the channel entries array in-place. */
@@ -653,7 +690,7 @@ static void async_channel_group_object_dtor(zend_object *object)
 	
 	group = (async_channel_group *) object;
 	
-	if (group->timeout > 0 && !uv_is_closing((uv_handle_t *) &group->timer)) {
+	if (!uv_is_closing((uv_handle_t *) &group->timer)) {
 		ASYNC_ADDREF(&group->std);
 		
 		uv_close((uv_handle_t *) &group->timer, dispose_group_timer);
@@ -687,47 +724,32 @@ static ZEND_METHOD(ChannelGroup, __construct)
 	async_channel_group *group;
 	
 	HashTable *map;
-	zval *t;
 	zval *entry;
 	zval tmp;
 	
-	zend_long timeout;
 	zend_long shuffle;
 	zend_long h;
 	zend_string *k;
 	
-	t = NULL;
 	shuffle = 0;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 3)
 		Z_PARAM_ARRAY_HT(map)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(t)
 		Z_PARAM_LONG(shuffle)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	group = (async_channel_group *) Z_OBJ_P(getThis());
+
+	uv_timer_init(&group->scheduler->loop, &group->timer);
+	uv_unref((uv_handle_t *) &group->timer);
 	
-	if (t == NULL || Z_TYPE_P(t) == IS_NULL) {
-		timeout = -1;
-	} else {
-		timeout = Z_LVAL_P(t);
-		
-		ASYNC_CHECK_ERROR(timeout < 0, "Timeout must not be negative, use NULL to disable timeout");
-		
-		if (timeout > 0) {
-			uv_timer_init(&group->scheduler->loop, &group->timer);
-			uv_unref((uv_handle_t *) &group->timer);
-			
-			group->timer.data = group;
-		}
-	}
+	group->timer.data = group;
 	
 	if (shuffle) {
 		group->flags |= ASYNC_CHANNEL_GROUP_FLAG_SHUFFLE;
 	}
 	
-	group->timeout = timeout;
 	group->entries = ecalloc(zend_array_count(map), sizeof(async_channel_group_entry));
 	
 	ZEND_HASH_FOREACH_KEY_VAL(map, h, k, entry) {
@@ -795,6 +817,8 @@ ASYNC_CALLBACK continue_select_cb(async_op *op)
 	
 	group->select.pending--;
 	
+	entry->it->flags &= ~ASYNC_CHANNEL_ITERATOR_FLAG_FETCHING;
+	
 	if (UNEXPECTED(entry->it->state->flags & ASYNC_CHANNEL_FLAG_CLOSED)) {
 		group->flags |= ASYNC_CHANNEL_GROUP_FLAG_CHECK_CLOSED;
 	}
@@ -832,27 +856,32 @@ ASYNC_CALLBACK timeout_select(uv_timer_t *timer)
 static ZEND_METHOD(ChannelGroup, select)
 {
 	async_channel_group *group;
+	async_channel_select *select;
 	async_channel_group_entry *entry;
 	async_channel_group_entry *first;
 	async_channel_state *state;
 	async_context *context;
 	
-	zval *val;
+	zend_long timeout;
+	zval *millis;
 	zval tmp;
 	
 	uint32_t i;
 	uint32_t j;
 	
-	val = NULL;
+	millis = NULL;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL_DEREF(val);
+		Z_PARAM_ZVAL(millis)
 	ZEND_PARSE_PARAMETERS_END();
 	
-	if (val != NULL) {
-		zval_ptr_dtor(val);
-		ZVAL_NULL(val);
+	if (millis == NULL || Z_TYPE_P(millis) == IS_NULL) {
+		timeout = -1;
+	} else {
+		timeout = Z_LVAL_P(millis);
+		
+		ASYNC_CHECK_ERROR(timeout < 0, "Timeout must not be negative");
 	}
 	
 	group = (async_channel_group *) Z_OBJ_P(getThis());
@@ -894,17 +923,15 @@ static ZEND_METHOD(ChannelGroup, select)
 	
 	// Perform a non-blocking select if a channel is ready.
 	if (first != NULL && fetch_noblock(first->it->state, &tmp) == SUCCESS) {
-		if (val != NULL) {
-			ZVAL_COPY(val, &tmp);
-		}
+		select = async_channel_select_object_create(&first->key, &tmp);
 		
 		zval_ptr_dtor(&tmp);
 		
-		RETURN_ZVAL(&first->key, 1, 0);
+		RETURN_OBJ(&select->std);
 	}
 	
 	// No more channels left or non-blocking select early return.
-	if (group->count == 0 || group->timeout == 0) {
+	if (group->count == 0 || timeout == 0) {
 		return;
 	}
 	
@@ -924,6 +951,8 @@ static ZEND_METHOD(ChannelGroup, select)
 		entry->base.arg = group;
 	
 		ASYNC_APPEND_OP(&entry->it->state->receivers, entry);
+		
+		entry->it->flags |= ASYNC_CHANNEL_ITERATOR_FLAG_FETCHING;
 	}
 	
 	context = async_context_get();
@@ -932,15 +961,15 @@ static ZEND_METHOD(ChannelGroup, select)
 		ASYNC_BUSY_ENTER(group->scheduler);
 	}
 	
-	if (group->timeout > 0) {
-		uv_timer_start(&group->timer, timeout_select, group->timeout, 0);
+	if (timeout > 0) {
+		uv_timer_start(&group->timer, timeout_select, timeout, 0);
 	}
 	
 	if (async_await_op((async_op *) &group->select) == FAILURE) {
 		forward_error(&group->select.base.result);
 	}
 	
-	if (group->timeout > 0) {
+	if (timeout > 0) {
 		uv_timer_stop(&group->timer);
 	}
 	
@@ -950,13 +979,9 @@ static ZEND_METHOD(ChannelGroup, select)
 	
 	// Populate return values.
 	if (EXPECTED(EG(exception) == NULL) && group->select.entry != NULL) {
-		if (val != NULL) {
-			ZVAL_COPY(val, &group->select.base.result);
-		}
-		
-		if (USED_RET()) {
-			ZVAL_COPY(return_value, &group->select.entry->key);
-		}
+		select = async_channel_select_object_create(&group->select.entry->key, &group->select.base.result);
+	} else {
+		select = NULL;
 	}
 	
 	// Cleanup pending operations.
@@ -966,6 +991,8 @@ static ZEND_METHOD(ChannelGroup, select)
 		zval_ptr_dtor(&entry->base.result);
 		
 		if (entry->base.list) {
+			entry->it->flags &= ~ASYNC_CHANNEL_ITERATOR_FLAG_FETCHING;
+		
 			ASYNC_LIST_REMOVE(&entry->it->state->receivers, (async_op *) entry);
 		}
 	}
@@ -977,6 +1004,10 @@ static ZEND_METHOD(ChannelGroup, select)
 	}
 	
 	zval_ptr_dtor(&group->select.base.result);
+	
+	if (EXPECTED(select != NULL)) {
+		RETURN_OBJ(&select->std);
+	}
 }
 
 ASYNC_CALLBACK dispose_send_timer_cb(uv_handle_t *handle)
@@ -1059,15 +1090,29 @@ static ZEND_METHOD(ChannelGroup, send)
 	async_channel_group_send_op *send;
 	async_channel_send_op *op;
 	async_op *receiver;
+	
+	zend_long timeout;
+	zval *millis;
+	zval *val;
 		
 	uint32_t i;
 	uint32_t j;
 	
-	zval *val;
+	millis = NULL;
 	
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_ZVAL(val);
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
+		Z_PARAM_ZVAL(val)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_ZVAL(millis)
 	ZEND_PARSE_PARAMETERS_END();
+	
+	if (millis == NULL || Z_TYPE_P(millis) == IS_NULL) {
+		timeout = -1;
+	} else {
+		timeout = Z_LVAL_P(millis);
+		
+		ASYNC_CHECK_ERROR(timeout < 0, "Timeout must not be negative");
+	}
 	
 	group = (async_channel_group *) Z_OBJ_P(getThis());
 	
@@ -1128,7 +1173,7 @@ static ZEND_METHOD(ChannelGroup, send)
 	}
 	
 	// No more channels left or non-blocking send early return.
-	if (group->count == 0 || group->timeout == 0) {
+	if (group->count == 0 || timeout == 0) {
 		return;
 	}
 	
@@ -1159,9 +1204,9 @@ static ZEND_METHOD(ChannelGroup, send)
 		ASYNC_BUSY_ENTER(group->scheduler);
 	}
 	
-	if (group->timeout > 0) {
+	if (timeout > 0) {
 		uv_timer_init(&group->scheduler->loop, &send->timer);
-		uv_timer_start(&send->timer, timeout_send_cb, group->timeout, 0);
+		uv_timer_start(&send->timer, timeout_send_cb, timeout, 0);
 		
 		send->timer.data = send;
 	}
@@ -1194,7 +1239,7 @@ static ZEND_METHOD(ChannelGroup, send)
 		compact_group(group, send->entry);
 	}
 	
-	if (group->timeout > 0) {
+	if (timeout > 0) {
 		uv_close((uv_handle_t *) &send->timer, dispose_send_timer_cb);
 	} else {
 		ASYNC_FREE_OP(send);
@@ -1203,7 +1248,6 @@ static ZEND_METHOD(ChannelGroup, send)
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_group_ctor, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, channels, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, shuffle, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
@@ -1211,11 +1255,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_group_count, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_group_select, 0, 0, 0)
-	ZEND_ARG_INFO(1, value)
+	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_channel_group_send, 0, 0, 1)
 	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry channel_group_functions[] = {
@@ -1447,10 +1492,33 @@ void async_channel_ce_register()
 	
 	zend_class_implements(async_channel_iterator_ce, 1, zend_ce_iterator);
 	
+	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\ChannelSelect", empty_funcs);
+	async_channel_select_ce = zend_register_internal_class(&ce);
+	async_channel_select_ce->ce_flags |= ZEND_ACC_FINAL;
+	async_channel_select_ce->create_object = NULL;
+	async_channel_select_ce->serialize = zend_class_serialize_deny;
+	async_channel_select_ce->unserialize = zend_class_unserialize_deny;
+	
+	memcpy(&async_channel_select_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	async_channel_select_handlers.offset = XtOffsetOf(async_channel_select, std);
+	async_channel_select_handlers.free_obj = async_channel_select_object_destroy;
+	async_channel_select_handlers.clone_obj = NULL;
 	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\ChannelClosedException", empty_funcs);
 	async_channel_closed_exception_ce = zend_register_internal_class(&ce);
 
 	zend_do_inheritance(async_channel_closed_exception_ce, zend_ce_exception);
+	
+	zend_declare_property_null(async_channel_select_ce, ZEND_STRL("key"), ZEND_ACC_PUBLIC);
+	zend_declare_property_null(async_channel_select_ce, ZEND_STRL("value"), ZEND_ACC_PUBLIC);
+	
+	str_key = zend_new_interned_string(zend_string_init(ZEND_STRL("key"), 1));
+	str_value = zend_new_interned_string(zend_string_init(ZEND_STRL("value"), 1));
+}
+
+void async_channel_ce_unregister()
+{
+	zend_string_release(str_key);
+	zend_string_release(str_value);
 }
 
 #endif /* PHALCON_USE_UV */

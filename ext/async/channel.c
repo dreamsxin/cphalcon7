@@ -453,28 +453,6 @@ static ZEND_METHOD(Channel, isClosed)
 	RETURN_BOOL(state->cancel.func == NULL);
 }
 
-static ZEND_METHOD(Channel, isReadyForReceive)
-{
-	async_channel_state *state;
-	
-	ZEND_PARSE_PARAMETERS_NONE();
-	
-	state = ((async_channel *) Z_OBJ_P(getThis()))->state;
-	
-	RETURN_BOOL(ASYNC_CHANNEL_READABLE_NONBLOCK(state));
-}
-
-static ZEND_METHOD(Channel, isReadyForSend)
-{
-	async_channel_state *state;
-	
-	ZEND_PARSE_PARAMETERS_NONE();
-	
-	state = ((async_channel *) Z_OBJ_P(getThis()))->state;
-	
-	RETURN_BOOL(state->cancel.func != NULL && (state->receivers.first != NULL || state->buffer.len < state->buffer.size));
-}
-
 static ZEND_METHOD(Channel, send)
 {
 	async_channel_state *state;

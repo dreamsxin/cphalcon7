@@ -231,7 +231,7 @@ static zend_always_inline void async_task_dispose(async_task *task)
 
 	trigger_ops(task);
 	
-	//ASYNC_DELREF(&task->std);
+	ASYNC_DELREF(&task->std);
 }
 
 static void async_task_execute_inline(async_task *task, async_context *context)
@@ -707,7 +707,6 @@ static void async_task_object_destroy(zend_object *object)
 		}
 	
 		async_fiber_destroy(task->fiber);
-		task->fiber = NULL;
 	}
 
 	if (task->file != NULL) {
@@ -719,7 +718,7 @@ static void async_task_object_destroy(zend_object *object)
 	ASYNC_DELREF_CB(task->fci);
 	ASYNC_DELREF(&task->context->std);
 	
-	ASYNC_DELREF(&task->std);
+	zend_object_std_dtor(&task->std);
 }
 
 static zval *read_task_property(zval *object, zval *member, int type, void **cache_slot, zval *rv)
@@ -734,7 +733,7 @@ static zval *read_task_property(zval *object, zval *member, int type, void **cac
 	if (strcmp(key, "status") == 0) {
 		ZVAL_STRING(rv, async_status_label(task->status));
 	} else if (strcmp(key, "file") == 0) {
-		ZVAL_STR(rv, zend_string_copy(task->file));
+		ZVAL_STR_COPY(rv, task->file);
 	} else if (strcmp(key, "line") == 0) {
 		ZVAL_LONG(rv, task->line);
 	} else {
@@ -1186,7 +1185,9 @@ static void async_task_scheduler_object_destroy(zend_object *object)
 {
 	async_task_scheduler *scheduler;
 
+#if ZEND_DEBUG
 	int code;
+#endif
 
 	scheduler = (async_task_scheduler *)object;
 
@@ -1198,16 +1199,16 @@ static void async_task_scheduler_object_destroy(zend_object *object)
 	// Run loop again to cleanup idle watcher.
 	uv_run(&scheduler->loop, UV_RUN_DEFAULT);
 
-	ZEND_ASSERT(!uv_loop_alive(&scheduler->loop));
-	ZEND_ASSERT(debug_handles(&scheduler->loop) == 0);
+#if ZEND_DEBUG
+	if (EXPECTED(!ASYNC_G(exit))) {
+		ZEND_ASSERT(!uv_loop_alive(&scheduler->loop));
+		ZEND_ASSERT(debug_handles(&scheduler->loop) == 0);
+	}
 	
 	code = uv_loop_close(&scheduler->loop);
-	ZEND_ASSERT(code == 0);
-	
-	ZEND_ASSERT(scheduler->ready.first == NULL);
-	ZEND_ASSERT(scheduler->fibers.first == NULL);
-	
-	zend_object_std_dtor(object);
+#else
+	uv_loop_close(&scheduler->loop);
+#endif
 	
 	if (scheduler->runner != NULL) {
 		if (scheduler->runner->flags & ASYNC_FIBER_FLAG_QUEUED) {
@@ -1215,8 +1216,17 @@ static void async_task_scheduler_object_destroy(zend_object *object)
 		}
 
 		async_fiber_destroy(scheduler->runner);
-		scheduler->runner = NULL;
 	}
+	
+#if ZEND_DEBUG
+	if (EXPECTED(!ASYNC_G(exit))) {
+		ZEND_ASSERT(code == 0);
+		ZEND_ASSERT(scheduler->ready.first == NULL);
+		ZEND_ASSERT(scheduler->fibers.first == NULL);
+	}
+#endif
+	
+	zend_object_std_dtor(object);
 }
 
 static ZEND_METHOD(TaskScheduler, __construct)
@@ -1467,7 +1477,8 @@ void async_task_ce_register()
 	zend_vm_set_opcode_handler_ex(task_run_op + 1, 0, 0, 0);
 
 	memset(&task_run_func, 0, sizeof(task_run_func));
-	ASYNC_STRP(task_run_func.function_name, "ext-async");	
+	
+	task_run_func.function_name = zend_new_interned_string(zend_string_init(ZEND_STRL("main"), 1));	
 	task_run_func.type = ZEND_USER_FUNCTION;
 	task_run_func.filename = ZSTR_EMPTY_ALLOC();
 	task_run_func.opcodes = task_run_op;
@@ -1544,7 +1555,7 @@ void async_task_scheduler_shutdown()
 
 void async_task_ce_unregister()
 {
-	zend_string_free(task_run_func.function_name);
+	zend_string_release(task_run_func.function_name);
 	task_run_func.function_name = NULL;
 }
 

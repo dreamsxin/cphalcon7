@@ -228,6 +228,46 @@ ASYNC_CALLBACK close_stream_cb(uv_handle_t *handle)
 #endif
 }
 
+#ifdef HAVE_ASYNC_SSL
+static int shutdown_ssl(async_stream *stream)
+{
+	async_stream_ssl_sync *sync;
+	
+	int code;
+	
+	char *buf;
+	size_t len;
+	
+	if (stream->ssl.ssl == NULL || stream->flags & ASYNC_STREAM_SSL_FATAL || SSL_get_shutdown(stream->ssl.ssl) & SSL_RECEIVED_SHUTDOWN) {
+		return 1;
+	}
+	
+	ERR_clear_error();
+	code = SSL_shutdown(stream->ssl.ssl);
+	
+	if ((len = BIO_ctrl_pending(stream->ssl.wbio)) > 0) {
+		buf = emalloc(len);
+
+		ERR_clear_error();
+
+		if ((code = BIO_read(stream->ssl.wbio, buf, (int) len)) > 0) {
+			sync = emalloc(sizeof(async_stream_ssl_sync));
+			
+			sync->req.data = sync;
+			sync->buf = uv_buf_init(buf, (uv_buf_size_t) len);
+			
+			if (0 == uv_write(&sync->req, stream->handle, &sync->buf, 1, ssl_sync_cb)) {
+				return code;
+			}
+		}
+
+		efree(buf);
+	}
+	
+	return code;
+}
+#endif
+
 ASYNC_CALLBACK dispose_read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 {
 	async_stream *stream;
@@ -290,44 +330,6 @@ ASYNC_CALLBACK dispose_timer_cb(uv_timer_t *handle)
 	}
 }
 
-#ifdef HAVE_ASYNC_SSL
-static void shutdown_ssl(async_stream *stream)
-{
-	async_stream_ssl_sync *sync;
-	
-	int code;
-	
-	char *buf;
-	size_t len;
-	
-	if (stream->ssl.ssl == NULL || stream->flags & ASYNC_STREAM_SSL_FATAL) {
-		return;
-	}
-	
-	ERR_clear_error();
-	code = SSL_shutdown(stream->ssl.ssl);
-	
-	if ((len = BIO_ctrl_pending(stream->ssl.wbio)) > 0) {
-		buf = emalloc(len);
-
-		ERR_clear_error();
-
-		if ((code = BIO_read(stream->ssl.wbio, buf, (int) len)) > 0) {
-			sync = emalloc(sizeof(async_stream_ssl_sync));
-			
-			sync->req.data = sync;
-			sync->buf = uv_buf_init(buf, (uv_buf_size_t) len);
-			
-			if (0 == uv_write(&sync->req, stream->handle, &sync->buf, 1, ssl_sync_cb)) {
-				return;
-			}
-		}
-
-		efree(buf);
-	}
-}
-#endif
-
 void async_stream_close_cb(async_stream *stream, async_stream_dispose_cb callback, void *data)
 {
 	if (stream->flags & ASYNC_STREAM_CLOSED) {
@@ -356,19 +358,15 @@ void async_stream_close_cb(async_stream *stream, async_stream_dispose_cb callbac
 
 #ifdef HAVE_ASYNC_SSL
 	if (stream->ssl.ssl && stream->writes.first == NULL) {
-		shutdown_ssl(stream);
-		
-		if (!(stream->flags & ASYNC_STREAM_SSL_FATAL)) {
-			if (!(SSL_get_shutdown(stream->ssl.ssl) & SSL_RECEIVED_SHUTDOWN)) {
-				stream->ref_count++;
-				
-				uv_ref((uv_handle_t *) stream->handle);
-				
-				uv_read_start(stream->handle, dispose_alloc_cb, dispose_read_cb);
-				uv_timer_start(&stream->timer, dispose_timer_cb, 5000, 0);
-				
-				return;
-			}
+		if (1 != shutdown_ssl(stream)) {
+			stream->ref_count++;
+			
+			uv_ref((uv_handle_t *) stream->handle);
+			
+			uv_read_start(stream->handle, dispose_alloc_cb, dispose_read_cb);
+			uv_timer_start(&stream->timer, dispose_timer_cb, 5000, 0);
+			
+			return;
 		}
 	}
 #endif
@@ -644,17 +642,35 @@ static zend_always_inline int process_input_bytes(async_stream *stream, int coun
 
 #endif
 
+static zend_always_inline int should_start_read(async_stream *stream)
+{
+	if (stream->flags & ASYNC_STREAM_IPC) {
+		return 0;
+	}
+	
+	return ((stream->buffer.size - stream->buffer.len) >= 4096);
+}
+
+static zend_always_inline int should_continue_read(async_stream *stream)
+{
+	if (stream->flags & ASYNC_STREAM_IPC) {
+		return (stream->read.base.status == ASYNC_STATUS_RUNNING);
+	}
+
+	return ((stream->buffer.size - stream->buffer.len) >= 4096);
+}
+
 ASYNC_CALLBACK read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 {
 	async_stream *stream;
 	
 	size_t blen;
 	
-	stream = (async_stream *) handle->data;
-
 	if (UNEXPECTED(nread == 0)) {
 		return;
 	}
+	
+	stream = (async_stream *) handle->data;
 	
 	if (UNEXPECTED(nread == UV_ECONNRESET)) {
 		nread = UV_EOF;
@@ -677,10 +693,24 @@ ASYNC_CALLBACK read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 	if (UNEXPECTED(nread == UV_EOF)) {
 		stream->flags |= ASYNC_STREAM_EOF;
 	} else {
+		if (UNEXPECTED(stream->flags & ASYNC_STREAM_IPC && uv_pipe_pending_count((uv_pipe_t *) stream->handle))) {
+			while (!(stream->read.req->in.flags & ASYNC_STREAM_READ_REQ_FLAG_IMPORT)) {
+				stream->read.req->out.error = UV_ENOBUFS;
+				
+				ASYNC_FINISH_OP(&stream->read);
+			}
+		
+			stream->read.req->out.error = uv_accept(stream->handle, stream->read.req->in.handle);
+			
+			nread--;
+			
+			ASYNC_FINISH_OP(&stream->read);
+		}
+	
 #ifdef HAVE_ASYNC_SSL
 		int code;
 
-		if (UNEXPECTED(SUCCESS != (code = process_input_bytes(stream, (int) nread)))) {
+		if (UNEXPECTED(nread > 0 && SUCCESS != (code = process_input_bytes(stream, (int) nread)))) {
 			if (code == FAILURE) {
 				return;
 			}
@@ -704,24 +734,38 @@ ASYNC_CALLBACK read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 	}
 
 	while (stream->read.base.status == ASYNC_STATUS_RUNNING && (blen = ASYNC_STREAM_BUFFER_LEN(stream)) > 0) {
-		if (stream->read.req->in.buffer == NULL) {
-			stream->read.req->out.len = async_ring_buffer_read_string(&stream->buffer, &stream->read.req->out.str, MIN(stream->read.req->in.len, blen));
-		} else {
-			stream->read.req->out.len = async_ring_buffer_read(&stream->buffer, stream->read.req->in.buffer, MIN(stream->read.req->in.len, blen));
+		if (UNEXPECTED(stream->read.req->in.flags & ASYNC_STREAM_READ_REQ_FLAG_IMPORT)) {
+			stream->read.req->out.error = UV_ENOBUFS;
+		} else {	
+			if (stream->read.req->in.buffer == NULL) {
+				stream->read.req->out.len = async_ring_buffer_read_string(&stream->buffer, &stream->read.req->out.str, MIN(stream->read.req->in.len, blen));
+			} else {
+				stream->read.req->out.len = async_ring_buffer_read(&stream->buffer, stream->read.req->in.buffer, MIN(stream->read.req->in.len, blen));
+			}
+			
+			ASYNC_STREAM_BUFFER_CONSUME(stream, stream->read.req->out.len);
 		}
 		
-		ASYNC_STREAM_BUFFER_CONSUME(stream, stream->read.req->out.len);
 		ASYNC_FINISH_OP(&stream->read);
 	}
 	
-	if (UNEXPECTED(nread == UV_EOF || stream->flags & ASYNC_STREAM_EOF)) {
+	if (UNEXPECTED(nread == UV_EOF || stream->flags & ASYNC_STREAM_EOF)) {	
 #ifdef HAVE_ASYNC_SSL
-		if (stream->ssl.ssl) {
-			shutdown_ssl(stream);
+		if (stream->ssl.ssl && stream->writes.first == NULL) {
+			if (1 != shutdown_ssl(stream)) {
+				stream->ref_count++;
+				
+				uv_ref((uv_handle_t *) stream->handle);
+				
+				uv_read_start(stream->handle, dispose_alloc_cb, dispose_read_cb);
+				uv_timer_start(&stream->timer, dispose_timer_cb, 5000, 0);
+			}
+		} else {
+#endif
+			uv_read_stop(handle);
+#ifdef HAVE_ASYNC_SSL
 		}
 #endif
-	
-		uv_read_stop(handle);
 		
 		stream->flags &= ~ASYNC_STREAM_READING;
 
@@ -732,7 +776,7 @@ ASYNC_CALLBACK read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 		return;
 	}
 	
-	if (!ASYNC_STREAM_SHOULD_READ(stream)) {
+	if (!should_continue_read(stream)) {
 		uv_read_stop(handle);
 		
 		stream->flags &= ~ASYNC_STREAM_READING;
@@ -786,8 +830,6 @@ int async_stream_read(async_stream *stream, async_stream_read_req *req)
 	size_t blen;	
 	int code;
 	
-	ZEND_ASSERT(req->in.len > 0);
-	
 	req->out.len = 0;
 	req->out.str = NULL;
 	req->out.error = 0;
@@ -809,8 +851,13 @@ int async_stream_read(async_stream *stream, async_stream_read_req *req)
 	if (UNEXPECTED(stream->buffer.base == NULL)) {
 		init_buffer(stream);
 	}
-
+	
 	if ((blen = ASYNC_STREAM_BUFFER_LEN(stream)) > 0) {
+		if (UNEXPECTED(req->in.flags & ASYNC_STREAM_READ_REQ_FLAG_IMPORT)) {
+			req->out.error = UV_EALREADY;
+			return FAILURE;
+		}
+	
 		if (req->in.buffer == NULL) {
 			req->out.len = async_ring_buffer_read_string(&stream->buffer, &req->out.str, MIN(req->in.len, blen));
 		} else {
@@ -819,7 +866,7 @@ int async_stream_read(async_stream *stream, async_stream_read_req *req)
 		
 		ASYNC_STREAM_BUFFER_CONSUME(stream, req->out.len);
 		
-		if (!(stream->flags && ASYNC_STREAM_EOF) && ASYNC_STREAM_SHOULD_READ(stream)) {
+		if (!(stream->flags && ASYNC_STREAM_EOF) && should_start_read(stream)) {
 			if (!(stream->flags & ASYNC_STREAM_READING)) {
 				uv_read_start(stream->handle, read_alloc_cb, read_cb);
 				
@@ -828,6 +875,14 @@ int async_stream_read(async_stream *stream, async_stream_read_req *req)
 		}
 		
 		return SUCCESS;
+	}
+	
+	if (UNEXPECTED(req->in.flags & ASYNC_STREAM_READ_REQ_FLAG_IMPORT)) {
+		if (uv_pipe_pending_count((uv_pipe_t *) stream->handle)) {
+			req->out.error = uv_accept(stream->handle, req->in.handle);
+			
+			return SUCCESS;
+		}
 	}
 	
 	if (UNEXPECTED(stream->flags & ASYNC_STREAM_EOF)) {
@@ -861,7 +916,7 @@ int async_stream_read(async_stream *stream, async_stream_read_req *req)
 	
 	ASYNC_RESET_OP(&stream->read);
 	
-	return (UNEXPECTED(req->out.error)) ? FAILURE : SUCCESS;
+	return (UNEXPECTED(req->out.error < 0)) ? FAILURE : SUCCESS;
 }
 
 static zend_always_inline void cleanup_write(async_stream_write_op *op)
@@ -887,6 +942,16 @@ static zend_always_inline int process_write(async_stream_write_op *op)
 {
 	uv_buf_t bufs[1];
 	int code;
+	
+	if (UNEXPECTED(op->flags & ASYNC_STREAM_WRITE_OP_FLAG_EXPORT)) {
+		bufs[0] = uv_buf_init(".", 1);
+		
+		uv_write2(&op->req, op->stream->handle, bufs, 1, op->handle, write_cb);
+		
+		op->flags |= ASYNC_STREAM_WRITE_OP_FLAG_STARTED;
+		
+		return FAILURE;
+	}
 	
 	code = ASYNC_STREAM_ENCODE_BUFFER(op->stream, op);
 		
@@ -976,11 +1041,12 @@ int async_stream_write(async_stream *stream, async_stream_write_req *req)
 {
 	async_stream_write_op *op;
 	
+	uv_stream_t *handle;
 	uv_buf_t bufs[1];
 	int code;
 	
-	ZEND_ASSERT(req->in.len > 0);
-	
+	handle = NULL;
+
 	req->out.error = 0;
 	
 #ifdef HAVE_ASYNC_SSL
@@ -992,53 +1058,73 @@ int async_stream_write(async_stream *stream, async_stream_write_req *req)
 		return FAILURE;
 	}
 	
+	if (UNEXPECTED(req->in.flags & ASYNC_STREAM_WRITE_REQ_FLAG_EXPORT)) {
+		if (!(stream->flags & ASYNC_STREAM_IPC)) {
+			req->out.error = UV_EINVAL;
+			return FAILURE;
+		}
+		
+		handle = req->in.handle;
+	}
+	
 	ASYNC_ALLOC_CUSTOM_OP(op, sizeof(async_stream_write_op));
 	
 	op->in.data = req->in.buffer;
 	op->in.size = req->in.len;
 	
+	if (UNEXPECTED(req->in.flags & ASYNC_STREAM_WRITE_REQ_FLAG_EXPORT)) {
+		op->flags |= ASYNC_STREAM_WRITE_OP_FLAG_EXPORT;
+		op->handle = handle;
+	}
+	
 	if (stream->writes.first == NULL && !(stream->flags & ASYNC_STREAM_WRITING)) {
-		code = ASYNC_STREAM_ENCODE_BUFFER(stream, op);
-		
-		if (UNEXPECTED(code == FAILURE)) {
-			cleanup_write(op);
+		if (UNEXPECTED(op->flags & ASYNC_STREAM_WRITE_OP_FLAG_EXPORT)) {
+			bufs[0] = uv_buf_init(".", 1);
 			
-			return FAILURE;
-		}
-		
-		if (UNEXPECTED(code == 0)) {
-			stream->flags |= ASYNC_STREAM_WANT_READ;
+			uv_write2(&op->req, stream->handle, bufs, 1, handle, write_cb);
 		} else {
-			do {break;
-				bufs[0] = uv_buf_init(op->out.data + op->out.offset, (unsigned int) (op->out.size - op->out.offset));
-				
-				code = uv_try_write(stream->handle, bufs, 1);
-				
-				if (code == UV_EAGAIN) {
-					break;
-				}
-				
-				if (UNEXPECTED(code < 0)) {
-					cleanup_write(op);
-				
-					req->out.error = code;
-					
-					return FAILURE;
-				}
-				
-				op->out.offset += code;
-				
-				if (op->out.offset == op->out.size) {
-					cleanup_write(op);
-					
-					return SUCCESS;
-				}
-			} while (1);
-		}
-		
-		bufs[0] = uv_buf_init(op->out.data + op->out.offset, (unsigned int) (op->out.size - op->out.offset));
+			code = ASYNC_STREAM_ENCODE_BUFFER(stream, op);
 			
-		uv_write(&op->req, stream->handle, bufs, 1, write_cb);
+			if (UNEXPECTED(code == FAILURE)) {
+				cleanup_write(op);
+				
+				return FAILURE;
+			}
+			
+			if (UNEXPECTED(code == 0)) {
+				stream->flags |= ASYNC_STREAM_WANT_READ;
+			} else {
+				do {					
+					bufs[0] = uv_buf_init(op->out.data + op->out.offset, (unsigned int) (op->out.size - op->out.offset));
+					
+					code = uv_try_write(stream->handle, bufs, 1);
+					
+					if (code == UV_EAGAIN) {
+						break;
+					}
+					
+					if (UNEXPECTED(code < 0)) {
+						cleanup_write(op);
+					
+						req->out.error = code;
+						
+						return FAILURE;
+					}
+					
+					op->out.offset += code;
+					
+					if (op->out.offset == op->out.size) {
+						cleanup_write(op);
+						
+						return SUCCESS;
+					}
+				} while (1);
+			}
+			
+			bufs[0] = uv_buf_init(op->out.data + op->out.offset, (unsigned int) (op->out.size - op->out.offset));
+				
+			uv_write(&op->req, stream->handle, bufs, 1, write_cb);
+		}
 		
 		op->flags |= ASYNC_STREAM_WRITE_OP_FLAG_STARTED;
 	}

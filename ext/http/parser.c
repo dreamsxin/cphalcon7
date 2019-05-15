@@ -52,6 +52,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_parser_execute, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, body, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, output, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_parser_method_entry[] = {
@@ -136,13 +137,17 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
  */
 PHP_METHOD(Phalcon_Http_Parser, execute){
 
-	zval *body, type = {};
+	zval *body, *output = NULL, type = {};
 	phalcon_http_parser_object *intern;
 	int body_len;
 	char versiphalcon_on_buffer[4] = {0};
 	size_t nparsed = 0;
 
-	phalcon_fetch_params(0, 1, 0, &body);
+	phalcon_fetch_params(0, 1, 1, &body, &output);
+
+	if (!output) {
+		output = &PHALCON_GLOBAL(z_false);
+	}
 
 	body_len = Z_STRLEN_P(body);
 
@@ -156,7 +161,7 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 		RETURN_FALSE;
 	}
 
-	if (intern->data->parser->state < HTTP_PARSER_STATE_END) {
+	if (intern->data->parser->state < HTTP_PARSER_STATE_END && !zend_is_true(output)) {
 		RETURN_TRUE;
 	}
 

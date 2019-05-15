@@ -55,8 +55,9 @@ static int tcp_socket_bind(php_stream *stream, async_xp_socket_data *data, php_s
 	char *ip;
 	int port;
 	int code;
+#ifdef HAVE_IPV6
 	zval *tmp;
-	
+#endif	
 	flags = 0;
 	
 	ip = NULL;

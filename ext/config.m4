@@ -11,6 +11,9 @@ else
 	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
 
+PHP_ARG_WITH(openssl-dir, OpenSSL dir for "async",
+[ --with-openssl-dir[=DIR] Openssl install prefix], no, no)
+
 PHP_ARG_WITH(non-free, wheter to enable non-free css and js minifier,
 [  --without-non-free      Disable non-free minifiers], yes, no)
 
@@ -1250,26 +1253,25 @@ aop.c"
 		fi
 	fi
 
-	AC_MSG_CHECKING([checking SSL support])
-	for i in /usr/local /usr; do
-		if test -r $i/include/openssl/evp.h; then
-			PHP_ADD_INCLUDE($i/include)
-			PHP_CHECK_LIBRARY(ssl, SSL_is_init_finished,
-			[
-				PHP_ADD_LIBRARY_WITH_PATH(ssl, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-				AC_DEFINE(HAVE_ASYNC_SSL, 1, [Have SSL support])
-			],[
-				AC_MSG_RESULT([SSL library not found])
-			],[
-				-L$i/$PHP_LIBDIR
-			])
-			break
-		else
-			AC_MSG_RESULT([no, found in $i])
-		fi
-	done
+	if test "$PHP_OPENSSL" = ""; then
+		AC_CHECK_HEADER(openssl/evp.h, [
+			PHP_OPENSSL='yes'
+		], [
+			PHP_OPENSSL='no'
+		])
+	fi
 
-  
+	if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
+		PHP_SETUP_OPENSSL(ASYNC_SHARED_LIBADD, [
+			AC_MSG_CHECKING(for SSL support)
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])
+		], [
+			AC_MSG_CHECKING(for SSL support)
+			AC_MSG_RESULT(no)
+		])
+	fi
+
 	async_use_asm="yes"
 	async_use_ucontext="no"
 

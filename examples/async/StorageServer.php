@@ -1,6 +1,11 @@
 <?php
 
-
+/**
+ * Usage:
+ *
+ * curl -v -d "SET key value" http://localhost:8888/
+ * curl -v -d "GET key" http://localhost:8888/
+ */
 $lmdb = new Phalcon\Storage\Libmdbx('./testdb');
 
 $server = Phalcon\Async\Network\TcpServer::listen('localhost', 8888);
@@ -21,6 +26,7 @@ try {
 
 				$buffer = '';
 				$content_length = 0;
+				$query = '';
 				$content = '';
 					
 				$parser = new Phalcon\Http\Parser();
@@ -28,6 +34,9 @@ try {
 					$buffer .= $chunk;
 					
 					if (($result = $parser->execute($chunk))) {
+						if (isset($result['QUERY_STRING'])) {
+							$query = $result['QUERY_STRING'];
+						}
 						if (isset($result['BODY'])) {
 							$content = $result['BODY'];
 						}
@@ -47,7 +56,11 @@ try {
 				
 				echo 'Content '.$content_length.', '.$content.PHP_EOL;
 
-				$parts = explode(" ", $content, 3);
+				if ($content) {
+					$parts = explode(" ", $content, 3);
+				} else {
+					$parts = explode("/", $content, 3);
+				}
 				if (count($parts) < 2) {
 					$sendchunk = generateChunk('error');
 					$socket->write($sendchunk);

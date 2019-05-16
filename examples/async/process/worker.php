@@ -1,7 +1,7 @@
 <?php
 
-var_dump(Phalcon\Async\Process::isForked());
-var_dump($ipc = Phalcon\Async\Process::forked());
+var_dump(Phalcon\Async\Process::isWorker());
+var_dump($ipc = Phalcon\Async\Process::connect());
 
 var_dump($tcp = Phalcon\Async\Network\TcpSocket::import($ipc));
 

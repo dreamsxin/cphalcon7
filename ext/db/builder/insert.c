@@ -122,7 +122,7 @@ PHP_METHOD(Phalcon_Db_Builder_Insert, _execute){
 		pretreatment = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_SEPARATE);
+	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_CTOR);
 	PHALCON_MM_ADD_ENTRY(&definition);
 
 	phalcon_read_property(&values, getThis(), SL("_values"), PH_READONLY);

@@ -983,8 +983,9 @@ static void async_task_scheduler_dispose(async_task_scheduler *scheduler)
 	}
 
 	scheduler->flags |= ASYNC_TASK_SCHEDULER_FLAG_DISPOSED;
-	//ASYNC_PREPARE_ERROR(&error, "Task scheduler has been disposed");
 
+	ASYNC_PREPARE_ERROR(&error, "Task scheduler has been disposed");
+	
 	do {
 		if (scheduler->operations.first != NULL) {
 			do {

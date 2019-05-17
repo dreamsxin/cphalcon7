@@ -195,7 +195,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	phalcon_fetch_params(1, 0, 1, &desc);
 
 	if (!desc || Z_TYPE_P(desc) == IS_NULL) {
-		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_SEPARATE);
+		phalcon_read_property(&descriptor, getThis(), SL("_descriptor"), PH_CTOR);
 	} else {
 		ZVAL_DUP(&descriptor, desc);
 	}
@@ -204,21 +204,23 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	/**
 	 * Check for a username or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"), PH_COPY)) {
+	if (phalcon_array_isset_fetch_str(&username, &descriptor, SL("username"), PH_CTOR)) {
 		phalcon_array_unset_str(&descriptor, SL("username"), 0);
+		PHALCON_MM_ADD_ENTRY(&username);
 	}
 
 	/**
 	 * Check for a password or use null as default
 	 */
-	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_COPY)) {
+	if (phalcon_array_isset_fetch_str(&password, &descriptor, SL("password"), PH_CTOR)) {
 		phalcon_array_unset_str(&descriptor, SL("password"), 0);
+		PHALCON_MM_ADD_ENTRY(&password);
 	}
 
 	/**
 	 * Check if the developer has defined custom options or create one from scratch
 	 */
-	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"), PH_COPY)) {
+	if (phalcon_array_isset_fetch_str(&options, &descriptor, SL("options"), PH_CTOR)) {
 		phalcon_array_unset_str(&descriptor, SL("options"), 0);
 	} else {
 		array_init(&options);

@@ -33,6 +33,7 @@
 #include "kernel/exception.h"
 #include "kernel/operators.h"
 #include "kernel/fcall.h"
+#include "kernel/debug.h"
 
 #include "internal/arginfo.h"
 
@@ -234,7 +235,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	phalcon_read_property(&db, getThis(), SL("_db"), PH_READONLY);
 	phalcon_read_property(&sql, getThis(), SL("_sql"), PH_READONLY);
 	phalcon_read_property(&total_sql, getThis(), SL("_total_sql"), PH_READONLY);
-	phalcon_read_property(&bind, getThis(), SL("_bind"), PH_SEPARATE);
+	phalcon_read_property(&bind, getThis(), SL("_bind"), PH_CTOR);
 	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_READONLY);
 	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_READONLY);
 	phalcon_read_property(&fetch_mode, getThis(), SL("_fetchMode"), PH_READONLY);

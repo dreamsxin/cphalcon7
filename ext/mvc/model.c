@@ -5042,16 +5042,13 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	} else {
 		ZVAL_NULL(&write_connection);
 	}
-
+	phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
 	if (Z_TYPE(write_connection) != IS_OBJECT) {
-		phalcon_read_property(&related, getThis(), SL("_related"), PH_READONLY);
-		if (Z_TYPE(related) == IS_ARRAY && phalcon_fast_count_ev(&related)) {
-				/**
-				 * Create/Get the current database connection
-				 */
-				PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
-				PHALCON_MM_ADD_ENTRY(&write_connection);
-		}
+		/**
+		 * Create/Get the current database connection
+		 */
+		PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+		PHALCON_MM_ADD_ENTRY(&write_connection);
 	}
 
 	/**

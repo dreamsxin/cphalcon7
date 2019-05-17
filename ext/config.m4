@@ -180,6 +180,15 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(async, whether to enable async support,
+[  --enable-async   Enable async support], yes, no)
+
+if test "$PHP_ASYNC" = "yes"; then
+	AC_MSG_RESULT([yes, async])
+else
+	AC_MSG_RESULT([no])
+fi
+
 PHP_ARG_ENABLE(python, for python support,
 [  --enable-python   Include python support], no, no)
 
@@ -1323,7 +1332,7 @@ aop.c"
 	fi
 
 	AC_MSG_CHECKING(checking php version >= 7.1)
-	if test "$PHP_UV" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
+	if test "$PHP_ASYNC" = "yes" && test "$PHP_UV" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
 		AC_MSG_RESULT(yes)
 		if test "$async_use_asm" = 'yes'; then
 			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"

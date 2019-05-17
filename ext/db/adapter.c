@@ -237,6 +237,7 @@ PHP_METHOD(Phalcon_Db_Adapter, __construct){
 	zend_class_entry *ce0;
 
 	phalcon_fetch_params(1, 1, 0, &descriptor);
+	PHALCON_SEPARATE_PARAM(descriptor);
 
 	/**
 	 * Every new connection created obtain a consecutive number from the static

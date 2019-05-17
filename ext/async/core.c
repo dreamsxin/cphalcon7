@@ -81,7 +81,6 @@ static void execute_root(zend_execute_data *exec)
 	}
 	
 	async_task_scheduler_run();
-	
 	EG(exception) = error;
 }
 

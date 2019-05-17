@@ -153,7 +153,7 @@ ASYNC_CALLBACK after_init_threads(uv_work_t *req, int status)
 {
 	ASYNC_G(threads) = 0;
 
-	efree(req);
+	free(req);
 }
 #endif
 
@@ -250,7 +250,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 #ifdef PHALCON_USE_UV
 	ASYNC_G(cli) = !strcmp(sapi_module.name, "cli");
 	if (ASYNC_G(cli)) {
-		uv_work_t *req = emalloc(sizeof(uv_work_t));
+		uv_work_t *req = malloc(sizeof(uv_work_t));
 		char entry[4];
 
 		sprintf(entry, "%d", (int) MAX(4, MIN(128, ASYNC_G(threads))));

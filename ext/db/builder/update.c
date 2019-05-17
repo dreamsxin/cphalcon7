@@ -130,7 +130,7 @@ PHP_METHOD(Phalcon_Db_Builder_Update, _execute){
 		pretreatment = &PHALCON_GLOBAL(z_false);
 	}
 
-	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_SEPARATE);
+	phalcon_read_property(&definition, getThis(), SL("_definition"), PH_CTOR);
 	PHALCON_MM_ADD_ENTRY(&definition);
 
 	phalcon_read_property(&conditions, getThis(), SL("_conditions"), PH_READONLY);

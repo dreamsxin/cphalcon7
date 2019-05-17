@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Config, val){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 1, 0, &array_config);
+	phalcon_fetch_params(1, 1, 0, &array_config);
 
 	phalcon_read_static_property_ce(&recursive, phalcon_config_ce, SL("_recursive"), PH_READONLY);
 
@@ -176,13 +176,14 @@ PHP_METHOD(Phalcon_Config, val){
 
 		if (Z_TYPE_P(value) == IS_ARRAY && zend_is_true(&recursive)) {
 			object_init_ex(&instance, phalcon_config_ce);
-			PHALCON_CALL_METHOD(NULL, &instance, "__construct", value);
-			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, &instance);
-			zval_ptr_dtor(&instance);
+			PHALCON_MM_ADD_ENTRY(&instance);
+			PHALCON_MM_CALL_METHOD(NULL, &instance, "__construct", value);
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "offsetset", &key, &instance);
 		} else {
-			PHALCON_CALL_METHOD(NULL, getThis(), "offsetset", &key, value);
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "offsetset", &key, value);
 		}
 	} ZEND_HASH_FOREACH_END();
+	RETURN_MM();
 }
 
 /**

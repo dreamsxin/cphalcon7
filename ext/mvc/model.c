@@ -5047,7 +5047,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 		/**
 		 * Create/Get the current database connection
 		 */
-		PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
+		PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &bind_params, &PHALCON_GLOBAL(z_null));
 		PHALCON_MM_ADD_ENTRY(&write_connection);
 	}
 
@@ -5442,7 +5442,7 @@ PHP_METHOD(Phalcon_Mvc_Model, delete){
 		return;
 	}
 
-	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
+	PHALCON_MM_CALL_METHOD(&write_connection, getThis(), "getwriteconnection", &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_null), &unique_params, &unique_types);
 	PHALCON_MM_ADD_ENTRY(&write_connection);
 
 	phalcon_update_property_bool(getThis(), SL("_skipped"), 0);

@@ -1271,7 +1271,7 @@ aop.c"
 	fi
 
 	if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
-		PHP_SETUP_OPENSSL(ASYNC_SHARED_LIBADD, [
+		PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
 			AC_MSG_CHECKING(for SSL support)
 			AC_MSG_RESULT(yes)
 			AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])

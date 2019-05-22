@@ -1018,8 +1018,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 	 * Get the current behaviors
 	 */
 	phalcon_read_property(&behaviors, getThis(), SL("_behaviors"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&models_behaviors, &behaviors, &entity_name, PH_READONLY)) {
 		array_init(&models_behaviors);
+		phalcon_update_property_array(getThis(), SL("_behaviors"), &entity_name, &models_behaviors);
+		zval_ptr_dtor(&models_behaviors);
 	}
 
 	/**
@@ -1027,12 +1029,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBehavior){
 	 */
 	phalcon_array_append(&models_behaviors, behavior, PH_COPY);
 
-	/**
-	 * Update the behaviors list
-	 */
-	phalcon_update_property_array(getThis(), SL("_behaviors"), &entity_name, &models_behaviors);
 	zval_ptr_dtor(&entity_name);
-	zval_ptr_dtor(&models_behaviors);
 }
 
 /**
@@ -1272,22 +1269,17 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, addBelongsTo){
 	 * Get existing relations by model
 	 */
 	phalcon_read_property(&belongs_to_single, getThis(), SL("_belongsToSingle"), PH_NOISY|PH_READONLY);
-	if (!phalcon_array_isset_fetch(&single_relations, &belongs_to_single, &entity_name, PH_COPY)) {
+	if (!phalcon_array_isset_fetch(&single_relations, &belongs_to_single, &entity_name, PH_READONLY)) {
 		array_init(&single_relations);
+		phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
+		zval_ptr_dtor(&single_relations);
 	}
+	zval_ptr_dtor(&entity_name);
 
 	/**
 	 * Append a new relationship
 	 */
 	phalcon_array_append(&single_relations, &relation, PH_COPY);
-
-	/**
-	 * Update relations by model
-	 */
-	phalcon_update_property_array(getThis(), SL("_belongsToSingle"), &entity_name, &single_relations);
-	zval_ptr_dtor(&entity_name);
-	zval_ptr_dtor(&single_relations);
-
 
 	RETVAL_ZVAL(&relation, 0, 0);
 }

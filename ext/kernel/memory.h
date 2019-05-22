@@ -89,22 +89,22 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 
 #define PHALCON_SEPARATE(z) \
 	do { \
-		if (Z_TYPE_P(z) == IS_ARRAY) { \
-			if (EXPECTED(!(GC_FLAGS(Z_ARRVAL_P(z)) & IS_ARRAY_IMMUTABLE))) { \
-				if (UNEXPECTED(GC_REFCOUNT(Z_ARR_P(z)) > 1)) { \
-					if (Z_REFCOUNTED_P(z)) { \
-						GC_DELREF(Z_ARR_P(z)); \
-					} \
-				} \
-			} \
-			ZVAL_ARR(z, zend_array_dup(Z_ARR_P(z))); \
+		zval *_zv = (z); \
+		if (Z_TYPE_P(_zv) == IS_ARRAY) { \
+			ZVAL_ARR(_zv, zend_array_dup(Z_ARR_P(_zv))); \
+		} else if (Z_ISREF_P(_zv)) { \
+			ZVAL_DUP(_zv, Z_REFVAL_P(_zv)); \
+		} else if (Z_REFCOUNTED_P(_zv)) { \
+			Z_ADDREF_P(_zv); \
 		} \
 	} while (0)
 
 #define PHALCON_MM_SEPARATE(z) \
 	do { \
-		SEPARATE_ZVAL(z); \
-		phalcon_array_append(&phalcon_memory_entry, z, 0); \
+		PHALCON_SEPARATE(z); \
+		if (Z_REFCOUNTED_P(z)) { \
+			phalcon_array_append(&phalcon_memory_entry, z, 0); \
+		} \
 	} while (0)
 
 #define PHALCON_SEPARATE_PARAM(z) \

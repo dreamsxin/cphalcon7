@@ -418,8 +418,8 @@ int phalcon_array_fetch(zval *return_value, const zval *arr, const zval *index, 
 			}
 			*/
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-				PHALCON_SEPARATE(zv);
-				ZVAL_COPY(return_value, zv);
+				ZVAL_COPY_VALUE(return_value, zv);
+				PHALCON_SEPARATE(return_value);
 			} else if ((flags & PH_CTOR) == PH_CTOR) {
 				ZVAL_DUP(return_value, zv);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
@@ -519,8 +519,8 @@ int phalcon_array_last(zval *return_value, const zval *stack, int flags)
 	}
 
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-		PHALCON_SEPARATE(val);
-		ZVAL_COPY(return_value, val);
+		ZVAL_COPY_VALUE(return_value, val);
+		PHALCON_SEPARATE(return_value);
 	} else if ((flags & PH_CTOR) == PH_CTOR) {
 		ZVAL_DUP(return_value, val);
 	} else if ((flags & PH_READONLY) == PH_READONLY) {
@@ -540,8 +540,8 @@ int phalcon_array_fetch_str(zval *return_value, const zval *arr, const char *ind
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_str_find(Z_ARRVAL_P(arr), index, index_length)) != NULL) {
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-				PHALCON_SEPARATE(zv);
-				ZVAL_COPY(return_value, zv);
+				ZVAL_COPY_VALUE(return_value, zv);
+				PHALCON_SEPARATE(return_value);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {
@@ -571,8 +571,8 @@ int phalcon_array_fetch_string(zval *return_value, const zval *arr, zend_string 
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-				PHALCON_SEPARATE(zv);
-				ZVAL_COPY(return_value, zv);
+				ZVAL_COPY_VALUE(return_value, zv);
+				PHALCON_SEPARATE(return_value);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {
@@ -602,8 +602,8 @@ int phalcon_array_fetch_long(zval *return_value, const zval *arr, ulong index, i
 	if (likely(Z_TYPE_P(arr) == IS_ARRAY)) {
 		if ((zv = zend_hash_index_find(Z_ARRVAL_P(arr), index)) != NULL) {
 			if ((flags & PH_SEPARATE) == PH_SEPARATE) {
-				PHALCON_SEPARATE(zv);
-				ZVAL_COPY(return_value, zv);
+				ZVAL_COPY_VALUE(return_value, zv);
+				PHALCON_SEPARATE(return_value);
 			} else if ((flags & PH_READONLY) == PH_READONLY) {
 				ZVAL_COPY_VALUE(return_value, zv);
 			} else {

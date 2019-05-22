@@ -465,30 +465,35 @@ PHP_METHOD(Phalcon_Security_Random, uuid) {
 
 	zval len = {}, bytes = {}, data = {}, format = {}, arr = {}, a2 = {}, a3 = {}, str = {};
 
+	PHALCON_MM_INIT();
+
 	ZVAL_LONG(&len, 16);
 
-	PHALCON_CALL_SELF(&bytes, "bytes", &len);
+	PHALCON_MM_CALL_SELF(&bytes, "bytes", &len);
 
-	ZVAL_STRING(&format, "N1a/n1b/n1c/n1d/n1e/N1f");
+	PHALCON_MM_ZVAL_STRING(&format, "N1a/n1b/n1c/n1d/n1e/N1f");
 
-	PHALCON_CALL_FUNCTION(&data, "unpack", &format, &bytes);
-	PHALCON_CALL_FUNCTION(&arr, "array_values", &data);
+	PHALCON_MM_CALL_FUNCTION(&data, "unpack", &format, &bytes);
+	PHALCON_MM_ADD_ENTRY(&data)
+	PHALCON_MM_CALL_FUNCTION(&arr, "array_values", &data);
+	PHALCON_MM_ADD_ENTRY(&arr)
 
 	phalcon_array_fetch_long(&a2, &arr, 2, PH_NOISY | PH_READONLY);
-	phalcon_array_update_long_long(&arr, 2, ((((int) (phalcon_get_numberval(&a2)) & 0x0fff)) | 0x4000), PH_COPY | PH_SEPARATE);
+	phalcon_array_update_long_long(&arr, 2, ((((int) (phalcon_get_numberval(&a2)) & 0x0fff)) | 0x4000), 0);
 
 	phalcon_array_fetch_long(&a3, &arr, 3, PH_NOISY | PH_READONLY);
-	phalcon_array_update_long_long(&arr, 3, ((((int) (phalcon_get_numberval(&a3)) & 0x3fff)) | 0x8000), PH_COPY | PH_SEPARATE);
+	phalcon_array_update_long_long(&arr, 3, ((((int) (phalcon_get_numberval(&a3)) & 0x3fff)) | 0x8000), 0);
 
-	ZVAL_STRING(&str, "%08x-%04x-%04x-%04x-%04x%08x");
+	PHALCON_MM_ZVAL_STRING(&str, "%08x-%04x-%04x-%04x-%04x%08x");
 
 	ZVAL_MAKE_REF(&arr);
-	PHALCON_CALL_FUNCTION(NULL, "array_unshift", &arr, &str);
+	PHALCON_MM_CALL_FUNCTION(NULL, "array_unshift", &arr, &str);
 	ZVAL_UNREF(&arr);
 
-	ZVAL_STRING(&str, "sprintf");
+	PHALCON_MM_ZVAL_STRING(&str, "sprintf");
 
 	PHALCON_CALL_USER_FUNC_ARRAY(return_value, &str, &arr);
+	RETURN_MM();
 }
 
 /**

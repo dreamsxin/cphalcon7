@@ -169,12 +169,14 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 
 	if (intern->data->url.s) {
 		zval url = {};
+		smart_str_0(&intern->data->url);
 		ZVAL_STR(&url, intern->data->url.s);
 		phalcon_array_update_str(return_value, SL("QUERY_STRING"), &url, PH_COPY);
 	}
 
 	if (intern->data->body.s) {
 		zval body = {};
+		smart_str_0(&intern->data->body);
 		ZVAL_STR(&body, intern->data->body.s);
 		phalcon_array_update_str(return_value, SL("BODY"), &body, PH_COPY);
 	}

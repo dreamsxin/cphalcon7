@@ -28,6 +28,19 @@
 
 #define PHV(v) phalcon_vdump(v)
 #define PHPR(v) phalcon_print_r(v)
+
+#define RC_DUMP(zv)                                                                                                                \
+	do {                                                                                                                           \
+		char *_n = (strrchr((#zv), '&') ? strrchr((#zv), '&') + 1 : (#zv));                                                        \
+		char *_f = (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : __FILE__);                                               \
+		zval *_z = (zv);                                                                                                           \
+		if (Z_REFCOUNTED_P(_z)) {                                                                                                  \
+			fprintf(stderr, "[DUMP]: %s:%d %s (%p) refcount=%d, type=%d\n", _f, __LINE__, _n, _z, Z_REFCOUNT_P(_z), Z_TYPE_P(_z)); \
+		} else {                                                                                                                   \
+			fprintf(stderr, "[DUMP]: %s:%d %s (%p) is not reference-counted, type=%d\n", _f, __LINE__, _n, _z, Z_TYPE_P(_z));      \
+		}                                                                                                                          \
+	} while (0)
+
 #define PHALCON_DEBUG_ZVAL(v) PHALCON_DEBUG_SIMPLE(); php_debug_zval_dump(v, 1)
 #define PHALCON_DEBUG_SIMPLE() zend_printf("\nFile:%s, Line:%d\n", __FILE__, __LINE__)
 #define PHALCON_DEBUG_SIMPLE_ZVAL(v) zend_printf("\nVar:%s, Refcount:%d, File:%s, Line:%d\n", #v, Z_REFCOUNT_P(v), __FILE__, __LINE__)

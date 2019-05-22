@@ -165,8 +165,8 @@ PHP_METHOD(Phalcon_Http_Uri, __construct)
 		phalcon_update_property(getThis(), SL("_parts"), uri);
 	} else if (Z_TYPE_P(uri) == IS_OBJECT && Z_OBJCE_P(uri) == phalcon_http_uri_ce) {
 		phalcon_read_property(&parts, uri, SL("_parts"), PH_SEPARATE);
+		PHALCON_MM_ADD_ENTRY(&parts);
 		phalcon_update_property(getThis(), SL("_parts"), &parts);
-		zval_ptr_dtor(&parts);
 	} else {
 		phalcon_update_property_empty_array(getThis(), SL("_parts"));
 	}

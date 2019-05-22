@@ -309,6 +309,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_MM_CALL_METHOD(&connection, &model, "getreadconnection");
 		PHALCON_MM_ADD_ENTRY(&connection);
 		PHALCON_MM_CALL_METHOD(&intermediate, &total_query, "parse");
+		PHALCON_MM_ADD_ENTRY(&intermediate);
 		PHALCON_MM_SEPARATE(&intermediate);
 
 		PHALCON_MM_CALL_METHOD(&tmp, &total_query, "getindex");
@@ -325,6 +326,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_MM_CALL_METHOD(&bind_params, &total_query, "getbindparams");
 		PHALCON_MM_ADD_ENTRY(&bind_params);
 		PHALCON_MM_CALL_METHOD(&bind_types, &total_query, "getbindtypes");
+		PHALCON_MM_ADD_ENTRY(&bind_types);
 		PHALCON_MM_SEPARATE(&bind_types);
 
 		/**

@@ -3499,12 +3499,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeSelect){
 	}
 
 	PHALCON_MM_CALL_SELF(&intermediate, "getintermediate");
+	PHALCON_MM_ADD_ENTRY(&intermediate);
 	PHALCON_MM_SEPARATE(&intermediate);
 
 	PHALCON_MM_CALL_SELF(&bind_params, "getmergebindparams");
 	PHALCON_MM_ADD_ENTRY(&bind_params);
 
 	PHALCON_MM_CALL_SELF(&bind_types, "getmergebindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 	PHALCON_MM_SEPARATE(&bind_types);
 
 	PHALCON_MM_CALL_SELF(&manager, "getmodelsmanager");
@@ -3921,10 +3923,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeInsert){
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_MM_CALL_SELF(&intermediate, "getintermediate");
+	PHALCON_MM_ADD_ENTRY(&intermediate);
 	PHALCON_MM_SEPARATE(&intermediate);
 	PHALCON_MM_CALL_SELF(&bind_params, "getmergebindparams");
+	PHALCON_MM_ADD_ENTRY(&bind_params);
 	PHALCON_MM_SEPARATE(&bind_params);
 	PHALCON_MM_CALL_SELF(&bind_types, "getmergebindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 	PHALCON_MM_SEPARATE(&bind_types);
 	PHALCON_MM_CALL_SELF(&connection, "getwriteconnection", &intermediate, &bind_params, &bind_types);
 	PHALCON_MM_ADD_ENTRY(&connection);
@@ -4123,10 +4128,12 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_MM_CALL_METHOD(&intermediate, getThis(), "getintermediate");
+	PHALCON_MM_ADD_ENTRY(&intermediate);
 	PHALCON_MM_SEPARATE(&intermediate);
 	PHALCON_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
 	PHALCON_MM_ADD_ENTRY(&bind_params);
 	PHALCON_CALL_METHOD(&bind_types, getThis(), "getmergebindtypes");
+	PHALCON_MM_ADD_ENTRY(&bind_types);
 	PHALCON_MM_SEPARATE(&bind_types);
 	PHALCON_MM_CALL_METHOD(&connection, getThis(), "getwriteconnection", &intermediate, &bind_params, &bind_types);
 	PHALCON_MM_ADD_ENTRY(&connection);
@@ -4269,6 +4276,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name);
 
 	PHALCON_MM_CALL_METHOD(&intermediate, getThis(), "getintermediate");
+	PHALCON_MM_ADD_ENTRY(&intermediate);
 	PHALCON_MM_SEPARATE(&intermediate);
 	PHALCON_MM_CALL_METHOD(&bind_params, getThis(), "getmergebindparams");
 	PHALCON_MM_ADD_ENTRY(&bind_params);

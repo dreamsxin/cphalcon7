@@ -361,8 +361,8 @@ PHP_METHOD(Phalcon_Mvc_Model_MetaData, getCacheKey){
 		RETURN_MM();
 	}
 
-	if (phalcon_method_exists_ex(model, SL("getcachekey")) == SUCCESS) {
-		PHALCON_MM_CALL_METHOD(&key, model, "getcachekey");
+	if (phalcon_method_exists_ex(model, SL("getmetadatacachekey")) == SUCCESS) {
+		PHALCON_MM_CALL_METHOD(&key, model, "getmetadatacachekey");
 		PHALCON_MM_ADD_ENTRY(&key);
 	}
 

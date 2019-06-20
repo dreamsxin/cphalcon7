@@ -11,6 +11,9 @@ else
 	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
 
+PHP_ARG_ENABLE(openssl, whether to enable openssl support,
+[  --enable-openssl   Enable openssl support], no, no)
+
 PHP_ARG_WITH(openssl-dir, OpenSSL dir for "async",
 [ --with-openssl-dir[=DIR] Openssl install prefix], no, no)
 
@@ -1262,7 +1265,7 @@ aop.c"
 		fi
 	fi
 
-	if test "$PHP_OPENSSL" = ""; then
+	if test "$PHP_OPENSSL" != "no"; then
 		AC_CHECK_HEADER(openssl/evp.h, [
 			PHP_OPENSSL='yes'
 		], [

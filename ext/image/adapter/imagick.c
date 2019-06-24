@@ -743,7 +743,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, _watermark) {
 	if (phalcon_get_intval(opacity) < 100) {
 		phalcon_get_class_constant(&op_constant, ce0, SL("EVALUATE_MULTIPLY"));
 
-		num = Z_LVAL_P(opacity) / 100;
+		num = (double)Z_LVAL_P(opacity) / 100;
 		ZVAL_DOUBLE(&op, num);
 
 		phalcon_get_class_constant(&channel, ce0, SL("CHANNEL_ALPHA"));

@@ -1357,7 +1357,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, __destruct){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, line){
 
-	zval *sx, *sy, *ex, *ey, *color = NULL, image = {}, draw = {}, pixel = {};
+	zval *sx, *sy, *ex, *ey, *color = NULL, im = {}, draw = {}, pixel = {};
 	zend_class_entry *imagick_draw_ce, *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 4, 1, &sx, &sy, &ex, &ey, &color);
@@ -1365,25 +1365,24 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, line){
 	if (!color) {
 		color = &PHALCON_GLOBAL(z_null);
 	}
-	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
+	phalcon_read_property(&im, getThis(), SL("_image"), PH_READONLY);
 
-	if (Z_TYPE(image) == IS_RESOURCE) {
-		imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
-		imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
+	imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
+	imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
-		object_init_ex(&draw, imagick_draw_ce);
-		PHALCON_CALL_METHOD(NULL, &draw, "__construct");
+	object_init_ex(&draw, imagick_draw_ce);
+	PHALCON_CALL_METHOD(NULL, &draw, "__construct");
 
-		object_init_ex(&pixel, imagick_pixel_ce);
-		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", color);
-		PHALCON_CALL_METHOD(NULL, &draw, "setstrokecolor", &pixel);
-		zval_ptr_dtor(&pixel);
-		PHALCON_CALL_METHOD(NULL, &draw, "line", sx, sy, ex, ey);
+	object_init_ex(&pixel, imagick_pixel_ce);
+	PHALCON_CALL_METHOD(NULL, &pixel, "__construct", color);
+	PHALCON_CALL_METHOD(NULL, &draw, "setstrokecolor", &pixel);
+	zval_ptr_dtor(&pixel);
+	PHALCON_CALL_METHOD(NULL, &draw, "line", sx, sy, ex, ey);
 
-		PHALCON_CALL_METHOD(NULL, &image, "drawimage", &draw);
+	PHALCON_CALL_METHOD(NULL, &im, "drawimage", &draw);
 
-		zval_ptr_dtor(&draw);
-	}
+	zval_ptr_dtor(&draw);
+
 	RETURN_THIS();
 }
 
@@ -1401,7 +1400,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, line){
  */
 PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
 
-	zval *coordinates, *color = NULL, image = {}, draw = {}, pixel = {}, *point, points = {};
+	zval *coordinates, *color = NULL, im = {}, draw = {}, pixel = {}, *point, points = {};
 	zend_class_entry *imagick_draw_ce, *imagick_pixel_ce;
 
 	phalcon_fetch_params(0, 1, 1, &coordinates, &color);
@@ -1414,53 +1413,52 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Coordinates must be not empty");
 		return;
 	}
-	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
+	phalcon_read_property(&im, getThis(), SL("_image"), PH_READONLY);
 
-	if (Z_TYPE(image) == IS_RESOURCE) {
-		imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
-		imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
+	imagick_draw_ce  = phalcon_fetch_str_class(SL("ImagickDraw"), ZEND_FETCH_CLASS_AUTO);
+	imagick_pixel_ce = phalcon_fetch_str_class(SL("ImagickPixel"), ZEND_FETCH_CLASS_AUTO);
 
-		object_init_ex(&draw, imagick_draw_ce);
-		PHALCON_CALL_METHOD(NULL, &draw, "__construct");
+	object_init_ex(&draw, imagick_draw_ce);
+	PHALCON_CALL_METHOD(NULL, &draw, "__construct");
 
-		object_init_ex(&pixel, imagick_pixel_ce);
-		PHALCON_CALL_METHOD(NULL, &pixel, "__construct", color);
+	object_init_ex(&pixel, imagick_pixel_ce);
+	PHALCON_CALL_METHOD(NULL, &pixel, "__construct", color);
 
-		PHALCON_CALL_METHOD(NULL, &draw, "setstrokecolor", &pixel);
-		PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
-		zval_ptr_dtor(&pixel);
+	PHALCON_CALL_METHOD(NULL, &draw, "setstrokecolor", &pixel);
+	PHALCON_CALL_METHOD(NULL, &draw, "setfillcolor", &pixel);
+	zval_ptr_dtor(&pixel);
 
-		array_init(&points);
-		ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(coordinates), point) {
-			zval newpoint = {}, x = {}, y = {};
-			array_init(&newpoint);
-			if (Z_TYPE_P(point) == IS_ARRAY) {
-				if (phalcon_fast_count_int(point) != 2) {
-					PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Coordinates point error");
-					return;
-				}
-				if (!phalcon_array_isset_fetch_long(&x, point, 0, PH_READONLY)) {
-					phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY|PH_READONLY);
-				}
-				if (!phalcon_array_isset_fetch_long(&y, point, 0, PH_READONLY)) {
-					phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY|PH_READONLY);
-				}
-			} else {
-				ZVAL_COPY_VALUE(&x, &_p->val);
-				_p++;
-				ZVAL_COPY_VALUE(&y, &_p->val);
+	array_init(&points);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(coordinates), point) {
+		zval newpoint = {}, x = {}, y = {};
+		array_init(&newpoint);
+		if (Z_TYPE_P(point) == IS_ARRAY) {
+			if (phalcon_fast_count_int(point) != 2) {
+				PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Coordinates point error");
+				return;
 			}
-			phalcon_array_update_str(&newpoint, SL("x"), &x, PH_COPY);
-			phalcon_array_update_str(&newpoint, SL("y"), &y, PH_COPY);
-			phalcon_array_append(&points, &newpoint, 0);
-		} ZEND_HASH_FOREACH_END();
+			if (!phalcon_array_isset_fetch_long(&x, point, 0, PH_READONLY)) {
+				phalcon_array_fetch_str(&x, point, SL("x"), PH_NOISY|PH_READONLY);
+			}
+			if (!phalcon_array_isset_fetch_long(&y, point, 0, PH_READONLY)) {
+				phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY|PH_READONLY);
+			}
+		} else {
+			ZVAL_COPY_VALUE(&x, &_p->val);
+			_p++;
+			ZVAL_COPY_VALUE(&y, &_p->val);
+		}
+		phalcon_array_update_str(&newpoint, SL("x"), &x, PH_COPY);
+		phalcon_array_update_str(&newpoint, SL("y"), &y, PH_COPY);
+		phalcon_array_append(&points, &newpoint, 0);
+	} ZEND_HASH_FOREACH_END();
 
-		PHALCON_CALL_METHOD(NULL, &draw, "polygon", &points);
-		zval_ptr_dtor(&points);
+	PHALCON_CALL_METHOD(NULL, &draw, "polygon", &points);
+	zval_ptr_dtor(&points);
 
-		PHALCON_CALL_METHOD(NULL, &image, "drawimage", &draw);
-		zval_ptr_dtor(&draw);
-	}
+	PHALCON_CALL_METHOD(NULL, &im, "drawimage", &draw);
+	zval_ptr_dtor(&draw);
+
 	RETURN_THIS();
 }
 

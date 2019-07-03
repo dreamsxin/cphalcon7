@@ -50,7 +50,7 @@
 #endif
 
 
-#include "async/thirdparty/libuv/include/uv.h"
+#include "uv.h"
 #include "php.h"
 
 #ifdef PHP_WIN32

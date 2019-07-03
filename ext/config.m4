@@ -1242,6 +1242,12 @@ aop.c"
 		[async_os="LINUX"]
 	)
 
+
+	UV_DIR="async/thirdparty/libuv"
+
+	PHP_ADD_INCLUDE("${UV_DIR}/include")
+	PHP_ADD_INCLUDE("${UV_DIR}/src")
+
 	async_source_files=" \
 		async/core.c \
 		async/channel.c \
@@ -1369,11 +1375,6 @@ aop.c"
 			[solaris*], [uv_os="SUNOS"],
 			[uv_os="LINUX"]
 		)
-
-		UV_DIR="async/thirdparty/libuv"
-
-		PHP_ADD_INCLUDE("${UV_DIR}/include")
-		PHP_ADD_INCLUDE("${UV_DIR}/src")
 
 		# Base files
 		UV_SRC=" \

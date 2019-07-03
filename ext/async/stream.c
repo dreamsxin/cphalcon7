@@ -288,19 +288,17 @@ static int shutdown_ssl(async_stream *stream)
 }
 #endif
 
+#ifdef HAVE_ASYNC_SSL
 ASYNC_CALLBACK dispose_read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_t *buf)
 {
 	async_stream *stream;
-	
-#ifdef HAVE_ASYNC_SSL
+
 	int code;
-#endif
 	
 	stream = (async_stream *) handle->data;
 	
 	ZEND_ASSERT(stream != NULL);
-	
-#ifdef HAVE_ASYNC_SSL
+
 	if (stream->ssl.ssl != NULL && nread > 0 && !(stream->flags & ASYNC_STREAM_SSL_FATAL)) {
 		ERR_clear_error();
 		BIO_read(stream->ssl.rbio, buf->base, buf->len);
@@ -321,7 +319,6 @@ ASYNC_CALLBACK dispose_read_cb(uv_stream_t *handle, ssize_t nread, const uv_buf_
 			}
 		}
 	}
-#endif
 	
 	if (nread < 0) {
 		ASYNC_UV_TRY_CLOSE(handle, close_stream_cb);
@@ -346,6 +343,7 @@ ASYNC_CALLBACK dispose_timer_cb(uv_timer_t *handle)
 	
 	ASYNC_UV_TRY_CLOSE(stream->handle, close_stream_cb);
 }
+#endif
 
 void async_stream_close_cb(async_stream *stream, async_stream_dispose_cb callback, void *data)
 {

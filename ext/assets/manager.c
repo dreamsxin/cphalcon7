@@ -34,6 +34,7 @@
 #include "kernel/array.h"
 #include "kernel/operators.h"
 #include "kernel/concat.h"
+#include "kernel/string.h"
 #include "kernel/file.h"
 #include "kernel/debug.h"
 
@@ -615,7 +616,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	/**
 	 * Get the resources as an array
 	 */
-	PHALCON_MM_CALL_METHOD(&resources, collection, "getresources");
+	PHALCON_MM_CALL_METHOD(&resources, collection, "getresources", &type);
 	PHALCON_MM_ADD_ENTRY(&resources);
 
 	/**
@@ -1031,6 +1032,9 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 
 		PHALCON_MM_CALL_METHOD(&target_uri, collection, "gettargeturi");
 		PHALCON_MM_ADD_ENTRY(&target_uri);
+		if (PHALCON_IS_NOT_EMPTY(&type) && PHALCON_IS_NOT_EMPTY(&target_uri) && !phalcon_fast_strpos_str(NULL, &target_uri, SL("."))) {
+			PHALCON_SCONCAT_SV(&target_uri, ".", &type);
+		}
 
 		/**
 		 * Generate the HTML using the original path in the resource

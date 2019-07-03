@@ -914,7 +914,9 @@ int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char
 	const char *found = NULL;
 
 	if (unlikely(Z_TYPE_P(haystack) != IS_STRING)) {
-		ZVAL_NULL(return_value);
+		if (return_value) {
+			ZVAL_NULL(return_value);
+		}
 		zend_error(E_WARNING, "Invalid arguments supplied for strpos()");
 		return 0;
 	}

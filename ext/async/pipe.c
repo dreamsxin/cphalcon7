@@ -21,8 +21,6 @@
 
 #include "async/core.h"
 
-#if PHALCON_USE_UV
-
 #include "async/async_stream.h"
 #include "async/async_socket.h"
 #include "async/async_pipe.h"
@@ -73,13 +71,9 @@ ASYNC_CALLBACK shutdown_pipe(void *arg, zval *error)
 	}
 	
 	if (pipe->stream == NULL) {
-		if (!uv_is_closing((uv_handle_t *) &pipe->handle)) {
-			ASYNC_ADDREF(&pipe->std);
-			
-			pipe->handle.data = pipe;
+		pipe->handle.data = pipe;
 
-			uv_close((uv_handle_t *) &pipe->handle, pipe_disposed);
-		}
+		ASYNC_UV_TRY_CLOSE_REF(&pipe->std, &pipe->handle, pipe_disposed);
 	} else {
 		ZVAL_OBJ(&obj, &pipe->std);
 		
@@ -178,7 +172,13 @@ ASYNC_CALLBACK connect_cb(uv_connect_t *req, int status)
 	ASYNC_FINISH_OP(op);
 }
 
-static ZEND_METHOD(Pipe, connect)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_connect, 0, 1, Phalcon\\Async\\Network\\Pipe, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(Pipe, connect)
 {
 	async_pipe *pipe;
 	async_context *context;
@@ -271,7 +271,12 @@ static ZEND_METHOD(Pipe, connect)
 	RETURN_OBJ(&pipe->std);
 }
 
-static ZEND_METHOD(Pipe, import)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_import, 0, 1, Phalcon\\Async\\Network\\Pipe, 0)
+	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(Pipe, import)
 {
 	async_pipe *pipe;
 	
@@ -284,7 +289,7 @@ static ZEND_METHOD(Pipe, import)
 	ipc = 0;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
-		Z_PARAM_ZVAL(conn)
+		Z_PARAM_OBJECT_OF_CLASS(conn, async_pipe_ce)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_LONG(ipc)
 	ZEND_PARSE_PARAMETERS_END();
@@ -309,14 +314,18 @@ static ZEND_METHOD(Pipe, import)
 	RETURN_OBJ(&pipe->std);
 }
 
-static ZEND_METHOD(Pipe, export)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_export, 0, 1, IS_VOID, 0)
+	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(Pipe, export)
 {
 	async_pipe *pipe;
 	
 	zval *ipc;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_ZVAL(ipc)
+		Z_PARAM_OBJECT_OF_CLASS(ipc, async_pipe_ce)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	pipe = (async_pipe *) Z_OBJ_P(getThis());
@@ -326,7 +335,7 @@ static ZEND_METHOD(Pipe, export)
 
 #ifdef ZEND_WIN32
 
-typedef struct {
+typedef struct _pipe_pair_op {
 	async_op base;
 	int code;
 	int pending;
@@ -362,7 +371,11 @@ ASYNC_CALLBACK connect_pipe_pair(uv_connect_t *req, int status)
 
 #endif
 
-static ZEND_METHOD(Pipe, pair)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_pair, 0, 0, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(Pipe, pair)
 {
 	async_pipe *pipe;
 	
@@ -501,7 +514,7 @@ static ZEND_METHOD(Pipe, pair)
 #endif
 }
 
-static ZEND_METHOD(Pipe, close)
+static PHP_METHOD(Pipe, close)
 {
 	async_pipe *pipe;
 
@@ -512,7 +525,7 @@ static ZEND_METHOD(Pipe, close)
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	pipe = (async_pipe *) Z_OBJ_P(getThis());
@@ -521,7 +534,7 @@ static ZEND_METHOD(Pipe, close)
 		return;
 	}
 
-	ASYNC_PREPARE_EXCEPTION(&error, async_stream_closed_exception_ce, "Socket has been closed");
+	ASYNC_PREPARE_EXCEPTION(&error, execute_data, async_stream_closed_exception_ce, "Socket has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -535,7 +548,7 @@ static ZEND_METHOD(Pipe, close)
 	zval_ptr_dtor(&error);
 }
 
-static ZEND_METHOD(Pipe, flush)
+static PHP_METHOD(Pipe, flush)
 {
 	async_pipe *pipe;
 	
@@ -546,7 +559,7 @@ static ZEND_METHOD(Pipe, flush)
 	async_stream_flush(pipe->stream);
 }
 
-static ZEND_METHOD(Pipe, getAddress)
+static PHP_METHOD(Pipe, getAddress)
 {
 	async_pipe *pipe;
 
@@ -557,12 +570,12 @@ static ZEND_METHOD(Pipe, getAddress)
 	RETURN_STR_COPY(pipe->name);
 }
 
-static ZEND_METHOD(Pipe, getPort)
+static PHP_METHOD(Pipe, getPort)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
 }
 
-static ZEND_METHOD(Pipe, setOption)
+static PHP_METHOD(Pipe, setOption)
 {
 	zend_long option;
 	zval *val;
@@ -575,7 +588,7 @@ static ZEND_METHOD(Pipe, setOption)
 	RETURN_FALSE;
 }
 
-static ZEND_METHOD(Pipe, getRemoteAddress)
+static PHP_METHOD(Pipe, getRemoteAddress)
 {
 	async_pipe *pipe;
 
@@ -586,12 +599,12 @@ static ZEND_METHOD(Pipe, getRemoteAddress)
 	RETURN_STR_COPY(pipe->name);
 }
 
-static ZEND_METHOD(Pipe, getRemotePort)
+static PHP_METHOD(Pipe, getRemotePort)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
 }
 
-static ZEND_METHOD(Pipe, isAlive)
+static PHP_METHOD(Pipe, isAlive)
 {
 	async_pipe *pipe;
 	
@@ -602,16 +615,16 @@ static ZEND_METHOD(Pipe, isAlive)
 	RETURN_BOOL(async_socket_is_alive(pipe->stream));
 }
 
-static ZEND_METHOD(Pipe, read)
+static PHP_METHOD(Pipe, read)
 {
 	async_pipe *pipe;
 
 	pipe = (async_pipe *) Z_OBJ_P(getThis());
 
-	async_stream_call_read(pipe->stream, &pipe->read_error, return_value, execute_data);
+	async_stream_call_read(pipe->stream, &pipe->read_error, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 
-static ZEND_METHOD(Pipe, getReadableStream)
+static PHP_METHOD(Pipe, getReadableStream)
 {
 	async_pipe *pipe;
 	async_stream_reader *reader;
@@ -624,48 +637,16 @@ static ZEND_METHOD(Pipe, getReadableStream)
 	RETURN_OBJ(&reader->std);
 }
 
-static ZEND_METHOD(Pipe, write)
+static PHP_METHOD(Pipe, write)
 {
 	async_pipe *pipe;
 
 	pipe = (async_pipe *) Z_OBJ_P(getThis());
 
-	async_stream_call_write(pipe->stream, &pipe->write_error, return_value, execute_data);
+	async_stream_call_write(pipe->stream, &pipe->write_error, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 }
 
-static ZEND_METHOD(Pipe, writeAsync)
-{
-	async_pipe *pipe;
-	async_stream_write_req write;
-	
-	zend_string *data;
-	
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_STR(data)
-	ZEND_PARSE_PARAMETERS_END();
-	
-	pipe = (async_pipe *) Z_OBJ_P(getThis());
-
-	if (UNEXPECTED(Z_TYPE_P(&pipe->write_error) != IS_UNDEF)) {
-		ASYNC_FORWARD_ERROR(&pipe->write_error);
-		return;
-	}
-	
-	write.in.len = ZSTR_LEN(data);
-	write.in.buffer = ZSTR_VAL(data);
-	write.in.handle = NULL;
-	write.in.str = data;
-	write.in.ref = getThis();
-	write.in.flags = ASYNC_STREAM_WRITE_REQ_FLAG_ASYNC;
-	
-	if (UNEXPECTED(FAILURE == async_stream_write(pipe->stream, &write))) {
-		forward_stream_write_error(pipe->stream, &write);
-	} else {
-		RETURN_LONG(pipe->handle.write_queue_size);
-	}
-}
-
-static ZEND_METHOD(Pipe, getWriteQueueSize)
+static PHP_METHOD(Pipe, getWriteQueueSize)
 {
 	async_pipe *pipe;
 	
@@ -676,7 +657,7 @@ static ZEND_METHOD(Pipe, getWriteQueueSize)
 	RETURN_LONG((Z_TYPE_P(&pipe->write_error) == IS_UNDEF) ? pipe->handle.write_queue_size : 0);
 }
 
-static ZEND_METHOD(Pipe, getWritableStream)
+static PHP_METHOD(Pipe, getWritableStream)
 {
 	async_pipe *pipe;
 	async_stream_writer *writer;
@@ -689,55 +670,32 @@ static ZEND_METHOD(Pipe, getWritableStream)
 	RETURN_OBJ(&writer->std);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_connect, 0, 1, Phalcon\\Async\\Network\\Pipe, 0)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_import, 0, 1, Phalcon\\Async\\Network\\Pipe, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_pair, 0, 0, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_export, 0, 1, IS_VOID, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_pair, 0, 0, IS_ARRAY, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_export, 0, 1, IS_VOID, NULL, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
-ZEND_END_ARG_INFO()
-#endif
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(Pipe, async_pipe_ce)
+ASYNC_METHOD_NO_WAKEUP(Pipe, async_pipe_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_pipe_functions[] = {
-	ZEND_ME(Pipe, connect, arginfo_pipe_connect, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(Pipe, import, arginfo_pipe_import, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(Pipe, pair, arginfo_pipe_pair, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(Pipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, flush, arginfo_socket_stream_flush, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getAddress, arginfo_socket_get_address, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getPort, arginfo_socket_get_port, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, setOption, arginfo_socket_set_option, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getRemoteAddress, arginfo_socket_stream_get_remote_address, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getRemotePort, arginfo_socket_stream_get_remote_port, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, isAlive, arginfo_socket_stream_is_alive, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, read, arginfo_readable_stream_read, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getReadableStream, arginfo_duplex_stream_get_readable_stream, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, write, arginfo_writable_stream_write, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, writeAsync, arginfo_socket_stream_write_async, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getWriteQueueSize, arginfo_socket_get_write_queue_size, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, getWritableStream, arginfo_duplex_stream_get_writable_stream, ZEND_ACC_PUBLIC)
-	ZEND_ME(Pipe, export, arginfo_pipe_export, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(Pipe, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(Pipe, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, connect, arginfo_pipe_connect, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Pipe, import, arginfo_pipe_import, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Pipe, pair, arginfo_pipe_pair, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Pipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, flush, arginfo_socket_stream_flush, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getAddress, arginfo_socket_get_address, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getPort, arginfo_socket_get_port, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, setOption, arginfo_socket_set_option, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getRemoteAddress, arginfo_socket_stream_get_remote_address, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getRemotePort, arginfo_socket_stream_get_remote_port, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, isAlive, arginfo_socket_stream_is_alive, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, read, arginfo_readable_stream_read, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getReadableStream, arginfo_duplex_stream_get_readable_stream, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, write, arginfo_writable_stream_write, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getWriteQueueSize, arginfo_socket_get_write_queue_size, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, getWritableStream, arginfo_duplex_stream_get_writable_stream, ZEND_ACC_PUBLIC)
+	PHP_ME(Pipe, export, arginfo_pipe_export, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -793,7 +751,7 @@ ASYNC_CALLBACK shutdown_server(void *arg, zval *error)
 		stream->data = server->scheduler;
 		ASYNC_ADDREF(&server->scheduler->std);
 		
-		uv_close((uv_handle_t *) stream, dispose_pending_cb);
+		ASYNC_UV_CLOSE(stream, dispose_pending_cb);
 	}
 	
 	while (server->accepts.first != NULL) {
@@ -808,11 +766,7 @@ ASYNC_CALLBACK shutdown_server(void *arg, zval *error)
 		}
 	}
 	
-	if (!uv_is_closing((uv_handle_t *) &server->handle)) {
-		ASYNC_ADDREF(&server->std);
-		
-		uv_close((uv_handle_t *) &server->handle, server_disposed);
-	}
+	ASYNC_UV_TRY_CLOSE_REF(&server->std, &server->handle, server_disposed);
 }
 
 static async_pipe_server *async_piper_server_object_create()
@@ -888,7 +842,7 @@ ASYNC_CALLBACK listen_cb(uv_stream_t *stream, int status)
 	}
 }
 
-static void create_server(async_pipe_server **result, zend_execute_data *execute_data, zval *return_value)
+static void create_server(async_pipe_server **result, INTERNAL_FUNCTION_PARAMETERS)
 {
 	async_pipe_server *server;
 	
@@ -945,11 +899,16 @@ static void create_server(async_pipe_server **result, zend_execute_data *execute
 	*result = server;
 }
 
-static ZEND_METHOD(PipeServer, bind)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_bind, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(PipeServer, bind)
 {
 	async_pipe_server *server;
 	
-	create_server(&server, execute_data, return_value);
+	create_server(&server, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 	
 	if (EXPECTED(server)) {
 		server->flags = ASYNC_PIPE_FLAG_LAZY;
@@ -958,13 +917,18 @@ static ZEND_METHOD(PipeServer, bind)
 	}
 }
 
-static ZEND_METHOD(PipeServer, listen)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_listen, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(PipeServer, listen)
 {
 	async_pipe_server *server;
 	
 	int code;
 	
-	create_server(&server, execute_data, return_value);
+	create_server(&server, INTERNAL_FUNCTION_PARAM_PASSTHRU);
 	
 	if (EXPECTED(server)) {
 		code = uv_listen((uv_stream_t *) &server->handle, 128, listen_cb);
@@ -979,7 +943,12 @@ static ZEND_METHOD(PipeServer, listen)
 	}
 }
 
-static ZEND_METHOD(PipeServer, import)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_import, 0, 1, Phalcon\\Async\\Network\\PipeServer, 0)
+	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
+	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(PipeServer, import)
 {
 	async_pipe_server *server;
 	
@@ -992,7 +961,7 @@ static ZEND_METHOD(PipeServer, import)
 	ipc = 0;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
-		Z_PARAM_ZVAL(conn)
+		Z_PARAM_OBJECT_OF_CLASS(conn, async_pipe_ce)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_LONG(ipc)
 	ZEND_PARSE_PARAMETERS_END();
@@ -1022,14 +991,18 @@ static ZEND_METHOD(PipeServer, import)
 	RETURN_OBJ(&server->std);
 }
 
-static ZEND_METHOD(PipeServer, export)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_server_export, 0, 1, IS_VOID, 0)
+	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(PipeServer, export)
 {
 	async_pipe_server *server;
 	
 	zval *conn;
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
-		Z_PARAM_ZVAL(conn)
+		Z_PARAM_OBJECT_OF_CLASS(conn, async_pipe_ce)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	server = (async_pipe_server *) Z_OBJ_P(getThis());
@@ -1037,7 +1010,7 @@ static ZEND_METHOD(PipeServer, export)
 	async_pipe_export_stream((async_pipe *) Z_OBJ_P(conn), (uv_stream_t *) &server->handle);
 }
 
-static ZEND_METHOD(PipeServer, close)
+static PHP_METHOD(PipeServer, close)
 {
 	async_pipe_server *server;
 
@@ -1048,7 +1021,7 @@ static ZEND_METHOD(PipeServer, close)
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 
 	server = (async_pipe_server *) Z_OBJ_P(getThis());
@@ -1057,7 +1030,7 @@ static ZEND_METHOD(PipeServer, close)
 		return;
 	}
 
-	ASYNC_PREPARE_EXCEPTION(&error, async_socket_exception_ce, "Server has been closed");
+	ASYNC_PREPARE_EXCEPTION(&error, execute_data, async_socket_exception_ce, "Server has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -1071,7 +1044,7 @@ static ZEND_METHOD(PipeServer, close)
 	zval_ptr_dtor(&error);
 }
 
-static ZEND_METHOD(PipeServer, getAddress)
+static PHP_METHOD(PipeServer, getAddress)
 {
 	async_pipe_server *server;
 
@@ -1082,12 +1055,12 @@ static ZEND_METHOD(PipeServer, getAddress)
 	RETURN_STR_COPY(server->name);
 }
 
-static ZEND_METHOD(PipeServer, getPort)
+static PHP_METHOD(PipeServer, getPort)
 {
 	ZEND_PARSE_PARAMETERS_NONE();
 }
 
-static ZEND_METHOD(PipeServer, setOption)
+static PHP_METHOD(PipeServer, setOption)
 {
 	zend_long option;
 	zval *val;
@@ -1100,7 +1073,7 @@ static ZEND_METHOD(PipeServer, setOption)
 	RETURN_FALSE;
 }
 
-static ZEND_METHOD(PipeServer, accept)
+static PHP_METHOD(PipeServer, accept)
 {
 	async_pipe_server *server;
 	async_pipe *pipe;
@@ -1171,42 +1144,24 @@ static ZEND_METHOD(PipeServer, accept)
 	RETURN_OBJ(&pipe->std);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_bind, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_listen, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_pipe_server_import, 0, 1, Phalcon\\Async\\Network\\Pipe\\Server, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe\\Server, 0)
-	ZEND_ARG_TYPE_INFO(0, ipc, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_server_export, 0, 1, IS_VOID, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_server_export, 0, 1, IS_VOID, NULL, 0)
-	ZEND_ARG_OBJ_INFO(0, pipe, Phalcon\\Async\\Network\\Pipe, 0)
-ZEND_END_ARG_INFO()
-#endif
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(PipeServer, async_pipe_server_ce)
+ASYNC_METHOD_NO_WAKEUP(PipeServer, async_pipe_server_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_pipe_server_functions[] = {
-	ZEND_ME(PipeServer, bind, arginfo_pipe_server_bind, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(PipeServer, listen, arginfo_pipe_server_listen, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(PipeServer, import, arginfo_pipe_server_import, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(PipeServer, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(PipeServer, getAddress, arginfo_socket_get_address, ZEND_ACC_PUBLIC)
-	ZEND_ME(PipeServer, getPort, arginfo_socket_get_port, ZEND_ACC_PUBLIC)
-	ZEND_ME(PipeServer, setOption, arginfo_socket_set_option, ZEND_ACC_PUBLIC)
-	ZEND_ME(PipeServer, accept, arginfo_server_accept, ZEND_ACC_PUBLIC)
-	ZEND_ME(PipeServer, export, arginfo_pipe_server_export, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(PipeServer, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(PipeServer, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, bind, arginfo_pipe_server_bind, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(PipeServer, listen, arginfo_pipe_server_listen, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(PipeServer, import, arginfo_pipe_server_import, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(PipeServer, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, getAddress, arginfo_socket_get_address, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, getPort, arginfo_socket_get_port, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, setOption, arginfo_socket_set_option, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, accept, arginfo_server_accept, ZEND_ACC_PUBLIC)
+	PHP_ME(PipeServer, export, arginfo_pipe_server_export, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -1235,7 +1190,7 @@ int async_pipe_import(uv_stream_t *handle, zend_object **object)
 		
 		pipe->handle.data = pipe;
 	
-		uv_close((uv_handle_t *) &pipe->handle, close_import_cb);
+		ASYNC_UV_CLOSE(&pipe->handle, close_import_cb);
 	
 		return code;
 	}
@@ -1317,11 +1272,9 @@ void async_pipe_export_stream(async_pipe *pipe, uv_stream_t *handle)
 	
 	ASYNC_CHECK_EXCEPTION(!(pipe->flags & ASYNC_PIPE_FLAG_IPC), async_stream_exception_ce, "Writing a handle requires pipe to be opened with IPC support");
 	
-	write.in.len = 0;
-	write.in.buffer = NULL;
+	memset(&write, 0, sizeof(async_stream_write_req));
+
 	write.in.handle = handle;
-	write.in.str = NULL;
-	write.in.ref = NULL;
 	write.in.flags = ASYNC_STREAM_WRITE_REQ_FLAG_EXPORT;
 	
 	if (UNEXPECTED(FAILURE == async_stream_write(pipe->stream, &write))) {
@@ -1330,11 +1283,82 @@ void async_pipe_export_stream(async_pipe *pipe, uv_stream_t *handle)
 }
 
 
+ASYNC_CALLBACK finish_async_write(async_op *op)
+{
+	async_awaitable_impl *awaitable;
+
+	awaitable = (async_awaitable_impl *) op->arg;
+
+	ZEND_ASSERT(awaitable != NULL);
+
+	if (op->status == ASYNC_STATUS_FAILED) {
+		async_awaitable_fail(awaitable, &op->result);
+	} else {
+		async_awaitable_resolve(awaitable, NULL);
+	}
+
+	ASYNC_DELREF((zend_object *) awaitable->arg);
+	ASYNC_DELREF(&awaitable->std);
+}
+
+static void intercept_write(async_context *context, zend_object *obj, INTERNAL_FUNCTION_PARAMETERS)
+{
+	async_pipe *pipe;
+	async_stream_write_req write;
+	async_awaitable_impl *awaitable;
+
+	zend_string *data;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_STR(data)
+	ZEND_PARSE_PARAMETERS_END();
+
+	pipe = (async_pipe *) obj;
+
+	if (UNEXPECTED(Z_TYPE_P(&pipe->write_error) != IS_UNDEF)) {
+		ASYNC_FORWARD_ERROR(&pipe->write_error);
+		return;
+	}
+
+	memset(&write, 0, sizeof(async_stream_write_req));
+
+	write.in.str = data;
+	write.in.len = ZSTR_LEN(data);
+	write.in.buffer = ZSTR_VAL(data);
+	write.in.context = context;
+	write.in.flags = ASYNC_STREAM_WRITE_REQ_FLAG_ASYNC;
+
+	if (return_value) {
+		awaitable = async_create_awaitable(EX(prev_execute_data)->prev_execute_data, pipe);
+
+		write.in.callback = finish_async_write;
+		write.in.arg = awaitable;
+
+		ASYNC_ADDREF(&awaitable->std);
+	} else {
+		awaitable = NULL;
+	}
+
+	if (UNEXPECTED(FAILURE == async_stream_write(pipe->stream, &write))) {
+		if (awaitable) {
+			ASYNC_DELREF(&awaitable->std);
+			ASYNC_DELREF(&awaitable->std);
+		}
+
+		forward_stream_write_error(pipe->stream, &write);
+	} else if (return_value) {
+		ASYNC_ADDREF(&pipe->std);
+
+		RETVAL_OBJ(&awaitable->std);
+	}
+}
+
 void async_pipe_ce_register()
 {
 	zend_class_entry ce;
+	zend_function *func;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\Pipe", async_pipe_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "Pipe", async_pipe_functions);
 	async_pipe_ce = zend_register_internal_class(&ce);
 	async_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_pipe_ce->serialize = zend_class_serialize_deny;
@@ -1347,7 +1371,7 @@ void async_pipe_ce_register()
 	async_pipe_handlers.free_obj = async_pipe_object_destroy;
 	async_pipe_handlers.clone_obj = NULL;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\Pipe\\Server", async_pipe_server_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "PipeServer", async_pipe_server_functions);
 	async_pipe_server_ce = zend_register_internal_class(&ce);
 	async_pipe_server_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_pipe_server_ce->serialize = zend_class_serialize_deny;
@@ -1359,6 +1383,8 @@ void async_pipe_ce_register()
 	async_pipe_server_handlers.dtor_obj = async_pipe_server_object_dtor;
 	async_pipe_server_handlers.free_obj = async_pipe_server_object_destroy;
 	async_pipe_server_handlers.clone_obj = NULL;
-}
 
-#endif /* PHALCON_USE_UV */
+	if (NULL != (func = (zend_function *) zend_hash_str_find_ptr(&async_pipe_ce->function_table, ZEND_STRL("write")))) {
+		async_register_interceptor(func, intercept_write);
+	}
+}

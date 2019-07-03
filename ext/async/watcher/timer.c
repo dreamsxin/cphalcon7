@@ -1,22 +1,19 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
@@ -24,17 +21,19 @@
 
 #include <Zend/zend_inheritance.h>
 
-#if PHALCON_USE_UV
-
+ASYNC_API zend_class_entry *async_timeout_ce;
 ASYNC_API zend_class_entry *async_timeout_exception_ce;
 ASYNC_API zend_class_entry *async_timer_ce;
 
+static zend_object_handlers async_timeout_handlers;
 static zend_object_handlers async_timer_handlers;
+
+static async_await_handler timeout_await_handler;
 
 static zend_function *orig_sleep;
 static zif_handler orig_sleep_handler;
 
-typedef struct {
+typedef struct _async_timer {
 	/* PHP object handle. */
 	zend_object std;
 
@@ -58,10 +57,22 @@ typedef struct {
 	async_cancel_cb cancel;
 } async_timer;
 
-typedef struct {
-	async_deferred_custom_awaitable base;
-	uv_timer_t timer;
-} async_timeout_awaitable;
+typedef struct _async_timeout {
+	zend_object std;
+
+	uv_timer_t handle;
+	zend_uchar ref_count;
+	zval error;
+
+	async_task_scheduler *scheduler;
+	async_context *context;
+	async_cancel_cb cancel;
+
+	async_op_list operations;
+} async_timeout;
+
+static async_timeout *async_timeout_object_create(uint64_t delay);
+
 
 ASYNC_CALLBACK trigger_timer(uv_timer_t *handle)
 {
@@ -120,11 +131,7 @@ ASYNC_CALLBACK shutdown_timer(void *obj, zval *error)
 		ZVAL_COPY(&timer->error, error);
 	}
 
-	if (!uv_is_closing((uv_handle_t *) &timer->handle)) {
-		ASYNC_ADDREF(&timer->std);
-
-		uv_close((uv_handle_t *) &timer->handle, close_timer);
-	}
+	ASYNC_UV_TRY_CLOSE_REF(&timer->std, &timer->handle, close_timer);
 	
 	if (error != NULL) {
 		while (timer->timeouts.first != NULL) {
@@ -187,7 +194,11 @@ static void async_timer_object_destroy(zend_object *object)
 	zend_object_std_dtor(&timer->std);
 }
 
-ZEND_METHOD(Timer, __construct)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_timer_ctor, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Timer, __construct)
 {
 	async_timer *timer;
 	uint64_t delay;
@@ -207,7 +218,11 @@ ZEND_METHOD(Timer, __construct)
 	timer->delay = delay;
 }
 
-ZEND_METHOD(Timer, close)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_close, 0, 0, IS_VOID, 0)
+	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Timer, close)
 {
 	async_timer *timer;
 
@@ -227,7 +242,7 @@ ZEND_METHOD(Timer, close)
 		return;
 	}
 	
-	ASYNC_PREPARE_ERROR(&error, "Timer has been closed");
+	ASYNC_PREPARE_ERROR(&error, execute_data, "Timer has been closed");
 	
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -241,7 +256,10 @@ ZEND_METHOD(Timer, close)
 	zval_ptr_dtor(&error);
 }
 
-ZEND_METHOD(Timer, awaitTimeout)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_await_timeout, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Timer, awaitTimeout)
 {
 	async_timer *timer;
 	async_op *op;
@@ -275,55 +293,12 @@ ZEND_METHOD(Timer, awaitTimeout)
 	ASYNC_FREE_OP(op);
 }
 
-ASYNC_CALLBACK timeout_close_cb(uv_handle_t *handle)
-{
-	async_deferred_awaitable *awaitable;
-	
-	awaitable = (async_deferred_awaitable *) handle->data;
-	
-	ZEND_ASSERT(awaitable != NULL);
-	
-	ASYNC_DELREF(&awaitable->std);
-}
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_timer_timeout, 0, 1, Phalcon\\Async\\Awaitable, 0)
+	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
+ZEND_END_ARG_INFO();
 
-ASYNC_CALLBACK timeout_cb(uv_timer_t *timer)
+PHP_METHOD(Timer, timeout)
 {
-	async_deferred_awaitable *awaitable;
-	
-	zval error;
-	
-	awaitable = timer->data;
-	
-	ZEND_ASSERT(awaitable != NULL);
-	
-	ASYNC_ADDREF(&awaitable->std);
-	
-	ASYNC_PREPARE_EXCEPTION(&error, async_timeout_exception_ce, "Operation timed out");
-	
-	async_fail_awaitable(awaitable, &error);
-	zval_ptr_dtor(&error);
-	
-	uv_close((uv_handle_t *) timer, timeout_close_cb);
-}
-
-ASYNC_CALLBACK timeout_dispose_cb(async_deferred_custom_awaitable *obj)
-{
-	async_timeout_awaitable *awaitable;
-	
-	awaitable = (async_timeout_awaitable *) obj;
-	
-	if (!uv_is_closing((uv_handle_t *) &awaitable->timer)) {
-		ASYNC_ADDREF(&awaitable->base.base.std);
-		
-		uv_close((uv_handle_t *) &awaitable->timer, timeout_close_cb);
-	}
-}
-
-ZEND_METHOD(Timer, timeout)
-{
-	async_timeout_awaitable *awaitable;
-	async_context *context;
-	
 	zval *a;
 	
 	uint64_t delay;
@@ -336,54 +311,157 @@ ZEND_METHOD(Timer, timeout)
 
 	ASYNC_CHECK_ERROR(delay < 0, "Delay must not be shorter than 0 milliseconds");
 	
-	awaitable = ecalloc(1, sizeof(async_timeout_awaitable));
-	context = async_context_get();
-	
-	async_init_awaitable((async_deferred_custom_awaitable *) awaitable, timeout_dispose_cb, context);
-	
-	uv_timer_init(&awaitable->base.base.state->scheduler->loop, &awaitable->timer);
-	
-	awaitable->timer.data = awaitable;
-	
-	if (async_context_is_background(context)) {
-		uv_unref((uv_handle_t *) &awaitable->timer);
-	}
-	
-	uv_timer_start(&awaitable->timer, timeout_cb, delay, 0);
-	
-	RETURN_OBJ(&awaitable->base.base.std);
+	RETURN_OBJ(&async_timeout_object_create(delay)->std);
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_timer_ctor, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_close, 0, 0, IS_VOID, 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_await_timeout, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_close, 0, 0, IS_VOID, NULL, 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_timer_await_timeout, 0, 0, IS_VOID, NULL, 0)
-ZEND_END_ARG_INFO()
-#endif
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_timer_timeout, 0, 1, Phalcon\\Async\\Awaitable, 0)
-	ZEND_ARG_TYPE_INFO(0, milliseconds, IS_LONG, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(Timer, async_timer_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_timer_functions[] = {
-	ZEND_ME(Timer, __construct, arginfo_timer_ctor, ZEND_ACC_PUBLIC)
-	ZEND_ME(Timer, close, arginfo_timer_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(Timer, awaitTimeout, arginfo_timer_await_timeout, ZEND_ACC_PUBLIC)
-	ZEND_ME(Timer, timeout, arginfo_timer_timeout, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_FE_END
+	PHP_ME(Timer, __construct, arginfo_timer_ctor, ZEND_ACC_PUBLIC)
+	PHP_ME(Timer, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(Timer, close, arginfo_timer_close, ZEND_ACC_PUBLIC)
+	PHP_ME(Timer, awaitTimeout, arginfo_timer_await_timeout, ZEND_ACC_PUBLIC)
+	PHP_ME(Timer, timeout, arginfo_timer_timeout, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_FE_END
+};
+
+
+static int timeout_await_delegate(zend_object *obj, zval *result, async_task *caller, async_context *context, int flags)
+{
+	async_timeout *timeout;
+
+	timeout = (async_timeout *) obj;
+
+	if (timeout->cancel.func == NULL) {
+		ZVAL_COPY(result, &timeout->error);
+
+		return ASYNC_OP_FAILED;
+	}
+
+	return 0;
+}
+
+static void timeout_await_schedule(zend_object *obj, async_op *op, async_task *caller, async_context *context, int flags)
+{
+	async_timeout *timeout;
+
+	timeout = (async_timeout *) obj;
+
+	ASYNC_APPEND_OP(&timeout->operations, op);
+}
+
+ASYNC_CALLBACK close_timeout(uv_handle_t *handle)
+{
+	async_timeout *timeout;
+
+	timeout = (async_timeout *) handle->data;
+
+	ZEND_ASSERT(timeout != NULL);
+
+	ASYNC_DELREF(&timeout->std);
+}
+
+ASYNC_CALLBACK shutdown_timeout(void *obj, zval *error)
+{
+	async_timeout *timeout;
+	async_op *op;
+
+	timeout = (async_timeout *) obj;
+
+	ZEND_ASSERT(timeout != NULL);
+
+	timeout->cancel.func = NULL;
+
+	if (error != NULL && Z_TYPE_P(&timeout->error) == IS_UNDEF) {
+		ZVAL_COPY(&timeout->error, error);
+	}
+
+	ASYNC_UV_TRY_CLOSE_REF(&timeout->std, &timeout->handle, close_timeout);
+
+	if (error != NULL) {
+		while (timeout->operations.first != NULL) {
+			ASYNC_NEXT_OP(&timeout->operations, op);
+			ASYNC_FAIL_OP(op, &timeout->error);
+		}
+	}
+}
+
+ASYNC_CALLBACK timeout_expired(uv_timer_t *handle)
+{
+	async_timeout *timeout;
+	zval error;
+
+	timeout = (async_timeout *) handle->data;
+
+	ZEND_ASSERT(timeout != NULL);
+
+	if (timeout->cancel.func != NULL) {
+		ASYNC_PREPARE_SCHEDULER_EXCEPTION(&error, async_timeout_exception_ce, "Operation timed out");
+		ASYNC_LIST_REMOVE(&timeout->scheduler->shutdown, &timeout->cancel);
+
+		timeout->cancel.func(timeout, &error);
+
+		zval_ptr_dtor(&error);
+	}
+}
+
+static async_timeout *async_timeout_object_create(uint64_t delay)
+{
+	async_timeout *timeout;
+
+	timeout = ecalloc(1, sizeof(async_timeout));
+
+	zend_object_std_init(&timeout->std, async_timeout_ce);
+	timeout->std.handlers = &async_timeout_handlers;
+
+	ZVAL_UNDEF(&timeout->error);
+
+	timeout->scheduler = async_task_scheduler_ref();
+
+	uv_timer_init(&timeout->scheduler->loop, &timeout->handle);
+	uv_unref((uv_handle_t *) &timeout->handle);
+	uv_timer_start(&timeout->handle, timeout_expired, delay, 0);
+
+	timeout->handle.data = timeout;
+
+	timeout->cancel.object = timeout;
+	timeout->cancel.func = shutdown_timeout;
+
+	ASYNC_LIST_APPEND(&timeout->scheduler->shutdown, &timeout->cancel);
+
+	return timeout;
+}
+
+static void async_timeout_object_dtor(zend_object *object)
+{
+	async_timeout *timeout;
+
+	timeout = (async_timeout *) object;
+
+	if (timeout->cancel.func != NULL) {
+		ASYNC_LIST_REMOVE(&timeout->scheduler->shutdown, &timeout->cancel);
+
+		timeout->cancel.func(timeout, NULL);
+	}
+}
+
+static void async_timeout_object_destroy(zend_object *object)
+{
+	async_timeout *timeout;
+
+	timeout = (async_timeout *) object;
+
+	zval_ptr_dtor(&timeout->error);
+
+	async_task_scheduler_unref(timeout->scheduler);
+
+	zend_object_std_dtor(&timeout->std);
+}
+
+static const zend_function_entry async_timeout_functions[] = {
+	PHP_FE_END
 };
 
 
@@ -457,7 +535,7 @@ static PHP_FUNCTION(asyncsleep)
 	
 	timer->data = scheduler;
 
-	uv_close((uv_handle_t *) timer, sleep_free_cb);
+	ASYNC_UV_CLOSE(timer, sleep_free_cb);
 
 #ifdef PHP_SLEEP_NON_VOID
 	if (UNEXPECTED(EG(exception))) {
@@ -474,14 +552,14 @@ static PHP_FUNCTION(asyncsleep)
 
 
 static const zend_function_entry empty_funcs[] = {
-	ZEND_FE_END
+	PHP_FE_END
 };
 
 void async_timer_ce_register()
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Timer", async_timer_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Timer", async_timer_functions);
 	async_timer_ce = zend_register_internal_class(&ce);
 	async_timer_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_timer_ce->create_object = async_timer_object_create;
@@ -493,10 +571,26 @@ void async_timer_ce_register()
 	async_timer_handlers.dtor_obj = async_timer_object_dtor;
 	async_timer_handlers.clone_obj = NULL;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\TimeoutException", empty_funcs);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Timeout", async_timeout_functions);
+	async_timeout_ce = zend_register_internal_class(&ce);
+	async_timeout_ce->ce_flags |= ZEND_ACC_FINAL;
+	async_timeout_ce->serialize = zend_class_serialize_deny;
+	async_timeout_ce->unserialize = zend_class_unserialize_deny;
+
+	memcpy(&async_timeout_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	async_timeout_handlers.free_obj = async_timeout_object_destroy;
+	async_timeout_handlers.dtor_obj = async_timeout_object_dtor;
+	async_timeout_handlers.clone_obj = NULL;
+
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "TimeoutException", empty_funcs);
 	async_timeout_exception_ce = zend_register_internal_class(&ce);
 
 	zend_do_inheritance(async_timeout_exception_ce, zend_ce_exception);
+
+	timeout_await_handler.delegate = timeout_await_delegate;
+	timeout_await_handler.schedule = timeout_await_schedule;
+
+	async_register_awaitable(async_timeout_ce, &timeout_await_handler);
 }
 
 void async_timer_init()
@@ -511,5 +605,3 @@ void async_timer_shutdown()
 {
 	orig_sleep->internal_function.handler = orig_sleep_handler;
 }
-
-#endif

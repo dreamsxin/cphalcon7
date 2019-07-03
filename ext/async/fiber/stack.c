@@ -21,7 +21,10 @@
 
 #include "async/core.h"
 
-#if PHALCON_USE_UV
+#ifdef HAVE_VALGRIND
+#include "valgrind/valgrind.h"
+#endif
+
 
 #include "async/async_stack.h"
 
@@ -93,5 +96,3 @@ void async_fiber_stack_free(async_fiber_stack *stack)
 		stack->pointer = NULL;
 	}
 }
-
-#endif

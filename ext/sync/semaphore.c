@@ -197,7 +197,7 @@ PHP_METHOD(Phalcon_Sync_Semaphore, lock){
 PHP_METHOD(Phalcon_Sync_Semaphore, unlock){
 
 	zval *_prevcount = NULL;
-	uint32_t prevcount;
+	uint32_t prevcount = 0;
 	phalcon_sync_semaphore_object *intern;
 
 	phalcon_fetch_params(0, 0, 1, &_prevcount);

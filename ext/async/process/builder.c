@@ -1,28 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
-
 #include "async/async_process.h"
 #include "kernel/backend.h"
 
@@ -129,7 +123,12 @@ static void async_process_builder_object_destroy(zend_object *object)
 	zend_object_std_dtor(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, __construct)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_process_builder_ctor, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, command, IS_STRING, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, __construct)
 {
 	async_process_builder *builder;
 	
@@ -193,7 +192,11 @@ static char **split_ini_settings(char *settings, int *count)
 	return ini;
 }
 
-static ZEND_METHOD(ProcessBuilder, fork)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_fork, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, fork)
 {
 	async_process_builder *builder;
 	
@@ -239,7 +242,7 @@ static ZEND_METHOD(ProcessBuilder, fork)
 	}
 	
 	// Mark new process as forked worker and setup input file.
-	ZVAL_STRING(&builder->argv[i++], "-dphalcon.async.forked=1");
+	ZVAL_STRING(&builder->argv[i++], "-dasync.forked=1");
 	ZVAL_COPY(&builder->argv[i++], file);
 	
 	builder->flags |= ASYNC_PROCESS_FLAG_IPC;
@@ -254,7 +257,11 @@ static ZEND_METHOD(ProcessBuilder, fork)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, shell)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_shell, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, interactive, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, shell)
 {
 	async_process_builder *builder;
 	
@@ -282,7 +289,11 @@ static ZEND_METHOD(ProcessBuilder, shell)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withCwd)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_cwd, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, directory, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withCwd)
 {
 	async_process_builder *builder;
 	
@@ -303,7 +314,12 @@ static ZEND_METHOD(ProcessBuilder, withCwd)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withEnv)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_env, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, env, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, inherit, _IS_BOOL, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withEnv)
 {
 	async_process_builder *builder;
 	
@@ -360,7 +376,10 @@ static ZEND_METHOD(ProcessBuilder, withEnv)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStdinPipe)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStdinPipe)
 {
 	async_process_builder *builder;
 	
@@ -373,7 +392,11 @@ static ZEND_METHOD(ProcessBuilder, withStdinPipe)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStdinInherited)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStdinInherited)
 {
 	async_process_builder *builder;
 	
@@ -396,7 +419,10 @@ static ZEND_METHOD(ProcessBuilder, withStdinInherited)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withoutStdin)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdin, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withoutStdin)
 {
 	async_process_builder *builder;
 	
@@ -409,7 +435,10 @@ static ZEND_METHOD(ProcessBuilder, withoutStdin)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStdoutPipe)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStdoutPipe)
 {
 	async_process_builder *builder;
 	
@@ -422,7 +451,11 @@ static ZEND_METHOD(ProcessBuilder, withStdoutPipe)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStdoutInherited)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStdoutInherited)
 {
 	async_process_builder *builder;
 	
@@ -445,7 +478,10 @@ static ZEND_METHOD(ProcessBuilder, withStdoutInherited)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withoutStdout)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdout, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withoutStdout)
 {
 	async_process_builder *builder;
 	
@@ -458,7 +494,10 @@ static ZEND_METHOD(ProcessBuilder, withoutStdout)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStderrPipe)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_pipe, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStderrPipe)
 {
 	async_process_builder *builder;
 	
@@ -471,7 +510,11 @@ static ZEND_METHOD(ProcessBuilder, withStderrPipe)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withStderrInherited)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_inherited, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withStderrInherited)
 {
 	async_process_builder *builder;
 	
@@ -494,7 +537,10 @@ static ZEND_METHOD(ProcessBuilder, withStderrInherited)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, withoutStderr)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stderr, 0, 0, Phalcon\\Async\\Process\\ProcessBuilder, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, withoutStderr)
 {
 	async_process_builder *builder;
 	
@@ -507,7 +553,11 @@ static ZEND_METHOD(ProcessBuilder, withoutStderr)
 	RETURN_OBJ(&builder->std);
 }
 
-static ZEND_METHOD(ProcessBuilder, execute)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, IS_LONG, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, execute)
 {
 	async_process_builder *builder;
 	
@@ -530,7 +580,11 @@ static ZEND_METHOD(ProcessBuilder, execute)
 	}
 }
 
-static ZEND_METHOD(ProcessBuilder, start)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phalcon\\Async\\Process\\Process, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ProcessBuilder, start)
 {
 	async_process_builder *builder;
 	zend_object *proc;
@@ -552,114 +606,29 @@ static ZEND_METHOD(ProcessBuilder, start)
 	}
 }
 
-static ZEND_METHOD(ProcessBuilder, daemon)
-{
-	async_process_builder *builder;
-	zend_object *proc;
-
-	uint32_t argc;
-	zval *argv;
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, -1)
-		Z_PARAM_OPTIONAL
-		Z_PARAM_VARIADIC('+', argv, argc)
-	ZEND_PARSE_PARAMETERS_END();
-
-	builder = (async_process_builder *) Z_OBJ_P(getThis());
-	builder->detached = 1;
-	proc = async_process_start(builder, argc, argv);
-	
-	if (EXPECTED(proc)) {
-		RETURN_OBJ(proc);
-	}
-}
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_process_builder_ctor, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, command, IS_STRING, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_fork, 0, 1, Phalcon\\Async\\Process\\ProcessBuilder, 0)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_shell, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, interactive, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_cwd, 0, 1, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, directory, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_env, 0, 1, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, env, IS_ARRAY, 0)
-	ZEND_ARG_TYPE_INFO(0, inherit, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdin_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdin, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stdout_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stdout, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_pipe, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_with_stderr_inherited, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-	ZEND_ARG_TYPE_INFO(0, fd, IS_LONG, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_without_stderr, 0, 0, Phalcon\\Async\\Process\\Builder, 0)
-ZEND_END_ARG_INFO()
-
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, IS_LONG, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_process_builder_execute, 0, 0, IS_LONG, NULL, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-#endif
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_process_builder_start, 0, 0, Phalcon\\Async\\Process, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, arguments, IS_STRING, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(ProcessBuilder, async_process_builder_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_process_builder_functions[] = {
-	ZEND_ME(ProcessBuilder, __construct, arginfo_process_builder_ctor, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, fork, arginfo_process_builder_fork, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(ProcessBuilder, shell, arginfo_process_builder_shell, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(ProcessBuilder, withCwd, arginfo_process_builder_with_cwd, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withEnv, arginfo_process_builder_with_env, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStdinPipe, arginfo_process_builder_with_stdin_pipe, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStdinInherited, arginfo_process_builder_with_stdin_inherited, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withoutStdin, arginfo_process_builder_without_stdin, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStdoutPipe, arginfo_process_builder_with_stdout_pipe, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStdoutInherited, arginfo_process_builder_with_stdout_inherited, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withoutStdout, arginfo_process_builder_without_stdout, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStderrPipe, arginfo_process_builder_with_stderr_pipe, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withStderrInherited, arginfo_process_builder_with_stderr_inherited, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, withoutStderr, arginfo_process_builder_without_stderr, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, execute, arginfo_process_builder_execute, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, start, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
-	ZEND_ME(ProcessBuilder, daemon, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(ProcessBuilder, __construct, arginfo_process_builder_ctor, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, fork, arginfo_process_builder_fork, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(ProcessBuilder, shell, arginfo_process_builder_shell, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(ProcessBuilder, withCwd, arginfo_process_builder_with_cwd, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withEnv, arginfo_process_builder_with_env, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStdinPipe, arginfo_process_builder_with_stdin_pipe, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStdinInherited, arginfo_process_builder_with_stdin_inherited, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withoutStdin, arginfo_process_builder_without_stdin, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStdoutPipe, arginfo_process_builder_with_stdout_pipe, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStdoutInherited, arginfo_process_builder_with_stdout_inherited, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withoutStdout, arginfo_process_builder_without_stdout, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStderrPipe, arginfo_process_builder_with_stderr_pipe, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withStderrInherited, arginfo_process_builder_with_stderr_inherited, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, withoutStderr, arginfo_process_builder_without_stderr, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, execute, arginfo_process_builder_execute, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, start, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -667,7 +636,7 @@ void async_process_builder_ce_register()
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Process\\Builder", async_process_builder_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Process", "ProcessBuilder", async_process_builder_functions);
 	async_process_builder_ce = zend_register_internal_class(&ce);
 	async_process_builder_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_process_builder_ce->create_object = async_process_builder_object_create;
@@ -682,5 +651,3 @@ void async_process_builder_ce_register()
 	ASYNC_PROCESS_BUILDER_CONST("STDOUT", ASYNC_PROCESS_STDOUT);
 	ASYNC_PROCESS_BUILDER_CONST("STDERR", ASYNC_PROCESS_STDERR);
 }
-
-#endif /* PHALCON_USE_UV */

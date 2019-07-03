@@ -1,28 +1,24 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #ifndef ASYNC_SSL_H
 #define ASYNC_SSL_H
 
-#include "async/core.h"
 #include "async/async_buffer.h"
 
 #define ASYNC_SSL_MODE_SERVER 0
@@ -42,7 +38,7 @@
 #define BIO_TYPE_PHP (98 | BIO_TYPE_SOURCE_SINK)
 #define ASYNC_SSL_BIO_OVERHEAD (2 * sizeof(size_t))
 
-typedef struct {
+typedef struct _async_ssl_bio_php {
 	size_t size;
 	size_t len;
 	char buf[1];
@@ -93,7 +89,7 @@ static zend_always_inline void async_ssl_bio_expose_buffer(BIO *b, char **buf, u
 
 #endif
 
-typedef struct {
+typedef struct _async_ssl_settings {
 	/* SSL mode (ASYNC_SSL_MODE_SERVER or ASYNC_SSL_MODE_CLIENT). */
 	zend_bool mode;
 
@@ -110,13 +106,13 @@ typedef struct {
 	int verify_depth;
 } async_ssl_settings;
 
-typedef struct {
+typedef struct _async_ssl_op {
 	async_op base;
 	int uv_error;
 	int ssl_error;
 } async_ssl_op;
 
-typedef struct {
+typedef struct _async_ssl_handshake_data {
 	async_ssl_settings *settings;
 	zend_string *host;
 	int uv_error;
@@ -124,7 +120,7 @@ typedef struct {
 	zend_string *error;
 } async_ssl_handshake_data;
 
-typedef struct {
+typedef struct _async_ssl_engine {
 #ifdef HAVE_ASYNC_SSL
 	/* SSL context.*/
 	SSL_CTX *ctx;
@@ -166,12 +162,12 @@ struct _async_tls_cert {
 #endif
 };
 
-typedef struct {
+typedef struct _async_tls_cert_list {
 	async_tls_cert *first;
 	async_tls_cert *last;
 } async_tls_cert_list;
 
-typedef struct {
+typedef struct _async_tls_client_encryption {
 	/* PHP object handle. */
 	zend_object std;
 
@@ -183,7 +179,7 @@ typedef struct {
 	zend_string *capath;
 } async_tls_client_encryption;
 
-typedef struct {
+typedef struct _async_tls_server_encryption {
 	/* PHP object handle. */
 	zend_object std;
 
@@ -196,15 +192,8 @@ typedef struct {
 	zend_string *capath;
 } async_tls_server_encryption;
 
-typedef struct {
-	/* PHP object handle. */
+typedef struct _async_tls_info {
 	zend_object std;
-	
-	const char *protocol;
-	const char *cipher_name;
-	int cipher_bits;
-	
-	zend_string *alpn;
 } async_tls_info;
 
 #ifdef HAVE_ASYNC_SSL

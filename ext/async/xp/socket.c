@@ -1,27 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
 
 #include "async/async_ssl.h"
 #include "async/async_xp.h"
@@ -120,12 +115,11 @@ static size_t async_xp_socket_write(php_stream *stream, const char *buf, size_t 
 	
 	ZVAL_RES(&ref, stream->res);
 	
+	memset(&write, 0, sizeof(async_stream_write_req));
+
 	write.in.len = count;
 	write.in.buffer = (char *) buf;
-	write.in.handle = NULL;
-	write.in.str = NULL;
 	write.in.ref = &ref;
-	write.in.flags = 0;
 	
 	if (UNEXPECTED(FAILURE == async_stream_write(data->astream, &write))) {
 		return 0;
@@ -192,17 +186,17 @@ static size_t async_xp_socket_read(php_stream *stream, char *buf, size_t count)
 ASYNC_CALLBACK dispose_timer(uv_handle_t *handle)
 {
 	async_xp_socket_data *data;
-
+	
 	data = (async_xp_socket_data *) handle->data;
-
+	
 	ZEND_ASSERT(data != NULL);
-
+	
 	if (data->ssl != NULL) {
 		async_xp_socket_release_ssl(data->ssl);
 	}
-
+	
 	async_task_scheduler_unref(data->scheduler);
-
+	
 	efree(data);
 }
 
@@ -231,10 +225,12 @@ ASYNC_CALLBACK close_cb(void *arg)
 		if (data->ssl != NULL) {
 			async_xp_socket_release_ssl(data->ssl);
 		}
+		
 		async_task_scheduler_unref(data->scheduler);
+		
 		efree(data);
 	} else {
-		uv_close((uv_handle_t *) &data->timer, dispose_timer);
+		ASYNC_UV_CLOSE(&data->timer, dispose_timer);
 	}
 }
 
@@ -255,10 +251,12 @@ ASYNC_CALLBACK close_dgram_cb(uv_handle_t *handle)
 		if (data->ssl != NULL) {
 			async_xp_socket_release_ssl(data->ssl);
 		}
+		
 		async_task_scheduler_unref(data->scheduler);
+		
 		efree(data);
 	} else {
-		uv_close((uv_handle_t *) &data->timer, dispose_timer);
+		ASYNC_UV_CLOSE(&data->timer, dispose_timer);
 	}
 }
 
@@ -275,9 +273,9 @@ static int async_xp_socket_close(php_stream *stream, int close_handle)
 				data->peer = NULL;
 			}
 
-			uv_close((uv_handle_t *) &data->timer, dispose_timer);
+			ASYNC_UV_CLOSE(&data->timer, dispose_timer);
 		} else {
-			uv_close(&data->handle, close_dgram_cb);
+			ASYNC_UV_CLOSE(&data->handle, close_dgram_cb);
 		}
 	} else {
 		async_stream_close_cb(data->astream, close_cb, data);
@@ -689,7 +687,7 @@ static int async_xp_socket_set_option(php_stream *stream, int option, int value,
 			
 			cipher = SSL_get_current_cipher(data->astream->ssl.ssl);
 			
-			add_assoc_string(&crypto, "protocol", (char*)SSL_get_version(data->astream->ssl.ssl));
+			add_assoc_string(&crypto, "protocol", SSL_get_version(data->astream->ssl.ssl));
 			add_assoc_string(&crypto, "cipher_name", (char *) SSL_CIPHER_get_name(cipher));
 			add_assoc_long(&crypto, "cipher_bits", SSL_CIPHER_get_bits(cipher, NULL));
 			add_assoc_string(&crypto, "cipher_version", cipher_get_version(cipher, cipher_version, 32));
@@ -797,5 +795,3 @@ php_stream_transport_factory async_xp_socket_register(const char *protocol, php_
 	
 	return prev;
 }
-
-#endif

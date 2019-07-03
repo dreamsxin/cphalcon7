@@ -2,7 +2,7 @@
 
 error_reporting(-1);
 
-$process = Phalcon\Async\Process\Builder::fork(__DIR__ . '/process/worker.php')->start();
+$process = Phalcon\Async\ProcessBuilder::fork(__DIR__ . '/process/worker.php')->start();
 $ipc = $process->getIpc();
 
 try {

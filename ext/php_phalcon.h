@@ -208,7 +208,7 @@ typedef struct _phalcon_aop_options {
 	zval *property_value;
 } phalcon_aop_options;
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 
 typedef struct _async_cancel_cb                     async_cancel_cb;
 typedef struct _async_cancellation_handler          async_cancellation_handler;
@@ -216,14 +216,11 @@ typedef struct _async_context                       async_context;
 typedef struct _async_context_cancellation          async_context_cancellation;
 typedef struct _async_context_timeout               async_context_timeout;
 typedef struct _async_context_var                   async_context_var;
-typedef struct _async_deferred                      async_deferred;
-typedef struct _async_deferred_awaitable            async_deferred_awaitable;
-typedef struct _async_deferred_custom_awaitable     async_deferred_custom_awaitable;
-typedef struct _async_deferred_state                async_deferred_state;
 typedef struct _async_fiber                         async_fiber;
 typedef struct _async_op                            async_op;
 typedef struct _async_task                          async_task;
 typedef struct _async_task_scheduler                async_task_scheduler;
+typedef struct _async_tick_event                    async_tick_event;
 
 typedef struct _phalcon_async_options {
 	/* Root fiber context used by the VM. */
@@ -238,6 +235,9 @@ typedef struct _phalcon_async_options {
 	/* Running task scheduler. */
 	async_task_scheduler *scheduler;
 
+	/* Call trace that triggered running the current scheduler. */
+	zend_execute_data *exec;
+
 	/* Current task being run. */
 	async_task *task;
 	
@@ -249,13 +249,21 @@ typedef struct _phalcon_async_options {
 	
 	/* Root context for all background contexts. */
 	async_context *background;
-	
+
 	/* Is set when the SAPI is cli. */
 	zend_bool cli;
 
 	/* Will be populated when bailout is requested. */
 	zend_bool exit;
 	
+	/* Point to the active thread (NULL when not running within worker thread). */
+	zend_object *thread;
+	
+	/* Holds a dummy awaitable object. */
+	zend_object *awaitable;
+
+	HashTable *factories;
+
 	/* INI settings. */
 	zend_bool dns_enabled;
 	zend_bool forked;
@@ -314,7 +322,7 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	phalcon_aop_options aop;
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 	/** Async */
 	phalcon_async_options async;
 #endif
@@ -334,7 +342,7 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 
 #define TXRG(v) (PHALCON_GLOBAL(xhprof).v)
 
-#ifdef PHALCON_USE_UV
+#ifdef PHALCON_USE_ASYNC
 #define ASYNC_G(v) (PHALCON_GLOBAL(async).v)
 #endif
 

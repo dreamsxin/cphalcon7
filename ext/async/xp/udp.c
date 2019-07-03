@@ -1,27 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
 
 #include "async/async_xp.h"
 
@@ -31,7 +26,7 @@ static php_stream_ops udp_socket_ops;
 #define ASYNC_XP_SOCKET_UDP_FLAG_RECEIVING (1 << 7)
 #define ASYNC_XP_SOCKET_UDP_FLAG_CONNECTED (1 << 6)
 
-typedef struct {
+typedef struct _async_xp_socket_data_udp {
 	ASYNC_XP_SOCKET_DATA_BASE
     uv_udp_t handle;
     php_sockaddr_storage dest;
@@ -39,7 +34,7 @@ typedef struct {
     async_op_list receivers;
 } async_xp_socket_data_udp;
 
-typedef struct {
+typedef struct _async_xp_udp_receive_op {
 	async_op base;
 	int code;
 	unsigned int flags;
@@ -449,5 +444,3 @@ void async_udp_socket_shutdown()
 		php_stream_xport_register("udp", orig_udp_factory);
 	}
 }
-
-#endif

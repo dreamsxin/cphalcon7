@@ -1,27 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
 
 #include "async/async_fiber.h"
 #include "async/async_stack.h"
@@ -31,7 +26,7 @@
 static int counter = 0;
 static size_t record_size = 0;
 
-typedef struct {
+typedef struct _async_fiber_ucontext {
 	ucontext_t ctx;
 	async_fiber_stack stack;
 	int id;
@@ -39,7 +34,7 @@ typedef struct {
 	zend_bool root;
 } async_fiber_ucontext;
 
-typedef struct {
+typedef struct _async_fiber_record_ucontext {
 	async_fiber_ucontext *fiber;
 	async_fiber_cb func;
 	void *arg;
@@ -198,21 +193,14 @@ void async_fiber_switch(async_task_scheduler *scheduler, async_fiber *next, asyn
 	
 	current = ASYNC_G(fiber);
 	
-	if (current == NULL) {
-		current = ASYNC_G(root);
-	}
-	
 	ZEND_ASSERT(current != NULL);
-	
-	if (UNEXPECTED(current == next)) {
-		return;
-	}
 
 	from = (async_fiber_ucontext *) current;
 	to = (async_fiber_ucontext *) next;
 
 	ZEND_ASSERT(from->initialized);
 	ZEND_ASSERT(to->initialized);
+	ZEND_ASSERT(from != to);
 	
 	if (EXPECTED(!(current->flags & ASYNC_FIBER_FLAG_QUEUED))) {
 		switch (suspend) {
@@ -233,10 +221,8 @@ void async_fiber_switch(async_task_scheduler *scheduler, async_fiber *next, asyn
 	
 	async_fiber_capture_state(current);	
 	ASYNC_G(fiber) = next;
-
+	
 	ASYNC_CHECK_FATAL(-1 == swapcontext(&from->ctx, &to->ctx), "Failed to switch fiber context");
 	
 	async_fiber_restore_state(current);
 }
-
-#endif

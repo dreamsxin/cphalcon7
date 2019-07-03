@@ -1,28 +1,23 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
-
+#include "async/async_helper.h"
 #include "async/async_ssl.h"
 #include "kernel/backend.h"
 
@@ -34,6 +29,21 @@ static zend_object_handlers async_tls_client_encryption_handlers;
 static zend_object_handlers async_tls_server_encryption_handlers;
 static zend_object_handlers async_tls_info_handlers;
 
+static zend_string *str_protocol;
+static zend_string *str_cipher_name;
+static zend_string *str_cipher_bits;
+static zend_string *str_alpn_protocol;
+
+
+static zend_always_inline async_tls_info *async_tls_info_obj(zend_object *object)
+{
+	return (async_tls_info *)((char *) object - XtOffsetOf(async_tls_info, std));
+}
+
+static zend_always_inline uint32_t async_tls_info_prop_offset(zend_string *name)
+{
+	return zend_get_property_info(async_tls_info_ce, name, 1)->offset;
+}
 
 static zend_always_inline zend_string *create_alpn_proto_list(zval *protos, uint32_t count)
 {
@@ -174,7 +184,11 @@ static void async_tls_client_encryption_object_destroy(zend_object *object)
 	zend_object_std_dtor(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withAllowSelfSigned)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_allow_self_signed, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, allow, _IS_BOOL, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withAllowSelfSigned)
 {
 	async_tls_client_encryption *encryption;
 
@@ -190,7 +204,11 @@ ZEND_METHOD(TlsClientEncryption, withAllowSelfSigned)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withVerifyDepth)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_verify_depth, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, depth, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withVerifyDepth)
 {
 	async_tls_client_encryption *encryption;
 
@@ -208,7 +226,11 @@ ZEND_METHOD(TlsClientEncryption, withVerifyDepth)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withPeerName)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_peer_name, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withPeerName)
 {
 	async_tls_client_encryption *encryption;
 
@@ -229,7 +251,11 @@ ZEND_METHOD(TlsClientEncryption, withPeerName)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withAlpnProtocols)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_alpn_protocols, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, protocols, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withAlpnProtocols)
 {
 	async_tls_client_encryption *encryption;
 
@@ -253,7 +279,11 @@ ZEND_METHOD(TlsClientEncryption, withAlpnProtocols)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withCertificateAuthorityPath)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_capath, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withCertificateAuthorityPath)
 {
 	async_tls_client_encryption *encryption;
 	
@@ -274,7 +304,11 @@ ZEND_METHOD(TlsClientEncryption, withCertificateAuthorityPath)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsClientEncryption, withCertificateAuthorityFile)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_cafile, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsClientEncryption, withCertificateAuthorityFile)
 {
 	async_tls_client_encryption *encryption;
 		
@@ -298,64 +332,19 @@ ZEND_METHOD(TlsClientEncryption, withCertificateAuthorityFile)
 	RETURN_OBJ(&encryption->std);
 }
 
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_allow_self_signed, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, allow, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_verify_depth, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, depth, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_peer_name, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_alpn_protocols, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, protocols, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_capath, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_client_encryption_with_cafile, 0, 1, Phalcon\\Async\\Network\\TlsClientEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_allow_self_signed, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_TYPE_INFO(0, allow, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_verify_depth, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_TYPE_INFO(0, depth, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_peer_name, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_alpn_protocols, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, protocols, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_capath, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_tls_client_encryption_with_cafile, 0, 1, IS_OBJECT, "Phalcon\\Async\\Network\\TlsClientEncryption", 0)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-#endif
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(TlsClientEncryption, async_tls_client_encryption_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_tls_client_encryption_functions[] = {
-	ZEND_ME(TlsClientEncryption, withAllowSelfSigned, arginfo_tls_client_encryption_with_allow_self_signed, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsClientEncryption, withVerifyDepth, arginfo_tls_client_encryption_with_verify_depth, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsClientEncryption, withPeerName, arginfo_tls_client_encryption_with_peer_name, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsClientEncryption, withAlpnProtocols, arginfo_tls_client_encryption_with_alpn_protocols, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsClientEncryption, withCertificateAuthorityPath, arginfo_tls_client_encryption_with_capath, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsClientEncryption, withCertificateAuthorityFile, arginfo_tls_client_encryption_with_cafile, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(TlsClientEncryption, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withAllowSelfSigned, arginfo_tls_client_encryption_with_allow_self_signed, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withVerifyDepth, arginfo_tls_client_encryption_with_verify_depth, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withPeerName, arginfo_tls_client_encryption_with_peer_name, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withAlpnProtocols, arginfo_tls_client_encryption_with_alpn_protocols, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withCertificateAuthorityPath, arginfo_tls_client_encryption_with_capath, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsClientEncryption, withCertificateAuthorityFile, arginfo_tls_client_encryption_with_cafile, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -436,7 +425,13 @@ static void async_tls_server_encryption_object_destroy(zend_object *object)
 	zend_object_std_dtor(&encryption->std);
 }
 
-ZEND_METHOD(TlsServerEncryption, withDefaultCertificate)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_default_certificate, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, cert, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, passphrase, IS_STRING, 1)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsServerEncryption, withDefaultCertificate)
 {
 	async_tls_server_encryption *encryption;
 
@@ -478,7 +473,14 @@ ZEND_METHOD(TlsServerEncryption, withDefaultCertificate)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsServerEncryption, withCertificate)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_certificate, 0, 2, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, cert, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, passphrase, IS_STRING, 1)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsServerEncryption, withCertificate)
 {
 	async_tls_server_encryption *encryption;
 	async_tls_cert *cert;
@@ -564,7 +566,11 @@ ZEND_METHOD(TlsServerEncryption, withCertificate)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsServerEncryption, withAlpnProtocols)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_alpn_protocols, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, protocols, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsServerEncryption, withAlpnProtocols)
 {
 	async_tls_server_encryption *encryption;
 
@@ -583,7 +589,11 @@ ZEND_METHOD(TlsServerEncryption, withAlpnProtocols)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsServerEncryption, withCertificateAuthorityPath)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_capath, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsServerEncryption, withCertificateAuthorityPath)
 {
 	async_tls_server_encryption *encryption;
 		
@@ -604,7 +614,11 @@ ZEND_METHOD(TlsServerEncryption, withCertificateAuthorityPath)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_METHOD(TlsServerEncryption, withCertificateAuthorityFile)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_cafile, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
+	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(TlsServerEncryption, withCertificateAuthorityFile)
 {
 	async_tls_server_encryption *encryption;
 		
@@ -628,38 +642,18 @@ ZEND_METHOD(TlsServerEncryption, withCertificateAuthorityFile)
 	RETURN_OBJ(&encryption->std);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_default_certificate, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, cert, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, passphrase, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_certificate, 0, 2, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, host, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, cert, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 1)
-	ZEND_ARG_TYPE_INFO(0, passphrase, IS_STRING, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_alpn_protocols, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
-	ZEND_ARG_VARIADIC_TYPE_INFO(0, protocols, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_capath, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_tls_server_encryption_with_cafile, 0, 1, Phalcon\\Async\\Network\\TlsServerEncryption, 0)
-	ZEND_ARG_TYPE_INFO(0, file, IS_STRING, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(TlsServerEncryption, async_tls_server_encryption_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_tls_server_encryption_functions[] = {
-	ZEND_ME(TlsServerEncryption, withDefaultCertificate, arginfo_tls_server_encryption_with_default_certificate, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsServerEncryption, withCertificate, arginfo_tls_server_encryption_with_certificate, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsServerEncryption, withAlpnProtocols, arginfo_tls_server_encryption_with_alpn_protocols, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsServerEncryption, withCertificateAuthorityPath, arginfo_tls_server_encryption_with_capath, ZEND_ACC_PUBLIC)
-	ZEND_ME(TlsServerEncryption, withCertificateAuthorityFile, arginfo_tls_server_encryption_with_cafile, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(TlsServerEncryption, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsServerEncryption, withDefaultCertificate, arginfo_tls_server_encryption_with_default_certificate, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsServerEncryption, withCertificate, arginfo_tls_server_encryption_with_certificate, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsServerEncryption, withAlpnProtocols, arginfo_tls_server_encryption_with_alpn_protocols, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsServerEncryption, withCertificateAuthorityPath, arginfo_tls_server_encryption_with_capath, ZEND_ACC_PUBLIC)
+	PHP_ME(TlsServerEncryption, withCertificateAuthorityFile, arginfo_tls_server_encryption_with_cafile, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 #ifdef HAVE_ASYNC_SSL
@@ -670,16 +664,18 @@ async_tls_info *async_tls_info_object_create(SSL *ssl)
 	
 	const SSL_CIPHER *cipher;
 
-	info = ecalloc(1, sizeof(async_tls_info));
+	info = ecalloc(1, sizeof(async_tls_info) + zend_object_properties_size(async_tls_info_ce));
 
 	zend_object_std_init(&info->std, async_tls_info_ce);
 	info->std.handlers = &async_tls_info_handlers;
 	
+	object_properties_init(&info->std, async_tls_info_ce);
+
 	cipher = SSL_get_current_cipher(ssl);
 	
-	info->protocol = SSL_get_version(ssl);
-	info->cipher_name = SSL_CIPHER_get_name(cipher);
-	info->cipher_bits = SSL_CIPHER_get_bits(cipher, NULL);
+	ZVAL_STRING(OBJ_PROP(&info->std, async_tls_info_prop_offset(str_protocol)), SSL_get_version(ssl));
+	ZVAL_STRING(OBJ_PROP(&info->std, async_tls_info_prop_offset(str_cipher_name)), SSL_CIPHER_get_name(cipher));
+	ZVAL_LONG(OBJ_PROP(&info->std, async_tls_info_prop_offset(str_cipher_bits)), SSL_CIPHER_get_bits(cipher, NULL));
 	
 #ifdef ASYNC_TLS_ALPN
 	const unsigned char *protos;
@@ -688,7 +684,7 @@ async_tls_info *async_tls_info_object_create(SSL *ssl)
 	SSL_get0_alpn_selected(ssl, &protos, &plen);
 			
 	if (plen > 0) {
-		info->alpn = zend_string_init((char *) protos, plen, 0);
+		ZVAL_STRINGL(OBJ_PROP(&info->std, async_tls_info_prop_offset(str_alpn_protocol)), (char *) protos, plen);
 	}
 #endif
 
@@ -701,103 +697,31 @@ static void async_tls_info_object_destroy(zend_object *object)
 {
 	async_tls_info *info;
 	
-	info = (async_tls_info *) object;
-	
-#ifdef ASYNC_TLS_ALPN
-	if (info->alpn != NULL) {
-		zend_string_release(info->alpn);
-	}
-#endif
+	info = async_tls_info_obj(object);
 	
 	zend_object_std_dtor(&info->std);
 }
 
-static zval *read_info_property(zval *object, zval *member, int type, void **cache_slot, zval *rv)
-{
-	async_tls_info *info;
-	
-	char *key;
-	
-	info = (async_tls_info *) Z_OBJ_P(object);
-	
-	key = Z_STRVAL_P(member);
-	
-	if (strcmp(key, "protocol") == 0) {
-		ZVAL_STRING(rv, info->protocol);
-	} else if (strcmp(key, "cipher_name") == 0) {
-		ZVAL_STRING(rv, info->cipher_name);
-	} else if (strcmp(key, "cipher_bits") == 0) {
-		ZVAL_LONG(rv, info->cipher_bits);
-	} else if (strcmp(key, "alpn_protocol") == 0) {
-		if (info->alpn == NULL) {
-			ZVAL_NULL(rv);
-		} else {
-			ZVAL_STR_COPY(rv, info->alpn);
-		}
-	} else {
-		rv = &EG(uninitialized_zval);
-	}
-	
-	return rv;
-}
-
-static int has_info_property(zval *object, zval *member, int has_set_exists, void **cache_slot)
-{
-	zval rv;
-	zval *val;
-
-    val = read_info_property(object, member, 0, cache_slot, &rv);
-    
-    if (val == &EG(uninitialized_zval)) {
-    	return 0;
-    }
-    
-    switch (has_set_exists) {
-    	case ZEND_PROPERTY_EXISTS:
-    	case ZEND_PROPERTY_ISSET:
-    		zval_ptr_dtor(val);
-    		return 1;
-    }
-    
-    convert_to_boolean(val);
-    
-    return (Z_TYPE_P(val) == IS_TRUE) ? 1 : 0;
-}
-
-ZEND_METHOD(TlsInfo, __debugInfo)
-{
-	async_tls_info *info;
-	
-	info = (async_tls_info *) Z_OBJ_P(getThis());
-	
-	if (USED_RET()) {
-		array_init(return_value);
-		
-		add_assoc_string(return_value, "protocol", (char *)info->protocol);
-		add_assoc_string(return_value, "cipher_name", (char *)info->cipher_name);
-		add_assoc_long(return_value, "cipher_bits", info->cipher_bits);
-		
-		if (info->alpn == NULL) {
-			add_assoc_null(return_value, "alpn_protocol");
-		} else {
-			add_assoc_str(return_value, "alpn_protocol", zend_string_copy(info->alpn));
-		}
-	}
-}
-
-ZEND_BEGIN_ARG_INFO(arginfo_tls_info_debug_info, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(TlsInfo, async_tls_info_ce)
+ASYNC_METHOD_NO_WAKEUP(TlsInfo, async_tls_info_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_tls_info_functions[] = {
-	ZEND_ME(TlsInfo, __debugInfo, arginfo_tls_info_debug_info, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(TlsInfo, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(TlsInfo, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 void async_ssl_ce_register()
 {
 	zend_class_entry ce;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\TlsClientEncryption", async_tls_client_encryption_functions);
+#if PHP_VERSION_ID >= 70400
+	zval tmp;
+#endif
+
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "TlsClientEncryption", async_tls_client_encryption_functions);
 	async_tls_client_encryption_ce = zend_register_internal_class(&ce);
 	async_tls_client_encryption_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_tls_client_encryption_ce->create_object = async_tls_client_encryption_object_create;
@@ -806,7 +730,7 @@ void async_ssl_ce_register()
 	async_tls_client_encryption_handlers.free_obj = async_tls_client_encryption_object_destroy;
 	async_tls_client_encryption_handlers.clone_obj = NULL;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\TlsServerEncryption", async_tls_server_encryption_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "TlsServerEncryption", async_tls_server_encryption_functions);
 	async_tls_server_encryption_ce = zend_register_internal_class(&ce);
 	async_tls_server_encryption_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_tls_server_encryption_ce->create_object = async_tls_server_encryption_object_create;
@@ -815,20 +739,49 @@ void async_ssl_ce_register()
 	async_tls_server_encryption_handlers.free_obj = async_tls_server_encryption_object_destroy;
 	async_tls_server_encryption_handlers.clone_obj = NULL;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Network\\TlsInfo", async_tls_info_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "TlsInfo", async_tls_info_functions);
 	async_tls_info_ce = zend_register_internal_class(&ce);
 	async_tls_info_ce->ce_flags |= ZEND_ACC_FINAL;
 
 	memcpy(&async_tls_info_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	async_tls_info_handlers.offset = XtOffsetOf(async_tls_info, std);
 	async_tls_info_handlers.free_obj = async_tls_info_object_destroy;
 	async_tls_info_handlers.clone_obj = NULL;
-	async_tls_info_handlers.has_property = has_info_property;
-	async_tls_info_handlers.read_property = read_info_property;
+	async_tls_info_handlers.write_property = async_prop_write_handler_readonly;
 	
+	str_protocol = zend_new_interned_string(zend_string_init(ZEND_STRL("protocol"), 1));
+	str_cipher_name = zend_new_interned_string(zend_string_init(ZEND_STRL("cipher_name"), 1));
+	str_cipher_bits = zend_new_interned_string(zend_string_init(ZEND_STRL("cipher_bits"), 1));
+	str_alpn_protocol = zend_new_interned_string(zend_string_init(ZEND_STRL("alpn_protocol"), 1));
+
+#if PHP_VERSION_ID < 70400
+	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("protocol"), ZEND_ACC_PUBLIC);
+	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("cipher_name"), ZEND_ACC_PUBLIC);
+	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("cipher_bits"), ZEND_ACC_PUBLIC);
+	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("alpn_protocol"), ZEND_ACC_PUBLIC);
+#else
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_tls_info_ce, str_protocol, &tmp, ZEND_ACC_PUBLIC, NULL, IS_STRING);
+	zend_declare_typed_property(async_tls_info_ce, str_cipher_name, &tmp, ZEND_ACC_PUBLIC, NULL, IS_STRING);
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_LONG(&tmp, 0);
+	zend_declare_typed_property(async_tls_info_ce, str_cipher_bits, &tmp, ZEND_ACC_PUBLIC, NULL, IS_LONG);
+
+	ZVAL_NULL(&tmp);
+	zend_declare_typed_property(async_tls_info_ce, str_alpn_protocol, &tmp, ZEND_ACC_PUBLIC, NULL, ZEND_TYPE_ENCODE(IS_STRING, 1));
+#endif
+
 #ifdef HAVE_ASYNC_SSL
 	async_ssl_bio_init();
 	async_ssl_engine_init();
 #endif
 }
 
-#endif /* PHALCON_USE_UV */
+void async_ssl_ce_unregister()
+{
+	zend_string_release(str_protocol);
+	zend_string_release(str_cipher_name);
+	zend_string_release(str_cipher_bits);
+	zend_string_release(str_alpn_protocol);
+}

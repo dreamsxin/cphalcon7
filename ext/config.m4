@@ -11,8 +11,11 @@ else
 	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
 
-PHP_ARG_ENABLE(openssl, whether to enable openssl support,
-[  --enable-openssl   Enable openssl support], no, no)
+PHP_ARG_ENABLE(async, Whether to enable "async" support,
+[ --enable-async          Enable "async" support], yes, no)
+
+PHP_ARG_WITH(openssl, OpenSSL dir for "async",
+[ --with-openssl[=DIR] Openssl dev lib directory], no, no)
 
 PHP_ARG_WITH(openssl-dir, OpenSSL dir for "async",
 [ --with-openssl-dir[=DIR] Openssl install prefix], no, no)
@@ -170,24 +173,6 @@ PHP_ARG_ENABLE(server, whether to enable server support,
 if test "$PHP_SERVER" = "yes"; then
 	AC_DEFINE([PHALCON_SERVER], [1], [Whether server are available])
 	AC_MSG_RESULT([yes, server])
-else
-	AC_MSG_RESULT([no])
-fi
-
-PHP_ARG_ENABLE(uv, whether to enable libuv support,
-[  --enable-uv   Enable libuv support], yes, no)
-
-if test "$PHP_UV" = "yes"; then
-	AC_MSG_RESULT([yes, libuv])
-else
-	AC_MSG_RESULT([no])
-fi
-
-PHP_ARG_ENABLE(async, whether to enable async support,
-[  --enable-async   Enable async support], yes, no)
-
-if test "$PHP_ASYNC" = "yes"; then
-	AC_MSG_RESULT([yes, async])
 else
 	AC_MSG_RESULT([no])
 fi
@@ -904,34 +889,6 @@ image/adapter/gd.c \
 image/adapter/imagick.c \
 registry.c \
 async.c \
-async/core.c \
-async/channel.c \
-async/console.c \
-async/context.c \
-async/deferred.c \
-async/dns.c \
-async/fiber/stack.c \
-async/filesystem.c \
-async/pipe.c \
-async/process/builder.c \
-async/process/env.c \
-async/process/runner.c \
-async/socket.c \
-async/ssl/api.c \
-async/ssl/bio.c \
-async/ssl/engine.c \
-async/stream.c \
-async/sync.c \
-async/task.c \
-async/tcp.c \
-async/udp.c \
-async/watcher/monitor.c \
-async/watcher/poll.c \
-async/watcher/signal.c \
-async/watcher/timer.c \
-async/xp/socket.c \
-async/xp/tcp.c \
-async/xp/udp.c \
 thread/exception.c \
 thread/pool.c \
 chart/exception.c \
@@ -1265,25 +1222,6 @@ aop.c"
 		fi
 	fi
 
-	if test "$PHP_OPENSSL" != "no"; then
-		AC_CHECK_HEADER(openssl/evp.h, [
-			PHP_OPENSSL='yes'
-		], [
-			PHP_OPENSSL='no'
-		])
-	fi
-
-	if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
-		PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
-			AC_MSG_CHECKING(for SSL support)
-			AC_MSG_RESULT(yes)
-			AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])
-		], [
-			AC_MSG_CHECKING(for SSL support)
-			AC_MSG_RESULT(no)
-		])
-	fi
-
 	async_use_asm="yes"
 	async_use_ucontext="no"
 
@@ -1301,11 +1239,42 @@ aop.c"
 	
 	AS_CASE([$host_os],
 		[darwin*], [async_os="MAC"],
-		[cygwin*], [async_os="WIN"],
-		[mingw*], [async_os="WIN"],
 		[async_os="LINUX"]
 	)
 
+	async_source_files=" \
+		async/core.c \
+		async/channel.c \
+		async/console.c \
+		async/context.c \
+		async/deferred.c \
+		async/dns.c \
+		async/event.c \
+		async/fiber/stack.c \
+		async/filesystem.c \
+		async/helper.c \
+		async/pipe.c \
+		async/process/builder.c \
+		async/process/env.c \
+		async/process/runner.c \
+		async/socket.c \
+		async/ssl/api.c \
+		async/ssl/bio.c \
+		async/ssl/engine.c \
+		async/stream.c \
+		async/sync.c \
+		async/task.c \
+		async/tcp.c \
+		async/thread.c \
+		async/udp.c \
+		async/watcher/monitor.c \
+		async/watcher/poll.c \
+		async/watcher/signal.c \
+		async/watcher/timer.c \
+		async/xp/socket.c \
+		async/xp/tcp.c \
+		async/xp/udp.c
+	"
 	if test "$async_cpu" = 'x86_64'; then
 		if test "$async_os" = 'LINUX'; then
 			async_asm_file="x86_64_sysv_elf_gas.S"
@@ -1335,66 +1304,209 @@ aop.c"
 	fi
 
 	AC_MSG_CHECKING(checking php version >= 7.1)
-	if test "$PHP_ASYNC" = "yes" && test "$PHP_UV" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
+	if test "$PHP_ASYNC" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
 		AC_MSG_RESULT(yes)
 		if test "$async_use_asm" = 'yes'; then
-			async_source_files="async/fiber/asm.c async/thirdparty/boost/asm/make_${async_asm_file} async/thirdparty/boost/asm/jump_${async_asm_file}"
+			async_source_files="$async_source_files \
+			async/fiber/asm.c \
+			async/thirdparty/boost/asm/make_${async_asm_file} \
+			async/thirdparty/boost/asm/jump_${async_asm_file}"
 		elif test "$async_use_ucontext" = 'yes'; then
-			async_source_files="async/fiber/ucontext.c"
-		else
-			async_source_files=""
+			async_source_files="$async_source_files \
+			async/fiber/ucontext.c"
 		fi
 	else
 		async_use_ucontext="no"
 	fi
 
+	if test "$PHP_OPENSSL" != "no"; then
+		AC_CHECK_HEADER(openssl/evp.h, [
+			PHP_OPENSSL='yes'
+		], [
+			PHP_OPENSSL='no'
+		])
+	fi
+
+	# Check SSL lib support.
+
+	if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
+		PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
+			AC_MSG_CHECKING(for SSL support)
+			AC_MSG_RESULT(yes)
+			AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])
+		], [
+			AC_MSG_CHECKING(for SSL support)
+			AC_MSG_RESULT(no)
+		])
+	fi
+
 	AC_MSG_CHECKING([checking libuv support])
 	if test "$async_use_ucontext" = "yes"; then
-		DIR="${srcdir}/async/thirdparty"
-		if test "$async_os" = 'LINUX' && test ! -s "${DIR}/lib/libuv.a"; then
-			AC_MSG_RESULT(no)
-			TMP=$(mktemp -d)
-			cp -r ${DIR}/libuv $TMP
-			pushd ${TMP}/libuv
-			./autogen.sh
-			./configure --disable-shared --prefix=${TMP}/build CFLAGS="$(CFLAGS) -fPIC -DPIC -g -O2"
-			make install
-			popd
-			mv ${TMP}/build/lib/libuv.a ${DIR}/lib
-			rm -rf $TMP
-		else
-			AC_MSG_RESULT(yes)
+
+		ASYNC_CFLAGS="-Wall -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
+		LDFLAGS="$LDFLAGS -lpthread"
+
+		# Embedded build of libuv because most OS package managers provide obsolete uv packages only.
+		# Code is based on "configure.ac" and "Makefile.am" shipped with libuv.
+
+		AC_CHECK_LIB([dl], [dlopen])
+		AC_CHECK_LIB([kstat], [kstat_lookup])
+		AC_CHECK_LIB([nsl], [gethostbyname])
+		AC_CHECK_LIB([perfstat], [perfstat_cpu])
+		AC_CHECK_LIB([pthread], [pthread_mutex_init])
+		AC_CHECK_LIB([rt], [clock_gettime])
+		AC_CHECK_LIB([sendfile], [sendfile])
+		AC_CHECK_LIB([socket], [socket])
+
+		AC_CHECK_HEADERS([sys/ahafs_evProds.h])
+
+		AS_CASE([$host_os],
+			[darwin*], [uv_os="MAC"],
+			[openbsd*], [uv_os="OPENBSD"],
+			[*freebsd*], [uv_os="FREEBSD"],
+			[netbsd*], [uv_os="NETBSD"],
+			[dragonfly*], [uv_os="DRAGONFLY"],
+			[solaris*], [uv_os="SUNOS"],
+			[uv_os="LINUX"]
+		)
+
+		UV_DIR="async/thirdparty/libuv"
+
+		PHP_ADD_INCLUDE("${UV_DIR}/include")
+		PHP_ADD_INCLUDE("${UV_DIR}/src")
+
+		# Base files
+		UV_SRC=" \
+			${UV_DIR}/src/fs-poll.c \
+			${UV_DIR}/src/idna.c \
+			${UV_DIR}/src/inet.c \
+			${UV_DIR}/src/strscpy.c \
+			${UV_DIR}/src/threadpool.c \
+			${UV_DIR}/src/timer.c \
+			${UV_DIR}/src/uv-data-getter-setters.c \
+			${UV_DIR}/src/uv-common.c \
+			${UV_DIR}/src/version.c
+		"
+		# UNIX files
+		UV_SRC="$UV_SRC \
+			${UV_DIR}/src/unix/async.c \
+			${UV_DIR}/src/unix/core.c \
+			${UV_DIR}/src/unix/dl.c \
+			${UV_DIR}/src/unix/fs.c \
+			${UV_DIR}/src/unix/getaddrinfo.c \
+			${UV_DIR}/src/unix/getnameinfo.c \
+			${UV_DIR}/src/unix/loop-watcher.c \
+			${UV_DIR}/src/unix/loop.c \
+			${UV_DIR}/src/unix/pipe.c \
+			${UV_DIR}/src/unix/poll.c \
+			${UV_DIR}/src/unix/process.c \
+			${UV_DIR}/src/unix/signal.c \
+			${UV_DIR}/src/unix/stream.c \
+			${UV_DIR}/src/unix/tcp.c \
+			${UV_DIR}/src/unix/thread.c \
+			${UV_DIR}/src/unix/tty.c \
+			${UV_DIR}/src/unix/udp.c
+		"
+
+		# Mac OS
+		if test "$uv_os" = 'MAC'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/bsd-ifaddrs.c \
+				${UV_DIR}/src/unix/darwin.c \
+				${UV_DIR}/src/unix/darwin-proctitle.c \
+				${UV_DIR}/src/unix/fsevents.c \
+				${UV_DIR}/src/unix/kqueue.c \
+				${UV_DIR}/src/unix/proctitle.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
+
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D_DARWIN_USE_64_BIT_INODE=1"
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D_DARWIN_UNLIMITED_SELECT=1"
 		fi
 
-		if test "$async_os" = 'LINUX' && test -s "${DIR}/lib/libuv.a"; then
-			AC_MSG_CHECKING([checking static libuv])
-			PHP_ADD_INCLUDE("${DIR}/libuv/include")
-			PHP_ADD_LIBRARY_WITH_PATH(uv, ${DIR}/lib, PHALCON_SHARED_LIBADD)
-			AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
-			phalcon_sources="$phalcon_sources $async_source_files"
-			AC_MSG_RESULT([yes, static])
-			CPPFLAGS="${CPPFLAGS} -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
-		else
-			AC_MSG_CHECKING([checking libuv support])
-			for i in /usr/local /usr; do
-				if test -r $i/include/uv.h; then
-					PHP_ADD_INCLUDE($i/include)
-					PHP_CHECK_LIBRARY(uv, uv_fs_open,
-					[
-						PHP_ADD_LIBRARY_WITH_PATH(uv, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
-						AC_DEFINE(PHALCON_USE_UV, 1, [Have uv support])
-						phalcon_sources="$phalcon_sources $async_source_files"
-					],[
-						AC_MSG_RESULT([Wrong uv version or library not found])
-					],[
-						-L$i/$PHP_LIBDIR -lpthread
-					])
-					break
-				else
-					AC_MSG_RESULT([no, found in $i])
-				fi
-			done
+		# DragonFly BSD
+		if test "$uv_os" = 'DRAGONFLY'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/bsd-ifaddrs.c \
+				${UV_DIR}/src/unix/bsd-proctitle.c \
+				${UV_DIR}/src/unix/freebsd.c \
+				${UV_DIR}/src/unix/kqueue.c \
+				${UV_DIR}/src/unix/posix-hrtime.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
 		fi
+
+		# FreeBSD
+		if test "$uv_os" = 'FREEBSD'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/bsd-ifaddrs.c \
+				${UV_DIR}/src/unix/bsd-proctitle.c \
+				${UV_DIR}/src/unix/freebsd.c \
+				${UV_DIR}/src/unix/kqueue.c \
+				${UV_DIR}/src/unix/posix-hrtime.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
+		fi
+
+		# Linux
+		if test "$uv_os" = 'LINUX'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/linux-core.c \
+				${UV_DIR}/src/unix/linux-inotify.c \
+				${UV_DIR}/src/unix/linux-syscalls.c \
+				${UV_DIR}/src/unix/procfs-exepath.c \
+				${UV_DIR}/src/unix/proctitle.c \
+				${UV_DIR}/src/unix/sysinfo-loadavg.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
+
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D_GNU_SOURCE"
+		fi
+
+		# NetBSD
+		if test "$uv_os" = 'NETBSD'; then
+			AC_CHECK_LIB([kvm], [kvm_open])
+
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/bsd-ifaddrs.c \
+				${UV_DIR}/src/unix/bsd-proctitle.c \
+				${UV_DIR}/src/unix/kqueue.c \
+				${UV_DIR}/src/unix/netbsd.c \
+				${UV_DIR}/src/unix/posix-hrtime.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
+		fi
+
+		# OpenBSD
+		if test "$uv_os" = 'OPENBSD'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/bsd-ifaddrs.c \
+				${UV_DIR}/src/unix/bsd-proctitle.c \
+				${UV_DIR}/src/unix/kqueue.c \
+				${UV_DIR}/src/unix/openbsd.c \
+				${UV_DIR}/src/unix/posix-hrtime.c
+			"
+			LDFLAGS="$LDFLAGS -lutil"
+		fi
+
+		# Solaris
+		if test "$uv_os" = 'SUNOS'; then
+			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/no-proctitle.c \
+				${UV_DIR}/src/unix/sunos.c
+			"
+
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D__EXTENSIONS__"
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D_XOPEN_SOURCE=500"
+			ASYNC_CFLAGS="$ASYNC_CFLAGS -D_REENTRANT"
+		fi
+
+		AS_CASE([$host_os], [kfreebsd*], [
+			LDFLAGS="$LDFLAGS -lfreebsd-glue"
+		])
+
+		phalcon_sources="$phalcon_sources $async_source_files $UV_SRC"
+		AC_DEFINE(PHALCON_USE_ASYNC, 1, [Have async support])
 	fi
 
 	if test "$PHP_WEBSOCKET" = "yes"; then
@@ -1642,9 +1754,10 @@ aop.c"
 
 	fi
 
-	PHP_SUBST(PHALCON_SHARED_LIBADD)
 
-	PHP_NEW_EXTENSION(phalcon, $phalcon_sources, $ext_shared)
+	PHP_NEW_EXTENSION(phalcon, $phalcon_sources, $ext_shared,, \\$(ASYNC_CFLAGS))
+	PHP_SUBST(ASYNC_CFLAGS)
+	PHP_SUBST(PHALCON_SHARED_LIBADD)
 	PHP_ADD_EXTENSION_DEP([phalcon], [spl])
 	PHP_ADD_EXTENSION_DEP([phalcon], [date])
 

@@ -1,21 +1,19 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #ifndef PHALCON_ASYNC_CORE_H
@@ -24,7 +22,23 @@
 #include "php_phalcon.h"
 #include "kernel/memory.h"
 
-# if PHALCON_USE_UV
+#include <Zend/zend_inheritance.h>
+
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
+#ifdef PHP_WIN32
+#include <Winsock2.h>
+#include <Mswsock.h>
+#include <psapi.h>
+#include <Iphlpapi.h>
+
+#undef HAVE_ASYNC_SSL
+#define HAVE_ASYNC_SSL 1
+
+#endif
+
 #ifdef HAVE_ASYNC_SSL
 #include <openssl/opensslv.h>
 #include <openssl/bio.h>
@@ -35,7 +49,9 @@
 #include <openssl/x509v3.h>
 #endif
 
-#include <uv.h>
+
+#include "uv.h"
+#include "php.h"
 
 #ifdef PHP_WIN32
 #define ASYNC_API __declspec(dllexport)
@@ -46,6 +62,10 @@
 #endif
 
 #define ASYNC_CALLBACK static void
+
+#ifdef ZTS
+#include "TSRM.h"
+#endif
 
 #ifdef PHP_WIN32
 typedef ULONG uv_buf_size_t;
@@ -63,53 +83,37 @@ typedef size_t uv_buf_size_t;
 #define ASYNC_STRP(target, message) target = zend_string_init(message, sizeof(message)-1, 1)
 
 #define ASYNC_STRF(target, message, ...) do { \
-	char *buf; \
-	int len; \
-	len = ap_php_asprintf(&buf, message ASYNC_VA_ARGS(__VA_ARGS__)); \
-	target = zend_string_init(buf, len, 0); \
-	free(buf); \
+	char *_buf; \
+	int _len; \
+	_len = ap_php_asprintf(&_buf, message ASYNC_VA_ARGS(__VA_ARGS__)); \
+	target = zend_string_init(_buf, _len, 0); \
+	free(_buf); \
 } while (0)
 
+#include "zend.h"
+#include "zend_API.h"
+#include "zend_vm.h"
+#include "zend_interfaces.h"
+#include "zend_exceptions.h"
+#include "zend_closures.h"
+
 #ifdef PHP_WIN32
-#include <win32/winutil.h>
+#include "win32/winutil.h"
 #endif
-#include <php_network.h>
-#include <php_streams.h>
 
-#include <Zend/zend_exceptions.h>
-#include <Zend/zend_interfaces.h>
-#include <Zend/zend_inheritance.h>
-#include <Zend/zend_vm.h>
+#include "php_network.h"
+#include "php_streams.h"
 
-#if !defined(PHP_WIN32) || (defined(PHALCON_USE_PHP_SOCKETS) && !defined(COMPILE_DL_SOCKETS))
+#if defined(HAVE_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
 #define ASYNC_SOCKETS 1
-#else
-#define ASYNC_SOCKETS 0
-#endif
-
-#if defined(PHALCON_USE_PHP_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
-#include <ext/sockets/php_sockets.h>
+#include "ext/sockets/php_sockets.h"
 #elif !defined(PHP_WIN32)
-typedef struct {
+#define ASYNC_SOCKETS 0
+typedef struct _php_socket {
 	int bsd_socket;
 } php_socket;
-#endif
-
-/* PHP 7.3 */
-
-#if PHP_VERSION_ID < 70200
-/* zend_internal_function_handler */
-typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
-#endif
-
-#ifndef ZEND_PARSE_PARAMETERS_NONE
-#define ZEND_PARSE_PARAMETERS_NONE() 
-#endif
-
-#ifndef ZEND_PROPERTY_EXISTS
-#define ZEND_PROPERTY_ISSET     0x0          /* Property exists and is not NULL */
-#define ZEND_PROPERTY_NOT_EMPTY ZEND_ISEMPTY /* Property is not empty */
-#define ZEND_PROPERTY_EXISTS    0x2          /* Property exists */
+#else
+#define ASYNC_SOCKETS 0
 #endif
 
 #define ASYNC_OP_PENDING 0
@@ -142,6 +146,7 @@ typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #endif
 
 ASYNC_API extern zend_class_entry *async_awaitable_ce;
+ASYNC_API extern zend_class_entry *async_awaitable_impl_ce;
 ASYNC_API extern zend_class_entry *async_cancellation_exception_ce;
 ASYNC_API extern zend_class_entry *async_cancellation_handler_ce;
 ASYNC_API extern zend_class_entry *async_channel_ce;
@@ -149,22 +154,29 @@ ASYNC_API extern zend_class_entry *async_channel_closed_exception_ce;
 ASYNC_API extern zend_class_entry *async_channel_group_ce;
 ASYNC_API extern zend_class_entry *async_channel_iterator_ce;
 ASYNC_API extern zend_class_entry *async_channel_select_ce;
+ASYNC_API extern zend_class_entry *async_component_ce;
 ASYNC_API extern zend_class_entry *async_context_ce;
 ASYNC_API extern zend_class_entry *async_context_var_ce;
 ASYNC_API extern zend_class_entry *async_deferred_ce;
 ASYNC_API extern zend_class_entry *async_deferred_awaitable_ce;
+ASYNC_API extern zend_class_entry *async_dns_config_ce;
+ASYNC_API extern zend_class_entry *async_dns_query_ce;
+ASYNC_API extern zend_class_entry *async_dns_resolver_ce;
 ASYNC_API extern zend_class_entry *async_duplex_stream_ce;
+ASYNC_API extern zend_class_entry *async_job_failed_ce;
 ASYNC_API extern zend_class_entry *async_monitor_ce;
 ASYNC_API extern zend_class_entry *async_monitor_event_ce;
 ASYNC_API extern zend_class_entry *async_pending_read_exception_ce;
 ASYNC_API extern zend_class_entry *async_pipe_ce;
 ASYNC_API extern zend_class_entry *async_pipe_server_ce;
 ASYNC_API extern zend_class_entry *async_poll_ce;
+ASYNC_API extern zend_class_entry *async_poll_event_ce;
 ASYNC_API extern zend_class_entry *async_process_builder_ce;
 ASYNC_API extern zend_class_entry *async_process_ce;
 ASYNC_API extern zend_class_entry *async_readable_console_stream_ce;
 ASYNC_API extern zend_class_entry *async_readable_pipe_ce;
 ASYNC_API extern zend_class_entry *async_readable_process_pipe_ce;
+ASYNC_API extern zend_class_entry *async_readable_memory_stream_ce;
 ASYNC_API extern zend_class_entry *async_readable_stream_ce;
 ASYNC_API extern zend_class_entry *async_server_ce;
 ASYNC_API extern zend_class_entry *async_socket_ce;
@@ -185,98 +197,46 @@ ASYNC_API extern zend_class_entry *async_task_ce;
 ASYNC_API extern zend_class_entry *async_task_scheduler_ce;
 ASYNC_API extern zend_class_entry *async_tcp_server_ce;
 ASYNC_API extern zend_class_entry *async_tcp_socket_ce;
+ASYNC_API extern zend_class_entry *async_thread_pool_ce;
 ASYNC_API extern zend_class_entry *async_tls_client_encryption_ce;
 ASYNC_API extern zend_class_entry *async_tls_info_ce;
 ASYNC_API extern zend_class_entry *async_tls_server_encryption_ce;
+ASYNC_API extern zend_class_entry *async_tick_event_ce;
+ASYNC_API extern zend_class_entry *async_timeout_ce;
 ASYNC_API extern zend_class_entry *async_timeout_exception_ce;
 ASYNC_API extern zend_class_entry *async_timer_ce;
+ASYNC_API extern zend_class_entry *async_timer_event_ce;
 ASYNC_API extern zend_class_entry *async_udp_datagram_ce;
 ASYNC_API extern zend_class_entry *async_udp_socket_ce;
 ASYNC_API extern zend_class_entry *async_writable_console_stream_ce;
 ASYNC_API extern zend_class_entry *async_writable_pipe_ce;
 ASYNC_API extern zend_class_entry *async_writable_process_pipe_ce;
+ASYNC_API extern zend_class_entry *async_writable_memory_stream_ce;
 ASYNC_API extern zend_class_entry *async_writable_stream_ce;
 
-void async_awaitable_ce_register();
-void async_channel_ce_register();
-void async_console_ce_register();
-void async_context_ce_register();
-void async_deferred_ce_register();
-void async_dns_ce_register();
-void async_monitor_ce_register();
-void async_pipe_ce_register();
-void async_poll_ce_register();
-void async_process_ce_register();
-void async_signal_ce_register();
-void async_socket_ce_register();
-void async_ssl_ce_register();
-void async_stream_ce_register();
-void async_sync_init();
-void async_task_ce_register();
-void async_tcp_ce_register();
-void async_timer_ce_register();
-void async_udp_socket_ce_register();
-
-void async_channel_ce_unregister();
-void async_monitor_ce_unregister();
-void async_task_ce_unregister();
-
-void async_context_init();
-void async_dns_init();
-void async_filesystem_init();
-void async_tcp_socket_init();
-void async_task_scheduler_init();
-void async_timer_init();
-void async_udp_socket_init();
-
-void async_context_shutdown();
-void async_dns_shutdown();
-void async_filesystem_shutdown();
-void async_tcp_socket_shutdown();
-void async_task_scheduler_shutdown();
-void async_timer_shutdown();
-void async_udp_socket_shutdown();
-
-void async_task_scheduler_run();
+typedef struct _async_cancel_cb                     async_cancel_cb;
+typedef struct _async_cancellation_handler          async_cancellation_handler;
+typedef struct _async_context                       async_context;
+typedef struct _async_context_cancellation          async_context_cancellation;
+typedef struct _async_context_timeout               async_context_timeout;
+typedef struct _async_context_var                   async_context_var;
+typedef struct _async_fiber                         async_fiber;
+typedef struct _async_op                            async_op;
+typedef struct _async_task                          async_task;
+typedef struct _async_task_scheduler                async_task_scheduler;
+typedef struct _async_tick_event                    async_tick_event;
 
 #define ASYNC_FIBER_FLAG_QUEUED 1
 
-struct _async_fiber {
-	uint8_t flags;
-	async_fiber *next;
-	async_fiber *prev;
-	
-	async_task_scheduler *scheduler;
-	async_context *context;
-	async_task *task;
-	zend_execute_data *current_execute_data;
-	zend_vm_stack vm_stack;
-	size_t vm_stack_page_size;
-	zend_class_entry *exception_class;
-	zend_error_handling_t error_handling;
-	int error_reporting;
-	JMP_BUF *bailout;
-};
-
-typedef struct {
-	async_cancel_cb *first;
-	async_cancel_cb *last;
-} async_cancel_list;
-
-typedef struct {
-	async_fiber *first;
-	async_fiber *last;
-} async_fiber_list;
-
-typedef struct {
+typedef struct _async_op_list {
 	async_op *first;
 	async_op *last;
 } async_op_list;
 
-typedef struct {
-	async_task *first;
-	async_task *last;
-} async_task_list;
+typedef struct _async_tick_list {
+	async_tick_event *first;
+	async_tick_event *last;
+} async_tick_list;
 
 struct _async_cancel_cb {
 	/* Struct being passed to callback as first arg. */
@@ -294,7 +254,7 @@ struct _async_cancel_cb {
 #define ASYNC_OP_FLAG_DEFER 2
 #define ASYNC_OP_FLAG_ATOMIC 4
 
-typedef enum {
+typedef enum _async_status {
 	ASYNC_STATUS_PENDING,
 	ASYNC_STATUS_RUNNING,
 	ASYNC_STATUS_RESOLVED,
@@ -326,13 +286,34 @@ struct _async_op {
 	async_op *prev;
 };
 
-typedef struct {
+typedef struct _async_uv_op {
 	/* Async operation structure, must be first element to allow for casting to async_op. */
 	async_op base;
 	
 	/* Result status code provided by libuv. */
 	int code;
 } async_uv_op;
+
+typedef struct _async_awaitable_impl {
+	uint8_t status;
+	zval result;
+	async_op_list operations;
+
+	void *arg;
+	zend_object std;
+} async_awaitable_impl;
+
+typedef void (* async_interceptor)(async_context *context, zend_object *obj, INTERNAL_FUNCTION_PARAMETERS);
+
+#define ASYNC_AWAIT_HANDLER_INLINE 1
+
+typedef struct _async_await_handler {
+	/* Must populate result with a zval copy if ASYNC_OP_RESOLVED or ASYNC_OP_FAILED is returned. */
+	int (* delegate)(zend_object *obj, zval *result, async_task *caller, async_context *context, int flags);
+
+	/* Enqueue the given op to await completion. */
+	void (* schedule)(zend_object *obj, async_op *op, async_task *caller, async_context *context, int flags);
+} async_await_handler;
 
 struct _async_cancellation_handler {
 	/* PHP object handle. */
@@ -386,7 +367,10 @@ struct _async_context_cancellation {
 	async_cancel_cb chain;
 
 	/* Linked list of cancellation callbacks. */
-	async_cancel_list callbacks;
+	struct {
+		async_cancel_cb *first;
+		async_cancel_cb *last;
+	} callbacks;
 };
 
 struct _async_context_timeout {
@@ -404,83 +388,29 @@ struct _async_context_var {
 	zend_object std;
 };
 
-struct _async_deferred {
-	/* PHP object handle. */
-	zend_object std;
-
-	/* Refers to the deferred state being shared by deferred and awaitable. */
-	async_deferred_state *state;
-
-	/* Inlined cancellation handler called during contextual cancellation. */
-	async_cancel_cb cancel;
-
-	/* Function call info & cache of the cancel callback. */
-	zend_fcall_info fci;
-	zend_fcall_info_cache fcc;
-};
-
-struct _async_deferred_awaitable {
-	/* PHP object handle. */
-	zend_object std;
-
-	/* Refers to the deferred state being shared by deferred and awaitable. */
-	async_deferred_state *state;
-};
-
-struct _async_deferred_custom_awaitable {
-	async_deferred_awaitable base;	
-	void (* dtor)(async_deferred_custom_awaitable *awaitable);
-	void *arg;
-};
-
-struct _async_deferred_state {
-	/* Deferred status, one of PENDING, RESOLVED or FAILED. */
-	zend_uchar status;
-
-	/* Internal refcount being used to control deferred lifecycle. */
-	uint32_t refcount;
-
-	/* Holds the result value or error. */
-	zval result;
-	
-	/* Reference to the task scheduler. */
-	async_task_scheduler *scheduler;
-
-	/* Associated async context. */
-	async_context *context;
-
-	/* Queue of waiting async operations. */
-	async_op_list operations;
-	
-	/* Cancel callback being called when the task scheduler is disposed. */
-	async_cancel_cb cancel;
-};
-
 #define ASYNC_TASK_FLAG_DISPOSED 1
 #define ASYNC_TASK_FLAG_NOWAIT (1 << 1)
+#define ASYNC_TASK_FLAG_ROOT (1 << 2)
 
 struct _async_task {
-	/* PHP object handle. */
-	zend_object std;
-	
 	/* Underlying fiber being used to run the task. */
 	async_fiber *fiber;
 	
 	/* Associated task scheduler. */
 	async_task_scheduler *scheduler;
 	
+	/* Task flags. */
+	uint8_t flags;
+
+	/* Async operation status. */
+	zend_uchar status;
+
 	/* Fiber C stack size. */
 	zend_long stack_size;
 
 	/* PHP callback to be run as task. */
 	zend_fcall_info fci;
 	zend_fcall_info_cache fcc;
-
-	/* Async operation status. */
-	zend_uchar status;
-	
-	/* Task flags. */
-	uint8_t flags;
 	
 	/* Async execution context provided to the task. */
 	async_context *context;
@@ -494,19 +424,18 @@ struct _async_task {
 	/* Current await operation. */
 	async_op op;
 	
-	/* Debug information about the task's origin. */
-	zend_string *file;
-	size_t line;
-	
 	/* Pointers related to the scheduler's task ready queue. */
 	async_task *prev;
 	async_task *next;
+
+	/* PHP object handle. */
+	zend_object std;
 };
 
 #define ASYNC_TASK_SCHEDULER_FLAG_RUNNING 1
 #define ASYNC_TASK_SCHEDULER_FLAG_DISPOSED (1 << 1)
 #define ASYNC_TASK_SCHEDULER_FLAG_NOWAIT (1 << 2)
-#define ASYNC_TASK_SCHEDULER_FLAG_EXIT (1 << 3)
+#define ASYNC_TASK_SCHEDULER_FLAG_ERROR (1 << 3)
 #define ASYNC_TASK_SCHEDULER_FLAG_ACTIVE (1 << 4)
 
 struct _async_task_scheduler {
@@ -517,7 +446,10 @@ struct _async_task_scheduler {
 	uint16_t flags;
 
 	/* Ready to run fibers. */
-	async_fiber_list fibers;
+	struct {
+		async_fiber *first;
+		async_fiber *last;
+	} fibers;
 	
 	/* Fiber runnung the event loop. */
 	async_fiber *runner;
@@ -526,7 +458,10 @@ struct _async_task_scheduler {
 	async_fiber *caller;
 
 	/* Tasks ready to be started or resumed. */
-	async_task_list ready;
+	struct {
+		async_task *first;
+		async_task *last;
+	} ready;
 	
 	/* Pending operations that have not completed yet. */
 	async_op_list operations;
@@ -535,7 +470,10 @@ struct _async_task_scheduler {
 	async_op op;
 	
 	/** Queue of shutdown callbacks that need to be executed when the scheduler is disposed. */
-	async_cancel_list shutdown;
+	struct {
+		async_cancel_cb *first;
+		async_cancel_cb *last;
+	} shutdown;
 
 	/* Libuv event loop. */
 	uv_loop_t loop;
@@ -546,6 +484,25 @@ struct _async_task_scheduler {
 	/* Timer being used to keep the loop busy when needed. */
 	uv_timer_t busy;
 	zend_ulong busy_count;
+
+	/* Instantiated scheduler-scoped objects created by factories. */
+	HashTable components;
+
+	/* Tick callbacks scheduled for next tick and running now. */
+	async_tick_list ticks;
+	async_tick_list running;
+	uint32_t refticks;
+
+	/* Holds the error that caused the scheduler to exit (UNDEF by default). */
+	zval error;
+
+	/* Embedded pseudo task that is used to schedule the root execution in deferred op mode. */
+	struct {
+		async_fiber *fiber;
+		async_task_scheduler *scheduler;
+		uint8_t flags;
+		zend_uchar status;
+	} root;
 };
 
 #define ASYNC_DEBUG_LOG(message, ...)
@@ -565,19 +522,6 @@ struct _async_task_scheduler {
 	} \
 	zval_ptr_dtor(&(fci).function_name); \
 } while (0)
-
-static zend_always_inline char *async_status_label(zend_uchar status)
-{
-	if (status == ASYNC_OP_RESOLVED) {
-		return "RESOLVED";
-	}
-
-	if (status == ASYNC_OP_FAILED) {
-		return "FAILED";
-	}
-
-	return "PENDING";
-}
 
 static zend_always_inline async_task_scheduler *async_task_scheduler_ref()
 {
@@ -608,19 +552,31 @@ static zend_always_inline async_context *async_context_ref()
 
 #define async_loop_get() &ASYNC_G(scheduler)->loop
 
+ASYNC_API void async_task_scheduler_run(async_task_scheduler *scheduler, zend_execute_data *execute_data);
 ASYNC_API int async_await_op(async_op *op);
-ASYNC_API int async_call_nowait(zend_fcall_info *fci, zend_fcall_info_cache *fcc);
 
-ASYNC_API void async_init_awaitable(async_deferred_custom_awaitable *awaitable, void (* dtor)(async_deferred_custom_awaitable *awaitable), async_context *context);
-ASYNC_API void async_resolve_awaitable(async_deferred_awaitable *awaitable, zval *val);
-ASYNC_API void async_fail_awaitable(async_deferred_awaitable *awaitable, zval *error);
+ASYNC_API void async_task_scheduler_handle_exit(async_task_scheduler *scheduler);
+ASYNC_API void async_task_scheduler_handle_error(async_task_scheduler *scheduler, zend_object *error);
+
+ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zend_class_entry *ce, const char *message, ...);
+ASYNC_API int async_call_nowait(zend_execute_data *exec, zend_fcall_info *fci, zend_fcall_info_cache *fcc);
+
+ASYNC_API async_awaitable_impl *async_create_awaitable(zend_execute_data *call, void *arg);
+
+ASYNC_API async_awaitable_impl *async_create_resolved_awaitable(zend_execute_data *call, zval *result);
+ASYNC_API async_awaitable_impl *async_create_failed_awaitable(zend_execute_data *call, zval *error);
+
+ASYNC_API void async_awaitable_resolve(async_awaitable_impl *awaitable, zval *result);
+ASYNC_API void async_awaitable_fail(async_awaitable_impl *awaitable, zval *error);
+
+ASYNC_API void async_register_interceptor(zend_function *func, async_interceptor interceptor);
+
+ASYNC_API void async_register_awaitable(zend_class_entry *ce, async_await_handler *handler);
+ASYNC_API async_await_handler *async_get_await_handler(zend_class_entry *ce);
+
+ASYNC_API zval *async_get_component(async_task_scheduler *scheduler, zend_string *type, zend_execute_data *exec);
 
 ASYNC_API int async_dns_lookup_ip(char *name, php_sockaddr_storage *dest, int proto);
-ASYNC_API int async_dns_lookup_ipv4(char *name, struct sockaddr_in *dest, int proto);
-
-#ifdef HAVE_IPV6
-ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int proto);
-#endif
 
 #define ASYNC_ALLOC_OP(op) do { \
 	op = ecalloc(1, sizeof(async_op)); \
@@ -735,6 +691,35 @@ ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int p
 	execute_data->opline++; \
 } while (0)
 
+#define ASYNC_FORWARD_EXIT() do { \
+	if (UNEXPECTED(ASYNC_G(exit))) { \
+		zend_bailout(); \
+	} \
+} while (0)
+
+#define ASYNC_UV_CLOSE(handle, callback) do { \
+	/*ASYNC_DEBUG_LOG("CLOSE %s: %s:%d\n", uv_handle_type_name(uv_handle_get_type((uv_handle_t *)(handle))), __FILE__, __LINE__);*/ \
+	uv_close((uv_handle_t *)(handle), (callback)); \
+} while (0)
+
+#define ASYNC_UV_CLOSE_REF(ref, handle, callback) do { \
+	ASYNC_ADDREF(ref); \
+	ASYNC_UV_CLOSE(handle, callback); \
+} while (0)
+
+#define ASYNC_UV_TRY_CLOSE(handle, callback) do { \
+	if (!uv_is_closing((uv_handle_t *)(handle))) { \
+		ASYNC_UV_CLOSE(handle, callback); \
+	} \
+} while (0)
+
+#define ASYNC_UV_TRY_CLOSE_REF(ref, handle, callback) do { \
+	if (!uv_is_closing((uv_handle_t *)(handle))) { \
+		ASYNC_ADDREF(ref); \
+		ASYNC_UV_CLOSE(handle, callback); \
+	} \
+} while (0)
+
 #define ASYNC_UNREF_ENTER(ctx, obj) do { \
 	if (!async_context_is_background(ctx)) { \
 		if (++(obj)->ref_count == 1) { \
@@ -763,37 +748,11 @@ ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int p
 	} \
 } while(0)
 
-#define ASYNC_PREPARE_ERROR(error, message, ...) do { \
-	zend_execute_data *exec; \
-	zend_execute_data dummy; \
-	zend_object *prev; \
-	prev = EG(exception); \
-	exec = EG(current_execute_data); \
-	if (UNEXPECTED(exec == NULL)) { \
-		memset(&dummy, 0, sizeof(zend_execute_data)); \
-		EG(current_execute_data) = &dummy; \
-	} \
-	zend_throw_error(NULL, message ASYNC_VA_ARGS(__VA_ARGS__)); \
-	ZVAL_OBJ(error, EG(exception)); \
-	EG(current_execute_data) = exec; \
-	EG(exception) = prev; \
-} while (0)
+#define ASYNC_PREPARE_ERROR(error, exec, message, ...) async_prepare_throwable(error, exec, zend_ce_error, message ASYNC_VA_ARGS(__VA_ARGS__))
+#define ASYNC_PREPARE_EXCEPTION(error, exec, ce, message, ...) async_prepare_throwable(error, exec, ce, message ASYNC_VA_ARGS(__VA_ARGS__))
 
-#define ASYNC_PREPARE_EXCEPTION(error, ce, message, ...) do { \
-	zend_execute_data *exec; \
-	zend_execute_data dummy; \
-	zend_object *prev; \
-	prev = EG(exception); \
-	exec = EG(current_execute_data); \
-	if (UNEXPECTED(exec == NULL)) { \
-		memset(&dummy, 0, sizeof(zend_execute_data)); \
-		EG(current_execute_data) = &dummy; \
-	} \
-	zend_throw_exception_ex(ce, 0, message ASYNC_VA_ARGS(__VA_ARGS__)); \
-	ZVAL_OBJ(error, EG(exception)); \
-	EG(current_execute_data) = exec; \
-	EG(exception) = prev; \
-} while (0)
+#define ASYNC_PREPARE_SCHEDULER_ERROR(error, message, ...) async_prepare_throwable(error, NULL, zend_ce_error, message ASYNC_VA_ARGS(__VA_ARGS__))
+#define ASYNC_PREPARE_SCHEDULER_EXCEPTION(error, ce, message, ...) async_prepare_throwable(error, NULL, ce, message ASYNC_VA_ARGS(__VA_ARGS__))
 
 #define ASYNC_CHECK_ERROR(expr, message, ...) do { \
     if (UNEXPECTED(expr)) { \
@@ -816,6 +775,12 @@ ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int p
 	} \
 } while (0)
 
+#define ASYNC_ENSURE_ERROR(message, ...) do { \
+    if (UNEXPECTED(!EG(exception))) { \
+    	zend_throw_error(NULL, message ASYNC_VA_ARGS(__VA_ARGS__)); \
+    } \
+} while (0)
+
 #define ASYNC_RETURN_ON_ERROR() do { \
 	if (UNEXPECTED(EG(exception))) { \
 		return; \
@@ -833,6 +798,22 @@ ASYNC_API int async_dns_lookup_ipv6(char *name, struct sockaddr_in6 *dest, int p
 		continue; \
 	} \
 } while (0)
+
+ZEND_BEGIN_ARG_INFO(arginfo_no_ctor, 0)
+ZEND_END_ARG_INFO();
+
+#define ASYNC_METHOD_NO_CTOR(type, ce) static PHP_METHOD(type, __construct) { \
+	ZEND_PARSE_PARAMETERS_NONE(); \
+	zend_throw_error(NULL, "Construction %s is not allowed", ZSTR_VAL(ce->name)); \
+}
+
+ZEND_BEGIN_ARG_INFO(arginfo_no_wakeup, 0)
+ZEND_END_ARG_INFO();
+
+#define ASYNC_METHOD_NO_WAKEUP(type, ce) static PHP_METHOD(type, __wakeup) { \
+	ZEND_PARSE_PARAMETERS_NONE(); \
+	zend_throw_error(NULL, "Unserialization of %s is not allowed", ZSTR_VAL(ce->name)); \
+}
 
 /*
  * List macros require a "q" pointer with fields "first" and "last" of same pointer type as "v".
@@ -920,4 +901,19 @@ ZEND_API void async_execute_ex(zend_execute_data *exec);
 
 #endif
 
-#endif /* PHALCON_ASYNC_CORE_H */
+
+/* PHP 7.3 */
+#if PHP_VERSION_ID < 70200
+/* zend_internal_function_handler */
+typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
+#endif
+
+#ifndef ZEND_PARSE_PARAMETERS_NONE
+#define ZEND_PARSE_PARAMETERS_NONE() 
+#endif
+
+#ifndef ZEND_PROPERTY_EXISTS
+#define ZEND_PROPERTY_ISSET     0x0          /* Property exists and is not NULL */
+#define ZEND_PROPERTY_NOT_EMPTY ZEND_ISEMPTY /* Property is not empty */
+#define ZEND_PROPERTY_EXISTS    0x2          /* Property exists */
+#endif

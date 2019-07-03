@@ -94,6 +94,9 @@ struct _async_process {
 
 	/* Exit code / process termination observers. */
 	async_op_list observers;
+
+	/* Use UV_PROCESS_DETACHED */
+	zend_bool detached;
 };
 
 typedef struct _async_readable_process_pipe {
@@ -110,7 +113,7 @@ typedef struct _async_writable_process_pipe {
 	async_writable_process_pipe_state *state;
 } async_writable_process_pipe;
 
-static async_process *async_process_object_create();
+static async_process *async_process_object_create(unsigned int detached);
 static async_readable_process_pipe *async_readable_process_pipe_object_create(async_process *process, async_readable_process_pipe_state *state);
 static async_writable_process_pipe *async_writable_process_pipe_object_create(async_process *process, async_writable_process_pipe_state *state);
 
@@ -264,6 +267,10 @@ static void prepare_process(async_process_builder *builder, async_process *proc,
 	}
 #endif
 
+	if (proc->detached) {
+		proc->options.flags |= UV_PROCESS_DETACHED;
+	}
+
 	if (Z_TYPE_P(&builder->env) != IS_UNDEF && zend_hash_num_elements(Z_ARRVAL_P(&builder->env)) > 0) {
 		proc->options.env = async_process_create_env(Z_ARRVAL_P(&builder->env), builder->flags & ASYNC_PROCESS_FLAG_INHERIT_ENV);
 	} else if (!(builder->flags & ASYNC_PROCESS_FLAG_INHERIT_ENV)) {
@@ -272,7 +279,7 @@ static void prepare_process(async_process_builder *builder, async_process *proc,
 	}
 }
 
-static async_process *async_process_object_create()
+static async_process *async_process_object_create(unsigned int detached)
 {
 	async_process *proc;
 
@@ -289,6 +296,7 @@ static async_process *async_process_object_create()
 	proc->cancel.func = shutdown_process;
 
 	proc->status = -1;
+	proc->detached = detached;
 
 	ZVAL_UNDEF(&proc->stdin_state.error);
 	ZVAL_UNDEF(&proc->stdout_state.error);
@@ -347,7 +355,7 @@ int async_process_execute(async_process_builder *builder, uint32_t argc, zval *a
 		}
 	}
 
-	proc = async_process_object_create();
+	proc = async_process_object_create(builder->detached);
 
 	prepare_process(builder, proc, argv, argc);
 
@@ -412,7 +420,7 @@ zend_object *async_process_start(async_process_builder *builder, uint32_t argc, 
 	int code;
 	int x;
 	
-	proc = async_process_object_create();
+	proc = async_process_object_create(builder->detached);
 
 	prepare_process(builder, proc, argv, argc);
 

@@ -606,6 +606,28 @@ static PHP_METHOD(ProcessBuilder, start)
 	}
 }
 
+static ZEND_METHOD(ProcessBuilder, daemon)
+{
+	async_process_builder *builder;
+	zend_object *proc;
+
+	uint32_t argc;
+	zval *argv;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, -1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_VARIADIC('+', argv, argc)
+	ZEND_PARSE_PARAMETERS_END();
+
+	builder = (async_process_builder *) Z_OBJ_P(getThis());
+	builder->detached = 1;
+	proc = async_process_start(builder, argc, argv);
+	
+	if (EXPECTED(proc)) {
+		RETURN_OBJ(proc);
+	}
+}
+
 //LCOV_EXCL_START
 ASYNC_METHOD_NO_WAKEUP(ProcessBuilder, async_process_builder_ce)
 //LCOV_EXCL_STOP
@@ -628,6 +650,7 @@ static const zend_function_entry async_process_builder_functions[] = {
 	PHP_ME(ProcessBuilder, withoutStderr, arginfo_process_builder_without_stderr, ZEND_ACC_PUBLIC)
 	PHP_ME(ProcessBuilder, execute, arginfo_process_builder_execute, ZEND_ACC_PUBLIC)
 	PHP_ME(ProcessBuilder, start, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
+	PHP_ME(ProcessBuilder, daemon, arginfo_process_builder_start, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

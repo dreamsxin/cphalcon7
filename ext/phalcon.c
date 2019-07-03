@@ -29,7 +29,10 @@
 #include "cache/yac/allocator.h"
 
 #include "py.h"
+
+#if PHALCON_USE_ASYNC
 #include "async/async_helper.h"
+#endif
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -1038,6 +1041,7 @@ static PHP_MINFO_FUNCTION(phalcon)
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
 #ifdef PHALCON_USE_ASYNC
+	php_info_print_table_row(2, "Async", "enabled");
 	sprintf(uv_version, "%d.%d", UV_VERSION_MAJOR, UV_VERSION_MINOR);
 	php_info_print_table_row(2, "Libuv version", uv_version);
 #endif

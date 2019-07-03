@@ -313,7 +313,8 @@ PHP_METHOD(Phalcon_Assets_Collection, addJs){
  */
 PHP_METHOD(Phalcon_Assets_Collection, getResources){
 
-	zval resources = {};
+	zval *type = NULL, resources = {}, *resource;
+	phalcon_fetch_params(1, 0, 1, &type);
 
 	phalcon_read_property(&resources, getThis(), SL("_resources"), PH_NOISY|PH_READONLY);
 
@@ -322,7 +323,19 @@ PHP_METHOD(Phalcon_Assets_Collection, getResources){
 		return;
 	}
 
-	RETURN_ZVAL(&resources, 1, 0);
+	if (type && Z_TYPE_P(type) == IS_STRING) {
+		array_init(return_value);
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {
+			zval rtype = {};
+			PHALCON_MM_CALL_METHOD(&rtype, resource, "gettype");
+			if (PHALCON_IS_EQUAL(&rtype, type)) {
+				phalcon_array_append(return_value, resource, PH_COPY);
+			}
+			zval_ptr_dtor(&rtype);
+		} ZEND_HASH_FOREACH_END();
+		RETURN_MM();
+	}
+	RETURN_MM_CTOR(&resources);
 }
 
 /**

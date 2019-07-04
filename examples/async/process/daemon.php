@@ -22,7 +22,7 @@ while (TRUE) {
 	$event = new Phalcon\Sync\Event("newtask");
 	$event->wait();
 
-	file_put_contents(__DIR__.'/daemon.log', 'task'.$n.PHP_EOL, FILE_APPEND);
+	file_put_contents(__DIR__.'/daemon.log', 'newtask'.$n.PHP_EOL, FILE_APPEND);
 	$n++;
 	if ($n > 10) {
 		break;

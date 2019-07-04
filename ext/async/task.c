@@ -1279,8 +1279,9 @@ static void async_task_scheduler_dispose(async_task_scheduler *scheduler)
 		if (scheduler->shutdown.first != NULL) {
 			do {
 				ASYNC_LIST_EXTRACT_FIRST(&scheduler->shutdown, cancel);
-	
-				cancel->func(cancel->object, &error);
+				if (cancel->func != NULL) {
+					cancel->func(cancel->object, &error);
+				}
 			} while (scheduler->shutdown.first != NULL);
 		}
 		

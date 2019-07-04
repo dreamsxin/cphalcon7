@@ -1,6 +1,6 @@
 <?php
 
-$builder = new Phalcon\Async\ProcessBuilder(PHP_BINARY);
+$builder = new Phalcon\Async\Process\ProcessBuilder(PHP_BINARY);
 $builder = $builder->withStdoutPipe();
 $builder->withStderrInherited();
 

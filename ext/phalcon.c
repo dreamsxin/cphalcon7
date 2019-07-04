@@ -897,7 +897,11 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	return SUCCESS;
 }
 
-static PHP_RINIT_FUNCTION(phalcon){
+static PHP_RINIT_FUNCTION(phalcon)
+{
+#if defined(ZTS) && defined(COMPILE_DL_PHALCON)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
@@ -1151,6 +1155,9 @@ static PHP_MINFO_FUNCTION(phalcon)
 
 static PHP_GINIT_FUNCTION(phalcon)
 {
+#if defined(ZTS) && defined(COMPILE_DL_PHALCON)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 	memset(phalcon_globals, 0, sizeof(zend_phalcon_globals));
 	php_phalcon_init_globals(phalcon_globals);
 

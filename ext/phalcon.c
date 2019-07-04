@@ -1240,5 +1240,8 @@ zend_module_entry phalcon_module_entry = {
 };
 
 #ifdef COMPILE_DL_PHALCON
+# ifdef ZTS
+ZEND_TSRMLS_CACHE_DEFINE()
+# endif
 ZEND_GET_MODULE(phalcon)
 #endif

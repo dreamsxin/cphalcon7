@@ -30,6 +30,10 @@
 
 #include "py.h"
 
+#if PHALCON_USE_ASYNC
+#include "async/async_helper.h"
+#endif
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -66,7 +70,7 @@ static PHP_INI_MH(OnChangeValsMemoryLimit) {
 }
 #endif
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 static PHP_INI_MH(OnUpdateFiberStackSize)
 {
 	OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
@@ -134,8 +138,9 @@ PHP_INI_BEGIN()
     STD_PHP_INI_ENTRY("phalcon.xhprof.clock_use_rdtsc",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.clock_use_rdtsc,	zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.snowflake.node", "0", PHP_INI_SYSTEM, OnUpdateLong, snowflake.node,  zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_BOOLEAN("phalcon.aop.enable_aop",   "0", PHP_INI_SYSTEM, OnUpdateBool, aop.enable_aop, zend_phalcon_globals, phalcon_globals)
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 	STD_PHP_INI_ENTRY("phalcon.async.dns",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.dns_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.filesystem", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.fs_enabled", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.forked",     "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.forked, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.stack_size", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateFiberStackSize, async.stack_size, zend_phalcon_globals, phalcon_globals)
@@ -146,7 +151,7 @@ PHP_INI_BEGIN()
 #endif
 PHP_INI_END()
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 ASYNC_CALLBACK init_threads(uv_work_t *req) { }
 
 ASYNC_CALLBACK after_init_threads(uv_work_t *req, int status)
@@ -247,7 +252,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PyEval_ReleaseLock();
 #endif
 
-#ifdef PHALCON_USE_UV
+#ifdef PHALCON_USE_ASYNC
 	ASYNC_G(cli) = !strcmp(sapi_module.name, "cli");
 	if (ASYNC_G(cli)) {
 		uv_work_t *req = malloc(sizeof(uv_work_t));
@@ -270,8 +275,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG, NULL);
 #endif
 #endif
-	async_awaitable_ce_register();
 
+	async_task_ce_register();
 	async_stream_ce_register();
 	async_socket_ce_register();
 
@@ -280,18 +285,40 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_context_ce_register();
 	async_deferred_ce_register();
 	async_dns_ce_register();
+	async_event_ce_register();
 	async_monitor_ce_register();
 	async_pipe_ce_register();
 	async_poll_ce_register();
 	async_process_ce_register();
 	async_signal_ce_register();
 	async_ssl_ce_register();
-	async_sync_init();
-	async_task_ce_register();
+	async_sync_ce_register();
 	async_tcp_ce_register();
+	async_thread_ce_register();
 	async_timer_ce_register();
 	async_udp_socket_ce_register();
+
+#ifdef HAVE_ASYNC_SSL
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
 	
+#ifdef ASYNC_TLS_SNI
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
+#else
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+#endif
+	
+#ifdef ASYNC_TLS_ALPN
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
+#else
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+#endif
+
+#else
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+#endif
+
 	async_orig_execute_ex = zend_execute_ex;
 	zend_execute_ex = async_execute_ex;
 #endif
@@ -844,26 +871,37 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 	Py_Finalize();
 #endif
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 	async_channel_ce_unregister();
+	async_deferred_ce_unregister();
+	async_dns_ce_unregister();
 	async_monitor_ce_unregister();
+	async_ssl_ce_unregister();
+	async_tcp_ce_unregister();
+	async_udp_socket_ce_unregister();
+
 	async_task_ce_unregister();
+	async_thread_ce_unregister();
 #endif
 
 	UNREGISTER_INI_ENTRIES();
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
+	zend_execute_ex = async_orig_execute_ex;
+
 	if (ASYNC_G(cli)) {
 		uv_tty_reset_mode();
 	}
-
-	zend_execute_ex = async_orig_execute_ex;
 #endif
 
 	return SUCCESS;
 }
 
-static PHP_RINIT_FUNCTION(phalcon){
+static PHP_RINIT_FUNCTION(phalcon)
+{
+#if defined(ZTS) && defined(COMPILE_DL_PHALCON)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 
 	zend_phalcon_globals *phalcon_globals_ptr = PHALCON_VGLOBAL;
 
@@ -900,9 +938,10 @@ static PHP_RINIT_FUNCTION(phalcon){
 	PHALCON_GLOBAL(python).tstate = interpreter_python_init_thread();
 #endif
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 	async_context_init();
 	async_task_scheduler_init();
+	async_helper_init();
 
 	if (ASYNC_G(dns_enabled)) {
 		async_dns_init();
@@ -977,7 +1016,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	interpreter_python_shutdown_thread(PHALCON_GLOBAL(python).tstate);
 #endif
 
-#if PHALCON_USE_UV
+#if PHALCON_USE_ASYNC
 	if (ASYNC_G(dns_enabled)) {
 		async_dns_shutdown();
 	}
@@ -998,14 +1037,15 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 
 static PHP_MINFO_FUNCTION(phalcon)
 {
-#ifdef PHALCON_USE_UV
+#ifdef PHALCON_USE_ASYNC
 	char uv_version[20];
 #endif
 	php_info_print_table_start();
 	php_info_print_table_row(2, "Phalcon7 Framework", "enabled");
 	php_info_print_table_row(2, "Phalcon7 Version", PHP_PHALCON_VERSION);
 	php_info_print_table_row(2, "Build Date", __DATE__ " " __TIME__ );
-#ifdef PHALCON_USE_UV
+#ifdef PHALCON_USE_ASYNC
+	php_info_print_table_row(2, "Async", "enabled");
 	sprintf(uv_version, "%d.%d", UV_VERSION_MAJOR, UV_VERSION_MINOR);
 	php_info_print_table_row(2, "Libuv version", uv_version);
 #endif
@@ -1115,6 +1155,9 @@ static PHP_MINFO_FUNCTION(phalcon)
 
 static PHP_GINIT_FUNCTION(phalcon)
 {
+#if defined(ZTS) && defined(COMPILE_DL_PHALCON)
+	ZEND_TSRMLS_CACHE_UPDATE();
+#endif
 	memset(phalcon_globals, 0, sizeof(zend_phalcon_globals));
 	php_phalcon_init_globals(phalcon_globals);
 
@@ -1204,5 +1247,8 @@ zend_module_entry phalcon_module_entry = {
 };
 
 #ifdef COMPILE_DL_PHALCON
+# ifdef ZTS
+ZEND_TSRMLS_CACHE_DEFINE()
+# endif
 ZEND_GET_MODULE(phalcon)
 #endif

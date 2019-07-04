@@ -1,22 +1,19 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #ifndef ASYNC_FIBER_H
@@ -32,10 +29,27 @@ typedef LPFIBER_START_ROUTINE async_fiber_cb;
 typedef void (* async_fiber_cb)(void *arg);
 #endif
 
+struct _async_fiber {
+	uint8_t flags;
+	async_fiber *next;
+	async_fiber *prev;
+
+	async_task_scheduler *scheduler;
+	async_context *context;
+	async_task *task;
+	zend_execute_data *current_execute_data;
+	zend_vm_stack vm_stack;
+	size_t vm_stack_page_size;
+	zend_class_entry *exception_class;
+	zend_error_handling_t error_handling;
+	int error_reporting;
+	JMP_BUF *bailout;
+};
+
 #define BACKUP_EG(name) (fiber)->name = EG(name)
 #define RESTORE_EG(name) EG(name) = (fiber)->name
 
-typedef enum {
+typedef enum _async_fiber_suspend_type {
 	ASYNC_FIBER_SUSPEND_NONE,
 	ASYNC_FIBER_SUSPEND_PREPEND,
 	ASYNC_FIBER_SUSPEND_APPEND

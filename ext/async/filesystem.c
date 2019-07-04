@@ -1,27 +1,23 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
 
-#if PHALCON_USE_UV
 
 #include <ext/standard/file.h>
 #include <ext/standard/flock_compat.h>
@@ -78,7 +74,7 @@
 	async_uv_op *op; \
 	int code; \
 	zend_bool disposed; \
-	disposed = (async_task_scheduler_get()->flags & ASYNC_TASK_SCHEDULER_FLAG_DISPOSED) ? 1 : 0; \
+	disposed = (async_task_scheduler_get()->flags & (ASYNC_TASK_SCHEDULER_FLAG_DISPOSED | ASYNC_TASK_SCHEDULER_FLAG_ERROR)) ? 1 : 0; \
 	op = NULL; \
 	if (EXPECTED(async && !disposed)) { \
 		ASYNC_ALLOC_CUSTOM_OP(op, sizeof(async_uv_op)); \
@@ -120,7 +116,7 @@ struct _async_dirstream_entry {
 	char name[1];
 };
 
-typedef struct {
+typedef struct _async_dirstream_data {
 	async_dirstream_entry *first;
 	async_dirstream_entry *last;
 	async_dirstream_entry *entry;
@@ -129,7 +125,7 @@ typedef struct {
 	async_task_scheduler *scheduler;
 } async_dirstream_data;
 
-typedef struct {
+typedef struct _async_filestream_data {
 	uv_file file;
 	char fmode[8];
 	int mode;
@@ -669,7 +665,7 @@ int options, zend_string **opened_path, php_stream_context *context STREAMS_DC)
 		if (options & REPORT_ERRORS) {
 			php_error_docref(NULL, E_WARNING, "'%s' is not a valid mode for fopen", mode);
         }
-
+        
 		return NULL;
 	}
 
@@ -1195,4 +1191,3 @@ void async_filesystem_shutdown()
 	}
 }
 
-#endif /* PHALCON_USE_UV */

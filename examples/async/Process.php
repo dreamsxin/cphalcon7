@@ -1,6 +1,6 @@
 <?php
 
-$builder = new Phalcon\Async\Process\Builder(PHP_BINARY);
+$builder = new Phalcon\Async\ProcessBuilder(PHP_BINARY);
 $builder->withStdoutInherited();
 $builder->withStderrInherited();
 
@@ -50,7 +50,7 @@ $reader = function (Phalcon\Async\Process\ReadablePipe $pipe, int $len) {
     }
 };
 
-$builder = Phalcon\Async\Process\Builder::shell();
+$builder = Phalcon\Async\ProcessBuilder::shell();
 $builder = $builder->withCwd(__DIR__);
 $builder = $builder->withStdoutPipe();
 $builder = $builder->withStderrInherited();

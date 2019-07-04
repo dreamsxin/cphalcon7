@@ -1,27 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
 
 #include "kernel/backend.h"
 #include "async/async_stream.h"
@@ -38,7 +33,7 @@ static zend_object_handlers async_writable_pipe_handlers;
 
 #define ASYNC_CONSOLE_FLAG_EOF (1 << 5)
 
-typedef struct {
+typedef struct _async_readable_pipe {
 	zend_object std;	
 	uint16_t flags;
 	
@@ -66,7 +61,7 @@ typedef struct {
 	zval error;
 } async_readable_pipe;
 
-typedef struct {
+typedef struct _async_writable_pipe {
 	zend_object std;	
 	uint16_t flags;
 	
@@ -90,13 +85,6 @@ typedef struct {
 	zval error;
 } async_writable_pipe;
 
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_is_terminal, 0, 0, _IS_BOOL, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_pipe_is_terminal, 0, 0, _IS_BOOL, NULL, 0)
-ZEND_END_ARG_INFO()
-#endif
 
 ASYNC_CALLBACK read_close_file_cb(uv_fs_t* req)
 {
@@ -125,7 +113,7 @@ ASYNC_CALLBACK readable_pipe_shutdown(void *object, zval *error)
 
 	if (Z_TYPE_P(&pipe->error) == IS_UNDEF) {
 		if (error == NULL) {
-			ASYNC_PREPARE_EXCEPTION(&pipe->error, async_stream_closed_exception_ce, "Console stream has been closed");
+			ASYNC_PREPARE_SCHEDULER_EXCEPTION(&pipe->error, async_stream_closed_exception_ce, "Console stream has been closed");
 		} else {
 			ZVAL_COPY(&pipe->error, error);
 		}
@@ -156,7 +144,9 @@ ASYNC_CALLBACK readable_pipe_shutdown(void *object, zval *error)
 static async_readable_pipe* async_readable_pipe_object_create(uv_file file, uv_handle_type type)
 {
 	async_readable_pipe *pipe;
+	
 	int code;
+	
 	pipe = ecalloc(1, sizeof(async_readable_pipe));
 	
 	pipe->scheduler = async_task_scheduler_get();
@@ -196,10 +186,9 @@ static async_readable_pipe* async_readable_pipe_object_create(uv_file file, uv_h
 		pipe->handle.file.offset = pipe->handle.file.buffer;
 	} else {
 		efree(pipe);
-		
 		return NULL;
 	}
-
+	
 	ASYNC_ADDREF(&pipe->scheduler->std);
 	
 	zend_object_std_init(&pipe->std, async_readable_pipe_ce);
@@ -247,7 +236,10 @@ static void async_readable_pipe_object_destroy(zend_object *object)
 	zend_object_std_dtor(&pipe->std);
 }
 
-static ZEND_METHOD(ReadablePipe, getStdin)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_readable_console_stream_get_stdin, 0, 0, Phalcon\\Async\\Stream\\ReadablePipe, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ReadablePipe, getStdin)
 {
 	async_readable_pipe *pipe;
 	
@@ -265,14 +257,18 @@ static ZEND_METHOD(ReadablePipe, getStdin)
 	
 	if (UNEXPECTED(pipe == NULL)) {
 		ASYNC_RETURN_ON_ERROR();
+		
 		zend_throw_error(NULL, "STDIN cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-
+	
 	RETURN_OBJ(&pipe->std);
 }
 
-static ZEND_METHOD(ReadablePipe, isTerminal)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_readable_console_stream_is_terminal, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(ReadablePipe, isTerminal)
 {
 	async_readable_pipe *pipe;
 	
@@ -283,7 +279,7 @@ static ZEND_METHOD(ReadablePipe, isTerminal)
 	RETURN_BOOL(pipe->flags & ASYNC_CONSOLE_FLAG_TTY);
 }
 
-static ZEND_METHOD(ReadablePipe, close)
+static PHP_METHOD(ReadablePipe, close)
 {
 	async_readable_pipe *pipe;
 	
@@ -294,7 +290,7 @@ static ZEND_METHOD(ReadablePipe, close)
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	pipe = (async_readable_pipe *) Z_OBJ_P(getThis());
@@ -303,7 +299,7 @@ static ZEND_METHOD(ReadablePipe, close)
 		return;
 	}
 	
-	ASYNC_PREPARE_EXCEPTION(&error, async_stream_closed_exception_ce, "Console stream has been closed");
+	ASYNC_PREPARE_EXCEPTION(&error, execute_data, async_stream_closed_exception_ce, "Console stream has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -328,7 +324,7 @@ ASYNC_CALLBACK read_fs_cb(uv_fs_t *req)
 	ASYNC_FINISH_OP(op);
 }
 
-static ZEND_METHOD(ReadablePipe, read)
+static PHP_METHOD(ReadablePipe, read)
 {
 	async_readable_pipe *pipe;
 	async_stream *stream;
@@ -438,15 +434,19 @@ static ZEND_METHOD(ReadablePipe, read)
 	forward_stream_read_error(stream, &read);
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_readable_console_stream_get_stdin, 0, 0, Phalcon\\Async\\Stream\\ReadablePipe, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(ReadablePipe, async_readable_pipe_ce)
+ASYNC_METHOD_NO_WAKEUP(ReadablePipe, async_readable_pipe_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_readable_pipe_functions[] = {
-	ZEND_ME(ReadablePipe, getStdin, arginfo_readable_console_stream_get_stdin, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(ReadablePipe, isTerminal, arginfo_pipe_is_terminal, ZEND_ACC_PUBLIC)
-	ZEND_ME(ReadablePipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(ReadablePipe, read, arginfo_readable_stream_read, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(ReadablePipe, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(ReadablePipe, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(ReadablePipe, getStdin, arginfo_readable_console_stream_get_stdin, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(ReadablePipe, isTerminal, arginfo_readable_console_stream_is_terminal, ZEND_ACC_PUBLIC)
+	PHP_ME(ReadablePipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
+	PHP_ME(ReadablePipe, read, arginfo_readable_stream_read, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -478,7 +478,7 @@ ASYNC_CALLBACK writable_pipe_shutdown(void *object, zval *error)
 
 	if (Z_TYPE_P(&pipe->error) == IS_UNDEF) {
 		if (error == NULL) {
-			ASYNC_PREPARE_EXCEPTION(&pipe->error, async_stream_closed_exception_ce, "Console stream has been closed");
+			ASYNC_PREPARE_SCHEDULER_EXCEPTION(&pipe->error, async_stream_closed_exception_ce, "Console stream has been closed");
 		} else {
 			ZVAL_COPY(&pipe->error, error);
 		}
@@ -583,7 +583,10 @@ static void async_writable_pipe_object_destroy(zend_object *object)
 	zend_object_std_dtor(&pipe->std);
 }
 
-static ZEND_METHOD(WritablePipe, getStdout)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_writable_console_stream_get_stdout, 0, 0, Phalcon\\Async\\Stream\\WritablePipe, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(WritablePipe, getStdout)
 {
 	async_writable_pipe *pipe;
 	
@@ -603,11 +606,14 @@ static ZEND_METHOD(WritablePipe, getStdout)
 		zend_throw_error(NULL, "STDOUT cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-
+	
 	RETURN_OBJ(&pipe->std);
 }
 
-static ZEND_METHOD(WritablePipe, getStderr)
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_writable_console_stream_get_stderr, 0, 0, Phalcon\\Async\\Stream\\WritablePipe, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(WritablePipe, getStderr)
 {
 	async_writable_pipe *pipe;
 	
@@ -627,11 +633,14 @@ static ZEND_METHOD(WritablePipe, getStderr)
 		zend_throw_error(NULL, "STDERR cannot be opened, it is detected as %s", uv_handle_type_name(type));
 		return;
 	}
-
+	
 	RETURN_OBJ(&pipe->std);
 }
 
-static ZEND_METHOD(WritablePipe, isTerminal)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_writable_console_stream_is_terminal, 0, 0, _IS_BOOL, 0)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(WritablePipe, isTerminal)
 {
 	async_writable_pipe *pipe;
 	
@@ -642,7 +651,7 @@ static ZEND_METHOD(WritablePipe, isTerminal)
 	RETURN_BOOL(pipe->flags & ASYNC_CONSOLE_FLAG_TTY);
 }
 
-static ZEND_METHOD(WritablePipe, close)
+static PHP_METHOD(WritablePipe, close)
 {
 	async_writable_pipe *pipe;
 	
@@ -653,7 +662,7 @@ static ZEND_METHOD(WritablePipe, close)
 	
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 	
 	pipe = (async_writable_pipe *) Z_OBJ_P(getThis());
@@ -662,7 +671,7 @@ static ZEND_METHOD(WritablePipe, close)
 		return;
 	}
 	
-	ASYNC_PREPARE_EXCEPTION(&error, async_stream_closed_exception_ce, "Console stream has been closed");
+	ASYNC_PREPARE_EXCEPTION(&error, execute_data, async_stream_closed_exception_ce, "Console stream has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -687,7 +696,7 @@ ASYNC_CALLBACK write_fs_cb(uv_fs_t *req)
 	ASYNC_FINISH_OP(op);
 }
 
-static ZEND_METHOD(WritablePipe, write)
+static PHP_METHOD(WritablePipe, write)
 {
 	async_writable_pipe *pipe;
 	async_stream *stream;
@@ -748,31 +757,32 @@ static ZEND_METHOD(WritablePipe, write)
 		stream = pipe->handle.pipe.stream;
 	}
 	
+	memset(&write, 0, sizeof(async_stream_write_req));
+
 	write.in.len = ZSTR_LEN(data);
 	write.in.buffer = ZSTR_VAL(data);
-	write.in.handle = NULL;
 	write.in.str = data;
 	write.in.ref = getThis();
-	write.in.flags = 0;
 	
 	if (UNEXPECTED(FAILURE == async_stream_write(stream, &write))) {
 		forward_stream_write_error(stream, &write);
 	}
 }
 
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_writable_console_stream_get_stdout, 0, 0, Phalcon\\Async\\Stream\\WritablePipe, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_writable_console_stream_get_stderr, 0, 0, Phalcon\\Async\\Stream\\WritablePipe, 0)
-ZEND_END_ARG_INFO()
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(WritablePipe, async_writable_pipe_ce)
+ASYNC_METHOD_NO_WAKEUP(WritablePipe, async_writable_pipe_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_writable_pipe_functions[] = {
-	ZEND_ME(WritablePipe, getStdout, arginfo_writable_console_stream_get_stdout, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(WritablePipe, getStderr, arginfo_writable_console_stream_get_stderr, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(WritablePipe, isTerminal, arginfo_pipe_is_terminal, ZEND_ACC_PUBLIC)
-	ZEND_ME(WritablePipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(WritablePipe, write, arginfo_writable_stream_write, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(WritablePipe, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(WritablePipe, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(WritablePipe, getStdout, arginfo_writable_console_stream_get_stdout, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(WritablePipe, getStderr, arginfo_writable_console_stream_get_stderr, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(WritablePipe, isTerminal, arginfo_writable_console_stream_is_terminal, ZEND_ACC_PUBLIC)
+	PHP_ME(WritablePipe, close, arginfo_stream_close, ZEND_ACC_PUBLIC)
+	PHP_ME(WritablePipe, write, arginfo_writable_stream_write, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -780,7 +790,7 @@ void async_console_ce_register()
 {
 	zend_class_entry ce;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream\\ReadablePipe", async_readable_pipe_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream", "ReadablePipe", async_readable_pipe_functions);
 	async_readable_pipe_ce = zend_register_internal_class(&ce);
 	async_readable_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_readable_pipe_ce->serialize = zend_class_serialize_deny;
@@ -793,7 +803,7 @@ void async_console_ce_register()
 	async_readable_pipe_handlers.free_obj = async_readable_pipe_object_destroy;
 	async_readable_pipe_handlers.clone_obj = NULL;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream\\WritablePipe", async_writable_pipe_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream", "WritablePipe", async_writable_pipe_functions);
 	async_writable_pipe_ce = zend_register_internal_class(&ce);
 	async_writable_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_writable_pipe_ce->serialize = zend_class_serialize_deny;
@@ -806,5 +816,3 @@ void async_console_ce_register()
 	async_writable_pipe_handlers.free_obj = async_writable_pipe_object_destroy;
 	async_writable_pipe_handlers.clone_obj = NULL;
 }
-
-#endif

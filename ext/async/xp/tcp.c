@@ -1,27 +1,22 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
-
-#if PHALCON_USE_UV
 
 #include "async/async_ssl.h"
 #include "async/async_xp.h"
@@ -33,7 +28,7 @@ static php_stream_transport_factory orig_tls_factory;
 
 static php_stream_ops tcp_socket_ops;
 
-typedef struct {
+typedef struct _async_xp_socket_data_tcp {
 	ASYNC_XP_SOCKET_DATA_BASE
     uv_tcp_t handle;
     uint16_t pending;
@@ -50,14 +45,14 @@ ASYNC_CALLBACK free_cb(uv_handle_t *handle)
 static int tcp_socket_bind(php_stream *stream, async_xp_socket_data *data, php_stream_xport_param *xparam)
 {
 	php_sockaddr_storage dest;
+	php_socket_t sock;
 	unsigned int flags;
 	
 	char *ip;
 	int port;
 	int code;
-#ifdef HAVE_IPV6
 	zval *tmp;
-#endif	
+	
 	flags = 0;
 	
 	ip = NULL;
@@ -74,7 +69,27 @@ static int tcp_socket_bind(php_stream *stream, async_xp_socket_data *data, php_s
 	
 	async_socket_set_port((struct sockaddr *) &dest, port);
 	
-	if (PHP_STREAM_CONTEXT(stream)) {
+	code = uv_tcp_init_ex(&data->scheduler->loop, (uv_tcp_t *) &data->handle, dest.ss_family);
+	
+	if (UNEXPECTED(code < 0)) {
+		return FAILURE;
+	}
+	
+	data->flags |= ASYNC_XP_SOCKET_FLAG_INIT;
+	
+	if (UNEXPECTED(0 != uv_fileno((const uv_handle_t *) &data->handle, (uv_os_fd_t *) &sock))) {
+		return FAILURE;
+	}
+	
+	async_socket_set_reuseaddr(sock, 1);
+	
+	if (PHP_STREAM_CONTEXT(stream)) {		
+		tmp = php_stream_context_get_option(PHP_STREAM_CONTEXT(stream), "socket", "so_reuseport");
+		
+		if (tmp != NULL && Z_TYPE_P(tmp) != IS_NULL && zend_is_true(tmp)) {
+			async_socket_set_reuseport(sock, 1);
+		}
+	
 #ifdef HAVE_IPV6
 		if (dest.ss_family == AF_INET6) {
 			tmp = php_stream_context_get_option(PHP_STREAM_CONTEXT(stream), "socket", "ipv6_v6only");
@@ -146,7 +161,9 @@ ASYNC_CALLBACK connect_timer_cb(uv_timer_t *timer)
 	tcp = (async_xp_socket_data_tcp *) timer->data;
 	
 	// Need to close the socket right here to cancel connect, anything else will segfault later...
-	uv_close((uv_handle_t *) &tcp->handle, NULL);
+	if (tcp->flags & ASYNC_XP_SOCKET_FLAG_INIT) {
+		ASYNC_UV_CLOSE(&tcp->handle, NULL);
+	}
 }
 
 static int tcp_socket_connect(php_stream *stream, async_xp_socket_data *data, php_stream_xport_param *xparam)
@@ -177,6 +194,10 @@ static int tcp_socket_connect(php_stream *stream, async_xp_socket_data *data, ph
 	}
 	
 	async_socket_set_port((struct sockaddr *) &dest, port);
+	
+	uv_tcp_init(&data->scheduler->loop, (uv_tcp_t *) &data->handle);
+	
+	data->flags |= ASYNC_XP_SOCKET_FLAG_INIT;
 	
 	code = uv_tcp_connect(&req, (uv_tcp_t *) &data->handle, (const struct sockaddr *) &dest, tcp_socket_connect_cb);
 	
@@ -299,6 +320,7 @@ static int tcp_socket_accept(php_stream *stream, async_xp_socket_data *data, php
 	
 	uv_tcp_init(&server->scheduler->loop, &client->handle);
 	
+	client->flags |= ASYNC_XP_SOCKET_FLAG_INIT;	
 	client->handle.data = client;
 
 	do {
@@ -334,7 +356,7 @@ static int tcp_socket_accept(php_stream *stream, async_xp_socket_data *data, php
 	} while (xparam->outputs.client == NULL);
 	
 	if (UNEXPECTED(xparam->outputs.client == NULL)) {
-		uv_close((uv_handle_t *) &client->handle, free_cb);
+		ASYNC_UV_CLOSE(&client->handle, free_cb);
 	
 		return code;
 	}
@@ -437,8 +459,6 @@ static php_stream *tcp_socket_factory(const char *proto, size_t plen, const char
 		return NULL;
 	}
  	
- 	uv_tcp_init(&data->scheduler->loop, &data->handle);
- 	
  	data->connect = tcp_socket_connect;
  	data->bind = tcp_socket_bind;
  	data->listen = tcp_socket_listen;
@@ -478,5 +498,3 @@ void async_tcp_socket_shutdown()
 		php_stream_xport_register("tcp", orig_tcp_factory);
 	}
 }
-
-#endif

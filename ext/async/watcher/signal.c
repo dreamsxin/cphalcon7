@@ -1,28 +1,23 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
 #include "kernel/backend.h"
-
-#if PHALCON_USE_UV
 
 ASYNC_API zend_class_entry *async_signal_ce;
 
@@ -32,7 +27,7 @@ static zend_object_handlers async_signal_handlers;
 	zend_declare_class_constant_long(async_signal_ce, const_name, sizeof(const_name)-1, (zend_long)value);
 
 
-typedef struct {
+typedef struct _async_signal {
 	/* PHP object handle. */
 	zend_object std;
 
@@ -114,11 +109,7 @@ ASYNC_CALLBACK shutdown_signal(void *obj, zval *error)
 		ZVAL_COPY(&signal->error, error);
 	}
 
-	if (!uv_is_closing((uv_handle_t *) &signal->handle)) {
-		ASYNC_ADDREF(&signal->std);
-
-		uv_close((uv_handle_t *) &signal->handle, close_signal);
-	}
+	ASYNC_UV_TRY_CLOSE_REF(&signal->std, &signal->handle, close_signal);
 	
 	if (error != NULL) {
 		while (signal->observers.first != NULL) {
@@ -174,7 +165,11 @@ static void async_signal_object_destroy(zend_object *object)
 	zend_object_std_dtor(&signal->std);
 }
 
-ZEND_METHOD(Signal, __construct)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_signal_ctor, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, __construct)
 {
 	async_signal *signal;
 	zend_long signum;
@@ -199,7 +194,11 @@ ZEND_METHOD(Signal, __construct)
 	ASYNC_LIST_APPEND(&signal->scheduler->shutdown, &signal->cancel);
 }
 
-ZEND_METHOD(Signal, close)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_close, 0, 0, IS_VOID, 0)
+	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, close)
 {
 	async_signal *signal;
 
@@ -210,7 +209,7 @@ ZEND_METHOD(Signal, close)
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 
 	signal = (async_signal *) Z_OBJ_P(getThis());
@@ -219,7 +218,7 @@ ZEND_METHOD(Signal, close)
 		return;
 	}
 	
-	ASYNC_PREPARE_ERROR(&error, "Signal has been closed");
+	ASYNC_PREPARE_ERROR(&error, execute_data, "Signal has been closed");
 	
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -233,7 +232,10 @@ ZEND_METHOD(Signal, close)
 	zval_ptr_dtor(&error);
 }
 
-ZEND_METHOD(Signal, awaitSignal)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_await_signal, 0, 0, IS_VOID, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, awaitSignal)
 {
 	async_signal *signal;
 	async_op *op;
@@ -285,7 +287,11 @@ static int is_signal_supported(int signum)
 	return 0;
 }
 
-ZEND_METHOD(Signal, isSupported)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_is_supported, 0, 1, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, isSupported)
 {
 	zend_long tmp;
 
@@ -300,7 +306,11 @@ ZEND_METHOD(Signal, isSupported)
 	RETURN_FALSE;
 }
 
-ZEND_METHOD(Signal, raise)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_raise, 0, 1, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, raise)
 {
 	zend_long tmp;
 	
@@ -319,7 +329,12 @@ ZEND_METHOD(Signal, raise)
 #endif
 }
 
-ZEND_METHOD(Signal, signal)
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_signal, 0, 2, IS_VOID, 0)
+	ZEND_ARG_TYPE_INFO(0, pid, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
+ZEND_END_ARG_INFO();
+
+PHP_METHOD(Signal, signal)
 {
 	zend_long pid;
 	zend_long sig;
@@ -343,60 +358,19 @@ ZEND_METHOD(Signal, signal)
 	}
 }
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_signal_ctor, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-#if PHP_VERSION_ID >= 70200
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_close, 0, 0, IS_VOID, 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_await_signal, 0, 0, IS_VOID, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_is_supported, 0, 1, _IS_BOOL, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_raise, 0, 1, IS_VOID, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_signal, 0, 2, IS_VOID, 0)
-	ZEND_ARG_TYPE_INFO(0, pid, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_close, 0, 0, IS_VOID, NULL, 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_await_signal, 0, 0, IS_VOID, NULL, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_is_supported, 0, 1, _IS_BOOL, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_raise, 0, 1, IS_VOID, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_signal_signal, 0, 2, IS_VOID, NULL, 0)
-	ZEND_ARG_TYPE_INFO(0, pid, IS_LONG, 0)
-	ZEND_ARG_TYPE_INFO(0, signum, IS_LONG, 0)
-ZEND_END_ARG_INFO()
-#endif
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(Signal, async_signal_ce)
+//LCOV_EXCL_STOP
 
 static const zend_function_entry async_signal_functions[] = {
-	ZEND_ME(Signal, __construct, arginfo_signal_ctor, ZEND_ACC_PUBLIC)
-	ZEND_ME(Signal, close, arginfo_signal_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(Signal, awaitSignal, arginfo_signal_await_signal, ZEND_ACC_PUBLIC)
-	ZEND_ME(Signal, isSupported, arginfo_signal_is_supported, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(Signal, raise, arginfo_signal_raise, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_ME(Signal, signal, arginfo_signal_signal, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	ZEND_FE_END
+	PHP_ME(Signal, __construct, arginfo_signal_ctor, ZEND_ACC_PUBLIC)
+	PHP_ME(Signal, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(Signal, close, arginfo_signal_close, ZEND_ACC_PUBLIC)
+	PHP_ME(Signal, awaitSignal, arginfo_signal_await_signal, ZEND_ACC_PUBLIC)
+	PHP_ME(Signal, isSupported, arginfo_signal_is_supported, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Signal, raise, arginfo_signal_raise, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Signal, signal, arginfo_signal_signal, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_FE_END
 };
 
 
@@ -404,7 +378,7 @@ void async_signal_ce_register()
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Signal", async_signal_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Signal", async_signal_functions);
 	async_signal_ce = zend_register_internal_class(&ce);
 	async_signal_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_signal_ce->create_object = async_signal_object_create;
@@ -424,5 +398,3 @@ void async_signal_ce_register()
 	ASYNC_SIGNAL_CONST("SIGUSR1", ASYNC_SIGNAL_SIGUSR1);
 	ASYNC_SIGNAL_CONST("SIGUSR2", ASYNC_SIGNAL_SIGUSR2);
 }
-
-#endif

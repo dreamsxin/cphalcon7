@@ -23,6 +23,38 @@
 
 #include <Zend/zend_types.h>
 
+#if PHP_VERSION_ID < 70200
+
+#undef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX
+#undef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO
+
+#undef ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX
+#undef ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO
+
+#define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, return_reference, required_num_args, class_name, allow_null) \
+	static const zend_internal_arg_info name[] = { \
+		{ (const char*)(zend_uintptr_t)(required_num_args), #class_name, IS_OBJECT, return_reference, allow_null, 0 },
+#define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO(name, class_name, allow_null) \
+	ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, 0, -1, class_name, allow_null)
+
+#define ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(name, return_reference, required_num_args, type, allow_null) \
+	static const zend_internal_arg_info name[] = { \
+	   	{ (const char*)(zend_uintptr_t)(required_num_args), NULL, type, return_reference, allow_null, 0 },
+#define ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO(name, type, allow_null) \
+	ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(name, 0, -1, type, allow_null)
+
+#elif PHP_VERSION_ID < 70300
+
+/**
+ * there's currently a PHP 7.2 bug in this macro
+ * see https://github.com/php/php-src/pull/2523
+ */
+#undef ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO
+
+#define ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO(name, class_name, allow_null) \
+	ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(name, 0, -1, class_name, allow_null)
+#endif
+
 #ifndef IS_VOID
 #define IS_VOID 0
 #endif

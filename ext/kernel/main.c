@@ -68,10 +68,6 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 
 	/* DB options */
 	phalcon_globals->db.escape_identifiers = 1;
-#if PHALCON_USE_UV
-	/* Async options */
-	phalcon_globals->async.fs_enabled = 0;
-#endif
 }
 
 /**

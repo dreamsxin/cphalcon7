@@ -1,28 +1,23 @@
-
 /*
-  +------------------------------------------------------------------------+
-  | Phalcon Framework                                                      |
-  +------------------------------------------------------------------------+
-  | Copyright (c) 2011-2014 Phalcon Team (http://www.phalconphp.com)       |
-  +------------------------------------------------------------------------+
-  | This source file is subject to the New BSD License that is bundled     |
-  | with this package in the file docs/LICENSE.txt.                        |
-  |                                                                        |
-  | If you did not receive a copy of the license and are unable to         |
-  | obtain it through the world-wide-web, please send an email             |
-  | to license@phalconphp.com so we can send you a copy immediately.       |
-  +------------------------------------------------------------------------+
-  | Authors: Andres Gutierrez <andres@phalconphp.com>                      |
-  |          Eduar Carvajal <eduar@phalconphp.com>                         |
-  |          ZhuZongXin <dreamsxin@qq.com>                                 |
-  |          Martin Schröder <m.schroeder2007@gmail.com>                   |
-  +------------------------------------------------------------------------+
+  +----------------------------------------------------------------------+
+  | PHP Version 7                                                        |
+  +----------------------------------------------------------------------+
+  | Copyright (c) 1997-2018 The PHP Group                                |
+  +----------------------------------------------------------------------+
+  | This source file is subject to version 3.01 of the PHP license,      |
+  | that is bundled with this package in the file LICENSE, and is        |
+  | available through the world-wide-web at the following url:           |
+  | http://www.php.net/license/3_01.txt                                  |
+  | If you did not receive a copy of the PHP license and are unable to   |
+  | obtain it through the world-wide-web, please send a note to          |
+  | license@php.net so we can mail you a copy immediately.               |
+  +----------------------------------------------------------------------+
+  | Authors: Martin Schröder <m.schroeder2007@gmail.com>                 |
+  +----------------------------------------------------------------------+
 */
 
 #include "async/core.h"
 #include "kernel/backend.h"
-
-#if PHALCON_USE_UV
 
 ASYNC_API zend_class_entry *async_monitor_ce;
 ASYNC_API zend_class_entry *async_monitor_event_ce;
@@ -30,7 +25,7 @@ ASYNC_API zend_class_entry *async_monitor_event_ce;
 static zend_object_handlers async_monitor_handlers;
 static zend_object_handlers async_monitor_event_handlers;
 
-typedef struct {
+typedef struct _async_monitor_event {
 	zend_string *path;
 	
 	zend_object std;
@@ -41,7 +36,7 @@ static zend_string *str_path;
 
 static async_monitor_event *async_monitor_event_object_create(int events, char *path, int len);
 
-typedef struct {
+typedef struct _async_monitor {
 	/* PHP object handle. */
 	zend_object std;
 	
@@ -56,7 +51,7 @@ typedef struct {
 	zval error;
 } async_monitor;
 
-typedef struct {
+typedef struct _async_monitor_op {
 	async_op base;
 	int status;
 	int events;
@@ -93,11 +88,7 @@ ASYNC_CALLBACK shutdown_cb(void *arg, zval *error)
 		ZVAL_COPY(&monitor->error, error);
 	}
 	
-	if (!uv_is_closing((uv_handle_t *) &monitor->handle)) {
-		ASYNC_ADDREF(&monitor->std);
-		
-		uv_close((uv_handle_t *) &monitor->handle, close_cb);
-	}
+	ASYNC_UV_TRY_CLOSE_REF(&monitor->std, &monitor->handle, close_cb);
 	
 	while (monitor->listeners.first) {
 		ASYNC_FAIL_OP(monitor->listeners.first, &monitor->error);
@@ -160,9 +151,9 @@ static void async_monitor_object_destroy(zend_object *object)
 ZEND_BEGIN_ARG_INFO_EX(arginfo_monitor_ctor, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, path, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, recursive, _IS_BOOL, 1)
-ZEND_END_ARG_INFO()
+ZEND_END_ARG_INFO();
 
-static ZEND_METHOD(Monitor, __construct)
+static PHP_METHOD(Monitor, __construct)
 {
 	async_monitor *monitor;
 	
@@ -220,17 +211,11 @@ ASYNC_CALLBACK event_cb(uv_fs_event_t *handle, const char *name, int events, int
 	}
 }
 
-#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_monitor_close, 0, 0, IS_VOID, 0)
 	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-#else
-ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_monitor_close, 0, 0, IS_VOID, NULL, 0)
-	ZEND_ARG_OBJ_INFO(0, error, Throwable, 1)
-ZEND_END_ARG_INFO()
-#endif
+ZEND_END_ARG_INFO();
 
-static ZEND_METHOD(Monitor, close)
+static PHP_METHOD(Monitor, close)
 {
 	async_monitor *monitor;
 
@@ -241,7 +226,7 @@ static ZEND_METHOD(Monitor, close)
 
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL(val)
+		Z_PARAM_OBJECT_OF_CLASS_EX(val, zend_ce_throwable, 1, 0)
 	ZEND_PARSE_PARAMETERS_END();
 
 	monitor = (async_monitor *) Z_OBJ_P(getThis());
@@ -250,7 +235,7 @@ static ZEND_METHOD(Monitor, close)
 		return;
 	}
 	
-	ASYNC_PREPARE_ERROR(&error, "Monitor has been closed");
+	ASYNC_PREPARE_ERROR(&error, execute_data, "Monitor has been closed");
 	
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -265,9 +250,9 @@ static ZEND_METHOD(Monitor, close)
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_monitor_await_event, 0, 0, Phalcon\\Async\\MonitorEvent, 0)
-ZEND_END_ARG_INFO()
+ZEND_END_ARG_INFO();
 
-static ZEND_METHOD(Monitor, awaitEvent)
+static PHP_METHOD(Monitor, awaitEvent)
 {
 	async_monitor *monitor;
 	async_monitor_event *event;
@@ -296,11 +281,16 @@ static ZEND_METHOD(Monitor, awaitEvent)
 	RETURN_OBJ(&event->std);
 }
 
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_WAKEUP(Monitor, async_monitor_ce)
+//LCOV_EXCL_STOP
+
 static const zend_function_entry async_monitor_functions[] = {
-	ZEND_ME(Monitor, __construct, arginfo_monitor_ctor, ZEND_ACC_PUBLIC)
-	ZEND_ME(Monitor, close, arginfo_monitor_close, ZEND_ACC_PUBLIC)
-	ZEND_ME(Monitor, awaitEvent, arginfo_monitor_await_event, ZEND_ACC_PUBLIC)
-	ZEND_FE_END
+	PHP_ME(Monitor, __construct, arginfo_monitor_ctor, ZEND_ACC_PUBLIC)
+	PHP_ME(Monitor, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_ME(Monitor, close, arginfo_monitor_close, ZEND_ACC_PUBLIC)
+	PHP_ME(Monitor, awaitEvent, arginfo_monitor_await_event, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -346,8 +336,15 @@ static void async_monitor_event_object_destroy(zend_object *object)
 	zend_object_std_dtor(&event->std);
 }
 
+//LCOV_EXCL_START
+ASYNC_METHOD_NO_CTOR(MonitorEvent, async_monitor_event_ce)
+ASYNC_METHOD_NO_WAKEUP(MonitorEvent, async_monitor_event_ce)
+//LCOV_EXCL_STOP
+
 static const zend_function_entry async_monitor_event_functions[] = {
-	ZEND_FE_END
+	PHP_ME(MonitorEvent, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
+	PHP_ME(MonitorEvent, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
+	PHP_FE_END
 };
 
 
@@ -355,7 +352,7 @@ void async_monitor_ce_register()
 {
 	zend_class_entry ce;
 
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\Monitor", async_monitor_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Monitor", async_monitor_functions);
 	async_monitor_ce = zend_register_internal_class(&ce);
 	async_monitor_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_monitor_ce->create_object = async_monitor_object_create;
@@ -367,7 +364,7 @@ void async_monitor_ce_register()
 	async_monitor_handlers.dtor_obj = async_monitor_object_dtor;
 	async_monitor_handlers.clone_obj = NULL;
 	
-	INIT_CLASS_ENTRY(ce, "Phalcon\\Async\\MonitorEvent", async_monitor_event_functions);
+	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "MonitorEvent", async_monitor_event_functions);
 	async_monitor_event_ce = zend_register_internal_class(&ce);
 	async_monitor_event_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_monitor_event_ce->create_object = NULL;
@@ -394,5 +391,3 @@ void async_monitor_ce_unregister()
 	zend_string_release(str_events);
 	zend_string_release(str_path);
 }
-
-#endif

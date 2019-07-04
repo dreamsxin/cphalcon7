@@ -293,7 +293,9 @@ static async_process *async_process_object_create(unsigned int detached)
 	proc->scheduler = async_task_scheduler_ref();
 
 	proc->cancel.object = proc;
-	proc->cancel.func = shutdown_process;
+	if (!detached) {
+		proc->cancel.func = shutdown_process;
+	}
 
 	proc->status = -1;
 	proc->detached = detached;

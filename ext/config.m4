@@ -1346,9 +1346,10 @@ aop.c"
 		])
 	fi
 
-	AC_MSG_CHECKING([checking libuv support])
+	AC_MSG_CHECKING([checking async support])
 	if test "$async_use_ucontext" = "yes"; then
 
+		AC_MSG_RESULT(yes)
 		ASYNC_CFLAGS="-Wall -DZEND_ENABLE_STATIC_TSRMLS_CACHE=1"
 		LDFLAGS="$LDFLAGS -lpthread"
 

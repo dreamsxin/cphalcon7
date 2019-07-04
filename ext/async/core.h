@@ -28,6 +28,8 @@
 #include "config.h"
 #endif
 
+#if PHALCON_USE_ASYNC
+
 #ifdef PHP_WIN32
 #include <Winsock2.h>
 #include <Mswsock.h>
@@ -899,8 +901,7 @@ ZEND_END_ARG_INFO();
 
 ZEND_API void async_execute_ex(zend_execute_data *exec);
 
-#endif
-
+#endif /* PHALCON_USE_ASYNC */
 
 /* PHP 7.3 */
 #if PHP_VERSION_ID < 70200
@@ -916,4 +917,6 @@ typedef void (ZEND_FASTCALL *zif_handler)(INTERNAL_FUNCTION_PARAMETERS);
 #define ZEND_PROPERTY_ISSET     0x0          /* Property exists and is not NULL */
 #define ZEND_PROPERTY_NOT_EMPTY ZEND_ISEMPTY /* Property is not empty */
 #define ZEND_PROPERTY_EXISTS    0x2          /* Property exists */
+#endif
+
 #endif

@@ -346,6 +346,10 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 #define ASYNC_G(v) (PHALCON_GLOBAL(async).v)
 #endif
 
+#if defined(ZTS) && defined(COMPILE_DL_PHALCON)
+ZEND_TSRMLS_CACHE_EXTERN()
+#endif
+
 extern zend_module_entry phalcon_module_entry;
 #define phpext_phalcon_ptr &phalcon_module_entry
 

@@ -216,6 +216,7 @@ ASYNC_API extern zend_class_entry *async_writable_process_pipe_ce;
 ASYNC_API extern zend_class_entry *async_writable_memory_stream_ce;
 ASYNC_API extern zend_class_entry *async_writable_stream_ce;
 
+/*
 typedef struct _async_cancel_cb                     async_cancel_cb;
 typedef struct _async_cancellation_handler          async_cancellation_handler;
 typedef struct _async_context                       async_context;
@@ -227,6 +228,7 @@ typedef struct _async_op                            async_op;
 typedef struct _async_task                          async_task;
 typedef struct _async_task_scheduler                async_task_scheduler;
 typedef struct _async_tick_event                    async_tick_event;
+*/
 
 #define ASYNC_FIBER_FLAG_QUEUED 1
 

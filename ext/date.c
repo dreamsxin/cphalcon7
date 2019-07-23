@@ -478,11 +478,11 @@ PHP_METHOD(Phalcon_Date, days){
 		ZVAL_STRING(&tmp, "Y");
 
 		PHALCON_CALL_FUNCTION(&year2, "date", &tmp);
-
-		y = phalcon_get_intval(&year2);
 	} else {
 		ZVAL_COPY_VALUE(&year2, year);
 	}
+
+	y = phalcon_get_intval(&year2);
 
 	if (Z_TYPE(months) == IS_ARRAY) {
 		if (phalcon_array_isset_fetch_long(&year_months, &months, y, PH_READONLY)) {

@@ -184,6 +184,7 @@ zend_class_entry *phalcon_http_parser_ce;
 
 PHP_METHOD(Phalcon_Http_Parser, __construct);
 PHP_METHOD(Phalcon_Http_Parser, execute);
+PHP_METHOD(Phalcon_Http_Parser, parseCookie);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_parser___construct, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
@@ -194,9 +195,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_parser_execute, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, output, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_http_parser_parsecookies, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_http_parser_method_entry[] = {
 	PHP_ME(Phalcon_Http_Parser, __construct, arginfo_phalcon_http_parser___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Http_Parser, execute, arginfo_phalcon_http_parser_execute, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Parser, parseCookie, arginfo_phalcon_http_parser_parsecookies, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -269,7 +275,7 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
 }
 
 /**
- * Phalcon\Http\Parser constructor
+ * parse
  *
  * @param string $body http message.
  * @return array|boolean $result
@@ -331,4 +337,42 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 
 	phalcon_array_update_str_str(return_value, SL("VERSION"), versiphalcon_on_buffer, 4, 0);
 	phalcon_array_update_str(return_value, SL("HEADERS"), &intern->data->head, PH_COPY);
+}
+
+/**
+ * parse cookies
+ *
+ * @param string $str
+ * @return array
+ */
+PHP_METHOD(Phalcon_Http_Parser, parseCookie){
+
+	zval *str, cookies = {}, *cookie = NULL;
+
+	phalcon_fetch_params(1, 1, 0, &str);
+
+	array_init(return_value);
+	phalcon_fast_explode_str(&cookies, SL(";"), str);
+	if (Z_TYPE(cookies) != IS_ARRAY) {
+		RETURN_MM();
+	}
+	PHALCON_MM_ADD_ENTRY(&cookies);
+
+	ZEND_HASH_FOREACH_VAL(Z_ARR(cookies), cookie) {
+		zval parts = {};
+		phalcon_fast_explode_str2(&parts, SL("="), cookie, 2);
+	
+		if (Z_TYPE(parts) != IS_ARRAY) {
+			continue;
+		}
+		PHALCON_MM_ADD_ENTRY(&parts);
+
+		if (phalcon_fast_count_int(&parts) == 2) {
+			zval key = {}, value = {};
+			phalcon_array_fetch_long(&key, &parts, 0, PH_NOISY|PH_READONLY);
+			phalcon_array_fetch_long(&value, &parts, 1, PH_NOISY|PH_READONLY);
+			phalcon_array_update(return_value, &key, &value, PH_COPY);
+		}
+	} ZEND_HASH_FOREACH_END();
+	RETURN_MM();
 }

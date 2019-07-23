@@ -563,12 +563,12 @@ PHP_METHOD(Phalcon_Websocket_Server, run)
 
 	// Disconnect users
 	text = zend_string_init(ZEND_STRL("Server terminated"), 0);
-	ZEND_HASH_FOREACH(Z_ARR(intern->connections), 0);
+	ZEND_HASH_FOREACH(Z_ARR(intern->connections), 0) {
 		conn = (phalcon_websocket_connection_object *) Z_OBJ_P(_z);
 		phalcon_websocket_connection_close(conn, text);
 		zval_delref_p(_z);
 		zend_hash_index_del(Z_ARR(intern->connections), _p->h);
-	ZEND_HASH_FOREACH_END();
+	} ZEND_HASH_FOREACH_END();
 
 	lws_context_destroy(intern->context);
 	intern->context = NULL;
@@ -610,7 +610,7 @@ PHP_METHOD(Phalcon_Websocket_Server, broadcast)
 	}
 
 	intern = phalcon_websocket_server_object_from_obj(Z_OBJ_P(getThis()));
-	ZEND_HASH_FOREACH_VAL(Z_ARR(intern->connections), connection);
+	ZEND_HASH_FOREACH_VAL(Z_ARR(intern->connections), connection) {
 		zval id = {};
 		phalcon_websocket_connection_object *intern = phalcon_websocket_connection_object_from_obj(Z_OBJ_P(connection));
 		// TODO Test return? Interrupt if a write fail?
@@ -619,7 +619,7 @@ PHP_METHOD(Phalcon_Websocket_Server, broadcast)
 			continue;
 		}
 		phalcon_websocket_connection_write(intern, text, write_protocol);
-	ZEND_HASH_FOREACH_END();
+	} ZEND_HASH_FOREACH_END();
 }
 
 /**

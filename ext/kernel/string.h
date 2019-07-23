@@ -73,6 +73,7 @@ void phalcon_append_printable_zval(smart_str *implstr, zval *tmp);
 void phalcon_fast_join_str(zval *result, char *glue, unsigned int glue_length, zval *pieces);
 void phalcon_fast_explode(zval *result, zval *delimiter, zval *str);
 void phalcon_fast_explode_str(zval *result, const char *delimiter, unsigned int delimiter_length, zval *str);
+void phalcon_fast_explode_str2(zval *result, const char *delimiter, unsigned int delimiter_length, zval *str, zend_long limit);
 void phalcon_fast_explode_str_str(zval *result, const char *delimiter, unsigned int delimiter_length, const char *str, unsigned int str_length);
 int phalcon_fast_strpos(zval *return_value, const zval *haystack, const zval *needle);
 int phalcon_fast_strpos_str(zval *return_value, const zval *haystack, const char *needle, unsigned int needle_length);

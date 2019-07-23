@@ -1912,7 +1912,7 @@ static zend_always_inline int phalcon_arr_aggregate(zval *result, zval* rows, zv
 
 static zend_always_inline void phalcon_arr_group_items(zval *groups_array, zval* rows, zend_string* field)
 {
-	zval *row, *category_key, *group;
+	zval *row, *category_key, *group = NULL;
 	HashTable * groups_ht;
 
 	// Allocate the group array for the current aggregation
@@ -1921,7 +1921,10 @@ static zend_always_inline void phalcon_arr_group_items(zval *groups_array, zval*
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(rows), row) {
 		if (Z_TYPE_P(row) == IS_ARRAY && (category_key = zend_hash_find(Z_ARRVAL_P(row), field)) != NULL) {
-			if (Z_TYPE_P(category_key) == IS_STRING) {
+			if (Z_TYPE_P(category_key) != IS_LONG) {
+				if (UNEXPECTED(Z_TYPE_P(category_key) != IS_STRING)) {
+					convert_to_string_ex(category_key);
+				}
 				if ((group = zend_hash_find(groups_ht, Z_STR_P(category_key))) == NULL) {
 					// Allocate a new group array
 					zval new_group = {};
@@ -1930,7 +1933,7 @@ static zend_always_inline void phalcon_arr_group_items(zval *groups_array, zval*
 					// Set the group array into the groups array.
 					group = zend_hash_update(groups_ht, Z_STR_P(category_key), &new_group);
 				}
-			} else if (Z_TYPE_P(category_key) == IS_LONG) {
+			} else {
 				if ((group = zend_hash_index_find(groups_ht, Z_LVAL_P(category_key))) == NULL) {
 					// Allocate a new group array
 					zval new_group = {};

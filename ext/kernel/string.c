@@ -598,6 +598,26 @@ void phalcon_fast_explode_str(zval *result, const char *delimiter, unsigned int 
 /**
  * Fast call to explode php function
  */
+void phalcon_fast_explode_str2(zval *result, const char *delimiter, unsigned int delimiter_length, zval *str, zend_long limit)
+{
+	zend_string *delim;
+
+	if (unlikely(Z_TYPE_P(str) != IS_STRING)) {
+		ZVAL_NULL(result);
+		zend_error(E_WARNING, "Invalid arguments supplied for explode()");
+		return;
+	}
+
+	delim = zend_string_init(delimiter, delimiter_length, 0);
+
+	array_init(result);
+	php_explode(delim, Z_STR_P(str), result, limit);
+	zend_string_release(delim);
+}
+
+/**
+ * Fast call to explode php function
+ */
 void phalcon_fast_explode_str_str(zval *result, const char *delimiter, unsigned int delimiter_length, const char *str, unsigned int str_length)
 {
 	zend_string *delim, *s;
@@ -1385,7 +1405,7 @@ static zend_long php_str_replace_in_subject(zval *search, zval *replace, zval *s
 {
 	zval		*search_entry,
 				*replace_entry = NULL;
-	zend_string	*tmp_result,
+	zend_string	*tmp_result = NULL,
 				*replace_entry_str = NULL;
 	char		*replace_value = NULL;
 	size_t		 replace_len = 0;

@@ -583,7 +583,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyName){
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
 
-	zval *ret;
+	zval *ret = NULL;
 	zend_class_entry *old_scope;
 	phalcon_aop_joinpoint_object *intern;
 
@@ -623,7 +623,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, setProperty){
 
-	zval *key, *value, *object;
+	zval *key, *value, *object = NULL;
 	phalcon_aop_joinpoint_object *intern;
 
 	phalcon_fetch_params(0, 2, 0, &key, &value);
@@ -658,7 +658,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, setProperty){
  */
 PHP_METHOD(Phalcon_Aop_Joinpoint, getProperty){
 
-	zval *key, *object;
+	zval *key, *object = NULL;
 	phalcon_aop_joinpoint_object *intern;
 
 	phalcon_fetch_params(0, 1, 0, &key);

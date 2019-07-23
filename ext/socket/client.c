@@ -319,6 +319,8 @@ PHP_METHOD(Phalcon_Socket_Client, send){
 		RETURN_FALSE;
 	}
 
+	len = Z_LVAL_P(length);
+
 	ZVAL_LONG(&ret, 0);
 	ZVAL_DUP(&writebuf, buffer);
 

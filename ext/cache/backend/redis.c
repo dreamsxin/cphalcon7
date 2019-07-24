@@ -339,7 +339,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Redis, save){
 		 */
 		PHALCON_MM_CALL_METHOD(&prepared_content, &frontend, "beforestore", &cached_content);
 		PHALCON_MM_ADD_ENTRY(&prepared_content);
-		PHALCON_MM_CALL_METHOD(&success, &redis, "set", &prefixed_key, &prepared_content);
+		PHALCON_MM_CALL_METHOD(&success, &redis, "set", &prefixed_key, &prepared_content, &ttl);
 		PHALCON_MM_ADD_ENTRY(&success);
 	}
 

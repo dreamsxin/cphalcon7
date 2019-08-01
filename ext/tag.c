@@ -411,7 +411,12 @@ PHALCON_STATIC void phalcon_tag_render_attributes(zval *code, zval *attributes)
 	}
 	PHALCON_MM_INIT();
 	PHALCON_MM_ADD_ENTRY(&escaper);
-	array_init(&attrs);
+	if (phalcon_array_isset_fetch_str(&v, attributes, SL("attrs"), PH_READONLY) && Z_TYPE(v) == IS_ARRAY) {
+		ZVAL_COPY_VALUE(&attrs, &v);
+		PHALCON_SEPARATE(&attrs);
+	} else {
+		array_init(&attrs);
+	}
 	PHALCON_MM_ADD_ENTRY(&attrs);
 	for (i=0; i<sizeof(order)/sizeof(order[0]); ++i) {
 		if (phalcon_array_isset_fetch_str(&v, attributes, order[i].str, order[i].size, PH_READONLY)) {

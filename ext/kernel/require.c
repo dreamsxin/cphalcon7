@@ -175,11 +175,19 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 	}
 	symbol_table = phalcon_build_symtable(vars);
 
+#if PHP_VERSION_ID < 70400
 	file_handle.filename = ZSTR_VAL(filename);
 	file_handle.free_filename = 0;
 	file_handle.type = ZEND_HANDLE_FILENAME;
 	file_handle.opened_path = NULL;
 	file_handle.handle.fp = NULL;
+#else
+	ret = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+
+	if (ret != SUCCESS) {
+		return FAILURE;
+	}
+#endif
 
 	op_array = zend_compile_file(&file_handle, ZEND_INCLUDE);
 
@@ -255,11 +263,19 @@ int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 
 	ZVAL_UNDEF(&local_retval);
 
+#if PHP_VERSION_ID < 70400
 	file_handle.filename = require_path;
 	file_handle.free_filename = 0;
 	file_handle.type = ZEND_HANDLE_FILENAME;
 	file_handle.opened_path = NULL;
 	file_handle.handle.fp = NULL;
+#else
+	ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+
+	if (ret != SUCCESS) {
+		return FAILURE;
+	}
+#endif
 
 	new_op_array = zend_compile_file(&file_handle, ZEND_REQUIRE);
 	if (new_op_array) {
@@ -275,7 +291,7 @@ int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 		}
 
 #if PHP_VERSION_ID >= 70100
-		new_op_array->scope = EG(fake_scope);
+		new_op_array->scope = EG(fake_scope) ? EG(fake_scope) : zend_get_executed_scope();
 #else
 		new_op_array->scope = EG(scope);
 #endif

@@ -53,6 +53,7 @@
  *                 "sql" => $sql,
  *                 "total_sql" => $sql2,
  *                 "bind" => $bind,
+ *                 //"total_bind" => $total_bind,
  *                 "limit" => 20,
  *                 "page" => $page
  * ));
@@ -100,6 +101,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_sql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_total_sql"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_bind"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_paginator_adapter_sql_ce, SL("_total_bind"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_paginator_adapter_sql_ce, SL("_fetchMode"), PDO_FETCH_OBJ, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_paginator_adapter_sql_ce, 1, phalcon_paginator_adapterinterface_ce);
@@ -114,7 +116,7 @@ PHALCON_INIT_CLASS(Phalcon_Paginator_Adapter_Sql){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 
-	zval *config, dbname = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, page = {}, fetch_mode = {};
+	zval *config, dbname = {}, db = {}, sql = {}, total_sql = {}, bind = {}, total_bind = {}, limit = {}, page = {}, fetch_mode = {};
 	long int i_limit;
 
 	phalcon_fetch_params(0, 1, 0, &config);
@@ -139,6 +141,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct){
 		phalcon_update_property_empty_array(getThis(), SL("_bind"));
 	}
 
+	if (phalcon_array_isset_fetch_str(&total_bind, config, SL("total_bind"), PH_READONLY)) {
+		if (Z_TYPE(total_bind) != IS_ARRAY) {
+			phalcon_update_property(getThis(), SL("_total_bind"), &total_bind);
+		}
+	}
 
 	if (!phalcon_array_isset_fetch_str(&dbname, config, SL("db"), PH_COPY)) {
 		ZVAL_STRING(&dbname, "db");
@@ -222,7 +229,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getDb){
  */
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 
-	zval event_name = {}, db = {}, sql = {}, total_sql = {}, bind = {}, limit = {}, number_page = {}, number = {}, fetch_mode = {}, items = {};
+	zval event_name = {}, db = {}, sql = {}, total_sql = {}, bind = {}, total_bind = {}, limit = {}, number_page = {}, number = {}, fetch_mode = {}, items = {};
 	zval row = {}, rowcount = {}, page = {};
 	long int i_limit, i_number_page, i_number, i_before, i_rowcount;
 	long int i_total_pages, i_next;
@@ -236,6 +243,7 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	phalcon_read_property(&sql, getThis(), SL("_sql"), PH_READONLY);
 	phalcon_read_property(&total_sql, getThis(), SL("_total_sql"), PH_READONLY);
 	phalcon_read_property(&bind, getThis(), SL("_bind"), PH_CTOR);
+	phalcon_read_property(&total_bind, getThis(), SL("_total_bind"), PH_CTOR);
 	phalcon_read_property(&limit, getThis(), SL("_limitRows"), PH_READONLY);
 	phalcon_read_property(&number_page, getThis(), SL("_page"), PH_READONLY);
 	phalcon_read_property(&fetch_mode, getThis(), SL("_fetchMode"), PH_READONLY);
@@ -255,18 +263,24 @@ PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate){
 	i_number = (i_number_page - 1) * i_limit;
 	i_before = (i_number_page == 1) ? 1 : (i_number_page - 1);
 
-	PHALCON_CALL_METHOD(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
+	if (Z_TYPE(total_bind) != IS_ARRAY) {
+		PHALCON_CALL_METHOD(&row, &db, "fetchone", &total_sql, &fetch_mode, &bind);
+	} else {
+		PHALCON_CALL_METHOD(&row, &db, "fetchone", &total_sql, &fetch_mode, &total_bind);
+	}
 
 	phalcon_read_property(&rowcount, &row, SL("rowcount"), PH_READONLY);
 
-	/* Set the limit clause avoiding negative offsets */
-	if (i_number < i_limit) {
-		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
-		phalcon_array_update_str_long(&bind, SL("offset"), 0, 0);
-	} else {
-		ZVAL_LONG(&number, i_number);
-		phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
-		phalcon_array_update_str(&bind, SL("offset"), &number, 0);
+	if (Z_TYPE(total_bind) != IS_ARRAY) {
+		/* Set the limit clause avoiding negative offsets */
+		if (i_number < i_limit) {
+			phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
+			phalcon_array_update_str_long(&bind, SL("offset"), 0, 0);
+		} else {
+			ZVAL_LONG(&number, i_number);
+			phalcon_array_update_str(&bind, SL("limit"), &limit, PH_COPY);
+			phalcon_array_update_str(&bind, SL("offset"), &number, 0);
+		}
 	}
 
 	PHALCON_CALL_METHOD(&items, &db, "fetchall", &sql, &fetch_mode, &bind);

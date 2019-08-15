@@ -4506,7 +4506,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, execute){
 			PHALCON_DEBUG_LOG(&debug_message);
 			zval_ptr_dtor(&debug_message);
 		}
-		if (Z_TYPE(result) != IS_NULL) {
+		if (!zend_is_true(result)) {
 			if (Z_TYPE(result) != IS_OBJECT) {
 				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache didn't return a valid resultset");
 				return;

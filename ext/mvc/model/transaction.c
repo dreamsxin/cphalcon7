@@ -146,7 +146,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Transaction, __construct){
 	}
 
 	if (!s || Z_TYPE_P(s) != IS_STRING) {
-		ZVAL_STR(&service, IS(db));
+		zval models_manager = {};
+		PHALCON_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+		PHALCON_CALL_METHOD(&service, &models_manager, "getdefaultwriteconnectionservice");
+		zval_ptr_dtor(&models_manager);
 	} else {
 		ZVAL_COPY(&service, s);
 	}

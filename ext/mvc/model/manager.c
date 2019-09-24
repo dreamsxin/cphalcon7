@@ -80,7 +80,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setReadConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultWriteConnectionService);
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultWriteConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultReadConnectionService);
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultReadConnectionService);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getWriteConnection);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnection);
 PHP_METHOD(Phalcon_Mvc_Model_Manager, getReadConnectionService);
@@ -270,7 +272,9 @@ static const zend_function_entry phalcon_mvc_model_manager_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultconnectionservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, getDefaultConnectionService, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultWriteConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultwriteconnectionservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Manager, getDefaultWriteConnectionService, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, setDefaultReadConnectionService, arginfo_phalcon_mvc_model_manager_setdefaultreadconnectionservice, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Manager, getDefaultReadConnectionService, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, getWriteConnection, arginfo_phalcon_mvc_model_manager_getwriteconnection, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, getReadConnection, arginfo_phalcon_mvc_model_manager_getreadconnection, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Manager, getReadConnectionService, arginfo_phalcon_mvc_model_manager_getreadconnectionservice, ZEND_ACC_PUBLIC)
@@ -757,6 +761,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultWriteConnectionService){
 }
 
 /**
+ * Gets default write connection service for a model
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultWriteConnectionService){
+
+	zval connection = {};
+
+	phalcon_read_property(&connection, getThis(), SL("_defaultWriteConnectionService"), PH_NOISY|PH_READONLY);
+	if (PHALCON_IS_NOT_EMPTY(&connection)) {
+		RETURN_CTOR(&connection);
+	}
+	RETURN_MEMBER(getThis(), "_defaultConnectionService");
+}
+
+/**
  * Sets default read connection service for a model
  *
  * @param string $connectionService
@@ -768,6 +788,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Manager, setDefaultReadConnectionService){
 	phalcon_fetch_params(0, 1, 0, &connection_service);
 
 	phalcon_update_property(getThis(), SL("_defaultReadConnectionService"), connection_service);
+}
+
+/**
+ * Gets default read connection service for a model
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Manager, getDefaultReadConnectionService){
+
+	zval connection = {};
+
+	phalcon_read_property(&connection, getThis(), SL("_defaultReadConnectionService"), PH_NOISY|PH_READONLY);
+	if (PHALCON_IS_NOT_EMPTY(&connection)) {
+		RETURN_CTOR(&connection);
+	}
+	RETURN_MEMBER(getThis(), "_defaultConnectionService");
 }
 
 /**

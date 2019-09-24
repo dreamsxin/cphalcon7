@@ -22,6 +22,7 @@
 #include "mvc/model/transaction/exception.h"
 #include "mvc/model/transaction/failed.h"
 #include "mvc/model/transaction/managerinterface.h"
+#include "di/injectable.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -113,7 +114,7 @@ static const zend_function_entry phalcon_mvc_model_transaction_method_entry[] = 
  */
 PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Transaction){
 
-	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Transaction, mvc_model_transaction, phalcon_mvc_model_transaction_method_entry, 0);
+	PHALCON_REGISTER_CLASS_EX(Phalcon\\Mvc\\Model, Transaction, mvc_model_transaction, phalcon_di_injectable_ce, phalcon_mvc_model_transaction_method_entry, 0);
 
 	zend_declare_property_null(phalcon_mvc_model_transaction_ce, SL("_connection"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_mvc_model_transaction_ce, SL("_activeTransaction"), 0, ZEND_ACC_PROTECTED);

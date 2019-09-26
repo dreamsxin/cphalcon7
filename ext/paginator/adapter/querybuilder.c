@@ -329,6 +329,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 		PHALCON_MM_ADD_ENTRY(&bind_types);
 		PHALCON_MM_SEPARATE(&bind_types);
 
+		PHALCON_MM_CALL_METHOD(&connection, &total_query, "getreadconnection", &intermediate, &bind_params, &bind_types);
+		PHALCON_MM_ADD_ENTRY(&connection);
+
 		/**
 		 * Replace the placeholders
 		 */

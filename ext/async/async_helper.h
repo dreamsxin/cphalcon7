@@ -60,6 +60,7 @@ void async_tcp_socket_init();
 void async_task_scheduler_init();
 void async_timer_init();
 void async_udp_socket_init();
+void async_unix_socket_init();
 
 void async_context_shutdown();
 void async_dns_shutdown();
@@ -68,6 +69,7 @@ void async_tcp_socket_shutdown();
 void async_task_scheduler_shutdown();
 void async_timer_shutdown();
 void async_udp_socket_shutdown();
+void async_unix_socket_shutdown();
 
 char *async_status_label(zend_uchar status);
 

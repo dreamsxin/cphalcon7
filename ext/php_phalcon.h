@@ -273,6 +273,7 @@ typedef struct _phalcon_async_options {
 	zend_long threads;
 	zend_bool timer_enabled;
 	zend_bool udp_enabled;
+	zend_bool unix_enabled;
 } phalcon_async_options;
 #endif
 

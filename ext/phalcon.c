@@ -148,6 +148,7 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("phalcon.async.threads",    "4", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateThreadCount, async.threads, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.timer",      "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.timer_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.udp",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.udp_enabled, zend_phalcon_globals, phalcon_globals)
+	STD_PHP_INI_ENTRY("phalcon.async.unix",       "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.unix_enabled, zend_phalcon_globals, phalcon_globals)
 #endif
 PHP_INI_END()
 
@@ -954,6 +955,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 	async_filesystem_init();
 	async_tcp_socket_init();
 	async_udp_socket_init();
+	async_unix_socket_init();
 #endif
 	return SUCCESS;
 }
@@ -1028,6 +1030,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 	async_filesystem_shutdown();
 	async_tcp_socket_shutdown();
 	async_udp_socket_shutdown();
+	async_unix_socket_shutdown();
 
 	async_task_scheduler_shutdown();
 	async_context_shutdown();

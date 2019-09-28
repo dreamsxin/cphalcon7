@@ -1279,7 +1279,8 @@ aop.c"
 		async/watcher/timer.c \
 		async/xp/socket.c \
 		async/xp/tcp.c \
-		async/xp/udp.c
+		async/xp/udp.c \
+		async/xp/unix.c
 	"
 	if test "$async_cpu" = 'x86_64'; then
 		if test "$async_os" = 'LINUX'; then

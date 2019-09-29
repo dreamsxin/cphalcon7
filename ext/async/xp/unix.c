@@ -66,7 +66,7 @@ ASYNC_CALLBACK free_cb(uv_handle_t *handle)
 static php_stream_transport_factory orig_unix_factory;
 static php_stream_ops unix_socket_ops;
 
-static php_stream *async_pipe_create(async_pipe_data *pipe, const char *pid)
+static php_stream *async_pipe_create(async_pipe_data *pipe, const char *pid STREAMS_DC)
 {
 	php_stream *stream;
 
@@ -98,7 +98,7 @@ static php_stream *async_pipe_create(async_pipe_data *pipe, const char *pid)
 static php_stream *unix_socket_factory(const char *proto, size_t plen, const char *res, size_t reslen,
 	const char *pid, int options, int flags, struct timeval *timeout, php_stream_context *context STREAMS_DC)
 {
-	return async_pipe_create(NULL, pid);
+	return async_pipe_create(NULL, pid STREAMS_CC);
 }
 
 static size_t async_pipe_write(php_stream *stream, const char *buf, size_t count)
@@ -364,7 +364,7 @@ static int async_pipe_xport_api(php_stream *stream, async_pipe_data *pipe, php_s
 
 			client = ecalloc(1, sizeof(async_pipe_data));
 			if (client) {
-				clientstream = async_pipe_create(client, NULL);
+				clientstream = async_pipe_create(client, NULL STREAMS_CC);
 				client->flags |= ASYNC_PIPE_FLAG_INIT;
 			}
 			if (clientstream) {

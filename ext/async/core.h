@@ -92,23 +92,23 @@ typedef size_t uv_buf_size_t;
 	free(_buf); \
 } while (0)
 
-#include "zend.h"
-#include "zend_API.h"
-#include "zend_vm.h"
-#include "zend_interfaces.h"
-#include "zend_exceptions.h"
-#include "zend_closures.h"
+#include <zend.h>
+#include <zend_API.h>
+#include <zend_vm.h>
+#include <zend_interfaces.h>
+#include <zend_exceptions.h>
+#include <zend_closures.h>
 
 #ifdef PHP_WIN32
 #include "win32/winutil.h"
 #endif
 
-#include "php_network.h"
-#include "php_streams.h"
+#include <main/php_network.h>
+#include <main/php_streams.h>
 
 #if defined(HAVE_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
 #define ASYNC_SOCKETS 1
-#include "ext/sockets/php_sockets.h"
+#include <ext/sockets/php_sockets.h>
 #elif !defined(PHP_WIN32)
 #define ASYNC_SOCKETS 0
 typedef struct _php_socket {

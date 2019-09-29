@@ -20,7 +20,7 @@
 #include "async/core.h"
 #include "async/async_xp.h"
 
-#include <main/php_streams>
+#include <main/php_streams.h>
 
 #define ASYNC_PIPE_FLAG_IPC 1
 #define ASYNC_PIPE_FLAG_LAZY (1 << 1)

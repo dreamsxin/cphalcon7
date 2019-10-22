@@ -289,6 +289,14 @@ static PHP_METHOD(Context, with)
 	RETURN_OBJ(&context->std);
 }
 
+static PHP_METHOD(Context, getVar)
+{
+	async_context *current;
+
+	current = (async_context *) Z_OBJ_P(getThis());
+	RETURN_ZVAL(&current->value, 1, 0);
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_with_isolated_output, 0, 0, Phalcon\\Async\\Context, 0)
 ZEND_END_ARG_INFO();
 
@@ -512,6 +520,7 @@ static const zend_function_entry async_context_functions[] = {
 	PHP_ME(Context, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, isCancelled, arginfo_context_is_cancelled, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, with, arginfo_context_with, ZEND_ACC_PUBLIC)
+	PHP_ME(Context, getVar, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withIsolatedOutput, arginfo_context_with_isolated_output, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withTimeout, arginfo_context_with_timeout, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withCancel, arginfo_context_with_cancel, ZEND_ACC_PUBLIC)

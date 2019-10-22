@@ -1148,6 +1148,12 @@ static PHP_METHOD(Task, getTrace)
 	}
 }
 
+static PHP_METHOD(Task, getId)
+{
+
+	RETURN_LONG(Z_OBJ_HANDLE_P(getThis()));
+}
+
 //LCOV_EXCL_START
 ASYNC_METHOD_NO_CTOR(Task, async_task_ce)
 ASYNC_METHOD_NO_WAKEUP(Task, async_task_ce)
@@ -1160,6 +1166,7 @@ static const zend_function_entry task_functions[] = {
 	PHP_ME(Task, asyncWithContext, arginfo_task_async_with_context, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Task, await, arginfo_task_await, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Task, getTrace, arginfo_task_get_trace, ZEND_ACC_PUBLIC)
+	PHP_ME(Task, getId, NULL, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

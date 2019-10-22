@@ -8,7 +8,7 @@ namespace Phalcon\Async;
 function job(Deferred $defer, ContextVar $var)
 {
     var_dump('INNER DONE!');
-    
+    // $defer->resolve($num = Context::current()->getVar());
     $defer->resolve($num = $var->get());
     
     return $num;

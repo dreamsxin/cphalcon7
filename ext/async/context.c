@@ -289,12 +289,36 @@ static PHP_METHOD(Context, with)
 	RETURN_OBJ(&context->std);
 }
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_context_getvar, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
+ZEND_END_ARG_INFO();
+
 static PHP_METHOD(Context, getVar)
 {
-	async_context *current;
+	zval *name = NULL;
+	async_context *context;
 
-	current = (async_context *) Z_OBJ_P(getThis());
-	RETURN_ZVAL(&current->value, 1, 0);
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_ZVAL(name)
+	ZEND_PARSE_PARAMETERS_END();
+
+	context = (async_context *) Z_OBJ_P(getThis());
+	
+	if (name == NULL || Z_TYPE_P(name) == IS_NULL) {
+		RETURN_ZVAL(&context->value, 1, 0);
+	} else {
+		do {
+			if (context->var && Z_TYPE(context->var->name) == IS_STRING) {
+				if (!zend_string_equals(Z_STR(context->var->name), Z_STR_P(name))) {
+					RETURN_ZVAL(&context->value, 1, 0);
+				}
+			}
+
+			context = context->parent;
+		} while (context != NULL);
+		RETURN_NULL();
+	}
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_with_isolated_output, 0, 0, Phalcon\\Async\\Context, 0)
@@ -520,7 +544,7 @@ static const zend_function_entry async_context_functions[] = {
 	PHP_ME(Context, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, isCancelled, arginfo_context_is_cancelled, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, with, arginfo_context_with, ZEND_ACC_PUBLIC)
-	PHP_ME(Context, getVar, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Context, getVar, arginfo_context_getvar, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withIsolatedOutput, arginfo_context_with_isolated_output, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withTimeout, arginfo_context_with_timeout, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withCancel, arginfo_context_with_cancel, ZEND_ACC_PUBLIC)
@@ -555,11 +579,26 @@ static void async_context_var_object_destroy(zend_object *object)
 }
 
 ZEND_BEGIN_ARG_INFO(arginfo_context_var_ctor, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 ZEND_END_ARG_INFO();
 
 static PHP_METHOD(ContextVar, __construct)
 {
-	ZEND_PARSE_PARAMETERS_NONE();
+	zval *name = NULL;
+	async_context_var *var;
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_ZVAL(name)
+	ZEND_PARSE_PARAMETERS_END();
+
+	var = (async_context_var *) Z_OBJ_P(getThis());
+
+	if (name && Z_TYPE_P(name) == IS_STRING) {
+		ZVAL_COPY(&var->name, name);
+	} else {
+		ZVAL_NULL(&var->name);
+	}
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_context_var_get, 0, 0, 0)

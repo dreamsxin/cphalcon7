@@ -627,7 +627,7 @@ PHP_METHOD(Phalcon_Mvc_Application, request){
 			} else {
 				ZVAL_LONG(&tmp, idx);
 			}
-		PHALCON_MM_CALL_METHOD(NULL, &dependency_injector_new, "setservice", &tmp, value);
+			PHALCON_MM_CALL_METHOD(NULL, &dependency_injector_new, "setservice", &tmp, value);
 		} ZEND_HASH_FOREACH_END();
 	} else {
 		ZVAL_COPY_VALUE(&dependency_injector_new, _dependency_injector);

@@ -390,6 +390,9 @@ struct _async_context_timeout {
 struct _async_context_var {
 	/* PHP object handle. */
 	zend_object std;
+
+	/* Name of the context var, defaults to zval NULL. */
+	zval name;
 };
 
 #define ASYNC_TASK_FLAG_DISPOSED 1

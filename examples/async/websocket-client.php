@@ -1,11 +1,19 @@
 <?php
 
-class Websocket
+class WebsocketClient
 {
 	static public $debug = false;
-	protected $port = null;
-	protected $host = null;
-	protected $server = null;
+	protected $url;
+	protected $options;
+	protected $scheme;
+	protected $host;
+	protected $user;
+	protected $pass;
+	protected $port;
+	protected $path;
+	protected $fullpath;
+	protected $query;
+	protected $socket;
 	protected $callback = null;
 
 	protected static $opcodes = array(
@@ -17,110 +25,212 @@ class Websocket
 		'pong'         => 10,
 	);
 
-	public function __construct($host, $port, $callback = NULL) {
-		$this->port = $port;
-		$this->host = $host;
+	public function __construct($url, $callback = NULL, array $options = NULL) {
+		$this->url = $url;
+		$this->options = $options;
+		$url_parts = parse_url($this->url);
+		if ($url_parts) {
+			$this->scheme = \Phalcon\Arr::get($url_parts, 'scheme');
+			$this->host = \Phalcon\Arr::get($url_parts, 'host');
+			$this->user = isset($url_parts['user']) ? $url_parts['user'] : '';
+			$this->pass = isset($url_parts['pass']) ? $url_parts['pass'] : '';
+			$this->port = isset($url_parts['port']) ? $url_parts['port'] : ($this->scheme === 'wss' ? 443 : 80);
+			$this->path = isset($url_parts['path']) ? $url_parts['path'] : '/';
+			$this->query = isset($url_parts['query'])    ? $url_parts['query'] : '';
+			$this->fragment = isset($url_parts['fragment']) ? $url_parts['fragment'] : '';
+		}
+
+		if (!in_array($this->scheme, array('ws', 'wss'))) {
+			throw new \Exception(
+				"Url should have scheme ws or wss, not '$scheme' from URI '$this->socket_uri' ."
+			);
+		}
+
+		$this->fullpath = $this->path;
+		if (!empty($this->query)) {
+			$this->fullpath .= '?' . $this->query;
+		}
+		if (!empty($this->fragment)) {
+			$this->fullpath .= '#' . $this->fragment;
+		}
+		if ($callback && \is_callable($callback)) {
+			$callback = Closure::bind($callback, $this);
+		}
 		$this->callback = $callback;
 	}
 
-	public function start()
-	{
-		try {
-			$this->server = \Phalcon\Async\Network\TcpServer::listen($this->host, $this->port);
-			self::info('start server listen:'.$this->host.':'.$this->port);
-			while (true) {
-				$socket = $this->server->accept();
-				if ($socket === false) {
-					continue;
-				}
-				$callback = $this->callback;
-				\Phalcon\Async\Task::async(function () use ($socket, $callback) {
-					$isClose = false;
-					$isHandshake = false;
-					$socket->is_closing = false;
-					$socket->fragment_status = 0;
-					$socket->fragment_length = 0;
-					$socket->fragment_size = 4096;
-					$socket->read_length = 0;
-					$socket->huge_payload = '';
-					$socket->payload = '';
-					$socket->headers = NULL;
-					$socket->request_path = NULL;
-					try {
-						$buffer = '';
-						while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
-
-							$buffer .= $chunk;
-							if ($isHandshake === false) {
-								if (strpos($buffer, "\r\n\r\n")) {
-									if ($this->handShake($socket, $buffer)) {
-										$isHandshake = true;
-										$buffer = '';
-									}
-								}
-								continue;
-							}
-							if ($this->process($socket, $buffer)) {
-								$buffer = '';
-								if ($callback && \is_callable($callback)) {
-									$callback($socket, $socket->headers, $socket->request_path, $socket->payload);
-								}
-								$socket->fragment_status = 0;
-								$socket->fragment_length = 0;
-								$socket->read_length = 0;
-								$socket->huge_payload = '';
-								$socket->payload = '';
-							}
-						}
-					} catch (\Throwable $e) {
-						self::err($e->getMessage());
-					} finally {
-						$socket->close();
-					}
-				});
-			}
-		} catch (\Throwable $e) {
-			self::err($e->getMessage());
-		} finally {
-			if ($this->server) {
-				$this->server->close();
-			}
+	public function __destruct() {
+		if ($this->socket && !$this->socket->is_closing) {
+			$this->socket->close();
+			$this->socket = null;
 		}
 	}
 
 	/**
-	 * 请求握手
-	 * @return boolean
-	 */
-	static public function handShake($socket, $buffer)
+	* Generate a random string for WebSocket key.
+	* @return string Random string
+	*/
+	protected static function generateKey() {
+		$chars = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ!"$&/()=[]{}0123456789';
+		$key = '';
+		$chars_length = strlen($chars);
+		for ($i = 0; $i < 16; $i++) {
+			$key .= $chars[mt_rand(0, $chars_length-1)];
+		}
+		return base64_encode($key);
+	}
+
+	public function sendHeader()
 	{
-		self::info('recv:'.$buffer);
-		if (($wsKeyIndex = stripos($buffer, 'Sec-WebSocket-Key:')) === false) {
-			throw new \Exception('Handshake failed, Sec-WebSocket-Key missing');
+		// Generate the WebSocket key.
+		$this->socket->key = self::generateKey();
+
+		// Default headers (using lowercase for simpler array_merge below).
+		$headers = array(
+			'Host'                  => $this->host . ":" . $this->port,
+			'User-Agent'            => 'websocket-client-php',
+			'Connection'            => 'Upgrade',
+			'Upgrade'               => 'websocket',
+			'Sec-WebSocket-Key'     => $this->socket->key,
+			'Sec-Websocket-Version' => '13',
+		);
+
+		// Handle basic authentication.
+		if ($this->user || $this->pass) {
+			$headers['authorization'] = 'Basic ' . base64_encode($this->user . ':' . $this->pass) . "\r\n";
 		}
 
-		if (!preg_match('/GET (.*) HTTP\//mUi', $buffer, $matches)) {
-			throw new \Exception('Handshake failed, No GET in HEAD');
+		// Deprecated way of adding origin (use headers instead).
+		if (isset($this->options['origin'])) {
+			$headers['origin'] = $this->options['origin'];
 		}
-		$uri = trim($matches[1]);
-		$uri_parts = parse_url($uri);;
 
-		$socket->headers = explode("\r\n", $buffer);
-		$socket->request_path = $uri_parts['path'];
+		// Add and override with headers from options.
+		if (isset($this->options['headers'])) {
+			$headers = array_merge($headers, array_change_key_case($this->options['headers']));
+		}
 
-		$wsKey = substr($buffer, $wsKeyIndex + 18);
-		$key = trim(substr($wsKey, 0, strpos($wsKey, "\r\n")));
+		$header = "GET " . $this->fullpath . " HTTP/1.1\r\n";
+		$headers = array_map(function($key, $value) {
+			return $key.': '.$value;
+		}, array_keys($headers), $headers);
+		$header .= implode("\r\n", $headers) . "\r\n\r\n";
 
-		// 根据客户端传递过来的 key 生成 accept key
-		$acceptKey = base64_encode(sha1($key . "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true));
+		// Send headers.
+		$this->socket->write($header);
+		return true;
+	}
 
-		// 拼接回复字符串
-		$msg = "HTTP/1.1 101 Switching Protocols\r\n";
-		$msg .= "Upgrade: websocket\r\n";
-		$msg .= "Sec-WebSocket-Version: 13\r\n";
-		$msg .= "Connection: Upgrade\r\n";
-		$msg .= "Sec-WebSocket-Accept: " . $acceptKey . "\r\n\r\n";
-		$socket->write($msg);
+	public function connect()
+	{
+		$defer = new \Phalcon\Async\Deferred();
+		try {
+			$socket = \Phalcon\Async\Network\TcpSocket::connect($this->host, $this->port);
+			$socket->is_closing = false;
+			$socket->fragment_status = 0;
+			$socket->fragment_length = 0;
+			$socket->fragment_size = 4096;
+			$socket->read_length = 0;
+			$socket->huge_payload = '';
+			$socket->payload = '';
+			$socket->headers = NULL;
+			$socket->isHandshake = false;
+			$this->socket = $socket;
+			$this->sendHeader();
+			// 接收握手数据
+			\Phalcon\Async\Task::async(function () use ($defer, $socket) {
+
+				try {
+					$buffer = '';
+					while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
+
+						$buffer .= $chunk;
+						if ($socket->isHandshake === false) {
+							if (strpos($buffer, "\r\n\r\n")) {
+								if ($this->handShake($socket, $buffer)) {
+									$socket->isHandshake = true;
+									$buffer = '';
+									$defer->resolve('connected');
+								}
+							}
+						} else {
+							$defer->resolve('connected');
+						}
+					}
+				} catch (\Throwable $e) {
+					$defer->fail($e);
+				}
+				$socket->close();
+				$socket->is_closing = true;
+			});
+		} catch (\Throwable $e) {
+			self::err($e->getMessage());
+			exit;
+		}
+		return $defer;
+	}
+
+	public function recv($stdin) {
+		$socket = $this->socket;
+		$callback = $this->callback;
+		// 接收数据
+		\Phalcon\Async\Task::async(function () use ($socket, $callback, $stdin) {
+
+			try {
+				$buffer = '';
+				while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
+
+					$buffer .= $chunk;
+					if ($this->process($socket, $buffer)) {
+						$buffer = '';
+						if ($callback && \is_callable($callback)) {
+							$callback($socket->payload);
+						}
+						$socket->fragment_status = 0;
+						$socket->fragment_length = 0;
+						$socket->read_length = 0;
+						$socket->huge_payload = '';
+						$socket->payload = '';
+					}
+				}
+			} catch (\Throwable $e) {
+				self::err($e->getMessage());
+			}
+			$socket->close();
+			$socket->is_closing = true;
+
+			echo PHP_EOL.\Phalcon\Cli\Color::success('disconnected');
+			$stdin->close();
+		});
+	}
+	public function isClose() {
+		return !$this->socket || $this->socket->is_closing;
+	}
+
+	public function send($data)
+	{
+		if ($this->isClose()) {
+			self::err("No connection established or connection closed");
+			return false;
+		}
+		self::sendFragment($this->socket, $data);
+	}
+
+	public function handShake($socket, $buffer)
+	{
+		// Validate response.
+		if (!preg_match('#Sec-WebSocket-Accept:(.*)$#mUi', $buffer, $matches)) {
+			throw new \Exception('Connection failed: Server sent invalid upgrade response:'.PHP_EOL . $buffer);
+		}
+
+		$keyAccept = trim($matches[1]);
+		$expectedResonse = base64_encode(pack('H*', sha1($this->socket->key . '258EAFA5-E914-47DA-95CA-C5AB0DC85B11')));
+
+		if ($keyAccept !== $expectedResonse) {
+		  throw new \Exception('Server sent bad upgrade response.');
+		}
+
+		$socket->isHandshake = true;
 		return true;
 	}
 
@@ -390,11 +500,49 @@ startfragment:
 /**
  * 客户端测试
  * sudo apt install node-ws
- * wscat -c ws://localhost:10001
+ * php -d extension=phalcon.so websocket-client.php -c ws://localhost:10001
  */
-// Websocket::$debug = true;
-$ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) {
-	var_dump($data);
-	Websocket::sendFragment($socket, 'Re: '.$data);
+error_reporting(-1);
+ini_set('display_errors', (DIRECTORY_SEPARATOR == '\\') ? '0' : '1');
+
+$opts = new \Phalcon\Cli\Options('Websocket CLI');
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_STRING,
+    'name' => 'connect',
+    'shortName' => 'c',
+    'required' => true,
+	'help' => "-c, --connect <url>           connect to a websocket server",
+]);
+$vals = $opts->parse();
+if (!isset($vals['connect'])) {
+	return;
+}
+
+$stdin = Phalcon\Async\Stream\ReadablePipe::getStdin();
+$stdout = Phalcon\Async\Stream\WritablePipe::getStdout();
+
+// WebsocketClient::$debug = true;
+$ws = new WebsocketClient($vals['connect'], function($data) use ($stdout) {
+    $stdout->write(Phalcon\Cli\Color::colorize('< '.$data, Phalcon\Cli\Color::FG_BLUE, NULL, Phalcon\Cli\Color::BG_LIGHT_GRAY));
+	$stdout->write(PHP_EOL.'> ');
 });
-$ws->start();
+
+$defer = $ws->connect();
+
+try {
+
+	\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $stdin, $stdout) {
+		if ($e) {
+			throw $e;
+		}
+		$ws->recv($stdin);
+		$stdout->write('> ');
+		while (null !== ($chunk = $stdin->read(100))) {
+
+			$ws->send(trim($chunk));
+		}
+	}));
+} catch (\Throwable $e) {
+} finally {
+    $stdout->close();
+}

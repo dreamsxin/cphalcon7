@@ -121,7 +121,7 @@ class WebsocketClient
 		return true;
 	}
 
-	public function connect()
+	public function connect($callback = NULL)
 	{
 		$defer = new \Phalcon\Async\Deferred();
 		try {
@@ -169,7 +169,17 @@ class WebsocketClient
 			self::err($e->getMessage());
 			exit;
 		}
-		return $defer;
+		$ws = $this;
+		\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $stdin, $callback) {
+			if ($e) {
+				throw $e;
+			}
+			$ws->recv($stdin);
+
+			if ($callback && \is_callable($callback)) {
+				$callback();
+			}
+		}));
 	}
 
 	public function recv($stdin) {
@@ -528,22 +538,15 @@ $ws = new WebsocketClient($vals['connect'], function($data) use ($stdout) {
 	$stdout->write(PHP_EOL.'> ');
 });
 
-$defer = $ws->connect();
-
 try {
-
-	\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $stdin, $stdout) {
-		if ($e) {
-			throw $e;
-		}
-		$ws->recv($stdin);
+	$ws->connect(function() use ($stdin, $stdout, $ws) {
 		echo \Phalcon\Cli\Color::success('connected (press CTRL+C to quit)');
 		$stdout->write('> ');
 		while (null !== ($chunk = $stdin->read(100))) {
 
 			$ws->send(trim($chunk));
 		}
-	}));
+	});
 } catch (\Throwable $e) {
 } finally {
     $stdout->close();

@@ -147,21 +147,18 @@ class WebsocketClient
 
 				try {
 					$buffer = '';
-					while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
+					while (!$socket->isHandshake && null !== ($chunk = $socket->read())) {
 
 						$buffer .= $chunk;
-						if ($socket->isHandshake === false) {
-							if (strpos($buffer, "\r\n\r\n")) {
-								if ($this->handShake($socket, $buffer)) {
-									$socket->isHandshake = true;
-									$buffer = '';
-									$defer->resolve('connected');
-								}
+						if (strpos($buffer, "\r\n\r\n")) {
+							if ($this->handShake($socket, $buffer)) {
+								$socket->isHandshake = true;
+								$buffer = '';
+								$defer->resolve('connected');
 							}
-						} else {
-							$defer->resolve('connected');
 						}
 					}
+					$defer->resolve('connected');
 				} catch (\Throwable $e) {
 					$defer->fail($e);
 				}
@@ -541,6 +538,7 @@ try {
 			throw $e;
 		}
 		$ws->recv($stdin);
+		echo \Phalcon\Cli\Color::success('connected (press CTRL+C to quit)');
 		$stdout->write('> ');
 		while (null !== ($chunk = $stdin->read(100))) {
 

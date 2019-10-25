@@ -125,7 +125,12 @@ class WebsocketClient
 	{
 		$defer = new \Phalcon\Async\Deferred();
 		try {
-			$socket = \Phalcon\Async\Network\TcpSocket::connect($this->host, $this->port);
+			$tls = NULL;
+			if ($this->scheme == 'wss') {
+				$tls = new \Phalcon\Async\TlsClientEncryption();
+				$tls = $tls->withAllowSelfSigned(true);
+			}
+			$socket = \Phalcon\Async\Network\TcpSocket::connect($this->host, $this->port, $tls);
 			$socket->is_closing = false;
 			$socket->fragment_status = 0;
 			$socket->fragment_length = 0;

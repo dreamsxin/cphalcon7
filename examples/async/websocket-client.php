@@ -501,7 +501,6 @@ startfragment:
 
 /**
  * 客户端测试
- * sudo apt install node-ws
  * php -d extension=phalcon.so websocket-client.php -c ws://localhost:10001
  */
 error_reporting(-1);

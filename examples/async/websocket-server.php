@@ -1,5 +1,52 @@
 <?php
 
+class Pool
+{
+    private $channel;
+    private $concurrency;
+    private $count = 0;
+    private $context;
+
+    public function __construct(int $concurrency = 1, int $capacity = 0)
+    {
+        $this->concurrency = max(1, $concurrency);
+        $this->channel = new \Phalcon\Async\Channel($capacity);
+        $this->context = \Phalcon\Async\Context::background();
+    }
+
+    public function close(?\Throwable $e = null): void
+    {
+        $this->count = \PHP_INT_MAX;
+        $this->channel->close($e);
+    }
+
+    public function submit(callable $work, ...$args): \Phalcon\Async\Awaitable
+    {
+        if ($this->count < $this->concurrency) {
+            $this->count++;
+
+            \Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
+                foreach ($it as list ($defer, $context, $work, $args)) {
+                    try {
+                        $defer->resolve($context->run($work, ...$args));
+                    } catch (\Throwable $e) {
+                        $defer->fail($e);
+                    }
+                }
+            }, $this->channel->getIterator());
+        }
+
+        $this->channel->send([
+            $defer = new \Phalcon\Async\Deferred(),
+            \Phalcon\Async\Context::current(),
+            $work,
+            $args
+        ]);
+
+        return $defer->awaitable();
+    }
+}
+
 class Websocket
 {
 	static public $debug = false;
@@ -17,10 +64,11 @@ class Websocket
 		'pong'         => 10,
 	);
 
-	public function __construct($host, $port, $callback = NULL) {
+	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 2, int $capacity = 0) {
 		$this->port = $port;
 		$this->host = $host;
 		$this->callback = $callback;
+		$this->pool = new Pool($concurrency, $capacity);
 	}
 
 	public function start()
@@ -34,7 +82,8 @@ class Websocket
 					continue;
 				}
 				$callback = $this->callback;
-				\Phalcon\Async\Task::async(function () use ($socket, $callback) {
+				// \Phalcon\Async\Task::async(
+				$this->pool->submit(function () use ($socket, $callback) {
 					$isClose = false;
 					$socket->isHttp = false;
 					$socket->parser = new \Phalcon\Http\Parser();

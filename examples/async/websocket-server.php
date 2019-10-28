@@ -20,26 +20,33 @@ class Pool
         $this->channel->close($e);
     }
 
-    public function submit(callable $work, ...$args): \Phalcon\Async\Awaitable
+    public function submit(callable $work, $socket, ...$args): \Phalcon\Async\Awaitable
     {
         if ($this->count < $this->concurrency) {
             $this->count++;
-
-            \Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
-                foreach ($it as list ($defer, $context, $work, $args)) {
-                    try {
-                        $defer->resolve($context->run($work, ...$args));
-                    } catch (\Throwable $e) {
-                        $defer->fail($e);
-                    }
-                }
-            }, $this->channel->getIterator());
+			\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
+				try {
+					foreach ($it as list ($defer, $context, $work, $socket, $args)) {
+						try {
+							$defer->resolve($context->run($work, $socket, ...$args));
+						} catch (\Throwable $e) {
+							$defer->fail($e);
+						} finally {
+							$socket->close();
+						}
+					}
+				} catch (\Throwable $e) {
+				} finally {
+					--$this->count;
+				}
+			}, $this->channel->getIterator());
         }
 
         $this->channel->send([
             $defer = new \Phalcon\Async\Deferred(),
             \Phalcon\Async\Context::current(),
             $work,
+			$socket,
             $args
         ]);
 
@@ -64,7 +71,7 @@ class Websocket
 		'pong'         => 10,
 	);
 
-	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 2, int $capacity = 0) {
+	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 500, int $capacity = 200) {
 		$this->port = $port;
 		$this->host = $host;
 		$this->callback = $callback;
@@ -73,6 +80,69 @@ class Websocket
 
 	public function start()
 	{
+		$callback = $this->callback;
+		$ws = $this;
+		$worker = static function ($socket) use ($ws, $callback) {
+			$isClose = false;
+			//$socket->setOption(TcpSocket::NODELAY, false);
+			$socket->isHttp = false;
+			$socket->parser = new \Phalcon\Http\Parser();
+			$socket->isHandshake = false;
+			$socket->is_closing = false;
+			$socket->fragment_status = 0;
+			$socket->fragment_length = 0;
+			$socket->fragment_size = 4096;
+			$socket->read_length = 0;
+			$socket->huge_payload = '';
+			$socket->payload = '';
+			$socket->headers = NULL;
+			$socket->request_path = NULL;
+			try {
+				$buffer = '';
+				while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
+
+					if ($socket->isHandshake === false) {
+						$buffer .= $chunk;
+						$pos = strpos($buffer, "\r\n\r\n");
+						if ($pos) {
+							$header = substr($buffer, 0, $pos+4);
+							$buffer = substr($buffer, $pos+4);
+							if ($ws->handShake($socket, $header)) {
+							}
+						}
+					} elseif ($socket->isHttp) {
+						$buffer = $chunk;
+					} else {
+						$buffer .= $chunk;
+					}
+					if ($socket->isHttp) {
+						$ret = $socket->parser->execute($buffer);
+						if (!$ret) {
+							throw new \Exception('HTTP parse failed');
+						}
+						if ($socket->parser->status() == \Phalcon\Http\Parser::STATUS_END) {
+							$body = \Phalcon\Arr::get($ret, 'BODY');
+							if ($callback && \is_callable($callback)) {
+								$callback($socket, $socket->headers, $socket->request_path, $body);
+							}
+							break;
+						}
+					} else if ($ws->process($socket, $buffer)) {
+						$buffer = substr($buffer, $socket->read_length);
+						if ($callback && \is_callable($callback)) {
+							$callback($socket, $socket->headers, $socket->request_path, $socket->payload);
+						}
+						$socket->fragment_status = 0;
+						$socket->fragment_length = 0;
+						$socket->read_length = 0;
+						$socket->huge_payload = '';
+						$socket->payload = '';
+					}
+				}
+			} catch (\Throwable $e) {
+				self::err($e->getMessage());
+			}
+		};
 		try {
 			$this->server = \Phalcon\Async\Network\TcpServer::listen($this->host, $this->port);
 			echo Phalcon\Cli\Color::info('start server listen:'.$this->host.':'.$this->port).PHP_EOL;
@@ -81,71 +151,8 @@ class Websocket
 				if ($socket === false) {
 					continue;
 				}
-				$callback = $this->callback;
-				// \Phalcon\Async\Task::async(
-				$this->pool->submit(function () use ($socket, $callback) {
-					$isClose = false;
-					$socket->isHttp = false;
-					$socket->parser = new \Phalcon\Http\Parser();
-					$socket->isHandshake = false;
-					$socket->is_closing = false;
-					$socket->fragment_status = 0;
-					$socket->fragment_length = 0;
-					$socket->fragment_size = 4096;
-					$socket->read_length = 0;
-					$socket->huge_payload = '';
-					$socket->payload = '';
-					$socket->headers = NULL;
-					$socket->request_path = NULL;
-					try {
-						$buffer = '';
-						while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
-
-							if ($socket->isHandshake === false) {
-								$buffer .= $chunk;
-								$pos = strpos($buffer, "\r\n\r\n");
-								if ($pos) {
-									$header = substr($buffer, 0, $pos+4);
-									$buffer = substr($buffer, $pos+4);
-									if ($this->handShake($socket, $header)) {
-										$socket->isHandshake = true;
-									}
-								}
-							} elseif ($socket->isHttp) {
-								$buffer = $chunk;
-							} else {
-								$buffer .= $chunk;
-							}
-							if ($socket->isHttp && $buffer) {
-								$ret = $socket->parser->execute($buffer);
-								if (!$ret) {
-									throw new \Exception('HTTP parse failed');
-								}
-								if ($socket->parser->status() == \Phalcon\Http\Parser::STATUS_END) {
-									$body = \Phalcon\Arr::get($ret, 'BODY');
-									if ($callback && \is_callable($callback)) {
-										$callback($socket, $socket->headers, $socket->request_path, $body);
-									}
-									break;
-								}
-							} else if ($this->process($socket, $buffer)) {
-								$buffer = substr($buffer, $socket->read_length);
-								if ($callback && \is_callable($callback)) {
-									$callback($socket, $socket->headers, $socket->request_path, $socket->payload);
-								}
-								$socket->fragment_status = 0;
-								$socket->fragment_length = 0;
-								$socket->read_length = 0;
-								$socket->huge_payload = '';
-								$socket->payload = '';
-							}
-						}
-					} catch (\Throwable $e) {
-						self::err($e->getMessage());
-					} finally {
-						$socket->close();
-					}
-				});
+				// \Phalcon\Async\Task::async
+				$this->pool->submit($worker, $socket);
 			}
 		} catch (\Throwable $e) {
 			self::err($e->getMessage());
@@ -175,8 +182,7 @@ class Websocket
 		} else if ($request['REQUEST_METHOD'] != 'GET') {
 			throw new \Exception('Handshake failed, No GET in HEAD');
 		}
-		$uri = trim($matches[1]);
-		$uri_parts = parse_url($uri);;
+		$socket->isHandshake = true;
 
 		$socket->headers = $headers;
 		$socket->request_path = $request['QUERY_STRING'];
@@ -466,7 +472,7 @@ startfragment:
  */
 // Websocket::$debug = true;
 $ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) {
-	var_dump($data);
+
 	if ($socket->isHttp) {
 		$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($data), $data);
 		$socket->write($sendchunk);

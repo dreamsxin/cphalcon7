@@ -215,18 +215,19 @@ PHP_METHOD(Phalcon_Cli_Color, colorize){
 	zval ret = {}, colored = {};
 	int i;
 
-	phalcon_fetch_params(0, 1, 3, &str, &fg, &at, &bg);
+	phalcon_fetch_params(1, 1, 3, &str, &fg, &at, &bg);
 
-	PHALCON_CALL_STATIC(&ret, "issupportedshell");
+	PHALCON_MM_CALL_STATIC(&ret, "issupportedshell");
 
 	if (!zend_is_true(&ret)) {
-		RETURN_CTOR(str);
+		RETURN_MM_CTOR(str);
 	}
 
 	if (fg && Z_TYPE_P(fg) == IS_LONG) {
 		i = Z_LVAL_P(fg);
 		if (i >= PHALCON_CLI_COLOR_FG_BLACK && i <= PHALCON_CLI_COLOR_FG_WHITE) {
-			phalcon_concat_sss(&colored, SL("\033["), fg_map[i], strlen(fg_map[i]), "m", 1, 1);
+			phalcon_concat_sss(&colored, SL("\033["), fg_map[i], strlen(fg_map[i]), "m", 1, 0);
+			PHALCON_MM_ADD_ENTRY(&colored);
 		}
 	}
 
@@ -234,6 +235,7 @@ PHP_METHOD(Phalcon_Cli_Color, colorize){
 		i = Z_LVAL_P(bg);
 		if (i >= PHALCON_CLI_COLOR_BG_BLACK && i <= PHALCON_CLI_COLOR_BG_LIGHT_GRAY) {
 			phalcon_concat_sss(&colored, SL("\033["), bg_map[i], strlen(bg_map[i]), "m", 1, 1);
+			PHALCON_MM_ADD_ENTRY(&colored);
 		}
 	}
 
@@ -241,12 +243,12 @@ PHP_METHOD(Phalcon_Cli_Color, colorize){
 		i = Z_LVAL_P(at);
 		if (i >= PHALCON_CLI_COLOR_AT_NORMAL && i <= PHALCON_CLI_COLOR_AT_STRIKE) {
 			phalcon_concat_sss(&colored, SL("\033["), at_map[i], strlen(at_map[i]), "m", 1, 1);
+			PHALCON_MM_ADD_ENTRY(&colored);
 		}
 	}
 
-	PHALCON_SCONCAT_VS(&colored, str, "\033[0m");
-
-    RETURN_ZVAL(&colored, 0, 0);
+	PHALCON_CONCAT_VVS(return_value, &colored, str, "\033[0m");
+	RETURN_MM();
 }
 
 /**
@@ -257,14 +259,15 @@ PHP_METHOD(Phalcon_Cli_Color, colorize){
  */
 PHP_METHOD(Phalcon_Cli_Color, head){
 
-	zval *str, fg = {};
+	zval *str, fg = {}, tmp = {};
 
 	phalcon_fetch_params(0, 1, 0, &str);
 
 	ZVAL_LONG(&fg, PHALCON_CLI_COLOR_FG_BROWN);
 
-	PHALCON_CALL_STATIC(return_value, "colorize", str, &fg);
-	PHALCON_SCONCAT_STR(return_value, PHP_EOL);
+	PHALCON_CALL_STATIC(&tmp, "colorize", str, &fg);
+	PHALCON_CONCAT_VS(return_value, &tmp, PHP_EOL);
+	zval_ptr_dtor(&tmp);
 }
 
 /**

@@ -271,12 +271,9 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 {
 	async_stream_read_req read;
 
-	zval *hint, *timeout;
-	size_t len;
+	zval *hint = NULL, *timeout = NULL;
 
-	hint = NULL;
-
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 2)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_ZVAL(hint)
 		Z_PARAM_ZVAL(timeout)
@@ -296,7 +293,7 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 		read.in.len = (size_t) Z_LVAL_P(hint);
 	}
 
-	if (timeout && Z_TYPE_P(timeout) == IS_LONG && Z_LVAL_P(timeout) > 0) {
+	if (timeout != NULL && Z_TYPE_P(timeout) == IS_LONG && Z_LVAL_P(timeout) > 0) {
 		read.in.timeout = Z_LVAL_P(timeout);
 	}
 

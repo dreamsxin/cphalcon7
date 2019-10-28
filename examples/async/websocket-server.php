@@ -36,7 +36,9 @@ class Websocket
 				$callback = $this->callback;
 				\Phalcon\Async\Task::async(function () use ($socket, $callback) {
 					$isClose = false;
-					$isHandshake = false;
+					$socket->isHttp = false;
+					$socket->parser = new \Phalcon\Http\Parser();
+					$socket->isHandshake = false;
 					$socket->is_closing = false;
 					$socket->fragment_status = 0;
 					$socket->fragment_length = 0;
@@ -50,18 +52,34 @@ class Websocket
 						$buffer = '';
 						while (!$socket->is_closing && null !== ($chunk = $socket->read())) {
 
-							$buffer .= $chunk;
-							if ($isHandshake === false) {
+							if ($socket->isHandshake === false) {
+								$buffer .= $chunk;
 								$pos = strpos($buffer, "\r\n\r\n");
 								if ($pos) {
-									if ($this->handShake($socket, $buffer)) {
-										$isHandshake = true;
-										$buffer = substr($buffer, $pos+4);
+									$header = substr($buffer, 0, $pos+4);
+									$buffer = substr($buffer, $pos+4);
+									if ($this->handShake($socket, $header)) {
+										$socket->isHandshake = true;
 									}
 								}
-								continue;
+							} elseif ($socket->isHttp) {
+								$buffer = $chunk;
+							} else {
+								$buffer .= $chunk;
 							}
-							if ($this->process($socket, $buffer)) {
+							if ($socket->isHttp && $buffer) {
+								$ret = $socket->parser->execute($buffer);
+								if (!$ret) {
+									throw new \Exception('HTTP parse failed');
+								}
+								if ($socket->parser->status() == \Phalcon\Http\Parser::STATUS_END) {
+									$body = \Phalcon\Arr::get($ret, 'BODY');
+									if ($callback && \is_callable($callback)) {
+										$callback($socket, $socket->headers, $socket->request_path, $body);
+									}
+									break;
+								}
+							} else if ($this->process($socket, $buffer)) {
 								$buffer = substr($buffer, $socket->read_length);
 								if ($callback && \is_callable($callback)) {
 									$callback($socket, $socket->headers, $socket->request_path, $socket->payload);
@@ -93,27 +111,31 @@ class Websocket
 	 * 请求握手
 	 * @return boolean
 	 */
-	static public function handShake($socket, $buffer)
+	static public function handShake($socket, $header)
 	{
-		self::info('recv:'.$buffer);
-		if (($wsKeyIndex = stripos($buffer, 'Sec-WebSocket-Key:')) === false) {
-			throw new \Exception('Handshake failed, Sec-WebSocket-Key missing');
-		}
+		self::info('recv:'.$header);
+		$request = $socket->parser->execute($header, true);
 
-		if (!preg_match('/GET (.*) HTTP\//mUi', $buffer, $matches)) {
+		if (!$request || !isset($request['HEADERS'])) {
+			throw new \Exception('Handshake failed, HEAD error');
+		}
+		$headers = $request['HEADERS'];
+		if (!isset($headers['Sec-WebSocket-Key'])) {
+			$socket->isHttp = true;
+			return true;
+		} else if ($request['REQUEST_METHOD'] != 'GET') {
 			throw new \Exception('Handshake failed, No GET in HEAD');
 		}
 		$uri = trim($matches[1]);
 		$uri_parts = parse_url($uri);;
 
-		$socket->headers = explode("\r\n", $buffer);
-		$socket->request_path = $uri_parts['path'];
+		$socket->headers = $headers;
+		$socket->request_path = $request['QUERY_STRING'];
 
-		$wsKey = substr($buffer, $wsKeyIndex + 18);
-		$key = trim(substr($wsKey, 0, strpos($wsKey, "\r\n")));
+		$wsKey = trim($headers['Sec-WebSocket-Key']);
 
 		// 根据客户端传递过来的 key 生成 accept key
-		$acceptKey = base64_encode(sha1($key . "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true));
+		$acceptKey = base64_encode(sha1($wsKey . "258EAFA5-E914-47DA-95CA-C5AB0DC85B11", true));
 
 		// 拼接回复字符串
 		$msg = "HTTP/1.1 101 Switching Protocols\r\n";
@@ -396,6 +418,11 @@ startfragment:
 // Websocket::$debug = true;
 $ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) {
 	var_dump($data);
-	Websocket::sendFragment($socket, 'Re: '.$data);
+	if ($socket->isHttp) {
+		$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($data), $data);
+		$socket->write($sendchunk);
+	} else {
+		Websocket::sendFragment($socket, 'Re: '.$data);
+	}
 });
 $ws->start();

@@ -180,7 +180,8 @@ class WebsocketClient
 		$ws = $this;
 		\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $callback) {
 			if ($e) {
-				throw $e;
+				self::err($e->getMessage());
+				return;
 			}
 			$ws->recv($ws->stdin);
 

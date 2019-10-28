@@ -56,6 +56,10 @@ class WebsocketClient
 		if ($callback && \is_callable($callback)) {
 			$callback = Closure::bind($callback, $this);
 		}
+
+
+		$this->stdin = Phalcon\Async\Stream\ReadablePipe::getStdin();
+		$this->stdout = Phalcon\Async\Stream\WritablePipe::getStdout();
 		$this->callback = $callback;
 	}
 
@@ -123,6 +127,9 @@ class WebsocketClient
 
 	public function connect($callback = NULL)
 	{
+		if ($callback && \is_callable($callback)) {
+			$callback = Closure::bind($callback, $this);
+		}
 		$defer = new \Phalcon\Async\Deferred();
 		try {
 			$tls = NULL;
@@ -150,10 +157,11 @@ class WebsocketClient
 					while (!$socket->isHandshake && null !== ($chunk = $socket->read())) {
 
 						$buffer .= $chunk;
-						if (strpos($buffer, "\r\n\r\n")) {
+						$pos = strpos($buffer, "\r\n\r\n");
+						if ($pos) {
 							if ($this->handShake($socket, $buffer)) {
 								$socket->isHandshake = true;
-								$buffer = '';
+								$buffer = substr($buffer, $pos+4);
 								$defer->resolve('connected');
 							}
 						}
@@ -170,11 +178,11 @@ class WebsocketClient
 			exit;
 		}
 		$ws = $this;
-		\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $stdin, $callback) {
+		\Phalcon\Async\Task::await(Phalcon\Async\Deferred::transform($defer->awaitable(), function (?\Throwable $e, ?string $v = null) use ($ws, $callback) {
 			if ($e) {
 				throw $e;
 			}
-			$ws->recv($stdin);
+			$ws->recv($ws->stdin);
 
 			if ($callback && \is_callable($callback)) {
 				$callback();
@@ -194,7 +202,7 @@ class WebsocketClient
 
 					$buffer .= $chunk;
 					if ($this->process($socket, $buffer)) {
-						$buffer = '';
+						$buffer = substr($buffer, $socket->read_length);
 						if ($callback && \is_callable($callback)) {
 							$callback($socket->payload);
 						}
@@ -529,25 +537,20 @@ if (!isset($vals['connect'])) {
 	return;
 }
 
-$stdin = Phalcon\Async\Stream\ReadablePipe::getStdin();
-$stdout = Phalcon\Async\Stream\WritablePipe::getStdout();
-
 // WebsocketClient::$debug = true;
-$ws = new WebsocketClient($vals['connect'], function($data) use ($stdout) {
-    $stdout->write(Phalcon\Cli\Color::colorize('< '.$data, Phalcon\Cli\Color::FG_BLUE, NULL, Phalcon\Cli\Color::BG_LIGHT_GRAY));
-	$stdout->write(PHP_EOL.'> ');
+$ws = new WebsocketClient($vals['connect'], function($data) {
+    $this->stdout->write(Phalcon\Cli\Color::colorize('< '.$data, Phalcon\Cli\Color::FG_BLUE, NULL, Phalcon\Cli\Color::BG_LIGHT_GRAY));
+	$this->stdout->write(PHP_EOL.'> ');
 });
 
 try {
-	$ws->connect(function() use ($stdin, $stdout, $ws) {
+	$ws->connect(function() use ($ws) {
 		echo \Phalcon\Cli\Color::success('connected (press CTRL+C to quit)');
-		$stdout->write('> ');
-		while (null !== ($chunk = $stdin->read(100))) {
+		$this->stdout->write('> ');
+		while (null !== ($chunk = $this->stdin->read(100))) {
 
 			$ws->send(trim($chunk));
 		}
 	});
 } catch (\Throwable $e) {
-} finally {
-    $stdout->close();
 }

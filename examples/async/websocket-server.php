@@ -27,7 +27,7 @@ class Websocket
 	{
 		try {
 			$this->server = \Phalcon\Async\Network\TcpServer::listen($this->host, $this->port);
-			self::info('start server listen:'.$this->host.':'.$this->port);
+			echo Phalcon\Cli\Color::info('start server listen:'.$this->host.':'.$this->port).PHP_EOL;
 			while (true) {
 				$socket = $this->server->accept();
 				if ($socket === false) {
@@ -52,16 +52,17 @@ class Websocket
 
 							$buffer .= $chunk;
 							if ($isHandshake === false) {
-								if (strpos($buffer, "\r\n\r\n")) {
+								$pos = strpos($buffer, "\r\n\r\n");
+								if ($pos) {
 									if ($this->handShake($socket, $buffer)) {
 										$isHandshake = true;
-										$buffer = '';
+										$buffer = substr($buffer, $pos+4);
 									}
 								}
 								continue;
 							}
 							if ($this->process($socket, $buffer)) {
-								$buffer = '';
+								$buffer = substr($buffer, $socket->read_length);
 								if ($callback && \is_callable($callback)) {
 									$callback($socket, $socket->headers, $socket->request_path, $socket->payload);
 								}

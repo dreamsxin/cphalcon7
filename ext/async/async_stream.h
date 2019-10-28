@@ -271,7 +271,7 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 {
 	async_stream_read_req read;
 
-	zval *hint;
+	zval *hint, *timeout;
 	size_t len;
 
 	hint = NULL;
@@ -279,27 +279,31 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_ZVAL(hint)
+		Z_PARAM_ZVAL(timeout)
 	ZEND_PARSE_PARAMETERS_END();
 
+	read.in.buffer = NULL;
+	read.in.handle = NULL;
+	read.in.timeout = 0;
+	read.in.flags = 0;
+
 	if (hint == NULL || Z_TYPE_P(hint) == IS_NULL) {
-		len = stream->buffer.size;
+		read.in.len = stream->buffer.size;
 	} else if (Z_LVAL_P(hint) < 1) {
 		zend_throw_exception_ex(async_socket_exception_ce, 0, "Invalid read length: %d", (int) Z_LVAL_P(hint));
 		return;
 	} else {
-		len = (size_t) Z_LVAL_P(hint);
+		read.in.len = (size_t) Z_LVAL_P(hint);
+	}
+
+	if (timeout && Z_TYPE_P(timeout) == IS_LONG && Z_LVAL_P(timeout) > 0) {
+		read.in.timeout = Z_LVAL_P(timeout);
 	}
 
 	if (UNEXPECTED(Z_TYPE_P(error) != IS_UNDEF)) {
 		ASYNC_FORWARD_ERROR(error);
 		return;
 	}
-
-	read.in.len = len;
-	read.in.buffer = NULL;
-	read.in.handle = NULL;
-	read.in.timeout = 0;
-	read.in.flags = 0;
 
 	if (EXPECTED(SUCCESS == async_stream_read(stream, &read))) {
 		if (EXPECTED(read.out.len)) {
@@ -351,6 +355,7 @@ ZEND_END_ARG_INFO();
 
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_readable_stream_read, 0, 0, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
 ZEND_END_ARG_INFO();
 
 // WritableStream

@@ -183,6 +183,7 @@ int phalcon_http_parser_on_chunk_complete(http_parser *p)
 zend_class_entry *phalcon_http_parser_ce;
 
 PHP_METHOD(Phalcon_Http_Parser, __construct);
+PHP_METHOD(Phalcon_Http_Parser, status);
 PHP_METHOD(Phalcon_Http_Parser, execute);
 PHP_METHOD(Phalcon_Http_Parser, parseCookie);
 
@@ -201,6 +202,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_parser_method_entry[] = {
 	PHP_ME(Phalcon_Http_Parser, __construct, arginfo_phalcon_http_parser___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Http_Parser, status, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Parser, execute, arginfo_phalcon_http_parser_execute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Parser, parseCookie, arginfo_phalcon_http_parser_parsecookies, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -240,6 +242,18 @@ PHALCON_INIT_CLASS(Phalcon_Http_Parser){
 	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("TYPE_REQUEST"), HTTP_REQUEST);
 	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("HTTP_RESPONSE"), HTTP_RESPONSE);
 	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("TYPE_BOTH"), HTTP_BOTH);
+
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_NONE"), HTTP_PARSER_STATE_NONE);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_BEGIN"), HTTP_PARSER_STATE_BEGIN);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_URL"), HTTP_PARSER_STATE_URL);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_STATUS"), HTTP_PARSER_STATE_STATUS);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_FIELD"), HTTP_PARSER_STATE_FIELD);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_VALUE"), HTTP_PARSER_STATE_VALUE);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_HEADER_END"), HTTP_PARSER_STATE_HEADER_END);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_BODY"), HTTP_PARSER_STATE_BODY);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_CHUNK"), HTTP_PARSER_STATE_CHUNK);
+	zend_declare_class_constant_long(phalcon_http_parser_ce, SL("STATUS_END"), HTTP_PARSER_STATE_END);
+
 	return SUCCESS;
 }
 
@@ -272,6 +286,20 @@ PHP_METHOD(Phalcon_Http_Parser, __construct)
 
 	intern = phalcon_http_parser_object_from_obj(Z_OBJ_P(getThis()));
 	intern->data = phalcon_http_parser_data_new(&http_parser_request_settings, t);
+}
+
+/**
+ * Gets parse status
+ *
+ * @return int
+ */
+PHP_METHOD(Phalcon_Http_Parser, status){
+
+	phalcon_http_parser_object *intern;
+
+	intern = phalcon_http_parser_object_from_obj(Z_OBJ_P(getThis()));
+
+	RETURN_LONG(intern->data->state);
 }
 
 /**

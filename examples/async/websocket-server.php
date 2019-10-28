@@ -24,22 +24,22 @@ class Pool
     {
         if ($this->count < $this->concurrency) {
             $this->count++;
-			\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
-				try {
-					foreach ($it as list ($defer, $context, $work, $socket, $args)) {
-						try {
-							$defer->resolve($context->run($work, $socket, ...$args));
-						} catch (\Throwable $e) {
-							$defer->fail($e);
-						} finally {
-							$socket->close();
-						}
+		\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
+			try {
+				foreach ($it as list ($defer, $context, $work, $socket, $args)) {
+					try {
+						$defer->resolve($context->run($work, $socket, ...$args));
+					} catch (\Throwable $e) {
+						$defer->fail($e);
+					} finally {
+						$socket->close();
 					}
-				} catch (\Throwable $e) {
-				} finally {
-					--$this->count;
 				}
-			}, $this->channel->getIterator());
+			} catch (\Throwable $e) {
+			} finally {
+				--$this->count;
+			}
+		}, $this->channel->getIterator());
         }
 
         $this->channel->send([
@@ -151,7 +151,7 @@ class Websocket
 				if ($socket === false) {
 					continue;
 				}
-				// \Phalcon\Async\Task::async
+				// \Phalcon\Async\Task::async($worker, $socket);
 				$this->pool->submit($worker, $socket);
 			}
 		} catch (\Throwable $e) {

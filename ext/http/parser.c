@@ -363,8 +363,7 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 		}
 
 		snprintf(versiphalcon_on_buffer, 4, "%d.%d", intern->data->parser->http_major, intern->data->parser->http_minor);
-	}
-	if (intern->data->state >= HTTP_PARSER_STATE_HEADER_END) {
+
 		add_assoc_long(return_value, "UPGRADE", (long)intern->data->parser->upgrade);
 
 		phalcon_array_update_str_str(return_value, SL("VERSION"), versiphalcon_on_buffer, 4, 0);

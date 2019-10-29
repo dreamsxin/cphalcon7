@@ -531,7 +531,7 @@ $opts->add([
     'name' => 'connect',
     'shortName' => 'c',
     'required' => true,
-	'help' => "-c, --connect <url>           connect to a websocket server",
+	'help' => "<url>           connect to a websocket server",
 ]);
 $vals = $opts->parse();
 if (!isset($vals['connect'])) {

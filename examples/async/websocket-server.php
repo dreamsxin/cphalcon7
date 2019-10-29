@@ -478,14 +478,14 @@ $opts->add([
     'name' => 'server',
     'shortName' => 's',
     'required' => false, // 可选，需要用=号赋值
-	'help' => "-s=, --server="
+	'help' => "address"
 ]);
 $opts->add([
     'type' => \Phalcon\Cli\Options::TYPE_INT,
     'name' => 'port',
     'shortName' => 'p',
     'required' => false,
-	'help' => "-p=, --port="
+	'help' => "port"
 ]);
 $vals = $opts->parse();
 if ($vals === false ) {

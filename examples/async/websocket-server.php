@@ -1,4 +1,12 @@
 <?php
+//Phalcon\Debug::enable();
+$loader = new Phalcon\Loader();
+
+$loader->registerDirs(array(
+	__DIR__.DIRECTORY_SEPARATOR."websocket-plugins".DIRECTORY_SEPARATOR,
+));
+
+$loader->register();
 
 class Pool
 {
@@ -175,6 +183,9 @@ class Websocket
 			throw new \Exception('Handshake failed, HEAD error');
 		}
 		$headers = $request['HEADERS'];
+		$socket->headers = $headers;
+		$socket->request_path = $request['QUERY_STRING'];
+
 		if (!isset($headers['Sec-WebSocket-Key'])) {
 			$socket->isHttp = true;
 			return true;
@@ -182,9 +193,6 @@ class Websocket
 			throw new \Exception('Handshake failed, No GET in HEAD');
 		}
 		$socket->isHandshake = true;
-
-		$socket->headers = $headers;
-		$socket->request_path = $request['QUERY_STRING'];
 
 		$wsKey = trim($headers['Sec-WebSocket-Key']);
 
@@ -468,10 +476,29 @@ startfragment:
  * 客户端测试
  * sudo apt install node-ws
  * wscat -c ws://localhost:10001
+ * curl -v http://localhost:10001/hello
  */
 // Websocket::$debug = true;
 $ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) {
 
+	if ($path) {
+		$handlerName = 'Index';
+		$actionName = 'Index';
+		$params = NULL;
+		if (preg_match("#^/([a-zA-Z0-9_-]++)/?+$#", $path, $matches)) {
+			$handlerName = $matches[1];
+		} else if (preg_match("#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#", $path, $matches)) {
+			$handlerName = $matches[1];
+			$actionName = $matches[2];
+			$params = isset($matches[3]) ? $matches[3] : NULL;
+		}
+		$handlerName = Phalcon\Text::camelize($handlerName);
+		$handlerName .= 'Plugin';
+		$actionName .= 'Action';
+		if (class_exists($handlerName) && method_exists($handlerName, $actionName)) {
+			$data = call_user_func($handlerName.'::'.$actionName, $data); 
+		}
+	}
 	if ($socket->isHttp) {
 		$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($data), $data);
 		$socket->write($sendchunk);

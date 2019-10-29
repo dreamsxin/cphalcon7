@@ -472,14 +472,34 @@ startfragment:
 	}
 }
 
+$opts = new \Phalcon\Cli\Options('Websocket CLI');
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_STRING,
+    'name' => 'server',
+    'shortName' => 's',
+    'required' => false, // 可选，需要用=号赋值
+	'help' => "-s=, --server="
+]);
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_INT,
+    'name' => 'port',
+    'shortName' => 'p',
+    'required' => false,
+	'help' => "-p=, --port="
+]);
+$vals = $opts->parse();
+if ($vals === false ) {
+	exit;
+}
 /**
  * 客户端测试
  * sudo apt install node-ws
  * wscat -c ws://localhost:10001
  * curl -v http://localhost:10001/hello
+ * 运行 php websocket-server.php
  */
 // Websocket::$debug = true;
-$ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) {
+$ws = new Websocket(\Phalcon\Arr::get($vals, 'server', '0.0.0.0'), \Phalcon\Arr::get($vals, 'port', 10001), function($socket, $headers, $path, $data) {
 
 	if ($path) {
 		$handlerName = 'Index';

@@ -503,7 +503,7 @@ $ws = new Websocket('0.0.0.0', 10001, function($socket, $headers, $path, $data) 
 		$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($data), $data);
 		$socket->write($sendchunk);
 	} else {
-		Websocket::sendFragment($socket, 'Re: '.$data);
+		Websocket::sendFragment($socket, $data);
 	}
 });
 $ws->start();

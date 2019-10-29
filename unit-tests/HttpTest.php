@@ -17,7 +17,7 @@ Cache-Control: max-age=0
 
 HTML;
 		$parser = new Phalcon\Http\Parser();
-		$result = $parser->execute($body);
+		$result = $parser->execute($body, true);
 		$this->assertTrue(is_array($result));
 
 		$this->assertTrue(isset($result['HEADERS']) && isset($result['HEADERS']['Cookie']));

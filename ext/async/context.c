@@ -19,6 +19,7 @@
 #include "async/core.h"
 
 #include "kernel/backend.h"
+#include "kernel/fcall.h"
 #include "async/async_fiber.h"
 
 ASYNC_API zend_class_entry *async_context_ce;
@@ -289,6 +290,46 @@ static PHP_METHOD(Context, with)
 	RETURN_OBJ(&context->std);
 }
 
+ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_context_setvar, 0, 2, Phalcon\\Async\\Context, 0)
+	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO();
+
+static PHP_METHOD(Context, setVar)
+{
+	async_context *current;
+	async_context_var *var;
+
+	zval *name, *value, key = {};
+
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 2, 2)
+		Z_PARAM_ZVAL(name)
+		Z_PARAM_ZVAL(value)
+	ZEND_PARSE_PARAMETERS_END();
+
+	current = (async_context *) Z_OBJ_P(getThis());
+
+	if (current->var == NULL) {
+		RETURN_FALSE;
+	}
+
+	object_init_ex(&key, async_context_var_ce);
+	PHALCON_CALL_METHOD(NULL, &key, "__construct", name);
+
+	var = (async_context_var *) Z_OBJ(key);
+
+	current->var = var;
+
+	zval_ptr_dtor(&current->value);
+	if (value == NULL) {
+		ZVAL_NULL(&current->value);
+	} else {
+		ZVAL_COPY(&current->value, value);
+	}
+
+	RETURN_OBJ(&current->std);
+}
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_context_getvar, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 ZEND_END_ARG_INFO();
@@ -544,6 +585,7 @@ static const zend_function_entry async_context_functions[] = {
 	PHP_ME(Context, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, isCancelled, arginfo_context_is_cancelled, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, with, arginfo_context_with, ZEND_ACC_PUBLIC)
+	PHP_ME(Context, setVar, arginfo_context_setvar, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, getVar, arginfo_context_getvar, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withIsolatedOutput, arginfo_context_with_isolated_output, ZEND_ACC_PUBLIC)
 	PHP_ME(Context, withTimeout, arginfo_context_with_timeout, ZEND_ACC_PUBLIC)

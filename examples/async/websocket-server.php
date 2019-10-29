@@ -2,56 +2,56 @@
 
 class Pool
 {
-    private $channel;
-    private $concurrency;
-    private $count = 0;
-    private $context;
+	private $channel;
+	private $concurrency;
+	private $count = 0;
+	private $context;
 
-    public function __construct(int $concurrency = 1, int $capacity = 0)
-    {
-        $this->concurrency = max(1, $concurrency);
-        $this->channel = new \Phalcon\Async\Channel($capacity);
-        $this->context = \Phalcon\Async\Context::background();
-    }
+	public function __construct(int $concurrency = 1, int $capacity = 0)
+	{
+		$this->concurrency = max(1, $concurrency);
+		$this->channel = new \Phalcon\Async\Channel($capacity);
+		$this->context = \Phalcon\Async\Context::background();
+	}
 
-    public function close(?\Throwable $e = null): void
-    {
-        $this->count = \PHP_INT_MAX;
-        $this->channel->close($e);
-    }
+	public function close(?\Throwable $e = null): void
+	{
+		$this->count = \PHP_INT_MAX;
+		$this->channel->close($e);
+	}
 
-    public function submit(callable $work, $socket, ...$args): \Phalcon\Async\Awaitable
-    {
-        if ($this->count < $this->concurrency) {
-            $this->count++;
-		\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
-			try {
-				foreach ($it as list ($defer, $context, $work, $socket, $args)) {
-					try {
-						$defer->resolve($context->run($work, $socket, ...$args));
-					} catch (\Throwable $e) {
-						$defer->fail($e);
-					} finally {
-						$socket->close();
+	public function submit(callable $work, $socket, ...$args): \Phalcon\Async\Awaitable
+	{
+		if ($this->count < $this->concurrency) {
+			$this->count++;
+			\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
+				try {
+					foreach ($it as list ($defer, $context, $work, $socket, $args)) {
+						try {
+							$defer->resolve($context->run($work, $socket, ...$args));
+						} catch (\Throwable $e) {
+							$defer->fail($e);
+						} finally {
+							$socket->close();
+						}
 					}
+				} catch (\Throwable $e) {
+				} finally {
+					--$this->count;
 				}
-			} catch (\Throwable $e) {
-			} finally {
-				--$this->count;
-			}
-		}, $this->channel->getIterator());
-        }
+			}, $this->channel->getIterator());
+		}
 
-        $this->channel->send([
-            $defer = new \Phalcon\Async\Deferred(),
-            \Phalcon\Async\Context::current(),
-            $work,
+		$this->channel->send([
+			$defer = new \Phalcon\Async\Deferred(),
+			\Phalcon\Async\Context::current(),
+			$work,
 			$socket,
-            $args
-        ]);
+			$args
+		]);
 
-        return $defer->awaitable();
-    }
+		return $defer->awaitable();
+	}
 }
 
 class Websocket
@@ -64,11 +64,11 @@ class Websocket
 
 	protected static $opcodes = array(
 		'continuation' => 0,
-		'text'         => 1,
-		'binary'       => 2,
-		'close'        => 8,
-		'ping'         => 9,
-		'pong'         => 10,
+		'text'		 => 1,
+		'binary'	   => 2,
+		'close'		=> 8,
+		'ping'		 => 9,
+		'pong'		 => 10,
 	);
 
 	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 500, int $capacity = 200) {
@@ -171,7 +171,6 @@ class Websocket
 	{
 		self::info('recv:'.$header);
 		$request = $socket->parser->execute($header, true);
-
 		if (!$request || !isset($request['HEADERS'])) {
 			throw new \Exception('Handshake failed, HEAD error');
 		}

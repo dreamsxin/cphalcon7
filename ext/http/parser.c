@@ -334,37 +334,38 @@ PHP_METHOD(Phalcon_Http_Parser, execute){
 		RETURN_FALSE;
 	}
 
-	if (intern->data->parser->state < HTTP_PARSER_STATE_END && !zend_is_true(output)) {
+	if (intern->data->state < HTTP_PARSER_STATE_END && !zend_is_true(output)) {
 		RETURN_TRUE;
 	}
 
 	array_init(return_value);
 
-	if (intern->data->parser->state >= HTTP_PARSER_STATE_URL && intern->data->url.s) {
-		zval url = {};
-		smart_str_0(&intern->data->url);
-		ZVAL_STR(&url, intern->data->url.s);
-		phalcon_array_update_str(return_value, SL("QUERY_STRING"), &url, PH_COPY);
-	}
-
-	if (intern->data->parser->state >= HTTP_PARSER_STATE_BODY && intern->data->body.s) {
+	if (intern->data->state >= HTTP_PARSER_STATE_BODY && intern->data->body.s) {
 		zval body = {};
 		smart_str_0(&intern->data->body);
 		ZVAL_STR(&body, intern->data->body.s);
 		phalcon_array_update_str(return_value, SL("BODY"), &body, PH_COPY);
 	}
 
-	if (intern->data->parser->state >= HTTP_PARSER_STATE_STATUS) {
+	if (intern->data->state >= HTTP_PARSER_STATE_STATUS) {
+
+		if (intern->data->url.s) {
+			zval url = {};
+			smart_str_0(&intern->data->url);
+			ZVAL_STR(&url, intern->data->url.s);
+			phalcon_array_update_str(return_value, SL("QUERY_STRING"), &url, PH_COPY);
+		}
+
 		if (Z_LVAL(type) == HTTP_REQUEST) {
 			add_assoc_string(return_value, "REQUEST_METHOD", (char*)http_method_str(intern->data->parser->method));
 		} else {
 			add_assoc_long(return_value, "STATUS_CODE", (long)intern->data->parser->status_code);
 		}
-	}
-	if (intern->data->parser->state >= HTTP_PARSER_STATE_HEADER_END) {
-		add_assoc_long(return_value, "UPGRADE", (long)intern->data->parser->upgrade);
 
 		snprintf(versiphalcon_on_buffer, 4, "%d.%d", intern->data->parser->http_major, intern->data->parser->http_minor);
+	}
+	if (intern->data->state >= HTTP_PARSER_STATE_HEADER_END) {
+		add_assoc_long(return_value, "UPGRADE", (long)intern->data->parser->upgrade);
 
 		phalcon_array_update_str_str(return_value, SL("VERSION"), versiphalcon_on_buffer, 4, 0);
 		phalcon_array_update_str(return_value, SL("HEADERS"), &intern->data->head, PH_COPY);

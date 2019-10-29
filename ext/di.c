@@ -27,6 +27,7 @@
 #include "di/serviceinterface.h"
 #include "di/factorydefault.h"
 #include "events/managerinterface.h"
+#include "async/core.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -691,18 +692,36 @@ PHP_METHOD(Phalcon_Di, setDefault){
 PHP_METHOD(Phalcon_Di, getDefault){
 
 	zval *name = NULL;
+#if PHALCON_USE_ASYNC
+	zval context = {}, diName = {};
+#endif
 
-	phalcon_fetch_params(0, 0, 1, &name);
+	phalcon_fetch_params(1, 0, 1, &name);
 
+#if PHALCON_USE_ASYNC
+	if (name && PHALCON_IS_NOT_EMPTY(name)) {
+		ZVAL_COPY_VALUE(&diName, name);
+	} else {
+		ZVAL_STR(&diName, IS(di));
+	}
+	PHALCON_MM_CALL_CE_STATIC(&context, async_context_ce, "current");
+	PHALCON_MM_ADD_ENTRY(&context);
+	PHALCON_MM_CALL_METHOD(return_value, &context, "getvar", &diName);
+
+	if (Z_TYPE_P(return_value) != IS_NULL) {
+		RETURN_MM();
+	}
+#endif
 	if (name && PHALCON_IS_NOT_EMPTY(name)) {
 		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name, PH_COPY);
 	} else {
 		phalcon_read_static_property_ce(return_value, phalcon_di_ce, SL("_default"), PH_COPY);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			object_init_ex(return_value, phalcon_di_factorydefault_ce);
-			PHALCON_CALL_METHOD(NULL, return_value, "__construct");
+			PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct");
 		}
 	}
+	RETURN_MM();
 }
 
 /**

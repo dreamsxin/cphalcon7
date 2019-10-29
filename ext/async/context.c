@@ -310,24 +310,41 @@ static PHP_METHOD(Context, setVar)
 	current = (async_context *) Z_OBJ_P(getThis());
 
 	if (current->var == NULL) {
-		RETURN_FALSE;
+
+		object_init_ex(&key, async_context_var_ce);
+		PHALCON_CALL_METHOD(NULL, &key, "__construct", name);
+		var = (async_context_var *) Z_OBJ(key);
+
+		current->var = var;
 	}
 
-	object_init_ex(&key, async_context_var_ce);
-	PHALCON_CALL_METHOD(NULL, &key, "__construct", name);
-
-	var = (async_context_var *) Z_OBJ(key);
-
-	current->var = var;
-
-	zval_ptr_dtor(&current->value);
-	if (value == NULL) {
-		ZVAL_NULL(&current->value);
+	if (name == NULL || Z_TYPE_P(name) == IS_NULL) {
+		zval_ptr_dtor(&current->value);
+		if (value == NULL) {
+			ZVAL_NULL(&current->value);
+		} else {
+			ZVAL_COPY(&current->value, value);
+		}
+		RETURN_TRUE;
 	} else {
-		ZVAL_COPY(&current->value, value);
+		do {
+			if (current->var && Z_TYPE(current->var->name) == IS_STRING) {
+				if (zend_string_equals(Z_STR(current->var->name), Z_STR_P(name))) {
+					zval_ptr_dtor(&current->value);
+					if (value == NULL) {
+						ZVAL_NULL(&current->value);
+					} else {
+						ZVAL_COPY(&current->value, value);
+					}
+					RETURN_TRUE;
+				}
+			}
+
+			current = current->parent;
+		} while (current != NULL);
 	}
 
-	RETURN_OBJ(&current->std);
+	RETURN_FALSE;
 }
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_context_getvar, 0, 0, 0)
@@ -351,7 +368,7 @@ static PHP_METHOD(Context, getVar)
 	} else {
 		do {
 			if (context->var && Z_TYPE(context->var->name) == IS_STRING) {
-				if (!zend_string_equals(Z_STR(context->var->name), Z_STR_P(name))) {
+				if (zend_string_equals(Z_STR(context->var->name), Z_STR_P(name))) {
 					RETURN_ZVAL(&context->value, 1, 0);
 				}
 			}

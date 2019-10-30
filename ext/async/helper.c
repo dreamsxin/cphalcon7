@@ -70,7 +70,6 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 
 	zval arg;
 	zval retval;
-	zval tmp;
 
 	current = EG(current_execute_data);
 	p1 = EG(exception);

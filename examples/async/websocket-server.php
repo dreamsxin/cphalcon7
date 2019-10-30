@@ -79,7 +79,7 @@ class Websocket
 		'pong'		 => 10,
 	);
 
-	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 500, int $capacity = 200) {
+	public function __construct($host, int $port, callable $callback = NULL, int $concurrency = 1, int $capacity = 0) {
 		$this->port = $port;
 		$this->host = $host;
 		$this->callback = $callback;
@@ -91,6 +91,7 @@ class Websocket
 		$callback = $this->callback;
 		$ws = $this;
 		$worker = static function ($socket) use ($ws, $callback) {
+			echo ('memory'.memory_get_usage()).PHP_EOL;
 			$isClose = false;
 			//$socket->setOption(TcpSocket::NODELAY, false);
 			$socket->isHttp = false;
@@ -487,6 +488,25 @@ $opts->add([
     'required' => false,
 	'help' => "port"
 ]);
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_BOOLEAN,
+    'name' => 'concurrency',
+    'shortName' => 'c',
+    'required' => false
+]);
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_BOOLEAN,
+    'name' => 'capacity',
+    'shortName' => 'C',
+    'required' => false
+]);
+$opts->add([
+    'type' => \Phalcon\Cli\Options::TYPE_BOOLEAN,
+    'name' => 'debug',
+    'shortName' => 'v',
+    'required' => false,
+	'help' => "enable debug"
+]);
 $vals = $opts->parse();
 if ($vals === false ) {
 	exit;
@@ -498,7 +518,9 @@ if ($vals === false ) {
  * curl -v http://localhost:10001/hello
  * 运行 php websocket-server.php
  */
-// Websocket::$debug = true;
+if (isset($vals['debug'])) {
+	Websocket::$debug = true;
+}
 $ws = new Websocket(\Phalcon\Arr::get($vals, 'server', '0.0.0.0'), \Phalcon\Arr::get($vals, 'port', 10001), function($socket, $headers, $path, $data) {
 
 	if ($path) {
@@ -525,5 +547,5 @@ $ws = new Websocket(\Phalcon\Arr::get($vals, 'server', '0.0.0.0'), \Phalcon\Arr:
 	} else {
 		Websocket::sendFragment($socket, $data);
 	}
-});
+}, \Phalcon\Arr::get($vals, 'concurrency', 500), \Phalcon\Arr::get($vals, 'capacity', 1));
 $ws->start();

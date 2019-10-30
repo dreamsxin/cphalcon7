@@ -54,7 +54,7 @@ zval *async_prop_write_handler_readonly(zval *object, zval *member, zval *value,
 
 ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zend_class_entry *ce, const char *message, ...)
 {
-	zend_execute_data *prev;
+	zend_execute_data *current, *prev;
 
 	zend_fcall_info fci;
 	zend_fcall_info_cache fcc;
@@ -72,33 +72,34 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 	zval retval;
 	zval tmp;
 
-	prev = EG(current_execute_data);
+	current = EG(current_execute_data);
 	p1 = EG(exception);
 	p2 = EG(prev_exception);
 
-	// The zend_fetch_debug_backtrace will causing memory not to be released
-	EG(current_execute_data) = NULL;
+	EG(current_execute_data) = exec;
 	EG(exception) = NULL;
 	EG(prev_exception) = NULL;
 
-	object_init_ex(error, ce);
-
-	if (UNEXPECTED(EG(exception))) {
-		zval_ptr_dtor(error);
-
-		ZVAL_OBJ(error, EG(exception));
-		EG(exception) = NULL;
+	// The zend_fetch_debug_backtrace will causing memory not to be released
+	if (exec) {
+		prev = exec->prev_execute_data;
+		exec->prev_execute_data = NULL;
 	}
+
+	object_init_ex(error, ce);
 
 	va_start(argv, message);
 
 	if (!ce->constructor) {
 		va_end(argv);
 
-		EG(current_execute_data) = prev;
+		EG(current_execute_data) = current;
 		EG(exception) = p1;
 		EG(prev_exception) = p2;
 
+		if (exec) {
+			exec->prev_execute_data = prev;
+		}
 		return;
 	}
 
@@ -142,36 +143,13 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 	zend_fcall_info_args_clear(&fci, 1);
 	zval_ptr_dtor(&fci.function_name);
 
-	if (UNEXPECTED(EG(exception))) {
-		zval_ptr_dtor(error);
-
-		ZVAL_OBJ(error, EG(exception));
-		EG(exception) = NULL;
-	}
-
-	if (exec == NULL) {
-		EG(current_execute_data) = prev;
-	} else {
-		EG(current_execute_data) = exec;
-	}
-
-#ifndef ZSTR_KNOWN
-	ZVAL_STRING(&tmp, zend_get_executed_filename());
-	zend_update_property_ex(ce, error, CG(known_strings)[ZEND_STR_FILE], &tmp);
-	zval_ptr_dtor(&tmp);
-	ZVAL_LONG(&tmp, zend_get_executed_lineno());
-	zend_update_property_ex(ce, error, CG(known_strings)[ZEND_STR_LINE], &tmp);
-#else
-	ZVAL_STRING(&tmp, zend_get_executed_filename());
-	zend_update_property_ex(ce, error, ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
-	zval_ptr_dtor(&tmp);
-	ZVAL_LONG(&tmp, zend_get_executed_lineno());
-	zend_update_property_ex(ce, error, ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
-#endif
-
-	EG(current_execute_data) = prev;
+	EG(current_execute_data) = current;
 	EG(exception) = p1;
 	EG(prev_exception) = p2;
+
+	if (exec) {
+		exec->prev_execute_data = prev;
+	}
 }
 
 int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error)

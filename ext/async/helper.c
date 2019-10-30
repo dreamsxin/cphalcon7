@@ -70,6 +70,7 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 
 	zval arg;
 	zval retval;
+	zval tmp;
 
 	prev = EG(current_execute_data);
 	p1 = EG(exception);
@@ -150,6 +151,14 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 	EG(current_execute_data) = prev;
 	EG(exception) = p1;
 	EG(prev_exception) = p2;
+
+	if (exec == NULL) {
+		ZVAL_STRING(&tmp, zend_get_executed_filename());
+		zend_update_property_ex(ce, error, ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+		zval_ptr_dtor(&tmp);
+		ZVAL_LONG(&tmp, zend_get_executed_lineno());
+		zend_update_property_ex(ce, error, ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+	}
 }
 
 int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error)

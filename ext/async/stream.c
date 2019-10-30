@@ -1915,7 +1915,8 @@ static PHP_METHOD(StreamWriter, close)
 		return;
 	}
 
-	ASYNC_PREPARE_EXCEPTION(writer->error, execute_data, async_stream_closed_exception_ce, "Stream has been closed");
+	// If use execute_data, In task call close dtor/destroy will not be called
+	ASYNC_PREPARE_EXCEPTION(writer->error, NULL, async_stream_closed_exception_ce, "Stream has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(writer->error), Z_OBJ_P(val));

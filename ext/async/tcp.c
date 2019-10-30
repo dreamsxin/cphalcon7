@@ -591,7 +591,8 @@ static PHP_METHOD(TcpSocket, close)
 		return;
 	}
 
-	ASYNC_PREPARE_EXCEPTION(&error, execute_data, async_stream_closed_exception_ce, "Socket has been closed");
+	// If use execute_data, In task call close dtor/destroy will not be called
+	ASYNC_PREPARE_EXCEPTION(&error, NULL, async_stream_closed_exception_ce, "Socket has been closed");
 
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));
@@ -599,7 +600,7 @@ static PHP_METHOD(TcpSocket, close)
 	}
 
 	ASYNC_LIST_REMOVE(&socket->scheduler->shutdown, &socket->cancel);
-	
+
 	socket->cancel.func(socket, &error);
 
 	zval_ptr_dtor(&error);

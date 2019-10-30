@@ -217,8 +217,9 @@ PHP_METHOD(Signal, close)
 	if (signal->cancel.func == NULL) {
 		return;
 	}
-	
-	ASYNC_PREPARE_ERROR(&error, execute_data, "Signal has been closed");
+
+	// If use execute_data, In task call close dtor/destroy will not be called
+	ASYNC_PREPARE_ERROR(&error, NULL, "Signal has been closed");
 	
 	if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 		zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));

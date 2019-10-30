@@ -32,18 +32,20 @@ class Pool
 	{
 		if ($this->count < $this->concurrency) {
 			$this->count++;
+			Websocket::info('Pool count '.$this->count);
 			\Phalcon\Async\Task::asyncWithContext($this->context, static function (iterable $it) {
 				try {
 					foreach ($it as list ($defer, $context, $work, $socket, $args)) {
 						try {
 							$defer->resolve($context->run($work, $socket, ...$args));
 						} catch (\Throwable $e) {
+							Websocket::err($e->getMessage());
 							$defer->fail($e);
 						} finally {
-							$socket->close();
 						}
 					}
 				} catch (\Throwable $e) {
+					Websocket::err($e->getMessage());
 				} finally {
 					--$this->count;
 				}
@@ -91,8 +93,7 @@ class Websocket
 		$callback = $this->callback;
 		$ws = $this;
 		$worker = static function ($socket) use ($ws, $callback) {
-			echo ('memory'.memory_get_usage()).PHP_EOL;
-			$isClose = false;
+			// echo ('memory'.memory_get_usage().PHP_EOL);
 			//$socket->setOption(TcpSocket::NODELAY, false);
 			$socket->isHttp = false;
 			$socket->parser = new \Phalcon\Http\Parser();
@@ -134,6 +135,7 @@ class Websocket
 							if ($callback && \is_callable($callback)) {
 								$callback($socket, $socket->headers, $socket->request_path, $body);
 							}
+							$socket->is_closing = true;
 							break;
 						}
 					} else if ($ws->process($socket, $buffer)) {
@@ -150,6 +152,8 @@ class Websocket
 				}
 			} catch (\Throwable $e) {
 				self::err($e->getMessage());
+			} finally {
+				$socket->close();
 			}
 		};
 		try {

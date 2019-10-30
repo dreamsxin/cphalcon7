@@ -122,7 +122,8 @@ static PHP_METHOD(Condition, close)
 	cond = (async_sync_condition *) Z_OBJ_P(getThis());
 	
 	if (cond->shutdown.func) {
-		ASYNC_PREPARE_ERROR(&error, execute_data, "Condition has been closed");
+		// If use execute_data, In task call close dtor/destroy will not be called
+		ASYNC_PREPARE_ERROR(&error, NULL, "Condition has been closed");
 		
 		if (val != NULL && Z_TYPE_P(val) != IS_NULL) {
 			zend_exception_set_previous(Z_OBJ_P(&error), Z_OBJ_P(val));

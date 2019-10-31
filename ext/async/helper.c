@@ -149,6 +149,7 @@ ASYNC_API void async_prepare_throwable(zval *error, zend_execute_data *exec, zen
 	if (exec) {
 		exec->prev_execute_data = prev;
 	}
+	trace_error_info(error);
 }
 
 int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error)

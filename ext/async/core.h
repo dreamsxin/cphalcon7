@@ -559,6 +559,37 @@ static zend_always_inline async_context *async_context_ref()
 
 #define async_loop_get() &ASYNC_G(scheduler)->loop
 
+static zend_always_inline void trace_error_info(zval *error)
+{
+	zend_class_entry *base;
+
+	zval tmp;
+
+	base = instanceof_function(Z_OBJCE_P(error), zend_ce_exception) ? zend_ce_exception : zend_ce_error;
+#if PHP_VERSION_ID < 70200
+	if (0 != zval_get_long(zend_read_property(base, error, SL("line"), 1, &tmp))) {
+		return;
+	}
+#else
+	if (0 != zval_get_long(zend_read_property_ex(base, error, ZSTR_KNOWN(ZEND_STR_LINE), 1, &tmp))) {
+		return;
+	}
+#endif
+#ifndef ZSTR_KNOWN
+	ZVAL_STRING(&tmp, zend_get_executed_filename());
+	zend_update_property_ex(base, error, CG(known_strings)[ZEND_STR_FILE], &tmp);
+	zval_ptr_dtor(&tmp);
+	ZVAL_LONG(&tmp, zend_get_executed_lineno());
+	zend_update_property_ex(base, error, CG(known_strings)[ZEND_STR_LINE], &tmp);
+#else
+	ZVAL_STRING(&tmp, zend_get_executed_filename());
+	zend_update_property_ex(base, error, ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+	zval_ptr_dtor(&tmp);
+	ZVAL_LONG(&tmp, zend_get_executed_lineno());
+	zend_update_property_ex(base, error, ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+#endif
+}
+
 ASYNC_API void async_task_scheduler_run(async_task_scheduler *scheduler, zend_execute_data *execute_data);
 ASYNC_API int async_await_op(async_op *op);
 

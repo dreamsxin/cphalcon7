@@ -1,5 +1,6 @@
 <?php
 
+// 用到了 sleep 需要设置 phalcon.async.timer = 1
 namespace Phalcon\Async;
 
 class Pool
@@ -54,7 +55,7 @@ $pool = new Pool(10);
 $job = Task::async(static function (Pool $pool) {
 	while(($v = $pool->pop())) {
 		echo 'pop '.$v.PHP_EOL;	
-		sleep(1);
+		usleep(200);
 	}
 }, $pool);
 
@@ -66,6 +67,7 @@ $job1 = Task::async(static function (Pool $pool) {
 
 $job2 = Task::async(static function (Pool $pool) {
 	for ($i = 12; $i <= 22; $i++) {
+		usleep(100);
 		$pool->push($i);
 	}
 }, $pool);

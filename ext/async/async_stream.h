@@ -287,7 +287,7 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 	if (hint == NULL || Z_TYPE_P(hint) == IS_NULL) {
 		read.in.len = stream->buffer.size;
 	} else if (Z_LVAL_P(hint) < 1) {
-		zend_throw_exception_ex(async_socket_exception_ce, 0, "Invalid read length: %d", (int) Z_LVAL_P(hint));
+		zend_throw_exception_ex(async_stream_exception_ce, 0, "Invalid read length: %d", (int) Z_LVAL_P(hint));
 		return;
 	} else {
 		read.in.len = (size_t) Z_LVAL_P(hint);
@@ -298,7 +298,11 @@ static zend_always_inline void async_stream_call_read(async_stream *stream, zval
 	}
 
 	if (UNEXPECTED(Z_TYPE_P(error) != IS_UNDEF)) {
-		ASYNC_FORWARD_ERROR(error);
+		zval tmp = {};
+		ASYNC_PREPARE_EXCEPTION(&tmp, execute_data, async_stream_exception_ce, "Read operation failed");
+		trace_error_info(&tmp, error);
+		ASYNC_FORWARD_ERROR(&tmp);
+		zval_ptr_dtor(&tmp);
 		return;
 	}
 
@@ -324,7 +328,11 @@ static zend_always_inline void async_stream_call_write(async_stream *stream, zva
 	ZEND_PARSE_PARAMETERS_END();
 
 	if (UNEXPECTED(Z_TYPE_P(error) != IS_UNDEF)) {
-		ASYNC_FORWARD_ERROR(error);
+		zval tmp = {};
+		ASYNC_PREPARE_EXCEPTION(&tmp, execute_data, async_stream_exception_ce, "Write operation failed");
+		trace_error_info(&tmp, error);
+		ASYNC_FORWARD_ERROR(&tmp);
+		zval_ptr_dtor(&tmp);
 		return;
 	}
 

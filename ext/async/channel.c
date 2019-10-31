@@ -121,6 +121,10 @@ typedef struct _async_channel_group_entry {
 typedef struct _async_channel_send_op {
 	async_op base;
 	zval value;
+	
+	/* Timer being used to timeout a send. */
+	uv_timer_t timer;
+
 	async_channel_group_entry *entry;
 } async_channel_send_op;
 
@@ -460,8 +464,31 @@ static PHP_METHOD(Channel, isClosed)
 	RETURN_BOOL(state->cancel.func == NULL);
 }
 
+ASYNC_CALLBACK dispose_channel_send_timer_cb(uv_handle_t *handle)
+{
+	async_channel_send_op *send;
+	
+	send = (async_channel_send_op *) handle->data;
+	
+	ZEND_ASSERT(send != NULL);
+	
+	ASYNC_FREE_OP(send);
+}
+
+ASYNC_CALLBACK timeout_channel_send_cb(uv_timer_t *timer)
+{
+	async_channel_send_op *send;
+	
+	send = (async_channel_send_op *) timer->data;
+	
+	ZEND_ASSERT(send != NULL);
+	
+	ASYNC_FINISH_OP(send);
+}
+
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_channel_send, 0, 1, IS_VOID, 0)
 	ZEND_ARG_INFO(0, message)
+	ZEND_ARG_TYPE_INFO(0, timeout, IS_LONG, 1)
 ZEND_END_ARG_INFO();
 
 static PHP_METHOD(Channel, send)
@@ -472,11 +499,23 @@ static PHP_METHOD(Channel, send)
 	async_op *op;
 	
 	zval *val;
+	zend_long timeout;
+	zval *millis = NULL;
 	
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 2)
 		Z_PARAM_ZVAL(val)
+		Z_PARAM_OPTIONAL
+		Z_PARAM_ZVAL(millis)
 	ZEND_PARSE_PARAMETERS_END();
-	
+
+	if (millis == NULL || Z_TYPE_P(millis) == IS_NULL) {
+		timeout = -1;
+	} else {
+		timeout = Z_LVAL_P(millis);
+		
+		ASYNC_CHECK_ERROR(timeout < 0, "Timeout must not be negative");
+	}
+
 	state = ((async_channel *) Z_OBJ_P(getThis()))->state;
 	
 	if (UNEXPECTED(Z_TYPE_P(&state->error) != IS_UNDEF)) {
@@ -503,6 +542,11 @@ static PHP_METHOD(Channel, send)
 		
 		return;
 	}
+
+	// non-blocking select early return.
+	if (timeout == 0) {
+		return;
+	}
 	
 	ASYNC_ALLOC_CUSTOM_OP(send, sizeof(async_channel_send_op));
 	ASYNC_APPEND_OP(&state->senders, send);
@@ -514,7 +558,14 @@ static PHP_METHOD(Channel, send)
 	if (!async_context_is_background(context)) {
 		ASYNC_BUSY_ENTER(state->scheduler);
 	}
-	
+
+	if (timeout > 0) {
+		uv_timer_init(&state->scheduler->loop, &send->timer);
+		uv_timer_start(&send->timer, timeout_channel_send_cb, timeout, 0);
+		
+		send->timer.data = send;
+	}
+
 	if (async_await_op((async_op *) send) == FAILURE) {
 		forward_error(&send->base.result, execute_data);
 	}
@@ -522,10 +573,14 @@ static PHP_METHOD(Channel, send)
 	if (!async_context_is_background(context)) {
 		ASYNC_BUSY_EXIT(state->scheduler);
 	}
-	
+
 	zval_ptr_dtor(&send->value);
 
-	ASYNC_FREE_OP(send);
+	if (timeout > 0) {
+		ASYNC_UV_CLOSE(&send->timer, dispose_channel_send_timer_cb);
+	} else {
+		ASYNC_FREE_OP(send);
+	}
 }
 
 //LCOV_EXCL_START

@@ -578,9 +578,10 @@ $work = static function ($url, &$total_request, &$connect_success, &$connect_fai
 		$connect_fail++;
 	}
 };
-$channelnum = 10;
-for ($j=0; $j<=$channelnum; $j++)  {
-	$channel[$j] = new \Phalcon\Async\Channel($concurrency);
+
+$channel = new \Phalcon\Async\Channel($concurrency);
+
+for ($j=0; $j<=$concurrency; $j++)  {
 	$tasks[] = \Phalcon\Async\Task::asyncWithContext($context, static function (iterable $it) use ($context, $work, &$total_request, &$connect_success, &$connect_fail, &$send_success, &$send_fail, &$recv_success, &$recv_fail, &$min_request_time, &$max_request_time) {
 		foreach ($it as $url) {
 			if ($url == 'close') {
@@ -591,7 +592,7 @@ for ($j=0; $j<=$channelnum; $j++)  {
 
 		}
 	
-	}, $channel[$j]->getIterator());
+	}, $channel->getIterator());
 }
 
 $begin_time = microtime_float(true);
@@ -599,27 +600,21 @@ $begin_time = microtime_float(true);
 $n = 0;
 $shownum = ceil($requests/10);
 for ($i=0; $i<$requests; $i++)  {
-	$j = $i%$channelnum;
-	$channel[$j]->send($url);
-	$c = ceil($i/$shownum);
-	if ($c > $n) {
+	$channel->send($url);
+	$c = floor($i/$shownum);
+	if ($c > $n || $i == ($requests-1)) {
 		echo 'Completed '.$i.' requests'.PHP_EOL;
 		$n = $c;
-		usleep(10);
 	}
 }
 
-for ($j=0; $j<=$channelnum; $j++)  {
-	$channel[$j]->send('close');
-}
+$channel->send('close');
 
 foreach ($tasks as $t) {
 	\Phalcon\Async\Task::await($t);
 }
 
-for ($j=0; $j<=$channelnum; $j++)  {
-	$channel[$j]->close();
-}
+$channel->close();
 
 $finish_time = microtime_float(true);
 $total_time = ($finish_time - $begin_time);

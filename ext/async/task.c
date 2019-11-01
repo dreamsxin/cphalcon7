@@ -1572,6 +1572,10 @@ ASYNC_FIBER_CALLBACK run_scheduler_fiber(void *arg)
 			if (UNEXPECTED(scheduler->flags & ASYNC_TASK_SCHEDULER_FLAG_ERROR)) {
 				break;
 			}
+			// If the scheduler has exited, the task does not finish, coredump will occur
+			if (UNEXPECTED(scheduler->flags & ASYNC_TASK_SCHEDULER_FLAG_DISPOSED)) {
+				break;
+			}
 		} while (again || scheduler->refticks > 0);
 		
 		async_fiber_switch(scheduler, scheduler->caller, ASYNC_FIBER_SUSPEND_NONE);

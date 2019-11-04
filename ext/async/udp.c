@@ -306,6 +306,9 @@ static PHP_METHOD(UdpSocket, connect)
 		host = Z_STR_P(name);
 	}
 
+	ASYNC_CHECK_EXCEPTION(async_task_scheduler_get()->flags & ASYNC_TASK_SCHEDULER_FLAG_DISPOSED, async_socket_exception_ce, "Task scheduler has been disposed");
+	ASYNC_CHECK_EXCEPTION(async_task_scheduler_get()->flags & ASYNC_TASK_SCHEDULER_FLAG_ERROR, async_socket_exception_ce, "Task scheduler was stopped due to an error");
+
 	code = async_dns_lookup_ip(ZSTR_VAL(host), &addr, IPPROTO_UDP);
 
 	ASYNC_CHECK_EXCEPTION(code < 0, async_socket_exception_ce, "Failed to assemble IP address: %s", uv_strerror(code));

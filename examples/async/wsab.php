@@ -501,21 +501,21 @@ $opts->add([
     'name' => 'requests',
     'shortName' => 'n',
     'required' => true,
-	'help' => "Number of requests to perform",
+    'help' => "Number of requests to perform",
 ]);
 $opts->add([
     'type' => \Phalcon\Cli\Options::TYPE_INT,
     'name' => 'concurrency',
     'shortName' => 'c',
     'required' => true,
-	'help' => "Number of multiple requests to make",
+    'help' => "Number of multiple requests to make",
 ]);
 $opts->add([
     'type' => \Phalcon\Cli\Options::TYPE_STRING,
     'name' => 'url',
     'shortName' => 'u',
     'required' => true,
-	'help' => "websocket server",
+    'help' => "websocket server",
 ]);
 $vals = $opts->parse();
 if (!isset($vals['url'])) {
@@ -535,8 +535,6 @@ if ($requests < $concurrency) {
 	WebsocketClient::err('Cannot use concurrency level greater than total number of requests');
 	return;
 }
-
-$group = $requests/$concurrency;
 
 $tasks = [];
 $total_request = 0;
@@ -565,28 +563,25 @@ $work = static function ($url, &$total_request, &$connect_success, &$connect_fai
 			$ws->send('hello');
 			$send_success++;
 		});
-
-		$etime = microtime_float(true);
-		$requesttime = $etime - $stime;
-		if ($min_request_time < 0 || $requesttime < $min_request_time) {
-			$min_request_time = $requesttime;
-		}
-		if ($requesttime > $max_request_time) {
-			$max_request_time = $requesttime;
-		}
 	} catch (\Throwable $e) {var_dump($e);
 		$connect_fail++;
 	}
+
+	$etime = microtime_float(true);
+	$requesttime = $etime - $stime;
+	if ($min_request_time < 0 || $requesttime < $min_request_time) {
+		$min_request_time = $requesttime;
+	}
+	if ($requesttime > $max_request_time) {
+		$max_request_time = $requesttime;
+	}
 };
 
-$channel = new \Phalcon\Async\Channel($concurrency);
+$channel = new \Phalcon\Async\Channel(0);
 
-for ($j=0; $j<=$concurrency; $j++)  {
+for ($j=0; $j<$concurrency; $j++)  {
 	$tasks[] = \Phalcon\Async\Task::asyncWithContext($context, static function (iterable $it) use ($context, $work, &$total_request, &$connect_success, &$connect_fail, &$send_success, &$send_fail, &$recv_success, &$recv_fail, &$min_request_time, &$max_request_time) {
 		foreach ($it as $url) {
-			if ($url == 'close') {
-				break;
-			}
 		
 			$work($url, $total_request, $connect_success, $connect_fail, $send_success, $send_fail, $recv_success, $recv_fail, $min_request_time, $max_request_time);
 
@@ -599,7 +594,7 @@ $begin_time = microtime_float(true);
 
 $n = 0;
 $shownum = ceil($requests/10);
-for ($i=0; $i<$requests; $i++)  {
+for ($i=1; $i<=$requests; $i++)  {
 	$channel->send($url);
 	$c = floor($i/$shownum);
 	if ($c > $n || $i == ($requests-1)) {
@@ -608,13 +603,12 @@ for ($i=0; $i<$requests; $i++)  {
 	}
 }
 
-$channel->send('close');
-
+$channel->close();
 foreach ($tasks as $t) {
 	\Phalcon\Async\Task::await($t);
 }
+echo 'Completed requests'.PHP_EOL;
 
-$channel->close();
 
 $finish_time = microtime_float(true);
 $total_time = ($finish_time - $begin_time);

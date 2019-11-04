@@ -1569,7 +1569,7 @@ ASYNC_FIBER_CALLBACK run_scheduler_fiber(void *arg)
 
 			scheduler->flags &= ~ASYNC_TASK_SCHEDULER_FLAG_ACTIVE;
 
-			if (UNEXPECTED(scheduler->flags & (ASYNC_TASK_SCHEDULER_FLAG_DISPOSED | ASYNC_TASK_SCHEDULER_FLAG_ERROR))) {
+			if (UNEXPECTED(scheduler->flags & ASYNC_TASK_SCHEDULER_FLAG_ERROR)) {
 				break;
 			}
 		} while (again || scheduler->refticks > 0);

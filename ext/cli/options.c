@@ -524,9 +524,6 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 
 	phalcon_fetch_params(0, 0, 1, &optind);
 
-	if (!optind) {
-		optind = &PHALCON_GLOBAL(z_null);
-	}
 	phalcon_read_property(&names, getThis(), SL("_names"), PH_READONLY);
 	phalcon_read_property(&short_names, getThis(), SL("_shortNames"), PH_READONLY);
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
@@ -534,7 +531,11 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 
 	phalcon_fast_join_str(&joined_opts, SL(""), &options);
 
-	PHALCON_CALL_FUNCTION(&values, "getopt", &joined_opts, &longopts, optind);
+	if (optind) {
+		PHALCON_CALL_FUNCTION(&values, "getopt", &joined_opts, &longopts, optind);
+	} else {
+		PHALCON_CALL_FUNCTION(&values, "getopt", &joined_opts, &longopts);
+	}
 	zval_ptr_dtor(&joined_opts);
 
 	if (phalcon_array_isset_str(&values, SL("help")) || phalcon_array_isset_str(&values, SL("h"))) {

@@ -134,7 +134,7 @@ class WebsocketClient
 		try {
 			$tls = NULL;
 			if ($this->scheme == 'wss') {
-				$tls = new \Phalcon\Async\TlsClientEncryption();
+				$tls = new \Phalcon\Async\Network\TlsClientEncryption();
 				$tls = $tls->withAllowSelfSigned(true);
 			}
 			$socket = \Phalcon\Async\Network\TcpSocket::connect($this->host, $this->port, $tls);

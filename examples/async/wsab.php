@@ -481,7 +481,7 @@ startfragment:
 function microtime_float($usefloat = false)
 {
 	if ($usefloat) {
-		return (int)microtime(true)*1000;
+		return microtime(true)*1000;
 	} else {
 		list($usec, $sec) = explode(" ", microtime());
 		return ((float)$usec + (float)$sec);
@@ -510,16 +510,23 @@ $opts->add([
     'required' => true,
     'help' => "Number of multiple requests to make",
 ]);
+// 可选项需要使用 = 赋值
 $opts->add([
     'type' => \Phalcon\Cli\Options::TYPE_STRING,
     'name' => 'url',
     'shortName' => 'u',
-    'required' => true,
-    'help' => "websocket server",
+    'required' => false,
+    'help' => "-u=<url> websocket server",
 ]);
-$vals = $opts->parse();
+$optind = NULL;
+$vals = $opts->parse($optind);
 if (!isset($vals['url'])) {
-	return;
+	if (isset($argv[$optind])) {
+		$vals['url'] = $argv[$optind];
+	} else {
+		$opts->help();
+		return;
+	}
 }
 $url = $vals['url'];
 
@@ -608,7 +615,6 @@ foreach ($tasks as $t) {
 	\Phalcon\Async\Task::await($t);
 }
 echo 'Completed requests'.PHP_EOL;
-
 
 $finish_time = microtime_float(true);
 $total_time = ($finish_time - $begin_time);

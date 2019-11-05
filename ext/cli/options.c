@@ -91,7 +91,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_options_add, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_options_parse, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+	ZEND_ARG_INFO(1, optind)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_options_method_entry[] = {
@@ -518,12 +518,15 @@ PHP_METHOD(Phalcon_Cli_Options, help){
  */
 PHP_METHOD(Phalcon_Cli_Options, parse){
 
-	zval *_options = NULL, names = {}, short_names ={}, options = {}, longopts = {}, joined_opts = {}, values = {};
+	zval *optind = NULL, names = {}, short_names ={}, options = {}, longopts = {}, joined_opts = {}, values = {};
 	zval default_values = {}, types = {}, required = {}, *name;
 	zend_string *str_key;
 
-	phalcon_fetch_params(0, 0, 1, &_options);
+	phalcon_fetch_params(0, 0, 1, &optind);
 
+	if (!optind) {
+		optind = &PHALCON_GLOBAL(z_null);
+	}
 	phalcon_read_property(&names, getThis(), SL("_names"), PH_READONLY);
 	phalcon_read_property(&short_names, getThis(), SL("_shortNames"), PH_READONLY);
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
@@ -531,7 +534,7 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 
 	phalcon_fast_join_str(&joined_opts, SL(""), &options);
 
-	PHALCON_CALL_FUNCTION(&values, "getopt", &joined_opts, &longopts);
+	PHALCON_CALL_FUNCTION(&values, "getopt", &joined_opts, &longopts, optind);
 	zval_ptr_dtor(&joined_opts);
 
 	if (phalcon_array_isset_str(&values, SL("help")) || phalcon_array_isset_str(&values, SL("h"))) {

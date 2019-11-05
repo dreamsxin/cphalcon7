@@ -242,7 +242,7 @@ static PHP_METHOD(ProcessBuilder, fork)
 	}
 	
 	// Mark new process as forked worker and setup input file.
-	ZVAL_STRING(&builder->argv[i++], "-dasync.forked=1");
+	ZVAL_STRING(&builder->argv[i++], "-dphalcon.async.forked=1");
 	ZVAL_COPY(&builder->argv[i++], file);
 	
 	builder->flags |= ASYNC_PROCESS_FLAG_IPC;

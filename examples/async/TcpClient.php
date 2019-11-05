@@ -21,7 +21,7 @@ try {
         var_dump($socket->encrypt());
     }
     
-    var_dump($socket->writeAsync("GET /json HTTP/1.0\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n"));
+    var_dump($socket->write("GET /json HTTP/1.0\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n"));
     var_dump($socket->getWriteQueueSize());
     
     while (null !== ($chunk = $socket->read())) {

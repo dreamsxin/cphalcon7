@@ -7,7 +7,7 @@ $ipc = $process->getIpc();
 
 try {
     $tcp = Phalcon\Async\Network\TcpSocket::connect('httpbin.org', 80);
-    $tcp->writeAsync("GET /json HTTP/1.0\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n");
+    $tcp->write("GET /json HTTP/1.0\r\nHost: httpbin.org\r\nConnection: close\r\n\r\n");
     
     var_dump('SEND HANDLE');
     $tcp->export($ipc);

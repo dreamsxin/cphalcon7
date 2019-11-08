@@ -319,8 +319,6 @@ void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, ch
         } else {
             snprintf(symbol, symbol_len, "%s==>", ZSTR_VAL(bucket->parent_function));
         }
-    } else {
-        snprintf(symbol, symbol_len, "");
     }
     /*
     else {

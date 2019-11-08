@@ -47,7 +47,7 @@
  *	$connection->setProfiler($profiler);
  *
  *	//Get the last profile in the profiler
- *	$profile = $profiler->stopProfile();
+ *	$profile = $profiler->getLastProfile();
  *
  *	echo "Data: ", $profile->getData(), "\n";
  *	echo "Start Time: ", $profile->getInitialTime(), "\n";

@@ -438,12 +438,16 @@ PHP_METHOD(Phalcon_Storage_Lmdb, get)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, put)
 {
-	zval *key, *value, s = {};
+	zval *key, *value, *_flags = NULL, s = {};
 	MDB_val k, v;
 	phalcon_storage_lmdb_object *intern;
-	int rc;
+	int flags = 0, rc;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 2, 1, &key, &value, &_flags);
+
+	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
+		flags = Z_LVAL_P(_flags);
+	}
 
 	phalcon_serialize(&s, value);
 
@@ -454,7 +458,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, put)
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
 
-	rc = mdb_put(intern->txn, intern->dbi, &k, &v, 0);
+	rc = mdb_put(intern->txn, intern->dbi, &k, &v, flags);
 	zval_ptr_dtor(&s);
 	if (rc != MDB_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to store items into a database (%s)", mdb_strerror(rc));

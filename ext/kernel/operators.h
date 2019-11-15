@@ -113,7 +113,7 @@ zend_long phalcon_get_intval_ex(const zval *op);
 double phalcon_get_doubleval_ex(const zval *op);
 zend_bool phalcon_get_boolval_ex(const zval *op);
 
-#define phalcon_get_numberval(z) (Z_TYPE_P(z) == IS_LONG ? Z_LVAL_P(z) : phalcon_get_doubleval(z))
+#define phalcon_get_numberval(z) (Z_TYPE_P(z) == IS_LONG ? (double)Z_LVAL_P(z) : phalcon_get_doubleval(z))
 #define phalcon_get_intval(z) (Z_TYPE_P(z) == IS_LONG ? Z_LVAL_P(z) : phalcon_get_intval_ex(z))
 #define phalcon_get_doubleval(z) (Z_TYPE_P(z) == IS_DOUBLE ? Z_DVAL_P(z) : phalcon_get_doubleval_ex(z))
 #define phalcon_get_boolval(z) (zend_is_true(z) ? 1 : 0);

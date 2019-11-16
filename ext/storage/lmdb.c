@@ -59,6 +59,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, readers, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, mapsize, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, envflags, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
@@ -160,7 +161,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NOLOCK"),		MDB_NOLOCK);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NORDAHEAD"),	MDB_NORDAHEAD);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NOMEMINIT"),	MDB_NOMEMINIT);
-	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("PREVMETA"),	MDB_PREVMETA);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("MDB_PREVSNAPSHOT"),	MDB_PREVSNAPSHOT);
 
 	// Database Flags
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("REVERSEKEY"),	MDB_REVERSEKEY);
@@ -219,17 +220,23 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
  * @param string $name
  * @param int $readers
  * @param int $mapsize
+ * @param int $envflags
+ * @param int $flags
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 {
-	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_flags = NULL;
+	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL;
 	phalcon_storage_lmdb_object *intern;
-	int flags = 0, rc;
+	int envflags = 0, flags = MDB_CREATE, rc;
 
-	phalcon_fetch_params(0, 1, 4, &path, &name, &readers, &mapsize, &_flags);
+	phalcon_fetch_params(0, 1, 5, &path, &name, &readers, &mapsize, &_envflags, &_flags);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (_envflags && Z_TYPE_P(_envflags) == IS_LONG) {
+		envflags = Z_LVAL_P(_envflags);
 	}
 
 	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
@@ -261,7 +268,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	}
 	mdb_env_set_maxdbs(intern->env, 256);
 
-	rc = mdb_env_open(intern->env, Z_STRVAL_P(path), flags, 0664);
+	rc = mdb_env_open(intern->env, Z_STRVAL_P(path), envflags, 0664);
 	
 	if (rc != MDB_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", Z_STRVAL_P(path));
@@ -276,9 +283,9 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 
 	if (Z_TYPE_P(name) == IS_STRING) {
 		phalcon_update_property(getThis(), SL("_name"), name);
-		rc = mdb_dbi_open(intern->txn, Z_STRVAL_P(name), MDB_CREATE, &intern->dbi);
+		rc = mdb_dbi_open(intern->txn, Z_STRVAL_P(name), flags, &intern->dbi);
 	} else {
-		rc = mdb_dbi_open(intern->txn, NULL, 0, &intern->dbi);
+		rc = mdb_dbi_open(intern->txn, NULL, flags, &intern->dbi);
 	}
 
 	if (rc != MDB_SUCCESS) {
@@ -297,6 +304,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 /**
  * Create a transaction for use with the environment
  *
+ * @param int $flags
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, begin)
 {
@@ -434,6 +442,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, get)
  *
  * @param string $key
  * @param mixed $value
+ * @param int $flags
  * @return mixed
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, put)

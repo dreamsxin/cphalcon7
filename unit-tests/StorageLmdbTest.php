@@ -41,5 +41,68 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 		}
 		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
 		$db->commit();
+		return;
+		// Multiple
+		$db = new Phalcon\Storage\Lmdb(__DIR__.'/lmdb2', NULL, NULL, NULL, NULL, Phalcon\Storage\Lmdb::CREATE | Phalcon\Storage\Lmdb::INTEGERKEY | Phalcon\Storage\Lmdb::INTEGERDUP | Phalcon\Storage\Lmdb::DUPSORT | Phalcon\Storage\Lmdb::DUPFIXED);
+
+		$db->begin();
+		try {
+			$db->put('key1', '1', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key1', '2', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key1', '3', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key1', '4', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key2', '1', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key2', '2', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key2', '3', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key2', '4', Phalcon\Storage\Lmdb::NODUPDATA);
+			$db->put('key3', '1');
+			$db->put('key3', '2');
+			$db->put('key3', '3');
+			$db->put('key3', '4');
+		} catch (\Exception $e) {
+			//print_r($e);
+		} finally {
+			$db->commit();
+		}
+
+		$db->begin(Phalcon\Storage\Lmdb::RDONLY);
+		$cur = $db->cursor();
+
+		$cur->valid();
+		if ($cur->retrieve('key1')) {
+			var_dump($cur->count());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next(true));
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next(true));
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+
+			var_dump($cur->next());
+			var_dump($cur->key());
+			var_dump($cur->current());
+		}
+
+		$db->commit();
 	}
 }

@@ -118,7 +118,7 @@ else
 fi
 
 PHP_ARG_ENABLE(storage-lmdb, whether to enable storage lmdb support,
-[  --enable-storage-lmdb   Enable storage lmdb support], no, no)
+[  --enable-storage-lmdb   Enable storage lmdb support], yes, no)
 
 if test "$PHP_STORAGE_LMDB" = "yes"; then
 	AC_DEFINE([PHALCON_STORAGE_LMDB], [1], [Whether storage lmdb are available])

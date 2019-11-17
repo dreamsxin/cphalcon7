@@ -42,6 +42,7 @@ zend_class_entry *phalcon_storage_lmdb_cursor_ce;
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, __construct);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, count);
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, get);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, put);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, del);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, current);
@@ -55,6 +56,11 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, valid);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_retrieve, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_get, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_put, 0, 0, 2)
@@ -87,6 +93,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_storage_lmdb_cursor_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, retrieve, arginfo_phalcon_storage_lmdb_cursor_retrieve, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, get, arginfo_phalcon_storage_lmdb_cursor_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, put, arginfo_phalcon_storage_lmdb_cursor_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, del, arginfo_phalcon_storage_lmdb_cursor_del, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, count, NULL, ZEND_ACC_PUBLIC)
@@ -120,6 +127,8 @@ void phalcon_storage_lmdb_cursor_object_free_handler(zend_object *object)
 	if (intern->cursor) {
 		mdb_cursor_close(intern->cursor);
 	}
+
+	zend_object_std_dtor(&intern->std);
 }
 
 /**
@@ -128,6 +137,13 @@ void phalcon_storage_lmdb_cursor_object_free_handler(zend_object *object)
 PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb_Cursor){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage\\Lmdb, Cursor, storage_lmdb_cursor, phalcon_storage_lmdb_cursor_method_entry, 0);
+
+	zend_declare_property_null(phalcon_storage_lmdb_cursor_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
+
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("GET_BOTH"),		MDB_GET_BOTH);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("GET_BOTH_RANGE"),	MDB_GET_BOTH_RANGE);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("GET_CURRENT"),		MDB_GET_CURRENT);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("GET_MULTIPLE"),	MDB_GET_MULTIPLE);
 
 	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("CURRENT"),			MDB_CURRENT);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NODUPDATA"),		MDB_NODUPDATA);
@@ -183,6 +199,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve)
 	rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_SET);
 
 	if (rc == MDB_SUCCESS) {
+		intern->start = 1;
 		RETVAL_TRUE;
 	} else if (rc == MDB_NOTFOUND) {
 		RETVAL_FALSE;
@@ -190,6 +207,59 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to retrieve by cursor (%s)", mdb_strerror(rc));
 		return;
 	}
+}
+
+/**
+ * Return key/data at current cursor position
+ *
+ * @param string $key
+ * @param int $flags
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, get)
+{
+	zval *key, *_flags = NULL, frontend = {}, value = {};
+	phalcon_storage_lmdb_cursor_object *intern;
+	int flags = MDB_GET_CURRENT, rc;
+
+	phalcon_fetch_params(0, 1, 1, &key, &_flags);
+
+	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
+		switch (Z_LVAL_P(_flags)) {
+		case MDB_GET_BOTH:
+		case MDB_GET_BOTH_RANGE:
+		case MDB_GET_CURRENT:
+		case MDB_GET_MULTIPLE:
+			flags = Z_LVAL_P(_flags);
+			break;
+		default:
+			break;
+		}
+	}
+
+	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+
+	intern->k.mv_size = Z_STRLEN_P(key);
+	intern->k.mv_data = Z_STRVAL_P(key);
+
+	rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flags);
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to store by cursor (%s)", mdb_strerror(rc));
+		return;
+	}
+	intern->start = 1;
+
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	
+	ZVAL_STRINGL(&value, (char *) intern->v.mv_data, (int) intern->v.mv_size);
+
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		PHALCON_CALL_METHOD_FLAG(rc, return_value, &frontend, "afterretrieve", &value);
+	} else {
+		phalcon_unserialize(return_value, &value);
+	}
+
+	zval_ptr_dtor(&value);
 }
 
 /**
@@ -202,7 +272,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, put)
 {
-	zval *key, *value, *_flags = NULL, s = {};
+	zval *key, *value, *_flags = NULL, frontend = {}, s = {};
 	phalcon_storage_lmdb_cursor_object *intern;
 	int flags = 0, rc;
 
@@ -214,7 +284,12 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, put)
 
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
-	phalcon_serialize(&s, value);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		PHALCON_CALL_METHOD_FLAG(rc, &s, &frontend, "beforestore", value);
+	} else {
+		phalcon_serialize(&s, value);
+	}
 
 	intern->k.mv_size = Z_STRLEN_P(key);
 	intern->k.mv_data = Z_STRVAL_P(key);
@@ -302,9 +377,15 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, current)
 	}
 
 	if (intern->rc == MDB_SUCCESS) {
-		zval s = {};
+		zval frontend = {}, s = {};
 		ZVAL_STRINGL(&s, (char *) intern->v.mv_data, (int) intern->v.mv_size);
-		phalcon_unserialize(return_value, &s);
+
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+		if (Z_TYPE(frontend) == IS_OBJECT) {
+			PHALCON_CALL_METHOD_FLAG(intern->rc, return_value, &frontend, "afterretrieve", &s);
+		} else {
+			phalcon_unserialize(return_value, &s);
+		}
 		zval_ptr_dtor(&s);
 	} else if (intern->rc == MDB_NOTFOUND) {
 		RETVAL_FALSE;
@@ -329,7 +410,6 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, key)
 		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_NEXT);
 		intern->start = 1;
 	}
-
 	if (intern->rc == MDB_SUCCESS) {
 		ZVAL_STRINGL(return_value, (char *) intern->k.mv_data, (int) intern->k.mv_size);
 	} else if (intern->rc == MDB_NOTFOUND) {

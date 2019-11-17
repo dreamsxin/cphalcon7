@@ -797,6 +797,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Intrusive_Rbtree_Node);
 #endif
 
+	PHALCON_INIT(Phalcon_Storage_FrontendInterface);
+	PHALCON_INIT(Phalcon_Storage_Frontend_Json);
+	PHALCON_INIT(Phalcon_Storage_Frontend_Base64);
+	PHALCON_INIT(Phalcon_Storage_Frontend_Igbinary);
+
 #ifdef PHALCON_STORAGE_BTREE
 	PHALCON_INIT(Phalcon_Storage_Btree);
 #endif

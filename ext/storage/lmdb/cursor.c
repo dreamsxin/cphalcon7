@@ -241,6 +241,8 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, get)
 
 	intern->k.mv_size = Z_STRLEN_P(key);
 	intern->k.mv_data = Z_STRVAL_P(key);
+	intern->v.mv_size = 0;
+	intern->v.mv_data = NULL;
 
 	rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flags);
 	if (rc != MDB_SUCCESS) {

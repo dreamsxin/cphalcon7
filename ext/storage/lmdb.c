@@ -399,7 +399,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, getAll)
 	phalcon_storage_lmdb_object *intern;
 	int flags = MDB_NEXT, rc;
 
-	phalcon_fetch_params(0, 1, 0, &dup);
+	phalcon_fetch_params(0, 0, 1, &dup);
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
 

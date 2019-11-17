@@ -28,6 +28,7 @@ typedef struct {
 	MDB_env *env;
 	MDB_dbi dbi;
 	MDB_txn *txn;
+	int flags;
 	zend_object std;
 } phalcon_storage_lmdb_object;
 

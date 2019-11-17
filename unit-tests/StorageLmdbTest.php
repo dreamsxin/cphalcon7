@@ -50,7 +50,7 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 		}
 		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
 		$db->commit();
-		return;
+
 		// cur
 		$db = new Phalcon\Storage\Lmdb('unit-tests/cache/lmdbcur', NULL, NULL, NULL, NULL, Phalcon\Storage\Lmdb::CREATE);
 
@@ -68,16 +68,17 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 			$this->assertEquals($cur->current(), '1');
 
 			if ($key == 'key1') {
-				$this->assertTrue($cur->put('key1', '0'));
+				$this->assertTrue($cur->put('key1', '0')); //  no dup
 				$this->assertEquals($cur->key(), 'key1');
 				$this->assertEquals($cur->current(), '0');
 			}
 		}
 
 		$db->commit();
-
+		return;
 		// dup
 		$flags = \Phalcon\Storage\Lmdb::CREATE | \Phalcon\Storage\Lmdb::INTEGERKEY | \Phalcon\Storage\Lmdb::INTEGERDUP | \Phalcon\Storage\Lmdb::DUPSORT | \Phalcon\Storage\Lmdb::DUPFIXED;
+		$flags = \Phalcon\Storage\Lmdb::CREATE | \Phalcon\Storage\Lmdb::DUPSORT | \Phalcon\Storage\Lmdb::DUPFIXED;
 		$db = new \Phalcon\Storage\Lmdb('unit-tests/cache/lmdbdup', NULL, NULL, NULL, NULL, $flags);
 
 		$db->begin();
@@ -103,9 +104,9 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 		$db->begin(\Phalcon\Storage\Lmdb::RDONLY);
 		$cur = $db->cursor();
 
-		$cur->valid();
 		if ($cur->retrieve('key1')) {
 			$this->assertEquals($cur->count(), 4);
+			$this->assertTrue($cur->next());
 			$this->assertEquals($cur->key(), 'key1');
 			$this->assertEquals($cur->current(), '1');
 

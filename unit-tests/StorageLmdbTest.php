@@ -50,7 +50,7 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 		}
 		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
 		$db->commit();
-
+		return;
 		// cur
 		$db = new Phalcon\Storage\Lmdb('unit-tests/cache/lmdbcur', NULL, NULL, NULL, NULL, Phalcon\Storage\Lmdb::CREATE);
 

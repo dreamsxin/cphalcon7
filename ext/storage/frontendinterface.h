@@ -26,10 +26,15 @@
 extern zend_class_entry *phalcon_storage_frontendinterface_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Storage_FrontendInterface);
-
+#if PHP_VERSION_ID >= 70200
 ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_storage_frontendinterface_beforestore, 0, 1, IS_STRING, 1)
 	ZEND_ARG_INFO(0, data)
 ZEND_END_ARG_INFO()
+#else
+ZEND_BEGIN_ARG_WITH_RETURN_TYPE_INFO_EX(arginfo_phalcon_storage_frontendinterface_beforestore, 0, 1, IS_STRING, NULL, 1)
+	ZEND_ARG_INFO(0, data)
+ZEND_END_ARG_INFO()
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_frontendinterface_afterretrieve, 0, 0, 1)
 	ZEND_ARG_INFO(0, data)

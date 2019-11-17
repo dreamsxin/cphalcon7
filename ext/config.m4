@@ -899,6 +899,10 @@ socket/client.c \
 socket/server.c \
 process/exception.c \
 storage/exception.c \
+storage/frontendinterface.c \
+storage/frontend/base64.c \
+storage/frontend/json.c \
+storage/frontend/igbinary.c \
 snowflake.c \
 server/utils.c \
 server/simple.c \

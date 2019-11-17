@@ -21,6 +21,7 @@
 #include "storage/lmdb.h"
 #include "storage/lmdb/cursor.h"
 #include "storage/exception.h"
+#include "storage/frontendinterface.h"
 
 #include <ext/standard/file.h>
 #include <zend_smart_str.h>
@@ -61,10 +62,15 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, mapsize, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, envflags, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, frontend, IS_OBJECT, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_begin, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_getall, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, dup, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_get, 0, 0, 1)
@@ -96,7 +102,7 @@ static const zend_function_entry phalcon_storage_lmdb_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Lmdb, commit, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, renew, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, reset, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Lmdb, getAll, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb, getAll, arginfo_phalcon_storage_lmdb_getall, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, get, arginfo_phalcon_storage_lmdb_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, put, arginfo_phalcon_storage_lmdb_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb, del, arginfo_phalcon_storage_lmdb_del, ZEND_ACC_PUBLIC)
@@ -136,6 +142,8 @@ void phalcon_storage_lmdb_object_free_handler(zend_object *object)
 		mdb_env_close(intern->env);
 		intern->env = NULL;
 	}
+
+	zend_object_std_dtor(&intern->std);
 }
 
 /**
@@ -145,6 +153,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage, Lmdb, storage_lmdb, phalcon_storage_lmdb_method_entry, 0);
 
+	zend_declare_property_null(phalcon_storage_lmdb_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_storage_lmdb_ce, SL("_path"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_storage_lmdb_ce, SL("_name"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_storage_lmdb_ce, SL("_flag"), 0, ZEND_ACC_PROTECTED);
@@ -175,11 +184,11 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
 	// Write Flags
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NOOVERWRITE"),	MDB_NOOVERWRITE);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NODUPDATA"),		MDB_NODUPDATA);
-	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CURRENT"),		MDB_CURRENT);
+	//zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CURRENT"),		MDB_CURRENT);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("RESERVE"),		MDB_RESERVE);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("APPEND"),			MDB_APPEND);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("APPENDDUP"),		MDB_APPENDDUP);
-	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("MULTIPLE"),		MDB_MULTIPLE);
+	//zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("MULTIPLE"),		MDB_MULTIPLE);
 
 	// Copy Flags
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CP_COMPACT"),		MDB_CP_COMPACT);
@@ -222,14 +231,15 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
  * @param int $mapsize
  * @param int $envflags
  * @param int $flags
+ * @param Phalcon\Storage\FrontendInterface $frontend
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 {
-	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL;
+	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL, *frontend = NULL;
 	phalcon_storage_lmdb_object *intern;
 	int envflags = 0, flags = MDB_CREATE, rc;
 
-	phalcon_fetch_params(0, 1, 5, &path, &name, &readers, &mapsize, &_envflags, &_flags);
+	phalcon_fetch_params(0, 1, 6, &path, &name, &readers, &mapsize, &_envflags, &_flags, &frontend);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
@@ -241,6 +251,10 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 
 	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
 		flags = Z_LVAL_P(_flags);
+	}
+	if (frontend && Z_TYPE_P(frontend) == IS_OBJECT) {
+		PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_storage_frontendinterface_ce, phalcon_storage_exception_ce);
+		phalcon_update_property(getThis(), SL("_frontend"), frontend);
 	}
 
 	if (phalcon_file_exists(path) == FAILURE) {
@@ -379,12 +393,19 @@ PHP_METHOD(Phalcon_Storage_Lmdb, reset)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, getAll)
 {
+	zval *dup = NULL, frontend = {};
 	MDB_val k, v;
 	MDB_cursor *cursor;
 	phalcon_storage_lmdb_object *intern;
-	int rc;
+	int flags = MDB_NEXT, rc;
+
+	phalcon_fetch_params(0, 0, 1, &dup);
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (dup && zend_is_true(dup)) {
+		flags = MDB_NEXT_DUP;
+	}
 
 	rc = mdb_cursor_open(intern->txn, intern->dbi, &cursor);
 	if (rc != MDB_SUCCESS) {
@@ -393,13 +414,28 @@ PHP_METHOD(Phalcon_Storage_Lmdb, getAll)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a cursor handle (%s)", mdb_strerror(rc));
 		return;
 	}
+
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+
 	array_init(return_value);
-	while ((rc = mdb_cursor_get(cursor, &k, &v, MDB_NEXT)) == 0) {
+	while ((rc = mdb_cursor_get(cursor, &k, &v, flags)) == 0) {
 		zval s = {}, u = {};
 		ZVAL_STRINGL(&s, (char *) v.mv_data, (int) v.mv_size);
-		phalcon_unserialize(&u, &s);
+
+		if (Z_TYPE(frontend) == IS_OBJECT) {
+			PHALCON_CALL_METHOD_FLAG(rc, &u, &frontend, "afterRetrieve", &s);
+		} else {
+			phalcon_unserialize(&u, &s);
+		}
 		zval_ptr_dtor(&s);
-		phalcon_array_update_str(return_value, (char *) k.mv_data, (int) k.mv_size, &u, 0);
+		if (flags == MDB_NEXT_DUP) {
+			zval key;
+			ZVAL_STRINGL(&key, (char *) k.mv_data, (int) k.mv_size);
+			phalcon_array_append_multi_2(return_value, &key, &u, 0);
+			zval_ptr_dtor(&key);
+		} else {
+			phalcon_array_update_str(return_value, (char *) k.mv_data, (int) k.mv_size, &u, 0);
+		}
 	}
 	mdb_cursor_close(cursor);
 }
@@ -426,8 +462,14 @@ PHP_METHOD(Phalcon_Storage_Lmdb, get)
 
 	rc = mdb_get(intern->txn, intern->dbi, &k, &v);
 	if (rc == MDB_SUCCESS) {
+		zval frontend = {};
 		ZVAL_STRINGL(&s, (char *) v.mv_data, (int) v.mv_size);
-		phalcon_unserialize(return_value, &s);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+		if (Z_TYPE(frontend) == IS_OBJECT) {
+			PHALCON_CALL_METHOD_FLAG(rc, return_value, &frontend, "afterretrieve", &s);
+		} else {
+			phalcon_unserialize(return_value, &s);
+		}
 		zval_ptr_dtor(&s);
 	} else if (rc == MDB_NOTFOUND) {
 		RETVAL_FALSE;
@@ -447,7 +489,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, get)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, put)
 {
-	zval *key, *value, *_flags = NULL, s = {};
+	zval *key, *value, *_flags = NULL, frontend = {}, s = {};
 	MDB_val k, v;
 	phalcon_storage_lmdb_object *intern;
 	int flags = 0, rc;
@@ -458,7 +500,15 @@ PHP_METHOD(Phalcon_Storage_Lmdb, put)
 		flags = Z_LVAL_P(_flags);
 	}
 
-	phalcon_serialize(&s, value);
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		PHALCON_CALL_METHOD_FLAG(rc, &s, &frontend, "beforestore", value);
+		if (rc == FAILURE) {
+			return;
+		}
+	} else {
+		phalcon_serialize(&s, value);
+	}
 
 	k.mv_size = Z_STRLEN_P(key);
 	k.mv_data = Z_STRVAL_P(key);
@@ -515,6 +565,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, del)
  */
 PHP_METHOD(Phalcon_Storage_Lmdb, cursor)
 {
+	zval frontend = {};
 	MDB_cursor *cursor;
 	phalcon_storage_lmdb_object *intern;
 	phalcon_storage_lmdb_cursor_object *cursor_intern;
@@ -531,6 +582,11 @@ PHP_METHOD(Phalcon_Storage_Lmdb, cursor)
 	object_init_ex(return_value, phalcon_storage_lmdb_cursor_ce);
 	cursor_intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(return_value));
 	cursor_intern->cursor = cursor;
+	
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		phalcon_update_property(return_value, SL("_frontend"), &frontend);
+	}
 }
 
 /**

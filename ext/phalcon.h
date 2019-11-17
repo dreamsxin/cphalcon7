@@ -473,6 +473,10 @@
 #include "snowflake.h"
 
 #include "storage/exception.h"
+#include "storage/frontendinterface.h"
+#include "storage/frontend/base64.h"
+#include "storage/frontend/igbinary.h"
+#include "storage/frontend/json.h"
 #include "storage/btree.h"
 #include "storage/wiredtiger.h"
 #include "storage/wiredtiger/cursor.h"

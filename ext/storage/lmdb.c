@@ -175,11 +175,11 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb){
 	// Write Flags
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NOOVERWRITE"),	MDB_NOOVERWRITE);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("NODUPDATA"),		MDB_NODUPDATA);
-	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CURRENT"),		MDB_CURRENT);
+	//zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CURRENT"),		MDB_CURRENT);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("RESERVE"),		MDB_RESERVE);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("APPEND"),			MDB_APPEND);
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("APPENDDUP"),		MDB_APPENDDUP);
-	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("MULTIPLE"),		MDB_MULTIPLE);
+	//zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("MULTIPLE"),		MDB_MULTIPLE);
 
 	// Copy Flags
 	zend_declare_class_constant_long(phalcon_storage_lmdb_ce, SL("CP_COMPACT"),		MDB_CP_COMPACT);

@@ -41,9 +41,10 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 		}
 		$this->assertEquals($ret, ['key1' => 'value1', 'key2' => 'value2']);
 		$db->commit();
-		return;
-		// Multiple
-		$db = new Phalcon\Storage\Lmdb(__DIR__.'/lmdb2', NULL, NULL, NULL, NULL, Phalcon\Storage\Lmdb::CREATE | Phalcon\Storage\Lmdb::INTEGERKEY | Phalcon\Storage\Lmdb::INTEGERDUP | Phalcon\Storage\Lmdb::DUPSORT | Phalcon\Storage\Lmdb::DUPFIXED);
+
+		// dup
+		$flags = \Phalcon\Storage\Lmdb::CREATE | \Phalcon\Storage\Lmdb::INTEGERKEY | \Phalcon\Storage\Lmdb::INTEGERDUP | \Phalcon\Storage\Lmdb::DUPSORT | \Phalcon\Storage\Lmdb::DUPFIXED;
+		$db = new \Phalcon\Storage\Lmdb('unit-tests/cache/lmdbdup', NULL, NULL, NULL, NULL, $flags);
 
 		$db->begin();
 		try {
@@ -65,42 +66,42 @@ class StorageLmdbTest extends PHPUnit\Framework\TestCase
 			$db->commit();
 		}
 
-		$db->begin(Phalcon\Storage\Lmdb::RDONLY);
+		$db->begin(\Phalcon\Storage\Lmdb::RDONLY);
 		$cur = $db->cursor();
 
 		$cur->valid();
 		if ($cur->retrieve('key1')) {
-			var_dump($cur->count());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertEquals($cur->count(), 4);
+			$this->assertEquals($cur->key(), 'key1');
+			$this->assertEquals($cur->current(), '1');
 
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertTrue($cur->next());
+			$this->assertEquals($cur->key(), 'key1');
+			$this->assertEquals($cur->current(), '2');
 
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertTrue($cur->next(\Phalcon\Storage\Lmdb\Cursor::NEXT_DUP));
+			$this->assertEquals($cur->key(), 'key1');
+			$this->assertEquals($cur->current(), '3');
 
-			var_dump($cur->next(true));
+			$this->assertTrue($cur->next(\Phalcon\Storage\Lmdb\Cursor::NEXT_DUP));
+			$this->assertEquals($cur->key(), 'key1');
+			$this->assertEquals($cur->current(), '4');
 
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertTrue($cur->next(\Phalcon\Storage\Lmdb\Cursor::NEXT_NODUP));
+			$this->assertEquals($cur->key(), 'key2');
+			$this->assertEquals($cur->current(), '1');
 
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertTrue($cur->next());
+			$this->assertEquals($cur->key(), 'key2');
+			$this->assertEquals($cur->current(), '2');
 
-			var_dump($cur->next(true));
+			$this->assertTrue($cur->next(\Phalcon\Storage\Lmdb\Cursor::NEXT_NODUP));
+			$this->assertEquals($cur->key(), 'key3');
+			$this->assertEquals($cur->current(), '1');
 
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
-
-			var_dump($cur->next());
-			var_dump($cur->key());
-			var_dump($cur->current());
+			$this->assertTrue($cur->next());
+			$this->assertEquals($cur->key(), 'key3');
+			$this->assertEquals($cur->current(), '2');
 		}
 
 		$db->commit();

@@ -42,37 +42,61 @@ zend_class_entry *phalcon_storage_lmdb_cursor_ce;
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, __construct);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, count);
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, put);
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, del);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, current);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, key);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, next);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, prev);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, rewind);
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, first);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, last);
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, valid);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_retrieve, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_put, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, key, IS_STRING, 0)
 	ZEND_ARG_INFO(0, value)
+	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_del, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_next, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO(0, multiple, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, flag, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_prev, 0, 0, 0)
-	ZEND_ARG_TYPE_INFO(0, multiple, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, flag, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+// arginfo_iterator_rewind
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_first, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, dup, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_last, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, dup, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_storage_lmdb_cursor_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, retrieve, arginfo_phalcon_storage_lmdb_cursor_retrieve, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, put, arginfo_phalcon_storage_lmdb_cursor_put, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, del, arginfo_phalcon_storage_lmdb_cursor_del, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, count, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, current, arginfo_iterator_current, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, key, arginfo_iterator_key, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, next, arginfo_phalcon_storage_lmdb_cursor_next, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, prev, arginfo_phalcon_storage_lmdb_cursor_prev, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Lmdb_Cursor, rewind, arginfo_iterator_rewind, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Lmdb_Cursor, last, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, rewind, arginfo_phalcon_storage_lmdb_cursor_first, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Storage_Lmdb_Cursor, first, rewind, arginfo_phalcon_storage_lmdb_cursor_first, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, last, arginfo_phalcon_storage_lmdb_cursor_last, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, valid, arginfo_iterator_valid, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -105,6 +129,23 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Lmdb_Cursor){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage\\Lmdb, Cursor, storage_lmdb_cursor, phalcon_storage_lmdb_cursor_method_entry, 0);
 
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("CURRENT"),			MDB_CURRENT);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NODUPDATA"),		MDB_NODUPDATA);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NOOVERWRITE"),		MDB_NOOVERWRITE);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("RESERVE"),			MDB_RESERVE);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("APPEND"),			MDB_APPEND);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("APPENDDUP"),		MDB_APPENDDUP);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("MULTIPLE"),		MDB_MULTIPLE);
+
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NEXT"),			MDB_NEXT);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NEXT_DUP"),		MDB_NEXT_DUP);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NEXT_MULTIPLE"),	MDB_NEXT_MULTIPLE);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("NEXT_NODUP"),		MDB_NEXT_NODUP);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("PREV"),			MDB_PREV);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("PREV_DUP"),		MDB_PREV_DUP);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("PREV_MULTIPLE"),	MDB_PREV_MULTIPLE);
+	zend_declare_class_constant_long(phalcon_storage_lmdb_cursor_ce, SL("PREV_NODUP"),		MDB_PREV_NODUP);
+
 	zend_class_implements(phalcon_storage_lmdb_cursor_ce, 1, zend_ce_iterator);
 
 	return SUCCESS;
@@ -124,33 +165,23 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, __construct)
  * Retrieve by cursor
  *
  * @param string $key
- * @param mixed $key
  * @return string
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve)
 {
-	zval *key, *_value = NULL, s = {};
+	zval *key;
 	phalcon_storage_lmdb_cursor_object *intern;
 	int rc;
 
-	phalcon_fetch_params(0, 1, 1, &key, &_value);
+	phalcon_fetch_params(0, 1, 0, &key);
 
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	intern->k.mv_size = Z_STRLEN_P(key);
 	intern->k.mv_data = Z_STRVAL_P(key);
 
-	if (_value && Z_TYPE_P(_value) != IS_NULL) {
-		phalcon_serialize(&s, _value);
-		intern->v.mv_size = Z_STRLEN(s);
-		intern->v.mv_data = Z_STRVAL(s);
-	}
 	rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_SET);
-	if (_value && Z_TYPE_P(_value) != IS_NULL) {
-		zval_ptr_dtor(&s);
-		intern->v.mv_size = 0;
-		intern->v.mv_data = NULL;
-	}
+
 	if (rc == MDB_SUCCESS) {
 		RETVAL_TRUE;
 	} else if (rc == MDB_NOTFOUND) {
@@ -159,6 +190,75 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, retrieve)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to retrieve by cursor (%s)", mdb_strerror(rc));
 		return;
 	}
+}
+
+/**
+ * Store by cursor
+ *
+ * @param string $key
+ * @param mixed $value
+ * @param int $flags
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, put)
+{
+	zval *key, *value, *_flags = NULL, s = {};
+	phalcon_storage_lmdb_cursor_object *intern;
+	int flags = 0, rc;
+
+	phalcon_fetch_params(0, 2, 1, &key, &value, &_flags);
+
+	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
+		flags = Z_LVAL_P(_flags);
+	}
+
+	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+
+	phalcon_serialize(&s, value);
+
+	intern->k.mv_size = Z_STRLEN_P(key);
+	intern->k.mv_data = Z_STRVAL_P(key);
+	intern->v.mv_size = Z_STRLEN(s);
+	intern->v.mv_data = Z_STRVAL(s);
+
+	rc = mdb_cursor_put(intern->cursor, &intern->k, &intern->v, flags);
+	zval_ptr_dtor(&s);
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to store by cursor (%s)", mdb_strerror(rc));
+		return;
+	}
+
+	RETURN_TRUE;
+}
+
+/**
+ * Delete current key/data pair
+ *
+ * @param int $flags
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, del)
+{
+	zval *_flags = NULL;
+	phalcon_storage_lmdb_cursor_object *intern;
+	int flags = 0, rc;
+
+	phalcon_fetch_params(0, 0, 1, &_flags);
+
+	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
+		flags = Z_LVAL_P(_flags);
+	}
+
+	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+
+	rc = mdb_cursor_del(intern->cursor, flags);
+
+	if (rc != MDB_SUCCESS) {
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to delete current key/data pair (%s)", mdb_strerror(rc));
+		return;
+	}
+
+	RETURN_TRUE;
 }
 
 /**
@@ -243,22 +343,35 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, key)
 /**
  * Moves cursor to next row
  *
- * @param boolean $multiple
+ * @param int $flag
  * @return boolean
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, next)
 {
-	zval *multiple = NULL;
+	zval *_flag = NULL;
 	phalcon_storage_lmdb_cursor_object *intern;
+	int flag = MDB_NEXT;
 
-	phalcon_fetch_params(0, 0, 1, &multiple);
+	phalcon_fetch_params(0, 0, 1, &_flag);
 
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
-	if (multiple && zend_is_true(multiple)) {
-		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_NEXT_MULTIPLE);
-	} else {
-		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_NEXT);
+	if (_flag && Z_TYPE_P(_flag) == IS_LONG) {
+		switch (Z_LVAL_P(_flag)) {
+		case MDB_NEXT_DUP:
+			flag = MDB_NEXT_DUP;
+			break;
+		case MDB_NEXT_MULTIPLE:
+			flag = MDB_NEXT_MULTIPLE;
+			break;
+		case MDB_NEXT_NODUP:
+			flag = MDB_NEXT_NODUP;
+			break;
+		default:
+			flag = MDB_NEXT;
+			break;
+		}
 	}
+	intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flag);
 	intern->start = 1;
 	if (intern->rc == MDB_SUCCESS) {
 		RETURN_TRUE;
@@ -273,24 +386,35 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, next)
 /**
  * Moves cursor to prev row
  *
- * @param boolean $multiple
+ * @param int $flag
  * @return boolean
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, prev)
 {
-	zval *multiple = NULL;
+	zval *_flag = NULL;
 	phalcon_storage_lmdb_cursor_object *intern;
+	int flag = MDB_PREV;
 
-	phalcon_fetch_params(0, 0, 1, &multiple);
+	phalcon_fetch_params(0, 0, 1, &_flag);
 
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
-	if (multiple && zend_is_true(multiple)) {
-		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_PREV_MULTIPLE);
-	} else {
-		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_PREV);
+	if (_flag && Z_TYPE_P(_flag) == IS_LONG) {
+		switch (Z_LVAL_P(_flag)) {
+		case MDB_PREV_DUP:
+			flag = MDB_PREV_DUP;
+			break;
+		case MDB_PREV_MULTIPLE:
+			flag = MDB_PREV_MULTIPLE;
+			break;
+		case MDB_PREV_NODUP:
+			flag = MDB_PREV_NODUP;
+			break;
+		default:
+			flag = MDB_PREV;
+			break;
+		}
 	}
-
-    intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_PREV);
+	intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flag);
 	intern->start = 1;
 	if (intern->rc == MDB_SUCCESS) {
 		RETURN_TRUE;
@@ -305,15 +429,22 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, prev)
 /**
  * Rewinds cursor to it's beginning
  *
+ * @param boolean $dup
  * @return boolean
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, rewind)
 {
+	zval *dup = NULL;
 	phalcon_storage_lmdb_cursor_object *intern;
 
-	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_fetch_params(0, 0, 1, &dup);
 
-    intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_FIRST);
+	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	if (dup && zend_is_true(dup)) {
+		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_FIRST_DUP);
+	} else {
+		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_FIRST);
+	}
 	intern->start = 1;
 	if (intern->rc == MDB_SUCCESS) {
 		RETURN_TRUE;
@@ -328,15 +459,22 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, rewind)
 /**
  * Rewinds cursor to it's last
  *
+ * @param boolean $dup
  * @return boolean
  */
 PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, last)
 {
+	zval *dup = NULL;
 	phalcon_storage_lmdb_cursor_object *intern;
 
-	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	phalcon_fetch_params(0, 0, 1, &dup);
 
-    intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_LAST);
+	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
+	if (dup && zend_is_true(dup)) {
+		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_LAST_DUP);
+	} else {
+		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, MDB_LAST);
+	}
 	intern->start = 1;
 	if (intern->rc == MDB_SUCCESS) {
 		RETURN_TRUE;

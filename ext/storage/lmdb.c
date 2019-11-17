@@ -264,7 +264,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	phalcon_update_property(getThis(), SL("_path"), path);
 
 	intern = phalcon_storage_lmdb_object_from_obj(Z_OBJ_P(getThis()));
-
+	intern->flags = flags;
 	rc = mdb_env_create(&intern->env);
 	if (rc != MDB_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Failed to create an LMDB environment handle");
@@ -428,7 +428,8 @@ PHP_METHOD(Phalcon_Storage_Lmdb, getAll)
 			phalcon_unserialize(&u, &s);
 		}
 		zval_ptr_dtor(&s);
-		if (flags == MDB_NEXT_DUP) {
+
+		if (intern->flags & MDB_DUPSORT) {
 			zval key;
 			ZVAL_STRINGL(&key, (char *) k.mv_data, (int) k.mv_size);
 			phalcon_array_append_multi_2(return_value, &key, &u, 0);
@@ -582,6 +583,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, cursor)
 	object_init_ex(return_value, phalcon_storage_lmdb_cursor_ce);
 	cursor_intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(return_value));
 	cursor_intern->cursor = cursor;
+	cursor_intern->flags = intern->flags;
 	
 	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(frontend) == IS_OBJECT) {

@@ -30,6 +30,7 @@ typedef struct {
 	MDB_val v;
 	int start;
 	int rc;
+	int flags;
 	zend_object std;
 } phalcon_storage_lmdb_cursor_object;
 

@@ -378,10 +378,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, current)
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	if (!intern->start) {
-		int flag = MDB_FIRST;
-		if (intern->flags & MDB_DUPSORT) {
-			//flag = MDB_FIRST_DUP;
-		}
+		int flag = MDB_NEXT;
 		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flag);
 		intern->start = 1;
 	}
@@ -417,10 +414,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb_Cursor, key)
 	intern = phalcon_storage_lmdb_cursor_object_from_obj(Z_OBJ_P(getThis()));
 
 	if (!intern->start) {
-		int flag = MDB_FIRST;
-		if (intern->flags & MDB_DUPSORT) {
-			//flag = MDB_FIRST_DUP;
-		}
+		int flag = MDB_NEXT;
 		intern->rc = mdb_cursor_get(intern->cursor, &intern->k, &intern->v, flag);
 		intern->start = 1;
 	}

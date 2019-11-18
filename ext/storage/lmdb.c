@@ -133,6 +133,10 @@ void phalcon_storage_lmdb_object_free_handler(zend_object *object)
 
 	intern = phalcon_storage_lmdb_object_from_obj(object);
 
+	if (intern->txn) {
+		mdb_txn_abort(intern->txn);
+		intern->txn = NULL;
+	}
 	if (intern->dbi) {
 		mdb_dbi_close(intern->env, intern->dbi);
 		intern->dbi = 0;
@@ -237,7 +241,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 {
 	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL, *frontend = NULL;
 	phalcon_storage_lmdb_object *intern;
-	int envflags = 0, flags = MDB_CREATE, rc;
+	int envflags = MDB_NOSYNC, flags = MDB_CREATE, rc;
 
 	phalcon_fetch_params(0, 1, 6, &path, &name, &readers, &mapsize, &_envflags, &_flags, &frontend);
 
@@ -267,11 +271,11 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	intern->flags = flags;
 	rc = mdb_env_create(&intern->env);
 	if (rc != MDB_SUCCESS) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Failed to create an LMDB environment handle");
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create an LMDB environment handle (%s)", mdb_strerror(rc));
 		return;
 	}
 	if (readers && Z_TYPE_P(readers) == IS_LONG) {
-		mdb_env_set_maxreaders(intern->env, Z_LVAL_P(readers));
+		mdb_env_set_maxreaders(intern->env, Z_LVAL_P(readers) + 2);
 	} else {
 		mdb_env_set_maxreaders(intern->env, 1024);
 	}
@@ -285,7 +289,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 	rc = mdb_env_open(intern->env, Z_STRVAL_P(path), envflags, 0664);
 	
 	if (rc != MDB_SUCCESS) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", Z_STRVAL_P(path));
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", mdb_strerror(rc));
 		return;
 	}
 
@@ -313,6 +317,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdb_strerror(rc));
 		return;
 	}
+	intern->txn = NULL;
 }
 
 /**
@@ -357,6 +362,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, commit)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdb_strerror(rc));
 		return;
 	}
+	intern->txn = NULL;
 	RETURN_TRUE;
 }
 
@@ -409,8 +415,6 @@ PHP_METHOD(Phalcon_Storage_Lmdb, getAll)
 
 	rc = mdb_cursor_open(intern->txn, intern->dbi, &cursor);
 	if (rc != MDB_SUCCESS) {
-		mdb_dbi_close(intern->env, intern->dbi);
-		mdb_txn_abort(intern->txn);
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a cursor handle (%s)", mdb_strerror(rc));
 		return;
 	}

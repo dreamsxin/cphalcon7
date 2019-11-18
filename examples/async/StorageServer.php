@@ -98,6 +98,9 @@ try {
 					}
 					$sendchunk = 'ok';
 					$lmdb->put($key, $value);
+				} elseif ($op == 'delete' || $op == 'del' || $op == 'rm') {
+					$sendchunk = 'ok';
+					$lmdb->del($key);
 				} else {
 					$sendchunk = 'error op is not valid';
 				}

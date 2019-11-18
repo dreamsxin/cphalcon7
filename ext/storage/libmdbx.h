@@ -25,12 +25,13 @@
 
 #ifdef PHALCON_USE_LIBMDBX
 
-#include "mdbx.h"
+#include <mdbx.h>
 
 typedef struct {
 	MDBX_env *env;
 	MDBX_dbi dbi;
 	MDBX_txn *txn;
+	int flags;
 	zend_object std;
 } phalcon_storage_libmdbx_object;
 

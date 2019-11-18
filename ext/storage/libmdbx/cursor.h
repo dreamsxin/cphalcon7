@@ -25,7 +25,7 @@
 
 #ifdef PHALCON_USE_LIBMDBX
 
-#include "mdbx.h"
+#include <mdbx.h>
 
 typedef struct {
 	MDBX_cursor *cursor;
@@ -33,6 +33,7 @@ typedef struct {
 	MDBX_val v;
 	int start;
 	int rc;
+	int flags;
 	zend_object std;
 } phalcon_storage_libmdbx_cursor_object;
 

@@ -21,6 +21,7 @@
 #include "storage/libmdbx.h"
 #include "storage/libmdbx/cursor.h"
 #include "storage/exception.h"
+#include "storage/frontendinterface.h"
 
 #include <ext/standard/file.h>
 #include <zend_smart_str.h>
@@ -59,11 +60,17 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_libmdbx___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, name, IS_STRING, 1)
 	ZEND_ARG_TYPE_INFO(0, readers, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, mapsize, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, envflags, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, frontend, IS_OBJECT, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_libmdbx_begin, 0, 0, 0)
 	ZEND_ARG_TYPE_INFO(0, flags, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_libmdbx_getall, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, dup, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_libmdbx_get, 0, 0, 1)
@@ -95,7 +102,7 @@ static const zend_function_entry phalcon_storage_libmdbx_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Libmdbx, commit, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Libmdbx, renew, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Libmdbx, reset, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Libmdbx, getAll, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Libmdbx, getAll, arginfo_phalcon_storage_libmdbx_getall, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Libmdbx, get, arginfo_phalcon_storage_libmdbx_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Libmdbx, put, arginfo_phalcon_storage_libmdbx_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Libmdbx, del, arginfo_phalcon_storage_libmdbx_del, ZEND_ACC_PUBLIC)
@@ -140,6 +147,8 @@ void phalcon_storage_libmdbx_object_free_handler(zend_object *object)
 		mdbx_env_close(intern->env);
 		intern->env = NULL;
 	}
+
+	zend_object_std_dtor(&intern->std);
 }
 
 /**
@@ -149,6 +158,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
 
 	PHALCON_REGISTER_CLASS_CREATE_OBJECT(Phalcon\\Storage, Libmdbx, storage_libmdbx, phalcon_storage_libmdbx_method_entry, 0);
 
+	zend_declare_property_null(phalcon_storage_libmdbx_ce, SL("_frontend"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_storage_libmdbx_ce, SL("_path"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_storage_libmdbx_ce, SL("_name"), ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_storage_libmdbx_ce, SL("_flag"), 0, ZEND_ACC_PROTECTED);
@@ -176,11 +186,11 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
 	// Write Flags
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NOOVERWRITE"),	MDBX_NOOVERWRITE);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NODUPDATA"),	MDBX_NODUPDATA);
-	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("CURRENT"),		MDBX_CURRENT);
+	//zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("CURRENT"),		MDBX_CURRENT);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("RESERVE"),		MDBX_RESERVE);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("APPEND"),		MDBX_APPEND);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("APPENDDUP"),	MDBX_APPENDDUP);
-	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("MULTIPLE"),	MDBX_MULTIPLE);
+	//zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("MULTIPLE"),	MDBX_MULTIPLE);
 
 	// Copy Flags
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("CP_COMPACT"),	MDBX_CP_COMPACT);
@@ -220,21 +230,32 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
  * @param string $name
  * @param int $readers
  * @param int $mapsize
+ * @param int $envflags
+ * @param int $flags
+ * @param Phalcon\Storage\FrontendInterface $frontend
  */
 PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 {
-	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_flags = NULL;
+	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL, *frontend = NULL;
 	phalcon_storage_libmdbx_object *intern;
-	int flags = 0, rc;
+	int envflags = 0, flags = MDBX_CREATE, rc;
 
-	phalcon_fetch_params(0, 1, 4, &path, &name, &readers, &mapsize, &_flags);
+	phalcon_fetch_params(0, 1, 6, &path, &name, &readers, &mapsize, &_envflags, &_flags, &frontend);
 
 	if (!name) {
 		name = &PHALCON_GLOBAL(z_null);
 	}
 
+	if (_envflags && Z_TYPE_P(_envflags) == IS_LONG) {
+		envflags = Z_LVAL_P(_envflags);
+	}
+
 	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
 		flags = Z_LVAL_P(_flags);
+	}
+	if (frontend && Z_TYPE_P(frontend) == IS_OBJECT) {
+		PHALCON_VERIFY_INTERFACE_EX(frontend, phalcon_storage_frontendinterface_ce, phalcon_storage_exception_ce);
+		phalcon_update_property(getThis(), SL("_frontend"), frontend);
 	}
 
 	if (phalcon_file_exists(path) == FAILURE) {
@@ -244,26 +265,31 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 	phalcon_update_property(getThis(), SL("_path"), path);
 
 	intern = phalcon_storage_libmdbx_object_from_obj(Z_OBJ_P(getThis()));
+	intern->flags = flags;
 
 	rc = mdbx_env_create(&intern->env);
 	if (rc != MDBX_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_storage_exception_ce, "Failed to create an environment handle");
 		return;
 	}
+
 	if (readers && Z_TYPE_P(readers) == IS_LONG) {
-		mdbx_env_set_maxreaders(intern->env, Z_LVAL_P(readers));
+		mdbx_env_set_maxreaders(intern->env, Z_LVAL_P(readers) + 2);
+	} else {
+		mdbx_env_set_maxreaders(intern->env, 1024);
 	}
+
 	if (mapsize && Z_TYPE_P(mapsize) == IS_LONG) {
 		mdbx_env_set_mapsize(intern->env, Z_LVAL_P(mapsize));
 	} else {
-		 mdbx_env_set_mapsize(intern->env, 256 * 1024 * 1024);
+		mdbx_env_set_mapsize(intern->env, 1024 * 1024 * 1024);
 	}
+
 	mdbx_env_set_maxdbs(intern->env, 256);
 
-	rc = mdbx_env_open(intern->env, Z_STRVAL_P(path), flags, 0664);
-	
+	rc = mdbx_env_open(intern->env, Z_STRVAL_P(path), envflags, 0664);
 	if (rc != MDBX_SUCCESS) {
-		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", Z_STRVAL_P(path));
+		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open an environment handle (%s)", mdbx_strerror(rc));
 		return;
 	}
 
@@ -272,17 +298,21 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a transaction for use with the environment (%s)", mdbx_strerror(rc));
 		return;
 	}
+
 	if (Z_TYPE_P(name) == IS_STRING) {
 		phalcon_update_property(getThis(), SL("_name"), name);
-		rc = mdbx_dbi_open(intern->txn, Z_STRVAL_P(name), MDBX_CREATE, &intern->dbi);
+		rc = mdbx_dbi_open(intern->txn, Z_STRVAL_P(name), flags, &intern->dbi);
 	} else {
-		rc = mdbx_dbi_open(intern->txn, NULL, 0, &intern->dbi);
+		rc = mdbx_dbi_open(intern->txn, NULL, flags, &intern->dbi);
 	}
+
 	if (rc != MDBX_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open a database in the environment (%s)", mdbx_strerror(rc));
 		return;
 	}
+zend_printf("%s %d\n", __FILE__, __LINE__);
 	rc = mdbx_txn_commit(intern->txn);
+zend_printf("%s %d\n", __FILE__, __LINE__);
 	if (rc != MDBX_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to reset a read-only transaction (%s)", mdbx_strerror(rc));
 		return;
@@ -331,6 +361,7 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, commit)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdbx_strerror(rc));
 		return;
 	}
+	intern->txn = NULL;
 	RETURN_TRUE;
 }
 
@@ -367,27 +398,51 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, reset)
  */
 PHP_METHOD(Phalcon_Storage_Libmdbx, getAll)
 {
+	zval *dup = NULL, frontend = {};
 	MDBX_val k, v;
 	MDBX_cursor *cursor;
 	phalcon_storage_libmdbx_object *intern;
-	int rc;
+	int flags = MDBX_NEXT, rc;
+
+	phalcon_fetch_params(0, 0, 1, &dup);
 
 	intern = phalcon_storage_libmdbx_object_from_obj(Z_OBJ_P(getThis()));
+
+	if (dup && zend_is_true(dup)) {
+		flags = MDBX_NEXT_DUP;
+	}
 
 	rc = mdbx_cursor_open(intern->txn, intern->dbi, &cursor);
 	if (rc != MDBX_SUCCESS) {
 		mdbx_dbi_close(intern->env, intern->dbi);
 		mdbx_txn_abort(intern->txn);
+		intern->txn = NULL;
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to create a cursor handle (%s)", mdbx_strerror(rc));
 		return;
 	}
+
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+
 	array_init(return_value);
-	while ((rc = mdbx_cursor_get(cursor, &k, &v, MDBX_NEXT)) == 0) {
+	while ((rc = mdbx_cursor_get(cursor, &k, &v, flags)) == 0) {
 		zval s = {}, u = {};
 		ZVAL_STRINGL(&s, (char *) v.iov_base, (int) v.iov_len);
-		phalcon_unserialize(&u, &s);
+
+		if (Z_TYPE(frontend) == IS_OBJECT) {
+			PHALCON_CALL_METHOD_FLAG(rc, &u, &frontend, "afterRetrieve", &s);
+		} else {
+			phalcon_unserialize(&u, &s);
+		}
+
 		zval_ptr_dtor(&s);
-		phalcon_array_update_str(return_value, (char *) k.iov_base, (int) k.iov_len, &u, 0);
+		if (intern->flags & MDBX_DUPSORT) {
+			zval key;
+			ZVAL_STRINGL(&key, (char *) k.iov_base, (int) k.iov_len);
+			phalcon_array_append_multi_2(return_value, &key, &u, 0);
+			zval_ptr_dtor(&key);
+		} else {
+			phalcon_array_update_str(return_value, (char *) k.iov_base, (int) k.iov_len, &u, 0);
+		}
 	}
 	mdbx_cursor_close(cursor);
 }
@@ -414,8 +469,14 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, get)
 
 	rc = mdbx_get(intern->txn, intern->dbi, &k, &v);
 	if (rc == MDBX_SUCCESS) {
+		zval frontend = {};
 		ZVAL_STRINGL(&s, (char *) v.iov_base, (int) v.iov_len);
-		phalcon_unserialize(return_value, &s);
+		phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+		if (Z_TYPE(frontend) == IS_OBJECT) {
+			PHALCON_CALL_METHOD_FLAG(rc, return_value, &frontend, "afterretrieve", &s);
+		} else {
+			phalcon_unserialize(return_value, &s);
+		}
 		zval_ptr_dtor(&s);
 	} else if (rc == MDBX_NOTFOUND) {
 		RETVAL_FALSE;
@@ -430,18 +491,31 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, get)
  *
  * @param string $key
  * @param mixed $value
+ * @param int $flags
  * @return mixed
  */
 PHP_METHOD(Phalcon_Storage_Libmdbx, put)
 {
-	zval *key, *value, s = {};
+	zval *key, *value, *_flags = NULL, frontend = {}, s = {};
 	MDBX_val k, v;
 	phalcon_storage_libmdbx_object *intern;
-	int rc;
+	int flags = 0, rc;
 
-	phalcon_fetch_params(0, 2, 0, &key, &value);
+	phalcon_fetch_params(0, 2, 1, &key, &value, &_flags);
 
-	phalcon_serialize(&s, value);
+	if (_flags && Z_TYPE_P(_flags) == IS_LONG) {
+		flags = Z_LVAL_P(_flags);
+	}
+
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		PHALCON_CALL_METHOD_FLAG(rc, &s, &frontend, "beforestore", value);
+		if (rc == FAILURE) {
+			return;
+		}
+	} else {
+		phalcon_serialize(&s, value);
+	}
 
 	k.iov_len = Z_STRLEN_P(key);
 	k.iov_base = Z_STRVAL_P(key);
@@ -450,7 +524,7 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, put)
 
 	intern = phalcon_storage_libmdbx_object_from_obj(Z_OBJ_P(getThis()));
 
-	rc = mdbx_put(intern->txn, intern->dbi, &k, &v, 0);
+	rc = mdbx_put(intern->txn, intern->dbi, &k, &v, flags);
 	zval_ptr_dtor(&s);
 	if (rc != MDBX_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to store items into a database (%s)", mdbx_strerror(rc));
@@ -498,6 +572,7 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, del)
  */
 PHP_METHOD(Phalcon_Storage_Libmdbx, cursor)
 {
+	zval frontend = {};
 	MDBX_cursor *cursor;
 	phalcon_storage_libmdbx_object *intern;
 	phalcon_storage_libmdbx_cursor_object *cursor_intern;
@@ -514,6 +589,12 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, cursor)
 	object_init_ex(return_value, phalcon_storage_libmdbx_cursor_ce);
 	cursor_intern = phalcon_storage_libmdbx_cursor_object_from_obj(Z_OBJ_P(return_value));
 	cursor_intern->cursor = cursor;
+	cursor_intern->flags = intern->flags;
+	
+	phalcon_read_property(&frontend, getThis(), SL("_frontend"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(frontend) == IS_OBJECT) {
+		phalcon_update_property(return_value, SL("_frontend"), &frontend);
+	}
 }
 
 /**

@@ -317,6 +317,7 @@ PHP_METHOD(Phalcon_Storage_Lmdb, __construct)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to commit all the operations of a transaction into the database (%s)", mdb_strerror(rc));
 		return;
 	}
+	intern->txn = NULL;
 }
 
 /**

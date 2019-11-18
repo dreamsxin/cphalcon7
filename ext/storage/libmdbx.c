@@ -310,13 +310,12 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to open a database in the environment (%s)", mdbx_strerror(rc));
 		return;
 	}
-zend_printf("%s %d\n", __FILE__, __LINE__);
 	rc = mdbx_txn_commit(intern->txn);
-zend_printf("%s %d\n", __FILE__, __LINE__);
 	if (rc != MDBX_SUCCESS) {
 		PHALCON_THROW_EXCEPTION_FORMAT(phalcon_storage_exception_ce, "Failed to reset a read-only transaction (%s)", mdbx_strerror(rc));
 		return;
 	}
+	intern->txn = NULL;
 }
 
 /**

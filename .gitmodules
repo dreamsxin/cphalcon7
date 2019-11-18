@@ -2,32 +2,35 @@
 	path   = php-tests/library/Mustache
 	url    = https://github.com/bobthecow/mustache.php.git
 	branch = master
-
 [submodule "php-tests/library/Twig"]
 	path   = php-tests/library/Twig
 	url    = https://github.com/fabpot/Twig.git
 	branch = master
 [submodule "deps/libwebsockets"]
 	path = deps/libwebsockets
-	url = https://github.com/warmcat/libwebsockets.git
+	url = https://github.com/dreamsxin/libwebsockets.git
+	branch = master
 [submodule "deps/libqrencode"]
 	path = deps/libqrencode
-	url = https://github.com/fukuchi/libqrencode.git
+	url = https://github.com/dreamsxin/libqrencode.git
+	branch = master
 [submodule "deps/libuv"]
 	path = deps/libuv
-	url = https://github.com/libuv/libuv.git
+	url = https://github.com/dreamsxin/libuv.git
+	branch = master
 [submodule "deps/mongo-c-driver"]
 	path = deps/mongo-c-driver
-	url = https://github.com/mongodb/mongo-c-driver.git
+	url = https://github.com/dreamsxin/mongo-c-driver.git
+	branch = master
 [submodule "deps/wiredtiger"]
 	path = deps/wiredtiger
 	url = https://github.com/dreamsxin/wiredtiger.git
+	branch = master
 [submodule "deps/mongoose"]
 	path = deps/mongoose
 	url = https://github.com/dreamsxin/mongoose.git
-[submodule "deps/libdeep"]
-	path = deps/libdeep
-	url = https://github.com/dreamsxin/libdeep.git
+	branch = master
 [submodule "deps/libmdbx"]
 	path = deps/libmdbx
-	url = https://github.com/leo-yuriev/libmdbx.git
+	url = https://github.com/dreamsxin/libmdbx.git
+	branch = 0.2.0

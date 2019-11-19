@@ -20,8 +20,19 @@
 #ifndef PHALCON_CHART_QRCODE_H
 #define PHALCON_CHART_QRCODE_H
 
+#include "php_phalcon.h"
+
 extern int  phalcon_qrcode_handle;
 #define phalcon_qrcode_handle_name "qrcode"
+
+#if PHALCON_USE_QRENCODE
+
+# include "chart/qrcode/qr.h"
+typedef struct {
+    QRcode *c;
+} phalcon_qrcode;
+
+#endif
 
 extern zend_class_entry *phalcon_chart_qrcode_ce;
 

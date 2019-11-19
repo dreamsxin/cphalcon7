@@ -47,7 +47,7 @@ int phalcon_has_constructor_ce(const zend_class_entry *ce)
 
 zval* _phalcon_call(zval *retval_ptr, zval *object, zend_class_entry *obj_ce, zend_function **fn_proxy, const char *function_name, size_t function_name_len, int param_count, zval* args[])
 {
-	int i, result;
+	int i = 0, result;
 	zend_fcall_info fci;
 	zval retval;
 	zval params[50];

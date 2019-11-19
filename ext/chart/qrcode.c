@@ -57,6 +57,7 @@ zend_class_entry *phalcon_chart_qrcode_ce;
 
 PHP_METHOD(Phalcon_Chart_QRcode, __construct);
 PHP_METHOD(Phalcon_Chart_QRcode, generate);
+PHP_METHOD(Phalcon_Chart_QRcode, getData);
 PHP_METHOD(Phalcon_Chart_QRcode, render);
 PHP_METHOD(Phalcon_Chart_QRcode, save);
 
@@ -96,6 +97,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_chart_qrcode_method_entry[] = {
 	PHP_ME(Phalcon_Chart_QRcode, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Chart_QRcode, generate, arginfo_phalcon_chart_qrcode_generate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Chart_QRcode, getData, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_QRcode, render, arginfo_phalcon_chart_qrcode_render, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_QRcode, save, arginfo_phalcon_chart_qrcode_save, ZEND_ACC_PUBLIC)
 
@@ -233,6 +235,29 @@ PHP_METHOD(Phalcon_Chart_QRcode, generate){
 		phalcon_update_property(getThis(), SL("_qr"), &zid);
 		RETURN_TRUE;
 	}
+}
+
+/**
+ * Return the qrcode binary string.
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Chart_QRcode, getData){
+
+	zval zid = {};
+	phalcon_qrcode *qr = NULL;
+
+	phalcon_read_property(&zid, getThis(), SL("_qr"), PH_NOISY|PH_READONLY);
+
+	if (Z_TYPE(zid) == IS_NULL) {
+		RETURN_FALSE;
+	}
+
+	if ((qr = (phalcon_qrcode *)zend_fetch_resource(Z_RES(zid), phalcon_qrcode_handle_name, phalcon_qrcode_handle)) == NULL) {
+		RETURN_FALSE;
+	}
+	
+	RETURN_STRINGL((const char *)qr->c->data, (qr->c->width*qr->c->width));
 }
 
 /**

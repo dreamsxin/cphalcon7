@@ -1000,12 +1000,12 @@ aop.c"
 		[[#include "php_config.h"]]
 	)
 
-	PHP_SOCKETS='no'
+	PHP_SOCKETS="no"
 
 	AC_CHECK_HEADERS(
 		[ext/sockets/php_sockets.h],
 		[
-			PHP_SOCKETS='yes'
+			PHP_SOCKETS="yes"
 			PHP_ADD_EXTENSION_DEP([phalcon], [sockets])
 			AC_DEFINE([PHALCON_USE_PHP_SOCKETS], [1], [Whether PHP sockets extension is present at compile time])
 		],
@@ -1184,11 +1184,11 @@ aop.c"
 	done
 
 	if test "$PHP_QRCODE" = "yes"; then
-		QRENCODE_FOUND = 'no'
+		QRENCODE_FOUND="no"
 		AC_MSG_CHECKING([checking libqrencode support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/qrencode.h; then
-				QRENCODE_FOUND = 'yes'
+				QRENCODE_FOUND="yes"
 				PHP_ADD_INCLUDE($i/include)
 				PHP_CHECK_LIBRARY(qrencode, QRcode_encodeString,
 				[
@@ -1205,7 +1205,6 @@ aop.c"
 				AC_MSG_RESULT([no, found in $i])
 			fi
 		done
-
 		if test "$QRENCODE_FOUND" = "yes" && test -n "$WAND_CFLAGS"; then
 			AC_MSG_CHECKING([checking libzbar support])
 			for i in /usr/local /usr; do
@@ -1334,9 +1333,9 @@ aop.c"
 
 	if test "$PHP_OPENSSL" != "no"; then
 		AC_CHECK_HEADER(openssl/evp.h, [
-			PHP_OPENSSL='yes'
+			PHP_OPENSSL="yes"
 		], [
-			PHP_OPENSSL='no'
+			PHP_OPENSSL="no"
 		])
 	fi
 

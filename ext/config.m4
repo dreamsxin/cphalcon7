@@ -1184,15 +1184,17 @@ aop.c"
 	done
 
 	if test "$PHP_QRCODE" = "yes"; then
+		QRENCODE_FOUND = 'no'
 		AC_MSG_CHECKING([checking libqrencode support])
 		for i in /usr/local /usr; do
 			if test -r $i/include/qrencode.h; then
+				QRENCODE_FOUND = 'yes'
 				PHP_ADD_INCLUDE($i/include)
 				PHP_CHECK_LIBRARY(qrencode, QRcode_encodeString,
 				[
 					PHP_ADD_LIBRARY_WITH_PATH(qrencode, $i/$PHP_LIBDIR, PHALCON_SHARED_LIBADD)
 					AC_DEFINE(PHALCON_USE_QRENCODE, 1, [Have qrencode support])
-					phalcon_sources="$phalcon_sources chart/qrcode.c "
+					phalcon_sources="$phalcon_sources chart/qrcode.c chart/qrcode/qr.c "
 				],[
 					AC_MSG_ERROR([Wrong qrencode version or library not found])
 				],[
@@ -1204,7 +1206,7 @@ aop.c"
 			fi
 		done
 
-		if test -n "$WAND_CFLAGS"; then
+		if test "$QRENCODE_FOUND" = "yes" && test -n "$WAND_CFLAGS"; then
 			AC_MSG_CHECKING([checking libzbar support])
 			for i in /usr/local /usr; do
 				if test -r $i/include/zbar.h; then

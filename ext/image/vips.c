@@ -30,6 +30,8 @@
 
 #include <main/SAPI.h>
 
+#define VIPS_DEBUG 1
+
 #include <vips/vips.h>
 #include <vips/debug.h>
 #include <vips/vector.h>
@@ -1074,6 +1076,7 @@ zend_class_entry *phalcon_image_vips_ce;
 PHP_METHOD(Phalcon_Image_Vips, __construct);
 PHP_METHOD(Phalcon_Image_Vips, black);
 PHP_METHOD(Phalcon_Image_Vips, drawRect);
+PHP_METHOD(Phalcon_Image_Vips, drawCircle);
 PHP_METHOD(Phalcon_Image_Vips, writeToFile);
 PHP_METHOD(Phalcon_Image_Vips, call);
 PHP_METHOD(Phalcon_Image_Vips, new_from_file);
@@ -1114,11 +1117,19 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_black, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawrect, 0, 0, 5)
-	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, color, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, left, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, top, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawcircle, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, color, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, cx, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, cy, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, radius, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
@@ -1235,6 +1246,7 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __construct, arginfo_phalcon_image_vips___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawRect, arginfo_phalcon_image_vips_drawrect, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawCircle, arginfo_phalcon_image_vips_drawcircle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, writeToFile, arginfo_phalcon_image_vips_writetofile, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, call, arginfo_phalcon_image_vips_call, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, new_from_file, arginfo_phalcon_image_vips_new_from_file, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -1376,6 +1388,48 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 		ZVAL_COPY_VALUE(&argv[6], options);
 	}
 	if (vips_php_call_array("draw_rect", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		RETURN_LONG(-1);
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		RETURN_LONG(-1);
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawCircle)
+{
+	zval *color, *cx, *cy, *radius, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 5, flag;
+
+	phalcon_fetch_params(0, 4, 1, &color, &cx, &cy, &radius, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 6;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], color);
+	ZVAL_COPY_VALUE(&argv[2], cx);
+	ZVAL_COPY_VALUE(&argv[3], cy);
+	ZVAL_COPY_VALUE(&argv[4], radius);
+	if (argc == 6) {
+		ZVAL_COPY_VALUE(&argv[5], options);
+	}
+
+	if (vips_php_call_array("draw_circle", NULL, "", argc, argv, &ret)) {
 		efree(argv);
 		RETURN_LONG(-1);
 	}

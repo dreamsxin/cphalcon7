@@ -210,6 +210,7 @@
 #include "http/client/adapter/stream.h"
 
 #include "image.h"
+#include "image/vips.h"
 #include "image/adapter.h"
 #include "image/adapterinterface.h"
 #include "image/adapter/gd.h"

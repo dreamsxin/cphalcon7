@@ -14,6 +14,9 @@ fi
 PHP_ARG_ENABLE(async, Whether to enable "async" support,
 [ --enable-async          Enable "async" support], yes, no)
 
+PHP_ARG_ENABLE(vips, whether to enable vips support,
+[  --enable-vips   Enable vips support], no, no)
+
 PHP_ARG_WITH(openssl, OpenSSL dir for "async",
 [ --with-openssl[=DIR] Openssl dev lib directory], no, no)
 
@@ -44,14 +47,6 @@ fi
 
 PHP_ARG_ENABLE(qrcode, wheter to enable qrcode support,
 [  --enable-qrcode         Enable qrcode], no, no)
-
-AC_MSG_CHECKING([Include qrcode])
-if test "$PHP_QRCODE" = "yes"; then
-	AC_DEFINE([PHALCON_QRCODE], [1], [Whether qrcode are available])
-	AC_MSG_RESULT([yes, qrcode])
-else
-	AC_MSG_RESULT([no])
-fi
 
 PHP_ARG_ENABLE(intrusive, whether to enable intrusive support,
 [  --enable-intrusive   Enable intrusive support], no, no)
@@ -1049,6 +1044,40 @@ aop.c"
 
 	CPPFLAGS=$old_CPPFLAGS
 
+	if test x"$PHP_VIPS" != x"no"; then
+		if ! pkg-config --atleast-pkgconfig-version 0.2; then
+			AC_MSG_ERROR([you need at least pkg-config 0.2 for this module])
+	 		PHP_VIPS=no
+		fi
+	fi
+
+	if test x"$PHP_VIPS" != x"no"; then
+		VIPS_MIN_VERSION=8.2
+		if ! pkg-config vips --atleast-version $VIPS_MIN_VERSION; then
+			AC_MSG_ERROR([you need at least libvips $VIPS_MIN_VERSION for this module])
+			PHP_VIPS=no
+		fi
+	fi
+
+	if test x"$PHP_VIPS" != x"no"; then
+		VIPS_CFLAGS=`pkg-config vips --cflags-only-other`
+		VIPS_INCS=`pkg-config vips --cflags-only-I`
+		VIPS_LIBS=`pkg-config vips --libs`
+
+		PHP_CHECK_LIBRARY(vips, vips_init,
+		[
+			PHP_EVAL_INCLINE($VIPS_INCS)
+			PHP_EVAL_LIBLINE($VIPS_LIBS, PHALCON_SHARED_LIBADD)
+			AC_DEFINE([PHALCON_USE_VIPS], [1], [Have libvips support])
+			
+			phalcon_sources="$phalcon_sources image/vips.c "
+		],[
+			AC_MSG_ERROR([libvips not found.])
+		],[
+			$VIPS_LIBS
+		])
+	fi
+
 	AC_MSG_CHECKING([checking png support])
 	for i in /usr/local /usr; do
 		if test -r $i/include/png.h; then
@@ -1173,10 +1202,10 @@ aop.c"
 			AC_DEFINE([PHALCON_USE_MONGOC], [1], [Have libmongoc support])
 			phalcon_sources="$phalcon_sources cache/backend/mongo.c mvc/model/metadata/mongo.c"
 
-            PHP_CHECK_LIBRARY(mongoc-1.0, mongoc_collection_find_with_opts,
-            [
-                AC_DEFINE(PHALCON_MONGOC_HAS_FIND_OPTS, 1, [Has mongoc_collection_find_with_opts support])
-            ])
+			PHP_CHECK_LIBRARY(mongoc-1.0, mongoc_collection_find_with_opts,
+			[
+				AC_DEFINE(PHALCON_MONGOC_HAS_FIND_OPTS, 1, [Has mongoc_collection_find_with_opts support])
+			])
 			break
 		else
 			AC_MSG_RESULT([no, found in $i])

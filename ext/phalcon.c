@@ -742,6 +742,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Events_Manager);
 	PHALCON_INIT(Phalcon_Events_Listener);
 	PHALCON_INIT(Phalcon_Image);
+#if PHALCON_USE_VIPS
+	PHALCON_INIT(Phalcon_Image_Vips);
+#endif
 	PHALCON_INIT(Phalcon_Image_Adapter);
 	PHALCON_INIT(Phalcon_Image_Adapter_GD);
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);

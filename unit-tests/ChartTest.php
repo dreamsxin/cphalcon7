@@ -38,23 +38,31 @@ class BeautifulQRCode {
 
 		$col_ellipse = self::hexColorAlloc($imageX2, $primaryColor);
 
+		$height = $with = $circleSize * $scale;
+
 		for ($i = 0; $i < $count; $i++) {
 			if ($i < 7) {
 				for ($j = 7; $j < $count - 7; $j++) {
 					if ($qr[$i][$j+1] & 1) {
-						imagefilledellipse($imageX2, $circleSize * (3 + $j) * $scale, $circleSize * (3 + $i) * $scale, $circleSize * $scale, $circleSize * $scale, $col_ellipse);
+						$cx = $circleSize * (3 + $j) * $scale;
+						$cy = $circleSize * (3 + $i) * $scale;
+						imagefilledellipse($imageX2, $cx, $cy, $with, $height, $col_ellipse);
 					}
 				}
 			} elseif ($i >= 7 && $i < $count - 7) {
 				for ($j = 0; $j < $count; $j++) {
 					if ($qr[$i][$j+1] & 1) {
-						imagefilledellipse($imageX2, $circleSize * (3 + $j) * $scale, $circleSize * (3 + $i) * $scale, $circleSize * $scale, $circleSize * $scale, $col_ellipse);
+						$cx = $circleSize * (3 + $j) * $scale;
+						$cy = $circleSize * (3 + $i) * $scale;
+						imagefilledellipse($imageX2, $cx, $cy, $with, $height, $col_ellipse);
 					}
 				}
 			} else {
 				for ($j = 7; $j < $count; $j++) {
 					if ($qr[$i][$j+1] & 1) {
-						imagefilledellipse($imageX2, $circleSize * (3 + $j) * $scale, $circleSize * (3 + $i) * $scale, $circleSize * $scale, $circleSize * $scale, $col_ellipse);
+						$cx = $circleSize * (3 + $j) * $scale;
+						$cy = $circleSize * (3 + $i) * $scale;
+						imagefilledellipse($imageX2, $cx, $cy, $with, $height, $col_ellipse);
 					}
 				}
 			}

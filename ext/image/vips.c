@@ -23,6 +23,7 @@
 
 #include "kernel/main.h"
 #include "kernel/exception.h"
+#include "kernel/operators.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
 #include "kernel/object.h"
@@ -1075,6 +1076,15 @@ zend_class_entry *phalcon_image_vips_ce;
 
 PHP_METHOD(Phalcon_Image_Vips, __construct);
 PHP_METHOD(Phalcon_Image_Vips, black);
+PHP_METHOD(Phalcon_Image_Vips, text);
+PHP_METHOD(Phalcon_Image_Vips, newFromArray);
+PHP_METHOD(Phalcon_Image_Vips, embed);
+PHP_METHOD(Phalcon_Image_Vips, ifthenelse);
+PHP_METHOD(Phalcon_Image_Vips, drawImage);
+PHP_METHOD(Phalcon_Image_Vips, drawMask);
+PHP_METHOD(Phalcon_Image_Vips, drawSmudge);
+PHP_METHOD(Phalcon_Image_Vips, drawFlood);
+PHP_METHOD(Phalcon_Image_Vips, drawLine);
 PHP_METHOD(Phalcon_Image_Vips, drawRect);
 PHP_METHOD(Phalcon_Image_Vips, drawCircle);
 PHP_METHOD(Phalcon_Image_Vips, writeToFile);
@@ -1114,6 +1124,66 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_black, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_text, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_newfromarray, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, coefficients, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, scale, IS_DOUBLE, 1)
+	ZEND_ARG_TYPE_INFO(0, offset, IS_DOUBLE, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_embed, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_ifthenelse, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, condthen, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, condelse, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawimage, 0, 0, 3)
+	ZEND_ARG_TYPE_INFO(0, sub, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawmask, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, mask, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, color, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawsmudge, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, left, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, top, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawflood, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawline, 0, 0, 5)
+	ZEND_ARG_TYPE_INFO(0, color, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, x1, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y1, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, x2, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y2, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawrect, 0, 0, 5)
@@ -1245,6 +1315,15 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __construct, arginfo_phalcon_image_vips___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, text, arginfo_phalcon_image_vips_text, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, newFromArray, arginfo_phalcon_image_vips_newfromarray, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, embed, arginfo_phalcon_image_vips_embed, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, ifthenelse, arginfo_phalcon_image_vips_ifthenelse, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawImage, arginfo_phalcon_image_vips_drawimage, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawMask, arginfo_phalcon_image_vips_drawmask, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawSmudge, arginfo_phalcon_image_vips_drawsmudge, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawFlood, arginfo_phalcon_image_vips_drawflood, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, drawLine, arginfo_phalcon_image_vips_drawline, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawRect, arginfo_phalcon_image_vips_drawrect, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawCircle, arginfo_phalcon_image_vips_drawcircle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, writeToFile, arginfo_phalcon_image_vips_writetofile, ZEND_ACC_PUBLIC)
@@ -1337,17 +1416,26 @@ PHP_METHOD(Phalcon_Image_Vips, __construct)
 
 PHP_METHOD(Phalcon_Image_Vips, black)
 {
-	zval *width, *height, *argv, ret = {}, image = {};
+	zval *width, *height, *options = NULL, *argv, ret = {}, image = {};
 	int argc = 2, flag;
 
-	phalcon_fetch_params(0, 2, 0, &width, &height);
+	phalcon_fetch_params(0, 2, 1, &width, &height, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
 
 	argv = (zval *)emalloc(argc * sizeof(zval));
 	ZVAL_COPY_VALUE(&argv[0], width);
 	ZVAL_COPY_VALUE(&argv[1], height);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
 	if (vips_php_call_array("black", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
@@ -1360,7 +1448,371 @@ PHP_METHOD(Phalcon_Image_Vips, black)
 	zval_ptr_dtor(&ret);
 	if (flag != SUCCESS) {
 		zval_ptr_dtor(return_value);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, text)
+{
+	zval *text, *options = NULL, *argv, ret = {}, image = {};
+	int argc = 1, flag;
+
+	phalcon_fetch_params(0, 1, 1, &text, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 2;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], text);
+	if (argc == 2) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("text", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, newFromArray)
+{
+	zval *coefficients, *scale = NULL, *offset = NULL, image = {};
+	int flag;
+	phalcon_fetch_params(0, 1, 2, &coefficients, &scale, &offset);
+
+	if (!scale) {
+		scale = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!offset) {
+		offset = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_CALL_CE_STATIC_FLAG(flag, &image, phalcon_image_vips_ce, "new_from_array", coefficients, scale, offset);
+	if (flag != SUCCESS) {
+		RETURN_FALSE;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&image);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a php array failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, embed)
+{
+	zval *x, *y, *width, *height, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 5, flag;
+
+	phalcon_fetch_params(0, 4, 0, &x, &y, &width, &height);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], x);
+	ZVAL_COPY_VALUE(&argv[2], y);
+	ZVAL_COPY_VALUE(&argv[3], width);
+	ZVAL_COPY_VALUE(&argv[4], height);
+
+	if (vips_php_call_array("embed", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "embed an image in a larger image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "embed an image in a larger image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "embed an image in a larger image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, ifthenelse)
+{
+	zval *condthen, *condelse, *options = NULL, image = {}, *argv, ret = {}, thenimage = {}, elseimage = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 1, &condthen, &condelse, &options);
+
+	PHALCON_VERIFY_CLASS_EX(condthen, phalcon_image_vips_ce, phalcon_image_exception_ce);
+	PHALCON_VERIFY_CLASS_EX(condelse, phalcon_image_vips_ce, phalcon_image_exception_ce);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&thenimage, condthen, SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&elseimage, condelse, SL("_image"), PH_NOISY|PH_READONLY);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &thenimage);
+	ZVAL_COPY_VALUE(&argv[2], &elseimage);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+
+	if (vips_php_call_array("ifthenelse", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "ifthenelse an image failed");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "ifthenelse an image failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "ifthenelse an image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawImage)
+{
+	zval *sub, *x, *y, *options = NULL, image = {}, *argv, ret = {}, sub_image = {}, image2 = {};
+	int argc = 4, flag;
+
+	phalcon_fetch_params(0, 3, 1, &sub, &x, &y, &options);
+	
+	PHALCON_VERIFY_CLASS_EX(sub, phalcon_image_vips_ce, phalcon_image_exception_ce);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 5;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&sub_image, sub, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &sub_image);
+	ZVAL_COPY_VALUE(&argv[2], x);
+	ZVAL_COPY_VALUE(&argv[3], y);
+	if (argc == 5) {
+		ZVAL_COPY_VALUE(&argv[4], options);
+	}
+
+	if (vips_php_call_array("draw_image", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawMask)
+{
+	zval *mask, *color, *x, *y, image = {}, *argv, ret = {}, mask_image = {}, image2 = {};
+	int argc = 5, flag;
+
+	phalcon_fetch_params(0, 4, 0, &mask, &color, &x, &y);
+	
+	PHALCON_VERIFY_CLASS_EX(mask, phalcon_image_vips_ce, phalcon_image_exception_ce);
+
+	if (PHALCON_IS_EMPTY_ARR(color)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "color parameter should must not be empty");
+		return;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&mask_image, mask, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], color);
+	ZVAL_COPY_VALUE(&argv[2], &mask_image);
+	ZVAL_COPY_VALUE(&argv[3], x);
+	ZVAL_COPY_VALUE(&argv[4], y);
+
+	if (vips_php_call_array("draw_mask", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a mask on an image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a mask on an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a mask on an image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawSmudge)
+{
+	zval *left, *top, *width, *height, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 5, flag;
+
+	phalcon_fetch_params(0, 4, 0, &left, &top, &width, &height);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], left);
+	ZVAL_COPY_VALUE(&argv[2], top);
+	ZVAL_COPY_VALUE(&argv[3], width);
+	ZVAL_COPY_VALUE(&argv[4], height);
+
+	if (vips_php_call_array("draw_smudge", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "blur a rectangle on an image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "blur a rectangle on an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "blur a rectangle on an image failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawFlood)
+{
+	zval *x, *y, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 1, &x, &y, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], x);
+	ZVAL_COPY_VALUE(&argv[2], y);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+
+	if (vips_php_call_array("draw_flood", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "flood-fill an area failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "flood-fill an area failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "flood-fill an area failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, drawLine)
+{
+	zval *color, *x1, *y1, *x2, *y2, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 6, flag;
+
+	phalcon_fetch_params(0, 5, 0, &color, &x1, &y1, &x2, &y2);
+
+	if (PHALCON_IS_EMPTY_ARR(color)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "color parameter should must not be empty");
+		return;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], color);
+	ZVAL_COPY_VALUE(&argv[2], x1);
+	ZVAL_COPY_VALUE(&argv[3], y1);
+	ZVAL_COPY_VALUE(&argv[4], x2);
+	ZVAL_COPY_VALUE(&argv[5], y2);
+
+	if (vips_php_call_array("draw_line", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a line on an image failed");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a line on an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a line on an image failed");
+		return;
 	}
 }
 
@@ -1370,6 +1822,11 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 	int argc = 6, flag;
 
 	phalcon_fetch_params(0, 5, 1, &color, &left, &top, &width, &height, &options);
+
+	if (PHALCON_IS_EMPTY_ARR(color)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "color parameter should must not be empty");
+		return;
+	}
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		argc = 7;
@@ -1389,11 +1846,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 	}
 	if (vips_php_call_array("draw_rect", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a rectangle on an image failed");
+		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a rectangle on an image failed");
 		return;
 	}
 
@@ -1402,7 +1860,8 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 	zval_ptr_dtor(&ret);
 	if (flag != SUCCESS) {
 		zval_ptr_dtor(return_value);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a rectangle on an image failed");
+		return;
 	}
 }
 
@@ -1412,6 +1871,11 @@ PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 	int argc = 5, flag;
 
 	phalcon_fetch_params(0, 4, 1, &color, &cx, &cy, &radius, &options);
+
+	if (PHALCON_IS_EMPTY_ARR(color)) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "color parameter should must not be empty");
+		return;
+	}
 
 	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		argc = 6;
@@ -1431,11 +1895,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 
 	if (vips_php_call_array("draw_circle", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a circle on an image failed");
+		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a circle on an image failed");
 		return;
 	}
 
@@ -1444,7 +1909,8 @@ PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 	zval_ptr_dtor(&ret);
 	if (flag != SUCCESS) {
 		zval_ptr_dtor(return_value);
-		RETURN_LONG(-1);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a circle on an image failed");
+		return;
 	}
 }
 

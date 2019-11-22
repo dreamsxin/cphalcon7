@@ -28,10 +28,13 @@
 #include "kernel/fcall.h"
 #include "kernel/object.h"
 #include "kernel/array.h"
+#include "kernel/string.h"
+
+#include "internal/arginfo.h"
 
 #include <main/SAPI.h>
 
-#define VIPS_DEBUG 1
+//#define VIPS_DEBUG 1
 
 #include <vips/vips.h>
 #include <vips/debug.h>
@@ -46,6 +49,15 @@
 }
 
 #define phalcon_image_vips_type_name "GObject"
+
+#define PHALCON_THROW_VIPS_EXCEPTION(format) \
+	do { \
+		if (strlen(vips_error_buffer()) > 0) { \
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_image_exception_ce, format, vips_error_buffer()); \
+			vips_error_clear(); \
+		} \
+		RETURN_LONG(-1); \
+	} while (0)
 
 /* True global resources - no need for thread safety here */
 static int le_vips_gobject;
@@ -1075,11 +1087,41 @@ vips_php_call_array(const char *operation_name, zval *instance,
 zend_class_entry *phalcon_image_vips_ce;
 
 PHP_METHOD(Phalcon_Image_Vips, __construct);
+PHP_METHOD(Phalcon_Image_Vips, __get);
+PHP_METHOD(Phalcon_Image_Vips, __set);
+PHP_METHOD(Phalcon_Image_Vips, __isset);
+PHP_METHOD(Phalcon_Image_Vips, __toString);
+
+PHP_METHOD(Phalcon_Image_Vips, identity);
 PHP_METHOD(Phalcon_Image_Vips, black);
 PHP_METHOD(Phalcon_Image_Vips, text);
 PHP_METHOD(Phalcon_Image_Vips, newFromArray);
+PHP_METHOD(Phalcon_Image_Vips, newFromBuffer);
+PHP_METHOD(Phalcon_Image_Vips, newFromMemory);
+PHP_METHOD(Phalcon_Image_Vips, newFromFile);
+
+PHP_METHOD(Phalcon_Image_Vips, crop);
+PHP_METHOD(Phalcon_Image_Vips, smartcrop);
+PHP_METHOD(Phalcon_Image_Vips, resize);
+PHP_METHOD(Phalcon_Image_Vips, rotate);
+
 PHP_METHOD(Phalcon_Image_Vips, embed);
 PHP_METHOD(Phalcon_Image_Vips, ifthenelse);
+
+PHP_METHOD(Phalcon_Image_Vips, getpoint);
+PHP_METHOD(Phalcon_Image_Vips, relational);
+PHP_METHOD(Phalcon_Image_Vips, relationalConst);
+PHP_METHOD(Phalcon_Image_Vips, add);
+PHP_METHOD(Phalcon_Image_Vips, subtract);
+PHP_METHOD(Phalcon_Image_Vips, multiply);
+PHP_METHOD(Phalcon_Image_Vips, divide);
+PHP_METHOD(Phalcon_Image_Vips, linear);
+PHP_METHOD(Phalcon_Image_Vips, max);
+PHP_METHOD(Phalcon_Image_Vips, min);
+PHP_METHOD(Phalcon_Image_Vips, math);
+PHP_METHOD(Phalcon_Image_Vips, math2);
+PHP_METHOD(Phalcon_Image_Vips, boolean);
+
 PHP_METHOD(Phalcon_Image_Vips, drawImage);
 PHP_METHOD(Phalcon_Image_Vips, drawMask);
 PHP_METHOD(Phalcon_Image_Vips, drawSmudge);
@@ -1087,7 +1129,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawFlood);
 PHP_METHOD(Phalcon_Image_Vips, drawLine);
 PHP_METHOD(Phalcon_Image_Vips, drawRect);
 PHP_METHOD(Phalcon_Image_Vips, drawCircle);
+
 PHP_METHOD(Phalcon_Image_Vips, writeToFile);
+PHP_METHOD(Phalcon_Image_Vips, writeToBuffer);
+PHP_METHOD(Phalcon_Image_Vips, writeToMemory);
+PHP_METHOD(Phalcon_Image_Vips, writeToArray);
+
 PHP_METHOD(Phalcon_Image_Vips, call);
 PHP_METHOD(Phalcon_Image_Vips, new_from_file);
 PHP_METHOD(Phalcon_Image_Vips, new_from_buffer);
@@ -1121,6 +1168,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, image, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_identity, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_black, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
@@ -1138,6 +1189,49 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_newfromarray, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, offset, IS_DOUBLE, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_newfrombuffer, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, buffer, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, option_string, IS_STRING, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_newfrommemory, 0, 0, 5)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, bands, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, format, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_newfromfile, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_crop, 0, 0, 4)
+	ZEND_ARG_TYPE_INFO(0, left, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, top, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_smartcrop, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_resize, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, scale, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_rotate, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, angle, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_embed, 0, 0, 4)
 	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
 	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
@@ -1150,6 +1244,74 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_ifthenelse, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, condelse, IS_OBJECT, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
+
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_getpoint, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, x, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, y, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_relational, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, right, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, relational, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_relationalconst, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, right, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, relational, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_add, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, other, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_subtract, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, other, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_multiply, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, other, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_divide, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, other, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_linear, 0, 0, 2)
+	ZEND_ARG_INFO(0, a)
+	ZEND_ARG_INFO(0, b)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_max, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_min, 0, 0, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_math, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, operation, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_math2, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, right, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, operation, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_boolean, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, right, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, operation, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_drawimage, 0, 0, 3)
 	ZEND_ARG_TYPE_INFO(0, sub, IS_OBJECT, 0)
@@ -1205,6 +1367,11 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_writetofile, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, filename, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_writetobuffer, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, suffix, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
@@ -1314,11 +1481,41 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __construct, arginfo_phalcon_image_vips___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Image_Vips, __get, arginfo___getref, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, __set, arginfo___set, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, __isset, arginfo___isset, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, __toString, NULL, ZEND_ACC_PUBLIC)
+
+	PHP_ME(Phalcon_Image_Vips, identity, arginfo_phalcon_image_vips_identity, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, text, arginfo_phalcon_image_vips_text, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, newFromArray, arginfo_phalcon_image_vips_newfromarray, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, newFromBuffer, arginfo_phalcon_image_vips_newfrombuffer, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, newFromMemory, arginfo_phalcon_image_vips_newfrommemory, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, newFromFile, arginfo_phalcon_image_vips_newfromfile, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+
+	PHP_ME(Phalcon_Image_Vips, crop, arginfo_phalcon_image_vips_crop, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, smartcrop, arginfo_phalcon_image_vips_smartcrop, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, resize, arginfo_phalcon_image_vips_resize, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, rotate, arginfo_phalcon_image_vips_rotate, ZEND_ACC_PUBLIC)
+
 	PHP_ME(Phalcon_Image_Vips, embed, arginfo_phalcon_image_vips_embed, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, ifthenelse, arginfo_phalcon_image_vips_ifthenelse, ZEND_ACC_PUBLIC)
+
+	PHP_ME(Phalcon_Image_Vips, getpoint, arginfo_phalcon_image_vips_getpoint, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, relational, arginfo_phalcon_image_vips_relational, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, relationalConst, arginfo_phalcon_image_vips_relationalconst, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, add, arginfo_phalcon_image_vips_add, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, subtract, arginfo_phalcon_image_vips_subtract, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, multiply, arginfo_phalcon_image_vips_multiply, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, divide, arginfo_phalcon_image_vips_divide, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, linear, arginfo_phalcon_image_vips_linear, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, max, arginfo_phalcon_image_vips_max, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, min, arginfo_phalcon_image_vips_min, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, math, arginfo_phalcon_image_vips_math, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, math2, arginfo_phalcon_image_vips_math2, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, boolean, arginfo_phalcon_image_vips_boolean, ZEND_ACC_PUBLIC)
+
 	PHP_ME(Phalcon_Image_Vips, drawImage, arginfo_phalcon_image_vips_drawimage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawMask, arginfo_phalcon_image_vips_drawmask, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawSmudge, arginfo_phalcon_image_vips_drawsmudge, ZEND_ACC_PUBLIC)
@@ -1326,7 +1523,12 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, drawLine, arginfo_phalcon_image_vips_drawline, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawRect, arginfo_phalcon_image_vips_drawrect, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, drawCircle, arginfo_phalcon_image_vips_drawcircle, ZEND_ACC_PUBLIC)
+
 	PHP_ME(Phalcon_Image_Vips, writeToFile, arginfo_phalcon_image_vips_writetofile, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, writeToBuffer, arginfo_phalcon_image_vips_writetobuffer, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, writeToMemory, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, writeToArray, NULL, ZEND_ACC_PUBLIC)
+
 	PHP_ME(Phalcon_Image_Vips, call, arginfo_phalcon_image_vips_call, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, new_from_file, arginfo_phalcon_image_vips_new_from_file, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, new_from_buffer, arginfo_phalcon_image_vips_new_from_buffer, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -1367,6 +1569,33 @@ PHALCON_INIT_CLASS(Phalcon_Image_Vips){
 
 	zend_declare_property_null(phalcon_image_vips_ce, SL("_image"), ZEND_ACC_PROTECTED);
 
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_EQUAL"), "equal");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_NOTEQ"), "noteq");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_LESS"), "less");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_LESSEQ"),  "lesseq");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_MORE"),  "more");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_RELATIONAL_MOREEQ"),  "moreeq");
+
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_SIN"), "sin");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_COS"), "cos");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_TAN"), "tan");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_ASIN"), "asin");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_ACOS"), "acos");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_ATAN"), "atan");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_LOG"), "log");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_LOG10"), "log10");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_EXP"), "exp");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH_EXP10"), "exp10");
+
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH2_POW"), "pow");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_MATH2_WOP"), "wop");
+
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_AND"), "and");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_OR"), "or");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_EOR"), "eor");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_LSHIFT"),  "lshift");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_RSHIFT"),  "rshift");
+
 	if (strcmp(sapi_module.name, "apache2handler") == 0) {
 #ifdef VIPS_SONAME
 		if (!dlopen(VIPS_SONAME, RTLD_LAZY | RTLD_NODELETE)) 
@@ -1374,12 +1603,23 @@ PHALCON_INIT_CLASS(Phalcon_Image_Vips){
 		if (!dlopen("libvips.so.42", RTLD_LAZY | RTLD_NODELETE)) 
 #endif /*VIPS_SONAME*/
 		{
-			sapi_module.sapi_error(E_WARNING, "phalcon7: unable to lock libvips -- graceful may be unreliable");
+			sapi_module.sapi_error(E_WARNING, "unable to lock libvips -- graceful may be unreliable");
 		}
 	}
-
-	if (VIPS_INIT("phalcon7")) {
-		return FAILURE;
+	if (PG(php_binary)) {
+		if (VIPS_INIT(PG(php_binary))) {
+#ifdef VIPS_DEBUG
+			printf( "VIPS_INIT failed\n" );
+#endif /*VIPS_DEBUG*/
+			return FAILURE;
+		}
+	} else {
+		if (VIPS_INIT(PHP_PHALCON_EXTNAME)) {
+#ifdef VIPS_DEBUG
+			printf( "VIPS_INIT failed\n" );
+#endif /*VIPS_DEBUG*/
+			return FAILURE;
+		}
 	}
 
 	le_vips_gobject = zend_register_list_destructors_ex(phalcon_vips_free_gobject, NULL, phalcon_image_vips_type_name, module_number);
@@ -1391,6 +1631,15 @@ PHALCON_INIT_CLASS(Phalcon_Image_Vips){
 	return SUCCESS;
 }
 
+/**
+ * Wrap a Image around an underlying vips resource.
+ *
+ * Don't call this yourself, users should stick to (for example)
+ *
+ * @param resource $image The underlying vips image resource that this class should wrap.
+ *
+ * @internal
+ */
 PHP_METHOD(Phalcon_Image_Vips, __construct)
 {
 	zval *image;
@@ -1414,6 +1663,161 @@ PHP_METHOD(Phalcon_Image_Vips, __construct)
 	phalcon_update_property(getThis(), SL("_image"), image);
 }
 
+/**
+ * Get any property from the underlying image.
+ *
+ * @param string $name The property name.
+ *
+ * @throws Exception
+ *
+ * @return mixed
+ */
+PHP_METHOD(Phalcon_Image_Vips, __get)
+{
+	zval *property, image, ret = {};
+
+	phalcon_fetch_params(0, 1, 0, &property);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(&ret, phalcon_image_vips_ce, "get", &image, property);
+	if (!phalcon_array_isset_fetch_str(return_value, &ret, SL("out"), PH_COPY)) {
+		RETURN_NULL();
+	}
+	zval_ptr_dtor(&ret);
+}
+
+/**
+ * Set any property on the underlying image.
+ *
+ * @param string $name  The property name.
+ * @param mixed  $value The value to set for this property.
+ *
+ * @return void
+ */
+PHP_METHOD(Phalcon_Image_Vips, __set)
+{
+	zval *property, *value, image;
+
+	phalcon_fetch_params(0, 2, 0, &property, &value);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_image_vips_ce, "set", &image, property, value);
+}
+
+/**
+ * Check if the GType of a property from the underlying image exists.
+ *
+ * @param string $name The property name.
+ *
+ * @return bool
+ */
+PHP_METHOD(Phalcon_Image_Vips, __isset)
+{
+	zval *key, image, ret = {};
+
+	phalcon_fetch_params(0, 1, 0, &key);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(&ret, phalcon_image_vips_ce, "get_typeof", &image, key);
+	if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) !=  0) {
+		RETURN_TRUE;
+	}
+	RETURN_FALSE;
+}
+
+/**
+ * Makes a string-ified version of the Image.
+ *
+ * @return string
+ */
+PHP_METHOD(Phalcon_Image_Vips, __toString){
+
+	zval image, property = {}, value = {}, ret = {};
+
+	PHALCON_MM_INIT();
+	array_init(&ret);
+	PHALCON_MM_ADD_ENTRY(&ret);
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_MM_ZVAL_STRING(&property, "width");
+	PHALCON_CALL_METHOD(&value, getThis(), "__get", &property);
+	phalcon_array_update(&ret, &property, &value, 0);
+
+	PHALCON_MM_ZVAL_STRING(&property, "height");
+	PHALCON_CALL_METHOD(&value, getThis(), "__get", &property);
+	phalcon_array_update(&ret, &property, &value, 0);
+
+	PHALCON_MM_ZVAL_STRING(&property, "bands");
+	PHALCON_CALL_METHOD(&value, getThis(), "__get", &property);
+	phalcon_array_update(&ret, &property, &value, 0);
+
+	PHALCON_MM_ZVAL_STRING(&property, "format");
+	PHALCON_CALL_METHOD(&value, getThis(), "__get", &property);
+	phalcon_array_update(&ret, &property, &value, 0);
+
+	PHALCON_MM_ZVAL_STRING(&property, "interpretation");
+	PHALCON_CALL_METHOD(&value, getThis(), "__get", &property);
+	phalcon_array_update(&ret, &property, &value, 0);
+
+	RETURN_MM_ON_FAILURE(phalcon_json_encode(return_value, &ret, 0));
+
+	RETURN_MM();
+}
+
+/**
+ * Make a 1D image where pixel values are indexes.
+ *
+ * If 'ushort' is TRUE, we make a 16-bit LUT, ie. 0 - 65535 values;
+ * otherwise it's 8-bit (0 - 255)
+ * <code>
+ *  $lut = Phalcon\Image\Vips::identity(['ushort' => true]);
+ * </code>
+ */
+PHP_METHOD(Phalcon_Image_Vips, identity)
+{
+	zval *options = NULL, *argv = NULL, ret = {}, image = {};
+	int argc = 0, flag;
+
+	phalcon_fetch_params(0, 0, 1, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 1;
+		argv = (zval *)emalloc(argc * sizeof(zval));
+		ZVAL_COPY_VALUE(&argv[0], options);
+	}
+
+	if (vips_php_call_array("identity", NULL, "", argc, argv, &ret)) {
+		if (argv) {
+			efree(argv);
+		}
+		PHALCON_THROW_VIPS_EXCEPTION("Make a 1D image where pixel values are indexes failed (%s)");
+		return;
+	}
+	if (argv) {
+		efree(argv);
+	}
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a 1D image where pixel values are indexes failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a 1D image where pixel values are indexes failed");
+		return;
+	}
+}
+
+/**
+ * Make a black image
+ */
 PHP_METHOD(Phalcon_Image_Vips, black)
 {
 	zval *width, *height, *options = NULL, *argv, ret = {}, image = {};
@@ -1434,11 +1838,12 @@ PHP_METHOD(Phalcon_Image_Vips, black)
 
 	if (vips_php_call_array("black", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("Make a black image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Make a black image failed");
 		return;
 	}
@@ -1453,6 +1858,9 @@ PHP_METHOD(Phalcon_Image_Vips, black)
 	}
 }
 
+/**
+ * Make a text image
+ */
 PHP_METHOD(Phalcon_Image_Vips, text)
 {
 	zval *text, *options = NULL, *argv, ret = {}, image = {};
@@ -1472,11 +1880,12 @@ PHP_METHOD(Phalcon_Image_Vips, text)
 
 	if (vips_php_call_array("text", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("make a text image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
 		return;
 	}
@@ -1491,6 +1900,19 @@ PHP_METHOD(Phalcon_Image_Vips, text)
 	}
 }
 
+/**
+ * Create a new Image from a php array.
+ *
+ * 2D arrays become 2D images. 1D arrays become 2D images with height 1.
+ *
+ * @param array $array  The array to make the image from.
+ * @param float $scale  The "scale" metadata item. Useful for integer convolution masks.
+ * @param float $offset The "offset" metadata item. Useful for integer convolution masks.
+ *
+ * @throws Exception
+ *
+ * @return Image A new Image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, newFromArray)
 {
 	zval *coefficients, *scale = NULL, *offset = NULL, image = {};
@@ -1519,6 +1941,309 @@ PHP_METHOD(Phalcon_Image_Vips, newFromArray)
 	}
 }
 
+/**
+ * Create a new Image from a compressed image held as a string.
+ *
+ * @param string $buffer        The formatted image to open.
+ * @param string $option_string Any text-style options to pass to the
+ *     selected loader.
+ * @param array  $options       Any options to pass on to the load operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new Image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, newFromBuffer)
+{
+	zval *buffer, *option_string = NULL, *options = NULL, ret = {}, image = {};
+	int flag;
+	phalcon_fetch_params(0, 1, 2, &buffer, &option_string, &options);
+
+	if (!option_string) {
+		option_string = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_CALL_CE_STATIC_FLAG(flag, &ret, phalcon_image_vips_ce, "new_from_buffer", buffer, option_string, options);
+	if (flag != SUCCESS) {
+		RETURN_FALSE;
+	}
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a compressed image held as a string failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a compressed image held as a string failed");
+		return;
+	}
+}
+
+/**
+ * Wraps an Image around an area of memory containing a C-style array.
+ *
+ * @param string $data   C-style array.
+ * @param int    $width  Image width in pixels.
+ * @param int    $height Image height in pixels.
+ * @param int    $bands  Number of bands.
+ * @param string $format Band format. (@see BandFormat)
+ *
+ * @throws Exception
+ *
+ * @return Image A new Image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, newFromMemory)
+{
+	zval *data, *width, *height, *bands, *format, ret = {}, image = {};
+	int flag;
+	phalcon_fetch_params(0, 5, 0, &data, &width, &height, &bands, &format);
+
+	PHALCON_CALL_CE_STATIC_FLAG(flag, &ret, phalcon_image_vips_ce, "new_from_memory", data, width, height, bands, format);
+	if (flag != SUCCESS) {
+		RETURN_FALSE;
+	}
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a compressed image held as a string failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a compressed image held as a string failed");
+		return;
+	}
+}
+
+/**
+ * Create a new Image from a file on disc.
+ *
+ * @param string $filename The file to open.
+ * @param array  $options  Any options to pass on to the load operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new Image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, newFromFile)
+{
+	zval *filename, *options = NULL, ret = {}, image = {};
+	int flag;
+	phalcon_fetch_params(0, 1, 1, &filename, &options);
+
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
+	}
+
+	PHALCON_CALL_CE_STATIC_FLAG(flag, &ret, phalcon_image_vips_ce, "new_from_file", filename, options);
+	if (flag != SUCCESS) {
+		RETURN_FALSE;
+	}
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a file on disc failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a new Image from a file on disc failed");
+		return;
+	}
+}
+
+/**
+ * Extract an area from an image
+ */
+PHP_METHOD(Phalcon_Image_Vips, crop)
+{
+	zval *left, *top, *width, *height, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 5, flag;
+
+	phalcon_fetch_params(0, 4, 1, &left, &top, &width, &height, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 6;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], left);
+	ZVAL_COPY_VALUE(&argv[2], top);
+	ZVAL_COPY_VALUE(&argv[3], width);
+	ZVAL_COPY_VALUE(&argv[4], height);
+	if (argc == 6) {
+		ZVAL_COPY_VALUE(&argv[5], options);
+	}
+	if (vips_php_call_array("crop", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Extract an area from an image failed (%s)");
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Extract an area from an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Extract an area from an image failed");
+		return;
+	}
+}
+
+/**
+ * Extract an area from an image
+ */
+PHP_METHOD(Phalcon_Image_Vips, smartcrop)
+{
+	zval *width, *height, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 1, &width, &height, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], width);
+	ZVAL_COPY_VALUE(&argv[2], height);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+	if (vips_php_call_array("smartcrop", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		
+		PHALCON_THROW_VIPS_EXCEPTION("Extract an area from an image failed (%s)");
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Extract an area from an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Extract an area from an image failed");
+		return;
+	}
+}
+
+/**
+ * Resize an image
+ */
+PHP_METHOD(Phalcon_Image_Vips, resize)
+{
+	zval *scale, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &scale, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], scale);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+	if (vips_php_call_array("resize", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Resize an image failed (%s)");
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Resize an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Resize an image failed");
+		return;
+	}
+}
+
+/**
+ * Rotate an image by a number of degrees
+ */
+PHP_METHOD(Phalcon_Image_Vips, rotate)
+{
+	zval *angle, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &angle, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], angle);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+	if (vips_php_call_array("rotate", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+
+		PHALCON_THROW_VIPS_EXCEPTION("Rotate an image by a number of degrees failed (%s)");
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Rotate an image by a number of degrees failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Rotate an image by a number of degrees failed");
+		return;
+	}
+}
+
+/**
+ * Embed an image in a larger image
+ */
 PHP_METHOD(Phalcon_Image_Vips, embed)
 {
 	zval *x, *y, *width, *height, image = {}, *argv, ret = {}, image2 = {};
@@ -1537,11 +2262,12 @@ PHP_METHOD(Phalcon_Image_Vips, embed)
 
 	if (vips_php_call_array("embed", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "embed an image in a larger image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("embed an image in a larger image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "embed an image in a larger image failed");
 		return;
 	}
@@ -1556,6 +2282,17 @@ PHP_METHOD(Phalcon_Image_Vips, embed)
 	}
 }
 
+/**
+ * Use $this as a condition image to pick pixels from either $then or $else.
+ *
+ * @param mixed $then    The true side of the operator
+ * @param mixed $else    The false side of the operator.
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, ifthenelse)
 {
 	zval *condthen, *condelse, *options = NULL, image = {}, *argv, ret = {}, thenimage = {}, elseimage = {}, image2 = {};
@@ -1584,12 +2321,12 @@ PHP_METHOD(Phalcon_Image_Vips, ifthenelse)
 
 	if (vips_php_call_array("ifthenelse", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "ifthenelse an image failed");
-		return;
+		PHALCON_THROW_VIPS_EXCEPTION("ifthenelse an image failed (%s)");
 	}
 	efree(argv);
 
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "ifthenelse an image failed");
 		return;
 	}
@@ -1603,6 +2340,622 @@ PHP_METHOD(Phalcon_Image_Vips, ifthenelse)
 	}
 }
 
+/**
+ * Reads a single pixel on an image.
+ *
+ *@return array
+ */
+PHP_METHOD(Phalcon_Image_Vips, getpoint)
+{
+	zval *x, *y, image = {}, *argv, ret = {};
+	int argc = 3;
+
+	phalcon_fetch_params(0, 2, 0, &x, &y);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], x);
+	ZVAL_COPY_VALUE(&argv[2], y);
+
+	if (vips_php_call_array("getpoint", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("paint an image into another image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(return_value, &ret, SL("out-array"), PH_COPY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
+		return;
+	}
+	zval_ptr_dtor(&ret);
+}
+
+/**
+ * Perform various relational operations on pairs of images. 
+ *
+ * @param Phalcon\Image\Vips $other	The right-hand side of the operator.
+ * @param string $relational
+ *
+ * @throws Exception
+ *
+ * @return Phalcon\Image\Vips
+ */
+PHP_METHOD(Phalcon_Image_Vips, relational)
+{
+	zval *right, *op, image = {}, *argv, ret = {}, rightimage = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 0, &right, &op);
+
+	PHALCON_VERIFY_CLASS_EX(right, phalcon_image_vips_ce, phalcon_image_exception_ce);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&rightimage, right, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &rightimage);
+	ZVAL_COPY_VALUE(&argv[2], op);
+
+	if (vips_php_call_array("relational", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("relational operation on two images failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "relational operation on two images failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "relational operation on two images failed");
+		return;
+	}
+}
+
+PHP_METHOD(Phalcon_Image_Vips, relationalConst)
+{
+	zval *right, *op, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 0, &right, &op);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], op);
+	ZVAL_COPY_VALUE(&argv[2], right);
+
+	if (vips_php_call_array("relational_const", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("relational operation on two images failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "relational operation on two images failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "relational operation on two images failed");
+		return;
+	}
+}
+
+/**
+ * Add $other to this image.
+ *
+ * @param mixed $other   The thing to add to this image.
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, add)
+{
+	zval *other, *options = NULL, image = {}, *argv, otherimage = {}, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &other, &options);
+
+	PHALCON_VERIFY_CLASS_EX(other, phalcon_image_vips_ce, phalcon_image_exception_ce);
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&otherimage, other, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &otherimage);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
+	if (vips_php_call_array("add", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Add $other to this image failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Add $other to this image failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Add $other to this image failed");
+		return;
+	}
+}
+
+/**
+ * Subtract $other from this image.
+ *
+ * @param mixed $other   The thing to subtract from this image.
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, subtract)
+{
+	zval *other, *options = NULL, image = {}, *argv, otherimage = {}, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &other, &options);
+
+	PHALCON_VERIFY_CLASS_EX(other, phalcon_image_vips_ce, phalcon_image_exception_ce);
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&otherimage, other, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &otherimage);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
+	if (vips_php_call_array("subtract", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Subtract $other to this image failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Subtract $other to this image failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Subtract $other to this image failed");
+		return;
+	}
+}
+
+/**
+ * Multiply this image by $other.
+ *
+ * @param mixed $other   The thing to multiply this image by.
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, multiply)
+{
+	zval *other, *options = NULL, image = {}, *argv, otherimage = {}, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &other, &options);
+
+	PHALCON_VERIFY_CLASS_EX(other, phalcon_image_vips_ce, phalcon_image_exception_ce);
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&otherimage, other, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &otherimage);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
+	if (vips_php_call_array("multiply", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Multiply this image by $other failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Multiply this image by $other failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Multiply this image by $other failed");
+		return;
+	}
+}
+
+/**
+ * Divide this image by $other.
+ *
+ * @param mixed $other   The thing to divide this image by.
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @throws Exception
+ *
+ * @return Image A new image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, divide)
+{
+	zval *other, *options = NULL, image = {}, *argv, otherimage = {}, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &other, &options);
+
+	PHALCON_VERIFY_CLASS_EX(other, phalcon_image_vips_ce, phalcon_image_exception_ce);
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&otherimage, other, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &otherimage);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
+	if (vips_php_call_array("divide", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Divide this image by $other failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Divide this image by $other failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Divide this image by $other failed");
+		return;
+	}
+}
+
+/**
+ * Calculate (a * in + b).
+ */
+PHP_METHOD(Phalcon_Image_Vips, linear)
+{
+	zval *a, *b, *options = NULL, image = {}, *argv, op_value = {}, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 1, &a, &b, &options);
+
+	if (Z_TYPE_P(a) != IS_LONG && Z_TYPE_P(a) != IS_DOUBLE && Z_TYPE_P(a) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "a parameter must be float or float[]");
+		return;
+	}
+
+	if (Z_TYPE_P(b) != IS_LONG && Z_TYPE_P(b) != IS_DOUBLE && Z_TYPE_P(b) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "b parameter must be float or float[]");
+		return;
+	}
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], a);
+	ZVAL_COPY_VALUE(&argv[2], b);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+
+	if (vips_php_call_array("linear", NULL, "", argc, argv, &ret)) {
+		zval_ptr_dtor(&op_value);
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("calculate (a * in + b) failed (%s)");
+		return;
+	}
+	zval_ptr_dtor(&op_value);
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "calculate (a * in + b) failed");
+		return;
+	}
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "calculate (a * in + b) failed");
+		return;
+	}
+}
+
+/**
+ * Find image maximum
+ *
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @return float
+ */
+PHP_METHOD(Phalcon_Image_Vips, max)
+{
+	zval *options = NULL, image = {}, *argv, ret = {};
+	int argc = 1;
+
+	phalcon_fetch_params(0, 0, 1, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 2;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	if (argc == 2) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("max", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Find image maximum failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(return_value, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Find image maximum failed");
+		return;
+	}
+	zval_ptr_dtor(&ret);
+}
+
+/**
+ * Find image minimum
+ *
+ * @param array $options An array of options to pass to the operation.
+ *
+ * @return float
+ */
+PHP_METHOD(Phalcon_Image_Vips, min)
+{
+	zval *options = NULL, image = {}, *argv, ret = {};
+	int argc = 1;
+
+	phalcon_fetch_params(0, 0, 1, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 2;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	if (argc == 2) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("max", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Find image minimum failed (%s)");
+		return;
+	}
+	efree(argv);
+
+	if (!phalcon_array_isset_fetch_str(return_value, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Find image minimum failed");
+		return;
+	}
+	zval_ptr_dtor(&ret);
+}
+
+/**
+ * Apply a math operation to an image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, math)
+{
+	zval *operation, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 1, 1, &operation, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], operation);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[2], options);
+	}
+
+	if (vips_php_call_array("math", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Apply a math operation to an image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Apply a math operation to an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Apply a math operation to an image failed");
+		return;
+	}
+}
+
+/**
+ * Binary math operations.
+ */
+PHP_METHOD(Phalcon_Image_Vips, math2)
+{
+	zval *right, *operation, *options = NULL, image = {}, *argv, rightimage = {}, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 1, 1, &right, &operation, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&rightimage, right, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &rightimage);
+	ZVAL_COPY_VALUE(&argv[2], operation);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+
+	if (vips_php_call_array("math2", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Binary math operations failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Binary math operations failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Binary math operations failed");
+		return;
+	}
+}
+
+/**
+ * Boolean operation on two images.
+ */
+PHP_METHOD(Phalcon_Image_Vips, boolean)
+{
+	zval *right, *operation, *options = NULL, image = {}, *argv, rightimage = {}, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 1, 1, &right, &operation, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&rightimage, right, SL("_image"), PH_NOISY|PH_READONLY);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &rightimage);
+	ZVAL_COPY_VALUE(&argv[2], operation);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+
+	if (vips_php_call_array("boolean", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Boolean operation on two images failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Boolean operation on two images failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Boolean operation on two images failed");
+		return;
+	}
+}
+
+/**
+ * Paint an image into another image
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawImage)
 {
 	zval *sub, *x, *y, *options = NULL, image = {}, *argv, ret = {}, sub_image = {}, image2 = {};
@@ -1630,11 +2983,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawImage)
 
 	if (vips_php_call_array("draw_image", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("paint an image into another image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "paint an image into another image failed");
 		return;
 	}
@@ -1649,6 +3003,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawImage)
 	}
 }
 
+/**
+ * Draw a mask on an image
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawMask)
 {
 	zval *mask, *color, *x, *y, image = {}, *argv, ret = {}, mask_image = {}, image2 = {};
@@ -1675,11 +3032,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawMask)
 
 	if (vips_php_call_array("draw_mask", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a mask on an image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("draw a mask on an image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a mask on an image failed");
 		return;
 	}
@@ -1694,6 +3052,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawMask)
 	}
 }
 
+/**
+ * Blur a rectangle on an image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawSmudge)
 {
 	zval *left, *top, *width, *height, image = {}, *argv, ret = {}, image2 = {};
@@ -1712,11 +3073,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawSmudge)
 
 	if (vips_php_call_array("draw_smudge", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "blur a rectangle on an image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("blur a rectangle on an image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "blur a rectangle on an image failed");
 		return;
 	}
@@ -1731,6 +3093,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawSmudge)
 	}
 }
 
+/**
+ * Flood-fill an area.
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawFlood)
 {
 	zval *x, *y, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
@@ -1754,11 +3119,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawFlood)
 
 	if (vips_php_call_array("draw_flood", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "flood-fill an area failed");
+		PHALCON_THROW_VIPS_EXCEPTION("flood-fill an area failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "flood-fill an area failed");
 		return;
 	}
@@ -1773,6 +3139,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawFlood)
 	}
 }
 
+/**
+ * Draw a line on an image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawLine)
 {
 	zval *color, *x1, *y1, *x2, *y2, image = {}, *argv, ret = {}, image2 = {};
@@ -1797,11 +3166,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawLine)
 
 	if (vips_php_call_array("draw_line", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a line on an image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("draw a line on an image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a line on an image failed");
 		return;
 	}
@@ -1816,6 +3186,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawLine)
 	}
 }
 
+/**
+ * Paint a rectangle on an image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawRect)
 {
 	zval *color, *left, *top, *width, *height, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
@@ -1846,11 +3219,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 	}
 	if (vips_php_call_array("draw_rect", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a rectangle on an image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("draw a rectangle on an image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a rectangle on an image failed");
 		return;
 	}
@@ -1865,6 +3239,9 @@ PHP_METHOD(Phalcon_Image_Vips, drawRect)
 	}
 }
 
+/**
+ * Draw a circle on an image.
+ */
 PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 {
 	zval *color, *cx, *cy, *radius, *options = NULL, image = {}, *argv, ret = {}, image2 = {};
@@ -1895,11 +3272,12 @@ PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 
 	if (vips_php_call_array("draw_circle", NULL, "", argc, argv, &ret)) {
 		efree(argv);
-		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a circle on an image failed");
+		PHALCON_THROW_VIPS_EXCEPTION("draw a circle on an image failed (%s)");
 		return;
 	}
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("image"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "draw a circle on an image failed");
 		return;
 	}
@@ -1914,6 +3292,16 @@ PHP_METHOD(Phalcon_Image_Vips, drawCircle)
 	}
 }
 
+/**
+ * Write an image to a file.
+ *
+ * @param string $filename The file to write the image to.
+ * @param array  $options  Any options to pass on to the selected save operation.
+ *
+ * @throws Exception
+ *
+ * @return void
+ */
 PHP_METHOD(Phalcon_Image_Vips, writeToFile)
 {
 	zval *filename, *options = NULL, image = {};
@@ -1927,6 +3315,98 @@ PHP_METHOD(Phalcon_Image_Vips, writeToFile)
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
 
 	PHALCON_CALL_CE_STATIC(return_value, phalcon_image_vips_ce, "write_to_file", &image, filename, options);
+	if (Z_TYPE_P(return_value) == IS_LONG && Z_LVAL_P(return_value) == -1) {
+		PHALCON_THROW_VIPS_EXCEPTION("Write an image to a file (%s)");
+	}
+}
+
+/**
+ * Write an image to a formatted string.
+ *
+ * @param string $suffix  The file type suffix, eg. ".jpg".
+ * @param array  $options Any options to pass on to the selected save operation.
+ *
+ * @throws Exception
+ *
+ * @return string The formatted image.
+ */
+PHP_METHOD(Phalcon_Image_Vips, writeToBuffer)
+{
+	zval *suffix, *options = NULL, image = {}, ret = {};
+
+	phalcon_fetch_params(0, 1, 1, &suffix, &options);
+
+	if (!options) {
+		options = &PHALCON_GLOBAL(z_null);
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(&ret, phalcon_image_vips_ce, "write_to_buffer", &image, suffix, options);
+	if (Z_TYPE(ret) == IS_LONG && Z_LVAL(ret) == -1) {
+		PHALCON_THROW_VIPS_EXCEPTION("Write an image to a formatted string (%s)");
+	}
+
+	if (!phalcon_array_isset_fetch_str(return_value, &ret, SL("buffer"), PH_COPY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Write an image to a formatted string failed");
+		return;
+	}
+	zval_ptr_dtor(&ret);
+}
+
+/**
+ * Write an image to a large memory array.
+ *
+ * @throws Exception
+ *
+ * @return string The memory array.
+ */
+PHP_METHOD(Phalcon_Image_Vips, writeToMemory)
+{
+	zval image = {};
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_image_vips_ce, "write_to_memory", &image);
+	if (Z_TYPE_P(return_value) == IS_LONG && Z_LVAL_P(return_value) == -1) {
+		PHALCON_THROW_VIPS_EXCEPTION("Write an image to a PHP array (%s)");
+	}
+}
+
+/**
+ * Write an image to a PHP array.
+ *
+ * Pixels are written as a simple one-dimensional array, for example, if
+ * you write:
+ *
+ * ```php
+ * $result = $image->crop(100, 100, 10, 1)->writeToArray();
+ * ```
+ *
+ * This will crop out 10 pixels and write them to the array. If `$image`
+ * is an RGB image, then `$array` will contain 30 numbers, with the first
+ * three being R, G and B for the first pixel.
+ *
+ * You'll need to slice and repack the array if you want more dimensions.
+ *
+ * This method is much faster than repeatedly calling `getpoint()`. It
+ * will use a lot of memory.
+ *
+ * @throws Exception
+ *
+ * @return array The pixel values as a PHP array.
+ */
+PHP_METHOD(Phalcon_Image_Vips, writeToArray)
+{
+	zval image = {};
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+
+	PHALCON_CALL_CE_STATIC(return_value, phalcon_image_vips_ce, "write_to_array", &image);
+	if (Z_TYPE_P(return_value) == IS_LONG && Z_LVAL_P(return_value) == -1) {
+		PHALCON_THROW_VIPS_EXCEPTION("Write an image to a PHP array (%s)");
+	}
 }
 
 /**
@@ -2002,7 +3482,7 @@ PHP_METHOD(Phalcon_Image_Vips, new_from_file)
 	VIPS_DEBUG_MSG("vips_image_new_from_file:\n");
 
 	options = NULL;
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "p|a", 
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "p|a!", 
 		&name, &name_len, &options) == FAILURE) {
 		RETURN_LONG(-1);
 	}
@@ -2015,7 +3495,7 @@ PHP_METHOD(Phalcon_Image_Vips, new_from_file)
 
 	ZVAL_STRING(&argv[0], filename);
 	argc = 1;
-	if (options) {
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		ZVAL_ARR(&argv[1], Z_ARR_P(options));
 		argc += 1;
 	}
@@ -2053,7 +3533,7 @@ PHP_METHOD(Phalcon_Image_Vips, new_from_buffer)
 
 	option_string = NULL;
 	options = NULL;
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|sa", 
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|sa!", 
 		&buffer, &buffer_len, &option_string, &option_string_len, 
 		&options) == FAILURE) {
 		RETURN_LONG(-1);
@@ -2065,7 +3545,7 @@ PHP_METHOD(Phalcon_Image_Vips, new_from_buffer)
 
 	ZVAL_STRINGL(&argv[0], buffer, buffer_len);
 	argc = 1;
-	if (options) {
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
 		ZVAL_ARR(&argv[1], Z_ARR_P(options));
 		argc += 1;
 	}
@@ -2246,7 +3726,7 @@ PHP_METHOD(Phalcon_Image_Vips, write_to_buffer)
 	zval argv[1];
 	int argc;
 
-	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rs|a", 
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "rs|a!", 
 		&IM, &suffix, &suffix_len, &options) == FAILURE) {
 		RETURN_LONG(-1);
 	}

@@ -1108,6 +1108,7 @@ PHP_METHOD(Phalcon_Image_Vips, crop);
 PHP_METHOD(Phalcon_Image_Vips, smartcrop);
 PHP_METHOD(Phalcon_Image_Vips, resize);
 PHP_METHOD(Phalcon_Image_Vips, rotate);
+PHP_METHOD(Phalcon_Image_Vips, composite);
 
 PHP_METHOD(Phalcon_Image_Vips, embed);
 PHP_METHOD(Phalcon_Image_Vips, ifthenelse);
@@ -1257,6 +1258,12 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_rotate, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, angle, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_composite, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, overlay, IS_OBJECT, 0)
+	ZEND_ARG_TYPE_INFO(0, mode, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
@@ -1530,6 +1537,7 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, smartcrop, arginfo_phalcon_image_vips_smartcrop, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, resize, arginfo_phalcon_image_vips_resize, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, rotate, arginfo_phalcon_image_vips_rotate, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, composite, arginfo_phalcon_image_vips_composite, ZEND_ACC_PUBLIC)
 
 	PHP_ME(Phalcon_Image_Vips, embed, arginfo_phalcon_image_vips_embed, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, ifthenelse, arginfo_phalcon_image_vips_ifthenelse, ZEND_ACC_PUBLIC)
@@ -1627,6 +1635,32 @@ PHALCON_INIT_CLASS(Phalcon_Image_Vips){
 	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_EOR"), "eor");
 	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_LSHIFT"),  "lshift");
 	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("OP_BOOLEAN_RSHIFT"),  "rshift");
+
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_CLEAR"),  "clear");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_SOURCE"),  "source");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_OVER"),  "over");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_IN"),  "in");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_OUT"),  "out");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_ATOP"),  "atop");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DEST"),  "dest");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DEST_OVER"),  "dest-over");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DEST_IN"),  "dest-in");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DEST_OUT"),  "dest-out");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DEST_ATOP"),  "dest-atop");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_XOR"),  "xor");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_ADD"),  "add");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_SATURATE"),  "saturate");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_MULTIPLY"),  "multiply");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_SCREEN"),  "screen");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_OVERLAY"),  "overlay");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DARKEN"),  "darken");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_LIGHTEN"),  "lighten");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_COLOUR_DODGE"),  "colour-dodge");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_COLOUR_BURN"),  "colour-burn");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_HARD_LIGHT"),  "hard-light");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_SOFT_LIGHT"),  "soft-light");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_DIFFERENCE"),  "difference");
+	zend_declare_class_constant_string(phalcon_image_vips_ce, SL("BLENDMODE_EXCLUSION"),  "exclusion");
 
 	if (strcmp(sapi_module.name, "apache2handler") == 0) {
 #ifdef VIPS_SONAME
@@ -2441,6 +2475,58 @@ PHP_METHOD(Phalcon_Image_Vips, rotate)
 	if (flag != SUCCESS) {
 		zval_ptr_dtor(return_value);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Rotate an image by a number of degrees failed");
+		return;
+	}
+}
+
+/**
+ * Composite $other on top of $this with $mode.
+ */
+PHP_METHOD(Phalcon_Image_Vips, composite)
+{
+	zval *overlay, *mode, *options = NULL, image = {}, overlayimage = {}, overlays = {}, *argv, ret = {}, image2 = {};
+	int argc = 3, flag;
+
+	phalcon_fetch_params(0, 2, 1, &overlay, &mode, &options);
+
+	PHALCON_VERIFY_CLASS_EX(overlay, phalcon_image_vips_ce, phalcon_image_exception_ce);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&overlayimage, overlay, SL("_image"), PH_NOISY|PH_READONLY);
+	array_init(&overlays);
+	phalcon_array_append(&overlays, &overlayimage, 0);
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &image);
+	ZVAL_COPY_VALUE(&argv[1], &overlayimage);
+	ZVAL_COPY_VALUE(&argv[2], mode);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+	if (vips_php_call_array("composite2", NULL, "", argc, argv, &ret)) {
+		zval_ptr_dtor(&overlays);
+		efree(argv);
+
+		PHALCON_THROW_VIPS_EXCEPTION("Composite an image failed (%s)");
+	}
+	zval_ptr_dtor(&overlays);
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Composite an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Composite an image failed");
 		return;
 	}
 }

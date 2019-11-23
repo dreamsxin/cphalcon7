@@ -1095,6 +1095,10 @@ PHP_METHOD(Phalcon_Image_Vips, __toString);
 PHP_METHOD(Phalcon_Image_Vips, identity);
 PHP_METHOD(Phalcon_Image_Vips, black);
 PHP_METHOD(Phalcon_Image_Vips, text);
+PHP_METHOD(Phalcon_Image_Vips, xyz);
+PHP_METHOD(Phalcon_Image_Vips, grey);
+PHP_METHOD(Phalcon_Image_Vips, gaussmat);
+PHP_METHOD(Phalcon_Image_Vips, logmat);
 PHP_METHOD(Phalcon_Image_Vips, newFromArray);
 PHP_METHOD(Phalcon_Image_Vips, newFromBuffer);
 PHP_METHOD(Phalcon_Image_Vips, newFromMemory);
@@ -1180,6 +1184,30 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_text, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, text, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_xyz, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_grey, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, width, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, height, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_gaussmat, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, sigma, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, min_ampl, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_logmat, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, sigma, IS_DOUBLE, 0)
+	ZEND_ARG_TYPE_INFO(0, min_ampl, IS_DOUBLE, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
@@ -1489,6 +1517,10 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, identity, arginfo_phalcon_image_vips_identity, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, text, arginfo_phalcon_image_vips_text, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, xyz, arginfo_phalcon_image_vips_xyz, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, grey, arginfo_phalcon_image_vips_grey, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, gaussmat, arginfo_phalcon_image_vips_gaussmat, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, logmat, arginfo_phalcon_image_vips_logmat, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, newFromArray, arginfo_phalcon_image_vips_newfromarray, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, newFromBuffer, arginfo_phalcon_image_vips_newfrombuffer, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, newFromMemory, arginfo_phalcon_image_vips_newfrommemory, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
@@ -1896,6 +1928,178 @@ PHP_METHOD(Phalcon_Image_Vips, text)
 	if (flag != SUCCESS) {
 		zval_ptr_dtor(return_value);
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "make a text image failed");
+		return;
+	}
+}
+
+/**
+ * Create a two-band uint32 image
+ */
+PHP_METHOD(Phalcon_Image_Vips, xyz)
+{
+	zval *width, *height, *options = NULL, *argv, ret = {}, image = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 2, 1, &width, &height, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], width);
+	ZVAL_COPY_VALUE(&argv[0], height);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("xyz", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Create a two-band uint32 image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a two-band uint32 image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a two-band uint32 image failed");
+		return;
+	}
+}
+
+/**
+ * Create a one-band float image
+ */
+PHP_METHOD(Phalcon_Image_Vips, grey)
+{
+	zval *width, *height, *options = NULL, *argv, ret = {}, image = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 2, 1, &width, &height, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], width);
+	ZVAL_COPY_VALUE(&argv[0], height);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("grey", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Create a one-band float image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a one-band float image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Create a one-band float image failed");
+		return;
+	}
+}
+
+/**
+ * Creates a circularly symmetric Gaussian image
+ */
+PHP_METHOD(Phalcon_Image_Vips, gaussmat)
+{
+	zval *sigma, *min_ampl, *options = NULL, *argv, ret = {}, image = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 2, 1, &sigma, &min_ampl, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], sigma);
+	ZVAL_COPY_VALUE(&argv[0], min_ampl);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("gaussmat", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Creates a circularly symmetric Gaussian image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Creates a circularly symmetric Gaussian image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Creates a circularly symmetric Gaussian image failed");
+		return;
+	}
+}
+
+/**
+ * Creates a circularly symmetric Laplacian image
+ */
+PHP_METHOD(Phalcon_Image_Vips, logmat)
+{
+	zval *sigma, *min_ampl, *options = NULL, *argv, ret = {}, image = {};
+	int argc = 2, flag;
+
+	phalcon_fetch_params(0, 2, 1, &sigma, &min_ampl, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 3;
+	}
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], sigma);
+	ZVAL_COPY_VALUE(&argv[0], min_ampl);
+	if (argc == 3) {
+		ZVAL_COPY_VALUE(&argv[1], options);
+	}
+
+	if (vips_php_call_array("logmat", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+		PHALCON_THROW_VIPS_EXCEPTION("Creates a circularly symmetric Laplacian image failed (%s)");
+		return;
+	}
+	efree(argv);
+	if (!phalcon_array_isset_fetch_str(&image, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Creates a circularly symmetric Laplacian image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image);
+	zval_ptr_dtor(&ret);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Creates a circularly symmetric Laplacian image failed");
 		return;
 	}
 }

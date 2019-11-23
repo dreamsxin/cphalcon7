@@ -277,6 +277,13 @@ typedef struct _phalcon_async_options {
 } phalcon_async_options;
 #endif
 
+#if PHALCON_USE_VIPS
+
+typedef struct _phalcon_vips_options {
+	char *home;
+} phalcon_vips_options;
+#endif
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -326,6 +333,11 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 #if PHALCON_USE_ASYNC
 	/** Async */
 	phalcon_async_options async;
+#endif
+
+
+#if PHALCON_USE_VIPS
+	phalcon_vips_options vips;
 #endif
 
 ZEND_END_MODULE_GLOBALS(phalcon)

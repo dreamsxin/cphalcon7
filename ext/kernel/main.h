@@ -112,6 +112,8 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		phalcon_array_append(&phalcon_memory_entry, z, 0); \
 	} while (0)
 
+#define RETURN_MM_LONG(value) RETVAL_LONG(value); RETURN_MM();
+
 #define RETURN_MM_STRING(s) { \
 		RETVAL_STRING(s); \
 		zval_ptr_dtor(&phalcon_memory_entry); \

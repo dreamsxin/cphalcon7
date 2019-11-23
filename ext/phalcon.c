@@ -150,6 +150,9 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_ENTRY("phalcon.async.udp",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.udp_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.unix",       "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.unix_enabled, zend_phalcon_globals, phalcon_globals)
 #endif
+#if PHALCON_USE_VIPS
+	STD_PHP_INI_ENTRY("phalcon.vips.home", ".", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateString, vips.home, zend_phalcon_globals, phalcon_globals)
+#endif
 PHP_INI_END()
 
 #if PHALCON_USE_ASYNC

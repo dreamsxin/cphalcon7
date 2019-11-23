@@ -59,6 +59,15 @@
 		RETURN_LONG(-1); \
 	} while (0)
 
+#define PHALCON_MM_THROW_VIPS_EXCEPTION(format) \
+	do { \
+		if (strlen(vips_error_buffer()) > 0) { \
+			PHALCON_THROW_EXCEPTION_FORMAT(phalcon_image_exception_ce, format, vips_error_buffer()); \
+			vips_error_clear(); \
+		} \
+		RETURN_MM_LONG(-1); \
+	} while (0)
+
 /* True global resources - no need for thread safety here */
 static int le_vips_gobject;
 
@@ -1087,6 +1096,7 @@ vips_php_call_array(const char *operation_name, zval *instance,
 zend_class_entry *phalcon_image_vips_ce;
 
 PHP_METHOD(Phalcon_Image_Vips, __construct);
+PHP_METHOD(Phalcon_Image_Vips, getVipsImage);
 PHP_METHOD(Phalcon_Image_Vips, __get);
 PHP_METHOD(Phalcon_Image_Vips, __set);
 PHP_METHOD(Phalcon_Image_Vips, __isset);
@@ -1109,6 +1119,7 @@ PHP_METHOD(Phalcon_Image_Vips, smartcrop);
 PHP_METHOD(Phalcon_Image_Vips, resize);
 PHP_METHOD(Phalcon_Image_Vips, rotate);
 PHP_METHOD(Phalcon_Image_Vips, composite);
+PHP_METHOD(Phalcon_Image_Vips, composite2);
 
 PHP_METHOD(Phalcon_Image_Vips, embed);
 PHP_METHOD(Phalcon_Image_Vips, ifthenelse);
@@ -1262,6 +1273,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_rotate, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_composite, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, overlays, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, modes, IS_ARRAY, 0)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_vips_composite2, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, overlay, IS_OBJECT, 0)
 	ZEND_ARG_TYPE_INFO(0, mode, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
@@ -1516,6 +1533,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __construct, arginfo_phalcon_image_vips___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Image_Vips, getVipsImage, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __get, arginfo___getref, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __isset, arginfo___isset, ZEND_ACC_PUBLIC)
@@ -1538,6 +1556,7 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, resize, arginfo_phalcon_image_vips_resize, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, rotate, arginfo_phalcon_image_vips_rotate, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, composite, arginfo_phalcon_image_vips_composite, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, composite2, arginfo_phalcon_image_vips_composite2, ZEND_ACC_PUBLIC)
 
 	PHP_ME(Phalcon_Image_Vips, embed, arginfo_phalcon_image_vips_embed, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, ifthenelse, arginfo_phalcon_image_vips_ifthenelse, ZEND_ACC_PUBLIC)
@@ -1672,8 +1691,9 @@ PHALCON_INIT_CLASS(Phalcon_Image_Vips){
 			sapi_module.sapi_error(E_WARNING, "unable to lock libvips -- graceful may be unreliable");
 		}
 	}
-	if (PG(php_binary)) {
-		if (VIPS_INIT(PG(php_binary))) {
+	// VIPSHOME
+	if (PHALCON_GLOBAL(vips).home) {
+		if (VIPS_INIT(PHALCON_GLOBAL(vips).home)) {
 #ifdef VIPS_DEBUG
 			printf( "VIPS_INIT failed\n" );
 #endif /*VIPS_DEBUG*/
@@ -1727,6 +1747,16 @@ PHP_METHOD(Phalcon_Image_Vips, __construct)
 	}
 
 	phalcon_update_property(getThis(), SL("_image"), image);
+}
+
+/**
+ * Return vips image resource
+ *
+ * @return resource
+ */
+PHP_METHOD(Phalcon_Image_Vips, getVipsImage)
+{
+	RETURN_MEMBER(getThis(), "_image");
 }
 
 /**
@@ -2481,10 +2511,72 @@ PHP_METHOD(Phalcon_Image_Vips, rotate)
 
 /**
  * Composite $other on top of $this with $mode.
+ *
+ * @param array $overlays
+ * @param array $modes
  */
 PHP_METHOD(Phalcon_Image_Vips, composite)
 {
-	zval *overlay, *mode, *options = NULL, image = {}, overlayimage = {}, overlays = {}, *argv, ret = {}, image2 = {};
+	zval *overlays, *modes, *options = NULL, image = {}, *overlay = NULL, overlayimages = {};
+	zval *argv, ret = {}, image2 = {};
+	int argc = 3, image_num = 1, flag;
+
+	phalcon_fetch_params(1, 2, 1, &overlays, &modes, &options);
+
+	if (options && Z_TYPE_P(options) == IS_ARRAY) {
+		argc = 4;
+	}
+
+	array_init(&overlayimages);
+	PHALCON_MM_ADD_ENTRY(&overlayimages);
+
+	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
+	phalcon_array_append(&overlayimages, &image, PH_COPY);
+	ZEND_HASH_FOREACH_VAL(Z_ARRVAL_P(overlays), overlay) {
+		zval overlayimage = {};
+		PHALCON_MM_VERIFY_CLASS_EX(overlay, phalcon_image_vips_ce, phalcon_image_exception_ce);
+		
+		phalcon_read_property(&overlayimage, overlay, SL("_image"), PH_NOISY|PH_READONLY);
+		phalcon_array_append(&overlayimages, &overlayimage, PH_COPY);
+		image_num++;
+	} ZEND_HASH_FOREACH_END();
+
+	argv = (zval *)emalloc(argc * sizeof(zval));
+	ZVAL_COPY_VALUE(&argv[0], &overlayimages);
+	ZVAL_LONG(&argv[1], image_num);
+	ZVAL_COPY_VALUE(&argv[2], modes);
+	if (argc == 4) {
+		ZVAL_COPY_VALUE(&argv[3], options);
+	}
+	if (vips_php_call_array("composite", NULL, "", argc, argv, &ret)) {
+		efree(argv);
+
+		PHALCON_MM_THROW_VIPS_EXCEPTION("Composite an image failed (%s)");
+	}
+	efree(argv);
+	PHALCON_MM_ADD_ENTRY(&ret);
+	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
+		zval_ptr_dtor(&ret);
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Composite an image failed");
+		return;
+	}
+
+	object_init_ex(return_value, phalcon_image_vips_ce);
+	PHALCON_CALL_METHOD_FLAG(flag, NULL, return_value, "__construct", &image2);
+	if (flag != SUCCESS) {
+		zval_ptr_dtor(return_value);
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "Composite an image failed");
+		return;
+	}
+	RETURN_MM();
+}
+
+/**
+ * Composite $other on top of $this with $mode.
+ */
+PHP_METHOD(Phalcon_Image_Vips, composite2)
+{
+	zval *overlay, *mode, *options = NULL, image = {}, overlayimage = {}, *argv, ret = {}, image2 = {};
 	int argc = 3, flag;
 
 	phalcon_fetch_params(0, 2, 1, &overlay, &mode, &options);
@@ -2497,8 +2589,6 @@ PHP_METHOD(Phalcon_Image_Vips, composite)
 
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&overlayimage, overlay, SL("_image"), PH_NOISY|PH_READONLY);
-	array_init(&overlays);
-	phalcon_array_append(&overlays, &overlayimage, 0);
 
 	argv = (zval *)emalloc(argc * sizeof(zval));
 	ZVAL_COPY_VALUE(&argv[0], &image);
@@ -2508,12 +2598,10 @@ PHP_METHOD(Phalcon_Image_Vips, composite)
 		ZVAL_COPY_VALUE(&argv[3], options);
 	}
 	if (vips_php_call_array("composite2", NULL, "", argc, argv, &ret)) {
-		zval_ptr_dtor(&overlays);
 		efree(argv);
 
 		PHALCON_THROW_VIPS_EXCEPTION("Composite an image failed (%s)");
 	}
-	zval_ptr_dtor(&overlays);
 	efree(argv);
 	if (!phalcon_array_isset_fetch_str(&image2, &ret, SL("out"), PH_READONLY)) {
 		zval_ptr_dtor(&ret);

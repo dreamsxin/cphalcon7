@@ -102,6 +102,7 @@
  */
 zend_class_entry *phalcon_mvc_model_ce;
 
+PHP_METHOD(Phalcon_Mvc_Model, register);
 PHP_METHOD(Phalcon_Mvc_Model, __construct);
 PHP_METHOD(Phalcon_Mvc_Model, setEventsManager);
 PHP_METHOD(Phalcon_Mvc_Model, getEventsManager);
@@ -227,6 +228,11 @@ PHP_METHOD(Phalcon_Mvc_Model, isNewRecord);
 PHP_METHOD(Phalcon_Mvc_Model, isDeletedRecord);
 PHP_METHOD(Phalcon_Mvc_Model, jsonSerialize);
 PHP_METHOD(Phalcon_Mvc_Model, __debugInfo);
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_register, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, model, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, table, IS_STRING, 1)
+ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
@@ -366,6 +372,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_filter, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_method_entry[] = {
+	PHP_ME(Phalcon_Mvc_Model, register, arginfo_phalcon_mvc_model_register, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, __construct, arginfo_phalcon_mvc_model___construct, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model, setEventsManager, arginfo_phalcon_events_eventsawareinterface_seteventsmanager, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, getEventsManager, arginfo_phalcon_events_eventsawareinterface_geteventsmanager, ZEND_ACC_PUBLIC)
@@ -568,6 +575,43 @@ static int phalcon_mvc_model_get_messages_from_model(zval *this_ptr, zval *model
 	} ZEND_HASH_FOREACH_END();
 
 	return likely(!EG(exception)) ? SUCCESS : FAILURE;
+}
+
+/**
+ * register model class
+ *
+ * @param string $model
+ * @param string $table
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Mvc_Model, register){
+
+	zval *model, *table = NULL;
+	zend_class_entry *target;
+
+	phalcon_fetch_params(1, 1, 1, &model, &table);
+	if ((target = phalcon_class_exists(model, 1)) == NULL) {
+		zend_class_entry ce;
+		char *php_class_name = Z_STRVAL_P(model);
+		INIT_CLASS_ENTRY_EX(ce, php_class_name, strlen(php_class_name), NULL);
+		target = zend_register_internal_class_ex(&ce, phalcon_mvc_model_ce);
+		if (!target) {
+			RETURN_MM_FALSE;
+		}
+	}
+	if (table && Z_TYPE_P(table) == IS_STRING) {
+		zval model_name = {}, di = {}, service_name = {}, models_manager = {};
+		phalcon_strtolower(&model_name, model);
+		PHALCON_MM_ADD_ENTRY(&model_name);
+		PHALCON_MM_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
+		PHALCON_MM_ADD_ENTRY(&di);
+		ZVAL_STR(&service_name, IS(modelsManager));
+		PHALCON_MM_CALL_METHOD(&models_manager, &di, "getshared", &service_name);
+		PHALCON_MM_ADD_ENTRY(&models_manager);
+
+		phalcon_update_property_array(&models_manager, SL("_sources"), &model_name, table);
+	}
+	RETURN_MM_TRUE;
 }
 
 /**

@@ -598,18 +598,18 @@ PHP_METHOD(Phalcon_Mvc_Model, register){
 		if (!target) {
 			RETURN_MM_FALSE;
 		}
-	}
-	if (table && Z_TYPE_P(table) == IS_STRING) {
-		zval model_name = {}, di = {}, service_name = {}, models_manager = {};
-		phalcon_strtolower(&model_name, model);
-		PHALCON_MM_ADD_ENTRY(&model_name);
-		PHALCON_MM_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
-		PHALCON_MM_ADD_ENTRY(&di);
-		ZVAL_STR(&service_name, IS(modelsManager));
-		PHALCON_MM_CALL_METHOD(&models_manager, &di, "getshared", &service_name);
-		PHALCON_MM_ADD_ENTRY(&models_manager);
+		if (table && Z_TYPE_P(table) == IS_STRING) {
+			zval model_name = {}, di = {}, service_name = {}, models_manager = {};
+			phalcon_strtolower(&model_name, model);
+			PHALCON_MM_ADD_ENTRY(&model_name);
+			PHALCON_MM_CALL_CE_STATIC(&di, phalcon_di_ce, "getdefault");
+			PHALCON_MM_ADD_ENTRY(&di);
+			ZVAL_STR(&service_name, IS(modelsManager));
+			PHALCON_MM_CALL_METHOD(&models_manager, &di, "getshared", &service_name);
+			PHALCON_MM_ADD_ENTRY(&models_manager);
 
-		phalcon_update_property_array(&models_manager, SL("_sources"), &model_name, table);
+			phalcon_update_property_array(&models_manager, SL("_sources"), &model_name, table);
+		}
 	}
 	RETURN_MM_TRUE;
 }

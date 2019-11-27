@@ -800,6 +800,35 @@ zend_class_entry* phalcon_get_internal_ce(const char *class_name, unsigned int c
     return temp_ce;
 }
 
+#if PHP_VERSION_ID >= 70400
+static inline zend_class_entry *phalcon_class_exists_impl(zend_string *name, zend_bool autoload, int flags, int skip_flags)
+{
+	zend_string *lcname;
+	zend_class_entry *ce;
+
+	if (!autoload) {
+		if (ZSTR_VAL(name)[0] == '\\') {
+			/* Ignore leading "\" */
+			lcname = zend_string_alloc(ZSTR_LEN(name) - 1, 0);
+			zend_str_tolower_copy(ZSTR_VAL(lcname), ZSTR_VAL(name) + 1, ZSTR_LEN(name) - 1);
+		} else {
+			lcname = zend_string_tolower(name);
+		}
+
+		ce = zend_hash_find_ptr(EG(class_table), lcname);
+		zend_string_release_ex(lcname, 0);
+	} else {
+		ce = zend_lookup_class(name);
+	}
+
+	if (ce) {
+		return ((flags == 0 || (ce->ce_flags & flags)) && !(ce->ce_flags & skip_flags)) ? ce : NULL;
+	} else {
+		return NULL;
+	}
+}
+#endif
+
 /**
  * Checks if a class exist
  */
@@ -807,11 +836,15 @@ zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) {
 
 	zend_class_entry *ce;
 
+#if PHP_VERSION_ID >= 70400
+	return phalcon_class_exists_impl(Z_STR_P(class_name), autoload, 0, ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT);
+#else
 	if (Z_TYPE_P(class_name) == IS_STRING) {
 		if ((ce = zend_lookup_class_ex(Z_STR_P(class_name), NULL, autoload)) != NULL) {
-			return (ce->ce_flags & (ZEND_ACC_INTERFACE | (ZEND_ACC_TRAIT - ZEND_ACC_EXPLICIT_ABSTRACT_CLASS))) == 0 ? ce : NULL;
+			return (ce->ce_flags & (ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT)) == 0 ? ce : NULL;
 		}
 	}
+#endif
 
 	return NULL;
 }

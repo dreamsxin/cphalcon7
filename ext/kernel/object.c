@@ -537,8 +537,9 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		array_init(result);
 
 		ZEND_HASH_FOREACH_KEY_VAL(properties, num_key, key, value) {
+			zend_bool is_dynamic = 0;
 #if PHP_VERSION_ID >= 70400
-			zend_bool is_dynamic = 1;
+			is_dynamic = 1;
 			if (Z_TYPE_P(value) == IS_INDIRECT) {
 				value = Z_INDIRECT_P(value);
 				if (UNEXPECTED(Z_ISUNDEF_P(value))) {
@@ -547,7 +548,6 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 
 				is_dynamic = 0;
 			}
-
 
 			if (check_access && key && zend_check_property_access(zobj, key, is_dynamic) == FAILURE) {
 #else
@@ -607,8 +607,9 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 		array_init(result);
 
 		ZEND_HASH_FOREACH_KEY_VAL(properties, num_key, key, value) {
+			zend_bool is_dynamic = 0;
 #if PHP_VERSION_ID >= 70400
-			zend_bool is_dynamic = 1;
+			is_dynamic = 1;
 			if (Z_TYPE_P(value) == IS_INDIRECT) {
 				value = Z_INDIRECT_P(value);
 				if (UNEXPECTED(Z_ISUNDEF_P(value))) {

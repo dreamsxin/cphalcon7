@@ -581,8 +581,9 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
  * Returns an array of object propertie names
  */
 void phalcon_get_object_members(zval *result, zval *object, int check_access) {
-
+#if PHP_VERSION_ID >= 70400
 	zval *value;
+#endif
 	HashTable *properties;
 	zend_string *key;
 	zend_ulong num_key;

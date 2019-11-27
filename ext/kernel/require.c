@@ -185,9 +185,9 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 	file_handle.opened_path = NULL;
 	file_handle.handle.fp = NULL;
 #else
-	ret = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+	status = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
 
-	if (ret != SUCCESS) {
+	if (status != SUCCESS) {
 		return FAILURE;
 	}
 #endif

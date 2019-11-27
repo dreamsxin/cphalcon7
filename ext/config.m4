@@ -901,12 +901,12 @@ storage/frontend/igbinary.c \
 snowflake.c \
 server/utils.c \
 server/simple.c \
-server/exception.c \
-aop/lexer.c \
-aop/exception.c \
-aop/joinpoint.c \
-aop.c"
+server/exception.c"
 
+	if test "$phalcon_php_version" -lt "7004000"; then
+		AC_DEFINE([PHALCON_USE_AOP], 1, [ ])
+		phalcon_sources="$phalcon_sources aop/lexer.c aop/exception.c aop/joinpoint.c aop.c"
+	fi
 	if test "$PHP_CACHE_YAC" = "yes"; then
 		phalcon_sources="$phalcon_sources cache/yac/allocators/mmap.c cache/yac/allocators/shm.c cache/yac/serializer.c cache/yac/storage.c cache/yac/allocator.c cache/yac.c"
 	fi

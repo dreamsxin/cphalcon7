@@ -204,8 +204,12 @@ void phalcon_gettype(zval *return_value, zval *arg);
 #define RETURN_MM_TRUE RETVAL_TRUE; RETURN_MM();
 
 /** Return empty array */
-#define RETURN_EMPTY_ARRAY() array_init(return_value); return;
-#define RETURN_MM_EMPTY_ARRAY() array_init(return_value); RETURN_MM();
+#if PHP_VERSION_ID >= 70400
+#define RETURN_MM_EMPTY_ARRAY() RETVAL_EMPTY_ARRAY(); RETURN_MM();
+#else
+# define RETURN_EMPTY_ARRAY() array_init(return_value); return;
+# define RETURN_MM_EMPTY_ARRAY() array_init(return_value); RETURN_MM();
+#endif
 
 /** class/interface registering */
 #define PHALCON_REGISTER_CLASS(ns, class_name, name, methods, flags) \

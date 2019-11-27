@@ -487,6 +487,7 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 	zend_bool fast_copy = 0;
 	zval *value;
 	zend_string *key;
+	zend_ulong num_key;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(object)->get_properties == NULL) {
@@ -534,47 +535,43 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 		}
 
 		array_init(result);
-		if (check_access) {
-			ZEND_HASH_FOREACH_STR_KEY_VAL_IND(properties, key, value) {
-				if (key) {
-					if (zend_check_property_access(zobj, key) == SUCCESS) {
-						if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
-							value = Z_REFVAL_P(value);
-						}
-						if (Z_REFCOUNTED_P(value)) {
-							Z_ADDREF_P(value);
-						}
-						if (ZSTR_VAL(key)[0] == 0) {
-							const char *prop_name, *class_name;
-							size_t prop_len;
-							zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-							zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
-						} else {
-							zend_hash_add_new(Z_ARRVAL_P(result), key, value);
-						}
-					}
+
+		ZEND_HASH_FOREACH_KEY_VAL(properties, num_key, key, value) {
+#if PHP_VERSION_ID >= 70400
+			zend_bool is_dynamic = 1;
+			if (Z_TYPE_P(value) == IS_INDIRECT) {
+				value = Z_INDIRECT_P(value);
+				if (UNEXPECTED(Z_ISUNDEF_P(value))) {
+					continue;
 				}
-			} ZEND_HASH_FOREACH_END();
-		} else {
-			ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
-				if (key) {
-					if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
-						value = Z_REFVAL_P(value);
-					}
-					if (Z_REFCOUNTED_P(value)) {
-						Z_ADDREF_P(value);
-					}
-					if (ZSTR_VAL(key)[0] == 0) {
-						const char *prop_name, *class_name;
-						size_t prop_len;
-						zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-						zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
-					} else {
-						zend_hash_add_new(Z_ARRVAL_P(result), key, value);
-					}
-				}
-			} ZEND_HASH_FOREACH_END();
-		}
+
+				is_dynamic = 0;
+			}
+
+
+			if (check_access && key && zend_check_property_access(zobj, key, is_dynamic) == FAILURE) {
+#else
+			if (check_access && key && zend_check_property_access(zobj, key) == FAILURE) {
+				continue;
+#endif
+			}
+			if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
+				value = Z_REFVAL_P(value);
+			}
+			if (Z_REFCOUNTED_P(value)) {
+				Z_ADDREF_P(value);
+			}
+			if (UNEXPECTED(!key)) {
+				zend_hash_index_add(Z_ARRVAL_P(result), num_key, value);
+			} else if (!is_dynamic && ZSTR_VAL(key)[0] == 0) {
+				const char *prop_name, *class_name;
+				size_t prop_len;
+				zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+				zend_hash_str_add_new(Z_ARRVAL_P(result), prop_name, prop_len, value);
+			} else {
+				zend_hash_add_new(Z_ARRVAL_P(result), key, value);
+			}
+		} ZEND_HASH_FOREACH_END();
 	} else {
 		php_error_docref(NULL, E_WARNING, "phalcon_get_object_vars expects an object");
 	}
@@ -585,8 +582,10 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
  */
 void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 
+	zval *value;
 	HashTable *properties;
 	zend_string *key;
+	zend_ulong num_key;
 
 	zend_object *zobj;
 
@@ -607,18 +606,33 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 
 		array_init(result);
 
-		ZEND_HASH_FOREACH_STR_KEY(properties, key) {
-			if (key) {
-				if (!check_access || zend_check_property_access(zobj, key) == SUCCESS) {
-					if (ZSTR_VAL(key)[0] == 0) {
-						const char *prop_name, *class_name;
-						size_t prop_len;
-						zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
-						phalcon_array_append_str(result, prop_name, prop_len, 0);
-					} else {
-						phalcon_array_append_str(result, ZSTR_VAL(key), ZSTR_LEN(key), 0);
-					}
+		ZEND_HASH_FOREACH_KEY_VAL(properties, num_key, key, value) {
+#if PHP_VERSION_ID >= 70400
+			zend_bool is_dynamic = 1;
+			if (Z_TYPE_P(value) == IS_INDIRECT) {
+				value = Z_INDIRECT_P(value);
+				if (UNEXPECTED(Z_ISUNDEF_P(value))) {
+					continue;
 				}
+
+				is_dynamic = 0;
+			}
+
+			if (check_access && key && zend_check_property_access(zobj, key, is_dynamic) == FAILURE) {
+#else
+			if (check_access && key && zend_check_property_access(zobj, key) == FAILURE) {
+#endif
+				continue;
+			}
+			if (UNEXPECTED(!key)) {
+				phalcon_array_append_long(result, num_key, 0);
+			} else if (!is_dynamic && ZSTR_VAL(key)[0] == 0) {
+				const char *prop_name, *class_name;
+				size_t prop_len;
+				zend_unmangle_property_name_ex(key, &class_name, &prop_name, &prop_len);
+				phalcon_array_append_str(result, prop_name, prop_len, 0);
+			} else {
+				phalcon_array_append_str(result, ZSTR_VAL(key), ZSTR_LEN(key), 0);
 			}
 		} ZEND_HASH_FOREACH_END();
 	} else {

@@ -99,8 +99,11 @@ char *async_xp_parse_ip(const char *str, size_t str_len, int *portno, int get_er
     return host;
 }
 
-
+#if PHP_VERSION_ID >= 70400
+static ssize_t async_xp_socket_write(php_stream *stream, const char *buf, size_t count)
+#else
 static size_t async_xp_socket_write(php_stream *stream, const char *buf, size_t count)
+#endif
 {
 	async_xp_socket_data *data;
 	async_stream_write_req write;
@@ -128,7 +131,11 @@ static size_t async_xp_socket_write(php_stream *stream, const char *buf, size_t 
 	return count;
 }
 
+#if PHP_VERSION_ID >= 70400
+static ssize_t async_xp_socket_read(php_stream *stream, char *buf, size_t count)
+#else
 static size_t async_xp_socket_read(php_stream *stream, char *buf, size_t count)
+#endif
 {
 	async_xp_socket_data *data;
 	async_stream_read_req read;

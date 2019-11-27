@@ -618,7 +618,8 @@ static void execute_context(zend_execute_data *execute_data, zval *args) /*{{{*/
 		}
 	} else { /* ZEND_OVERLOADED_FUNCTION */
 		//this will never happend,becase there's no hook for overload function
-#if PHP_VERSION_ID >= 70200
+#if PHP_VERSION_ID >= 70400
+#elif PHP_VERSION_ID >= 70200
 		zend_do_fcall_overloaded(execute_data, execute_data->return_value);
 #endif
 	}
@@ -1101,7 +1102,9 @@ zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, voi
 
 void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 {
-#if PHP_VERSION_ID >= 70300
+#if PHP_VERSION_ID >= 70400
+	uint32_t *pcre_extra = NULL;
+#elif PHP_VERSION_ID >= 70300
 	uint32_t *pcre_extra = NULL;
 	uint32_t preg_options = 0;
 #else
@@ -1145,7 +1148,9 @@ void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 	zend_string_release(regexp_buffer);
 
 	regexp = zend_string_init(tempregexp, strlen(tempregexp), 0);
-#if PHP_VERSION_ID >= 70300
+#if PHP_VERSION_ID >= 70400
+	pc->re_method = pcre_get_compiled_regex(regexp, pcre_extra);
+#elif PHP_VERSION_ID >= 70300
 	pc->re_method = pcre_get_compiled_regex(regexp, pcre_extra, &preg_options);
 #else
 	pc->re_method = pcre_get_compiled_regex(regexp, &pcre_extra, &preg_options);
@@ -1187,7 +1192,9 @@ void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 		zend_string_release(regexp_buffer);
 
 		regexp = zend_string_init(tempregexp, strlen(tempregexp), 0);
-#if PHP_VERSION_ID >= 70300
+#if PHP_VERSION_ID >= 70400
+		pc->re_class = pcre_get_compiled_regex(regexp, pcre_extra);
+#elif PHP_VERSION_ID >= 70300
 		pc->re_class = pcre_get_compiled_regex(regexp, pcre_extra, &preg_options);
 #else
 		pc->re_class = pcre_get_compiled_regex(regexp, &pcre_extra, &preg_options);

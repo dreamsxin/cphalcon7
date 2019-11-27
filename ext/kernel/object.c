@@ -606,8 +606,11 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 		zobj = Z_OBJ_P(object);
 
 		array_init(result);
-
+#if PHP_VERSION_ID >= 70400
 		ZEND_HASH_FOREACH_KEY_VAL(properties, num_key, key, value) {
+#else
+		ZEND_HASH_FOREACH_KEY(properties, num_key, key) {
+#endif
 			zend_bool is_dynamic = 0;
 #if PHP_VERSION_ID >= 70400
 			is_dynamic = 1;

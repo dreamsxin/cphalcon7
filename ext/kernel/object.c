@@ -834,11 +834,10 @@ static inline zend_class_entry *phalcon_class_exists_impl(zend_string *name, zen
  */
 zend_class_entry *phalcon_class_exists(const zval *class_name, int autoload) {
 
-	zend_class_entry *ce;
-
 #if PHP_VERSION_ID >= 70400
 	return phalcon_class_exists_impl(Z_STR_P(class_name), autoload, 0, ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT);
 #else
+	zend_class_entry *ce;
 	if (Z_TYPE_P(class_name) == IS_STRING) {
 		if ((ce = zend_lookup_class_ex(Z_STR_P(class_name), NULL, autoload)) != NULL) {
 			return (ce->ce_flags & (ZEND_ACC_INTERFACE | ZEND_ACC_TRAIT)) == 0 ? ce : NULL;

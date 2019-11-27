@@ -137,7 +137,11 @@ PHP_INI_BEGIN()
 	STD_PHP_INI_BOOLEAN("phalcon.xhprof.enable_xhprof",   "0",  PHP_INI_SYSTEM, OnUpdateBool, xhprof.enable_xhprof,	zend_phalcon_globals, phalcon_globals)
     STD_PHP_INI_ENTRY("phalcon.xhprof.clock_use_rdtsc",   "0",  PHP_INI_ALL, OnUpdateBool, xhprof.clock_use_rdtsc,	zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.snowflake.node", "0", PHP_INI_SYSTEM, OnUpdateLong, snowflake.node,  zend_phalcon_globals, phalcon_globals)
+
+#if PHP_VERSION_ID < 70400
 	STD_PHP_INI_BOOLEAN("phalcon.aop.enable_aop",   "0", PHP_INI_SYSTEM, OnUpdateBool, aop.enable_aop, zend_phalcon_globals, phalcon_globals)
+#endif
+
 #if PHALCON_USE_ASYNC
 	STD_PHP_INI_ENTRY("phalcon.async.dns",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.dns_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.filesystem", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
@@ -200,10 +204,11 @@ static PHP_MINIT_FUNCTION(phalcon)
 		PHALCON_GLOBAL(snowflake).node = 0;
     }
 
+#if PHP_VERSION_ID < 70400
 	if (PHALCON_GLOBAL(aop).enable_aop) {
-#if PHP_VERSION_ID >= 70300 && PHP_VERSION_ID < 70400
+# if PHP_VERSION_ID >= 70300
 		zend_object_handlers *handlers = (zend_object_handlers *)zend_get_std_object_handlers();
-#endif
+# endif
 		// overload zend_execute_ex and zend_execute_internal
 		original_zend_execute_internal = zend_execute_internal;
 		zend_execute_internal = phalcon_aop_execute_internal;
@@ -211,18 +216,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 		original_zend_execute_ex = zend_execute_ex;
 		zend_execute_ex = phalcon_aop_execute_ex;
 
-#if PHP_VERSION_ID >= 70400
-		/* 7.4 const
-		original_zend_std_read_property = handlers->read_property;
-		handlers->read_property = phalcon_aop_read_property;
-
-		original_zend_std_write_property = handlers->write_property;
-		handlers->write_property = phalcon_aop_write_property;
-
-		original_zend_std_get_property_ptr_ptr = handlers->get_property_ptr_ptr;
-		handlers->get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
-		*/
-#elif PHP_VERSION_ID >= 70300
+# if PHP_VERSION_ID >= 70300
 		// overload zend_std_read_property and zend_std_write_property
 		original_zend_std_read_property = handlers->read_property;
 		handlers->read_property = phalcon_aop_read_property;
@@ -232,7 +226,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 		original_zend_std_get_property_ptr_ptr = handlers->get_property_ptr_ptr;
 		handlers->get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
-#else
+# else
 		// overload zend_std_read_property and zend_std_write_property
 		original_zend_std_read_property = std_object_handlers.read_property;
 		std_object_handlers.read_property = phalcon_aop_read_property;
@@ -242,8 +236,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 
 		original_zend_std_get_property_ptr_ptr = std_object_handlers.get_property_ptr_ptr;
 		std_object_handlers.get_property_ptr_ptr = phalcon_aop_get_property_ptr_ptr;
-#endif
+# endif
 	}
+#endif
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		xhprof_orig_zend_execute_internal = zend_execute_internal;
@@ -401,8 +396,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Py_Exception);
 #endif
 	PHALCON_INIT(Phalcon_Thread_Exception);
-	PHALCON_INIT(Phalcon_Aop_Exception);
 
+#if PHP_VERSION_ID < 70400
+	PHALCON_INIT(Phalcon_Aop_Exception);
+#endif
 	/* 2. Register interfaces */
 	PHALCON_INIT(Phalcon_DiInterface);
 	PHALCON_INIT(Phalcon_Di_InjectionAwareInterface);
@@ -868,9 +865,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Py_Matplot);
 #endif
 
+#if PHP_VERSION_ID < 70400
 	PHALCON_INIT(Phalcon_Aop);
 	PHALCON_INIT(Phalcon_Aop_Joinpoint);
-
+#endif
 	return SUCCESS;
 }
 
@@ -933,6 +931,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 
 	phalcon_initialize_memory(phalcon_globals_ptr);
 
+#if PHP_VERSION_ID < 70400
 	if (PHALCON_GLOBAL(aop).enable_aop) {
 		PHALCON_GLOBAL(aop).overloaded = 0;
 		PHALCON_GLOBAL(aop).pointcut_version = 0;
@@ -951,6 +950,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 		ALLOC_HASHTABLE(PHALCON_GLOBAL(aop).function_cache);
 		zend_hash_init(PHALCON_GLOBAL(aop).function_cache, 16, NULL, phalcon_aop_free_pointcut_cache, 0);
 	}
+#endif
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		tracing_request_init();
@@ -984,6 +984,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 
 static PHP_RSHUTDOWN_FUNCTION(phalcon){
 
+#if PHP_VERSION_ID < 70400
 	if (PHALCON_GLOBAL(aop).enable_aop) {
 		int i;
 		zend_array_destroy(PHALCON_GLOBAL(aop).pointcuts_table);
@@ -1013,6 +1014,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 			efree(PHALCON_GLOBAL(aop).property_value);
 		}
 	}
+#endif
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		int i = 0;
@@ -1074,9 +1076,12 @@ static PHP_MINFO_FUNCTION(phalcon)
 	sprintf(uv_version, "%d.%d", UV_VERSION_MAJOR, UV_VERSION_MINOR);
 	php_info_print_table_row(2, "Libuv version", uv_version);
 #endif
+
+#if PHP_VERSION_ID < 70400
 	if (PHALCON_GLOBAL(aop).enable_aop) {
 		php_info_print_table_header(2, "AOP support", "enabled");
 	}
+#endif
 
 	if (PHALCON_GLOBAL(xhprof).enable_xhprof) {
 		php_info_print_table_row(2, "Xhprof", "enabled");

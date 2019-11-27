@@ -39,7 +39,7 @@
 #define PHP_PHALCON_VERSION_MED             3
 #define PHP_PHALCON_VERSION_MIN             3
 #define PHP_PHALCON_VERSION_RELEASE         PHALCON_VERSION_STABLE
-#define PHP_PHALCON_VERSION_RELEASE_VERSION 2
+#define PHP_PHALCON_VERSION_RELEASE_VERSION 3
 #define PHP_PHALCON_EXTNAME "phalcon7"
 
 /** DEBUG options */
@@ -184,6 +184,7 @@ typedef struct _phalcon_snowflake_options {
 	uint64_t epoch;
 } phalcon_snowflake_options;
 
+#if PHP_VERSION_ID < 70400
 /** AOP options */
 typedef struct {
     zend_array *read;
@@ -207,6 +208,7 @@ typedef struct _phalcon_aop_options {
 
 	zval *property_value;
 } phalcon_aop_options;
+#endif
 
 #if PHALCON_USE_ASYNC
 
@@ -328,7 +330,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	phalcon_snowflake_options snowflake;
 
+#if PHP_VERSION_ID < 70400
 	phalcon_aop_options aop;
+#endif
 
 #if PHALCON_USE_ASYNC
 	/** Async */

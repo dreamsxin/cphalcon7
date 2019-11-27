@@ -984,7 +984,7 @@ zval *phalcon_aop_read_property(zval *object, zval *member, int type, void **cac
 }
 /*}}}*/
 
-void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table, zval *aop_object) /*{{{*/
+void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table, zval *aop_object)
 {
 	phalcon_aop_pointcut *current_pc = NULL;
 	zval *current_pc_value = NULL;
@@ -1048,9 +1048,12 @@ void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table,
 		execute_pointcut(current_pc, aop_object, &pointcut_ret);
 	}
 }
-/*}}}*/
 
-void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot) /*{{{*/
+#if PHP_VERSION_ID >= 70400
+zval* phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot)
+#else
+void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot)
+#endif
 {
 	zval aop_object;
 	phalcon_aop_joinpoint_object *joinpoint;
@@ -1059,12 +1062,21 @@ void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **
 
 	if (PHALCON_GLOBAL(aop).lock_write_property > 25) {
 		zend_error(E_ERROR, "Too many level of nested advices. Are there any recursive call ?");
+#if PHP_VERSION_ID >= 70400
+		return value;
+#else
+		return;
+#endif
 	}
 
 	pointcut_table = get_cache_property(object, member, PHALCON_AOP_KIND_WRITE);
 	if (pointcut_table == NULL || zend_hash_num_elements(pointcut_table) == 0) {
+#if PHP_VERSION_ID >= 70400
+		return original_zend_std_write_property(object, member, value, cache_slot);
+#else
 		original_zend_std_write_property(object, member, value, cache_slot);
-		return ;
+		return;
+#endif
 	}
 	zend_hash_internal_pointer_reset_ex(pointcut_table, &pos);
 
@@ -1086,8 +1098,10 @@ void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **
 	PHALCON_GLOBAL(aop).lock_write_property--;
 
 	zval_ptr_dtor(&aop_object);
+#if PHP_VERSION_ID >= 70400
+	return value;
+#endif
 }
-/*}}}*/
 
 zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
 {

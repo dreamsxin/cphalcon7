@@ -89,7 +89,11 @@ void phalcon_aop_do_read_property(HashPosition pos, zend_array *pointcut_table, 
 void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table, zval *aop_object);
 
 zval *phalcon_aop_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv);
+#if PHP_VERSION_ID >= 70400
+zval *phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot);
+#else
 void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot);
+#endif
 zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot);
 
 void phalcon_aop_free_pointcut(zval *elem);

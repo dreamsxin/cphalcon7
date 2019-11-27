@@ -435,7 +435,7 @@ PHP_METHOD(Phalcon_Mvc_Router, getDefaults){
 PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 	zval *uri = NULL, real_uri = {}, status = {}, removeextraslashes = {}, handled_uri = {}, route_found = {}, params = {}, service = {}, dependency_injector = {}, request = {}, debug_message = {}, event_name = {};
-	zval all_case_sensitive = {}, current_host_name = {}, routes = {}, *route, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
+	zval all_case_sensitive = {}, current_host_name = {}, routes = {}, *route = NULL, matches = {}, parts = {}, namespace_name = {}, default_namespace = {}, module = {}, default_module = {}, exact = {};
 	zval controller = {}, default_handler = {}, action = {}, default_action = {}, mode = {}, http_method = {}, action_name = {}, params_str = {}, str_params = {}, params_merge = {}, default_params = {};
 	zend_string *str_key;
 	ulong idx;

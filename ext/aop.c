@@ -1099,7 +1099,7 @@ void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **
 
 	zval_ptr_dtor(&aop_object);
 #if PHP_VERSION_ID >= 70400
-	return value;
+	return joinpoint->return_value;
 #endif
 }
 

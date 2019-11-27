@@ -1,5 +1,6 @@
 <?php
 
+// Support < 7.4
 class MyServices
 {
 	private $val = 0;

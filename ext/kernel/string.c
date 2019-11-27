@@ -2801,7 +2801,11 @@ int phalcon_preg_match(zval *retval, zval *regex, zval *subject, zval *matches, 
 	}
 
 	//pce->refcount++;
+#if PHP_VERSION_ID >= 70400
+	php_pcre_match_impl(pce, Z_STR_P(subject), retval, matches, global, use_flags, flags, start_offset);
+#else
 	php_pcre_match_impl(pce, Z_STRVAL_P(subject), Z_STRLEN_P(subject), retval, matches, global, use_flags, flags, start_offset);
+#endif
 	//pce->refcount--;
 	return SUCCESS;
 }

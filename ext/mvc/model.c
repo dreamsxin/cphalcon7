@@ -591,10 +591,14 @@ PHP_METHOD(Phalcon_Mvc_Model, register){
 
 	phalcon_fetch_params(1, 1, 1, &model, &table);
 	if ((target = phalcon_class_exists(model, 1)) == NULL) {
+		zend_module_entry *module;
 		zend_class_entry ce;
 		char *php_class_name = Z_STRVAL_P(model);
 		INIT_CLASS_ENTRY_EX(ce, php_class_name, strlen(php_class_name), NULL);
+		module = EG(current_module);
+		EG(current_module) = &phalcon_module_entry;
 		target = zend_register_internal_class_ex(&ce, phalcon_mvc_model_ce);
+		EG(current_module) = module;
 		if (!target) {
 			RETURN_MM_FALSE;
 		}

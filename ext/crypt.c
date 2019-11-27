@@ -346,10 +346,10 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	zval *source, *key = NULL, *options = NULL, handler = {}, arguments = {}, value = {}, text = {}, encrypt_key = {}, encrypt_options = {};
 	zval method = {}, pos = {}, mode = {}, cipher = {}, iv_size = {}, iv = {}, block_size = {}, padding = {}, padded = {}, encrypt = {};
 
-	phalcon_fetch_params(0, 1, 2, &source, &key, &options);
+	phalcon_fetch_params(1, 1, 2, &source, &key, &options);
 
 	if (phalcon_function_exists_ex(SL("openssl_encrypt")) == FAILURE) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "openssl extension is required");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "openssl extension is required");
 		return;
 	}
 
@@ -359,9 +359,11 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 		PHALCON_SEPARATE_PARAM(source);
 
 		array_init_size(&arguments, 1);
+		PHALCON_MM_ADD_ENTRY(&arguments);
 		phalcon_array_append(&arguments, source, PH_COPY);
 
-		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		PHALCON_MM_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
+		PHALCON_MM_ADD_ENTRY(&value);
 
 		source = &value;
 	}
@@ -372,6 +374,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	} else {
 		ZVAL_COPY(&text, source);
 	}
+	PHALCON_MM_ADD_ENTRY(&text);
 
 	if (!key || Z_TYPE_P(key) == IS_NULL) {
 		phalcon_read_property(&encrypt_key, getThis(), SL("_key"), PH_READONLY);
@@ -380,7 +383,7 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	if (PHALCON_IS_EMPTY(&encrypt_key)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Encryption key cannot be empty");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Encryption key cannot be empty");
 		return;
 	}
 
@@ -391,64 +394,54 @@ PHP_METHOD(Phalcon_Crypt, encrypt){
 	}
 
 	phalcon_read_property(&method, getThis(), SL("_method"), PH_NOISY|PH_READONLY);
-/*
-	PHALCON_CALL_FUNCTION(&methods, "openssl_get_cipher_methods", &PHALCON_GLOBAL(z_true));
-
-	if (!phalcon_fast_in_array(&method, &methods)) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_crypt_exception_ce, "Cipher algorithm is unknown");
-		zval_ptr_dtor(&methods);
-		return;
-	}
-	zval_ptr_dtor(&methods);
-*/
 
 	phalcon_read_property(&padding, getThis(), SL("_padding"), PH_NOISY|PH_READONLY);
 	if (PHALCON_GT_LONG(&padding, 0) && phalcon_fast_strrpos_str(&pos, &method, SL("-"))) {
 		zval tmp = {};
 		phalcon_substr(&mode, &method, Z_LVAL(pos) + 1, 0);
+		PHALCON_MM_ADD_ENTRY(&mode);
 		phalcon_substr(&tmp, &method, 0, Z_LVAL(pos));
+		PHALCON_MM_ADD_ENTRY(&tmp);
 		phalcon_fast_str_replace_str(&cipher, "-", "", &tmp);
-		zval_ptr_dtor(&tmp);
+		PHALCON_MM_ADD_ENTRY(&cipher);
 		phalcon_strtolower_inplace(&cipher);
 	}
 
-	PHALCON_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
-
-	PHALCON_CALL_FUNCTION(&iv, "openssl_random_pseudo_bytes", &iv_size);
-
+	PHALCON_MM_CALL_FUNCTION(&iv_size, "openssl_cipher_iv_length", &method);
+	if (PHALCON_GT_LONG(&iv_size, 0)) {
+		PHALCON_MM_CALL_FUNCTION(&iv, "openssl_random_pseudo_bytes", &iv_size);
+		PHALCON_MM_ADD_ENTRY(&iv);
+	} else {
+		ZVAL_NULL(&iv);
+	}
 	if (PHALCON_GT_LONG(&padding, 0)) {
 		if (PHALCON_LE_LONG(&iv_size, 0) && zend_is_true(&cipher)) {
-			PHALCON_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
+			PHALCON_MM_CALL_FUNCTION(&block_size, "openssl_cipher_iv_length", &cipher);
 		} else {
-			ZVAL_COPY(&block_size, &iv_size);
+			ZVAL_COPY_VALUE(&block_size, &iv_size);
 		}
 		phalcon_crypt_pad_text(&padded, &text, &mode, Z_LVAL(block_size), Z_LVAL(padding));
-		zval_ptr_dtor(&block_size);
 	} else {
-		ZVAL_COPY(&padded, &text);
+		ZVAL_COPY_VALUE(&padded, &text);
 	}
-	zval_ptr_dtor(&cipher);
-	zval_ptr_dtor(&mode);
-	zval_ptr_dtor(&text);
 
-	PHALCON_CALL_FUNCTION(&encrypt, "openssl_encrypt", &padded, &method, &encrypt_key, &encrypt_options, &iv);
-	zval_ptr_dtor(&padded);
+	PHALCON_MM_CALL_FUNCTION(&encrypt, "openssl_encrypt", &padded, &method, &encrypt_key, &encrypt_options, &iv);
+	PHALCON_MM_ADD_ENTRY(&encrypt);
 	PHALCON_CONCAT_VV(return_value, &iv, &encrypt);
-	zval_ptr_dtor(&iv);
-	zval_ptr_dtor(&encrypt);
 
 	phalcon_read_property(&handler, getThis(), SL("_afterEncrypt"), PH_NOISY|PH_READONLY);
 
 	if (phalcon_is_callable(&handler)) {
 		array_init_size(&arguments, 1);
+		PHALCON_MM_ADD_ENTRY(&arguments);
 		phalcon_array_append(&arguments, return_value, PH_COPY);
 
 		PHALCON_CALL_USER_FUNC_ARRAY(&value, &handler, &arguments);
-		zval_ptr_dtor(&arguments);
 		zval_ptr_dtor(return_value);
 
 		RETVAL_ZVAL(&value, 0, 0);
 	}
+	RETURN_MM();
 }
 
 /**

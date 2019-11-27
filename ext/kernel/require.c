@@ -97,11 +97,13 @@ zend_array *phalcon_build_symtable(zval *vars) {
 
 int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *symbol_table) {
 	zend_execute_data *call;
+	zend_object *obj = NULL;
 	zval result;
 
 	ZVAL_UNDEF(&result);
 
 	if (object && Z_TYPE_P(object) == IS_OBJECT) {
+		obj = Z_OBJ_P(object);
 		op_array->scope = Z_OBJCE_P(object);
 	} else {
 #if PHP_VERSION_ID >= 70100
@@ -111,12 +113,13 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 #endif
 	}
 
-	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE
-#if PHP_VERSION_ID >= 70100
-		    | ZEND_CALL_HAS_SYMBOL_TABLE
+#if PHP_VERSION_ID >= 70400
+	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE, (zend_function*)op_array, 0, obj ? obj : NULL);
+#elif PHP_VERSION_ID >= 70100
+	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE, (zend_function*)op_array, 0, op_array->scope, obj ? obj : NULL);
+#else
+	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE, (zend_function*)op_array, 0, op_array->scope, obj ? obj : NULL);
 #endif
-			,
-			(zend_function*)op_array, 0, op_array->scope, object ? Z_OBJ_P(object) : NULL);
 
 	call->symbol_table = symbol_table;
 
@@ -182,9 +185,9 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 	file_handle.opened_path = NULL;
 	file_handle.handle.fp = NULL;
 #else
-	ret = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
+	status = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
 
-	if (ret != SUCCESS) {
+	if (status != SUCCESS) {
 		return FAILURE;
 	}
 #endif

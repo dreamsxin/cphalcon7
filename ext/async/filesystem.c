@@ -264,9 +264,9 @@ static zend_always_inline int parse_open_mode(const char *mode, int *mods)
 }
 
 #if PHP_VERSION_ID >= 70400
-static size_t async_dirstream_read(php_stream *stream, char *buf, size_t count)
-#else
 static ssize_t async_dirstream_read(php_stream *stream, char *buf, size_t count)
+#else
+static size_t async_dirstream_read(php_stream *stream, char *buf, size_t count)
 #endif
 {
 	async_dirstream_data *data;

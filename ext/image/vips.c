@@ -20,6 +20,7 @@
 
 #include "image/vips.h"
 #include "image/exception.h"
+#include "image/vips/core.h"
 
 #include "kernel/main.h"
 #include "kernel/exception.h"

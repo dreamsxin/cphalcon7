@@ -184,7 +184,6 @@ typedef struct _phalcon_snowflake_options {
 	uint64_t epoch;
 } phalcon_snowflake_options;
 
-#if PHP_VERSION_ID < 70400
 /** AOP options */
 typedef struct {
     zend_array *read;
@@ -194,6 +193,9 @@ typedef struct {
 
 typedef struct _phalcon_aop_options {
 	zend_bool enable_aop;
+#if PHALCON_USE_AOP_PROPERTY
+	zend_bool enable_property;
+#endif
 	zend_array *pointcuts_table;
 	int pointcut_version;
 	int overloaded;
@@ -208,7 +210,6 @@ typedef struct _phalcon_aop_options {
 
 	zval *property_value;
 } phalcon_aop_options;
-#endif
 
 #if PHALCON_USE_ASYNC
 
@@ -330,9 +331,7 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	phalcon_snowflake_options snowflake;
 
-#if PHP_VERSION_ID < 70400
 	phalcon_aop_options aop;
-#endif
 
 #if PHALCON_USE_ASYNC
 	/** Async */

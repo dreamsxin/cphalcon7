@@ -24,6 +24,7 @@
 #define PHALCON_AOP_H
 
 #include "php_phalcon.h"
+#include "kernel/debug.h"
 
 #include <ext/pcre/php_pcre.h>
 

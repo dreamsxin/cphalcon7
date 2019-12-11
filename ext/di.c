@@ -187,7 +187,7 @@ PHALCON_INIT_CLASS(Phalcon_Di){
 	zend_declare_property_null(phalcon_di_ce, SL("_list"), ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 	zend_declare_property_null(phalcon_di_ce, SL("_eventsManager"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_di_ce, 1, phalcon_diinterface_ce);
+	zend_class_implements(phalcon_di_ce, 2, zend_ce_arrayaccess, phalcon_diinterface_ce);
 
 	return SUCCESS;
 }

@@ -27,6 +27,7 @@ class ImageTest extends PHPUnit\Framework\TestCase
 	public function testGD()
 	{
 		if (!function_exists('gd_info')) {
+			$this->markTestSkipped('gd extension is required');
 			return;
 		}
 
@@ -167,6 +168,7 @@ class ImageTest extends PHPUnit\Framework\TestCase
 	public function testImagick()
 	{
 		if (!class_exists('imagick')) {
+			$this->markTestSkipped('imagick extension is required');
 			return;
 		}
 

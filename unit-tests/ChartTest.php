@@ -202,6 +202,11 @@ class ChartTest extends PHPUnit\Framework\TestCase
 
 	public function testBeautifulQRCode()
 	{
+		if (!function_exists('gd_info')) {
+			$this->markTestSkipped('gd extension is required');
+			return;
+		}
+
 		if (!class_exists('Phalcon\Chart\QRcode')) {
 			$this->markTestSkipped('Class `Phalcon\Chart\QRcode` is not exists');
 			return false;

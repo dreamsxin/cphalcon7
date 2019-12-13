@@ -37,7 +37,7 @@
 ZEND_API void phalcon_xhprof_execute_internal(zend_execute_data *execute_data, zval *return_value);
 ZEND_API void phalcon_xhprof_execute_ex(zend_execute_data *execute_data);
 
-void tracing_callgraph_append_to_array(zval *return_value);
+void tracing_callgraph_append_to_array(zval *return_value, zend_long flags);
 void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, char *symbol, size_t symbol_len);
 zend_ulong tracing_callgraph_bucket_key(xhprof_frame_t *frame);
 xhprof_callgraph_bucket *tracing_callgraph_bucket_find(xhprof_callgraph_bucket *bucket, xhprof_frame_t *current_frame, xhprof_frame_t *previous, zend_long key);

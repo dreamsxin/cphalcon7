@@ -340,7 +340,7 @@ void tracing_callgraph_get_parent_child_name(xhprof_callgraph_bucket *bucket, ch
     }
 }
 
-void tracing_callgraph_append_to_array(zval *return_value)
+void tracing_callgraph_append_to_array(zval *return_value, zend_long flags)
 {
     int i = 0;
     xhprof_callgraph_bucket *bucket;
@@ -356,30 +356,57 @@ void tracing_callgraph_append_to_array(zval *return_value)
             tracing_callgraph_get_parent_child_name(bucket, symbol, sizeof(symbol));
 
             array_init(stats);
-            add_assoc_long(stats, "calls", bucket->count);
-            add_assoc_long(stats, "time", bucket->wall_time);
+			if (flags) {
+				add_assoc_long(stats, "ct", bucket->count);
+				add_assoc_long(stats, "wt", bucket->wall_time);
 
-            if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
-                add_assoc_long(stats, "memory.num_alloc", bucket->num_alloc);
-                add_assoc_long(stats, "memory.num_free", bucket->num_free);
-                add_assoc_long(stats, "memory.amount_alloc", bucket->amount_alloc);
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
+					add_assoc_long(stats, "mem.na", bucket->num_alloc);
+					add_assoc_long(stats, "mem.nf", bucket->num_free);
+					add_assoc_long(stats, "mem.aa", bucket->amount_alloc);
 
-                if (as_mu) {
-                    add_assoc_long(stats, "memory.usage", bucket->memory);
-                }
-            }
+					if (as_mu) {
+						add_assoc_long(stats, "mu", bucket->memory);
+					}
+				}
 
-            if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
-                add_assoc_long(stats, "cpu", bucket->cpu_time);
-            }
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
+					add_assoc_long(stats, "cpu", bucket->cpu_time);
+				}
 
-            if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
-                add_assoc_long(stats, "memory", bucket->memory);
-            }
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+					add_assoc_long(stats, "mu", bucket->memory);
+				}
 
-            if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_PMU) {
-                add_assoc_long(stats, "peakofmemory", bucket->memory_peak);
-            }
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_PMU) {
+					add_assoc_long(stats, "pmu", bucket->memory_peak);
+				}
+			} else {
+				add_assoc_long(stats, "calls", bucket->count);
+				add_assoc_long(stats, "time", bucket->wall_time);
+
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_ALLOC) {
+					add_assoc_long(stats, "memory.num_alloc", bucket->num_alloc);
+					add_assoc_long(stats, "memory.num_free", bucket->num_free);
+					add_assoc_long(stats, "memory.amount_alloc", bucket->amount_alloc);
+
+					if (as_mu) {
+						add_assoc_long(stats, "memory.usage", bucket->memory);
+					}
+				}
+
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_CPU) {
+					add_assoc_long(stats, "cpu", bucket->cpu_time);
+				}
+
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_MU) {
+					add_assoc_long(stats, "memory", bucket->memory);
+				}
+
+				if (TXRG(flags) & PHALCON_XHPROF_FLAG_MEMORY_PMU) {
+					add_assoc_long(stats, "peakofmemory", bucket->memory_peak);
+				}
+			}
 
             add_assoc_zval(return_value, symbol, stats);
 
@@ -496,6 +523,12 @@ PHP_METHOD(Phalcon_Xhprof, enable){
  */
 PHP_METHOD(Phalcon_Xhprof, disable){
 
+    zend_long flags = 0;
+
+    if (zend_parse_parameters(ZEND_NUM_ARGS(), "|l", &flags) == FAILURE) {
+        return;
+    }
+
     if (!PHALCON_GLOBAL(xhprof).enable_xhprof) {
         PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Change phalcon.xhprof.enable_xhprof in php.ini.");
         return;
@@ -505,5 +538,5 @@ PHP_METHOD(Phalcon_Xhprof, disable){
 
     array_init(return_value);
 
-    tracing_callgraph_append_to_array(return_value);
+    tracing_callgraph_append_to_array(return_value, flags);
 }

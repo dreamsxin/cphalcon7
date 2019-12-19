@@ -72,8 +72,9 @@ PHP_METHOD(Phalcon_Binary_Reader, readFloat);
 PHP_METHOD(Phalcon_Binary_Reader, readDouble);
 PHP_METHOD(Phalcon_Binary_Reader, readString);
 PHP_METHOD(Phalcon_Binary_Reader, readHexString);
+PHP_METHOD(Phalcon_Binary_Reader, append);
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader___construct, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, data)
 	ZEND_ARG_INFO(0, endian)
 ZEND_END_ARG_INFO()
@@ -104,6 +105,11 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_readhexstring, 0, 0, 0)
 	ZEND_ARG_INFO(0, lowNibble)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_reader_append, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_binary_reader_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Reader, __construct, arginfo_phalcon_binary_reader___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Binary_Reader, getEndian, NULL, ZEND_ACC_PUBLIC)
@@ -126,6 +132,7 @@ static const zend_function_entry phalcon_binary_reader_method_entry[] = {
 	PHP_ME(Phalcon_Binary_Reader, readDouble, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readString, arginfo_phalcon_binary_reader_readstring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Binary_Reader, readHexString, arginfo_phalcon_binary_reader_readhexstring, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Binary_Reader, append, arginfo_phalcon_binary_reader_append, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -153,11 +160,15 @@ PHALCON_INIT_CLASS(Phalcon_Binary_Reader){
  */
 PHP_METHOD(Phalcon_Binary_Reader, __construct){
 
-	zval *data, *endian = NULL;
+	zval *data = NULL, *endian = NULL;
 
-	phalcon_fetch_params(1, 1, 1, &data, &endian);
+	phalcon_fetch_params(1, 0, 2, &data, &endian);
 
-	if (Z_TYPE_P(data) == IS_STRING) {
+	if (!data) {
+		data = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (Z_TYPE_P(data) == IS_STRING || Z_TYPE_P(data) == IS_NULL) {
 		zval filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
 		phalcon_update_property(getThis(), SL("_data"), data);
 
@@ -337,6 +348,8 @@ PHP_METHOD(Phalcon_Binary_Reader, isEof){
 PHP_METHOD(Phalcon_Binary_Reader, read){
 
 	zval *length, position = {}, eof_position = {}, result = {}, input = {};
+	php_stream *stream;
+	zend_long len;
 
 	phalcon_fetch_params(0, 1, 0, &length);
 
@@ -349,7 +362,12 @@ PHP_METHOD(Phalcon_Binary_Reader, read){
 	}
 
 	phalcon_read_property(&input, getThis(), SL("_input"), PH_NOISY|PH_READONLY);
-	PHALCON_CALL_FUNCTION(return_value, "fread", &input, length);
+	php_stream_from_res(stream, Z_RES(input));
+
+	len = Z_LVAL_P(length);
+	ZVAL_NEW_STR(return_value, zend_string_alloc(len, 0));
+	Z_STRLEN_P(return_value) = php_stream_read(stream, Z_STRVAL_P(return_value), len);
+
 	phalcon_update_property(getThis(), SL("_position"), &result);
 }
 
@@ -739,4 +757,55 @@ PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setposition", &len, &seek_type);
 	}
 	RETURN_MM();
+}
+
+/**
+ * Write bytes to the end position in the file pointer
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Binary_Reader, append){
+
+	zval *data, *length = NULL, position = {}, eof_position = {}, input = {}, new_data = {};
+	php_stream *stream;
+	zend_long len, size;
+	int ret;
+
+	phalcon_fetch_params(0, 1, 1, &data, &length);
+	
+	if (!length || Z_LVAL_P(length) <= 0) {
+		len = Z_STRLEN_P(data);
+	} else {
+		len = Z_LVAL_P(length);
+	}
+
+	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&eof_position, getThis(), SL("_eofPosition"), PH_NOISY|PH_READONLY);
+
+	phalcon_read_property(&input, getThis(), SL("_input"), PH_NOISY|PH_READONLY);
+	php_stream_from_res(stream, Z_RES(input));
+
+	ret = php_stream_seek(stream, 0, SEEK_END);
+	if (ret < 0) {
+		RETURN_FALSE;
+	}
+
+	size = php_stream_write(stream, Z_STRVAL_P(data), len);
+	if (size <= 0) {
+		ret = php_stream_seek(stream, Z_LVAL(position), SEEK_SET);
+		RETURN_FALSE;
+	}
+
+	phalcon_update_property_long(getThis(), SL("_eofPosition"), Z_LVAL(eof_position) + size);
+
+	php_stream_rewind(stream);
+
+	ZVAL_NEW_STR(&new_data, zend_string_alloc(Z_LVAL(eof_position) + size, 0));
+	Z_STRLEN(new_data) = php_stream_read(stream, Z_STRVAL(new_data), Z_LVAL(eof_position) + size);
+
+	phalcon_update_property(getThis(), SL("_data"), &new_data);
+
+	ret = php_stream_seek(stream, Z_LVAL(position), SEEK_SET);
+
+	RETURN_TRUE;
 }

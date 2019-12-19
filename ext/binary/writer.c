@@ -75,12 +75,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer___construct, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_write, 0, 0, 2)
-	ZEND_ARG_INFO(0, data)
-	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writechar, 0, 0, 1)
-	ZEND_ARG_INFO(0, byte)
+	ZEND_ARG_TYPE_INFO(0, byte, IS_STRING, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writeunsignedchar, 0, 0, 1)
@@ -122,13 +122,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writedouble, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writestring, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 	ZEND_ARG_INFO(0, exact)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_writer_writehexstring, 0, 0, 1)
-	ZEND_ARG_INFO(0, str)
+	ZEND_ARG_TYPE_INFO(0, str, IS_STRING, 0)
 	ZEND_ARG_TYPE_INFO(0, length, IS_LONG, 1)
 	ZEND_ARG_TYPE_INFO(0, lowNibble, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
@@ -247,9 +247,9 @@ PHP_METHOD(Phalcon_Binary_Writer, getOutput){
 }
 
 /**
- * Gets the ouput
+ * Gets the content
  *
- * @return int
+ * @return string
  */
 PHP_METHOD(Phalcon_Binary_Writer, getContent){
 
@@ -276,20 +276,34 @@ PHP_METHOD(Phalcon_Binary_Writer, getPosition){
 /**
  * Write bytes to the current position in the file pointer
  *
- * @return Phalcon\Binary\Writer
+ * @return boolean
  */
 PHP_METHOD(Phalcon_Binary_Writer, write){
 
-	zval *data, *length, position = {}, result = {}, output = {};
+	zval *data, *length = NULL, position = {}, result = {}, output = {};
+	php_stream *stream;
+	zend_long len, size;
 
-	phalcon_fetch_params(0, 2, 0, &data, &length);
+	phalcon_fetch_params(0, 1, 1, &data, &length);
+	
+	if (!length || Z_LVAL_P(length) <= 0) {
+		len = Z_STRLEN_P(data);
+	} else {
+		len = Z_LVAL_P(length);
+	}
 
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
-	phalcon_add_function(&result, &position, length);
+	ZVAL_LONG(&result, Z_LVAL(position)+len);
 
 	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY|PH_READONLY);
-	PHALCON_CALL_FUNCTION(return_value, "fwrite", &output, data, length);
-	phalcon_update_property(getThis(), SL("_position"), &result);
+	php_stream_from_res(stream, Z_RES(output));
+
+	size = php_stream_write(stream, Z_STRVAL_P(data), len);
+	if (size > 0) {
+		phalcon_update_property(getThis(), SL("_position"), &result);
+		RETURN_TRUE;
+	}
+	RETURN_FALSE;
 }
 
 /**

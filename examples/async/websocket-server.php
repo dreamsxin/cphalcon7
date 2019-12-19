@@ -235,7 +235,9 @@ class Websocket
 		if (!array_key_exists($opcode_int, $opcode_ints)) {
 			throw new \Exception('Bad opcode in websocket frame: '.$opcode_int);
 		}
+
 		$opcode = $opcode_ints[$opcode_int];
+		self::info('opcode '.$opcode);
 
 		// record the opcode if we are not receiving a continutation fragment
 		if ($opcode !== 'continuation') {
@@ -315,6 +317,11 @@ class Websocket
 		// record the length of the payload
 		$payload_length = strlen($payload);
 
+		if ($payload_length <= 0) {
+			self::send_frame($socket, 1, NULL, $opcode, $masked);
+			return;
+		}
+
 		$fragment_cursor = 0;
 		// while we have data to send
 		while ($payload_length > $fragment_cursor) {
@@ -336,7 +343,7 @@ class Websocket
 
 	}
 
-	static public function send_frame($socket, $final, $payload, $opcode, $masked) {
+	static public function send_frame2($socket, $final, $payload, $opcode, $masked) {
 		// Binary string for header.
 		$frame_head_binstr = '';
 
@@ -382,6 +389,40 @@ class Websocket
 		// Append payload to frame:
 		for ($i = 0; $i < $payload_length; $i++) {
 			$frame .= ($masked === true) ? $payload[$i] ^ $mask[$i % 4] : $payload[$i];
+		}
+
+		$socket->write($frame);
+	}
+
+	static public function send_frame($socket, $final, $payload, $opcode, $masked) {
+		$first_byte = ($final ? 0x80 : 0x00 ) | self::$opcodes[$opcode]; // echo sprintf('%b', 0x80); sprintf('%x', $first_byte)
+		$frame_head_binstr = chr($first_byte);
+
+		$length_flag = $payload_length = strlen($payload);
+		$pack = '';
+		if ($payload_length > 65535) {
+			$length_flag = 127;
+			$pack   = \pack('NN', ($payload_length & 0xFFFFFFFF00000000) >> 32, $payload_length & 0x00000000FFFFFFFF); // 大端
+		} elseif ($payload_length > 125) {
+			$length_flag = 126;
+			$pack   = \pack('n*', $payload_length);
+		}
+
+		$frame_head_binstr .=  chr((($masked ? 1 : 0)  << 7) | $length_flag).$pack;
+
+		$frame = $frame_head_binstr;
+
+		if ($masked) {
+			$mask = '';
+			for ($i = 0; $i < 4; $i++) $mask .= chr(rand(0, 255));
+			$frame .= $mask;
+
+			if ($payload_length) {
+				$mask_key = \str_repeat($mask, \floor($payload_length / 4)) . \substr($mask, 0, $payload_length % 4);
+				$frame .= $payload ^ $mask_key;
+			}
+		} else {
+			$frame .= $payload;
 		}
 
 		$socket->write($frame);
@@ -527,6 +568,12 @@ if (isset($vals['debug'])) {
 }
 $ws = new Websocket(\Phalcon\Arr::get($vals, 'server', '0.0.0.0'), \Phalcon\Arr::get($vals, 'port', 10001), function($socket, $headers, $path, $data) {
 
+	if ($socket->last_opcode == 'ping') {
+		Websocket::sendFragment($socket, NULL, 'pong');
+		return;
+	} elseif ($socket->last_opcode == 'pong') {
+		return;
+	}
 	if ($path) {
 		$handlerName = 'Index';
 		$actionName = 'Index';

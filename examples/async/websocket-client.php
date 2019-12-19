@@ -228,13 +228,13 @@ class WebsocketClient
 		return !$this->socket || $this->socket->is_closing;
 	}
 
-	public function send($data)
+	public function send($data, $opcode = 'text')
 	{
 		if ($this->isClose()) {
 			self::err("No connection established or connection closed");
 			return false;
 		}
-		self::sendFragment($this->socket, $data);
+		self::sendFragment($this->socket, $data, $opcode);
 	}
 
 	public function handShake($socket, $buffer)
@@ -276,7 +276,9 @@ class WebsocketClient
 		if (!array_key_exists($opcode_int, $opcode_ints)) {
 			throw new \Exception('Bad opcode in websocket frame: '.$opcode_int);
 		}
+
 		$opcode = $opcode_ints[$opcode_int];
+		self::info('opcode '.$opcode);
 
 		// record the opcode if we are not receiving a continutation fragment
 		if ($opcode !== 'continuation') {
@@ -322,11 +324,13 @@ class WebsocketClient
 		// Get masking key.
 		if ($socket->mask) {
 			if ($socket->fragment_length - $socket->read_length < (4 + $socket->payload_length)) {
+				self::info('fragment_length - read_length < 4 + payload_length');
 				return false;
 			}
 			$masking_key = substr($buffer, $socket->read_length, 4);
 			$socket->read_length += 4;
 		} elseif ($socket->fragment_length - $socket->read_length < $socket->payload_length) {
+			self::info('fragment_length - read_length < payload_length');
 			return false;
 		}
 
@@ -355,6 +359,10 @@ class WebsocketClient
 
 		// record the length of the payload
 		$payload_length = strlen($payload);
+		if ($payload_length <= 0) {
+			self::send_frame($socket, 1, NULL, $opcode, $masked);
+			return;
+		}
 
 		$fragment_cursor = 0;
 		// while we have data to send
@@ -378,51 +386,34 @@ class WebsocketClient
 	}
 
 	static public function send_frame($socket, $final, $payload, $opcode, $masked) {
-		// Binary string for header.
-		$frame_head_binstr = '';
+		$first_byte = ($final ? 0x80 : 0x00 ) | self::$opcodes[$opcode]; // echo sprintf('%b', 0x80); sprintf('%x', $first_byte)
+		$frame_head_binstr = chr($first_byte);
 
-		// Write FIN, final fragment bit.
-		$frame_head_binstr .= (bool) $final ? '1' : '0';
-
-		// RSV 1, 2, & 3 false and unused.
-		$frame_head_binstr .= '000';
-
-		// Opcode rest of the byte.
-		$frame_head_binstr .= sprintf('%04b', self::$opcodes[$opcode]);
-
-		// Use masking?
-		$frame_head_binstr .= $masked ? '1' : '0';
-
-		// 7 bits of payload length...
-		$payload_length = strlen($payload);
+		$length_flag = $payload_length = strlen($payload);
+		$pack = '';
 		if ($payload_length > 65535) {
-			$frame_head_binstr .= decbin(127);
-			$frame_head_binstr .= sprintf('%064b', $payload_length);
-		}
-		elseif ($payload_length > 125) {
-			$frame_head_binstr .= decbin(126);
-			$frame_head_binstr .= sprintf('%016b', $payload_length);
-		}
-		else {
-			$frame_head_binstr .= sprintf('%07b', $payload_length);
+			$length_flag = 127;
+			$pack   = \pack('NN', ($payload_length & 0xFFFFFFFF00000000) >> 32, $payload_length & 0x00000000FFFFFFFF); // 大端
+		} elseif ($payload_length > 125) {
+			$length_flag = 126;
+			$pack   = \pack('n*', $payload_length);
 		}
 
-		$frame = '';
+		$frame_head_binstr .=  chr((($masked ? 1 : 0)  << 7) | $length_flag).$pack;
 
-		// Write frame head to frame.
-		foreach (str_split($frame_head_binstr, 8) as $binstr) $frame .= chr(bindec($binstr));
+		$frame = $frame_head_binstr;
 
-		// Handle masking
 		if ($masked) {
-			// generate a random mask:
 			$mask = '';
 			for ($i = 0; $i < 4; $i++) $mask .= chr(rand(0, 255));
 			$frame .= $mask;
-		}
 
-		// Append payload to frame:
-		for ($i = 0; $i < $payload_length; $i++) {
-			$frame .= ($masked === true) ? $payload[$i] ^ $mask[$i % 4] : $payload[$i];
+			if ($payload_length) {
+				$mask_key = \str_repeat($mask, \floor($payload_length / 4)) . \substr($mask, 0, $payload_length % 4);
+				$frame .= $payload ^ $mask_key;
+			}
+		} else {
+			$frame .= $payload;
 		}
 
 		$socket->write($frame);
@@ -549,8 +540,12 @@ try {
 		echo \Phalcon\Cli\Color::success('connected (press CTRL+C to quit)');
 		$this->stdout->write('> ');
 		while (null !== ($chunk = $this->stdin->read(100))) {
-
-			$ws->send(trim($chunk));
+			$chunk = trim($chunk);
+			if ($chunk == 'ping') {
+				$ws->send(NULL, 'ping');
+			} else {
+				$ws->send($chunk);
+			}
 		}
 	});
 } catch (\Throwable $e) {

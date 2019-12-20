@@ -14,7 +14,7 @@ $t = Phalcon\Async\Task::async(function () use ($a) {
 
 		while (null !== ($chr = $a->read(1))) {
 			if ($chr == chr(0x0)) {
-				var_dump($buf);
+				//var_dump($buf);
 				$buf = '';
 				$num++;
 				continue;
@@ -31,7 +31,7 @@ $t = Phalcon\Async\Task::async(function () use ($a) {
 });
 
 try {
-	for ($i = 0; $i < 100; $i++) {
+	for ($i = 0; $i < 100000; $i++) {
 		$b->write($chunk.chr(0x0));
 	}
 } finally {
@@ -44,30 +44,24 @@ list ($a, $b) = Phalcon\Async\Network\Pipe::pair();
 
 $t = Phalcon\Async\Task::async(function () use ($a) {
 	try {
-		$buf = '';
 		$num = 0;
 		$status = 0;
 		$len = 0;
-		$reader = new Phalcon\Binary\Reader;
+		$alldata = '';
 		while (null !== ($data = $a->read())) {
-			$reader->append($data);
-			while (!$reader->isEof() && $status == 0) {
-				if ($status == 0) {
-					if ($reader->getEofPosition() - $reader->getPosition() >= 2) {
-						$len = $reader->readInt16();
-						$status = 1;
-					}
-				}
-				if ($status == 1 && $reader->getEofPosition() - $reader->getPosition() >= $len) {
-					$status = 0;	
-					$num++;
-					
-					$buf = $reader->readString();
-					var_dump($buf);
-				}
-			}
+			$alldata .= $data;
 		}
 
+		$reader = new Phalcon\Binary\Reader($alldata);
+		while (!$reader->isEof()) {
+			$len = $reader->readInt16();
+			if($len != 10) {
+				break;
+			}
+			$buf = $reader->readString($len+1); // $bin->read($len);
+			//var_dump($buf);
+			$num++;
+		}
 		var_dump($num);
 	} catch (\Throwable $e) {
 		echo $e, "\n\n";
@@ -77,10 +71,10 @@ $t = Phalcon\Async\Task::async(function () use ($a) {
 });
 
 try {
-	for ($i = 0; $i < 100; $i++) {
+	for ($i = 0; $i < 100000; $i++) {
 		$bin = new Phalcon\Binary\Writer;
 		$bin->writeInt16(strlen($chunk));
-		$bin->writeString($chunk);
+		$bin->writeString($chunk); // $bin->write($chunk, strlen($chunk));
 		$b->write($bin->getContent());
 	}
 } finally {

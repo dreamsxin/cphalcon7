@@ -186,18 +186,20 @@ PHP_METHOD(Phalcon_Binary_Writer, __construct){
 	}
 
 	if (Z_TYPE_P(data) == IS_STRING || Z_TYPE_P(data) == IS_NULL) {
-		zval filename = {}, mode = {}, handler = {}, fstat = {}, size = {};
+		zval filename = {}, mode = {}, handler = {};
 		PHALCON_MM_ZVAL_STRING(&filename, "php://memory");
 		PHALCON_MM_ZVAL_STRING(&mode, "br+");
 		PHALCON_MM_CALL_FUNCTION(&handler, "fopen", &filename, &mode);
 		PHALCON_MM_ADD_ENTRY(&handler);
+		if (Z_TYPE_P(data) == IS_STRING) {
+			php_stream *stream;
+			zend_long size;
+			php_stream_from_res(stream, Z_RES(handler));
 
-		PHALCON_MM_CALL_FUNCTION(NULL, "fwrite", &handler, data);
-		PHALCON_MM_CALL_FUNCTION(&fstat, "fstat", &handler);
-		PHALCON_MM_ADD_ENTRY(&fstat);
-
-		if (phalcon_array_isset_fetch_str(&size, &fstat, SL("size"), PH_READONLY)) {
-			phalcon_update_property(getThis(), SL("_position"), &size);
+			size = php_stream_write(stream, Z_STRVAL_P(data), Z_STRLEN_P(data));
+			if (size > 0) {
+				phalcon_update_property_long(getThis(), SL("_position"), size);
+			}
 		}
 		phalcon_update_property(getThis(), SL("_output"), &handler);
 	} else if (Z_TYPE_P(data) == IS_RESOURCE) {
@@ -254,11 +256,14 @@ PHP_METHOD(Phalcon_Binary_Writer, getOutput){
 PHP_METHOD(Phalcon_Binary_Writer, getContent){
 
 	zval output = {}, position = {};
+	php_stream *stream;
 
 	phalcon_read_property(&output, getThis(), SL("_output"), PH_NOISY|PH_READONLY);
 	phalcon_read_property(&position, getThis(), SL("_position"), PH_NOISY|PH_READONLY);
 
-	PHALCON_CALL_FUNCTION(NULL, "rewind", &output);
+	php_stream_from_res(stream, Z_RES(output));
+	php_stream_rewind(stream);
+
 	PHALCON_CALL_FUNCTION(return_value, "fread", &output, &position);
 }
 

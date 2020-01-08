@@ -23,6 +23,17 @@
 
 #include "php_phalcon.h"
 
+typedef struct {
+	zend_long *value;
+	size_t len;
+	size_t total;
+	zend_object std;
+} phalcon_arr_int_object;
+
+static inline phalcon_arr_int_object *phalcon_arr_int_object_from_obj(zend_object *obj) {
+	return (phalcon_arr_int_object*)((char*)(obj) - XtOffsetOf(phalcon_arr_int_object, std));
+}
+
 extern zend_class_entry *phalcon_arr_int_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Arr_Int);

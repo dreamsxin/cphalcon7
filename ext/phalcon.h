@@ -395,6 +395,7 @@
 
 #include "text.h"
 #include "arr.h"
+#include "arr/int.h"
 #include "matrix.h"
 #include "date.h"
 #include "date/datetime.h"

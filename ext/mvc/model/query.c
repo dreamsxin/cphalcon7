@@ -1965,12 +1965,18 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _getJoins){
 
 	phalcon_fetch_params(1, 1, 0, &select);
 
-	phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&sql_aliases, getThis(), SL("_sqlAliases"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&sql_aliases_models, getThis(), SL("_sqlAliasesModels"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&sql_models_aliases, getThis(), SL("_sqlModelsAliases"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&sql_aliases_models_instances, getThis(), SL("_sqlAliasesModelsInstances"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&models, getThis(), SL("_models"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&models);
+	phalcon_read_property(&sql_aliases, getThis(), SL("_sqlAliases"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&sql_aliases);
+	phalcon_read_property(&sql_aliases_models, getThis(), SL("_sqlAliasesModels"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&sql_aliases_models);
+	phalcon_read_property(&sql_models_aliases, getThis(), SL("_sqlModelsAliases"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&sql_models_aliases);
+	phalcon_read_property(&sql_aliases_models_instances, getThis(), SL("_sqlAliasesModelsInstances"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&sql_aliases_models_instances);
+	phalcon_read_property(&models_instances, getThis(), SL("_modelsInstances"), PH_NOISY|PH_SEPARATE);
+	PHALCON_MM_ADD_ENTRY(&models_instances);
 
 	PHALCON_MM_ZVAL_DUP(&from_models, &models);
 

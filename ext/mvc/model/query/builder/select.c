@@ -79,6 +79,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, offset);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getOffset);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, groupBy);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy);
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, cache);
 PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, _compile);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select___construct, 0, 0, 0)
@@ -125,6 +126,10 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_groupby, 0
 	ZEND_ARG_INFO(0, group)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_select_cache, 0, 0, 1)
+	ZEND_ARG_INFO(0, cacheOptions)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_mvc_model_query_builder_select_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, __construct, arginfo_phalcon_mvc_model_query_builder_select___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, distinct, arginfo_phalcon_mvc_model_query_builder_select_distinct, ZEND_ACC_PUBLIC)
@@ -144,6 +149,7 @@ static const zend_function_entry phalcon_mvc_model_query_builder_select_method_e
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getOffset, NULL, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, groupBy, arginfo_phalcon_mvc_model_query_builder_select_groupby, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, cache, arginfo_phalcon_mvc_model_query_builder_select_cache, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Select, _compile, NULL, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
@@ -634,6 +640,22 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, getGroupBy){
 
 
 	RETURN_MEMBER(getThis(), "_group");
+}
+
+/**
+ * Sets the cache parameters
+ *
+ * @param array $cacheOptions
+ * @return Phalcon\Mvc\Model\Query\Builder\Select
+ */
+PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Select, cache){
+
+	zval *cache_options;
+
+	phalcon_fetch_params(0, 1, 0, &cache_options);
+
+	phalcon_update_property(getThis(), SL("_cache"), cache_options);
+	RETURN_THIS();
 }
 
 /**

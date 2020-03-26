@@ -477,12 +477,8 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 					if (zend_is_true(&allow_empty)) {
 						PHALCON_MM_CALL_METHOD(NULL, &cache, "save", &cache_key, &row, &lifetime);
 					} else {
-						if (Z_TYPE(result) == IS_OBJECT) {
-							zval num = {};
-							PHALCON_MM_CALL_METHOD(&num, &result, "count");
-							if (PHALCON_GT_LONG(&num, 0)) {
-								PHALCON_MM_CALL_METHOD(NULL, &cache, "save", &cache_key, &row, &lifetime);
-							}
+						if (Z_TYPE(row) == IS_ARRAY) {
+							PHALCON_MM_CALL_METHOD(NULL, &cache, "save", &cache_key, &row, &lifetime);
 						}
 					}
 				} else {

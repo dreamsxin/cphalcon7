@@ -25,6 +25,8 @@
 #include "mvc/model/query/builderinterface.h"
 #include "mvc/model/managerinterface.h"
 #include "db/rawvalue.h"
+#include "cache/backendinterface.h"
+#include "cache/frontendinterface.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -273,11 +275,11 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 
 	phalcon_read_property(&rowcount, getThis(), SL("_totalItems"), PH_READONLY);
 	if (Z_TYPE(rowcount) != IS_LONG) {
-		zval cache_options = {}, cache_key = {}, cache_service = {}, cache = {}, lifetime = {}, cache_result = {};
+		zval cache_options = {}, cache_key = {}, cache_service = {}, cache = {}, lifetime = {};
 		phalcon_read_property(&cache_options, getThis(), SL("_cache"), PH_READONLY);
 		if (Z_TYPE(cache_options) == IS_ARRAY) {
 			if (!phalcon_array_isset_fetch_str(&cache_key, &cache_options, SL("key"), PH_READONLY)) {
-				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "A cache key must be provided to identify the cached resultset in the cache backend");
 				return;
 			}
 
@@ -291,17 +293,18 @@ PHP_METHOD(Phalcon_Paginator_Adapter_QueryBuilder, getPaginate){
 			PHALCON_MM_CALL_METHOD(&cache, &dependency_injector, "getshared", &cache_service);
 			PHALCON_MM_ADD_ENTRY(&cache);
 			if (Z_TYPE(cache) != IS_OBJECT) {
-				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_query_exception_ce, "The cache service must be an object");
+				PHALCON_MM_THROW_EXCEPTION_STR(phalcon_paginator_exception_ce, "The cache service must be an object");
 				return;
 			}
 
 			PHALCON_MM_VERIFY_INTERFACE(&cache, phalcon_cache_backendinterface_ce);
 			if (!phalcon_array_isset_fetch_str(&lifetime, &cache_options, SL("lifetime"), PH_READONLY)) {
+				zval frontend = {};
 				PHALCON_MM_CALL_METHOD(&frontend, &cache, "getfrontend");
 				PHALCON_MM_ADD_ENTRY(&frontend);
 
 				if (Z_TYPE(frontend) == IS_OBJECT) {
-					PHALCON_MM_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_mvc_model_query_exception_ce);
+					PHALCON_MM_VERIFY_INTERFACE_EX(&frontend, phalcon_cache_frontendinterface_ce, phalcon_paginator_exception_ce);
 					PHALCON_MM_CALL_METHOD(&lifetime, &frontend, "getlifetime");
 				} else {
 					ZVAL_LONG(&lifetime, 3600);

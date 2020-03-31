@@ -149,7 +149,7 @@ PHP_METHOD(Phalcon_Validation_Validator, getOption){
 
 	phalcon_fetch_params(0, 1, 0, &key);
 
-	phalcon_read_property(&options, this_ptr, SL("_options"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
 
 	if (!phalcon_array_isset_fetch(return_value, &options, key, PH_COPY)) {
 		ZVAL_NULL(return_value);

@@ -145,11 +145,15 @@ PHP_METHOD(Phalcon_Validation_Validator, isSetOption){
  */
 PHP_METHOD(Phalcon_Validation_Validator, getOption){
 
-	zval *key;
+	zval *key, options = {};
 
 	phalcon_fetch_params(0, 1, 0, &key);
-	PHALCON_ENSURE_IS_STRING(key);
-	phalcon_validation_validator_getoption_helper(return_value, phalcon_validation_validator_ce, getThis(), Z_STRVAL_P(key));
+
+	phalcon_read_property(&options, getThis(), SL("_options"), PH_NOISY|PH_READONLY);
+
+	if (!phalcon_array_isset_fetch(return_value, &options, key, PH_COPY)) {
+		ZVAL_NULL(return_value);
+	}
 }
 
 /**

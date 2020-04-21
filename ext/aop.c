@@ -729,7 +729,10 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 			execute_pointcut(current_pc, aop_object, &pointcut_ret);
 			if (Z_TYPE(pointcut_ret) > IS_NULL) {
 				if (ex->return_value != NULL) {
-					zval_ptr_dtor(ex->return_value);
+					if (Z_TYPE_P(ex->return_value) > IS_NULL && Z_TYPE_P(ex->return_value) < 21) {
+						zval_ptr_dtor(ex->return_value);
+					}
+
 					ZVAL_COPY_VALUE(ex->return_value, &pointcut_ret);
 				} else {
 					zval_ptr_dtor(&pointcut_ret);

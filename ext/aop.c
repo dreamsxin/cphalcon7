@@ -148,6 +148,9 @@ static int strcmp_with_joker_case(char *str_with_jok, char *str, int case_sensit
 static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_entry *ce) /*{{{*/
 {
 	int i, matches;
+	if (pc == NULL || pc->re_class == NULL) {
+		return 0;
+	}
 
 #if PHP_VERSION_ID >= 70300
 	pcre2_match_data *match_data = php_pcre_create_match_data(0, pc->re_class);
@@ -285,7 +288,7 @@ static int pointcut_match_zend_function(phalcon_aop_pointcut *pc, zend_execute_d
 	if (pc->method_jok) {
 		int matches;
 #if PHP_VERSION_ID >= 70300
-		pcre2_match_data *match_data = php_pcre_create_match_data(0, pc->re_class);
+		pcre2_match_data *match_data = php_pcre_create_match_data(0, pc->re_method);
 		if (NULL == match_data) {
 			return 0;
 		}

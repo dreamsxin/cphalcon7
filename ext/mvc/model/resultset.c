@@ -219,14 +219,13 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
 				PHALCON_CALL_METHOD(&r, &result, "fetchall");
 				if (likely(Z_TYPE(r) == IS_ARRAY)) {
 					zend_hash_internal_pointer_reset(Z_ARRVAL(r));
-					phalcon_update_property(getThis(), SL("_rows"), &r);
 				}
 
+				phalcon_update_property(getThis(), SL("_rows"), &r);
 				zval_ptr_dtor(&r);
 			}
-		} else if (Z_TYPE(rows) == IS_ARRAY) {
-			HashPosition pos;
-			zend_hash_internal_pointer_reset_ex(Z_ARRVAL(rows), &pos);
+		} else if (Z_TYPE(rows) == IS_ARRAY && zend_hash_num_elements(Z_ARRVAL(rows)) > 0) {
+			zend_hash_internal_pointer_reset(Z_ARRVAL(rows));
 		}
 	}
 

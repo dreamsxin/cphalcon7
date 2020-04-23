@@ -716,10 +716,4 @@ void phalcon_array_append_multi_ex(zval *arr, zval *value, const char *types, in
 int phalcon_array_append_multi(zval *arr, zval *value, const char *types, int types_length, int types_count, ...);
 int phalcon_array_ksort(zval *arr, int reverse);
 
-static inline void phalcon_array_reset(zval *arr)
-{
-	HashPosition pos;
-	zend_hash_internal_pointer_reset(Z_ARRVAL(r), &pos);
-}
-
 #endif /* PHALCON_KERNEL_ARRAY_H */

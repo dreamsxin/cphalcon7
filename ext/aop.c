@@ -189,13 +189,13 @@ static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_
 
 	for (i = 0; i < (int) ce->num_traits; i++) {
 #if PHP_VERSION_ID >= 70400
-		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->trait_names[i].name), ZSTR_LEN(ce->trait_names[i].name), 0, 0, NULL, 0);
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->trait_names[i].name), ZSTR_LEN(ce->trait_names[i].name), 0, 0, match_data, php_pcre_mctx());
 		if (matches >= 0) {
 			php_pcre_free_match_data(match_data);
 			return 1;
 		}
 #elif PHP_VERSION_ID >= 70300
-		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->traits[i]->name), ZSTR_LEN(ce->traits[i]->name), 0, 0, NULL, 0);
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->traits[i]->name), ZSTR_LEN(ce->traits[i]->name), 0, 0, match_data, php_pcre_mctx());
 
 		if (matches >= 0) {
 			php_pcre_free_match_data(match_data);

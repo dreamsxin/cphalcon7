@@ -174,7 +174,7 @@ static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_
 
 	for (i = 0; i < (int) ce->num_interfaces; i++) {
 #if PHP_VERSION_ID >= 70300
-		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->interfaces[i]->name), ZSTR_LEN(ce->interfaces[i]->name), 0, 0, NULL, php_pcre_mctx());
+		matches = pcre2_match(pc->re_class, (PCRE2_SPTR)ZSTR_VAL(ce->interfaces[i]->name), ZSTR_LEN(ce->interfaces[i]->name), 0, 0, match_data, php_pcre_mctx());
 		if (matches >= 0) {
 			php_pcre_free_match_data(match_data);
 			return 1;
@@ -292,7 +292,7 @@ static int pointcut_match_zend_function(phalcon_aop_pointcut *pc, zend_execute_d
 		if (NULL == match_data) {
 			return 0;
 		}
-		matches = pcre2_match(pc->re_method, (PCRE2_SPTR)ZSTR_VAL(curr_func->common.function_name), ZSTR_LEN(curr_func->common.function_name), 0, 0, NULL, 0);
+		matches = pcre2_match(pc->re_method, (PCRE2_SPTR)ZSTR_VAL(curr_func->common.function_name), ZSTR_LEN(curr_func->common.function_name), 0, 0, match_data, 0);
 		php_pcre_free_match_data(match_data);
 		if (matches < 0) {
 			return 0;

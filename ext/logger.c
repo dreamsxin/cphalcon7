@@ -20,12 +20,12 @@
 
 #include "logger.h"
 #include "logger/exception.h"
-#include "logger/../exception.h"
 
 #include "di.h"
 #include "diinterface.h"
 
 #include "kernel/main.h"
+#include "kernel/exception.h"
 #include "kernel/array.h"
 #include "kernel/fcall.h"
 

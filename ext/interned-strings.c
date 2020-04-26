@@ -133,6 +133,7 @@ zend_string *phalcon_interned_app							= NULL;
 zend_string *phalcon_interned_application					= NULL;
 zend_string *phalcon_interned_validation					= NULL;
 zend_string *phalcon_interned_translate						= NULL;
+zend_string *phalcon_interned_logger						= NULL;
 
 PHALCON_STATIC void phalcon_init_interned_strings()
 {
@@ -246,6 +247,7 @@ PHALCON_STATIC void phalcon_init_interned_strings()
 	phalcon_interned_application					= SSL("application");
 	phalcon_interned_validation						= SSL("validation");
 	phalcon_interned_translate						= SSL("translate");
+	phalcon_interned_logger							= SSL("logger");
 }
 
 PHALCON_STATIC void phalcon_release_interned_strings()
@@ -360,4 +362,5 @@ PHALCON_STATIC void phalcon_release_interned_strings()
 	zend_string_release(phalcon_interned_application);
 	zend_string_release(phalcon_interned_validation);
 	zend_string_release(phalcon_interned_translate);
+	zend_string_release(phalcon_interned_logger);
 }

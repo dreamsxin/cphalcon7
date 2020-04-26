@@ -133,6 +133,7 @@ extern zend_string *phalcon_interned_app;
 extern zend_string *phalcon_interned_application;
 extern zend_string *phalcon_interned_validation;
 extern zend_string *phalcon_interned_translate;
+extern zend_string *phalcon_interned_logger;
 
 void phalcon_init_interned_strings();
 void phalcon_release_interned_strings();

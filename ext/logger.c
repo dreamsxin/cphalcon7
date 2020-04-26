@@ -26,6 +26,7 @@
 #include "diinterface.h"
 
 #include "kernel/main.h"
+#include "kernel/array.h"
 #include "kernel/fcall.h"
 
 #include "interned-strings.h"

@@ -2662,22 +2662,22 @@ PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
 PHP_METHOD(Phalcon_Mvc_Model, group){
 
 	zval *params, dependency_injector = {}, columns = {}, aggregators = {}, service_name = {};
-	zval manager = {}, model_name = {}, model = {}, builder = {}, query = {};
+	zval manager = {}, model_name = {}, model = {}, builder = {}, event_name = {}, query = {};
 	zend_string *item_key;
 
-	phalcon_fetch_params(0, 1, 0, &params);
+	phalcon_fetch_params(1 1, 0, &params);
 
-	PHALCON_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
-
+	PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
+	PHALCON_MM_ADD_ENTRY(&dependency_injector);
 	if (Z_TYPE(dependency_injector) != IS_OBJECT) {
-		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
+		PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "A dependency injector container is required to obtain the services related to the ORM");
 		return;
 	}
 
 	if (phalcon_array_isset_fetch_str(&aggregators, params, SL("aggregators"), PH_READONLY)) {
 		zval *aggregator, joined_columns = {}, group_columns = {};
 		if (Z_TYPE(aggregators) != IS_ARRAY) {
-			PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The aggregators must be array");
+			PHALCON_MM_THROW_EXCEPTION_STR(phalcon_mvc_model_exception_ce, "The aggregators must be array");
 			return;
 		}
 
@@ -2732,36 +2732,37 @@ PHP_METHOD(Phalcon_Mvc_Model, group){
 			ZVAL_STRING(&columns, "*");
 		}
 	}
+	PHALCON_MM_ADD_ENTRY(&columns);
 
 	ZVAL_STR(&service_name, IS(modelsManager));
 
-	PHALCON_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
-	zval_ptr_dtor(&dependency_injector);
+	PHALCON_MM_CALL_METHOD(&manager, &dependency_injector, "getshared", &service_name);
+	PHALCON_MM_ADD_ENTRY(&manager);
 
 	phalcon_get_called_class(&model_name);
-	PHALCON_CALL_METHOD(&model, &manager, "load", &model_name);
-	PHALCON_CALL_METHOD(&builder, &manager, "createbuilder", params);
-	zval_ptr_dtor(&manager);
+	PHALCON_MM_ADD_ENTRY(&model_name);
+	PHALCON_MM_CALL_METHOD(&model, &manager, "load", &model_name);
+	PHALCON_MM_ADD_ENTRY(&model);
+	PHALCON_MM_CALL_METHOD(&builder, &manager, "createbuilder", params);
+	PHALCON_MM_ADD_ENTRY(&builder);
 
-	PHALCON_CALL_METHOD(NULL, &builder, "columns", &columns);
-	zval_ptr_dtor(&columns);
+	PHALCON_MM_CALL_METHOD(NULL, &builder, "columns", &columns);
+	PHALCON_MM_CALL_METHOD(NULL, &builder, "from", &model_name);
 
-	PHALCON_CALL_METHOD(NULL, &builder, "from", &model_name);
-	zval_ptr_dtor(&model_name);
-
-	if (phalcon_method_exists_ex(&model, SL("beforequery")) == SUCCESS) {
-		PHALCON_CALL_METHOD(NULL, &model, "beforequery", &builder);
+	PHALCON_MM_ZVAL_STRING(&event_name, "beforeQuery");
+	PHALCON_MM_CALL_METHOD(return_value, &model, "fireevent", &event_name, &builder);
+	if (Z_TYPE_P(return_value) >= IS_STRING) {
+		RETURN_MM();
 	}
-	zval_ptr_dtor(&model);
 
-	PHALCON_CALL_METHOD(&query, &builder, "getquery");
-	zval_ptr_dtor(&builder);
+	PHALCON_MM_CALL_METHOD(&query, &builder, "getquery");
+	PHALCON_MM_ADD_ENTRY(&query);
 
 	/**
 	 * Execute the query
 	 */
-	PHALCON_CALL_METHOD(return_value, &query, "execute");
-	zval_ptr_dtor(&query);
+	PHALCON_MM_CALL_METHOD(return_value, &query, "execute");
+	RETURN_MM();
 }
 
 /**

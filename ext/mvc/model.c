@@ -2665,7 +2665,7 @@ PHP_METHOD(Phalcon_Mvc_Model, group){
 	zval manager = {}, model_name = {}, model = {}, builder = {}, event_name = {}, query = {};
 	zend_string *item_key;
 
-	phalcon_fetch_params(1 1, 0, &params);
+	phalcon_fetch_params(1, 1, 0, &params);
 
 	PHALCON_MM_CALL_CE_STATIC(&dependency_injector, phalcon_di_ce, "getdefault");
 	PHALCON_MM_ADD_ENTRY(&dependency_injector);

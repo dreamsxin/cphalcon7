@@ -48,6 +48,9 @@ zend_class_entry *phalcon_binary_ce;
 
 PHP_METHOD(Phalcon_Binary, pack);
 PHP_METHOD(Phalcon_Binary, unpack);
+PHP_METHOD(Phalcon_Binary, setbit);
+PHP_METHOD(Phalcon_Binary, getbit);
+PHP_METHOD(Phalcon_Binary, print);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_pack, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
@@ -61,9 +64,28 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_unpack, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, endian, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_setbit, 1, 0, 3)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, value, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_getbit, 1, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_print, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
+	ZEND_ARG_TYPE_INFO(0, ret, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_binary_method_entry[] = {
 	PHP_ME(Phalcon_Binary, pack, arginfo_phalcon_binary_pack, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Binary, unpack, arginfo_phalcon_binary_unpack, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Binary, setbit, arginfo_phalcon_binary_setbit, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Binary, getbit, arginfo_phalcon_binary_getbit, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Binary, print, arginfo_phalcon_binary_print, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -234,4 +256,96 @@ PHP_METHOD(Phalcon_Binary, unpack)
 		RETURN_MM_NULL();
 	}
 	RETURN_MM();
+}
+
+/**
+ * Changes a single bit of a string.
+ *
+ * @param string $data
+ * @param int $offset
+ * @param int $value
+ * @return bool
+ **/
+PHP_METHOD(Phalcon_Binary, setbit)
+{
+	zval *data, *offset, *value;
+	zend_long byte_offset;
+
+	phalcon_fetch_params(0, 3, 0, &data, &offset, &value);
+
+	if (offset < 0) {
+		php_error_docref(NULL, E_NOTICE, "Offset must be greater than or equal to 0");
+		RETURN_FALSE;
+	}
+    byte_offset = Z_LVAL_P(offset) / 8;
+	if (byte_offset >= Z_STRLEN_P(data)) {
+		zend_string *c;
+		c = Z_STR_P(data);
+		if (IS_INTERNED(c)) {
+			php_error_docref(NULL, E_NOTICE, "Cannot Change interned string");
+			RETURN_FALSE;
+		}
+		zend_string_realloc(c, byte_offset+1, 0);
+		ZVAL_STR(data, c);
+	}
+	if (zend_is_true(value)) {
+		PHALCON_BINARY_SETBIT(Z_STRVAL_P(data), Z_LVAL_P(offset));
+	} else {
+		PHALCON_BINARY_UNSETBIT(Z_STRVAL_P(data), Z_LVAL_P(offset));
+	}
+	RETURN_TRUE;
+}
+
+/**
+ * Gets a single bit of a string.
+ *
+ * @param string $data
+ * @param int $offset
+ * @return int
+ **/
+PHP_METHOD(Phalcon_Binary, getbit)
+{
+	zval *data, *offset;
+	zend_long byte_offset;
+
+	phalcon_fetch_params(0, 2, 0, &data, &offset);
+
+	if (offset < 0) {
+		php_error_docref(NULL, E_NOTICE, "Offset must be greater than or equal to 0");
+		RETURN_FALSE;
+	}
+    byte_offset = Z_LVAL_P(offset) / 8;
+	if (byte_offset >= Z_STRLEN_P(data)) {
+		RETURN_FALSE;
+	}
+	RETURN_LONG(PHALCON_BINARY_GETBIT(Z_STRVAL_P(data), Z_LVAL_P(offset)));
+}
+
+/**
+ * Print binary string.
+ *
+ * @param string $data
+ * @param int $ret
+ * @return int
+ **/
+PHP_METHOD(Phalcon_Binary, print)
+{
+	zval *data, *ret = NULL;
+	zend_long byte_length;
+	int i;
+
+	phalcon_fetch_params(0, 1, 1, &data, &ret);
+
+    byte_length = Z_STRLEN_P(data);
+	for (i=0; i<byte_length; i++) {
+		int j;
+		for (j=0; j<8; j++) {
+			if (PHALCON_BINARY_GETBIT(Z_STRVAL_P(data), (i*8)+j)) {
+				zend_printf("1");
+			} else {
+				zend_printf("0");
+			}
+		}
+	}
+	zend_printf("\n");
 }

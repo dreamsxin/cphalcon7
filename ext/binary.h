@@ -40,6 +40,12 @@
 #define PHALCON_BINARY_TYPE_STRING				10
 #define PHALCON_BINARY_TYPE_HEXSTRING			11
 
+
+#define PHALCON_BINARY_SETBIT(data, n)   (data[n/8] |= (1 << (n%8)))
+#define PHALCON_BINARY_UNSETBIT(data, n)   (data[n/8] &= ~(1 << (n%8)))
+#define PHALCON_BINARY_REVBIT(data, n)   (data[n/8] ^= (1 << (n%8)))
+#define PHALCON_BINARY_GETBIT(data, n)   (data[n/8] & (1 << (n%8)))
+
 extern zend_class_entry *phalcon_binary_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Binary);

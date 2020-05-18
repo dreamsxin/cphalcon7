@@ -50,7 +50,7 @@ PHP_METHOD(Phalcon_Binary, pack);
 PHP_METHOD(Phalcon_Binary, unpack);
 PHP_METHOD(Phalcon_Binary, setbit);
 PHP_METHOD(Phalcon_Binary, getbit);
-PHP_METHOD(Phalcon_Binary, print);
+PHP_METHOD(Phalcon_Binary, toBitstring);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_pack, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
@@ -75,9 +75,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_getbit, 1, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, offset, IS_LONG, 0)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_print, 0, 0, 1)
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_binary_tobitstring, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_STRING, 0)
-	ZEND_ARG_TYPE_INFO(0, ret, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_binary_method_entry[] = {
@@ -85,7 +84,7 @@ static const zend_function_entry phalcon_binary_method_entry[] = {
 	PHP_ME(Phalcon_Binary, unpack, arginfo_phalcon_binary_unpack, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Binary, setbit, arginfo_phalcon_binary_setbit, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Binary, getbit, arginfo_phalcon_binary_getbit, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Binary, print, arginfo_phalcon_binary_print, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Binary, toBitstring, arginfo_phalcon_binary_tobitstring, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -318,34 +317,42 @@ PHP_METHOD(Phalcon_Binary, getbit)
 	if (byte_offset >= Z_STRLEN_P(data)) {
 		RETURN_FALSE;
 	}
-	RETURN_LONG(PHALCON_BINARY_GETBIT(Z_STRVAL_P(data), Z_LVAL_P(offset)));
+	RETURN_LONG(PHALCON_BINARY_CHECKBIT(Z_STRVAL_P(data), Z_LVAL_P(offset)) ? 1 : 0);
 }
 
 /**
  * Print binary string.
  *
  * @param string $data
- * @param int $ret
- * @return int
+ * @return string
  **/
-PHP_METHOD(Phalcon_Binary, print)
+PHP_METHOD(Phalcon_Binary, toBitstring)
 {
-	zval *data, *ret = NULL;
+	zval *data;
 	zend_long byte_length;
+	smart_str str = {0};
 	int i;
 
-	phalcon_fetch_params(0, 1, 1, &data, &ret);
+	phalcon_fetch_params(0, 1, 0, &data);
 
     byte_length = Z_STRLEN_P(data);
 	for (i=0; i<byte_length; i++) {
 		int j;
 		for (j=0; j<8; j++) {
-			if (PHALCON_BINARY_GETBIT(Z_STRVAL_P(data), (i*8)+j)) {
-				zend_printf("1");
+			if (PHALCON_BINARY_CHECKBIT(Z_STRVAL_P(data), (i*8)+j)) {
+				smart_str_appendc(&str, '1');
 			} else {
-				zend_printf("0");
+				smart_str_appendc(&str, '0');
 			}
 		}
 	}
-	zend_printf("\n");
+
+	smart_str_0(&str);
+
+	if (str.s) {
+		RETURN_STR(str.s);
+	} else {
+		smart_str_free(&str);
+		RETURN_FALSE;
+	}
 }

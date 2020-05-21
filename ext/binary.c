@@ -128,8 +128,8 @@ PHP_METHOD(Phalcon_Binary, pack)
 
 	phalcon_fetch_params(1, 2, 1, &type, &data, &endian);
 
-	if (!endian) {
-		endian = &PHALCON_GLOBAL(z_null);
+	if (!endian || Z_TYPE_P(endian) == IS_NULL) {
+		endian = &PHALCON_GLOBAL(z_one);
 	}
 
 	switch (Z_LVAL_P(type)) {
@@ -197,8 +197,8 @@ PHP_METHOD(Phalcon_Binary, unpack)
 
 	phalcon_fetch_params(1, 2, 1, &type, &data, &endian);
 
-	if (!endian) {
-		endian = &PHALCON_GLOBAL(z_null);
+	if (!endian || Z_TYPE_P(endian) == IS_NULL) {
+		endian = &PHALCON_GLOBAL(z_one);
 	}
 
 	switch (Z_LVAL_P(type)) {

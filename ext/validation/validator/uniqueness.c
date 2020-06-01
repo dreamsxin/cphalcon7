@@ -26,6 +26,7 @@
 #include "validation.h"
 #include "mvc/modelinterface.h"
 #include "mvc/model.h"
+#include "arr.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"
@@ -124,10 +125,21 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 			ZVAL_COPY(&allow_empty, _allow_empty);
 		}
 	}
-	if (zend_is_true(&allow_empty) && PHALCON_IS_EMPTY(&values)) {
-		zval_ptr_dtor(&allow_empty);
-		zval_ptr_dtor(&values);
-		RETURN_TRUE;
+	if (zend_is_true(&allow_empty)) {
+		zval tmp = {};
+		if (PHALCON_IS_EMPTY(&tmp)) {
+			zval_ptr_dtor(&allow_empty);
+			zval_ptr_dtor(&values);
+			RETURN_TRUE;
+		}
+		PHALCON_CALL_STATIC(&tmp, phalcon_arr_ce, "filter", &values, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
+		if (PHALCON_IS_EMPTY(&tmp)) {
+			zval_ptr_dtor(&tmp);
+			zval_ptr_dtor(&allow_empty);
+			zval_ptr_dtor(&values);
+			RETURN_TRUE;
+		}
+		zval_ptr_dtor(&tmp);
 	}
 	zval_ptr_dtor(&allow_empty);
 

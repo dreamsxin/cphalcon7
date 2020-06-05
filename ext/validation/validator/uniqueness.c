@@ -127,11 +127,6 @@ PHP_METHOD(Phalcon_Validation_Validator_Uniqueness, validate){
 	}
 	if (zend_is_true(&allow_empty)) {
 		zval tmp = {};
-		if (PHALCON_IS_EMPTY(&tmp)) {
-			zval_ptr_dtor(&allow_empty);
-			zval_ptr_dtor(&values);
-			RETURN_TRUE;
-		}
 		PHALCON_CALL_CE_STATIC(&tmp, phalcon_arr_ce, "filter", &values, &PHALCON_GLOBAL(z_null), &PHALCON_GLOBAL(z_true));
 		if (PHALCON_IS_EMPTY(&tmp)) {
 			zval_ptr_dtor(&tmp);

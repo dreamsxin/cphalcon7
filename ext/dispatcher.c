@@ -1363,7 +1363,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 				phalcon_get_class_ns(&real_controller_name, &controller_part, 0);
 
 				phalcon_array_update_str(&forward_parts, SL("controller"), &real_controller_name, 0);
-				phalcon_get_ns_class(&real_namespace_name, &controller_name, 0);
+				phalcon_get_ns_class(&real_namespace_name, &controller_part, 0);
 
 				if (zend_is_true(&namespace_name)) {
 					phalcon_array_update_str(&forward_parts, SL("namespace"), &real_namespace_name, 0);

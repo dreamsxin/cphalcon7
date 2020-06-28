@@ -1334,8 +1334,11 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 	if (Z_TYPE_P(forward) == IS_STRING) {
 		array_init(&forward_parts);
 		PHALCON_MM_ADD_ENTRY(&forward_parts);
-
-		phalcon_fast_explode_str(&parts, SL("::"), forward);
+		if (phalcon_memnstr_str(forward, SL("::"))) {
+			phalcon_fast_explode_str(&parts, SL("::"), forward);
+		} else {
+			phalcon_fast_explode_str(&parts, SL("/"), forward);
+		}
 		phalcon_fast_count(&number_parts, &parts);
 
 		num = phalcon_get_intval(&number_parts);
@@ -1376,7 +1379,7 @@ PHP_METHOD(Phalcon_Dispatcher, forward){
 			zval_ptr_dtor(&real_controller_name);
 			phalcon_array_update_str(&forward_parts, SL("controller"), &controller_part, 0);
 
-			if (Z_TYPE(action_part) != IS_NULL) {
+			if (Z_TYPE(action_part) > IS_NULL) {
 				phalcon_array_update_str(&forward_parts, SL("action"), &action_part, PH_COPY);
 			}
 		}

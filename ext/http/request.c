@@ -573,7 +573,7 @@ PHP_METHOD(Phalcon_Http_Request, getParam){
 	PHALCON_MM_CALL_METHOD(&dispatcher, &dependency_injector, "getshared", &service);
 	PHALCON_MM_ADD_ENTRY(&dispatcher);
 
-	PHALCON_MM_CALL_METHOD(NULL, &dispatcher, "getparam", param, filters, default_value);
+	PHALCON_MM_CALL_METHOD(return_value, &dispatcher, "getparam", param, filters, default_value);
 	RETURN_MM();
 }
 

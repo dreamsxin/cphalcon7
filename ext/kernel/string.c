@@ -273,7 +273,11 @@ void phalcon_fast_join(zval *result, zval *glue, zval *pieces){
 		return;
 	}
 
+#if PHP_VERSION_ID < 80000
 	php_implode(Z_STR_P(glue), pieces, result);
+#else
+	php_implode(Z_STR_P(glue), Z_ARRVAL_P(pieces), result);
+#endif
 }
 
 /**
@@ -1142,8 +1146,12 @@ void phalcon_fast_strip_tags(zval *return_value, zval *str)
 	}
 
 	stripped = estrndup(Z_STRVAL_P(str), Z_STRLEN_P(str));
-	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, NULL, 0);
 
+#if PHP_VERSION_ID < 80000
+	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, NULL, 0);
+#else
+	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, 0);
+#endif
 	ZVAL_STRINGL(return_value, stripped, len);
 }
 

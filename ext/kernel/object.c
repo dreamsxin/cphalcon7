@@ -495,8 +495,11 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 			return;
 		}
 
+#if PHP_VERSION_ID < 80000
 		properties = Z_OBJ_HT_P(object)->get_properties(object);
-
+#else
+		properties = Z_OBJ_HT_P(object)->get_properties(Z_OBJ_P(object));
+#endif
 		if (properties == NULL) {
 			ZVAL_NULL(result);
 			return;

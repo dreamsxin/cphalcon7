@@ -78,7 +78,7 @@ static zend_always_inline xhprof_frame_t* tracing_fast_alloc_frame()
     }
 }
 
-static zend_always_inline zend_string* tracing_get_class_name(zend_execute_data *data TSRMLS_DC)
+static zend_always_inline zend_string* tracing_get_class_name(zend_execute_data *data)
 {
     zend_function *curr_func;
 

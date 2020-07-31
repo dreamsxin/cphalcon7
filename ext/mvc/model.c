@@ -6616,6 +6616,13 @@ PHP_METHOD(Phalcon_Mvc_Model, __callStatic){
 		}
 	}
 
+	if (Z_TYPE(extra_method) <= IS_NULL) {
+		PHALCON_CONCAT_SVSVS(&exception_message, "The extra method is required");
+		PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+		zval_ptr_dtor(&exception_message);
+		return;
+	}
+
 	/**
 	 * The called class is the model
 	 */

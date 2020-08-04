@@ -69,8 +69,8 @@ static const zend_function_entry phalcon_filter_method_entry[] = {
 	PHP_ME(Phalcon_Filter, __construct, arginfo_phalcon_filterinterface___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Filter, add, arginfo_phalcon_filterinterface_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Filter, sanitize, arginfo_phalcon_filterinterface_sanitize, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Filter, _sanitize, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Filter, getFilters, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Filter, _sanitize, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Filter, getFilters, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

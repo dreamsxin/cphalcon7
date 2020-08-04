@@ -93,8 +93,8 @@ static const zend_function_entry phalcon_db_builder_select_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder_Select, limit, arginfo_phalcon_db_builder_select_limit, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Select, offset, arginfo_phalcon_db_builder_select_offset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Select, groupBy, arginfo_phalcon_db_builder_select_groupby, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder_Select, _execute, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Db_Builder_Select, count, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Builder_Select, _execute, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Db_Builder_Select, count, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

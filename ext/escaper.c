@@ -70,7 +70,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_escaper_method_entry[] = {
 	PHP_ME(Phalcon_Escaper, setEncoding, arginfo_phalcon_escaperinterface_setencoding, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Escaper, getEncoding, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Escaper, getEncoding, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Escaper, setHtmlQuoteType, arginfo_phalcon_escaperinterface_sethtmlquotetype, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Escaper, detectEncoding, arginfo_phalcon_escaper_detectencoding, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Escaper, normalizeEncoding, arginfo_phalcon_escaper_normalizeencoding, ZEND_ACC_PUBLIC)

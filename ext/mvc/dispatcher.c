@@ -77,17 +77,17 @@ PHP_METHOD(Phalcon_Mvc_Dispatcher, getPreviousActionName);
 
 static const zend_function_entry phalcon_mvc_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Dispatcher, setControllerSuffix, arginfo_phalcon_mvc_dispatcherinterface_setcontrollersuffix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerSuffix, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerSuffix, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Dispatcher, setDefaultController, arginfo_phalcon_mvc_dispatcherinterface_setdefaultcontroller, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Dispatcher, setControllerName, arginfo_phalcon_mvc_dispatcherinterface_setcontrollername, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, _throwDispatchException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Mvc_Dispatcher, _handleException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerClass, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getLastController, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getActiveController, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getPreviousControllerName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Dispatcher, getPreviousActionName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, _throwDispatchException, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Dispatcher, _handleException, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getControllerClass, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getLastController, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getActiveController, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getPreviousControllerName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Dispatcher, getPreviousActionName, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

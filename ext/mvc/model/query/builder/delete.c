@@ -75,8 +75,8 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_model_query_builder_delete_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, __construct, arginfo_phalcon_mvc_model_query_builder_delete___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, table, arginfo_phalcon_mvc_model_query_builder_delete_table, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, getTable, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, _compile, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, getTable, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Delete, _compile, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

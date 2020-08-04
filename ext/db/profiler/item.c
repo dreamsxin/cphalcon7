@@ -54,11 +54,11 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_db_profiler_item_method_entry[] = {
 	PHP_ME(Phalcon_Db_Profiler_Item, setSQLStatement, arginfo_phalcon_db_profiler_item_setsqlstatement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Profiler_Item, getSQLStatement, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Profiler_Item, getSQLStatement, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Profiler_Item, setSQLVariables, arginfo_phalcon_db_profiler_item_setsqlvariables, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Profiler_Item, getSQLVariables, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Profiler_Item, getSQLVariables, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Profiler_Item, setSQLBindTypes, arginfo_phalcon_db_profiler_item_setsqlbindtypes, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Profiler_Item, getSQLBindTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Profiler_Item, getSQLBindTypes, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

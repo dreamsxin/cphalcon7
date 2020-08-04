@@ -51,7 +51,7 @@ static const zend_function_entry phalcon_validation_validator_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Validator, isSetOption, arginfo_phalcon_validation_validatorinterface_issetoption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Validator, getOption, arginfo_phalcon_validation_validatorinterface_getoption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Validator, setOption, arginfo_phalcon_validation_validatorinterface_setoption, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator, getType, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator, getType, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

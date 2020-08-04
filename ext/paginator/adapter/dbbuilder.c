@@ -36,7 +36,6 @@
 #include "kernel/concat.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
 #include "interned-strings.h"
 
 /**

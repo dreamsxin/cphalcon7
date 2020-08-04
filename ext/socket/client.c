@@ -92,14 +92,14 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_socket_client_method_entry[] = {
 	PHP_ME(Phalcon_Socket_Client, __construct, arginfo_phalcon_socket_client___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Socket_Client, connect, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, connect, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, read, arginfo_phalcon_socket_client_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, write, arginfo_phalcon_socket_client_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, recv, arginfo_phalcon_socket_client_recv, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Client, send, arginfo_phalcon_socket_client_send, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Client, keepAlive, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Client, shutdown, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Client, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, keepAlive, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, shutdown, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Client, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -30,8 +30,6 @@
 #include "kernel/file.h"
 #include "kernel/exception.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Storage\Leveldb\Writebatch
  *
@@ -54,7 +52,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_storage_leveldb_writebatch_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Leveldb_Writebatch, put, arginfo_phalcon_storage_leveldb_wirtebatch_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Writebatch, delete, arginfo_phalcon_storage_leveldb_wirtebatch_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Leveldb_Writebatch, clear, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Leveldb_Writebatch, clear, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

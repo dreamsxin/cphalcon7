@@ -51,9 +51,9 @@ PHP_METHOD(Phalcon_Logger_Adapter_Firephp, logInternal);
 PHP_METHOD(Phalcon_Logger_Adapter_Firephp, close);
 
 static const zend_function_entry phalcon_logger_adapter_firephp_method_entry[] = {
-	PHP_ME(Phalcon_Logger_Adapter_Firephp, getFormatter, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_Firephp, getFormatter, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter_Firephp, logInternal, arginfo_phalcon_logger_adapter_loginternal, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Logger_Adapter_Firephp, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_Firephp, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

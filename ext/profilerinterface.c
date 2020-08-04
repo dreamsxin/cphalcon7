@@ -26,11 +26,11 @@ zend_class_entry *phalcon_profilerinterface_ce;
 static const zend_function_entry phalcon_profilerinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, startProfile, arginfo_phalcon_profilerinterface_startprofile)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, stopProfile, arginfo_phalcon_profilerinterface_stopprofile)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalElapsedSeconds, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalUsageMemory, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getProfiles, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getLastProfile, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, reset, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalElapsedSeconds, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalUsageMemory, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getProfiles, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getLastProfile, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, reset, arginfo_empty)
 	PHP_FE_END
 };
 

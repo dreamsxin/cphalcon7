@@ -90,8 +90,8 @@ const zend_function_entry phalcon_websocket_client_method_entry[] = {
 	PHP_ME(Phalcon_Websocket_Client, connect, arginfo_phalcon_websocket_client_connect, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Client, send, arginfo_phalcon_websocket_client_send, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Client, sendJson, arginfo_phalcon_websocket_client_sendjson, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Client, isConnected, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Client, disconnect, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Client, isConnected, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Client, disconnect, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

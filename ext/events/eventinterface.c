@@ -25,15 +25,15 @@ zend_class_entry *phalcon_events_eventinterface_ce;
 
 static const zend_function_entry phalcon_events_eventinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, setType, arginfo_phalcon_events_eventinterface_settype)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getType, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getType, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, setSource, arginfo_phalcon_events_eventinterface_setsource)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getSource, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getSource, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, setData, arginfo_phalcon_events_eventinterface_setdata)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getData, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, getData, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, setCancelable, arginfo_phalcon_events_eventinterface_setcancelable)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, isCancelable, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, stop, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, isStopped, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, isCancelable, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, stop, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Events_EventInterface, isStopped, arginfo_empty)
 	PHP_FE_END
 };
 

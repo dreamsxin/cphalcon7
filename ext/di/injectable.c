@@ -42,7 +42,6 @@
 #include "kernel/string.h"
 #include "kernel/debug.h"
 
-#include "internal/arginfo.h"
 #include "interned-strings.h"
 
 /**
@@ -86,8 +85,8 @@ static const zend_function_entry phalcon_di_injectable_method_entry[] = {
 	PHP_ME(Phalcon_Di_Injectable, getResolveService, arginfo_phalcon_di_injectable_getresolveservice, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, attachEvent, arginfo_phalcon_di_injectable_attachevent, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di_Injectable, __get, arginfo___get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di_Injectable, __sleep, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di_Injectable, __debugInfo, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, __sleep, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di_Injectable, __debugInfo, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

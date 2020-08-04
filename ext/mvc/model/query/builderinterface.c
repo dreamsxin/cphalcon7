@@ -23,10 +23,10 @@
 zend_class_entry *phalcon_mvc_model_query_builderinterface_ce;
 
 static const zend_function_entry phalcon_mvc_model_query_builderinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getType, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, compile, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getPhql, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getQuery, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getType, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, compile, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getPhql, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_Query_BuilderInterface, getQuery, arginfo_empty)
 	PHP_FE_END
 };
 

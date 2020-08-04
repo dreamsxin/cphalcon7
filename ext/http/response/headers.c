@@ -59,10 +59,10 @@ static const zend_function_entry phalcon_http_response_headers_method_entry[] = 
 	PHP_ME(Phalcon_Http_Response_Headers, get, arginfo_phalcon_http_response_headersinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, setRaw, arginfo_phalcon_http_response_headersinterface_setraw, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, remove, arginfo_phalcon_http_response_headersinterface_remove, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Response_Headers, send, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Response_Headers, reset, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Response_Headers, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Response_Headers, toString, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response_Headers, send, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response_Headers, reset, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response_Headers, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Response_Headers, toString, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Response_Headers, __set_state, arginfo_phalcon_http_response_headers___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };

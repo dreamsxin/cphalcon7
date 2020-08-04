@@ -35,8 +35,6 @@
 #include "kernel/file.h"
 #include "kernel/exception.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Storage\Wiredtiger\Cursor
  *
@@ -102,11 +100,11 @@ static const zend_function_entry phalcon_storage_wiredtiger_cursor_method_entry[
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, current, arginfo_iterator_current, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, key, arginfo_iterator_key, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, next, arginfo_iterator_next, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, prev, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, prev, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, rewind, arginfo_iterator_rewind, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, last, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, last, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, valid, arginfo_iterator_valid, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Wiredtiger_Cursor, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

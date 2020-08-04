@@ -63,7 +63,7 @@ PHP_METHOD(Phalcon_Validation_Validator_File, valid);
 
 static const zend_function_entry phalcon_validation_validator_file_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Validator_File, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator_File, valid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator_File, valid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

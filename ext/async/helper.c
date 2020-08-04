@@ -38,7 +38,13 @@ char *async_status_label(zend_uchar status)
 	return "PENDING";
 }
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+zval *async_prop_write_handler_readonly(zend_object *object, zend_string *member, zval *value, void **cache_slot)
+{
+	zend_throw_error(NULL, "Cannot write to property \"%s\" of %s", ZSTR_VAL(member), ZSTR_VAL(object->ce->name));
+	return NULL;
+}
+#elif PHP_VERSION_ID < 70400
 void async_prop_write_handler_readonly(zval *object, zval *member, zval *value, void **cache_slot)
 {
 	zend_throw_error(NULL, "Cannot write to property \"%s\" of %s", ZSTR_VAL(Z_STR_P(member)), ZSTR_VAL(Z_OBJCE_P(object)->name));

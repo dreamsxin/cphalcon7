@@ -162,7 +162,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter_imagick_convert, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_adapter_imagick_method_entry[] = {
-	PHP_ME(Phalcon_Image_Adapter_Imagick, check, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, check, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, __construct, arginfo_phalcon_image_adapter_imagick___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _resize, arginfo_phalcon_image_adapter__resize, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _liquidRescale, arginfo_phalcon_image_adapter__liquidrescale, ZEND_ACC_PROTECTED)
@@ -179,11 +179,11 @@ static const zend_function_entry phalcon_image_adapter_imagick_method_entry[] = 
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _pixelate, arginfo_phalcon_image_adapter__pixelate, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _save, arginfo_phalcon_image_adapter__save, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, _render, arginfo_phalcon_image_adapter__render, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Image_Adapter_Imagick, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, __destruct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, line, arginfo_phalcon_image_adapterinterface_line, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, polygon, arginfo_phalcon_image_adapterinterface_polygon, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, shadow, arginfo_phalcon_image_adapter_imagick_shadow, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Adapter_Imagick, getInternalImInstance, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, getInternalImInstance, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, setResourceLimit, arginfo_phalcon_image_adapter_imagick_setresourcelimit, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, colorize, arginfo_phalcon_image_adapter_imagick_colorize, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, gamma, arginfo_phalcon_image_adapter_imagick_gamma, ZEND_ACC_PUBLIC)
@@ -192,8 +192,8 @@ static const zend_function_entry phalcon_image_adapter_imagick_method_entry[] = 
 	PHP_ME(Phalcon_Image_Adapter_Imagick, hsl, arginfo_phalcon_image_adapter_imagick_hsl, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, curves_graph, arginfo_phalcon_image_adapter_imagick_curves_graph, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, vignette, arginfo_phalcon_image_adapter_imagick_vignette, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Adapter_Imagick, earlybird, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Adapter_Imagick, inkwell, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, earlybird, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Adapter_Imagick, inkwell, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_Imagick, convert, arginfo_phalcon_image_adapter_imagick_convert, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };

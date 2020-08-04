@@ -37,8 +37,6 @@
 #include "kernel/array.h"
 #include "kernel/file.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Image\Adapter
  *

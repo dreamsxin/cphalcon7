@@ -65,11 +65,11 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_logger_adapter_file_method_entry[] = {
 	PHP_ME(Phalcon_Logger_Adapter_File, __construct, arginfo_phalcon_logger_adapter_file___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Logger_Adapter_File, getFormatter, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_File, getFormatter, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter_File, logInternal, arginfo_phalcon_logger_adapter_loginternal, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Logger_Adapter_File, close, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Logger_Adapter_File, getPath, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Logger_Adapter_File, __wakeup, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_File, close, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_File, getPath, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_File, __wakeup, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

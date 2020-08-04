@@ -25,7 +25,7 @@ zend_class_entry *phalcon_filterinterface_ce;
 static const zend_function_entry phalcon_filterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_FilterInterface, add, arginfo_phalcon_filterinterface_add)
 	PHP_ABSTRACT_ME(Phalcon_FilterInterface, sanitize, arginfo_phalcon_filterinterface_sanitize)
-	PHP_ABSTRACT_ME(Phalcon_FilterInterface, getFilters, NULL)
+	PHP_ABSTRACT_ME(Phalcon_FilterInterface, getFilters, arginfo_empty)
 	PHP_FE_END
 };
 

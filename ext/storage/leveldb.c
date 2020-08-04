@@ -79,7 +79,7 @@ static const zend_function_entry phalcon_storage_leveldb_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Leveldb, put, arginfo_phalcon_storage_leveldb_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb, write, arginfo_phalcon_storage_leveldb_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb, delete, arginfo_phalcon_storage_leveldb_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Leveldb, iterator, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Leveldb, iterator, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Storage_Leveldb, set, put, arginfo_phalcon_storage_leveldb_put, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

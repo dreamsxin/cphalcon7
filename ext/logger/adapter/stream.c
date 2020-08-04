@@ -58,9 +58,9 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_logger_adapter_stream_method_entry[] = {
 	PHP_ME(Phalcon_Logger_Adapter_Stream, __construct, arginfo_phalcon_logger_adapter_stream___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Logger_Adapter_Stream, getFormatter, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_Stream, getFormatter, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter_Stream, logInternal, arginfo_phalcon_logger_adapter_loginternal, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Logger_Adapter_Stream, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter_Stream, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -62,11 +62,11 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_events_listener_method_entry[] = {
 	PHP_ME(Phalcon_Events_Listener, __construct, arginfo_phalcon_events_listener___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Events_Listener, setListener, arginfo_phalcon_events_listener_setlistener, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Events_Listener, getListener, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Events_Listener, getListener, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Listener, setPriority, arginfo_phalcon_events_listener_setpriority, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Events_Listener, getPriority, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Events_Listener, getPriority, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Events_Listener, setEvent, arginfo_phalcon_events_listener_setevent, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Events_Listener, getEvent, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Events_Listener, getEvent, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

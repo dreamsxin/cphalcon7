@@ -92,13 +92,13 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_model_query_builder_insert_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, __construct, arginfo_phalcon_mvc_model_query_builder_insert___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, table, arginfo_phalcon_mvc_model_query_builder_insert_table, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getTable, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getTable, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, columns, arginfo_phalcon_mvc_model_query_builder_insert_columns, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getColumns, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, values, arginfo_phalcon_mvc_model_query_builder_insert_values, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getValues, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, getValues, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, setConflict, arginfo_phalcon_mvc_model_query_builder_insert_setconflict, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, _compile, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Insert, _compile, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

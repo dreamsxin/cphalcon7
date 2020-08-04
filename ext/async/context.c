@@ -448,10 +448,15 @@ static PHP_METHOD(Context, withCancel)
 
 	zval *val;
 
+#if PHP_VERSION_ID >= 80000
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
+		Z_PARAM_ZVAL(val)
+	ZEND_PARSE_PARAMETERS_END();
+#else
 	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 1, 1)
 		Z_PARAM_ZVAL_DEREF(val)
 	ZEND_PARSE_PARAMETERS_END();
-	
+#endif
 	zval_ptr_dtor(val);
 
 	parent = (async_context *) Z_OBJ_P(getThis());
@@ -536,8 +541,9 @@ static PHP_METHOD(Context, run)
 	}
 
 	fci.retval = &result;
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
-
+#endif
 	prev = ASYNC_G(context);
 	ASYNC_G(context) = context;
 	

@@ -176,14 +176,14 @@ static const zend_function_entry phalcon_socket_server_method_entry[] = {
 	PHP_ME(Phalcon_Socket_Server, setDaemon, arginfo_phalcon_socket_server_setdaemon, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setMaxChildren, arginfo_phalcon_socket_server_setmaxchildren, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, setEvent, arginfo_phalcon_socket_server_setevent, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Server, getEvent, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Server, getEvent, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, listen, arginfo_phalcon_socket_server_listen, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Server, accept, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Server, getClients, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Server, accept, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Server, getClients, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, getClient, arginfo_phalcon_socket_server_getclient, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, removeClient, arginfo_phalcon_socket_server_removeclient, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket_Server, disconnect, arginfo_phalcon_socket_server_disconnect, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket_Server, run, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket_Server, run, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

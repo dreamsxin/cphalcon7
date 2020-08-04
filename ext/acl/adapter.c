@@ -39,10 +39,10 @@ zend_class_entry *phalcon_acl_adapter_ce;
 
 static const zend_function_entry phalcon_acl_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Acl_Adapter, setDefaultAction, arginfo_phalcon_acl_adapter_setdefaultaction, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Acl_Adapter, getDefaultAction, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Acl_Adapter, getActiveRole, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Acl_Adapter, getActiveResource, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Acl_Adapter, getActiveAccess, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Acl_Adapter, getDefaultAction, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Acl_Adapter, getActiveRole, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Acl_Adapter, getActiveResource, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Acl_Adapter, getActiveAccess, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -51,7 +51,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_logger_formatter_method_entry[] = {
 	PHP_ME(Phalcon_Logger_Formatter, setTypeStrings, arginfo_phalcon_logger_formatter_settypestrings, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Logger_Formatter, getTypeStrings, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Formatter, getTypeStrings, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Formatter, setTypeString, arginfo_phalcon_logger_formatter_settypestring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Formatter, getTypeString, arginfo_phalcon_logger_formatter_gettypestring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Formatter, interpolate, arginfo_phalcon_logger_formatter_interpolate, ZEND_ACC_PROTECTED)

@@ -24,7 +24,7 @@
 zend_class_entry *phalcon_db_builderinterface_ce;
 
 static const zend_function_entry phalcon_db_builderinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Db_BuilderInterface, execute, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Db_BuilderInterface, execute, arginfo_empty)
 	PHP_FE_END
 };
 

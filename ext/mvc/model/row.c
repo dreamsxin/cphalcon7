@@ -70,8 +70,8 @@ static const zend_function_entry phalcon_mvc_model_row_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Row, offsetGet, arginfo_phalcon_mvc_model_row_offsetget, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Row, offsetSet, arginfo_phalcon_mvc_model_row_offsetset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Row, offsetUnset, arginfo_phalcon_mvc_model_row_offsetunset, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Row, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Row, count, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Row, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Row, count, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

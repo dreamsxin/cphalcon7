@@ -50,8 +50,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_chart_captcha_tiny_save, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_chart_captcha_tiny_method_entry[] = {
-	PHP_ME(Phalcon_Chart_Captcha_Tiny, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Chart_Captcha_Tiny, getValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Chart_Captcha_Tiny, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Chart_Captcha_Tiny, getValue, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_Captcha_Tiny, render, arginfo_phalcon_chart_captcha_tiny_render, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Chart_Captcha_Tiny, save, arginfo_phalcon_chart_captcha_tiny_save, ZEND_ACC_PUBLIC)
 	PHP_FE_END

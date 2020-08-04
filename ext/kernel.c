@@ -115,11 +115,11 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, setMessagesDir, arginfo_phalcon_kernel_setmessagesdir, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, message, arginfo_phalcon_kernel_message, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setMessages, arginfo_phalcon_kernel_setmessages, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Kernel, getMessages, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getMessages, arginfo_empty, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setAliasDir, arginfo_phalcon_kernel_setaliasdir, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, alias, arginfo_phalcon_kernel_alias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, setAlias, arginfo_phalcon_kernel_setalias, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Kernel, getAlias, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getAlias, arginfo_empty, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalFile, arginfo_phalcon_kernel_evalfile, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalString, arginfo_phalcon_kernel_evalstring, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END

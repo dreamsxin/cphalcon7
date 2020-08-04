@@ -164,7 +164,10 @@ static int query_dns(zval *resolver, async_dns_query *query)
 	fci.retval = &retval;
 	fci.param_count = 1;
 	fci.params = args;
+
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
+#endif
 
 	fcc = empty_fcall_info_cache;
 	fcc.object = Z_OBJ_P(resolver);
@@ -624,9 +627,9 @@ static void handle_get_mx(INTERNAL_FUNCTION_PARAMETERS)
 
 	ZEND_PARSE_PARAMETERS_START(2, 3)
 		Z_PARAM_STR(host)
-		Z_PARAM_ZVAL_DEREF(mx)
+		Z_PARAM_ZVAL(mx)
 		Z_PARAM_OPTIONAL
-		Z_PARAM_ZVAL_DEREF(weight)
+		Z_PARAM_ZVAL(weight)
 	ZEND_PARSE_PARAMETERS_END();
 
 	zval_ptr_dtor(mx);
@@ -1335,7 +1338,11 @@ void async_dns_ce_register()
 	ASYNC_DNS_QUERY_CONST("SRV", ASYNC_DNS_SRV);
 	ASYNC_DNS_QUERY_CONST("TXT", ASYNC_DNS_TXT);
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_dns_query_ce, str_host, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zval_ptr_dtor(&tmp);
+#elif PHP_VERSION_ID < 70400
 	zend_declare_property_null(async_dns_query_ce, ZEND_STRL("host"), ZEND_ACC_PUBLIC);
 #else
 	ZVAL_STRING(&tmp, "");

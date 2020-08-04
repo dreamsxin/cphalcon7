@@ -65,22 +65,22 @@ static const zend_function_entry phalcon_http_client_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Http_Client_Adapter, setHeader, arginfo_phalcon_http_client_adapterinterface_setheader, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setHeaders, arginfo_phalcon_http_client_adapterinterface_setheaders, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setData, arginfo_phalcon_http_client_adapterinterface_setdata, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Adapter, setFile, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Adapter, setFile, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setFiles, arginfo_phalcon_http_client_adapterinterface_setfiles, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Adapter, getPath, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Adapter, getPath, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, get, arginfo_phalcon_http_client_adapterinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, head, arginfo_phalcon_http_client_adapterinterface_head, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, post, arginfo_phalcon_http_client_adapterinterface_post, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, put, arginfo_phalcon_http_client_adapterinterface_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, delete, arginfo_phalcon_http_client_adapterinterface_delete, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setUri, arginfo_phalcon_http_client_adapterinterface_seturi, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Adapter, getUri, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Adapter, getUri, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setBaseUri, arginfo_phalcon_http_client_adapterinterface_setbaseuri, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setMethod, arginfo_phalcon_http_client_adapterinterface_setmethod, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, setTimeOut, arginfo_phalcon_http_client_adapterinterface_settimeout, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Adapter, send, arginfo_phalcon_http_client_adapterinterface_send, ZEND_ACC_PUBLIC)
 
-	ZEND_FENTRY(sendInternal, NULL, NULL, ZEND_ACC_PROTECTED|ZEND_ACC_ABSTRACT)
+	ZEND_FENTRY(sendInternal, NULL, arginfo_empty, ZEND_ACC_PROTECTED|ZEND_ACC_ABSTRACT)
 
 	PHP_FE_END
 };

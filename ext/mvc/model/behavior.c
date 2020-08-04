@@ -44,8 +44,8 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_behavior_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Behavior, __construct, arginfo_phalcon_mvc_model_behavior___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Mvc_Model_Behavior, mustTakeAction, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Mvc_Model_Behavior, getOptions, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Model_Behavior, mustTakeAction, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Model_Behavior, getOptions, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model_Behavior, notify, arginfo_phalcon_mvc_model_behaviorinterface_notify, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Behavior, missingMethod, arginfo_phalcon_mvc_model_behaviorinterface_missingmethod, ZEND_ACC_PUBLIC)
 	PHP_FE_END

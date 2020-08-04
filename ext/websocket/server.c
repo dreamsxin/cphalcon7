@@ -93,8 +93,8 @@ static const zend_function_entry phalcon_websocket_server_method_entry[] = {
 	PHP_ME(Phalcon_Websocket_Server, __construct, arginfo_phalcon_websocket_server___construct, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Server, setEventLoop, arginfo_phalcon_websocket_server_seteventloop, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Server, serviceFd, arginfo_phalcon_websocket_server_servicefd, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Server, run, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Server, stop, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Server, run, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Server, stop, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Server, on, arginfo_phalcon_websocket_server_on, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Server, broadcast, arginfo_phalcon_websocket_server_broadcast, ZEND_ACC_PUBLIC)
 	PHP_FE_END

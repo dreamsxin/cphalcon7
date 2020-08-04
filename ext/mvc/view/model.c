@@ -42,8 +42,6 @@
 #include "kernel/output.h"
 #include "kernel/debug.h"
 
-#include "internal/arginfo.h"
-
 #include "interned-strings.h"
 
 /**
@@ -92,24 +90,24 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_mvc_view_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_View_Model, __construct, arginfo_phalcon_mvc_view_model___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Mvc_View_Model, setTemplate, arginfo_phalcon_mvc_view_modelinterface_settemplate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, getTemplate, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, getTemplate, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setVars, arginfo_phalcon_mvc_view_modelinterface_setvars, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, getVars, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, getVars, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setVar, arginfo_phalcon_mvc_view_modelinterface_setvar, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, getVar, arginfo_phalcon_mvc_view_modelinterface_getvar, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, addChild, arginfo_phalcon_mvc_view_modelinterface_addchild, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, appendChild, arginfo_phalcon_mvc_view_modelinterface_appendchild, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, getChild, arginfo_phalcon_mvc_view_modelinterface_getchild, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, hasChild, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, hasChild, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setCaptureTo, arginfo_phalcon_mvc_view_modelinterface_setcaptureto, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, getCaptureTo, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, getCaptureTo, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setTerminal, arginfo_phalcon_mvc_view_modelinterface_setterminal, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, getTerminal, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, getTerminal, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setAppend, arginfo_phalcon_mvc_view_modelinterface_setappend, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, isAppend, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, isAppend, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, setView, arginfo_phalcon_mvc_view_modelinterface_setview, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, getView, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Model, render, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, getView, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Model, render, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Model, __isset, arginfo___isset, ZEND_ACC_PUBLIC)

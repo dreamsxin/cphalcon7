@@ -97,7 +97,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_cli_options_method_entry[] = {
 	PHP_ME(Phalcon_Cli_Options, __construct, arginfo_phalcon_cli_options___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Cli_Options, add, arginfo_phalcon_cli_options_add, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Options, help, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Options, help, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Options, parse, arginfo_phalcon_cli_options_parse, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Cli_Options, addOption, add, arginfo_phalcon_cli_options_add, ZEND_ACC_PUBLIC)
 	PHP_FE_END

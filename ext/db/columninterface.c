@@ -23,19 +23,19 @@
 zend_class_entry *phalcon_db_columninterface_ce;
 
 static const zend_function_entry phalcon_db_columninterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getSchemaName, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getName, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getType, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getSize, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getScale, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isUnsigned, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isNotNull, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isPrimary, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isAutoIncrement, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isNumeric, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isFirst, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getAfterPosition, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getBindType, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getSchemaName, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getName, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getType, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getSize, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getScale, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isUnsigned, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isNotNull, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isPrimary, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isAutoIncrement, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isNumeric, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, isFirst, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getAfterPosition, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ColumnInterface, getBindType, arginfo_empty)
 	PHP_FE_END
 };
 

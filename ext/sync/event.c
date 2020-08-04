@@ -55,8 +55,8 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_sync_event_method_entry[] = {
 	PHP_ME(Phalcon_Sync_Event, __construct, arginfo_phalcon_sync_event___construct, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Sync_Event, wait, arginfo_phalcon_sync_event_wait, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Event, fire, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Event, reset, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Event, fire, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Event, reset, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

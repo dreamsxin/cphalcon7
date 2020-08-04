@@ -35,8 +35,6 @@
 #include "kernel/hash.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Cache\Backend\Wiredtiger
  *
@@ -91,7 +89,7 @@ static const zend_function_entry phalcon_cache_backend_wiredtiger_method_entry[]
 	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Wiredtiger, flush, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

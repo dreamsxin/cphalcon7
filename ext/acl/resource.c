@@ -27,8 +27,6 @@
 #include "kernel/object.h"
 #include "kernel/operators.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Acl\Resource
  *

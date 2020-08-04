@@ -59,9 +59,9 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_sync_readerwriter_method_entry[] = {
 	PHP_ME(Phalcon_Sync_Readerwriter, __construct, arginfo_phalcon_sync_readerwriter___construct, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Sync_Readerwriter, readlock, arginfo_phalcon_sync_readerwriter_readlock, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Readerwriter, readunlock, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Readerwriter, readunlock, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Sync_Readerwriter, writelock, arginfo_phalcon_sync_readerwriter_writelock, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Readerwriter, writeunlock, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Readerwriter, writeunlock, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

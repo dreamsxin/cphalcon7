@@ -43,8 +43,8 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build);
 
 
 static const zend_function_entry phalcon_di_service_builder_method_entry[] = {
-	PHP_ME(Phalcon_Di_Service_Builder, _buildParameter, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Di_Service_Builder, _buildParameters, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di_Service_Builder, _buildParameter, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di_Service_Builder, _buildParameters, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Di_Service_Builder, build, arginfo_phalcon_di_service_builder_build, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

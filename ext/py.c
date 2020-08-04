@@ -99,7 +99,7 @@ static const zend_function_entry phalcon_py_method_entry[] = {
 	PHP_ME(Phalcon_Py, tuple, arginfo_phalcon_py_tuple, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, dict, arginfo_phalcon_py_dict, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Py, val, arginfo_phalcon_py_val, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Py, version, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Py, version, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 

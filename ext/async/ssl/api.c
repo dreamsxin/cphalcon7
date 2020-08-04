@@ -754,7 +754,18 @@ void async_ssl_ce_register()
 	str_cipher_bits = zend_new_interned_string(zend_string_init(ZEND_STRL("cipher_bits"), 1));
 	str_alpn_protocol = zend_new_interned_string(zend_string_init(ZEND_STRL("alpn_protocol"), 1));
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_tls_info_ce, str_protocol, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zend_declare_typed_property(async_tls_info_ce, str_cipher_name, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_LONG(&tmp, 0);
+	zend_declare_typed_property(async_tls_info_ce, str_cipher_bits, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_LONG, 0, 0));
+
+	ZVAL_NULL(&tmp);
+	zend_declare_typed_property(async_tls_info_ce, str_alpn_protocol, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 1, 0));
+#elif PHP_VERSION_ID < 70400
 	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("protocol"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("cipher_name"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_tls_info_ce, ZEND_STRL("cipher_bits"), ZEND_ACC_PUBLIC);

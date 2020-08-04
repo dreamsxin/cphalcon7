@@ -56,19 +56,19 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_profiler_item_method_entry[] = {
 	PHP_ME(Phalcon_Profiler_Item, __construct, arginfo_phalcon_profiler_item___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Profiler_Item, getName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getName, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler_Item, setData, arginfo_phalcon_profiler_iteminterface_setdata, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getData, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getData, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler_Item, setInitialTime, arginfo_phalcon_profiler_iteminterface_setinitialtime, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getInitialTime, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getInitialTime, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler_Item, setFinalTime, arginfo_phalcon_profiler_iteminterface_setfinaltime, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getFinalTime, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getTotalElapsedSeconds, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getFinalTime, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getTotalElapsedSeconds, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler_Item, setStartMemory, arginfo_phalcon_profiler_iteminterface_setstartmemory, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getStartMemory, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getStartMemory, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler_Item, setEndMemory, arginfo_phalcon_profiler_iteminterface_setendmemory, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getEndMemory, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler_Item, getTotalUsageMemory, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getEndMemory, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler_Item, getTotalUsageMemory, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

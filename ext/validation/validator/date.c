@@ -56,7 +56,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Date, valid);
 
 static const zend_function_entry phalcon_validation_validator_date_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Validator_Date, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator_Date, valid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator_Date, valid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

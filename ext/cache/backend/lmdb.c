@@ -35,8 +35,6 @@
 #include "kernel/hash.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Cache\Backend\Lmdb
  *
@@ -96,7 +94,7 @@ static const zend_function_entry phalcon_cache_backend_lmdb_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Lmdb, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Lmdb, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Lmdb, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Lmdb, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Lmdb, flush, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -60,14 +60,14 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_socket_setoption, 0, 0, 3)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_socket_method_entry[] = {
-	PHP_ME(Phalcon_Socket, getSocket, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, _throwSocketException, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Socket, getSocket, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket, _throwSocketException, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Socket, setBlocking, arginfo_phalcon_socket_setblocking, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, isBlocking, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket, isBlocking, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Socket, setOption, arginfo_phalcon_socket_setoption, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, close, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, isClose, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Socket, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
+	PHP_ME(Phalcon_Socket, close, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket, isClose, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Socket, __destruct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
 	PHP_FE_END
 };
 

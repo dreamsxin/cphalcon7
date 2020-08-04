@@ -23,14 +23,14 @@
 zend_class_entry *phalcon_db_referenceinterface_ce;
 
 static const zend_function_entry phalcon_db_referenceinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getName, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getSchemaName, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedSchema, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getColumns, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedTable, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedColumns, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getOnDelete, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getOnUpdate, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getName, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getSchemaName, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedSchema, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getColumns, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedTable, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getReferencedColumns, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getOnDelete, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_ReferenceInterface, getOnUpdate, arginfo_empty)
 	PHP_FE_END
 };
 

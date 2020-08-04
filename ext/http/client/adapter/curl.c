@@ -49,7 +49,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal);
 
 static const zend_function_entry phalcon_http_client_adapter_curl_method_entry[] = {
 	PHP_ME(Phalcon_Http_Client_Adapter_Curl, __construct, arginfo_phalcon_http_client_adapterinterface___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Http_Client_Adapter_Curl, sendInternal, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Http_Client_Adapter_Curl, sendInternal, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

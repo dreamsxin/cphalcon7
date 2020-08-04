@@ -54,7 +54,7 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_db_builder_insert_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder_Insert, __construct, arginfo_phalcon_db_builder_insert___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Db_Builder_Insert, values, arginfo_phalcon_db_builder_insert_values, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder_Insert, _execute, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Db_Builder_Insert, _execute, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

@@ -190,7 +190,11 @@ static zend_always_inline int async_stream_call_close(zval *stream)
 	}
 	
 	ZVAL_UNDEF(&tmp);
+#if PHP_VERSION_ID >= 80000
+	zend_call_method_with_0_params(Z_OBJ_P(stream), Z_OBJCE_P(stream), NULL, "close", &tmp);
+#else
 	zend_call_method_with_0_params(stream, Z_OBJCE_P(stream), NULL, "close", &tmp);
+#endif
 	zval_ptr_dtor(&tmp);
 	
 	return 1;
@@ -208,7 +212,11 @@ static zend_always_inline int async_stream_call_close_obj(zend_object *object)
 	ZVAL_OBJ(&obj, object);
 	ZVAL_UNDEF(&tmp);
 
+#if PHP_VERSION_ID >= 80000
+	zend_call_method_with_0_params(Z_OBJ(obj), Z_OBJCE_P(&obj), NULL, "close", &tmp);
+#else
 	zend_call_method_with_0_params(&obj, Z_OBJCE_P(&obj), NULL, "close", &tmp);
+#endif
 	zval_ptr_dtor(&tmp);
 	
 	return 1;

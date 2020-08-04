@@ -59,9 +59,9 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_client_adapter_stream_method_entry[] = {
 	PHP_ME(Phalcon_Http_Client_Adapter_Stream, __construct, arginfo_phalcon_http_client_adapterinterface___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Http_Client_Adapter_Stream, buildBody, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Http_Client_Adapter_Stream, buildBody, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Http_Client_Adapter_Stream, errorHandler, arginfo_phalcon_http_client_adapter_stream_errorhandler, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Adapter_Stream, sendInternal, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Http_Client_Adapter_Stream, sendInternal, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

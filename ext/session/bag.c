@@ -25,7 +25,6 @@
 #include "di.h"
 #include "diinterface.h"
 #include "di/injectable.h"
-#include "internal/arginfo.h"
 
 #include <ext/spl/spl_array.h>
 

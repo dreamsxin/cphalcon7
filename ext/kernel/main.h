@@ -33,6 +33,19 @@
 #include "kernel/memory.h"
 #include "kernel/backtrace.h"
 
+#include "internal/arginfo.h"
+
+
+#if PHP_VERSION_ID >= 80000
+# ifndef ZEND_ACC_DTOR
+#  define ZEND_ACC_DTOR 0
+# endif
+# ifndef instanceof_function_ex
+#  define instanceof_function_ex(class_ce, interface_ce, loss) zend_class_implements_interface(class_ce, interface_ce)
+# endif
+
+#endif
+
 /** Main macros */
 #define PH_DEBUG		0
 
@@ -292,6 +305,16 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		ZVAL_NULL(&phalcon_memory_entry); \
 	}
 
+#if PHP_VERSION_ID >= 80000
+#define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce) \
+	if (Z_TYPE_P(instance) != IS_OBJECT) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
+		return; \
+	} else if (!zend_class_implements_interface(Z_OBJCE_P(instance), interface_ce)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
+		return; \
+	}
+#else
 #define PHALCON_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
@@ -300,7 +323,18 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
 		return; \
 	}
+#endif
 
+#if PHP_VERSION_ID >= 80000
+#define PHALCON_MM_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce) \
+	if (Z_TYPE_P(instance) != IS_OBJECT) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
+		RETURN_MM(); \
+	} else if (!zend_class_implements_interface(Z_OBJCE_P(instance), interface_ce)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
+		RETURN_MM(); \
+	}
+#else
 #define PHALCON_MM_VERIFY_INTERFACE_EX(instance, interface_ce, exception_ce) \
 	if (Z_TYPE_P(instance) != IS_OBJECT) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, %s given", interface_ce->name->val, zend_zval_type_name(instance)); \
@@ -309,7 +343,21 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, Z_OBJCE_P(instance)->name->val); \
 		RETURN_MM(); \
 	}
+#endif
 
+#if PHP_VERSION_ID >= 80000
+#define PHALCON_VERIFY_INTERFACE_CE_EX(instance_ce, interface_ce, exception_ce) \
+	if (!zend_class_implements_interface(instance_ce, interface_ce)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, instance_ce->name->val); \
+		return; \
+	}
+
+#define PHALCON_MM_VERIFY_INTERFACE_CE_EX(instance_ce, interface_ce, exception_ce) \
+	if (!zend_class_implements_interface(instance_ce, interface_ce)) { \
+		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, instance_ce->name->val); \
+		RETURN_MM(); \
+	}
+#else
 #define PHALCON_VERIFY_INTERFACE_CE_EX(instance_ce, interface_ce, exception_ce) \
 	if (!instanceof_function_ex(instance_ce, interface_ce, 1)) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, instance_ce->name->val); \
@@ -321,6 +369,7 @@ void phalcon_gettype(zval *return_value, zval *arg);
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object implementing %s, object of type %s given", interface_ce->name->val, instance_ce->name->val); \
 		RETURN_MM(); \
 	}
+#endif
 
 #define PHALCON_VERIFY_INTERFACE_OR_NULL_EX(pzv, interface_ce, exception_ce) \
 	if (Z_TYPE_P(pzv) != IS_NULL){ \
@@ -333,7 +382,7 @@ void phalcon_gettype(zval *return_value, zval *arg);
 	}
 
 #define PHALCON_VERIFY_CLASS_EX(instance, class_ce, exception_ce) \
-	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(instance), class_ce, 0)) { \
+	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(instance), class_ce)) { \
 		if (Z_TYPE_P(instance) != IS_OBJECT) { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name->val, zend_zval_type_name(instance)); \
 		} else { \
@@ -343,7 +392,7 @@ void phalcon_gettype(zval *return_value, zval *arg);
 	}
 
 #define PHALCON_MM_VERIFY_CLASS_EX(instance, class_ce, exception_ce) \
-	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function_ex(Z_OBJCE_P(instance), class_ce, 0)) { \
+	if (Z_TYPE_P(instance) != IS_OBJECT || !instanceof_function(Z_OBJCE_P(instance), class_ce)) { \
 		if (Z_TYPE_P(instance) != IS_OBJECT) { \
 			zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", class_ce->name->val, zend_zval_type_name(instance)); \
 		} else { \
@@ -353,13 +402,13 @@ void phalcon_gettype(zval *return_value, zval *arg);
 	}
 
 #define PHALCON_VERIFY_CLASS_CE_EX(instance_ce, interface_ce, exception_ce) \
-	if (!instanceof_function_ex(instance_ce, interface_ce, 0)) { \
+	if (!instanceof_function_ex(instance_ce, interface_ce)) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", interface_ce->name->val, instance_ce->name->val); \
 		return; \
 	}
 
 #define PHALCON_MM_VERIFY_CLASS_CE_EX(instance_ce, interface_ce, exception_ce) \
-	if (!instanceof_function_ex(instance_ce, interface_ce, 0)) { \
+	if (!instanceof_function_ex(instance_ce, interface_ce)) { \
 		zend_throw_exception_ex(exception_ce, 0, "Unexpected value type: expected object of type %s, %s given", interface_ce->name->val, instance_ce->name->val); \
 		RETURN_MM(); \
 	}

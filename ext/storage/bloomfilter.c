@@ -61,8 +61,8 @@ static const zend_function_entry phalcon_storage_bloomfilter_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Bloomfilter, __construct, arginfo_phalcon_storage_bloomfilter___construct, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Storage_Bloomfilter, add, arginfo_phalcon_storage_bloomfilter_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Bloomfilter, check, arginfo_phalcon_storage_bloomfilter_check, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Bloomfilter, reset, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Bloomfilter, save, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Bloomfilter, reset, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Bloomfilter, save, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

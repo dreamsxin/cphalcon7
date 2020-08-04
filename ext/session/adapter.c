@@ -21,7 +21,6 @@
 #include "session/adapter.h"
 #include "session/adapterinterface.h"
 #include "di/injectable.h"
-#include "internal/arginfo.h"
 
 #include <main/SAPI.h>
 #include <ext/spl/spl_array.h>

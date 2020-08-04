@@ -74,12 +74,12 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_thread_pool_method_entry[] = {
 	PHP_ME(Phalcon_Thread_Pool, __construct, arginfo_phalcon_thread_pool___construct, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Thread_Pool, getNumThreads, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Thread_Pool, getNumThreads, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Thread_Pool, inc, arginfo_phalcon_thread_pool_inc, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Thread_Pool, dec, arginfo_phalcon_thread_pool_dec, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Thread_Pool, add, arginfo_phalcon_thread_pool_add, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Thread_Pool, wait, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Thread_Pool, destroy, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Thread_Pool, wait, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Thread_Pool, destroy, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

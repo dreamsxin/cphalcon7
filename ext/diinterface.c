@@ -33,11 +33,11 @@ static const zend_function_entry phalcon_diinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_DiInterface, setService, arginfo_phalcon_diinterface_setservice)
 	PHP_ABSTRACT_ME(Phalcon_DiInterface, getService, arginfo_phalcon_diinterface_getservice)
 	PHP_ABSTRACT_ME(Phalcon_DiInterface, has, arginfo_phalcon_diinterface_has)
-	PHP_ABSTRACT_ME(Phalcon_DiInterface, wasFreshInstance, NULL)
-	PHP_ABSTRACT_ME(Phalcon_DiInterface, getServices, NULL)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, wasFreshInstance, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_DiInterface, getServices, arginfo_empty)
 	ZEND_FENTRY(setDefault, NULL, arginfo_phalcon_diinterface_setdefault, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
-	ZEND_FENTRY(getDefault, NULL, NULL, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
-	ZEND_FENTRY(reset, NULL, NULL, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
+	ZEND_FENTRY(getDefault, NULL, arginfo_empty, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
+	ZEND_FENTRY(reset, NULL, arginfo_empty, ZEND_ACC_STATIC|ZEND_ACC_ABSTRACT|ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

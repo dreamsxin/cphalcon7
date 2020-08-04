@@ -202,7 +202,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_parser_method_entry[] = {
 	PHP_ME(Phalcon_Http_Parser, __construct, arginfo_phalcon_http_parser___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Http_Parser, status, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Parser, status, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Parser, execute, arginfo_phalcon_http_parser_execute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Parser, parseCookie, arginfo_phalcon_http_parser_parsecookies, ZEND_ACC_PUBLIC)
 	PHP_FE_END

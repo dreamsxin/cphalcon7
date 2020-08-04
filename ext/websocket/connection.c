@@ -54,9 +54,9 @@ ZEND_END_ARG_INFO()
 const zend_function_entry phalcon_websocket_connection_method_entry[] = {
 	PHP_ME(Phalcon_Websocket_Connection, send, arginfo_phalcon_websocket_connection_send, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Websocket_Connection, sendJson, arginfo_phalcon_websocket_connection_sendjson, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Connection, isConnected, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Connection, getUid, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Websocket_Connection, disconnect, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Connection, isConnected, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Connection, getUid, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Websocket_Connection, disconnect, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

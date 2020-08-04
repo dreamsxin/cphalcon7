@@ -1165,7 +1165,15 @@ void async_udp_socket_ce_register()
 	async_udp_datagram_handlers.clone_obj = NULL;
 	async_udp_datagram_handlers.write_property = async_prop_write_handler_readonly;
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_udp_datagram_ce, str_data, &tmp, ZEND_ACC_PUBLIC, NULL,  (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zend_declare_typed_property(async_udp_datagram_ce, str_address, &tmp, ZEND_ACC_PUBLIC, NULL,  (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 1, 0));
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_LONG(&tmp, 0);
+	zend_declare_typed_property(async_udp_datagram_ce, str_port, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_LONG, 1, 0));
+#elif PHP_VERSION_ID < 70400
 	zend_declare_property_null(async_udp_datagram_ce, ZEND_STRL("data"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_udp_datagram_ce, ZEND_STRL("address"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_udp_datagram_ce, ZEND_STRL("port"), ZEND_ACC_PUBLIC);

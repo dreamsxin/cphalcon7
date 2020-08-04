@@ -24,17 +24,17 @@ zend_class_entry *phalcon_mvc_model_relationinterface_ce;
 
 static const zend_function_entry phalcon_mvc_model_relationinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, setIntermediateRelation, arginfo_phalcon_mvc_model_relationinterface_setintermediaterelation)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getType, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getReferencedModel, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getFields, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getReferencedFields, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getOptions, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, isForeignKey, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getForeignKey, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, isThrough, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateFields, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateModel, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateReferencedFields, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getType, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getReferencedModel, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getFields, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getReferencedFields, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getOptions, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, isForeignKey, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getForeignKey, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, isThrough, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateFields, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateModel, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_RelationInterface, getIntermediateReferencedFields, arginfo_empty)
 	PHP_FE_END
 };
 

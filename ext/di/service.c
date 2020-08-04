@@ -35,7 +35,6 @@
 #include "kernel/operators.h"
 
 #include "interned-strings.h"
-#include "internal/arginfo.h"
 
 /**
  * Phalcon\Di\Service

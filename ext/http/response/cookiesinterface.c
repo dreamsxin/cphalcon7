@@ -24,13 +24,13 @@ zend_class_entry *phalcon_http_response_cookiesinterface_ce;
 
 static const zend_function_entry phalcon_http_response_cookiesinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, useEncryption, arginfo_phalcon_http_response_cookiesinterface_useencryption)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, isUsingEncryption, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, isUsingEncryption, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, set, arginfo_phalcon_http_response_cookiesinterface_set)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, get, arginfo_phalcon_http_response_cookiesinterface_get)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, has, arginfo_phalcon_http_response_cookiesinterface_has)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, delete, arginfo_phalcon_http_response_cookiesinterface_delete)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, send, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, reset, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, send, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_CookiesInterface, reset, arginfo_empty)
 	PHP_FE_END
 };
 

@@ -64,8 +64,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_flash_session_has, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_flash_session_method_entry[] = {
-	PHP_ME(Phalcon_Flash_Session, _getSessionMessages, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Flash_Session, _setSessionMessages, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Flash_Session, _getSessionMessages, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Flash_Session, _setSessionMessages, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Flash_Session, message, arginfo_phalcon_flashinterface_message, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Flash_Session, getMessages, arginfo_phalcon_flash_session_getmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Flash_Session, output, arginfo_phalcon_flash_session_output, ZEND_ACC_PUBLIC)

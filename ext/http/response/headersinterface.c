@@ -26,9 +26,9 @@ static const zend_function_entry phalcon_http_response_headersinterface_method_e
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, set, arginfo_phalcon_http_response_headersinterface_set)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, get, arginfo_phalcon_http_response_headersinterface_get)
 	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, setRaw, arginfo_phalcon_http_response_headersinterface_setraw)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, send, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, reset, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, toArray, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, send, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, reset, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Http_Response_HeadersInterface, toArray, arginfo_empty)
 	PHP_FE_END
 };
 

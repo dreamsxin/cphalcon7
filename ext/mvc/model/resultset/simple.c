@@ -36,8 +36,6 @@
 #include "kernel/exception.h"
 #include "kernel/variables.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Mvc\Model\Resultset\Simple
  *

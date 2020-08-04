@@ -72,9 +72,9 @@ PHP_METHOD(Phalcon_Session_Adapter_Memcached, destroy);
 PHP_METHOD(Phalcon_Session_Adapter_Memcached, gc);
 
 static const zend_function_entry phalcon_session_adapter_memcached_method_entry[] = {
-	PHP_ME(Phalcon_Session_Adapter_Memcached, start, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Memcached, start, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Memcached, open, arginfo_phalcon_session_adapterinterface_open, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Memcached, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Memcached, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Memcached, read, arginfo_phalcon_session_adapterinterface_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Memcached, write, arginfo_phalcon_session_adapterinterface_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Memcached, destroy, arginfo_phalcon_session_adapterinterface_destroy, ZEND_ACC_PUBLIC)

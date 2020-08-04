@@ -64,13 +64,13 @@ static const zend_function_entry phalcon_cache_backend_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend, __construct, arginfo_phalcon_cache_backend___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Cache_Backend, start, arginfo_phalcon_cache_backendinterface_start, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, stop, arginfo_phalcon_cache_backendinterface_stop, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, getFrontend, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, getOptions, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, isFresh, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, isStarted, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, getLifetime, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, getFrontend, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, getOptions, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, isFresh, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, isStarted, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, getLifetime, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend, setPrefix, arginfo_phalcon_cache_backend_setprefix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend, getPrefix, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend, getPrefix, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

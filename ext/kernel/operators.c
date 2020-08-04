@@ -842,13 +842,22 @@ zend_long phalcon_fast_count_int(zval *value)
 	if (Z_TYPE_P(value) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			zend_long result;
+
+#if PHP_VERSION_ID >= 80000
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(Z_OBJ_P(value), &result)) {
+#else
 			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &result)) {
+#endif
 				return result;
 			}
 		}
 
 		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
+#if PHP_VERSION_ID >= 80000
+			zend_call_method_with_0_params(Z_OBJ_P(value), Z_OBJCE_P(value), NULL, "count", &retval);
+#else
 			zend_call_method_with_0_params(value, Z_OBJCE_P(value), NULL, "count", &retval);
+#endif
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				result = Z_LVAL(retval);
@@ -883,13 +892,21 @@ void phalcon_fast_count(zval *result, zval *value)
 	if (Z_TYPE_P(value) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(value)->count_elements) {
 			ZVAL_LONG(result, 1);
+#if PHP_VERSION_ID >= 80000
+			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(Z_OBJ_P(value), &Z_LVAL_P(result))) {
+#else
 			if (SUCCESS == Z_OBJ_HT(*value)->count_elements(value, &Z_LVAL_P(result))) {
+#endif
 				return;
 			}
 		}
 
 		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+#if PHP_VERSION_ID >= 80000
+			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
+#else
 			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+#endif
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				ZVAL_LONG(result, Z_LVAL(retval));
@@ -924,12 +941,21 @@ int phalcon_fast_count_ev(zval *value)
 
 	if (Z_TYPE_P(value) == IS_OBJECT) {
 		if (Z_OBJ_HT_P(value)->count_elements) {
+
+#if PHP_VERSION_ID >= 80000
+			Z_OBJ_HT(*value)->count_elements(Z_OBJ_P(value), &count);
+#else
 			Z_OBJ_HT(*value)->count_elements(value, &count);
+#endif
 			return (int) count > 0;
 		}
 
 		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+#if PHP_VERSION_ID >= 80000
+			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
+#else
 			zend_call_method_with_0_params(value, NULL, NULL, "count", &retval);
+#endif
 			if (!Z_ISUNDEF(retval)) {
 				convert_to_long_ex(&retval);
 				count = Z_LVAL(retval);

@@ -77,12 +77,12 @@ static const zend_function_entry phalcon_profiler_method_entry[] = {
 	PHP_ME(Phalcon_Profiler, __construct, arginfo_phalcon_profiler___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Profiler, startProfile, arginfo_phalcon_profilerinterface_startprofile, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Profiler, stopProfile, arginfo_phalcon_profilerinterface_stopprofile, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, getTotalElapsedSeconds, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, getTotalUsageMemory, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, getProfiles, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, getLastProfile, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, getCurrentProfile, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Profiler, reset, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, getTotalElapsedSeconds, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, getTotalUsageMemory, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, getProfiles, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, getLastProfile, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, getCurrentProfile, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Profiler, reset, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

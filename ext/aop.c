@@ -148,6 +148,7 @@ static int strcmp_with_joker_case(char *str_with_jok, char *str, int case_sensit
 static int pointcut_match_zend_class_entry(phalcon_aop_pointcut *pc, zend_class_entry *ce) /*{{{*/
 {
 	int i, matches;
+
 	if (pc == NULL || pc->re_class == NULL) {
 		return 0;
 	}
@@ -244,9 +245,11 @@ static zend_array *calculate_class_pointcuts(zend_class_entry *ce, int kind_of_a
 
 	ZEND_HASH_FOREACH_VAL(PHALCON_GLOBAL(aop).pointcuts_table, pc_value) {
 		pc = (phalcon_aop_pointcut *)Z_PTR_P(pc_value);
+
 		if (!(pc->kind_of_advice & kind_of_advice)) {
 			continue;
 		}
+
 		if ((ce == NULL && pc->kind_of_advice & PHALCON_AOP_KIND_FUNCTION)
 			|| (ce != NULL && pointcut_match_zend_class_entry(pc, ce))) {
 			zend_hash_next_index_insert(ht, pc_value);
@@ -274,6 +277,7 @@ static int pointcut_match_zend_function(phalcon_aop_pointcut *pc, zend_execute_d
 			}
 		}
 	}
+
 	//check public/protect/private
 	if (pc->scope != 0 && !(pc->scope & (curr_func->common.fn_flags & ZEND_ACC_PPP_MASK))) {
 		return 0;
@@ -324,7 +328,7 @@ static zend_array *calculate_function_pointcuts(zend_execute_data *ex) /*{{{*/
 	phalcon_aop_pointcut *pc;
 	zend_ulong h;
 
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 	object = Z_OBJ(ex->This);
 #else
 	if (Z_TYPE(ex->This) == IS_OBJECT) {
@@ -334,7 +338,6 @@ static zend_array *calculate_function_pointcuts(zend_execute_data *ex) /*{{{*/
 	if (object != NULL) {
 		ce = Z_OBJCE(ex->This);
 	}
-
 	if (ce == NULL && ex->func->common.fn_flags & ZEND_ACC_STATIC) {
 		ce = ex->func->common.scope;
 	}
@@ -442,8 +445,7 @@ phalcon_aop_object_cache *get_object_cache (zend_object *object) /*{{{*/
 /*}}}*/
 
 /*{{{ get_object_cache_func/read/write*/
-zend_array *get_object_cache_func(zend_object *object)
-{
+zend_array *get_object_cache_func(zend_object *object) {
 	phalcon_aop_object_cache *cache;
 	cache = get_object_cache(object);
 	if (cache->func == NULL) {
@@ -486,7 +488,7 @@ static zend_array *get_cache_func(zend_execute_data *ex) /*{{{*/
 	zval pointcut_cache_value;
 	phalcon_aop_pointcut_cache *_pointcut_cache = NULL;
 
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 	object = Z_OBJ(ex->This);
 #else
 	if (Z_TYPE(ex->This) == IS_OBJECT) {
@@ -676,7 +678,7 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 	zval *current_pc_value = NULL;
 	zval pointcut_ret = {};
 	zend_object *exception = NULL;
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 	zend_class_entry *current_scope = NULL;
 #endif
 	phalcon_aop_joinpoint_object *joinpoint = phalcon_aop_joinpoint_object_from_obj(Z_OBJ_P(aop_object));
@@ -691,7 +693,7 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 	}
 
 	if (current_pc_value == NULL) {
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		if (EG(scope) != ex->called_scope) {
 			current_scope = EG(scope);
 			EG(scope) = ex->called_scope;
@@ -703,7 +705,7 @@ void phalcon_aop_do_func_execute(HashPosition pos, zend_array *pointcut_table, z
 
 		joinpoint->is_ex_executed = 1;
 
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		if (current_scope != NULL) {
 			EG(scope) = current_scope;
 		}
@@ -812,6 +814,7 @@ void func_pointcut_and_execute(zend_execute_data *ex) /*{{{*/
 		PHALCON_GLOBAL(aop).overloaded = 1;
 		return;
 	}
+
 	zend_hash_internal_pointer_reset_ex(pointcut_table, &pos);
 
 	object_init_ex(&aop_object, phalcon_aop_joinpoint_ce);
@@ -924,7 +927,7 @@ void phalcon_aop_do_read_property(HashPosition pos, zend_array *pointcut_table, 
 	}
 
 	if (current_pc_value == NULL) {
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		if (EG(scope) != joinpoint->ex->called_scope) {
 			current_scope = EG(scope);
 			EG(scope) = joinpoint->ex->called_scope;
@@ -936,11 +939,15 @@ void phalcon_aop_do_read_property(HashPosition pos, zend_array *pointcut_table, 
 		}
 #endif
 
+#if PHP_VERSION_ID >= 80000
+		property_value = original_zend_std_read_property(Z_OBJ_P(joinpoint->object), Z_STR_P(joinpoint->member), joinpoint->type, joinpoint->cache_slot, joinpoint->rv);
+#else
 		property_value = original_zend_std_read_property(joinpoint->object, joinpoint->member, joinpoint->type, joinpoint->cache_slot, joinpoint->rv);
+#endif
 		ZVAL_COPY_VALUE(PHALCON_GLOBAL(aop).property_value, property_value);
 
 		if (current_scope != NULL) {
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 			EG(scope) = current_scope;
 #else
 			EG(fake_scope) = current_scope;
@@ -998,7 +1005,12 @@ zval *phalcon_aop_read_property(zval *object, zval *member, int type, void **cac
 
 	pointcut_table = get_cache_property(object, member, PHALCON_AOP_KIND_READ);
 	if (pointcut_table == NULL || zend_hash_num_elements(pointcut_table) == 0) {
-		return original_zend_std_read_property(object,member,type,cache_slot,rv);
+
+#if PHP_VERSION_ID >= 80000
+		return original_zend_std_read_property(Z_OBJ_P(object), Z_STR_P(member),type,cache_slot,rv);
+#else
+		return original_zend_std_read_property(object, member, type,cache_slot,rv);
+#endif
 	}
 	zend_hash_internal_pointer_reset_ex(pointcut_table, &pos);
 
@@ -1049,7 +1061,7 @@ void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table,
 	}
 
 	if (current_pc_value == NULL) {
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		if (EG(scope) != joinpoint->ex->called_scope) {
 			current_scope = EG(scope);
 			EG(scope) = joinpoint->ex->called_scope;
@@ -1060,9 +1072,14 @@ void phalcon_aop_do_write_property(HashPosition pos, zend_array *pointcut_table,
 			EG(fake_scope) = joinpoint->ex->func->common.scope;
 		}
 #endif
+#if PHP_VERSION_ID >= 80000
+		original_zend_std_write_property(Z_OBJ_P(joinpoint->object), Z_STR_P(joinpoint->member), &joinpoint->property_value, joinpoint->cache_slot);
+#else
 		original_zend_std_write_property(joinpoint->object, joinpoint->member, &joinpoint->property_value, joinpoint->cache_slot);
+#endif
 		if (current_scope != NULL) {
-#if PHP_MINOR_VERSION < 1
+
+#if PHP_VERSION_ID < 70100
 			EG(scope) = current_scope;
 #else
 			EG(fake_scope) = current_scope;
@@ -1118,7 +1135,10 @@ void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **
 
 	pointcut_table = get_cache_property(object, member, PHALCON_AOP_KIND_WRITE);
 	if (pointcut_table == NULL || zend_hash_num_elements(pointcut_table) == 0) {
-#if PHP_VERSION_ID >= 70400
+
+#if PHP_VERSION_ID >= 80000
+		return original_zend_std_write_property(Z_OBJ_P(object), Z_STR_P(member), value, cache_slot);
+#elif PHP_VERSION_ID >= 70400
 		return original_zend_std_write_property(object, member, value, cache_slot);
 #else
 		original_zend_std_write_property(object, member, value, cache_slot);
@@ -1150,16 +1170,29 @@ void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **
 #endif
 }
 
-zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
+#if PHP_VERSION_ID >= 80000
+zval *phalcon_aop_get_property_ptr_ptr(zend_object *object, zend_string *member, int type, void **cache_slot)
 {
 	zend_execute_data *ex = EG(current_execute_data);
 	if (ex->opline == NULL || (ex->opline->opcode != ZEND_PRE_INC_OBJ && ex->opline->opcode != ZEND_POST_INC_OBJ && ex->opline->opcode != ZEND_PRE_DEC_OBJ && ex->opline->opcode != ZEND_POST_DEC_OBJ)) {
 		return original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
 	}
+	return NULL;
+}
+#else
+zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot)
+{
+	zend_execute_data *ex = EG(current_execute_data);
+	if (ex->opline == NULL || (ex->opline->opcode != ZEND_PRE_INC_OBJ && ex->opline->opcode != ZEND_POST_INC_OBJ && ex->opline->opcode != ZEND_PRE_DEC_OBJ && ex->opline->opcode != ZEND_POST_DEC_OBJ)) {
+#if PHP_VERSION_ID >= 70400
+		return original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
+#endif
+	}
 	// Call original to not have a notice
 	//original_zend_std_get_property_ptr_ptr(object, member, type, cache_slot);
 	return NULL;
 }
+#endif
 
 void phalcon_aop_make_regexp_on_pointcut (phalcon_aop_pointcut *pc) /*{{{*/
 {

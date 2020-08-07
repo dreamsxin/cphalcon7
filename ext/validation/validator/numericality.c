@@ -54,7 +54,7 @@ PHP_METHOD(Phalcon_Validation_Validator_Numericality, valid);
 
 static const zend_function_entry phalcon_validation_validator_numericality_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Validator_Numericality, validate, arginfo_phalcon_validation_validatorinterface_validate, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Validator_Numericality, valid, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Validator_Numericality, valid, arginfo_phalcon_validation_validatorinterface_valid, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

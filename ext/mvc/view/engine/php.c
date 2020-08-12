@@ -68,7 +68,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	zval *path, *params, *must_clean = NULL, *partial = NULL, contents = {}, view = {}, *value = NULL;
 	zend_string *str_key;
-	zend_array *symbol_table, *old_symbol_table;
+	zend_array *symbol_table, *old_symbol_table = NULL;
 	ulong idx;
 	int clean = 0;
 

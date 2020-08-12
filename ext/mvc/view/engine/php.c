@@ -144,21 +144,17 @@ end:
 			zval key = {};
 			if (str_key) {
 				ZVAL_STR(&key, str_key);
+				if (!zend_hash_exists(old_symbol_table, str_key)) {
+					phalcon_del_symbol(symbol_table, &key);
+				}
 			} else {
 				ZVAL_LONG(&key, idx);
+				if (!zend_hash_index_exists(old_symbol_table, idx)) {
+					phalcon_del_symbol(symbol_table, &key);
+				}
 			}
-			phalcon_del_symbol(symbol_table, &key);
 		} ZEND_HASH_FOREACH_END();
 		if (EXPECTED(old_symbol_table != NULL)) {
-			ZEND_HASH_FOREACH_KEY_VAL_IND(old_symbol_table, idx, str_key, value) {
-				zval key = {};
-				if (str_key) {
-					ZVAL_STR(&key, str_key);
-				} else {
-					ZVAL_LONG(&key, idx);
-				}
-				phalcon_set_symbol(symbol_table, &key, value);
-			} ZEND_HASH_FOREACH_END();
 			zend_array_destroy(old_symbol_table);
 		}
 	}

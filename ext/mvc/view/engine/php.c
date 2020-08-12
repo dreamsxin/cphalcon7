@@ -68,7 +68,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	zval *path, *params, *must_clean = NULL, *partial = NULL, contents = {}, view = {}, *value = NULL;
 	zend_string *str_key;
-	zend_array *symbol_table;
+	zend_array *symbol_table, *old_symbol_table;
 	ulong idx;
 	int clean = 0;
 
@@ -99,6 +99,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	 * Create the variables in local symbol table
 	 */
 	if (Z_TYPE_P(params) == IS_ARRAY) {
+		if (EXPECTED(symbol_table != NULL)) {
+			old_symbol_table = zend_array_dup(symbol_table);
+		}
 		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(params), idx, str_key, value) {
 			zval key = {};
 			if (str_key) {
@@ -135,6 +138,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	ZVAL_TRUE(return_value);
 
 end:
+	// 清除本次，恢复上一次的
 	if (Z_TYPE_P(params) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(params), idx, str_key) {
 			zval key = {};
@@ -145,5 +149,17 @@ end:
 			}
 			phalcon_del_symbol(symbol_table, &key);
 		} ZEND_HASH_FOREACH_END();
+		if (EXPECTED(old_symbol_table != NULL)) {
+			ZEND_HASH_FOREACH_KEY_VAL_IND(old_symbol_table, idx, str_key, value) {
+				zval key = {};
+				if (str_key) {
+					ZVAL_STR(&key, str_key);
+				} else {
+					ZVAL_LONG(&key, idx);
+				}
+				phalcon_set_symbol(symbol_table, &key, value);
+			} ZEND_HASH_FOREACH_END();
+			zend_array_destroy(old_symbol_table);
+		}
 	}
 }

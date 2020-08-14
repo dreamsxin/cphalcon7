@@ -129,7 +129,7 @@ ZEND_API void phalcon_xhprof_execute_ex (zend_execute_data *execute_data) {
     }
 }
 
-static const char digits[] = "0123456789abcdef";
+//static const char digits[] = "0123456789abcdef";
 
 static void *(*_zend_malloc) (size_t);
 static void (*_zend_free) (void *);

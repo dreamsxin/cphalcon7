@@ -155,11 +155,12 @@ static zend_always_inline double phalcon_get_timebase_factor(int source)
             tsc_start  = phalcon_time_milliseconds(source, 1.0);
             /* Busy loop for 5 miliseconds. */
             do {
-                for (i = 0; i < 1000000; i++);
+                for (i = 0; i < 1000000; i++) {
                     if (gettimeofday(&end, 0)) {
                         perror("gettimeofday");
                         return 0.0;
                     }
+				}
                 tsc_end = phalcon_time_milliseconds(source, 1.0);
             } while (phalcon_get_us_interval(&start, &end) < 5000);
 

@@ -23,7 +23,7 @@
 zend_class_entry *phalcon_mvc_model_queryinterface_ce;
 
 static const zend_function_entry phalcon_mvc_model_queryinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_QueryInterface, parse, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_QueryInterface, parse, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_Model_QueryInterface, execute, arginfo_phalcon_mvc_model_queryinterface_execute)
 	PHP_FE_END
 };

@@ -71,7 +71,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_server_method_entry[] = {
 	PHP_ME(Phalcon_Server, __construct, arginfo_phalcon_server___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Server, start, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Server, start, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Server, close, arginfo_phalcon_server_close, ZEND_ACC_PUBLIC)
 	PHP_ABSTRACT_ME(Phalcon_Server, onConnect, arginfo_phalcon_server_onconnect)
 	PHP_ABSTRACT_ME(Phalcon_Server, onReceive, arginfo_phalcon_server_onreceive)

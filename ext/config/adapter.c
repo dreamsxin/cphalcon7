@@ -46,7 +46,7 @@ static const zend_function_entry phalcon_config_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Config_Adapter, __construct, arginfo_phalcon_config_adapter___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Config_Adapter, factory, arginfo_phalcon_config_adapter_factory, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Config_Adapter, setBasePath, arginfo_phalcon_config_adapterinterface_setbasepath, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Config_Adapter, getBasePath, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Config_Adapter, getBasePath, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Config_Adapter, load, arginfo_phalcon_config_adapterinterface_load, ZEND_ACC_PUBLIC)
 
 	ZEND_FENTRY(read, NULL, arginfo_phalcon_config_adapter_read, ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)

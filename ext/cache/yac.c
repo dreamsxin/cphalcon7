@@ -92,7 +92,7 @@ static const zend_function_entry phalcon_cache_yac_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Yac, set, arginfo_phalcon_cache_yac_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Yac, get, arginfo_phalcon_cache_yac_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Yac, delete, arginfo_phalcon_cache_yac_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Yac, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Yac, flush, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Yac, dump, arginfo_phalcon_cache_yac_dump, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Yac, __set, arginfo_phalcon_cache_yac___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Yac, __get, arginfo_phalcon_cache_yac___get, ZEND_ACC_PUBLIC)

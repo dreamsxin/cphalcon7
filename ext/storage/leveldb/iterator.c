@@ -30,8 +30,6 @@
 #include "kernel/file.h"
 #include "kernel/exception.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Storage\Leveldb\Iterator
  *
@@ -49,13 +47,13 @@ PHP_METHOD(Phalcon_Storage_Leveldb_Iterator, seek);
 PHP_METHOD(Phalcon_Storage_Leveldb_Iterator, valid);
 
 static const zend_function_entry phalcon_storage_leveldb_iterator_method_entry[] = {
-	PHP_ME(Phalcon_Storage_Leveldb_Iterator, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
+	PHP_ME(Phalcon_Storage_Leveldb_Iterator, __construct, arginfo_empty, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, current, arginfo_iterator_current, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, key, arginfo_iterator_key, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, next, arginfo_iterator_next, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Leveldb_Iterator, prev, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Leveldb_Iterator, prev, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, rewind, arginfo_iterator_rewind, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Leveldb_Iterator, last, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Leveldb_Iterator, last, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, seek, arginfo_seekableiterator_seek, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Leveldb_Iterator, valid, arginfo_iterator_valid, ZEND_ACC_PUBLIC)
 	PHP_FE_END

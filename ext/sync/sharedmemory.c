@@ -60,8 +60,8 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_sync_sharedmemory_method_entry[] = {
 	PHP_ME(Phalcon_Sync_Sharedmemory, __construct, arginfo_phalcon_sync_sharedmemory___construct, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Sharedmemory, first, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Sync_Sharedmemory, size, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Sharedmemory, first, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Sync_Sharedmemory, size, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Sync_Sharedmemory, read, arginfo_phalcon_sync_sharedmemory_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Sync_Sharedmemory, write, arginfo_phalcon_sync_sharedmemory_write, ZEND_ACC_PUBLIC)
 	PHP_FE_END

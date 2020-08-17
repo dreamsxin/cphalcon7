@@ -22,9 +22,9 @@
 #include "config.h"
 #endif
 
-#include "php.h"
-#include "ext/standard/php_var.h"
-#include "zend_smart_str.h"
+#include <php.h>
+#include <ext/standard/php_var.h>
+#include <zend_smart_str.h>
 
 #include "cache/yac/serializer.h"
 

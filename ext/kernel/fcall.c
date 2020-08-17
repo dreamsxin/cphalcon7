@@ -29,6 +29,7 @@
 #include "kernel/exception.h"
 #include "kernel/backtrace.h"
 #include "kernel/string.h"
+#include "kernel/array.h"
 
 #include "interned-strings.h"
 
@@ -62,7 +63,10 @@ zval* _phalcon_call(zval *retval_ptr, zval *object, zend_class_entry *obj_ce, ze
 	fci.retval = retval_ptr ? retval_ptr : &retval;
 	fci.param_count = param_count;
 	fci.params = params;
+
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
+#endif
 
 	if (!fn_proxy && !obj_ce) {
 		/* no interest in caching and no information already present that is
@@ -132,16 +136,41 @@ int phalcon_call_user_func_args(zval *retval, zval *handler, zval *params, int p
 	zval ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret;
 	int status;
 
-	if (
-#if PHP_VERSION_ID >= 70100
-		(status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, params, 1)) == FAILURE || EG(exception)
-#else
-		(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, params)) == FAILURE || EG(exception)
-#endif
-	) {
+#if PHP_VERSION_ID >= 80000
+	zval object = {}, function_name = {};
+	if (Z_TYPE_P(handler) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch_long(&object, handler, 0, PH_READONLY)) {
+			return FAILURE;
+		}
+		if (!phalcon_array_isset_fetch_long(&function_name, handler, 1, PH_READONLY)) {
+			if ((status = _call_user_function_ex(NULL, &object, retval_ptr, param_count, params)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		} else {
+			if ((status = _call_user_function_ex(&object, &function_name, retval_ptr, param_count, params)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		}
+	} else {
+		if ((status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, params)) == FAILURE || EG(exception)) {
+			status = FAILURE;
+			ZVAL_NULL(retval_ptr);
+		}
+	}
+
+#elif PHP_VERSION_ID >= 70100
+	if ((status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, params, 1)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 	}
+#else
+	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, params)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
+	}
+#endif
 
 	return status;
 }
@@ -164,16 +193,41 @@ int phalcon_call_user_func_params(zval *retval, zval *handler, int param_count, 
 		i++;
 	}
 
-	if (
-#if PHP_VERSION_ID >= 70100
-		(status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, arguments, 1)) == FAILURE || EG(exception)
-#else
-		(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
-#endif
-	) {
+#if PHP_VERSION_ID >= 80000
+	zval object = {}, function_name = {};
+	if (Z_TYPE_P(handler) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch_long(&object, handler, 0, PH_READONLY)) {
+			return FAILURE;
+		}
+		if (!phalcon_array_isset_fetch_long(&function_name, handler, 1, PH_READONLY)) {
+			if ((status = _call_user_function_ex(NULL, &object, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		} else {
+			if ((status = _call_user_function_ex(&object, &function_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		}
+	} else {
+		if ((status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+			status = FAILURE;
+			ZVAL_NULL(retval_ptr);
+		}
+	}
+
+#elif PHP_VERSION_ID >= 70100
+	if ((status = _call_user_function_ex(NULL, handler, retval_ptr, param_count, arguments, 1)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 	}
+#else
+	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
+	}
+#endif
 
 	efree(arguments);
 
@@ -187,7 +241,7 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 
 	if (params && Z_TYPE_P(params) != IS_ARRAY && Z_TYPE_P(params) > IS_NULL) {
 		status = FAILURE;
-		php_error_docref(NULL TSRMLS_CC, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
+		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for phalcon_call_user_func_array()");
 		return status;
 	}
 
@@ -203,16 +257,42 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 		params_count = 0;
 		arguments = NULL;
 	}
-	if (
-#if PHP_VERSION_ID >= 70100
-	(status = _call_user_function_ex(NULL, handler, retval_ptr, params_count, arguments, 1)) == FAILURE || EG(exception)
-#else
-	(status = call_user_function(EG(function_table), NULL, handler, retval_ptr, params_count, arguments)) == FAILURE || EG(exception)
-#endif
-	) {
+
+#if PHP_VERSION_ID >= 80000
+	zval object = {}, function_name = {};
+	if (Z_TYPE_P(handler) == IS_ARRAY) {
+		if (!phalcon_array_isset_fetch_long(&object, handler, 0, PH_READONLY)) {
+			return FAILURE;
+		}
+		if (!phalcon_array_isset_fetch_long(&function_name, handler, 1, PH_READONLY)) {
+			if ((status = _call_user_function_ex(NULL, &object, retval_ptr, params_count, arguments)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		} else {
+			if ((status = _call_user_function_ex(&object, &function_name, retval_ptr, params_count, arguments)) == FAILURE || EG(exception)) {
+				status = FAILURE;
+				ZVAL_NULL(retval_ptr);
+			}
+		}
+	} else {
+		if ((status = _call_user_function_ex(NULL, handler, retval_ptr, params_count, arguments)) == FAILURE || EG(exception)) {
+			status = FAILURE;
+			ZVAL_NULL(retval_ptr);
+		}
+	}
+
+#elif PHP_VERSION_ID >= 70100
+	if ((status = _call_user_function_ex(NULL, handler, retval_ptr, params_count, arguments, 1)) == FAILURE || EG(exception)) {
 		status = FAILURE;
 		ZVAL_NULL(retval_ptr);
 	}
+#else
+	if ((status = call_user_function(EG(function_table), NULL, handler, retval_ptr, params_count, arguments)) == FAILURE || EG(exception)) {
+		status = FAILURE;
+		ZVAL_NULL(retval_ptr);
+	}
+#endif
 
 	efree(arguments);
 
@@ -298,7 +378,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	}
 
 	if (
-#if PHP_VERSION_ID >= 70100
+#if PHP_VERSION_ID >= 80000
+	(status = _call_user_function_ex(object, &func_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
+#elif PHP_VERSION_ID >= 70100
 	(status = _call_user_function_ex(object, &func_name, retval_ptr, param_count, arguments, 1)) == FAILURE || EG(exception)
 #else
 	(status = call_user_function_ex(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)

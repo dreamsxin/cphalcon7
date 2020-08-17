@@ -51,9 +51,9 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_intrusive_avltree_node_method_entry[] = {
 	PHP_ME(Phalcon_Intrusive_Avltree_Node, __construct, phalcon_intrusive_avltree_node___construct, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Intrusive_Avltree_Node, setValue, phalcon_intrusive_avltree_node_setvalue, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Avltree_Node, getValue, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Avltree_Node, prev, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Avltree_Node, next, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Avltree_Node, getValue, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Avltree_Node, prev, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Avltree_Node, next, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

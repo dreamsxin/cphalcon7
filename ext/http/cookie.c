@@ -113,22 +113,22 @@ static const zend_function_entry phalcon_http_cookie_method_entry[] = {
 	PHP_ME(Phalcon_Http_Cookie, __construct, arginfo_phalcon_http_cookie___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Http_Cookie, setValue, arginfo_phalcon_http_cookie_setvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, getValue, arginfo_phalcon_http_cookie_getvalue, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, send, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, restore, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, delete, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, send, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, restore, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, delete, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, useEncryption, arginfo_phalcon_http_cookie_useencryption, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, isUsingEncryption, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, isUsingEncryption, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setExpiration, arginfo_phalcon_http_cookie_setexpiration, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, getExpiration, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, getExpiration, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setPath, arginfo_phalcon_http_cookie_setpath, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, getPath, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, getPath, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setDomain, arginfo_phalcon_http_cookie_setdomain, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, getDomain, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, getDomain, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setSecure, arginfo_phalcon_http_cookie_setsecure, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, getSecure, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, getSecure, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setHttpOnly, arginfo_phalcon_http_cookie_sethttponly, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, getHttpOnly, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, __toString, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, getHttpOnly, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -768,14 +768,20 @@ PHP_METHOD(Phalcon_Http_Cookie, getHttpOnly){
  */
 PHP_METHOD(Phalcon_Http_Cookie, __toString){
 
-	zval value = {}, e = {}, exception = {}, *m;
+	zval value = {}, exception = {}, *m;
 
 	phalcon_read_property(&value, getThis(), SL("_value"), PH_NOISY|PH_READONLY);
 	if (Z_TYPE(value) == IS_NULL) {
 		if (FAILURE == phalcon_call_method(return_value, getThis(), "getvalue", 0, NULL)) {
 			if (EG(exception)) {
+
+#if PHP_VERSION_ID >= 80000
+				ZVAL_OBJ(&exception, EG(exception));
+#else
+				zval e = {};
 				ZVAL_OBJ(&e, EG(exception));
 				ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+#endif
 				m = zend_read_property(Z_OBJCE(exception), &exception, SL("message"), 1, NULL);
 
 				Z_TRY_ADDREF_P(m);

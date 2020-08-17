@@ -24,14 +24,14 @@ zend_class_entry *phalcon_validation_messageinterface_ce;
 
 static const zend_function_entry phalcon_validation_messageinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, setType, arginfo_phalcon_validation_messageinterface_settype)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getType, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getType, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, setCode, arginfo_phalcon_validation_messageinterface_setcode)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getCode, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getCode, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, setMessage, arginfo_phalcon_validation_messageinterface_setmessage)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getMessage, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getMessage, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, setField, arginfo_phalcon_validation_messageinterface_setfield)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getField, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, __toString, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getField, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, __toString, arginfo_empty)
 	PHP_FE_END
 };
 

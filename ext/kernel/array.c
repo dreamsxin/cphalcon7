@@ -1224,7 +1224,13 @@ int phalcon_array_update_multi(zval *arr, zval *value, const char *types, int ty
 	return 0;
 }
 
+//typedef int (*bucket_compare_func_t)(Bucket *a, Bucket *b);
+
+#if PHP_VERSION_ID >= 80000
+static int phalcon_array_key_compare(Bucket *a, Bucket *b)
+#else
 static int phalcon_array_key_compare(const void *a, const void *b)
+#endif
 {
 	Bucket *f = (Bucket *) a;
 	Bucket *s = (Bucket *) b;
@@ -1264,11 +1270,12 @@ static int phalcon_array_key_compare(const void *a, const void *b)
 	return l1 > l2 ? 1 : (l1 < l2 ? -1 : 0);
 }
 
-int phalcon_array_ksort(zval *arr, int reverse) {
+void phalcon_array_ksort(zval *arr, int reverse) {
 
+#if PHP_VERSION_ID < 80000
 	compare_func_t cmp = phalcon_array_key_compare;
-	if (zend_hash_sort(Z_ARRVAL_P(arr), cmp, 0) == FAILURE) {
-		return 0;
-	}
-	return 1;
+#else
+	bucket_compare_func_t cmp = phalcon_array_key_compare;
+#endif
+	zend_hash_sort(Z_ARRVAL_P(arr), cmp, 0);
 }

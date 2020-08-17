@@ -24,7 +24,7 @@
 zend_class_entry *phalcon_acl_resourceaware_ce;
 
 static const zend_function_entry phalcon_acl_resourceaware_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Acl_ResourceAware, getResourceName, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Acl_ResourceAware, getResourceName, arginfo_empty)
 	PHP_FE_END
 };
 

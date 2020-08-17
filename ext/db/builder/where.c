@@ -86,7 +86,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_db_builder_where_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder_Where, setConditions, arginfo_phalcon_db_builder_where_setconditions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder_Where, getConditions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Builder_Where, getConditions, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Where, where, arginfo_phalcon_db_builder_where_where, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Where, andWhere, arginfo_phalcon_db_builder_where_andwhere, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder_Where, orWhere, arginfo_phalcon_db_builder_where_orwhere, ZEND_ACC_PUBLIC)

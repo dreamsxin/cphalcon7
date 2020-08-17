@@ -66,9 +66,9 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_router_handle, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_router_method_entry[] = {
-	PHP_ME(Phalcon_Cli_Router, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Cli_Router, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Cli_Router, setDefaultTask, arginfo_phalcon_routerinterface_setdefaulthandler, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Router, getTaskName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Router, getTaskName, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Router, handle, arginfo_phalcon_cli_router_handle, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

@@ -19,7 +19,6 @@
 */
 
 #include "registry.h"
-#include "internal/arginfo.h"
 
 #include <Zend/zend_interfaces.h>
 #include <Zend/zend_smart_str.h>
@@ -106,7 +105,7 @@ PHP_METHOD(Phalcon_Registry, unserialize);
 PHP_METHOD(Phalcon_Registry, __wakeup);
 
 const zend_function_entry phalcon_registry_method_entry[] = {
-	PHP_ME(Phalcon_Registry, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Registry, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Registry, __get, arginfo___getref, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Registry, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Registry, __isset, arginfo___isset, ZEND_ACC_PUBLIC)

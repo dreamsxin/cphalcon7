@@ -25,14 +25,14 @@ zend_class_entry *phalcon_cryptinterface_ce;
 
 static const zend_function_entry phalcon_cryptinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, setMethod, arginfo_phalcon_cryptinterface_setmethod)
-	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getMethod, NULL)
+	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getMethod, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, setKey, arginfo_phalcon_cryptinterface_setkey)
-	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getKey, NULL)
+	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getKey, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, encrypt, arginfo_phalcon_cryptinterface_encrypt)
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, decrypt, arginfo_phalcon_cryptinterface_decrypt)
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, encryptBase64, arginfo_phalcon_cryptinterface_encryptbase64)
 	PHP_ABSTRACT_ME(Phalcon_CryptInterface, decryptBase64, arginfo_phalcon_cryptinterface_decryptbase64)
-	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getAvailableMethods, NULL)
+	PHP_ABSTRACT_ME(Phalcon_CryptInterface, getAvailableMethods, arginfo_empty)
 	PHP_FE_END
 };
 

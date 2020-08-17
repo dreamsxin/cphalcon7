@@ -75,9 +75,9 @@ PHP_METHOD(Phalcon_Session_Adapter_Cache, destroy);
 PHP_METHOD(Phalcon_Session_Adapter_Cache, gc);
 
 static const zend_function_entry phalcon_session_adapter_cache_method_entry[] = {
-	PHP_ME(Phalcon_Session_Adapter_Cache, start, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Cache, start, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Cache, open, arginfo_phalcon_session_adapterinterface_open, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Session_Adapter_Cache, close, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Session_Adapter_Cache, close, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Cache, read, arginfo_phalcon_session_adapterinterface_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Cache, write, arginfo_phalcon_session_adapterinterface_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Session_Adapter_Cache, destroy, arginfo_phalcon_session_adapterinterface_destroy, ZEND_ACC_PUBLIC)

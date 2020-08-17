@@ -103,12 +103,12 @@ static const zend_function_entry phalcon_validation_message_group_method_entry[]
 	PHP_ME(Phalcon_Validation_Message_Group, appendMessage, arginfo_phalcon_validation_message_group_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message_Group, appendMessages, arginfo_phalcon_validation_message_group_appendmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message_Group, filter, arginfo_phalcon_validation_message_group_filter, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, count, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, rewind, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, current, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, key, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, next, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message_Group, valid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, count, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, rewind, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, current, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, key, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, next, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, valid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message_Group, __set_state, arginfo_phalcon_validation_message_group___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };

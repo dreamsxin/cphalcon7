@@ -32,8 +32,6 @@
 #include "kernel/string.h"
 #include "kernel/output.h"
 
-#include "internal/arginfo.h"
-
 
 /**
  * Phalcon\Date\DateTime
@@ -113,18 +111,18 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_date_datetime_method_entry[] = {
 	PHP_ME(Phalcon_Date_DateTime, __construct, arginfo_phalcon_date_datetime___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Date_DateTime, setDateTime, arginfo_phalcon_date_datetime_setdatetime, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfDay, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfDay, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfMonth, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfMonth, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfQuarter, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfQuarter, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfYear, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfYear, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfDecade, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfDecade, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, startOfCentury, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Date_DateTime, endOfCentury, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfDay, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfDay, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfMonth, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfMonth, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfQuarter, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfQuarter, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfYear, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfYear, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfDecade, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfDecade, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, startOfCentury, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Date_DateTime, endOfCentury, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, modifyYear, arginfo_phalcon_date_datetime_modifyyear, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, modifyQuarter, arginfo_phalcon_date_datetime_modifyquarter, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Date_DateTime, modifyMonth, arginfo_phalcon_date_datetime_modifymonth, ZEND_ACC_PUBLIC)

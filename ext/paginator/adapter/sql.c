@@ -35,7 +35,6 @@
 #include "kernel/fcall.h"
 #include "kernel/debug.h"
 
-#include "internal/arginfo.h"
 
 /**
  * Phalcon\Paginator\Adapter\Sql

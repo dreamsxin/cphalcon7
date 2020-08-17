@@ -46,7 +46,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_py_object___construct, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_py_object_method_entry[] = {
-	PHP_ME(Phalcon_Py_Object, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Py_Object, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_FE_END
 };
 

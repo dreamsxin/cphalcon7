@@ -90,39 +90,39 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_forms_element_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Element, __construct, arginfo_phalcon_forms_elementinterface___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Forms_Element, setForm, arginfo_phalcon_forms_elementinterface_setform, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getForm, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getForm, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setName, arginfo_phalcon_forms_elementinterface_setname, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getName, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setFilters, arginfo_phalcon_forms_elementinterface_setfilters, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, addFilter, arginfo_phalcon_forms_elementinterface_addfilter, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getFilters, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getFilters, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, addValidators, arginfo_phalcon_forms_elementinterface_addvalidators, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, addValidator, arginfo_phalcon_forms_elementinterface_addvalidator, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getValidators, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getValidators, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, prepareAttributes, arginfo_phalcon_forms_elementinterface_prepareattributes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setAttribute, arginfo_phalcon_forms_elementinterface_setattribute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, getAttribute, arginfo_phalcon_forms_elementinterface_getattribute, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setAttributes, arginfo_phalcon_forms_elementinterface_setattributes, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getAttributes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getAttributes, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setUserOption, arginfo_phalcon_forms_elementinterface_setuseroption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, getUserOption, arginfo_phalcon_forms_elementinterface_getuseroption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setUserOptions, arginfo_phalcon_forms_elementinterface_setuseroptions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getUserOptions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getUserOptions, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setLabel, arginfo_phalcon_forms_elementinterface_setlabel, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getLabel, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getLabel, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, label, arginfo_phalcon_forms_element_label, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setDefault, arginfo_phalcon_forms_elementinterface_setdefault, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getDefault, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getDefault, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getValue, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setValue, arginfo_phalcon_forms_element_setvalue, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, getMessages, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, hasMessages, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, getMessages, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, hasMessages, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, setMessages, arginfo_phalcon_forms_elementinterface_setmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, appendMessage, arginfo_phalcon_forms_elementinterface_appendmessage, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, clear, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, clear, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Element, render, arginfo_phalcon_forms_elementinterface_render, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Element, __toString, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Element, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -957,12 +957,17 @@ PHP_METHOD(Phalcon_Forms_Element, render){
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	zval e = {}, exception = {}, *m;
+	zval exception = {}, *m;
 
 	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
 		if (EG(exception)) {
+#if PHP_VERSION_ID >= 80000
+			ZVAL_OBJ(&exception, zend_objects_clone_obj(EG(exception)));
+#else
+			zval e = {};
 			ZVAL_OBJ(&e, EG(exception));
 			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+#endif
 			m = zend_read_property(Z_OBJCE(exception), &exception, SL("message"), 1, NULL);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);

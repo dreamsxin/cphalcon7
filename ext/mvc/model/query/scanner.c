@@ -23,7 +23,7 @@
 #include "config.h"
 #endif
 
-#include "php.h"
+#include <php.h>
 #include "php_phalcon.h"
 
 #include "scanner.h"

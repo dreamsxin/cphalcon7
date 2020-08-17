@@ -34,8 +34,6 @@
 #include "kernel/hash.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Cache\Backend\Redis
  *
@@ -93,7 +91,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_backend_redis_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Redis, __construct, arginfo_phalcon_cache_backend_redis___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Backend_Redis, _connect, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cache_Backend_Redis, _connect, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Cache_Backend_Redis, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
@@ -101,8 +99,8 @@ static const zend_function_entry phalcon_cache_backend_redis_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Redis, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Redis, flush, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Redis, flushDb, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Redis, flush, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Redis, flushDb, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, setTrackingKey, arginfo_phalcon_cache_backend_redis_settrackingkey, ZEND_ACC_PUBLIC)
 	PHP_FE_END

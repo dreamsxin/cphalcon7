@@ -31,8 +31,6 @@
 #include "kernel/file.h"
 #include "kernel/variables.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Storage\Lmdb\Cursor
  *
@@ -91,12 +89,12 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_storage_lmdb_cursor_last, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_storage_lmdb_cursor_method_entry[] = {
-	PHP_ME(Phalcon_Storage_Lmdb_Cursor, __construct, NULL, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, __construct, arginfo_empty, ZEND_ACC_PRIVATE|ZEND_ACC_CTOR|ZEND_ACC_FINAL)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, retrieve, arginfo_phalcon_storage_lmdb_cursor_retrieve, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, get, arginfo_phalcon_storage_lmdb_cursor_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, put, arginfo_phalcon_storage_lmdb_cursor_put, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, del, arginfo_phalcon_storage_lmdb_cursor_del, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Lmdb_Cursor, count, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Lmdb_Cursor, count, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, current, arginfo_iterator_current, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, key, arginfo_iterator_key, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Lmdb_Cursor, next, arginfo_phalcon_storage_lmdb_cursor_next, ZEND_ACC_PUBLIC)

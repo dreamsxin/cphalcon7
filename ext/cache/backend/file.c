@@ -94,7 +94,7 @@ static const zend_function_entry phalcon_cache_backend_file_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_File, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_File, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_File, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_File, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_File, flush, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

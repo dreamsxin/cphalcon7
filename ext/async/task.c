@@ -1022,7 +1022,9 @@ static PHP_METHOD(Task, async)
 		}
 	}
 
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
+#endif
 
 	if (count == 0) {
 		fci.param_count = 0;
@@ -1080,7 +1082,9 @@ static PHP_METHOD(Task, asyncWithContext)
 		}
 	}
 
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
+#endif
 
 	if (count == 0) {
 		fci.param_count = 0;
@@ -1166,7 +1170,7 @@ static const zend_function_entry task_functions[] = {
 	PHP_ME(Task, asyncWithContext, arginfo_task_async_with_context, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Task, await, arginfo_task_await, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Task, getTrace, arginfo_task_get_trace, ZEND_ACC_PUBLIC)
-	PHP_ME(Task, getId, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Task, getId, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1255,7 +1259,12 @@ static void async_task_scheduler_dispose(async_task_scheduler *scheduler)
 	ZEND_HASH_FOREACH_VAL(&scheduler->components, component) {
 		if (instanceof_function(Z_OBJCE_P(component), async_component_ce)) {
 			zend_try {
+
+#if PHP_VERSION_ID >= 80000
+				zend_call_method_with_0_params(Z_OBJ_P(component), Z_OBJCE_P(component), NULL, "shutdown", &error);
+#else
 				zend_call_method_with_0_params(component, Z_OBJCE_P(component), NULL, "shutdown", &error);
+#endif
 			} zend_catch {
 				async_task_scheduler_handle_exit(scheduler);
 			} zend_end_try();
@@ -1506,8 +1515,10 @@ static void run_ticks(async_task_scheduler *scheduler)
 
 		fci.size = sizeof(zend_fcall_info);
 		fci.object = event->fcc.object;
-		fci.no_separation = 1;
 
+#if PHP_VERSION_ID < 80000
+		fci.no_separation = 1;
+#endif
 		ZVAL_COPY_VALUE(&fci.function_name, &event->callback);
 
 		fci.params = args;
@@ -1705,8 +1716,10 @@ ASYNC_CALLBACK debug_pending_tasks(async_task_scheduler *scheduler, zend_fcall_i
 	fci->param_count = 1;
 	fci->params = args;
 	fci->retval = &retval;
-	fci->no_separation = 1;
 
+#if PHP_VERSION_ID < 80000
+	fci->no_separation = 1;
+#endif
 	zend_call_function(fci, fcc);
 
 	zval_ptr_dtor(&args[0]);
@@ -2207,7 +2220,15 @@ void async_task_ce_register()
 	async_awaitable_impl_handlers.clone_obj = NULL;
 	async_awaitable_impl_handlers.write_property = async_prop_write_handler_readonly;
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_awaitable_impl_ce, str_status, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_NULL(&tmp);
+	zend_declare_typed_property(async_awaitable_impl_ce, str_file, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 1, 0));
+	zend_declare_typed_property(async_awaitable_impl_ce, str_line, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_LONG, 0, 0));
+#elif PHP_VERSION_ID < 70400
 	zend_declare_property_null(async_awaitable_impl_ce, ZEND_STRL("status"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_awaitable_impl_ce, ZEND_STRL("file"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_awaitable_impl_ce, ZEND_STRL("line"), ZEND_ACC_PUBLIC);
@@ -2232,8 +2253,16 @@ void async_task_ce_register()
 	async_task_handlers.free_obj = async_task_object_destroy;
 	async_task_handlers.clone_obj = NULL;
 	async_task_handlers.write_property = async_prop_write_handler_readonly;
-	
-#if PHP_VERSION_ID < 70400
+
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, "");
+	zend_declare_typed_property(async_task_ce, str_status, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 0, 0));
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_NULL(&tmp);
+	zend_declare_typed_property(async_task_ce, str_file, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_STRING, 1, 0));
+	zend_declare_typed_property(async_task_ce, str_line, &tmp, ZEND_ACC_PUBLIC, NULL, (zend_type) ZEND_TYPE_INIT_CODE(IS_LONG, 0, 0));
+#elif PHP_VERSION_ID < 70400
 	zend_declare_property_null(async_task_ce, ZEND_STRL("status"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_task_ce, ZEND_STRL("file"), ZEND_ACC_PUBLIC);
 	zend_declare_property_null(async_task_ce, ZEND_STRL("line"), ZEND_ACC_PUBLIC);

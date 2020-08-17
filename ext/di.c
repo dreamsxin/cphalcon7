@@ -41,8 +41,6 @@
 #include "kernel/hash.h"
 #include "kernel/operators.h"
 
-#include "internal/arginfo.h"
-
 #include "interned-strings.h"
 
 /**
@@ -134,9 +132,9 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_di_method_entry[] = {
 	PHP_ME(Phalcon_Di, __construct, arginfo_phalcon_di___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Di, getName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di, setEventsManager, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Di, getEventsManager, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di, getName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, setEventsManager, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Di, getEventsManager, arginfo_empty, ZEND_ACC_PROTECTED)
 	/* Phalcon\DiInterface*/
 	PHP_ME(Phalcon_Di, set, arginfo_phalcon_diinterface_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di, remove, arginfo_phalcon_diinterface_remove, ZEND_ACC_PUBLIC)
@@ -147,11 +145,11 @@ static const zend_function_entry phalcon_di_method_entry[] = {
 	PHP_ME(Phalcon_Di, get, arginfo_phalcon_diinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di, getShared, arginfo_phalcon_diinterface_getshared, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di, has, arginfo_phalcon_diinterface_has, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di, wasFreshInstance, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Di, getServices, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, wasFreshInstance, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, getServices, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Di, setDefault, arginfo_phalcon_diinterface_setdefault, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Di, getDefault, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Di, reset, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Di, getDefault, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Di, reset, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 
 	/* Convenience methods */
 	PHP_ME(Phalcon_Di, attempt, arginfo_phalcon_di_attempt, ZEND_ACC_PUBLIC)
@@ -165,7 +163,7 @@ static const zend_function_entry phalcon_di_method_entry[] = {
 	PHP_ME(Phalcon_Di, __call, arginfo_phalcon_di___call, ZEND_ACC_PUBLIC)
 
 	/* Misc */
-	PHP_ME(Phalcon_Di, __clone, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Di, __clone, arginfo_empty, ZEND_ACC_PUBLIC)
 
 	PHP_MALIAS(Phalcon_Di, __set, set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Di, __get, get, arginfo___get, ZEND_ACC_PUBLIC)

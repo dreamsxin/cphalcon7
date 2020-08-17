@@ -85,22 +85,22 @@ ZEND_BEGIN_ARG_INFO(arginfo_phalcon_aop_joinpoint_getproperty, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_aop_joinpoint_method_entry[] = {
-	PHP_ME(Phalcon_Aop_Joinpoint, getArguments, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getArguments, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, setArguments, arginfo_phalcon_aop_joinpoint_setarguments, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getException, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getPointcut, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, process, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getKindOfAdvice, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getObject, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getException, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getPointcut, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, process, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getKindOfAdvice, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getObject, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, getReturnedValue, arginfo_phalcon_aop_joinpoint_getreturnedvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, setReturnedValue, arginfo_phalcon_aop_joinpoint_setreturnedvalue, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getClassName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getMethodName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getFunctionName, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getClassName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getMethodName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getFunctionName, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, getAssignedValue, arginfo_phalcon_aop_joinpoint_getassignedvalue, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, setAssignedValue, arginfo_phalcon_aop_joinpoint_setassignedvalue, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyValue, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Aop_Joinpoint, getPropertyValue, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, setProperty, arginfo_phalcon_aop_joinpoint_setproperty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Aop_Joinpoint, getProperty, arginfo_phalcon_aop_joinpoint_getproperty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -367,7 +367,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getObject){
 			RETURN_ZVAL(intern->object, 1, 0);
 		}
 	} else {
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		call_object = Z_OBJ(intern->ex->This);
 #else
 		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {
@@ -451,7 +451,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getClassName){
 		zend_class_entry *ce = NULL;
 		zend_object *call_object = NULL;
 
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		call_object = Z_OBJ(intern->ex->This);
 #else
 		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {
@@ -606,7 +606,11 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getPropertyValue){
 		old_scope = EG(scope);
 		EG(scope) = Z_OBJCE_P(intern->object);
 #endif
+#if PHP_VERSION_ID >= 80000
+	   ret = original_zend_std_get_property_ptr_ptr(Z_OBJ_P(intern->object), Z_STR_P(intern->member), intern->type, intern->cache_slot);
+#else
 	   ret = original_zend_std_get_property_ptr_ptr(intern->object, intern->member, intern->type, intern->cache_slot);
+#endif
 #if PHP_VERSION_ID >= 70100
 		EG(fake_scope) = old_scope;
 #else
@@ -636,7 +640,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, setProperty){
 		}
 	} else {
 		zend_object *call_object = NULL;
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		call_object = Z_OBJ(intern->ex->This);
 #else
 		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {
@@ -671,7 +675,7 @@ PHP_METHOD(Phalcon_Aop_Joinpoint, getProperty){
 		}
 	} else {
 		zend_object *call_object = NULL;
-#if PHP_MINOR_VERSION < 1
+#if PHP_VERSION_ID < 70100
 		call_object = Z_OBJ(intern->ex->This);
 #else
 		if (Z_TYPE(intern->ex->This) == IS_OBJECT) {

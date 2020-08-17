@@ -79,11 +79,13 @@ int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error);
 #define ASYNC_DEBUG_INFO_HANDLER(name) HashTable *name(zval *obj_, int *temp)
 #define ASYNC_DEBUG_INFO_OBJ() Z_OBJ_P(obj_)
 #else
-#define ASYNC_DEBUG_INFO_HANDLER(name) HashTable *##name##(zend_object *object, int *temp)
+#define ASYNC_DEBUG_INFO_HANDLER(name) HashTable *name(zend_object *object, int *temp)
 #define ASYNC_DEBUG_INFO_OBJ() object
 #endif
 
-#if PHP_VERSION_ID < 70400
+#if PHP_VERSION_ID >= 80000
+zval *async_prop_write_handler_readonly(zend_object *object, zend_string *member, zval *value, void **cache_slot);
+#elif PHP_VERSION_ID < 70400
 void async_prop_write_handler_readonly(zval *object, zval *member, zval *value, void **cache_slot);
 #else
 zval *async_prop_write_handler_readonly(zval *object, zval *member, zval *value, void **cache_slot);

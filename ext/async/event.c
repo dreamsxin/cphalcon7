@@ -105,8 +105,9 @@ ASYNC_CALLBACK poll_cb(uv_poll_t *handle, int status, int events)
 
 	fci.size = sizeof(zend_fcall_info);
 	fci.object = event->fcc.object;
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
-
+#endif
 	ZVAL_COPY_VALUE(&fci.function_name, &event->callback);
 
 	fci.retval = &retval;
@@ -577,8 +578,9 @@ ASYNC_CALLBACK timer_cb(uv_timer_t *handle)
 
 	fci.size = sizeof(zend_fcall_info);
 	fci.object = event->fcc.object;
+#if PHP_VERSION_ID < 80000
 	fci.no_separation = 1;
-
+#endif
 	ZVAL_COPY_VALUE(&fci.function_name, &event->callback);
 
 	fci.params = args;

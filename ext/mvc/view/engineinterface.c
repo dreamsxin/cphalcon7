@@ -23,9 +23,9 @@
 zend_class_entry *phalcon_mvc_view_engineinterface_ce;
 
 static const zend_function_entry phalcon_mvc_view_engineinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, getContent, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, getContent, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, startSection, arginfo_phalcon_mvc_view_engineinterface_startsection)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, stopSection, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, stopSection, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, section, arginfo_phalcon_mvc_view_engineinterface_section)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, partial, arginfo_phalcon_mvc_view_engineinterface_partial)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_EngineInterface, render, arginfo_phalcon_mvc_view_engineinterface_render)

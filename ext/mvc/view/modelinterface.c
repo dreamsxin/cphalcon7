@@ -24,24 +24,24 @@ zend_class_entry *phalcon_mvc_view_modelinterface_ce;
 
 static const zend_function_entry phalcon_mvc_view_modelinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setTemplate, arginfo_phalcon_mvc_view_modelinterface_settemplate)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getTemplate, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getTemplate, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setVars, arginfo_phalcon_mvc_view_modelinterface_setvars)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getVars, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getVars, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setVar, arginfo_phalcon_mvc_view_modelinterface_setvar)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getVar, arginfo_phalcon_mvc_view_modelinterface_getvar)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, addChild, arginfo_phalcon_mvc_view_modelinterface_addchild)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, appendChild, arginfo_phalcon_mvc_view_modelinterface_appendchild)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getChild, arginfo_phalcon_mvc_view_modelinterface_getchild)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, hasChild, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, hasChild, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setCaptureTo, arginfo_phalcon_mvc_view_modelinterface_setcaptureto)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getCaptureTo, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getCaptureTo, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setTerminal, arginfo_phalcon_mvc_view_modelinterface_setterminal)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getTerminal, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getTerminal, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setAppend, arginfo_phalcon_mvc_view_modelinterface_setappend)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, isAppend, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, isAppend, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, setView, arginfo_phalcon_mvc_view_modelinterface_setview)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getView, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, render, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, getView, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Mvc_View_ModelInterface, render, arginfo_empty)
 	PHP_FE_END
 };
 

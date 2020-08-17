@@ -69,14 +69,14 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_process_sharedmemory_method_entry[] = {
 	PHP_ME(Phalcon_Process_Sharedmemory, __construct, arginfo_phalcon_process_sharedmemory___construct, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Process_Sharedmemory, isOpen, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Sharedmemory, getName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Sharedmemory, getSize, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Sharedmemory, open, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Sharedmemory, isOpen, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Sharedmemory, getName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Sharedmemory, getSize, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Sharedmemory, open, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Process_Sharedmemory, create, arginfo_phalcon_process_sharedmemory_create, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Process_Sharedmemory, lock, arginfo_phalcon_process_sharedmemory_lock, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Process_Sharedmemory, unlock, arginfo_phalcon_process_sharedmemory_unlock, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Process_Sharedmemory, read, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Process_Sharedmemory, read, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Process_Sharedmemory, write, arginfo_phalcon_process_sharedmemory_write, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

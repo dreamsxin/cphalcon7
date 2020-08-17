@@ -55,10 +55,10 @@ ZEND_END_ARG_INFO()
 
 const zend_function_entry phalcon_user_logic_method_entry[] = {
 	PHP_ME(Phalcon_User_Logic,	__construct,		arginfo_phalcon_user_logic_method___construct,	ZEND_ACC_PUBLIC | ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_User_Logic,	getActionName,		NULL,											ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_User_Logic,	getActionParams,	NULL,											ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_User_Logic,	getActionName,		arginfo_empty,									ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_User_Logic,	getActionParams,	arginfo_empty,									ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_User_Logic,	setContent,			arginfo_phalcon_user_logic_method_setcontent,	ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_User_Logic,	getContent,			NULL,											ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_User_Logic,	getContent,			arginfo_empty,									ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_User_Logic,	call,				arginfo_phalcon_user_logic_method_call,			ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_FE_END
 };

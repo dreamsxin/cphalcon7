@@ -24,9 +24,9 @@ zend_class_entry *phalcon_paginator_adapterinterface_ce;
 
 static const zend_function_entry phalcon_paginator_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage)
-	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getCurrentPage, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getCurrentPage, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, setLimit, arginfo_phalcon_paginator_adapterinterface_setlimit)
-	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getLimit, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getLimit, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Paginator_AdapterInterface, getPaginate, arginfo_phalcon_paginator_adapterinterface_getpaginate)
 	PHP_FE_END
 };

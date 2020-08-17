@@ -78,7 +78,7 @@ static const zend_function_entry phalcon_db_result_pdo_method_entry[] = {
 	PHP_ME(Phalcon_Db_Result_Pdo, dataSeek, arginfo_phalcon_db_resultinterface_dataseek, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Result_Pdo, setFetchMode, arginfo_phalcon_db_resultinterface_setfetchmode, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Result_Pdo, getInternalResult, arginfo_phalcon_db_resultinterface_getinternalresult, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Result_Pdo, nextRowset, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Result_Pdo, nextRowset, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

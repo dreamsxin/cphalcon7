@@ -49,7 +49,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_snowflake_parse, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_snowflake_method_entry[] = {
-	PHP_ME(Phalcon_Snowflake, nextId, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Snowflake, nextId, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Snowflake, parse, arginfo_phalcon_snowflake_parse, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Snowflake, parseID, arginfo_phalcon_snowflake_parse, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_FE_END

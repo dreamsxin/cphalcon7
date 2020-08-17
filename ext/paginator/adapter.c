@@ -43,9 +43,9 @@ PHP_METHOD(Phalcon_Paginator_Adapter, getLimit);
 
 static const zend_function_entry phalcon_paginator_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Paginator_Adapter, setCurrentPage, arginfo_phalcon_paginator_adapterinterface_setcurrentpage, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter, getCurrentPage, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Paginator_Adapter, getCurrentPage, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Paginator_Adapter, setLimit, arginfo_phalcon_paginator_adapterinterface_setlimit, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Paginator_Adapter, getLimit, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Paginator_Adapter, getLimit, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -50,7 +50,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_xhprof_method_entry[] = {
     PHP_ME(Phalcon_Xhprof, enable, arginfo_phalcon_xhprof_enable, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-    PHP_ME(Phalcon_Xhprof, disable, NULL, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+    PHP_ME(Phalcon_Xhprof, disable, arginfo_empty, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
     PHP_FE_END
 };
 
@@ -190,7 +190,7 @@ void tracing_end()
         }
 
         while (TXRG(callgraph_frames)) {
-            tracing_exit_frame_callgraph(TSRMLS_C);
+            tracing_exit_frame_callgraph();
         }
 
         TXRG(enabled) = 0;

@@ -27,8 +27,6 @@
 #include "kernel/exception.h"
 #include "kernel/fcall.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Db\Index
  *
@@ -52,9 +50,9 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_db_index_method_entry[] = {
 	PHP_ME(Phalcon_Db_Index, __construct, arginfo_phalcon_db_index___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Db_Index, getName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Index, getColumns, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Index, getType, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Index, getName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Index, getColumns, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Index, getType, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Index, __set_state, arginfo___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };

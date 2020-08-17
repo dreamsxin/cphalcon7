@@ -22,12 +22,10 @@
 #include "kernel/exit.h"
 
 void phalcon_exit_empty() {
-	//TSRMLS_FETCH();
 	zend_bailout();
 }
 
 void phalcon_exit(zval *ptr)  {
-	TSRMLS_FETCH();
 	if (Z_TYPE_P(ptr) == IS_LONG) {
 		EG(exit_status) = Z_LVAL_P(ptr);
 	} else {

@@ -54,7 +54,6 @@
 #include "kernel/debug.h"
 
 #include "interned-strings.h"
-#include "internal/arginfo.h"
 
 /**
  * Phalcon\Security\Random
@@ -166,7 +165,7 @@ static const zend_function_entry phalcon_security_random_method_entry[] = {
 	PHP_ME(Phalcon_Security_Random, base58, arginfo_phalcon_security_random_base58, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security_Random, base64, arginfo_phalcon_security_random_base64, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security_Random, base64Safe, arginfo_phalcon_security_random_base64safe, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Security_Random, uuid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Security_Random, uuid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security_Random, number, arginfo_phalcon_security_random_number, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

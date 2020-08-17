@@ -20,7 +20,6 @@
 #include "translate/adapter.h"
 #include "translate/adapterinterface.h"
 #include "translate/exception.h"
-#include "internal/arginfo.h"
 
 #include "kernel/main.h"
 #include "kernel/memory.h"

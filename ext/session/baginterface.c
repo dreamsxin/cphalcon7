@@ -23,8 +23,8 @@
 zend_class_entry *phalcon_session_baginterface_ce;
 
 static const zend_function_entry phalcon_session_baginterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, initialize, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, destroy, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, initialize, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, destroy, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, set, arginfo_phalcon_session_baginterface_set)
 	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, get, arginfo_phalcon_session_baginterface_get)
 	PHP_ABSTRACT_ME(Phalcon_Session_BagInterface, has, arginfo_phalcon_session_baginterface_has)

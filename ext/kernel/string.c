@@ -273,7 +273,11 @@ void phalcon_fast_join(zval *result, zval *glue, zval *pieces){
 		return;
 	}
 
+#if PHP_VERSION_ID < 80000
 	php_implode(Z_STR_P(glue), pieces, result);
+#else
+	php_implode(Z_STR_P(glue), Z_ARRVAL_P(pieces), result);
+#endif
 }
 
 /**
@@ -1142,8 +1146,12 @@ void phalcon_fast_strip_tags(zval *return_value, zval *str)
 	}
 
 	stripped = estrndup(Z_STRVAL_P(str), Z_STRLEN_P(str));
-	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, NULL, 0);
 
+#if PHP_VERSION_ID < 80000
+	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, NULL, 0);
+#else
+	len = php_strip_tags(stripped, Z_STRLEN_P(str), NULL, 0);
+#endif
 	ZVAL_STRINGL(return_value, stripped, len);
 }
 
@@ -2969,7 +2977,11 @@ void phalcon_htmlspecialchars(zval *return_value, zval *string, zval *quoting, z
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
 
+#if PHP_VERSION_ID >= 80000
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 0, qs, cs, /* double_encode */ 1, /* quiet */ 1);
+#else
 	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 0, qs, cs, 1);
+#endif
 	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {
@@ -2993,8 +3005,11 @@ void phalcon_htmlentities(zval *return_value, zval *string, zval *quoting, zval 
 
 	cs = (charset && Z_TYPE_P(charset) == IS_STRING) ? Z_STRVAL_P(charset) : NULL;
 	qs = (quoting && Z_TYPE_P(quoting) == IS_LONG)   ? Z_LVAL_P(quoting)   : ENT_COMPAT;
-
+#if PHP_VERSION_ID >= 80000
+	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 0, qs, cs, /* double_encode */ 1, /* quiet */ 1);
+#else
 	escaped = php_escape_html_entities_ex((unsigned char *)(Z_STRVAL_P(string)), Z_STRLEN_P(string), 1, qs, cs, 1);
+#endif
 	ZVAL_STR(return_value, escaped);
 
 	if (unlikely(use_copy)) {

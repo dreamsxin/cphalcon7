@@ -47,4 +47,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_validatorinterface_validate, 0
 	ZEND_ARG_TYPE_INFO(0, allowEmpty, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_validatorinterface_valid, 0, 0, 1)
+	ZEND_ARG_INFO(0, value)
+ZEND_END_ARG_INFO()
+
 #endif /* PHALCON_VALIDATION_VALIDATORINTERFACE_H */

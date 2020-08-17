@@ -53,7 +53,6 @@
 #include "kernel/array.h"
 
 #include "interned-strings.h"
-#include "internal/arginfo.h"
 
 static const unsigned char ascii64[] = "./0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz";
 
@@ -177,9 +176,9 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_security_method_entry[] = {
 	PHP_ME(Phalcon_Security, setRandomBytes, arginfo_phalcon_security_setrandombytes, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Security, getRandomBytes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Security, getRandomBytes, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, setWorkFactor, arginfo_phalcon_security_setworkfactor, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Security, getWorkFactor, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Security, getWorkFactor, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, getSaltBytes, arginfo_phalcon_security_getsaltbytes, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, hash, arginfo_phalcon_security_hash, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, checkHash, arginfo_phalcon_security_checkhash, ZEND_ACC_PUBLIC)

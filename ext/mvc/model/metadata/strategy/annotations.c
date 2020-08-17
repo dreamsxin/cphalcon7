@@ -52,7 +52,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_metadata_strategy_annotations_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getMetaData, arginfo_phalcon_mvc_model_metadata_strategy_annotations_getmetadata, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Strategy_Annotations, getColumnMaps, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

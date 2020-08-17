@@ -48,9 +48,9 @@ PHP_METHOD(Phalcon_Application, getDefaultModule);
 
 static const zend_function_entry phalcon_application_method_entry[] = {
 	PHP_ME(Phalcon_Application, registerModules, arginfo_phalcon_application_registermodules, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Application, getModules, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Application, getModules, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Application, setDefaultModule, arginfo_phalcon_application_setdefaultmodule, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Application, getDefaultModule, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Application, getDefaultModule, arginfo_empty, ZEND_ACC_PUBLIC)
 	ZEND_FENTRY(handle, NULL, arginfo_phalcon_application_handle, ZEND_ACC_PUBLIC|ZEND_ACC_ABSTRACT)
 	PHP_FE_END
 };

@@ -23,8 +23,8 @@
 zend_class_entry *phalcon_db_indexinterface_ce;
 
 static const zend_function_entry phalcon_db_indexinterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_Db_IndexInterface, getName, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Db_IndexInterface, getColumns, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Db_IndexInterface, getName, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Db_IndexInterface, getColumns, arginfo_empty)
 	PHP_FE_END
 };
 

@@ -76,7 +76,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_cli_color_info, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_color_method_entry[] = {
-	PHP_ME(Phalcon_Cli_Color, isSupportedShell, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Cli_Color, isSupportedShell, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Cli_Color, colorize, arginfo_phalcon_cli_color_colorize, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Cli_Color, head, arginfo_phalcon_cli_color_head, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Cli_Color, error, arginfo_phalcon_cli_color_error, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)

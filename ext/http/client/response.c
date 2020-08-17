@@ -68,12 +68,12 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_http_client_response_method_entry[] = {
 	PHP_ME(Phalcon_Http_Client_Response, __construct, arginfo_phalcon_http_client_response___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Http_Client_Response, setHeader, arginfo_phalcon_http_client_response_setheader, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Response, getHeader, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Response, getHeader, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, setBody, arginfo_phalcon_http_client_response_setbody, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Response, getBody, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Response, getJsonBody, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Response, getBody, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Response, getJsonBody, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Response, setStatusCode, arginfo_phalcon_http_client_response_setstatuscode, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Response, getStatusCode, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Response, getStatusCode, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

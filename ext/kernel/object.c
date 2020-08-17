@@ -495,8 +495,11 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 			return;
 		}
 
+#if PHP_VERSION_ID < 80000
 		properties = Z_OBJ_HT_P(object)->get_properties(object);
-
+#else
+		properties = Z_OBJ_HT_P(object)->get_properties(Z_OBJ_P(object));
+#endif
 		if (properties == NULL) {
 			ZVAL_NULL(result);
 			return;
@@ -596,8 +599,11 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 			return;
 		}
 
+#if PHP_VERSION_ID >= 80000
+		properties = Z_OBJ_HT_P(object)->get_properties(Z_OBJ_P(object));
+#else
 		properties = Z_OBJ_HT_P(object)->get_properties(object);
-
+#endif
 		if (properties == NULL) {
 			ZVAL_NULL(result);
 			return;
@@ -670,7 +676,6 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 	zval method_name = {};
 	zend_class_entry *ce = NULL, *pce;
 	zend_function *mptr;
-	zend_string *key;
 
 	if (Z_TYPE_P(object) == IS_OBJECT) {
 		ce = Z_OBJCE_P(object);
@@ -684,6 +689,8 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 		RETURN_NULL();
 	}
 
+	array_init(return_value);
+
 	if (check_access) {
 #if PHP_VERSION_ID < 70100
 		zend_class_entry *scope = EG(scope);
@@ -691,6 +698,21 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 		zend_class_entry *scope = zend_get_executed_scope();
 #endif
 
+#if PHP_VERSION_ID >= 80000
+		ZEND_HASH_FOREACH_PTR(&ce->function_table, mptr) {
+			if ((mptr->common.fn_flags & ZEND_ACC_PUBLIC)
+			 || (scope &&
+				 (((mptr->common.fn_flags & ZEND_ACC_PROTECTED) &&
+				   zend_check_protected(mptr->common.scope, scope))
+			   || ((mptr->common.fn_flags & ZEND_ACC_PRIVATE) &&
+				   scope == mptr->common.scope)))
+			) {
+				ZVAL_STR_COPY(&method_name, mptr->common.function_name);
+				zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &method_name);
+			}
+		} ZEND_HASH_FOREACH_END();
+#else
+		zend_string *key;
 		ZEND_HASH_FOREACH_STR_KEY_PTR(&ce->function_table, key, mptr) {
 
 			if ((mptr->common.fn_flags & ZEND_ACC_PUBLIC)
@@ -721,9 +743,16 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
+#endif
 	} else {
-		array_init(return_value);
 
+#if PHP_VERSION_ID >= 80000
+		ZEND_HASH_FOREACH_PTR(&ce->function_table, mptr) {
+			ZVAL_STR_COPY(&method_name, mptr->common.function_name);
+			zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &method_name);
+		} ZEND_HASH_FOREACH_END();
+#else
+		zend_string *key;
 		ZEND_HASH_FOREACH_STR_KEY_PTR(&ce->function_table, key, mptr) {
 			size_t len = ZSTR_LEN(mptr->common.function_name);
 
@@ -746,6 +775,7 @@ void phalcon_get_class_methods(zval *return_value, zval *object, int check_acces
 				}
 			}
 		} ZEND_HASH_FOREACH_END();
+#endif
 	}
 }
 
@@ -908,7 +938,12 @@ int phalcon_clone(zval *destination, zval *obj) {
 				php_error_docref(NULL, E_ERROR, "Trying to clone an uncloneable object");
 			}
 		} else {
+
+#if PHP_VERSION_ID >= 80000
+			ZVAL_OBJ(destination, clone_call(Z_OBJ_P(obj)));
+#else
 			ZVAL_OBJ(destination, clone_call(obj));
+#endif
 			if (EG(exception)) {
 				ZVAL_NULL(destination);
 			} else {
@@ -1005,7 +1040,11 @@ int phalcon_property_exists(zval *object, const char *property_name, uint32_t pr
 		}
 
 		if (likely((flags & PH_DYNAMIC) == PH_DYNAMIC)) {
+#if PHP_VERSION_ID >= 80000
+			return zend_hash_str_exists(Z_OBJ_HT_P(object)->get_properties(Z_OBJ_P(object)), property_name, property_length);
+#else
 			return zend_hash_str_exists(Z_OBJ_HT_P(object)->get_properties(object), property_name, property_length);
+#endif
 		}
 	}
 
@@ -1052,7 +1091,11 @@ int phalcon_read_property(zval *result, zval *object, const char *property_name,
 
 	ZVAL_STRINGL(&property, property_name, property_length);
 
+#if PHP_VERSION_ID >= 80000
+	res = Z_OBJ_HT_P(object)->read_property(Z_OBJ_P(object), Z_STR(property), flags ? BP_VAR_IS : BP_VAR_R, NULL, &rv);
+#else
 	res = Z_OBJ_HT_P(object)->read_property(object, &property, flags ? BP_VAR_IS : BP_VAR_R, NULL, &rv);
+#endif
 	if ((flags & PH_SEPARATE) == PH_SEPARATE) {
 		ZVAL_COPY_VALUE(result, res);
 		PHALCON_SEPARATE(result);
@@ -1113,7 +1156,12 @@ int phalcon_update_property(zval *object, const char *property_name, uint32_t pr
 	ZVAL_STRINGL(&property, property_name, property_length);
 
 	/* write_property will add 1 to refcount, so no Z_TRY_ADDREF_P(value); is necessary */
+
+#if PHP_VERSION_ID >= 80000
+	Z_OBJ_HANDLER_P(object, write_property)(Z_OBJ_P(object), Z_STR(property), value, NULL);
+#else
 	Z_OBJ_HANDLER_P(object, write_property)(object, &property, value, NULL);
+#endif
 
 #if PHP_VERSION_ID >= 70100
 	EG(fake_scope) = old_scope;

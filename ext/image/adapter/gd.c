@@ -90,7 +90,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_image_adapter_gd__create, 0, 0, 2)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_adapter_gd_method_entry[] = {
-	PHP_ME(Phalcon_Image_Adapter_GD, check, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Adapter_GD, check, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Adapter_GD, __construct, arginfo_phalcon_image_adapter_gd___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Image_Adapter_GD, _resize, arginfo_phalcon_image_adapter__resize, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_GD, _liquidRescale, arginfo_phalcon_image_adapter__liquidrescale, ZEND_ACC_PROTECTED)
@@ -108,7 +108,7 @@ static const zend_function_entry phalcon_image_adapter_gd_method_entry[] = {
 	PHP_ME(Phalcon_Image_Adapter_GD, _save, arginfo_phalcon_image_adapter__save, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_GD, _render, arginfo_phalcon_image_adapter__render, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Image_Adapter_GD, _create, arginfo_phalcon_image_adapter_gd__create, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Image_Adapter_GD, __destruct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
+	PHP_ME(Phalcon_Image_Adapter_GD, __destruct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_DTOR)
 	PHP_ME(Phalcon_Image_Adapter_GD, line, arginfo_phalcon_image_adapterinterface_line, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Adapter_GD, polygon, arginfo_phalcon_image_adapterinterface_polygon, ZEND_ACC_PUBLIC)
 	PHP_FE_END
@@ -989,19 +989,19 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _pixelate){
 			x1 = (int)(x + a/2 + 0.5);
 			y1 = (int)(y + a/2 + 0.5);
 
-			ZVAL_LONG(&tmp1, x1)
-			ZVAL_LONG(&tmp2, y1)
+			ZVAL_LONG(&tmp1, x1);
+			ZVAL_LONG(&tmp2, y1);
 
 			PHALCON_CALL_FUNCTION(&color, "imagecolorat", &image, &tmp1, &tmp2);
 
-			ZVAL_LONG(&tmp1, x)
-			ZVAL_LONG(&tmp2, y)
+			ZVAL_LONG(&tmp1, x);
+			ZVAL_LONG(&tmp2, y);
 
 			x1 = x + a;
 			y1 = y + a;
 
-			ZVAL_LONG(&tmp3, x1)
-			ZVAL_LONG(&tmp4, y1)
+			ZVAL_LONG(&tmp3, x1);
+			ZVAL_LONG(&tmp4, y1);
 
 			PHALCON_CALL_FUNCTION(NULL, "imagefilledrectangle", &image, &tmp1, &tmp2, &tmp3, &tmp4, &color);
 			zval_ptr_dtor(&color);

@@ -147,7 +147,6 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						/* no break */
 					case BP_VAR_UNSET:
 					case BP_VAR_IS: {
-						TSRMLS_FETCH();
 						ret = &EG(uninitialized_zval);
 						break;
 					}
@@ -174,7 +173,6 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 						/* no break */
 					case BP_VAR_UNSET:
 					case BP_VAR_IS: {
-						TSRMLS_FETCH();
 						ret = &EG(uninitialized_zval);
 						break;
 					}
@@ -193,7 +191,6 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 			return ret;
 
 		default: {
-			TSRMLS_FETCH();
 			zend_error(E_WARNING, "Illegal offset type");
 			return (type == BP_VAR_W || type == BP_VAR_RW) ? &EG(error_zval) : &EG(uninitialized_zval);
 		}

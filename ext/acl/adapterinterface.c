@@ -24,7 +24,7 @@ zend_class_entry *phalcon_acl_adapterinterface_ce;
 
 static const zend_function_entry phalcon_acl_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, setDefaultAction, arginfo_phalcon_acl_adapterinterface_setdefaultaction)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getDefaultAction, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getDefaultAction, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, addRole, arginfo_phalcon_acl_adapterinterface_addrole)
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, addInherit, arginfo_phalcon_acl_adapterinterface_addinherit)
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, isRole, arginfo_phalcon_acl_adapterinterface_isrole)
@@ -35,11 +35,11 @@ static const zend_function_entry phalcon_acl_adapterinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, allow, arginfo_phalcon_acl_adapterinterface_allow)
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, deny, arginfo_phalcon_acl_adapterinterface_deny)
 	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, isAllowed, arginfo_phalcon_acl_adapterinterface_isallowed)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveRole, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveResource, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveAccess, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getRoles, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getResources, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveRole, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveResource, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getActiveAccess, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getRoles, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Acl_AdapterInterface, getResources, arginfo_empty)
 	PHP_FE_END
 };
 

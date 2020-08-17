@@ -54,14 +54,14 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_queue_beanstalk_job_method_entry[] = {
 	PHP_ME(Phalcon_Queue_Beanstalk_Job, __construct, arginfo_phalcon_queue_beanstalk_job___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, getId, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, getBody, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, delete, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, release, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, bury, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, touch, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, kick, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Queue_Beanstalk_Job, __wakeup, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, getId, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, getBody, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, delete, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, release, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, bury, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, touch, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, kick, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Queue_Beanstalk_Job, __wakeup, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

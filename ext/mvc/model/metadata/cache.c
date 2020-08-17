@@ -63,7 +63,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_metadata_cache_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, __construct, arginfo_phalcon_mvc_model_metadata_cache___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, _getCache, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, _getCache, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, read, arginfo_phalcon_mvc_model_metadatainterface_read, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, write, arginfo_phalcon_mvc_model_metadatainterface_write, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_MetaData_Cache, reset, arginfo_phalcon_mvc_model_metadatainterface_reset, ZEND_ACC_PUBLIC)

@@ -87,18 +87,18 @@ ZEND_END_ARG_INFO()
 
 
 static const zend_function_entry phalcon_http_client_header_method_entry[] = {
-	PHP_ME(Phalcon_Http_Client_Header, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Http_Client_Header, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Http_Client_Header, set, arginfo_phalcon_http_client_header_set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, setStatusCode, arginfo_phalcon_http_client_header_setstatuscode, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, setMultiple, arginfo_phalcon_http_client_header_setmultiple, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, addMultiple, arginfo_phalcon_http_client_header_addmultiple, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, get, arginfo_phalcon_http_client_header_get, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Header, getStatusCode, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Header, getAll, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Header, getStatusCode, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Header, getAll, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, remove, arginfo_phalcon_http_client_header_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, parse, arginfo_phalcon_http_client_header_parse, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Client_Header, build, arginfo_phalcon_http_client_header_build, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Client_Header, count, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Client_Header, count, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

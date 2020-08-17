@@ -31,8 +31,6 @@
 #include "kernel/array.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
-
 #include <main/SAPI.h>
 
 //#define VIPS_DEBUG 1
@@ -1534,11 +1532,11 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __construct, arginfo_phalcon_image_vips___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Image_Vips, getVipsImage, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, getVipsImage, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __get, arginfo___getref, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __isset, arginfo___isset, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Vips, __toString, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
 
 	PHP_ME(Phalcon_Image_Vips, identity, arginfo_phalcon_image_vips_identity, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
@@ -1586,8 +1584,8 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 
 	PHP_ME(Phalcon_Image_Vips, writeToFile, arginfo_phalcon_image_vips_writetofile, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, writeToBuffer, arginfo_phalcon_image_vips_writetobuffer, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Vips, writeToMemory, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Vips, writeToArray, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, writeToMemory, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, writeToArray, arginfo_empty, ZEND_ACC_PUBLIC)
 
 	PHP_ME(Phalcon_Image_Vips, call, arginfo_phalcon_image_vips_call, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, new_from_file, arginfo_phalcon_image_vips_new_from_file, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -1606,17 +1604,17 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, get_typeof, arginfo_phalcon_image_vips_get_typeof, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, set, arginfo_phalcon_image_vips_set, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, remove, arginfo_phalcon_image_vips_remove, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, error_buffer, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, error_buffer, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, cache_set_max, arginfo_phalcon_image_vips_cache_set_max, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, cache_get_max, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, cache_get_max, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, cache_set_max_mem, arginfo_phalcon_image_vips_cache_set_max_mem, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, cache_get_max_mem, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, cache_get_max_mem, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, cache_set_max_files, arginfo_phalcon_image_vips_cache_set_max_files, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, cache_get_max_files, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, cache_get_size, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, cache_get_max_files, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, cache_get_size, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Image_Vips, concurrency_set, arginfo_phalcon_image_vips_concurrency_set, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, concurrency_get, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Image_Vips, version, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, concurrency_get, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Image_Vips, version, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 

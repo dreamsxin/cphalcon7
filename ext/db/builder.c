@@ -94,9 +94,9 @@ static const zend_function_entry phalcon_db_builder_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder, insert, arginfo_phalcon_db_builder_insert, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Db_Builder, delete, arginfo_phalcon_db_builder_delete, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Db_Builder, setBindParams, arginfo_phalcon_db_builder_setbindparams, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder, getBindParams, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Builder, getBindParams, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder, setBindTypes, arginfo_phalcon_db_builder_setbindtypes, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Builder, getBindTypes, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Builder, getBindTypes, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Db_Builder, execute, arginfo_phalcon_db_builder_execute, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

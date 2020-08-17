@@ -74,13 +74,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_intrusive_rbtree_next, 0, 0, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_intrusive_rbtree_method_entry[] = {
-	PHP_ME(Phalcon_Intrusive_Rbtree, __construct, NULL, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
+	PHP_ME(Phalcon_Intrusive_Rbtree, __construct, arginfo_empty, ZEND_ACC_PUBLIC|ZEND_ACC_FINAL|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Intrusive_Rbtree, insert, arginfo_phalcon_intrusive_rbtree_insert, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Rbtree, remove, arginfo_phalcon_intrusive_rbtree_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Rbtree, replace, arginfo_phalcon_intrusive_rbtree_replace, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Rbtree, find, arginfo_phalcon_intrusive_rbtree_find, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Rbtree, first, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Intrusive_Rbtree, last, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Rbtree, first, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Intrusive_Rbtree, last, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Rbtree, prev, arginfo_phalcon_intrusive_rbtree_prev, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Intrusive_Rbtree, next, arginfo_phalcon_intrusive_rbtree_next, ZEND_ACC_PUBLIC)
 	PHP_FE_END

@@ -120,7 +120,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_model_query_builder_where_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, setConditions, arginfo_phalcon_mvc_model_query_builder_where_setconditions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, getConditions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, getConditions, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, where, arginfo_phalcon_mvc_model_query_builder_where_where, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, andWhere, arginfo_phalcon_mvc_model_query_builder_where_andwhere, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, orWhere, arginfo_phalcon_mvc_model_query_builder_where_orwhere, ZEND_ACC_PUBLIC)
@@ -128,7 +128,7 @@ static const zend_function_entry phalcon_mvc_model_query_builder_where_method_en
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, notBetweenWhere, arginfo_phalcon_mvc_model_query_builder_where_notbetweenwhere, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, inWhere, arginfo_phalcon_mvc_model_query_builder_where_inwhere, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, notInWhere, arginfo_phalcon_mvc_model_query_builder_where_notinwhere, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, getWhere, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_Model_Query_Builder_Where, getWhere, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

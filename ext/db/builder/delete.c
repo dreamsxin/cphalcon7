@@ -48,7 +48,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_db_builder_delete_method_entry[] = {
 	PHP_ME(Phalcon_Db_Builder_Delete, __construct, arginfo_phalcon_db_builder_delete___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Db_Builder_Delete, _execute, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Db_Builder_Delete, _execute, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_FE_END
 };
 

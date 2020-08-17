@@ -24,19 +24,19 @@
 zend_class_entry *phalcon_profiler_iteminterface_ce;
 
 static const zend_function_entry phalcon_profiler_iteminterface_method_entry[] = {
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getName, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getName, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, setData, arginfo_phalcon_profiler_iteminterface_setdata)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getData, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getData, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, setInitialTime, arginfo_phalcon_profiler_iteminterface_setinitialtime)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getInitialTime, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getInitialTime, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, setFinalTime, arginfo_phalcon_profiler_iteminterface_setfinaltime)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getFinalTime, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalElapsedSeconds, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getFinalTime, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalElapsedSeconds, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, setStartMemory, arginfo_phalcon_profiler_iteminterface_setstartmemory)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getStartMemory, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getStartMemory, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, setEndMemory, arginfo_phalcon_profiler_iteminterface_setendmemory)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getEndMemory, NULL)
-	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalUsageMemory, NULL)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getEndMemory, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_ProfilerInterface, getTotalUsageMemory, arginfo_empty)
 	PHP_FE_END
 };
 

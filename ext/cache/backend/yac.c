@@ -35,8 +35,6 @@
 #include "kernel/hash.h"
 #include "kernel/string.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Cache\Backend\Yac
  *
@@ -90,7 +88,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cache_backend_yac_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Yac, __construct, arginfo_phalcon_cache_backend_yac___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Cache_Backend_Yac, _connect, NULL, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cache_Backend_Yac, _connect, arginfo_empty, ZEND_ACC_PROTECTED)
 	PHP_ME(Phalcon_Cache_Backend_Yac, get, arginfo_phalcon_cache_backendinterface_get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
@@ -98,7 +96,7 @@ static const zend_function_entry phalcon_cache_backend_yac_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Yac, exists, arginfo_phalcon_cache_backendinterface_exists, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, increment, arginfo_phalcon_cache_backendinterface_increment, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, decrement, arginfo_phalcon_cache_backendinterface_decrement, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cache_Backend_Yac, flush, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cache_Backend_Yac, flush, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Yac, setTrackingKey, arginfo_phalcon_cache_backend_yac_settrackingkey, ZEND_ACC_PUBLIC)
 	PHP_FE_END

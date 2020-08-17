@@ -61,12 +61,12 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_view_engine_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_View_Engine, __construct, arginfo_phalcon_mvc_view_engine___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Mvc_View_Engine, getContent, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Engine, getContent, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, startSection, arginfo_phalcon_mvc_view_engineinterface_startsection, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Engine, stopSection, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Engine, stopSection, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, section, arginfo_phalcon_mvc_view_engineinterface_section, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, partial, arginfo_phalcon_mvc_view_engineinterface_partial, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Mvc_View_Engine, getView, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View_Engine, getView, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, addMethod, arginfo_phalcon_mvc_view_engineinterface_addmethod, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View_Engine, __call, arginfo_phalcon_mvc_view_engineinterface___call, ZEND_ACC_PUBLIC)
 	PHP_FE_END

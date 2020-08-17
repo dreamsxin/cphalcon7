@@ -16,7 +16,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "php.h"
+#include <php.h>
 #include "cache/yac/storage.h"
 #include "cache/yac/allocator.h"
 

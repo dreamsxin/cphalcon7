@@ -81,15 +81,15 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_cli_dispatcher_method_entry[] = {
 	PHP_ME(Phalcon_Cli_Dispatcher, setTaskSuffix, arginfo_phalcon_cli_dispatcher_settasksuffix, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Dispatcher, getTaskSuffix, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskSuffix, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Dispatcher, setDefaultTask, arginfo_phalcon_cli_dispatcher_setdefaulttask, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cli_Dispatcher, setTaskName, arginfo_phalcon_cli_dispatcher_settaskname, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Dispatcher, getTaskName, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Dispatcher, _throwDispatchException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Cli_Dispatcher, _handleException, NULL, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Cli_Dispatcher, getTaskClass, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Dispatcher, getLastTask, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Cli_Dispatcher, getActiveTask, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskName, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, _throwDispatchException, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cli_Dispatcher, _handleException, arginfo_empty, ZEND_ACC_PROTECTED)
+	PHP_ME(Phalcon_Cli_Dispatcher, getTaskClass, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getLastTask, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Cli_Dispatcher, getActiveTask, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

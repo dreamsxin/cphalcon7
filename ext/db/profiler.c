@@ -72,7 +72,7 @@ PHP_METHOD(Phalcon_Db_Profiler, getNumberTotalStatements);
 
 static const zend_function_entry phalcon_db_profiler_method_entry[] = {
 	PHP_ME(Phalcon_Db_Profiler, startProfile, arginfo_phalcon_profilerinterface_startprofile, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Db_Profiler, getNumberTotalStatements, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Db_Profiler, getNumberTotalStatements, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

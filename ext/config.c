@@ -30,8 +30,6 @@
 #include "kernel/operators.h"
 #include "kernel/array.h"
 
-#include "internal/arginfo.h"
-
 /**
  * Phalcon\Config
  *

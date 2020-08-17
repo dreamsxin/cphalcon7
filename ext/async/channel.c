@@ -784,7 +784,9 @@ static PHP_METHOD(ChannelGroup, __construct)
 				return;
 			}
 
-#if PHP_VERSION_ID >= 70300
+#if PHP_VERSION_ID >= 80000
+			zend_call_method_with_0_params(Z_OBJ_P(entry), Z_OBJCE_P(entry), &Z_OBJCE_P(entry)->iterator_funcs_ptr->zf_new_iterator, "getiterator", &tmp);
+#elif PHP_VERSION_ID >= 70300
 			zend_call_method_with_0_params(entry, Z_OBJCE_P(entry), &Z_OBJCE_P(entry)->iterator_funcs_ptr->zf_new_iterator, "getiterator", &tmp);
 #else
 			zend_call_method_with_0_params(entry, Z_OBJCE_P(entry), &Z_OBJCE_P(entry)->iterator_funcs.zf_new_iterator, "getiterator", &tmp);

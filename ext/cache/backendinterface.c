@@ -25,16 +25,16 @@ zend_class_entry *phalcon_cache_backendinterface_ce;
 static const zend_function_entry phalcon_cache_backendinterface_method_entry[] = {
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, start, arginfo_phalcon_cache_backendinterface_start)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, stop, arginfo_phalcon_cache_backendinterface_stop)
-	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, getFrontend, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, getOptions, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, isFresh, NULL)
-	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, isStarted, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, getFrontend, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, getOptions, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, isFresh, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, isStarted, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, get, arginfo_phalcon_cache_backendinterface_get)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, save, arginfo_phalcon_cache_backendinterface_save)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, delete, arginfo_phalcon_cache_backendinterface_delete)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, queryKeys, arginfo_phalcon_cache_backendinterface_querykeys)
 	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, exists, arginfo_phalcon_cache_backendinterface_exists)
-	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, flush, NULL)
+	PHP_ABSTRACT_ME(Phalcon_Cache_BackendInterface, flush, arginfo_empty)
 	PHP_FE_END
 };
 

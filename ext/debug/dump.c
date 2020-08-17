@@ -84,15 +84,15 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_debug_dump_method_entry[] = {
 	PHP_ME(Phalcon_Debug_Dump, __construct, arginfo_phalcon_debug_dump___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Debug_Dump, all, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Debug_Dump, all, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug_Dump, getStyle, arginfo_phalcon_debug_dump_getstyle, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug_Dump, setStyles, arginfo_phalcon_debug_dump_setstyles, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug_Dump, output, arginfo_phalcon_debug_dump_output, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Debug_Dump, variable, arginfo_phalcon_debug_dump_variable, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Debug_Dump, variables, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Debug_Dump, variables, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Debug_Dump, one, variable, arginfo_phalcon_debug_dump_variable, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Debug_Dump, var, variable, arginfo_phalcon_debug_dump_variable, ZEND_ACC_PUBLIC)
-	PHP_MALIAS(Phalcon_Debug_Dump, vars, variables, NULL, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Debug_Dump, vars, variables, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

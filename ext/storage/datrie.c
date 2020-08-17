@@ -73,7 +73,7 @@ static const zend_function_entry phalcon_storage_datrie_method_entry[] = {
 	PHP_ME(Phalcon_Storage_Datrie, add, arginfo_phalcon_storage_datrie_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Datrie, query, arginfo_phalcon_storage_datrie_query, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Storage_Datrie, delete, arginfo_phalcon_storage_datrie_delete, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Storage_Datrie, save, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Storage_Datrie, save, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Storage_Datrie, get, query, arginfo_phalcon_storage_datrie_query, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };

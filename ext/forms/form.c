@@ -212,18 +212,18 @@ ZEND_END_ARG_INFO()
 static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, __construct, arginfo_phalcon_forms_form___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
 	PHP_ME(Phalcon_Forms_Form, setAction, arginfo_phalcon_forms_form_setaction, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getAction, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getAction, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setMethod, arginfo_phalcon_forms_form_setmethod, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getMethod, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getMethod, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setEnctype, arginfo_phalcon_forms_form_setenctype, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getEnctype, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getEnctype, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setOption, arginfo_phalcon_forms_form_setoption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getOption, arginfo_phalcon_forms_form_getoption, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setOptions, arginfo_phalcon_forms_form_setoptions, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getOptions, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getOptions, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, setEntity, arginfo_phalcon_forms_form_setentity, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getEntity, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, getElements, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getEntity, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, getElements, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, bind, arginfo_phalcon_forms_form_bind, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, isValid, arginfo_phalcon_forms_form_isvalid, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, getMessages, arginfo_phalcon_forms_form_getmessages, ZEND_ACC_PUBLIC)
@@ -240,16 +240,16 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, has, arginfo_phalcon_forms_form_has, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, remove, arginfo_phalcon_forms_form_remove, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, clear, arginfo_phalcon_forms_form_clear, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, count, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, rewind, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, current, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, key, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, next, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, valid, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, count, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, rewind, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, current, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, key, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, next, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, valid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessage, arginfo_phalcon_forms_form_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessages, arginfo_phalcon_forms_form_appendmessages, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, toArray, NULL, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, __toString, NULL, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -1400,7 +1400,7 @@ PHP_METHOD(Phalcon_Forms_Form, valid){
 		}
 	}
 
-	RETURN_FALSE
+	RETURN_FALSE;
 }
 
 /**

@@ -668,18 +668,13 @@ PHP_METHOD(Phalcon_Mvc_View_Simple, partial){
 			ZVAL_COPY_VALUE(&merged_params, params);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&merged_params, params);
+		ZVAL_COPY_VALUE(&merged_params, &view_params);
 	}
 
 	/**
 	 * Call engine render, this checks in every registered engine for the partial
 	 */
 	PHALCON_MM_CALL_METHOD(NULL, getThis(), "_internalrender", partial_path, &merged_params, absolute_path);
-
-	/**
-	 * Restore the original view params
-	 */
-	phalcon_update_property(getThis(), SL("_viewParams"), &view_params);
 
 	phalcon_ob_end_clean();
 

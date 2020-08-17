@@ -99,6 +99,8 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 	zend_execute_data *call;
 	zend_object *obj = NULL;
 	zval result;
+	uint32_t call_info;
+	zend_function *func = (zend_function *)op_array;
 
 	ZVAL_UNDEF(&result);
 
@@ -106,6 +108,7 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 		obj = Z_OBJ_P(object);
 		op_array->scope = Z_OBJCE_P(object);
 	} else {
+		obj = zend_get_this_object(EG(current_execute_data));
 #if PHP_VERSION_ID >= 70100
 		op_array->scope = EG(fake_scope);
 #else
@@ -114,11 +117,19 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 	}
 
 #if PHP_VERSION_ID >= 70400
-	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE, (zend_function*)op_array, 0, obj ? obj : NULL);
+	call_info = ZEND_CALL_HAS_THIS | ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE;
 #elif PHP_VERSION_ID >= 70100
-	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE, (zend_function*)op_array, 0, op_array->scope, obj ? obj : NULL);
+	call_info = ZEND_CALL_NESTED_CODE | ZEND_CALL_HAS_SYMBOL_TABLE;
 #else
-	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE, (zend_function*)op_array, 0, op_array->scope, obj ? obj : NULL);
+	call_info = ZEND_CALL_NESTED_CODE;
+#endif
+
+#if PHP_VERSION_ID >= 70400
+	call = zend_vm_stack_push_call_frame(call_info, func, 0, obj ? obj : NULL);
+#elif PHP_VERSION_ID >= 70100
+	call = zend_vm_stack_push_call_frame(call_info, func, 0, op_array->scope, obj ? obj : NULL);
+#else
+	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE, func, 0, op_array->scope, obj ? obj : NULL);
 #endif
 
 	call->symbol_table = symbol_table;

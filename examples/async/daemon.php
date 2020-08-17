@@ -2,7 +2,7 @@
 
 $builder = new Phalcon\Async\Process\ProcessBuilder(PHP_BINARY);
 $builder = $builder->withStdoutPipe();
-$builder->withStderrInherited();
+$builder = $builder->withStderrInherited();
 
 $proc = $builder->daemon(__DIR__.'/process/daemon.php');
 if ($proc->isRunning()) {
@@ -23,3 +23,11 @@ if ($proc->isRunning()) {
 		echo 'Error'.PHP_EOL;
 	}
 }
+
+/*
+$builder = new Phalcon\Async\Process\ProcessBuilder(PHP_BINARY);
+$builder = $builder->withStdoutInherited();
+$builder = $builder->withStderrInherited();
+
+$proc = $builder->daemon('/var/www/html/xxx/apps/cli.php', '--namespace=task', '--task=main', '--action=main');
+*/

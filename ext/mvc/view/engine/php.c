@@ -67,9 +67,6 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
 	zval *path, *params, *must_clean = NULL, *partial = NULL, contents = {}, view = {}, *value = NULL;
-	zend_string *str_key;
-	zend_array *symbol_table, *old_symbol_table = NULL;
-	ulong idx;
 	int clean = 0;
 
 	phalcon_fetch_params(0, 2, 2, &path, &params, &must_clean, &partial);
@@ -92,33 +89,12 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		phalcon_ob_clean();
 	}
 
-	// phalcon_exec_file(NULL, getThis(), path, params);
-	symbol_table = zend_rebuild_symbol_table();
-
-	/**
-	 * Create the variables in local symbol table
-	 */
-	if (Z_TYPE_P(params) == IS_ARRAY) {
-		if (EXPECTED(symbol_table != NULL)) {
-			old_symbol_table = zend_array_dup(symbol_table);
-		}
-		ZEND_HASH_FOREACH_KEY_VAL_IND(Z_ARRVAL_P(params), idx, str_key, value) {
-			zval key = {};
-			if (str_key) {
-				ZVAL_STR(&key, str_key);
-			} else {
-				ZVAL_LONG(&key, idx);
-			}
-			phalcon_set_symbol(symbol_table, &key, value);
-		} ZEND_HASH_FOREACH_END();
-	}
 
 	/**
 	 * Require the file
 	 */
-	if (phalcon_require(Z_STRVAL_P(path)) == FAILURE) {
-		ZVAL_FALSE(return_value);
-		goto end;
+	if (phalcon_exec_file(NULL, NULL, path, params) == FAILURE) {
+		RETURN_FALSE;
 	}
 
 	if (clean) {
@@ -130,32 +106,9 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents);
 		zval_ptr_dtor(&contents);
 		if (flag == FAILURE) {
-			ZVAL_FALSE(return_value);
-			goto end;
+			RETURN_FALSE;
 		}
 	}
 
-	ZVAL_TRUE(return_value);
-
-end:
-	// 清除本次，恢复上一次的
-	if (Z_TYPE_P(params) == IS_ARRAY) {
-		ZEND_HASH_FOREACH_KEY(Z_ARRVAL_P(params), idx, str_key) {
-			zval key = {};
-			if (str_key) {
-				ZVAL_STR(&key, str_key);
-				if (!zend_hash_exists(old_symbol_table, str_key)) {
-					phalcon_del_symbol(symbol_table, &key);
-				}
-			} else {
-				ZVAL_LONG(&key, idx);
-				if (!zend_hash_index_exists(old_symbol_table, idx)) {
-					phalcon_del_symbol(symbol_table, &key);
-				}
-			}
-		} ZEND_HASH_FOREACH_END();
-		if (EXPECTED(old_symbol_table != NULL)) {
-			zend_array_destroy(old_symbol_table);
-		}
-	}
+	RETURN_TRUE;
 }

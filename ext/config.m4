@@ -1420,11 +1420,12 @@ aop.c"
 			${UV_DIR}/src/fs-poll.c \
 			${UV_DIR}/src/idna.c \
 			${UV_DIR}/src/inet.c \
+			${UV_DIR}/src/random.c \
 			${UV_DIR}/src/strscpy.c \
 			${UV_DIR}/src/threadpool.c \
 			${UV_DIR}/src/timer.c \
-			${UV_DIR}/src/uv-data-getter-setters.c \
 			${UV_DIR}/src/uv-common.c \
+			${UV_DIR}/src/uv-data-getter-setters.c \
 			${UV_DIR}/src/version.c
 		"
 		# UNIX files
@@ -1440,6 +1441,7 @@ aop.c"
 			${UV_DIR}/src/unix/pipe.c \
 			${UV_DIR}/src/unix/poll.c \
 			${UV_DIR}/src/unix/process.c \
+			${UV_DIR}/src/unix/random-devurandom.c \
 			${UV_DIR}/src/unix/signal.c \
 			${UV_DIR}/src/unix/stream.c \
 			${UV_DIR}/src/unix/tcp.c \
@@ -1467,6 +1469,7 @@ aop.c"
 		# DragonFly BSD
 		if test "$uv_os" = 'DRAGONFLY'; then
 			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/random-getrandom.c \
 				${UV_DIR}/src/unix/bsd-ifaddrs.c \
 				${UV_DIR}/src/unix/bsd-proctitle.c \
 				${UV_DIR}/src/unix/freebsd.c \
@@ -1479,6 +1482,7 @@ aop.c"
 		# FreeBSD
 		if test "$uv_os" = 'FREEBSD'; then
 			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/random-getrandom.c \
 				${UV_DIR}/src/unix/bsd-ifaddrs.c \
 				${UV_DIR}/src/unix/bsd-proctitle.c \
 				${UV_DIR}/src/unix/freebsd.c \
@@ -1491,12 +1495,13 @@ aop.c"
 		# Linux
 		if test "$uv_os" = 'LINUX'; then
 			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/random-getrandom.c
+				${UV_DIR}/src/unix/random-sysctl-linux.c
 				${UV_DIR}/src/unix/linux-core.c \
 				${UV_DIR}/src/unix/linux-inotify.c \
 				${UV_DIR}/src/unix/linux-syscalls.c \
 				${UV_DIR}/src/unix/procfs-exepath.c \
-				${UV_DIR}/src/unix/proctitle.c \
-				${UV_DIR}/src/unix/sysinfo-loadavg.c
+				${UV_DIR}/src/unix/proctitle.c
 			"
 			LDFLAGS="$LDFLAGS -lutil"
 
@@ -1520,6 +1525,7 @@ aop.c"
 		# OpenBSD
 		if test "$uv_os" = 'OPENBSD'; then
 			UV_SRC="$UV_SRC \
+				${UV_DIR}/src/unix/random-getentropy.c \
 				${UV_DIR}/src/unix/bsd-ifaddrs.c \
 				${UV_DIR}/src/unix/bsd-proctitle.c \
 				${UV_DIR}/src/unix/kqueue.c \

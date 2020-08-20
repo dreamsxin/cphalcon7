@@ -1802,7 +1802,11 @@ int phalcon_property_isset_fetch(zval *return_value, zval *object, const char *p
 		ce = phalcon_lookup_class_ce(ce, property_name, property_length);
 	}
 
+#if PHP_VERSION_ID >= 80000
+	value = zend_read_property(ce, Z_OBJ_P(object), property_name, property_length, 1, NULL);
+#else
 	value = zend_read_property(ce, object, property_name, property_length, 1, NULL);
+#endif
 	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
 		value = Z_REFVAL_P(value);
 	}

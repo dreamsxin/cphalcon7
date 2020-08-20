@@ -70,8 +70,8 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_where_setconditio
 	ZEND_ARG_INFO(0, conditions)
 	ZEND_ARG_TYPE_INFO(0, bindParams, IS_ARRAY, 1)
 	ZEND_ARG_TYPE_INFO(0, bindTypes, IS_ARRAY, 1)
-	ZEND_ARG_TYPE_INFO(0, bindParams, IS_ARRAY, 1)
-	ZEND_ARG_TYPE_INFO(0, type, _IS_BOOL, 1)
+	ZEND_ARG_TYPE_INFO(0, type, _IS_BOOL, 0)
+	ZEND_ARG_TYPE_INFO(0, grouping, _IS_BOOL, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_model_query_builder_where_where, 0, 0, 1)
@@ -175,6 +175,10 @@ PHP_METHOD(Phalcon_Mvc_Model_Query_Builder_Where, setConditions){
 
 	if (!type) {
 		type = &PHALCON_GLOBAL(z_null);
+	}
+
+	if (!grouping) {
+		grouping = &PHALCON_GLOBAL(z_null);
 	}
 
 	ZVAL_BOOL(&merge, Z_TYPE_P(type) != IS_NULL ? 1 : 0);

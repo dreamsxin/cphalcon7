@@ -390,6 +390,67 @@ static void async_deferred_awaitable_object_destroy(zend_object *object)
 	zend_object_std_dtor(&awaitable->std);
 }
 
+#if PHP_VERSION_ID >= 80000
+static int deferred_awaitable_has_prop(zend_object *object, zend_string *member, int has_set_exists, void **cache_slot)
+{
+	async_deferred_awaitable *awaitable;
+
+	zend_property_info *info;
+
+	awaitable = async_deferred_awaitable_obj(object);
+
+	info = zend_get_property_info(object->ce, member, 0);
+
+	if (info == NULL) {
+		return 0;
+	}
+
+	if (info->offset == off_awaitable_status) {
+		return 1;
+	}
+
+	if (has_set_exists != ZEND_PROPERTY_EXISTS) {
+		if (info->offset == off_awaitable_line) {
+			return (has_set_exists == ZEND_PROPERTY_NOT_EMPTY) ? (awaitable->state->line > 0) : 1;
+		}
+
+		if (info->offset == off_awaitable_file) {
+			return awaitable->state->file ? 1 : 0;
+		}
+	}
+
+	return 1;
+}
+
+static zval *deferred_awaitable_read_prop(zend_object *object, zend_string *member, int type, void **cache_slot, zval *rv)
+{
+	async_deferred_awaitable *awaitable;
+
+	zend_property_info *info;
+
+	awaitable = async_deferred_awaitable_obj(object);
+
+	info = zend_get_property_info(object->ce, member, 0);
+
+	if (info == NULL) {
+		rv = &EG(uninitialized_zval);
+	} else if (info->offset == off_awaitable_status) {
+		ZVAL_STRING(rv, async_status_label(awaitable->state->status));
+	} else if (info->offset == off_awaitable_file) {
+		if (awaitable->state->file) {
+			ZVAL_STR_COPY(rv, awaitable->state->file);
+		} else {
+			ZVAL_NULL(rv);
+		}
+	} else if (info->offset == off_awaitable_line) {
+		ZVAL_LONG(rv, awaitable->state->line);
+	} else {
+		rv = &EG(uninitialized_zval);
+	}
+
+	return rv;
+}
+#else
 static int deferred_awaitable_has_prop(zval *object, zval *member, int has_set_exists, void **cache_slot)
 {
 	async_deferred_awaitable *awaitable;
@@ -453,6 +514,7 @@ static zval *deferred_awaitable_read_prop(zval *object, zval *member, int type, 
 
 	return rv;
 }
+#endif
 
 static ASYNC_DEBUG_INFO_HANDLER(deferred_awaitable_debug_info)
 {
@@ -468,6 +530,18 @@ static ASYNC_DEBUG_INFO_HANDLER(deferred_awaitable_debug_info)
 	return Z_ARRVAL(info);
 }
 
+#if PHP_VERSION_ID >= 80000
+static HashTable *deferred_awaitable_get_props(zend_object *obj)
+{
+	async_deferred_awaitable *awaitable;
+
+	awaitable = async_deferred_awaitable_obj(obj);
+
+	refresh_props(&awaitable->std, awaitable->state, async_deferred_awaitable_prop_offset);
+
+	return awaitable->std.properties;
+}
+#else
 static HashTable *deferred_awaitable_get_props(zval *obj)
 {
 	async_deferred_awaitable *awaitable;
@@ -478,6 +552,7 @@ static HashTable *deferred_awaitable_get_props(zval *obj)
 
 	return awaitable->std.properties;
 }
+#endif
 
 //LCOV_EXCL_START
 ASYNC_METHOD_NO_CTOR(DeferredAwaitable, async_deferred_awaitable_ce)
@@ -486,7 +561,7 @@ ASYNC_METHOD_NO_WAKEUP(DeferredAwaitable, async_deferred_awaitable_ce)
 
 static const zend_function_entry deferred_awaitable_functions[] = {
 	PHP_ME(DeferredAwaitable, __construct, arginfo_no_ctor, ZEND_ACC_PRIVATE)
-	PHP_ME(DeferredAwaitable, __wakeup, arginfo_no_wakeup, ZEND_ACC_PRIVATE)
+	PHP_ME(DeferredAwaitable, __wakeup, arginfo_no_wakeup, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -667,6 +742,18 @@ static ASYNC_DEBUG_INFO_HANDLER(deferred_debug_info)
 	return Z_ARRVAL(info);
 }
 
+#if PHP_VERSION_ID >= 80000
+static HashTable *deferred_get_props(zend_object *obj)
+{
+	async_deferred *defer;
+
+	defer = async_deferred_obj(obj);
+
+	refresh_props(&defer->std, defer->state, async_deferred_prop_offset);
+
+	return defer->std.properties;
+}
+#else
 static HashTable *deferred_get_props(zval *obj)
 {
 	async_deferred *defer;
@@ -677,6 +764,7 @@ static HashTable *deferred_get_props(zval *obj)
 
 	return defer->std.properties;
 }
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_deferred_ctor, 0, 0, 0)
 	ZEND_ARG_CALLABLE_INFO(0, cancel, 1)

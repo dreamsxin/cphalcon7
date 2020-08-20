@@ -54,8 +54,13 @@ void phalcon_throw_exception_debug(zval *object, const char *file, uint32_t line
 		PHALCON_CALL_METHOD(&curline, &exception, "getline");
 		if (PHALCON_IS_LONG(&curline, 0)) {
 			default_exception_ce = zend_exception_get_default();
+#if PHP_VERSION_ID >= 80000
+			zend_update_property_string(default_exception_ce, Z_OBJ(exception), "file", sizeof("file")-1, file);
+			zend_update_property_long(default_exception_ce, Z_OBJ(exception), "line", sizeof("line")-1, line);
+#else
 			zend_update_property_string(default_exception_ce, &exception, "file", sizeof("file")-1, file);
 			zend_update_property_long(default_exception_ce, &exception, "line", sizeof("line")-1, line);
+#endif
 		}
 	}
 
@@ -86,8 +91,13 @@ void phalcon_throw_exception_string_debug(zend_class_entry *ce, const char *mess
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
+#if PHP_VERSION_ID >= 80000
+		zend_update_property_string(default_exception_ce, Z_OBJ(object), "file", sizeof("file")-1, file);
+		zend_update_property_long(default_exception_ce, Z_OBJ(object), "line", sizeof("line")-1, line);
+#else
 		zend_update_property_string(default_exception_ce, &object, "file", sizeof("file")-1, file);
 		zend_update_property_long(default_exception_ce, &object, "line", sizeof("line")-1, line);
+#endif
 	}
 
 	zend_throw_exception_object(&object);
@@ -120,8 +130,13 @@ void phalcon_throw_exception_zval_debug(zend_class_entry *ce, zval *message, con
 
 	if (line > 0) {
 		default_exception_ce = zend_exception_get_default();
+#if PHP_VERSION_ID >= 80000
+		zend_update_property_string(default_exception_ce, Z_OBJ(object), "file", sizeof("file")-1, file);
+		zend_update_property_long(default_exception_ce, Z_OBJ(object), "line", sizeof("line")-1, line);
+#else
 		zend_update_property_string(default_exception_ce, &object, "file", sizeof("file")-1, file);
 		zend_update_property_long(default_exception_ce, &object, "line", sizeof("line")-1, line);
+#endif
 	}
 
 	zend_throw_exception_object(&object);

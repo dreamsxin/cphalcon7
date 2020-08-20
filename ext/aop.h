@@ -95,8 +95,11 @@ zval *phalcon_aop_write_property(zval *object, zval *member, zval *value, void *
 #else
 void phalcon_aop_write_property(zval *object, zval *member, zval *value, void **cache_slot);
 #endif
+#if PHP_VERSION_ID >= 80000
+zval *phalcon_aop_get_property_ptr_ptr(zend_object *object, zend_string *member, int type, void **cache_slot);
+#else
 zval *phalcon_aop_get_property_ptr_ptr(zval *object, zval *member, int type, void **cache_slot);
-
+#endif
 void phalcon_aop_free_pointcut(zval *elem);
 void phalcon_aop_free_pointcut_cache(zval *elem);
 

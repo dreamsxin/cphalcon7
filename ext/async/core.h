@@ -566,7 +566,11 @@ static zend_always_inline void trace_error_info(zval *error, zval *prev)
 	zval tmp;
 
 	base = instanceof_function(Z_OBJCE_P(error), zend_ce_exception) ? zend_ce_exception : zend_ce_error;
-#if PHP_VERSION_ID < 70200
+#if PHP_VERSION_ID >= 80000
+	if (0 != zval_get_long(zend_read_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_LINE), 1, &tmp))) {
+		return;
+	}
+#elif PHP_VERSION_ID < 70200
 	if (0 != zval_get_long(zend_read_property_ex(base, error, CG(known_strings)[ZEND_STR_FILE], 1, &tmp))) {
 		return;
 	}
@@ -575,7 +579,18 @@ static zend_always_inline void trace_error_info(zval *error, zval *prev)
 		return;
 	}
 #endif
-#ifndef ZSTR_KNOWN
+#if PHP_VERSION_ID >= 80000
+	ZVAL_STRING(&tmp, zend_get_executed_filename());
+	zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+	zval_ptr_dtor(&tmp);
+	ZVAL_LONG(&tmp, zend_get_executed_lineno());
+	zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+	if (prev) {
+		zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_PREVIOUS), prev);
+		
+	}
+#else
+# ifndef ZSTR_KNOWN
 	ZVAL_STRING(&tmp, zend_get_executed_filename());
 	zend_update_property_ex(base, error, CG(known_strings)[ZEND_STR_FILE], &tmp);
 	zval_ptr_dtor(&tmp);
@@ -584,7 +599,7 @@ static zend_always_inline void trace_error_info(zval *error, zval *prev)
 	if (prev) {
 		zend_update_property_ex(base, error, CG(known_strings)[ZEND_STR_PREVIOUS], prev);
 	}
-#else
+# else
 	ZVAL_STRING(&tmp, zend_get_executed_filename());
 	zend_update_property_ex(base, error, ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
 	zval_ptr_dtor(&tmp);
@@ -594,6 +609,7 @@ static zend_always_inline void trace_error_info(zval *error, zval *prev)
 		zend_update_property_ex(base, error, ZSTR_KNOWN(ZEND_STR_PREVIOUS), prev);
 		
 	}
+# endif
 #endif
 }
 

@@ -738,6 +738,21 @@ ASYNC_API int async_dns_lookup_ip(char *name, php_sockaddr_storage *dest, int pr
 	efree(op); \
 } while (0)
 
+#if PHP_VERSION_ID >= 80000
+#define ASYNC_FORWARD_OP_ERROR(op) do { \
+	Z_ADDREF_P(&((async_op *) op)->result); \
+	EG(current_execute_data)->opline--; \
+	zend_throw_exception_internal(Z_OBJ(((async_op *) op)->result)); \
+	EG(current_execute_data)->opline++; \
+} while (0)
+
+#define ASYNC_FORWARD_ERROR(error) do { \
+	Z_ADDREF_P(error); \
+	execute_data->opline--; \
+	zend_throw_exception_internal(Z_OBJ_P(error)); \
+	execute_data->opline++; \
+} while (0)
+#else
 #define ASYNC_FORWARD_OP_ERROR(op) do { \
 	Z_ADDREF_P(&((async_op *) op)->result); \
 	EG(current_execute_data)->opline--; \
@@ -751,6 +766,7 @@ ASYNC_API int async_dns_lookup_ip(char *name, php_sockaddr_storage *dest, int pr
 	zend_throw_exception_internal(error); \
 	execute_data->opline++; \
 } while (0)
+#endif
 
 #define ASYNC_FORWARD_EXIT() do { \
 	if (UNEXPECTED(ASYNC_G(exit))) { \

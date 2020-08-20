@@ -208,7 +208,11 @@ static zend_always_inline void forward_error(zval *cause, zend_execute_data *exe
 	EG(current_execute_data) = exec;
 
 	exec->opline--;
+#if PHP_VERSION_ID >= 80000
+	zend_throw_exception_internal(Z_OBJ(error));
+#else
 	zend_throw_exception_internal(&error);
+#endif
 	exec->opline++;
 
 	EG(current_execute_data) = prev;

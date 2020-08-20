@@ -327,7 +327,23 @@ static zend_always_inline void populate_error_info(zval *error)
 	zval tmp;
 
 	base = instanceof_function(Z_OBJCE_P(error), zend_ce_exception) ? zend_ce_exception : zend_ce_error;
-#if PHP_VERSION_ID < 70200
+#if PHP_VERSION_ID >= 80000
+	if (0 != zval_get_long(zend_read_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_LINE), 1, &tmp))) {
+		return;
+	}
+
+	ZVAL_STRING(&tmp, zend_get_executed_filename());
+	zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_FILE), &tmp);
+	zval_ptr_dtor(&tmp);
+
+	ZVAL_LONG(&tmp, zend_get_executed_lineno());
+	zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_LINE), &tmp);
+
+	zend_fetch_debug_backtrace(&tmp, 0, 0, 0);
+	Z_SET_REFCOUNT(tmp, 0);
+
+	zend_update_property_ex(base, Z_OBJ_P(error), ZSTR_KNOWN(ZEND_STR_TRACE), &tmp);
+#elif PHP_VERSION_ID < 70200
 	if (0 != zval_get_long(zend_read_property(base, error, SL("line"), 1, &tmp))) {
 		return;
 	}
@@ -869,7 +885,11 @@ static void await_val(async_task *task, zval *val, INTERNAL_FUNCTION_PARAMETERS)
 	populate_error_info(&op->result);
 
 	execute_data->opline--;
+#if PHP_VERSION_ID >= 80000
+	zend_throw_exception_internal(Z_OBJ(op->result));
+#else
 	zend_throw_exception_internal(&op->result);
+#endif
 	execute_data->opline++;
 }
 

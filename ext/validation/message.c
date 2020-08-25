@@ -20,6 +20,10 @@
 #include "validation/message.h"
 #include "validation/messageinterface.h"
 
+#ifdef PHALCON_USE_PHP_JSON
+#include <ext/json/php_json.h>
+#endif
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/object.h"
@@ -44,6 +48,7 @@ PHP_METHOD(Phalcon_Validation_Message, setField);
 PHP_METHOD(Phalcon_Validation_Message, getField);
 PHP_METHOD(Phalcon_Validation_Message, __toString);
 PHP_METHOD(Phalcon_Validation_Message, __set_state);
+PHP_METHOD(Phalcon_Validation_Message, jsonSerialize);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_message___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, message)
@@ -68,6 +73,7 @@ static const zend_function_entry phalcon_validation_message_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Message, getField, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message, __set_state, arginfo_phalcon_validation_message___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Validation_Message, jsonSerialize, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -84,7 +90,9 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message){
 	zend_declare_property_long(phalcon_validation_message_ce, SL("_code"), 0, ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_validation_message_ce, 1, phalcon_validation_messageinterface_ce);
-
+#ifdef PHALCON_USE_PHP_JSON
+	zend_class_implements(phalcon_validation_message_ce, 1, php_json_serializable_ce);
+#endif
 	return SUCCESS;
 }
 
@@ -277,4 +285,14 @@ PHP_METHOD(Phalcon_Validation_Message, __set_state){
 
 	object_init_ex(return_value, phalcon_validation_message_ce);
 	PHALCON_CALL_METHOD(NULL, return_value, "__construct", &message_text, &field, &type, &code);
+}
+
+/**
+ * Returns serialised model as array for json_encode.
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Validation_Message, jsonSerialize) {
+
+	RETURN_MEMBER(getThis(), "_message");
 }

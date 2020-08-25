@@ -22,6 +22,10 @@
 #include "validation/message.h"
 #include "validation/messageinterface.h"
 
+#ifdef PHALCON_USE_PHP_JSON
+#include <ext/json/php_json.h>
+#endif
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/hash.h"
@@ -53,6 +57,8 @@ PHP_METHOD(Phalcon_Validation_Message_Group, key);
 PHP_METHOD(Phalcon_Validation_Message_Group, next);
 PHP_METHOD(Phalcon_Validation_Message_Group, valid);
 PHP_METHOD(Phalcon_Validation_Message_Group, __set_state);
+PHP_METHOD(Phalcon_Validation_Message_Group, toArray);
+PHP_METHOD(Phalcon_Validation_Message_Group, jsonSerialize);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_validation_message_group___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, messages)
@@ -110,6 +116,8 @@ static const zend_function_entry phalcon_validation_message_group_method_entry[]
 	PHP_ME(Phalcon_Validation_Message_Group, next, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message_Group, valid, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message_Group, __set_state, arginfo_phalcon_validation_message_group___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Validation_Message_Group, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message_Group, jsonSerialize, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -124,7 +132,9 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message_Group){
 	zend_declare_property_null(phalcon_validation_message_group_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 
 	zend_class_implements(phalcon_validation_message_group_ce, 3, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_iterator);
-
+#ifdef PHALCON_USE_PHP_JSON
+	zend_class_implements(phalcon_validation_message_group_ce, 1, php_json_serializable_ce);
+#endif
 	return SUCCESS;
 }
 
@@ -469,4 +479,44 @@ PHP_METHOD(Phalcon_Validation_Message_Group, __set_state){
 	} else {
 		zend_throw_exception_ex(spl_ce_BadMethodCallException, 0, "Invalid arguments passed to %s", "Phalcon\\Mvc\\Model\\Message\\Group::__set_state()");
 	}
+}
+
+/**
+ * Returns the instance as an array representation
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Validation_Message_Group, toArray){
+
+	zval messages = {}, *message;
+
+	PHALCON_MM_INIT();
+
+	array_init(return_value);
+
+	phalcon_read_property(&messages, getThis(), SL("_messages"), PH_READONLY);
+	if (Z_TYPE(messages) == IS_ARRAY) {
+		/**
+		 * A group of messages is iterated and appended one-by-one to the current list
+		 */
+		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(messages), message) {
+			zval field = {}, msg = {};
+			PHALCON_MM_CALL_METHOD(&field, message, "getfield");
+			PHALCON_MM_ADD_ENTRY(&field);
+			PHALCON_MM_CALL_METHOD(&msg, message, "getmessage");
+			phalcon_array_update(return_value, &field, &msg, 0);
+		} ZEND_HASH_FOREACH_END();
+
+	}
+	RETURN_MM();
+}
+
+/**
+ * Returns serialised model as array for json_encode.
+ *
+ * @return array
+ */
+PHP_METHOD(Phalcon_Validation_Message_Group, jsonSerialize) {
+
+	PHALCON_CALL_METHOD(return_value, getThis(), "toarray");
 }

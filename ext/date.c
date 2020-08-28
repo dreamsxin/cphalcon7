@@ -984,9 +984,10 @@ PHP_METHOD(Phalcon_Date, fuzzy_span2)
 		ZVAL_LONG(&span, seconds);
 		phalcon_array_fetch_long(&label, &output, 6, PH_NOISY|PH_READONLY);
 
-		PHALCON_CONCAT_VVV(return_value, &ret, &span, &label);
+		PHALCON_SCONCAT_VV(&ret, &span, &label);
+		PHALCON_MM_ADD_ENTRY(&ret);
 	}
-	RETURN_MM();
+	RETURN_MM_CTOR(&ret);
 }
 
 /**

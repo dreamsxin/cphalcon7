@@ -18,7 +18,8 @@ $loader->registerNamespaces(array(
 
 $loader->register();
 
-$now = new \DateTime();
+$now = new \DateTime('2020-08-20 11:00:00');
+var_dump($now);
 
 $schedule = new \Cron\Schedule('* * * * *');
 var_dump($schedule->valid($now));
@@ -29,11 +30,20 @@ var_dump($schedule->valid($now));
 $schedule = new \Cron\Schedule('0 */1 * * *');
 var_dump($schedule->valid($now));
 
+$schedule = new \Cron\Schedule('0 */2 * * *');
+var_dump($schedule->valid($now));
 
+echo 'Seconds'.PHP_EOL;
+$schedule = new \Cron\Schedule2('0 0 * * * *');
+var_dump($schedule->valid($now));
+
+$schedule = new \Cron\Schedule2('1 0 * * * *');
+var_dump($schedule->valid($now));
+return;
 $builder = new Phalcon\Async\Process\ProcessBuilder(PHP_BINARY);
 $builder = $builder->withStdoutInherited();
 $builder = $builder->withStderrInherited();
 
-$process = $builder->start(__DIR__ . '/task.php');
+$process = $builder->start(__DIR__ . '/task.php', '--namespace=main');
 $code = $process->join();
 var_dump($code, $process);

@@ -103,6 +103,8 @@ static const zend_function_entry phalcon_cache_backend_redis_method_entry[] = {
 	PHP_ME(Phalcon_Cache_Backend_Redis, flushDb, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, getTrackingKey, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Cache_Backend_Redis, setTrackingKey, arginfo_phalcon_cache_backend_redis_settrackingkey, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Cache_Backend_Redis, set, save, arginfo_phalcon_cache_backendinterface_save, ZEND_ACC_PUBLIC)
+	PHP_MALIAS(Phalcon_Cache_Backend_Redis, del, delete, arginfo_phalcon_cache_backendinterface_delete, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

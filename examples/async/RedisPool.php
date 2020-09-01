@@ -36,7 +36,7 @@ class RedisPool
 		$this->channel->send([
 			$v
 		]);
-		echo 'push '.get_class($v).' success'.PHP_EOL;
+		//echo 'push '.get_class($v).' success'.PHP_EOL;
 
         return true;
     }
@@ -64,6 +64,7 @@ $jobs[] = Task::async(static function (RedisPool $pool) {
 		sleep(1);
 		$pool->push($v);
 	}
+	echo 'job0 exit'.PHP_EOL;
 }, $pool);
 
 $jobs[] = Task::async(static function (RedisPool $pool) {
@@ -73,9 +74,14 @@ $jobs[] = Task::async(static function (RedisPool $pool) {
 		sleep(1);
 		$pool->push($v);
 	}
+	echo 'job1 exit'.PHP_EOL;
 }, $pool);
+
+//$signal = new Signal(Signal::SIGINT);
+//$signal->awaitSignal();
+//$pool->close();
 
 foreach ($jobs as $i => $job) {
     printf("#%u => %s\n", $i + 1, Task::await($job));
 }
-$channel->close();
+echo "END!";

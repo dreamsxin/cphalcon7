@@ -76,6 +76,7 @@ PHP_METHOD(Phalcon_Arr, group);
 PHP_METHOD(Phalcon_Arr, flip);
 PHP_METHOD(Phalcon_Arr, getHashKey);
 PHP_METHOD(Phalcon_Arr, getHashValue);
+PHP_METHOD(Phalcon_Arr, sort);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_is_assoc, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, array, IS_ARRAY, 0)
@@ -220,6 +221,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_gethashvalue, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, pos, IS_LONG, 1)
 ZEND_END_ARG_INFO()
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_sort, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(1, array, IS_ARRAY, 0)
+	ZEND_ARG_INFO(0, sort_field)
+	ZEND_ARG_TYPE_INFO(0, sort_order, IS_LONG, 1)
+	ZEND_ARG_TYPE_INFO(0, sort_flags, IS_LONG, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, is_assoc, arginfo_phalcon_arr_is_assoc, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, is_array, arginfo_phalcon_arr_is_array, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -247,6 +255,7 @@ static const zend_function_entry phalcon_arr_method_entry[] = {
 	PHP_ME(Phalcon_Arr, flip, arginfo_phalcon_arr_flip, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, getHashKey, arginfo_phalcon_arr_gethashkey, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Arr, getHashValue, arginfo_phalcon_arr_gethashvalue, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Arr, sort, arginfo_phalcon_arr_sort, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_FE_END
 };
 
@@ -2190,4 +2199,42 @@ PHP_METHOD(Phalcon_Arr, getHashValue){
 		RETURN_CTOR(item);
 	}
 	RETURN_NULL();
+}
+
+/**
+ * Sort an array
+ *
+ * @param array $array
+ * @param string|array $field
+ * @param int $order
+ * @param int $flag
+ * @return bool
+ */
+PHP_METHOD(Phalcon_Arr, sort){
+
+	zval *array, *field, *_order = NULL, *_flag = NULL, order = {}, flag = {}, map = {};
+	int sort_order = PHP_SORT_ASC;
+	int sort_type  = PHP_SORT_REGULAR;
+
+	phalcon_fetch_params(1, 2, 2, &array, &field, &_order, &_flag);
+
+	if (_order && Z_TYPE_P(_order) == IS_LONG) {
+		sort_order = Z_LVAL_P(_order);
+	}
+	if (_flag && Z_TYPE_P(_flag) == IS_LONG) {
+		sort_type = Z_LVAL_P(_flag);
+	}
+	ZVAL_LONG(&order, sort_order);
+	ZVAL_LONG(&flag, sort_type);
+
+	PHALCON_MM_CALL_SELF(&map, "path", array, field);
+	if (Z_TYPE(map) != IS_ARRAY) {
+		RETURN_MM_FALSE;
+	}
+
+	//ZVAL_MAKE_REF(&map);
+	PHALCON_MM_CALL_FUNCTION(return_value, "array_multisort", &map, &order, &flag, array);
+	//ZVAL_UNREF(&map);
+
+	RETURN_MM();
 }

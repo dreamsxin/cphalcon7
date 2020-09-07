@@ -2203,7 +2203,17 @@ PHP_METHOD(Phalcon_Arr, getHashValue){
 
 /**
  * Sort an array
- *
+ * 
+ *<code>
+ * $arr = [
+ * 	'2x' => ['sort' => 3],
+ * 	'1x' =>['sort' => 4],
+ * 	'3x' =>['sort' => 1],
+ * 	'4x' =>['sort' => 2],
+ * ];
+ * \Phalcon\Arr::sort($arr, '*.sort'));
+ *</code>
+ * 
  * @param array $array
  * @param string|array $field
  * @param int $order

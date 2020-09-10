@@ -868,6 +868,9 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Aop);
 	PHALCON_INIT(Phalcon_Aop_Joinpoint);
 
+	PHALCON_INIT(Phalcon_Num);
+	PHALCON_INIT(Phalcon_Num_Ndarray);
+
 	return SUCCESS;
 }
 

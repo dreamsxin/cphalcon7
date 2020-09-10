@@ -905,7 +905,9 @@ server/exception.c \
 aop/lexer.c \
 aop/exception.c \
 aop/joinpoint.c \
-aop.c"
+aop.c \
+num.c \
+num/ndarray.c"
 
 	if test "$phalcon_php_version" -lt "7004000"; then
 		AC_DEFINE([PHALCON_USE_AOP_PROPERTY], 1, [ ])

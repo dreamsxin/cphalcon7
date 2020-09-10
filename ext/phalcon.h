@@ -508,4 +508,7 @@
 #include "aop/lexer.h"
 #include "aop/joinpoint.h"
 
+#include "num.h"
+#include "num/ndarray.h"
+
 #endif /* PHALCON_H */

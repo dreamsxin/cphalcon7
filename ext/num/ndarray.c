@@ -19,6 +19,7 @@
 
 #include "num.h"
 #include "num/ndarray.h"
+#include "num/../exception.h"
 #include "internal/arginfo.h"
 
 #include <Zend/zend_smart_str.h>
@@ -28,6 +29,7 @@
 #include "kernel/fcall.h"
 #include "kernel/object.h"
 #include "kernel/string.h"
+#include "kernel/exception.h"
 
 int num_calc_shape(zval *data, zval *shape, zend_long dimension){
     zval *check_shape;
@@ -206,6 +208,7 @@ PHP_METHOD(Phalcon_Num_Ndarray, add);
 PHP_METHOD(Phalcon_Num_Ndarray, sub);
 PHP_METHOD(Phalcon_Num_Ndarray, mult);
 PHP_METHOD(Phalcon_Num_Ndarray, div);
+PHP_METHOD(Phalcon_Num_Ndarray, apply);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_num_ndarray___construct, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, data, IS_ARRAY, 0)
@@ -213,6 +216,10 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_num_ndarray_add, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, ndarray, Phalcon\\Num\\Ndarray, 0)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_num_ndarray_apply, 0, 0, 1)
+	ZEND_ARG_CALLABLE_INFO(0, callback, 0)
 ZEND_END_ARG_INFO()
 
 zend_function_entry phalcon_num_ndarray_method_entry[] = {
@@ -226,6 +233,7 @@ zend_function_entry phalcon_num_ndarray_method_entry[] = {
 	PHP_ME(Phalcon_Num_Ndarray, sub, arginfo_phalcon_num_ndarray_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Num_Ndarray, mult, arginfo_phalcon_num_ndarray_add, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Num_Ndarray, div, arginfo_phalcon_num_ndarray_add, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Num_Ndarray, apply, arginfo_phalcon_num_ndarray_apply, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 
@@ -412,5 +420,82 @@ PHP_METHOD(Phalcon_Num_Ndarray, div)
 	phalcon_read_property(&data1, getThis(), SL(NUM_NDARRAY_PROPERT_DATA), PH_READONLY);
 	phalcon_read_property(&data2, obj, SL(NUM_NDARRAY_PROPERT_DATA), PH_READONLY);
     num_ndarray_recursive(&data1, &data2, num_operator_div);
+    RETURN_THIS();
+}
+
+
+
+int num_ndarray_fci_recursive(zval *data, zend_fcall_info *fci, zend_fcall_info_cache *fci_cache){
+    zval *val;
+    zend_ulong idx;
+    HashTable *ht1;
+    if (Z_TYPE_P(data) == IS_ARRAY) {
+        ht1 = Z_ARR_P(data);
+        ZEND_HASH_FOREACH_NUM_KEY_VAL(ht1, idx, val) {
+            if (Z_TYPE_P(val) == IS_ARRAY) {
+                num_ndarray_fci_recursive(val, fci, fci_cache);
+            } else {
+				zval params[2], ret = {};
+
+				ZVAL_COPY_VALUE(&params[0], val);
+				ZVAL_LONG(&params[1], idx);
+
+				fci->param_count = 2;
+				fci->params = params;
+				fci->retval = &ret;
+
+				if (zend_call_function(fci, fci_cache) == FAILURE || Z_ISUNDEF(ret)) {
+					zval_ptr_dtor(&ret);
+					goto error;
+				}
+				switch (Z_TYPE(ret))
+				{
+					case IS_LONG: {
+						ZVAL_LONG(val, Z_LVAL(ret));
+						break;
+					}
+					case IS_DOUBLE: {
+						ZVAL_DOUBLE(val, Z_DVAL(ret));
+						break;
+					}
+					case IS_NULL: {
+						zval_ptr_dtor(&ret);
+						PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Expected number, null returned");
+						goto error;
+					}       
+					default: {
+						zval_ptr_dtor(&ret);
+						PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Callable should return a number");
+						goto error;
+					}
+				}
+            }
+        } ZEND_HASH_FOREACH_END();
+    }
+    return SUCCESS;
+error:
+    return FAILURE;
+}
+
+/**
+ * 
+ */
+PHP_METHOD(Phalcon_Num_Ndarray, apply)
+{
+    zval data = {};
+	zend_fcall_info fci;
+	zend_fcall_info_cache fci_cache;
+
+	//parse prameters
+	ZEND_PARSE_PARAMETERS_START(1, 1)
+		Z_PARAM_FUNC(fci, fci_cache)
+	ZEND_PARSE_PARAMETERS_END_EX(
+		PHALCON_THROW_EXCEPTION_STR(phalcon_exception_ce, "Expects a callback as a argument");
+		return;
+	);
+
+	phalcon_read_property(&data, getThis(), SL(NUM_NDARRAY_PROPERT_DATA), PH_READONLY);
+
+    num_ndarray_fci_recursive(&data, &fci, &fci_cache);
     RETURN_THIS();
 }

@@ -1,5 +1,8 @@
 <?php
 
+$ndarray = \Phalcon\Num::arange(0, 1);
+echo $ndarray;
+
 $ndarray = \Phalcon\Num::array([[1.0, 2, 3], [2, 3, 4]]);
 echo $ndarray;
 
@@ -70,3 +73,10 @@ array([
   [0.8,0.75,2]
 ])
 */
+
+
+$ndarray = \Phalcon\Num::array([[1.0, 2, 3], [2, 3, 4]]);
+echo $ndarray->apply(function($val, $idx) {
+	var_dump($val, $idx);
+	return 0;
+});

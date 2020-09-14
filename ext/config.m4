@@ -11,6 +11,12 @@ else
 	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
 
+PHP_ARG_ENABLE(carray, whether to enable carray support,
+[  --enable-carray     whether to enable carray support], yes, no)
+
+PHP_ARG_ENABLE(carray-opencl, whether to enable OpenCL support,
+[  --enable-carray-opencl     whether to enable OpenCL support], no, no)
+
 PHP_ARG_ENABLE(async, Whether to enable "async" support,
 [ --enable-async          Enable "async" support], yes, no)
 
@@ -1048,6 +1054,111 @@ num/ndarray.c"
 	)
 
 	CPPFLAGS=$old_CPPFLAGS
+
+	if test "$PHP_CARRAY" = "yes"; then
+
+		carray_source_files=" \
+		  carray/phpsci.c \
+		  carray/kernel/alloc.c \
+		  carray/kernel/carray.c \
+		  carray/kernel/iterators.c \
+		  carray/kernel/flagsobject.c \
+		  carray/kernel/assign.c \
+		  carray/kernel/convert.c \
+		  carray/kernel/casting.c \
+		  carray/kernel/linalg.c \
+		  carray/kernel/calculation.c \
+		  carray/kernel/shape.c \
+		  carray/kernel/common/common.c \
+		  carray/kernel/common/cblas_funcs.c \
+		  carray/kernel/common/clblas_funcs.c \
+		  carray/kernel/common/mem_overlap.c \
+		  carray/kernel/number.c \
+		  carray/kernel/convert_type.c \
+		  carray/kernel/trigonometric.c \
+		  carray/kernel/matlib.c \
+		  carray/kernel/statistics.c \
+		  carray/kernel/arraytypes.c \
+		  carray/kernel/join.c \
+		  carray/kernel/ctors.c \
+		  carray/kernel/scalar.c \
+		  carray/kernel/round.c \
+		  carray/kernel/getset.c \
+		  carray/kernel/common/strided_loops.c \
+		  carray/kernel/convert_datatype.c \
+		  carray/kernel/dtype_transfer.c \
+		  carray/kernel/assign_scalar.c \
+		  carray/kernel/gpu.c \
+		  carray/kernel/common/exceptions.c \
+		  carray/kernel/item_selection.c \
+		  carray/kernel/clip.c \
+		  carray/kernel/search.c \
+		  carray/kernel/common/sort.c \
+		  carray/kernel/interfaces/rubix.c \
+		  carray/kernel/common/compare.c \
+		  carray/kernel/exp_logs.c \
+		  carray/kernel/random.c \
+		  carray/kernel/storage.c \
+		  carray/kernel/range.c \
+		  carray/kernel/random/distributions.c \
+		  carray/kernel/conversion_utils.c \
+		  carray/kernel/buffer.c
+		"
+
+		AC_MSG_CHECKING([checking OpenBLAS support])
+
+		OPENBLAS_CFLAGS=`pkg-config --cflags openblas`
+		OPENBLAS_INCS=`pkg-config --cflags-only-I openblas`
+		OPENBLAS_LDFLAGS=`pkg-config --libs openblas`
+
+		CBLAS_CFLAGS=`pkg-config --cflags cblas`
+		CBLAS_INCS=`pkg-config --cflags-only-I cblas`
+		CBLAS_LDFLAGS=`pkg-config --libs cblas`
+
+		LAPACKE_CFLAGS=`pkg-config --cflags lapacke`
+		LAPACKE_INCS=`pkg-config --cflags-only-I lapacke`
+		LAPACKE_LDFLAGS=`pkg-config --libs lapacke`
+
+		CPPFLAGS="${CPPFLAGS} ${OPENBLAS_CFLAGS} ${CBLAS_CFLAGS} ${LAPACKE_CFLAGS}"
+		EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${OPENBLAS_LDFLAGS} ${CBLAS_LDFLAGS} ${LAPACKE_LDFLAGS}"
+
+		PHP_CHECK_LIBRARY(cblas,cblas_sdot,
+		[
+		  AC_DEFINE(HAVE_CBLAS,1,[ ])
+		  AC_DEFINE(HAVE_BLAS,1,[ ])
+          PHP_EVAL_INCLINE($CBLAS_INCS)
+		  PHP_EVAL_LIBLINE($CBLAS_LDFLAGS,PHALCON_SHARED_LIBADD)
+		  AC_MSG_RESULT([CBlas detected ])
+		],[
+		  PHP_CHECK_LIBRARY(openblas,cblas_sdot,
+		  [
+            PHP_EVAL_INCLINE($OPENBLAS_INCS)
+			PHP_EVAL_LIBLINE($OPENBLAS_LDFLAGS,PHALCON_SHARED_LIBADD)
+			AC_MSG_RESULT([OpenBLAS detected ])
+			AC_DEFINE(HAVE_BLAS,1,[ ])
+		  ],[
+			AC_MSG_RESULT([wrong openblas/blas version or library not found.])
+		  ],[
+			$OPENBLAS_LDFLAGS
+		  ])
+		],[
+		  $CBLAS_LDFLAGS
+		])
+
+		PHP_CHECK_LIBRARY(lapacke,LAPACKE_sgetrf,
+		[
+		  AC_DEFINE(HAVE_LAPACKE,1,[ ])
+          PHP_EVAL_INCLINE($LAPACKE_INCS)
+		  PHP_EVAL_LIBLINE($LAPACKE_LDFLAGS,PHALCON_SHARED_LIBADD)
+		],[
+		  AC_MSG_RESULT([wrong lapacke version or library not found])
+		],[
+		  $LAPACKE_LDFLAGS
+		])
+
+		AC_DEFINE([PHALCON_USE_CARRAY], [1], [Have OpenBLAS support])
+		phalcon_sources="$phalcon_sources $carray_source_files"
+	fi
 
 	if test x"$PHP_VIPS" != x"no"; then
 		if ! pkg-config --atleast-pkgconfig-version 0.2; then

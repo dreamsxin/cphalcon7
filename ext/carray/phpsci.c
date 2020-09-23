@@ -300,7 +300,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_offsetGet, 0, 0, 1)
 ZEND_END_ARG_INFO()
 PHP_METHOD(CArray, offsetGet)
 {
-    CArray * _this_ca, * ret_ca;
+    CArray * _this_ca, * ret_ca = NULL;
     MemoryPointer ptr, target_ptr;
     zval *index;
     if (zend_parse_parameters(ZEND_NUM_ARGS(), "z", &index) == FAILURE) {
@@ -750,7 +750,7 @@ PHP_METHOD(CArray, log1p)
 PHP_METHOD(CArray, transpose)
 {
     zval * target;
-    zval * axes;
+    zval * axes = NULL;
     int size_axes;
     CArray * ret, * target_ca;
     MemoryPointer ptr;
@@ -783,17 +783,13 @@ PHP_METHOD(CArray, identity)
     MemoryPointer ptr;
     CArray * output;
     zend_long size;
-    char * dtype;
+    char * dtype = NULL;
     size_t type_len;
     ZEND_PARSE_PARAMETERS_START(1, 2)
         Z_PARAM_LONG(size)
         Z_PARAM_OPTIONAL
         Z_PARAM_STRING(dtype, type_len)
     ZEND_PARSE_PARAMETERS_END();
-
-    if(ZEND_NUM_ARGS() == 1) {
-        dtype = NULL;
-    }
 
     output = CArray_Eye((int)size, (int)size, 0, dtype, &ptr);
 
@@ -806,7 +802,7 @@ PHP_METHOD(CArray, eye)
     MemoryPointer ptr;
     CArray * output;
     zend_long n, m, k;
-    char * dtype;
+    char * dtype = NULL;
     size_t type_len;
     ZEND_PARSE_PARAMETERS_START(1, 4)
         Z_PARAM_LONG(n)
@@ -817,16 +813,11 @@ PHP_METHOD(CArray, eye)
     ZEND_PARSE_PARAMETERS_END();
 
     if(ZEND_NUM_ARGS() == 1) {
-        dtype = NULL;
         m = n;
         k = 0;
     }
     if(ZEND_NUM_ARGS() == 2) {
-        dtype = NULL;
         k = 0;
-    }
-    if(ZEND_NUM_ARGS() == 3) {
-        dtype = NULL;
     }
 
     output = CArray_Eye((int)n, (int)m, (int)k, dtype, &ptr);
@@ -917,12 +908,12 @@ PHP_METHOD(CArray, argmin)
 PHP_METHOD(CArray, sort)
 {
     zval * target;
-    char * kind;
-    long axis;
+    char * kind = NULL;
+    long axis = 0;
     int * axis_p, decref = 0;
     zend_bool is_null = 0;
     size_t s_kind;
-    CArray * ret, * target_ca, * tmp_ca = NULL;
+    CArray * ret, * target_ca = NULL, * tmp_ca = NULL;
     MemoryPointer ptr, out_ptr, tmp_ptr;
     CARRAY_SORTKIND sortkind;
     ZEND_PARSE_PARAMETERS_START(1, 3)
@@ -1193,7 +1184,7 @@ PHP_METHOD(CArray, svd)
     MemoryPointer a_ptr, * out_ptr;
     zval * a;
     zval * tmp_zval;
-    zend_bool  full_matrices, compute_uv;
+    zend_bool  full_matrices = IS_FALSE, compute_uv = IS_FALSE;
     CArray ** rtn, * a_ca;
     ZEND_PARSE_PARAMETERS_START(1, 1)
             Z_PARAM_ZVAL(a)
@@ -2142,8 +2133,8 @@ PHP_METHOD(CArray, arange)
     CArray * target_array;
     double start, stop, step_d;
     int typenum;
-    zval * start_stop, * stop_start, * step;
-    char * dtype;
+    zval * start_stop, * stop_start = NULL, * step = NULL;
+    char * dtype = NULL;
     size_t type_len;
     ZEND_PARSE_PARAMETERS_START(1, 4)
         Z_PARAM_ZVAL(start_stop)
@@ -2218,8 +2209,8 @@ PHP_METHOD(CArray, linspace)
     size_t type_len;
     CArray * ret;
     zval * start, * stop;
-    double start_d, stop_d;
-    char * typestr;
+    double start_d = 0, stop_d = 0;
+    char * typestr = NULL;
     int type_num, axis;
     MemoryPointer out;
     zend_long axis_l;

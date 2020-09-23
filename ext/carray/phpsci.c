@@ -1,5 +1,4 @@
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wimplicit-function-declaration"
+
 /*
   +----------------------------------------------------------------------+
   | PHPSci CArray                                                        |
@@ -504,8 +503,6 @@ PHP_METHOD(CArray, sum)
 PHP_METHOD(CArray, sin)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -521,8 +518,6 @@ PHP_METHOD(CArray, sin)
 PHP_METHOD(CArray, cos)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -538,8 +533,6 @@ PHP_METHOD(CArray, cos)
 PHP_METHOD(CArray, tan)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -555,8 +548,6 @@ PHP_METHOD(CArray, tan)
 PHP_METHOD(CArray, arcsin)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -572,8 +563,6 @@ PHP_METHOD(CArray, arcsin)
 PHP_METHOD(CArray, arccos)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -589,8 +578,6 @@ PHP_METHOD(CArray, arccos)
 PHP_METHOD(CArray, arctan)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -606,8 +593,6 @@ PHP_METHOD(CArray, arctan)
 PHP_METHOD(CArray, sinh)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -623,8 +608,6 @@ PHP_METHOD(CArray, sinh)
 PHP_METHOD(CArray, cosh)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -640,8 +623,6 @@ PHP_METHOD(CArray, cosh)
 PHP_METHOD(CArray, tanh)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -661,8 +642,6 @@ PHP_METHOD(CArray, tanh)
 PHP_METHOD(CArray, exp)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -678,8 +657,6 @@ PHP_METHOD(CArray, exp)
 PHP_METHOD(CArray, expm1)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -695,8 +672,6 @@ PHP_METHOD(CArray, expm1)
 PHP_METHOD(CArray, exp2)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -712,8 +687,6 @@ PHP_METHOD(CArray, exp2)
 PHP_METHOD(CArray, log)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -729,8 +702,6 @@ PHP_METHOD(CArray, log)
 PHP_METHOD(CArray, log10)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -746,8 +717,6 @@ PHP_METHOD(CArray, log10)
 PHP_METHOD(CArray, log2)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -763,8 +732,6 @@ PHP_METHOD(CArray, log2)
 PHP_METHOD(CArray, log1p)
 {
     zval * target;
-    long axis;
-    int * axis_p;
     CArray * ret, * target_ca;
     MemoryPointer ptr, rtn_tr;
     ZEND_PARSE_PARAMETERS_START(1, 1)
@@ -3126,6 +3093,3 @@ void carray_ce_register()
     // Pray
     return SUCCESS;
 }
-
-
-#pragma clang diagnostic pop

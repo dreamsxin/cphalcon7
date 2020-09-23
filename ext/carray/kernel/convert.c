@@ -7,8 +7,6 @@
 #include "assign_scalar.h"
 #include "zend_alloc.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wimplicit-function-declaration"
 /**
  * Slice CArray
  * 
@@ -410,5 +408,3 @@ CArray_Slice_Str(CArray *self, char *index, MemoryPointer *out)
     efree(dimensions);
     return rtn;
 }
-
-#pragma clang diagnostic pop

@@ -51,13 +51,7 @@ INT_clip(int *in, int ni, int *min, int *max, int *out)
         }
     }
     else {
-        /*
-         * Visual Studio 2015 loop vectorizer handles NaN in an unexpected
-         * manner, see: https://github.com/numpy/numpy/issues/7601
-         */
-        #if (_MSC_VER == 1900)
-        #pragma loop( no_vector )
-        #endif
+
         for (i = 0; i < ni; i++) {
             if (in[i] < min_val) {
                 out[i]   = min_val;
@@ -106,13 +100,7 @@ DOUBLE_clip(double *in, int ni, double *min, double *max, double *out)
         }
     }
     else {
-        /*
-         * Visual Studio 2015 loop vectorizer handles NaN in an unexpected
-         * manner, see: https://github.com/numpy/numpy/issues/7601
-         */
-#if (_MSC_VER == 1900)
-#pragma loop( no_vector )
-#endif
+
         for (i = 0; i < ni; i++) {
             if (in[i] < min_val) {
                 out[i]   = min_val;

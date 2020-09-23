@@ -31,9 +31,6 @@
 #include "ctors.h"
 #include "linalg.h"
 
-#pragma clang diagnostic push
-#pragma clang diagnostic ignored "-Wint-conversion"
-#pragma clang diagnostic ignored "-Wimplicit-function-declaration"
 /**
  * @param CHAR_TYPE
  */
@@ -2017,5 +2014,3 @@ CArray_FromAny(CArray *op, CArrayDescriptor *newtype, int min_depth,
 
     return ret;
 }
-
-#pragma clang diagnostic pop

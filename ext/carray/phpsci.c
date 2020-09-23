@@ -1061,7 +1061,7 @@ PHP_METHOD(CArray, matmul)
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
 
     zval * target1, * target2;
-    CArray * target_ca1, * target_ca2, * output_ca, * out;
+    CArray * target_ca1, * target_ca2, * output_ca;
     ZEND_PARSE_PARAMETERS_START(2, 2)
         Z_PARAM_ZVAL(target1)
         Z_PARAM_ZVAL(target2)
@@ -1575,6 +1575,9 @@ PHP_METHOD(CArray, prod)
     target_ca = CArray_FromMemoryPointer(&ptr);
     ret = CArray_Prod(target_ca, axis_p, target_ca->descriptor->type_num, &rtn_ptr);
 
+    if (ret == NULL) {
+		return;
+	}
     efree(axis_p);
     CArray_DECREF(target_ca);
     FREE_FROM_MEMORYPOINTER(&ptr);
@@ -1603,6 +1606,9 @@ PHP_METHOD(CArray, cumprod)
     ZVAL_TO_MEMORYPOINTER(target, &ptr, NULL);
     target_ca = CArray_FromMemoryPointer(&ptr);
     ret = CArray_CumProd(target_ca, axis_p, target_ca->descriptor->type_num, &ptr);
+    if (ret == NULL) {
+		return;
+	}
     efree(axis_p);
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
@@ -1904,7 +1910,7 @@ PHP_METHOD(CArray, atleast_2d)
 {
     zval * temp_zval;
     int i;
-    CArray * target, * out_carray;
+    CArray * target;
     MemoryPointer ptr, out;
     zval * dict;
     int dict_size;
@@ -1914,7 +1920,7 @@ PHP_METHOD(CArray, atleast_2d)
     if (dict_size == 1) {
         ZVAL_TO_MEMORYPOINTER(&(dict[0]), &ptr, NULL);
         target = CArray_FromMemoryPointer(&ptr);
-        out_carray = CArray_atleast2d(target, &out);
+        CArray_atleast2d(target, &out);
         RETURN_MEMORYPOINTER(return_value, &out);
         if(ptr.free == 1) {
             CArray_Alloc_FreeFromMemoryPointer(&ptr);
@@ -1931,7 +1937,7 @@ PHP_METHOD(CArray, atleast_2d)
         for(i = 0; i < dict_size; i++) {
             ZVAL_TO_MEMORYPOINTER(&(dict[i]), &ptr, NULL);
             target = CArray_FromMemoryPointer(&ptr);
-            out_carray = CArray_atleast2d(target, &out);
+            CArray_atleast2d(target, &out);
             temp_zval = MEMORYPOINTER_TO_ZVAL(&out);
             zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), temp_zval);
             if(ptr.free) {

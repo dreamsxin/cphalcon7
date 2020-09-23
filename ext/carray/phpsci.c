@@ -65,6 +65,9 @@ typedef struct _zend_carray_cdata {
     zend_object std;
 } end_carray_cdata;
 
+zend_class_entry *carray_sc_entry;
+
+zend_object_handlers carray_object_handlers;
 static inline zend_object *carray_create_object(zend_class_entry *ce) /* {{{ */
 {
     end_carray_cdata * intern = emalloc(sizeof(end_carray_cdata) + zend_object_properties_size(ce));

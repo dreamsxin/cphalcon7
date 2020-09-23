@@ -32,8 +32,7 @@
 #include "carray/kernel/carray.h"
 
 
-static zend_class_entry *carray_sc_entry;
-static zend_object_handlers carray_object_handlers;
+extern zend_class_entry *carray_sc_entry;
 
 void RETURN_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr);
 int * ZVAL_TO_TUPLE(zval * obj, int * size);

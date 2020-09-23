@@ -3015,10 +3015,7 @@ static zend_function_entry carray_class_methods[] =
         PHP_ME(CArray, offsetExists, arginfo_array_offsetGet, ZEND_ACC_PUBLIC)
         { NULL, NULL, NULL }
 };
-static zend_function_entry carray_iterator_class_methods[] =
-{
-        { NULL, NULL, NULL }
-};
+
 zend_function_entry carray_functions[] = {
         {NULL, NULL, NULL}
 };

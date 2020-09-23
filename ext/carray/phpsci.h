@@ -34,8 +34,6 @@
 
 static zend_class_entry *carray_sc_entry;
 static zend_object_handlers carray_object_handlers;
-static zend_class_entry *carray_exception_sc_entry;
-static zend_class_entry *carray_iterator_sc_entry;
 
 void RETURN_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr);
 int * ZVAL_TO_TUPLE(zval * obj, int * size);

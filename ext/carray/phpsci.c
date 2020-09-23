@@ -147,7 +147,7 @@ void FREE_FROM_MEMORYPOINTER(MemoryPointer * ptr)
     }
 }
 
-void * FREE_TUPLE(int * tuple)
+void FREE_TUPLE(int * tuple)
 {
     if(tuple != NULL)
         efree(tuple);
@@ -214,6 +214,7 @@ static int TYPESTR_TO_INT(char * str)
     if (!strcmp(str, TYPE_FLOAT64_STRING) || !strcmp(str, TYPE_DOUBLE_STRING)) {
         return TYPE_DOUBLE_INT;
     }
+	return TYPE_INTEGER_INT;
 }
 
 PHP_METHOD(CArray, __construct)
@@ -2380,7 +2381,6 @@ PHP_METHOD(CArray, logspace)
     int num;
     zend_bool endpoint;
     size_t type_len;
-    CArray * ret;
     zval * start, * stop;
     double start_d, stop_d, base;
     char * typestr;
@@ -2443,7 +2443,7 @@ PHP_METHOD(CArray, logspace)
         type_num = TYPESTR_TO_INT(typestr);
     }
 
-    ret = CArray_Logspace(start_d, stop_d, num, endpoint, base, type_num, &out);
+    CArray_Logspace(start_d, stop_d, num, endpoint, base, type_num, &out);
 
     RETURN_MEMORYPOINTER(return_value, &out);
 }
@@ -2454,7 +2454,6 @@ PHP_METHOD(CArray, geomspace)
     int num;
     zend_bool endpoint;
     size_t type_len;
-    CArray * ret;
     zval * start, * stop;
     double start_d, stop_d;
     char * typestr;
@@ -2513,7 +2512,7 @@ PHP_METHOD(CArray, geomspace)
         type_num = TYPESTR_TO_INT(typestr);
     }
 
-    ret = CArray_Geomspace(start_d, stop_d, num, endpoint, type_num, &out);
+    CArray_Geomspace(start_d, stop_d, num, endpoint, type_num, &out);
 
     RETURN_MEMORYPOINTER(return_value, &out);
 }
@@ -3192,7 +3191,4 @@ void carray_ce_register()
 
     // Register Exception Classes
     init_exception_objects();
-
-    // Pray
-    return SUCCESS;
 }

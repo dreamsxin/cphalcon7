@@ -42,7 +42,7 @@ int * ZVAL_TO_TUPLE(zval * obj, int * size);
 void ZVAL_TO_MEMORYPOINTER(zval * obj, MemoryPointer * ptr, char * type);
 void RETURN_RUBIX_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr);
 void FREE_FROM_MEMORYPOINTER(MemoryPointer * ptr);
-void * FREE_TUPLE(int * tuple);
+void FREE_TUPLE(int * tuple);
 zval * MEMORYPOINTER_TO_ZVAL(MemoryPointer * ptr);
 
 void carray_ce_register();

@@ -91,27 +91,6 @@ CArrayIterator_NEXT(CArrayIterator * iterator)
     } while(0);
 }
 
-/**
- * Get DATA pointer from iterator
- *
- * @param iter
- * @param coordinates
- * @return
- */
-static char*
-get_ptr(CArrayIterator * iter, uintptr_t * coordinates)
-{
-    uintptr_t i;
-    char *ret;
-
-    ret = CArray_DATA(iter->array);
-
-    for(i = 0; i <  CArray_NDIM(iter->array); ++i) {
-        ret += coordinates[i] * iter->strides[i];
-    }
-
-    return ret;
-}
 
 /**
  * @param iterator

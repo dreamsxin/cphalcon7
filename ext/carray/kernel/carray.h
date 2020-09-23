@@ -526,7 +526,7 @@ print_matrix( char* desc, int m, int n, double* a, int lda ) {
  *
  * Return 0 on success, -1 on failure
  */
-static int _safe_ceil_to_int(double value, int* ret)
+static inline int _safe_ceil_to_int(double value, int* ret)
 {
     double ivalue;
 

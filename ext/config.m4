@@ -1105,59 +1105,48 @@ num/ndarray.c"
 		  carray/kernel/buffer.c
 		"
 
-		AC_MSG_CHECKING([checking OpenBLAS support])
+		AC_MSG_CHECKING([checking BLAS support])
+		if pkg-config --exists blas; then
+			BLAS_CFLAGS=`pkg-config --cflags blas`
+			BLAS_INCS=`pkg-config --cflags-only-I blas`
+			BLAS_LIBS=`pkg-config --libs blas`
 
-		OPENBLAS_CFLAGS=`pkg-config --cflags openblas`
-		OPENBLAS_INCS=`pkg-config --cflags-only-I openblas`
-		OPENBLAS_LDFLAGS=`pkg-config --libs openblas`
-
-		CBLAS_CFLAGS=`pkg-config --cflags cblas`
-		CBLAS_INCS=`pkg-config --cflags-only-I cblas`
-		CBLAS_LDFLAGS=`pkg-config --libs cblas`
-
-		LAPACKE_CFLAGS=`pkg-config --cflags lapacke`
-		LAPACKE_INCS=`pkg-config --cflags-only-I lapacke`
-		LAPACKE_LDFLAGS=`pkg-config --libs lapacke`
-
-		CPPFLAGS="${CPPFLAGS} ${OPENBLAS_CFLAGS} ${CBLAS_CFLAGS} ${LAPACKE_CFLAGS}"
-		EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${OPENBLAS_LDFLAGS} ${CBLAS_LDFLAGS} ${LAPACKE_LDFLAGS}"
-
-		PHP_CHECK_LIBRARY(cblas,cblas_sdot,
-		[
-		  AC_DEFINE(HAVE_CBLAS,1,[ ])
-		  AC_DEFINE(HAVE_BLAS,1,[ ])
-          PHP_EVAL_INCLINE($CBLAS_INCS)
-		  PHP_EVAL_LIBLINE($CBLAS_LDFLAGS,PHALCON_SHARED_LIBADD)
-		  AC_MSG_RESULT([CBlas detected ])
-		],[
-		  PHP_CHECK_LIBRARY(openblas,cblas_sdot,
-		  [
-            PHP_EVAL_INCLINE($OPENBLAS_INCS)
-			PHP_EVAL_LIBLINE($OPENBLAS_LDFLAGS,PHALCON_SHARED_LIBADD)
-			AC_MSG_RESULT([OpenBLAS detected ])
+			AC_DEFINE(HAVE_CBLAS,1,[ ])
 			AC_DEFINE(HAVE_BLAS,1,[ ])
-		  ],[
-			AC_MSG_RESULT([wrong openblas/blas version or library not found.])
-		  ],[
-			$OPENBLAS_LDFLAGS
-		  ])
-		],[
-		  $CBLAS_LDFLAGS
-		])
+			PHP_EVAL_INCLINE($BLAS_INCS)
+			PHP_EVAL_LIBLINE($BLAS_LIBS, PHALCON_SHARED_LIBADD)
+		    AC_MSG_RESULT([CBLAS found])
+		elif pkg-config --exists openblas; then
+			BLAS_CFLAGS=`pkg-config --cflags openblas`
+			BLAS_INCS=`pkg-config --cflags-only-I openblas`
+			BLAS_LIBS=`pkg-config --libs openblas`
 
-		PHP_CHECK_LIBRARY(lapacke,LAPACKE_sgetrf,
-		[
-		  AC_DEFINE(HAVE_LAPACKE,1,[ ])
-          PHP_EVAL_INCLINE($LAPACKE_INCS)
-		  PHP_EVAL_LIBLINE($LAPACKE_LDFLAGS,PHALCON_SHARED_LIBADD)
-		],[
-		  AC_MSG_RESULT([wrong lapacke version or library not found])
-		],[
-		  $LAPACKE_LDFLAGS
-		])
+			CPPFLAGS="${CPPFLAGS} ${BLAS_CFLAGS}"
+			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${BLAS_LIBS}"
 
-		AC_DEFINE([PHALCON_USE_CARRAY], [1], [Have OpenBLAS support])
-		phalcon_sources="$phalcon_sources $carray_source_files"
+			AC_DEFINE(HAVE_BLAS,1,[ ])
+			PHP_EVAL_INCLINE($BLAS_INCS)
+			PHP_EVAL_LIBLINE($BLAS_LIBS, PHALCON_SHARED_LIBADD)
+		    AC_MSG_RESULT([OpenBLAS found])
+		fi
+
+		AC_MSG_CHECKING([checking lapacke support])
+		if pkg-config --exists lapacke; then
+			LAPACKE_CFLAGS=`pkg-config --cflags lapacke`
+			LAPACKE_INCS=`pkg-config --cflags-only-I lapacke`
+			LAPACKE_LIBS=`pkg-config --libs lapacke`
+
+			AC_DEFINE(HAVE_LAPACKE,1,[ ])
+			PHP_EVAL_INCLINE($LAPACKE_INCS)
+			PHP_EVAL_LIBLINE($LAPACKE_LIBS, PHALCON_SHARED_LIBADD)
+		fi
+
+		if test -z "$BLAS_CFLAGS"; then
+			AC_MSG_ERROR([Incorrect BLAS library])
+		else
+			AC_DEFINE([PHALCON_USE_CARRAY], [1], [Have OpenBLAS support])
+			phalcon_sources="$phalcon_sources $carray_source_files"
+		fi
 	fi
 
 	if test x"$PHP_VIPS" != x"no"; then

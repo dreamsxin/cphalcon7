@@ -41,6 +41,9 @@ sudo ln -s /usr/include/ImageMagick-6/ /usr/include/ImageMagick
 sudo add-apt-repository ppa:ondrej/php
 sudo apt-get install php7.1-dev libpcre3-dev gcc make
 
+# carray
+sudo apt-get install libblas-dev liblapacke-dev libopenblas-dev libatlas-base-dev
+
 # or compilation
 ----------------
 cd php-src

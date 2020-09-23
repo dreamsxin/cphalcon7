@@ -89,8 +89,7 @@ static inline zend_object *crubix_create_object(zend_class_entry *ce) /* {{{ */
     return &intern->std;
 }
 
-void
-ZVAL_TO_MEMORYPOINTER(zval * obj, MemoryPointer * ptr, char * type)
+void ZVAL_TO_MEMORYPOINTER(zval * obj, MemoryPointer * ptr, char * type)
 {
     ptr->free = 0;
     if (Z_TYPE_P(obj) == IS_ARRAY) {
@@ -141,16 +140,14 @@ ZVAL_TO_MEMORYPOINTER(zval * obj, MemoryPointer * ptr, char * type)
     }
 }
 
-void
-FREE_FROM_MEMORYPOINTER(MemoryPointer * ptr)
+void FREE_FROM_MEMORYPOINTER(MemoryPointer * ptr)
 {
     if(ptr->free == 1 || ptr->free == 2) {
         CArray_Alloc_FreeFromMemoryPointer(ptr);
     }
 }
 
-void *
-FREE_TUPLE(int * tuple)
+void * FREE_TUPLE(int * tuple)
 {
     if(tuple != NULL)
         efree(tuple);
@@ -171,8 +168,7 @@ int * ZVAL_TO_TUPLE(zval * obj, int * size)
     return data_int;
 }
 
-zval * 
-MEMORYPOINTER_TO_ZVAL(MemoryPointer * ptr)
+zval * MEMORYPOINTER_TO_ZVAL(MemoryPointer * ptr)
 {
     zval * a = emalloc(sizeof(zval));
     object_init_ex(a, carray_sc_entry);
@@ -182,8 +178,7 @@ MEMORYPOINTER_TO_ZVAL(MemoryPointer * ptr)
     return a;
 }
 
-void
-RETURN_MEMORYPOINTER(zval *return_value, MemoryPointer *ptr)
+void RETURN_MEMORYPOINTER(zval *return_value, MemoryPointer *ptr)
 {
     zend_class_entry *scope = zend_get_executed_scope();
     if(!strcmp(scope->name->val, "CRubix")) {
@@ -197,8 +192,7 @@ RETURN_MEMORYPOINTER(zval *return_value, MemoryPointer *ptr)
     zend_update_property_long(carray_sc_entry, return_value, "ndim", sizeof("ndim") - 1, arr->ndim);
 }
 
-void
-RETURN_RUBIX_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr)
+void RETURN_RUBIX_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr)
 {
     object_init_ex(return_value, crubix_sc_entry);
     CArray *arr = CArray_FromMemoryPointer(ptr);
@@ -206,8 +200,7 @@ RETURN_RUBIX_MEMORYPOINTER(zval * return_value, MemoryPointer * ptr)
     zend_update_property_long(carray_sc_entry, return_value, "ndim", sizeof("ndim") - 1, arr->ndim);
 }
 
-static int
-TYPESTR_TO_INT(char * str)
+static int TYPESTR_TO_INT(char * str)
 {
     if (!strcmp(str, TYPE_INT32_STRING) || !strcmp(str, TYPE_INT_STRING)) {
         return TYPE_INTEGER_INT;
@@ -256,6 +249,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_array_set, 0, 0, 2)
     ZEND_ARG_INFO(0, name)
     ZEND_ARG_INFO(0, value)
 ZEND_END_ARG_INFO()
+
 PHP_METHOD(CArray, __set)
 {
     size_t name_len;
@@ -298,6 +292,7 @@ PHP_METHOD(CArray, offsetExists)
 ZEND_BEGIN_ARG_INFO_EX(arginfo_array_offsetGet, 0, 0, 1)
     ZEND_ARG_INFO(0, index)
 ZEND_END_ARG_INFO()
+
 PHP_METHOD(CArray, offsetGet)
 {
     CArray * _this_ca, * ret_ca = NULL;
@@ -334,6 +329,7 @@ ZEND_BEGIN_ARG_INFO(arginfo_offsetSet, 0)
                 ZEND_ARG_INFO(0, index)
                 ZEND_ARG_INFO(0, newval)
 ZEND_END_ARG_INFO();
+
 PHP_METHOD(CArray, offsetSet)
 {
     CArray * target, * value;
@@ -360,6 +356,7 @@ PHP_METHOD(CArray, offsetSet)
     FREE_FROM_MEMORYPOINTER(&target_ptr);
     FREE_FROM_MEMORYPOINTER(&value_ptr);
 }
+
 PHP_METHOD(CArray, offsetUnset)
 {
     zval *index;
@@ -368,7 +365,6 @@ PHP_METHOD(CArray, offsetUnset)
     }
 
 }
-
 
 PHP_METHOD(CArray, setShape)
 {
@@ -391,6 +387,7 @@ PHP_METHOD(CArray, setShape)
     }
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
+
 PHP_METHOD(CArray, shape)
 {
     MemoryPointer ptr;
@@ -408,6 +405,7 @@ PHP_METHOD(CArray, shape)
         zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), &tmp_zval);
     }
 }
+
 PHP_METHOD(CArray, reshape)
 {
     MemoryPointer ptr;
@@ -436,8 +434,6 @@ PHP_METHOD(CArray, reshape)
     }
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
-
-
 
 PHP_METHOD(CArray, dump)
 {
@@ -529,6 +525,7 @@ PHP_METHOD(CArray, sin)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, cos)
 {
     zval * target;
@@ -548,6 +545,7 @@ PHP_METHOD(CArray, cos)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, tan)
 {
     zval * target;
@@ -566,6 +564,7 @@ PHP_METHOD(CArray, tan)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, arcsin)
 {
     zval * target;
@@ -584,6 +583,7 @@ PHP_METHOD(CArray, arcsin)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, arccos)
 {
     zval * target;
@@ -602,6 +602,7 @@ PHP_METHOD(CArray, arccos)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, arctan)
 {
     zval * target;
@@ -620,6 +621,7 @@ PHP_METHOD(CArray, arctan)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, sinh)
 {
     zval * target;
@@ -638,6 +640,7 @@ PHP_METHOD(CArray, sinh)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, cosh)
 {
     zval * target;
@@ -656,6 +659,7 @@ PHP_METHOD(CArray, cosh)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, tanh)
 {
     zval * target;
@@ -696,6 +700,7 @@ PHP_METHOD(CArray, exp)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, expm1)
 {
     zval * target;
@@ -714,6 +719,7 @@ PHP_METHOD(CArray, expm1)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, exp2)
 {
     zval * target;
@@ -732,6 +738,7 @@ PHP_METHOD(CArray, exp2)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, log)
 {
     zval * target;
@@ -750,6 +757,7 @@ PHP_METHOD(CArray, log)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, log10)
 {
     zval * target;
@@ -768,6 +776,7 @@ PHP_METHOD(CArray, log10)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, log2)
 {
     zval * target;
@@ -786,6 +795,7 @@ PHP_METHOD(CArray, log2)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
+
 PHP_METHOD(CArray, log1p)
 {
     zval * target;
@@ -804,8 +814,6 @@ PHP_METHOD(CArray, log1p)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_tr);
 }
-
-
 
 PHP_METHOD(CArray, transpose)
 {
@@ -861,6 +869,7 @@ PHP_METHOD(CArray, identity)
 	}
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
+
 PHP_METHOD(CArray, eye)
 {
     MemoryPointer ptr;
@@ -931,6 +940,7 @@ PHP_METHOD(CArray, argmax)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &out_ptr);
 }
+
 PHP_METHOD(CArray, argmin)
 {
     zval * target;
@@ -1052,7 +1062,6 @@ PHP_METHOD(CArray, sort)
     RETURN_MEMORYPOINTER(return_value, &out_ptr);
 }
 
-
 /**
  * LINEAR ALGEBRA 
  */ 
@@ -1080,6 +1089,7 @@ PHP_METHOD(CArray, matmul)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, inv)
 {
     MemoryPointer target, rtn_ptr;
@@ -1097,6 +1107,7 @@ PHP_METHOD(CArray, inv)
         RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
     }
 }
+
 PHP_METHOD(CArray, solve)
 {
     MemoryPointer out, a_ptr, b_ptr;
@@ -1122,6 +1133,7 @@ PHP_METHOD(CArray, solve)
     FREE_FROM_MEMORYPOINTER(&b_ptr);
     RETURN_MEMORYPOINTER(return_value, &out);
 }
+
 /**
  * @todo Implement more norm types
  * @param execute_data
@@ -1152,6 +1164,7 @@ PHP_METHOD(CArray, norm)
         RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
     }
 }
+
 PHP_METHOD(CArray, det)
 {
     MemoryPointer target, rtn_ptr;
@@ -1169,6 +1182,7 @@ PHP_METHOD(CArray, det)
         RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
     }
 }
+
 PHP_METHOD(CArray, matrix_rank)
 {
     zval * a;
@@ -1176,6 +1190,7 @@ PHP_METHOD(CArray, matrix_rank)
             Z_PARAM_ZVAL(a)
     ZEND_PARSE_PARAMETERS_END();
 }
+
 PHP_METHOD(CArray, vdot)
 {
     MemoryPointer a_ptr, b_ptr, rtn_ptr;
@@ -1202,6 +1217,7 @@ PHP_METHOD(CArray, vdot)
 
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, inner)
 {
     MemoryPointer rtn_ptr, a_ptr, b_ptr;
@@ -1227,10 +1243,12 @@ PHP_METHOD(CArray, inner)
 
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, outer)
 {
 
 }
+
 PHP_METHOD(CArray, eig)
 {
     zval * a;
@@ -1238,6 +1256,7 @@ PHP_METHOD(CArray, eig)
             Z_PARAM_ZVAL(a)
     ZEND_PARSE_PARAMETERS_END();
 }
+
 PHP_METHOD(CArray, eigvals)
 {
     zval * a;
@@ -1245,6 +1264,7 @@ PHP_METHOD(CArray, eigvals)
             Z_PARAM_ZVAL(a)
     ZEND_PARSE_PARAMETERS_END();
 }
+
 PHP_METHOD(CArray, svd)
 {
     int full_matrices_int = 1, compute_uv_int = 1, i = 0;
@@ -1294,6 +1314,7 @@ PHP_METHOD(CArray, svd)
     efree(out_ptr);
     efree(rtn);
 }
+
 PHP_METHOD(CArray, qr)
 {
     zval * a;
@@ -1303,6 +1324,7 @@ PHP_METHOD(CArray, qr)
 
 
 }
+
 PHP_METHOD(CArray, cholesky)
 {
     zval * a;
@@ -1311,12 +1333,6 @@ PHP_METHOD(CArray, cholesky)
     ZEND_PARSE_PARAMETERS_END();
 
 }
-
-
-
-
-
-
 
 PHP_METHOD(CArray, zeros)
 {   
@@ -1346,6 +1362,7 @@ PHP_METHOD(CArray, zeros)
     }
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
+
 PHP_METHOD(CArray, ones)
 {   
     zval * zshape;
@@ -1397,6 +1414,7 @@ PHP_METHOD(CArray, add)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, subtract)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1419,6 +1437,7 @@ PHP_METHOD(CArray, subtract)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, multiply)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1441,6 +1460,7 @@ PHP_METHOD(CArray, multiply)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, divide)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1464,6 +1484,7 @@ PHP_METHOD(CArray, divide)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, power)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1486,6 +1507,7 @@ PHP_METHOD(CArray, power)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, mod)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1508,6 +1530,7 @@ PHP_METHOD(CArray, mod)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, fmod)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1530,6 +1553,7 @@ PHP_METHOD(CArray, fmod)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, remainder)
 {
     MemoryPointer target1_ptr, target2_ptr, result_ptr;
@@ -1552,6 +1576,7 @@ PHP_METHOD(CArray, remainder)
         RETURN_MEMORYPOINTER(return_value, &result_ptr);
     }
 }
+
 PHP_METHOD(CArray, prod)
 {
     zval * target;
@@ -1612,6 +1637,7 @@ PHP_METHOD(CArray, cumprod)
     efree(axis_p);
     RETURN_MEMORYPOINTER(return_value, &ptr);
 }
+
 PHP_METHOD(CArray, cumsum)
 {
     zval * target;
@@ -1642,6 +1668,7 @@ PHP_METHOD(CArray, cumsum)
     FREE_FROM_MEMORYPOINTER(&ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, negative)
 {
     MemoryPointer out, rtn_ptr;
@@ -1660,6 +1687,7 @@ PHP_METHOD(CArray, negative)
     FREE_FROM_MEMORYPOINTER(&out);
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, sqrt)
 {
     MemoryPointer target_ptr, rtn_ptr;
@@ -1679,6 +1707,7 @@ PHP_METHOD(CArray, sqrt)
     FREE_FROM_MEMORYPOINTER(&target_ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, reciprocal)
 {
     MemoryPointer target_ptr, rtn_ptr;
@@ -1721,6 +1750,7 @@ PHP_METHOD(CArray, ceil)
     FREE_FROM_MEMORYPOINTER(&target_ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, floor)
 {
     MemoryPointer target_ptr, rtn_ptr;
@@ -1740,6 +1770,7 @@ PHP_METHOD(CArray, floor)
     FREE_FROM_MEMORYPOINTER(&target_ptr);
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, around)
 {
     MemoryPointer target_ptr, rtn_ptr;
@@ -1771,7 +1802,6 @@ PHP_METHOD(CArray, around)
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
 
-
 /**
  * STATISTICS
  */
@@ -1799,7 +1829,6 @@ PHP_METHOD(CArray, correlate)
     FREE_FROM_MEMORYPOINTER(&v_ptr);
     RETURN_MEMORYPOINTER(return_value, &out);
 }
-
 
 /**
  * INDEXING ROUTINES
@@ -1839,6 +1868,7 @@ PHP_METHOD(CArray, diagonal)
     }
     RETURN_MEMORYPOINTER(return_value, &rtn_ptr);
 }
+
 PHP_METHOD(CArray, take)
 {
     CArray * ca_a, * ca_indices, * out;
@@ -1865,6 +1895,7 @@ PHP_METHOD(CArray, take)
         RETURN_MEMORYPOINTER(return_value, &out_ptr);
     }
 }
+
 PHP_METHOD(CArray, atleast_1d)
 {
     zval * temp_zval;
@@ -1906,6 +1937,7 @@ PHP_METHOD(CArray, atleast_1d)
         }
     }
 }
+
 PHP_METHOD(CArray, atleast_2d)
 {
     zval * temp_zval;
@@ -1951,11 +1983,12 @@ PHP_METHOD(CArray, atleast_2d)
         }
     }
 }
+
 PHP_METHOD(CArray, atleast_3d)
 {
     zval * temp_zval;
     int i;
-    CArray * target, * out_carray;
+    CArray * target;
     MemoryPointer ptr, out;
     zval * dict;
     int dict_size;
@@ -1965,7 +1998,7 @@ PHP_METHOD(CArray, atleast_3d)
     if (dict_size == 1) {
         ZVAL_TO_MEMORYPOINTER(&(dict[0]), &ptr, NULL);
         target = CArray_FromMemoryPointer(&ptr);
-        out_carray = CArray_atleast3d(target, &out);
+        CArray_atleast3d(target, &out);
         RETURN_MEMORYPOINTER(return_value, &out);
         if(ptr.free) {
             CArray_Alloc_FreeFromMemoryPointer(&ptr);
@@ -1978,7 +2011,7 @@ PHP_METHOD(CArray, atleast_3d)
         for(i = 0; i < dict_size; i++) {
             ZVAL_TO_MEMORYPOINTER(&(dict[i]), &ptr, NULL);
             target = CArray_FromMemoryPointer(&ptr);
-            out_carray = CArray_atleast3d(target, &out);
+            CArray_atleast3d(target, &out);
             temp_zval = MEMORYPOINTER_TO_ZVAL(&out);
             zend_hash_next_index_insert_new(Z_ARRVAL_P(return_value), temp_zval);
             if(ptr.free) {
@@ -1992,6 +2025,7 @@ PHP_METHOD(CArray, atleast_3d)
         }
     }
 }
+
 PHP_METHOD(CArray, squeeze)
 {
     MemoryPointer a_ptr, out_ptr;
@@ -2029,6 +2063,7 @@ PHP_METHOD(CArray, squeeze)
         RETURN_MEMORYPOINTER(return_value, &out_ptr);
     }
 }
+
 PHP_METHOD(CArray, expand_dims)
 {
     zval * a;
@@ -2091,12 +2126,12 @@ PHP_METHOD(CArray, rollaxis)
     CArray_Rollaxis(target_array, (int)axis, (int)start, &a_ptr);
     RETURN_MEMORYPOINTER(return_value, &a_ptr);
 }
+
 PHP_METHOD(CArray, flip)
 {
     MemoryPointer a_ptr, out_ptr;
-    CArray * target_array, *rtn;
-    zval * a, * axis;
-    int axis_p, start;
+    CArray * target_array;
+    zval * a;
     ZEND_PARSE_PARAMETERS_START(1, 1)
             Z_PARAM_ZVAL(a)
     ZEND_PARSE_PARAMETERS_END();
@@ -2104,12 +2139,13 @@ PHP_METHOD(CArray, flip)
     target_array = CArray_FromMemoryPointer(&a_ptr);
 
     if(ZEND_NUM_ARGS() == 1) {
-        rtn = CArray_Flip(target_array, NULL, &out_ptr);
+        CArray_Flip(target_array, NULL, &out_ptr);
     }
 
     FREE_FROM_MEMORYPOINTER(&a_ptr);
     RETURN_MEMORYPOINTER(return_value, &out_ptr);
 }
+
 PHP_METHOD(CArray, moveaxis)
 {
     MemoryPointer a_ptr, src_ptr, dst_ptr, out_ptr;
@@ -2137,6 +2173,7 @@ PHP_METHOD(CArray, moveaxis)
         RETURN_MEMORYPOINTER(return_value, &out_ptr);
     }
 }
+
 PHP_METHOD(CArray, concatenate)
 {
     int i = 0;
@@ -2196,14 +2233,12 @@ PHP_METHOD(CArray, concatenate)
     RETURN_MEMORYPOINTER(return_value, &result_ptr);
 }
 
-
 /**
  * NUMERICAL RANGES
  */
 PHP_METHOD(CArray, arange)
 {
     MemoryPointer a_ptr;
-    CArray * target_array;
     double start, stop, step_d;
     int typenum;
     zval * start_stop, * stop_start = NULL, * step = NULL;
@@ -2271,22 +2306,21 @@ PHP_METHOD(CArray, arange)
         step_d  = (double)zval_get_double(step);
         typenum = CHAR_TYPE_INT(dtype[0]);
     }
-    target_array = CArray_Arange(start, stop, step_d, typenum , &a_ptr);
+    CArray_Arange(start, stop, step_d, typenum , &a_ptr);
     RETURN_MEMORYPOINTER(return_value, &a_ptr);
 }
+
 PHP_METHOD(CArray, linspace)
 {
     long num_samples;
     int num;
     zend_bool endpoint;
     size_t type_len;
-    CArray * ret;
     zval * start, * stop;
     double start_d = 0, stop_d = 0;
     char * typestr = NULL;
     int type_num, axis;
     MemoryPointer out;
-    zend_long axis_l;
 
     ZEND_PARSE_PARAMETERS_START(2, 7)
             Z_PARAM_ZVAL(start)
@@ -2294,7 +2328,6 @@ PHP_METHOD(CArray, linspace)
             Z_PARAM_OPTIONAL
             Z_PARAM_LONG(num_samples)
             Z_PARAM_BOOL(endpoint)
-            //Z_PARAM_LONG(axis_l)
             Z_PARAM_STRING(typestr, type_len)
     ZEND_PARSE_PARAMETERS_END();
     if(ZEND_NUM_ARGS() == 2) {
@@ -2336,10 +2369,11 @@ PHP_METHOD(CArray, linspace)
         axis = (int)0;
     }
 
-    ret = CArray_Linspace(start_d, stop_d, num, endpoint, 1, &axis, type_num, &out);
+    CArray_Linspace(start_d, stop_d, num, endpoint, 1, &axis, type_num, &out);
 
     RETURN_MEMORYPOINTER(return_value, &out);
 }
+
 PHP_METHOD(CArray, logspace)
 {
     long num_samples;
@@ -2500,6 +2534,7 @@ PHP_METHOD(CArray, rand)
     RETURN_MEMORYPOINTER(return_value, &out);
     FREE_TUPLE(dims);
 }
+
 PHP_METHOD(CArray, poisson)
 {
     zval * size;
@@ -2515,7 +2550,6 @@ PHP_METHOD(CArray, poisson)
     RETURN_MEMORYPOINTER(return_value, &out);
     FREE_TUPLE(dims);
 }
-
 
 /**
  * MISC
@@ -2543,6 +2577,7 @@ PHP_METHOD(CArray, fill)
     CArray_FillWithScalar(target_ca, scalar);
     CArrayScalar_FREE(scalar);
 }
+
 PHP_METHOD(CArray, clip)
 {
     MemoryPointer ptr_a, ptr_min, ptr_max, ptr_rtn;
@@ -2584,6 +2619,7 @@ PHP_METHOD(CArray, clip)
 
     RETURN_MEMORYPOINTER(return_value, &ptr_rtn);
 }
+
 PHP_METHOD(CArray, convolve)
 {
     MemoryPointer out, a_ptr, v_ptr;
@@ -2612,7 +2648,6 @@ PHP_METHOD(CArray, convolve)
     RETURN_MEMORYPOINTER(return_value, &out);
 }
 
-
 /**
  * LOGICAL FUNCTIONS
  */
@@ -2620,11 +2655,11 @@ PHP_METHOD(CArray, any)
 {
 
 }
+
 PHP_METHOD(CArray, all)
 {
 
 }
-
 
 PHP_METHOD(CArray, __toString)
 {
@@ -2639,6 +2674,7 @@ PHP_METHOD(CArray, __toString)
 
     ZVAL_STR(return_value, str);
 }
+
 PHP_METHOD(CArray, toArray)
 {
     CArray * target_ca;
@@ -2649,6 +2685,7 @@ PHP_METHOD(CArray, toArray)
     target_ca = CArray_FromMemoryPointer(&ptr);
     CArray_ToArray(target_ca, return_value);
 }
+
 PHP_METHOD(CArray, map)
 {
     int i;
@@ -2691,6 +2728,7 @@ PHP_METHOD(CArray, map)
     }
     efree(params);
 }
+
 PHP_METHOD(CArray, __invoke)
 {
     throw_notimplemented_exception();
@@ -2717,6 +2755,7 @@ PHP_METHOD(CArray, save)
         return;
     }
 }
+
 PHP_METHOD(CArray, load)
 {
     MemoryPointer rtn;

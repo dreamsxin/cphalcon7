@@ -1105,7 +1105,7 @@ num/ndarray.c"
 		  carray/kernel/buffer.c
 		"
 
-		AC_MSG_CHECKING([checking BLAS support])
+		AC_MSG_CHECKING([BLAS support])
 		if pkg-config --exists blas; then
 			BLAS_CFLAGS=`pkg-config --cflags blas`
 			BLAS_INCS=`pkg-config --cflags-only-I blas`
@@ -1130,7 +1130,7 @@ num/ndarray.c"
 		    AC_MSG_RESULT([OpenBLAS found])
 		fi
 
-		AC_MSG_CHECKING([checking lapacke support])
+		AC_MSG_CHECKING([lapacke support])
 		if pkg-config --exists lapacke; then
 			LAPACKE_CFLAGS=`pkg-config --cflags lapacke`
 			LAPACKE_INCS=`pkg-config --cflags-only-I lapacke`

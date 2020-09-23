@@ -2,27 +2,27 @@
  * CArray Interface for RubixML
  */
 
-#include <kernel/shape.h>
-#include <kernel/alloc.h>
-#include <kernel/iterators.h>
-#include <kernel/linalg.h>
-#include <kernel/exp_logs.h>
-#include <kernel/number.h>
-#include <kernel/trigonometric.h>
-#include <kernel/convert.h>
-#include <kernel/matlib.h>
-#include <kernel/item_selection.h>
-#include <kernel/buffer.h>
-#include <kernel/search.h>
-#include <kernel/round.h>
-#include <kernel/calculation.h>
+#include <carray/kernel/shape.h>
+#include <carray/kernel/alloc.h>
+#include <carray/kernel/iterators.h>
+#include <carray/kernel/linalg.h>
+#include <carray/kernel/exp_logs.h>
+#include <carray/kernel/number.h>
+#include <carray/kernel/trigonometric.h>
+#include <carray/kernel/convert.h>
+#include <carray/kernel/matlib.h>
+#include <carray/kernel/item_selection.h>
+#include <carray/kernel/buffer.h>
+#include <carray/kernel/search.h>
+#include <carray/kernel/round.h>
+#include <carray/kernel/calculation.h>
 #include "rubix.h"
-#include <kernel/carray.h>
-#include <phpsci.h>
+#include <carray/kernel/carray.h>
+#include <carray/phpsci.h>
 #include "php.h"
 #include "php_ini.h"
-#include <kernel/common/exceptions.h>
-#include <kernel/scalar.h>
+#include <carray/kernel/common/exceptions.h>
+#include <carray/kernel/scalar.h>
 #include "lapacke.h"
 #include "cblas.h"
 

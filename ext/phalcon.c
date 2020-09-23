@@ -34,6 +34,11 @@
 #include "async/async_helper.h"
 #endif
 
+#if PHALCON_USE_CARRAY
+#include "carray/phpsci.h"
+#endif
+
+
 #include "kernel/main.h"
 #include "kernel/memory.h"
 #include "kernel/fcall.h"
@@ -905,6 +910,10 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 
 	async_task_ce_unregister();
 	async_thread_ce_unregister();
+#endif
+
+#if PHALCON_USE_CARRAY
+	carray_ce_register();
 #endif
 
 	UNREGISTER_INI_ENTRIES();

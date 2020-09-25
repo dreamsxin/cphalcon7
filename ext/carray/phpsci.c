@@ -3152,12 +3152,6 @@ int carray_do_operation(zend_uchar opcode, zval *result, zval *op1, zval *op2) /
     return retval;
 }
 
-static int
-carray_cast(zval *readobj, zval *retval, int type) {
-    throw_valueerror_exception("Use astype() for casting");
-    return FAILURE;
-}
-
 void carray_ce_register()
 {
     zend_class_entry ce;

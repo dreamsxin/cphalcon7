@@ -163,13 +163,6 @@ _copy_from_same_shape(CArray *dest, CArray *src,
     return 0;
 }
 
-static int
-_broadcast_copy(CArray *dest, CArray *src,
-                strided_copy_func_t myfunc, int swap)
-{
-    
-}
-
 static void
 _strided_byte_copy(char *dst, int outstrides, char *src, int instrides,
                    int N, int elsize, CArrayDescriptor* ignore)
@@ -1653,7 +1646,8 @@ _array_copy_into(CArray *dest, CArray *src, int usecopy)
         return _copy_from_same_shape(dest, src, myfunc, swap);
     }
     else {
-        return _broadcast_copy(dest, src, myfunc, swap);
+        throw_valueerror_exception("Only copying same-shape");
+        return -1;
     }
 }
 

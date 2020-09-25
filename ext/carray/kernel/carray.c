@@ -49,36 +49,6 @@ CHAR_TYPE_INT(char CHAR_TYPE)
     throw_valueerror_exception("Unknown type");
 }
 
-/**
- * Print current CArray
- **/ 
-void
-CArray_ToString(CArray * carray)
-{
-
-}
-
-
-/**
- * Create CArray from Double ZVAL
- * @return
- */
-MemoryPointer
-CArray_FromZval_Double(zval * php_obj, char * type)
-{
-
-}
-
-/**
- * Create CArray from Long ZVAL
- * @return
- */
-MemoryPointer
-CArray_FromZval_Long(zval * php_obj, char * type)
-{
-
-}
-
 void
 _strided_byte_swap(void *p, int stride, int n, int size)
 {
@@ -1535,7 +1505,7 @@ CArray_ResolveWritebackIfCopy(CArray * self)
             CArray_ENABLEFLAGS((fa->base),CARRAY_ARRAY_WRITEABLE);
             CArray_CLEARFLAGS(self, CARRAY_ARRAY_UPDATEIFCOPY);
             CArray_CLEARFLAGS(self, CARRAY_ARRAY_WRITEBACKIFCOPY);
-            retval = CArray_CopyAnyInto(fa->base, self);
+            retval = CArray_CopyInto(fa->base, self);
             CArray_DECREF(fa->base);
             fa->base = NULL;
             if (retval < 0) {

@@ -838,8 +838,7 @@ PHP_METHOD(CArray, transpose)
     target_ca = CArray_FromMemoryPointer(&ptr);
     if(ZEND_NUM_ARGS() == 1) {
         ret = CArray_Transpose(target_ca, NULL, &ptr);
-    }
-    if(ZEND_NUM_ARGS() > 1) {
+    } else {
         permute.ptr = ZVAL_TO_TUPLE(axes, &size_axes);
         permute.len = size_axes;
         ret = CArray_Transpose(target_ca, &permute, &ptr);
@@ -2244,7 +2243,7 @@ PHP_METHOD(CArray, concatenate)
 PHP_METHOD(CArray, arange)
 {
     MemoryPointer a_ptr;
-    double start, stop, step_d;
+    double start=0.00, stop=0.00, step_d = 1.00;
     int typenum;
     zval * start_stop, * stop_start = NULL, * step = NULL;
     char * dtype = NULL;
@@ -2386,7 +2385,7 @@ PHP_METHOD(CArray, logspace)
     zend_bool endpoint;
     size_t type_len;
     zval * start, * stop;
-    double start_d, stop_d, base;
+    double start_d = 0, stop_d = 0, base= 10.00;
     char * typestr;
     int type_num;
     MemoryPointer out;
@@ -2459,8 +2458,8 @@ PHP_METHOD(CArray, geomspace)
     zend_bool endpoint;
     size_t type_len;
     zval * start, * stop;
-    double start_d, stop_d;
-    char * typestr;
+    double start_d = 0, stop_d = 0;
+    char * typestr = NULL;
     int type_num;
     MemoryPointer out;
 

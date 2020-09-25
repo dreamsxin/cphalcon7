@@ -108,7 +108,7 @@ CArrayIterator * CArray_NewIter(CArray * array);
  * @param coordinates
  * @return
  */
-static char* get_ptr(CArrayIterator * iter, uintptr_t * coordinates)
+static inline char* get_ptr(CArrayIterator * iter, uintptr_t * coordinates)
 {
     uintptr_t i;
     char *ret;

@@ -66,6 +66,7 @@ typedef struct _zend_carray_cdata {
 } end_carray_cdata;
 
 zend_class_entry *carray_sc_entry;
+zend_class_entry *crubix_sc_entry;
 
 zend_object_handlers carray_object_handlers;
 static inline zend_object *carray_create_object(zend_class_entry *ce) /* {{{ */
@@ -2568,12 +2569,12 @@ PHP_METHOD(CArray, fill)
        Z_PARAM_ZVAL(scalar_obj)
     ZEND_PARSE_PARAMETERS_END();
     if(Z_TYPE_P(scalar_obj) == IS_LONG) {
+        scalar = CArrayScalar_NewInt((int)zval_get_long(scalar_obj));
+    } else if(Z_TYPE_P(scalar_obj) == IS_DOUBLE) {
+        scalar = CArrayScalar_NewDouble(zval_get_double(scalar_obj));
+    } else {
         convert_to_long(scalar_obj);
         scalar = CArrayScalar_NewInt((int)zval_get_long(scalar_obj));
-    }
-    if(Z_TYPE_P(scalar_obj) == IS_DOUBLE) {
-        convert_to_double(scalar_obj);
-        scalar = CArrayScalar_NewDouble(zval_get_double(scalar_obj));
     }
     target_ca = CArray_FromMemoryPointer(&ptr);
     CArray_FillWithScalar(target_ca, scalar);

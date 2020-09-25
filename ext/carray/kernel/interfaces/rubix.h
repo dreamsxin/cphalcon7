@@ -3,13 +3,7 @@
 
 #include "../carray.h"
 
-static zend_class_entry *crubix_sc_entry;
-static zend_object_handlers crubix_object_handlers;
-static zend_class_entry *crubix_exception_sc_entry;
-static zend_class_entry *crubix_iterator_sc_entry;
-extern zend_module_entry crubix_module_entry;
-
-#define phpext_crubix_ptr &crubix_module_entry
+extern zend_class_entry *crubix_sc_entry;
 
 /**
  * Rubix-ML CArray Interface Definition

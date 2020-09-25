@@ -645,7 +645,7 @@ void
 CArray_INIT(MemoryPointer * ptr, CArray * output_ca, int * dims, int ndim, char type)
 {
     CArrayDescriptor * output_ca_dscr;
-    int * target_stride;
+    int * target_stride = NULL;
     int i, num_elements = 0;
 
     if(output_ca == NULL) {
@@ -696,7 +696,10 @@ CArray_INIT(MemoryPointer * ptr, CArray * output_ca, int * dims, int ndim, char 
     CArray_NewFromDescr_int(output_ca, output_ca_dscr, ndim, dims, target_stride, NULL, CARRAY_NEEDS_INIT, NULL, 1, 0);
     output_ca->flags &= ~CARRAY_ARRAY_F_CONTIGUOUS;
     add_to_buffer(ptr, output_ca, sizeof(output_ca));
-    efree(target_stride);
+    if (target_stride != NULL)
+    {
+		efree(target_stride);
+    }
 }
 
 /**
@@ -1515,52 +1518,6 @@ CArray_SetWritebackIfCopyBase(CArray *arr, CArray *base)
   fail:
     CArray_DECREF(base);
     return -1;
-}
-
-/**
- * @return
- */ 
-int
-CArray_CopyAsFlat(CArray *dst, CArray *src, CARRAY_ORDER order)
-{
-    //PyArray_StridedUnaryOp *stransfer = NULL;
-    //NpyAuxData *transferdata = NULL;
-    //NpyIter *dst_iter, *src_iter;
-
-    //NpyIter_IterNextFunc *dst_iternext, *src_iternext;
-    char **dst_dataptr, **src_dataptr;
-    int dst_stride, src_stride;
-    int *dst_countptr, *src_countptr;
-    int baseflags;
-
-    char *dst_data, *src_data;
-    int dst_count, src_count, count;
-    int src_itemsize;
-    int dst_size, src_size;
-    int needs_api;
-
-    /*
-     * If the shapes match and a particular order is forced
-     * for both, use the more efficient CopyInto
-     */
-    if (order != CARRAY_ANYORDER && order != CARRAY_KEEPORDER &&
-        CArray_NDIM(dst) == CArray_NDIM(src) &&
-        CArray_CompareLists(CArray_DIMS(dst), CArray_DIMS(src),
-        CArray_NDIM(dst))) {
-            
-            //return CArray_CopyInto(dst, src);
-    }
-}
-
-/**
- * Copy an Array into another array -- memory must not overlap
- * Does not require src and dest to have "broadcastable" shapes
- * (only the same number of elements).
- */ 
-int
-CArray_CopyAnyInto(CArray *dst, CArray *src)
-{
-    return CArray_CopyAsFlat(dst, src, CARRAY_CORDER);
 }
 
 /**

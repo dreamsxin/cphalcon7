@@ -4,8 +4,7 @@
 #include "carray.h"
 
 /* Converts a type number from unsigned to signed */
-static int
-type_num_unsigned_to_signed(int type_num)
+static inline int type_num_unsigned_to_signed(int type_num)
 {
     switch (type_num) {
         default:
@@ -17,9 +16,7 @@ type_num_unsigned_to_signed(int type_num)
  * The is_small_unsigned output flag indicates whether it's an unsigned integer,
  * and would fit in a signed integer of the same bit size.
  */
-static
-int min_scalar_type_num(char *valueptr, int type_num,
-                               int *is_small_unsigned)
+static inline int min_scalar_type_num(char *valueptr, int type_num, int *is_small_unsigned)
 {
     switch (type_num) {
         case TYPE_INTEGER_INT: {

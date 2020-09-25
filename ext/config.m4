@@ -1142,7 +1142,7 @@ num/ndarray.c"
 		fi
 
 		if test -z "$BLAS_CFLAGS"; then
-			AC_MSG_ERROR([Incorrect BLAS library])
+			AC_MSG_RESULT([no])
 		else
 			AC_DEFINE([PHALCON_USE_CARRAY], [1], [Have OpenBLAS support])
 			phalcon_sources="$phalcon_sources $carray_source_files"

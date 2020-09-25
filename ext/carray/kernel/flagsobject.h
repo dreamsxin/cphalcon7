@@ -6,8 +6,7 @@
 /*
  * Enables the specified array flags.
  */
-static void
-CArray_ENABLEFLAGS(CArray * arr, int flags)
+static inline void CArray_ENABLEFLAGS(CArray * arr, int flags)
 {
     (arr)->flags |= flags;
 }
@@ -16,8 +15,7 @@ CArray_ENABLEFLAGS(CArray * arr, int flags)
  * Clears the specified array flags. Does no checking,
  * assumes you know what you're doing.
  */
-static void
-CArray_CLEARFLAGS(CArray *arr, int flags)
+static inline void CArray_CLEARFLAGS(CArray *arr, int flags)
 {
     (arr)->flags &= ~flags;
 }

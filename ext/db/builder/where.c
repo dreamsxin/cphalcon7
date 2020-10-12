@@ -323,7 +323,7 @@ PHP_METHOD(Phalcon_Db_Builder_Where, inWhere){
 		 */
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
 
-		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
+		PHALCON_CONCAT_SV(&query_key, ":", &key);
 		phalcon_array_append(&bind_keys, &query_key, 0);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 		zval_ptr_dtor(&key);
@@ -389,7 +389,7 @@ PHP_METHOD(Phalcon_Db_Builder_Where, notInWhere){
 		 */
 		PHALCON_CONCAT_SV(&key, "phi", &hidden_param);
 
-		PHALCON_CONCAT_SVS(&query_key, ":", &key, ":");
+		PHALCON_CONCAT_SV(&query_key, ":", &key);
 		phalcon_array_append(&bind_keys, &query_key, 0);
 		phalcon_array_update(&bind_params, &key, value, PH_COPY);
 		zval_ptr_dtor(&key);

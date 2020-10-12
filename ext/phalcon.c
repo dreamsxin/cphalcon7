@@ -871,6 +871,10 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Num);
 	PHALCON_INIT(Phalcon_Num_Ndarray);
 
+#ifdef PHALCON_JWT
+	PHALCON_INIT(Phalcon_JWT);
+#endif
+
 	return SUCCESS;
 }
 
@@ -1208,6 +1212,18 @@ static PHP_GINIT_FUNCTION(phalcon)
 	phalcon_globals->xhprof.nesting_maximum_level =  0;
 
 	phalcon_globals->snowflake.epoch = 1420864633000ULL;
+
+#ifdef PHALCON_JWT
+    phalcon_globals->jwt.expiration = 0;
+    phalcon_globals->jwt.not_before = 0;
+    phalcon_globals->jwt.iss = NULL;
+    phalcon_globals->jwt.iat = 0;
+    phalcon_globals->jwt.jti = NULL;
+    phalcon_globals->jwt.aud = NULL;
+    phalcon_globals->jwt.sub = NULL;
+    phalcon_globals->jwt.leeway = 0;
+    phalcon_globals->jwt.algorithm = "HS256";
+#endif
 }
 
 static PHP_GSHUTDOWN_FUNCTION(phalcon)
@@ -1218,7 +1234,9 @@ static PHP_GSHUTDOWN_FUNCTION(phalcon)
 static const zend_module_dep phalcon_deps[] = {
 	ZEND_MOD_REQUIRED("spl")
 	ZEND_MOD_REQUIRED("date")
-#if PHALCON_USE_PHP_JSON
+#if PHALCON_JWT
+	ZEND_MOD_REQUIRED("json")
+#elif PHALCON_USE_PHP_JSON
 	ZEND_MOD_REQUIRED("json")
 #else
 	ZEND_MOD_OPTIONAL("json")

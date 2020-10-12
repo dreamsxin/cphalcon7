@@ -287,6 +287,19 @@ typedef struct _phalcon_vips_options {
 } phalcon_vips_options;
 #endif
 
+/** JWT options */
+typedef struct _phalcon_jwt_options {
+  time_t expiration;
+  time_t not_before;
+  char *iss;
+  time_t iat;
+  char *jti;
+  zval *aud;
+  char *sub;
+  size_t leeway;
+  char *algorithm;
+} phalcon_jwt_options;
+
 ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/* Controls double initialization of memory frames */
@@ -343,6 +356,8 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	phalcon_vips_options vips;
 #endif
 
+	phalcon_jwt_options jwt;
+
 ZEND_END_MODULE_GLOBALS(phalcon)
 
 
@@ -357,6 +372,8 @@ ZEND_EXTERN_MODULE_GLOBALS(phalcon)
 #endif
 
 #define TXRG(v) (PHALCON_GLOBAL(xhprof).v)
+
+#define JWT_G(v) (PHALCON_GLOBAL(jwt).v)
 
 #ifdef PHALCON_USE_ASYNC
 #define ASYNC_G(v) (PHALCON_GLOBAL(async).v)

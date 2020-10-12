@@ -182,6 +182,9 @@ else
 	AC_MSG_RESULT([no])
 fi
 
+PHP_ARG_ENABLE(jwt, whether to enable JWT support,
+[  --enable-jwt   Enable JWT support], yes, no)
+
 AC_DEFUN([AC_TIDEWAYS_CLOCK],
 [
   have_clock_gettime=no
@@ -1365,25 +1368,28 @@ num/ndarray.c"
 		async_use_ucontext="no"
 	fi
 
-	if test "$PHP_OPENSSL" != "no"; then
-		AC_CHECK_HEADER(openssl/evp.h, [
-			PHP_OPENSSL="yes"
-		], [
-			PHP_OPENSSL="no"
-		])
-	fi
-
 	# Check SSL lib support.
+	PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
+		AC_MSG_CHECKING(for SSL support)
+		AC_MSG_RESULT(yes)
+		AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])
 
-	if test "$PHP_OPENSSL" != "no" || test "$PHP_OPENSSL_DIR" != "no"; then
-		PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
-			AC_MSG_CHECKING(for SSL support)
-			AC_MSG_RESULT(yes)
-			AC_DEFINE(HAVE_ASYNC_SSL, 1, [ ])
-		], [
-			AC_MSG_CHECKING(for SSL support)
-			AC_MSG_RESULT(no)
-		])
+		PHP_OPENSSL="yes"
+	], [
+		AC_MSG_CHECKING(for SSL support)
+		AC_MSG_RESULT(no)
+
+		PHP_OPENSSL="no"
+	])
+
+	AC_MSG_CHECKING([for JWT support])
+	if test "$PHP_JWT" = "yes" && test "$PHP_OPENSSL" = "yes"; then
+		AC_DEFINE([PHALCON_JWT], [1], [Whether JWT are available])
+		AC_MSG_RESULT([yes, JWT])
+		
+		phalcon_sources="$phalcon_sources jwt.c "
+	else
+		AC_MSG_RESULT([no])
 	fi
 
 	AC_MSG_CHECKING([checking async support])

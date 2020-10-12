@@ -511,4 +511,6 @@
 #include "num.h"
 #include "num/ndarray.h"
 
+#include "jwt.h"
+
 #endif /* PHALCON_H */

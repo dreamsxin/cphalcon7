@@ -48,8 +48,40 @@ $payload = ['data' => 'data', 'exp' => time() - 1];
 $token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
 
 try {
-    $decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['algorithm' => 'HS256']);
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['algorithm' => 'HS256']);
 	print_r($decoded_token);
 } catch (\Exception $e) {
-    print_r($e);
+	print_r($e);
 }
+
+$payload = ['data' => 'data', 'nbf' => time() + 3600];
+
+$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
+
+try {
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['algorithm' => 'HS256']);
+	print_r($decoded_token);
+} catch (\Exception $e) {
+	print_r($e);
+}
+
+$payload = ['data' => 'data', 'aud' => ['Young', 'Old']];
+
+$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
+
+try {
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['aud' => ['Young'], 'algorithm' => 'HS256']);
+} catch (\Exception $e) {
+	print_r($e);
+}
+
+$payload = ['data' => 'data', 'jti' => md5('id')];
+
+$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
+
+try {
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['jti' => md5('id'), 'algorithm' => 'HS256']);
+} catch (\Exception $e) {
+	print_r($e);
+}
+

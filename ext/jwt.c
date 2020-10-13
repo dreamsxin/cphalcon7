@@ -811,7 +811,7 @@ int jwt_verify_body(char *body, zval *return_value)
 #define FORMAT_CEX_TIME(t, cex) do {                                                            \
        struct tm *timeinfo;                                                                     \
        char buf[128];                                                                           \
-       timeinfo = localtime(&t);                                                                \
+       timeinfo = localtime(&curr_time);                                                                \
        strftime(buf, sizeof(buf), "Cannot handle token prior to %Y-%m-%d %H:%M:%S", timeinfo);  \
        ce = cex;                                                                                \
        err_msg = buf;                                                                           \
@@ -838,20 +838,26 @@ int jwt_verify_body(char *body, zval *return_value)
         JWT_G(iat) = jwt_hash_str_find_long(return_value, "iat");
 
         /* expiration */
-        if (JWT_G(expiration) && (curr_time - JWT_G(leeway)) >= JWT_G(expiration))
+        if (JWT_G(expiration) && (curr_time - JWT_G(leeway)) >= JWT_G(expiration)) {
             FORMAT_CEX_MSG("Expired token", jwt_expired_signature_cex);
+			goto done;
         /* not before */
-        if (JWT_G(not_before) && JWT_G(not_before) > (curr_time + JWT_G(leeway)))
+        } else if (JWT_G(not_before) && JWT_G(not_before) > (curr_time + JWT_G(leeway))) {
             FORMAT_CEX_TIME(JWT_G(not_before), jwt_before_valid_cex);
+			goto done;
         /* iat */
-        if (JWT_G(iat) && JWT_G(iat) > (curr_time + JWT_G(leeway)))
+        } else if (JWT_G(iat) && JWT_G(iat) > (curr_time + JWT_G(leeway))) {
             FORMAT_CEX_TIME(JWT_G(iat), jwt_invalid_iat_cex);
+			goto done;
         /* iss */
-        if (jwt_verify_claims_str(return_value, "iss", JWT_G(iss)))
+        } else if (jwt_verify_claims_str(return_value, "iss", JWT_G(iss))) {
             FORMAT_CEX_MSG("Invalid Issuer", jwt_invalid_issuer_cex);
+			goto done;
         /* jti */
-        if (jwt_verify_claims_str(return_value, "jti", JWT_G(jti)))
+        } else if (jwt_verify_claims_str(return_value, "jti", JWT_G(jti))) {
             FORMAT_CEX_MSG("Invalid Jti", jwt_invalid_jti_cex);
+			goto done;
+		}
 
         /* aud */
         size_t flag = 0;
@@ -870,14 +876,20 @@ int jwt_verify_body(char *body, zval *return_value)
                 break;
             }
 
-            if (flag) FORMAT_CEX_MSG("Invalid Aud", jwt_invalid_aud_cex);
+            if (flag) {
+				FORMAT_CEX_MSG("Invalid Aud", jwt_invalid_aud_cex);
+				goto done;
+			}
         }
 
         /* sub */
-        if (jwt_verify_claims_str(return_value, "sub", JWT_G(sub)))
+        if (jwt_verify_claims_str(return_value, "sub", JWT_G(sub))) {
             FORMAT_CEX_MSG("Invalid Sub", jwt_invalid_sub_cex);
+			goto done;
+		}
     } else {
         FORMAT_CEX_MSG("Json decode error", spl_ce_UnexpectedValueException);
+		goto done;
     }
 
 done:
@@ -967,7 +979,8 @@ static void php_jwt_encode(INTERNAL_FUNCTION_PARAMETERS) {
     smart_str_free(&json_header);
     smart_str_free(&json_payload);
 
-    buf = (char *)emalloc(strlen(header_b64) + strlen(payload_b64) + 1);
+	int buflen = strlen(header_b64) + strlen(payload_b64) + 2;
+    buf = (char *)ecalloc(buflen, 1);
     strcpy(buf, header_b64);
     strcat(buf, ".");
     strcat(buf, payload_b64);
@@ -977,9 +990,11 @@ static void php_jwt_encode(INTERNAL_FUNCTION_PARAMETERS) {
 
     /* sign */
     if (jwt->alg == JWT_ALG_NONE) {
+		buflen+=1;
         /* alg none */
-        buf = (char *)erealloc(buf, strlen(buf) + 1);
+        buf = (char *)erealloc(buf, buflen);
         strcat(buf, ".");
+		buf[buflen]='\0';
     } else {
         /* set jwt struct */
         jwt->key = key;
@@ -996,7 +1011,8 @@ static void php_jwt_encode(INTERNAL_FUNCTION_PARAMETERS) {
         zend_string *sig_str = zend_string_init(sig, sig_len, 0);
         char *sig_b64 = jwt_b64_url_encode(sig_str);
 
-        char *tmp = (char *)emalloc(strlen(sig_b64) + strlen(buf) + 1);
+		buflen = strlen(sig_b64) + strlen(buf) + 2;
+        char *tmp = (char *)ecalloc(buflen, 1);
         sprintf(tmp, "%s.%s", buf, sig_b64);
 
         efree(buf);
@@ -1014,11 +1030,8 @@ encode_done:
 
     jwt_free(jwt);
 
-    char *ret = alloca(strlen(buf));
-    strcpy(ret, buf);
+	RETVAL_STRINGL(buf, strlen(buf));
     efree(buf);
-
-    RETURN_STRING(ret);
 }
 
 /* Jwt decode */

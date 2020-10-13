@@ -16,6 +16,7 @@ jti：JWT ID
 
 */
 $hmackey = "example-hmac-key";
+/*
 $payload = array(
     "data" => [
         "name" => "ZiHang Gao",
@@ -54,17 +55,6 @@ try {
 	print_r($e);
 }
 
-$payload = ['data' => 'data', 'nbf' => time() + 3600];
-
-$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
-
-try {
-	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['algorithm' => 'HS256']);
-	print_r($decoded_token);
-} catch (\Exception $e) {
-	print_r($e);
-}
-
 $payload = ['data' => 'data', 'aud' => ['Young', 'Old']];
 
 $token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
@@ -84,4 +74,29 @@ try {
 } catch (\Exception $e) {
 	print_r($e);
 }
+*/
 
+echo 'nbf'.PHP_EOL;
+$payload = ['data' => 'data', 'nbf' => time() + 3600];
+
+$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
+print_r($token.PHP_EOL);
+try {
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['algorithm' => 'HS256']);
+	print_r($decoded_token);
+} catch (\Exception $e) {
+	print_r($e);
+}
+
+$payload = ['data' => 'data', 'lat' => time() + 60];
+
+// build expired token
+$token = \Phalcon\JWT::encode($payload, $hmackey, 'HS256');
+print_r($token.PHP_EOL);
+
+try {
+	$decoded_token = \Phalcon\JWT::decode($token, $hmackey, ['leeway' => 30, 'algorithm' => 'HS256']);
+	print_r($decoded_token);
+} catch (\Exception $e) {
+	print_r($e);
+}

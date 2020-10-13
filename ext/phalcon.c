@@ -158,6 +158,9 @@ PHP_INI_BEGIN()
 #if PHALCON_USE_VIPS
 	STD_PHP_INI_ENTRY("phalcon.vips.home", ".", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateString, vips.home, zend_phalcon_globals, phalcon_globals)
 #endif
+#ifdef PHALCON_JWT
+	STD_PHP_INI_ENTRY("phalcon.jwt.algorithm", "HS256", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateString, jwt.algorithm, zend_phalcon_globals, phalcon_globals)
+#endif
 PHP_INI_END()
 
 #if PHALCON_USE_ASYNC

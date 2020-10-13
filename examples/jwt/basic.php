@@ -16,7 +16,7 @@ jti：JWT ID
 
 */
 $hmackey = "example-hmac-key";
-/*
+
 $payload = array(
     "data" => [
         "name" => "ZiHang Gao",
@@ -25,18 +25,6 @@ $payload = array(
     "iss" => "http://example.org",
     "sub" => "1234567890",
 );
-
-// Array
-// (
-//    [data] => Array
-//        (
-//            [name] => ZiHang Gao
-//            [admin] => 1
-//        )
-//
-//    [iss] => http://example.org
-//    [sub] => 1234567890
-// )
 
 // or would you prefer to use a static method call
 $token = \Phalcon\JWT::encode($payload, $hmackey);
@@ -74,7 +62,6 @@ try {
 } catch (\Exception $e) {
 	print_r($e);
 }
-*/
 
 echo 'nbf'.PHP_EOL;
 $payload = ['data' => 'data', 'nbf' => time() + 3600];

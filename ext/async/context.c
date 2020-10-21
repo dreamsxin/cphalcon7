@@ -857,8 +857,9 @@ void async_context_init()
 	context->flags |= ASYNC_CONTEXT_FLAG_BACKGROUND;
 	
 	context->output.context = ASYNC_G(foreground);
-	
+
 	ASYNC_G(background) = context;
+	ASYNC_G(nc) = 0;
 }
 
 void async_context_shutdown()

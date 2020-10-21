@@ -948,7 +948,7 @@ static async_task *async_task_object_create(zend_execute_data *call, async_task_
 
 	task = ecalloc(1, sizeof(async_task) + zend_object_properties_size(async_task_ce));
 	task->status = ASYNC_TASK_STATUS_INIT;
-
+	task->id = ++ASYNC_G(nc);
 	stack_size = ASYNC_G(stack_size);
 
 	if (stack_size == 0) {
@@ -995,7 +995,8 @@ static void async_task_object_destroy(zend_object *object)
 	
 		async_fiber_destroy(task->fiber);
 	}
-	
+
+	zval_ptr_dtor(&task->di);
 	zval_ptr_dtor(&task->result);
 
 	ASYNC_DELREF_CB(task->fci);

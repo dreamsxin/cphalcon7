@@ -400,6 +400,10 @@ struct _async_context_var {
 #define ASYNC_TASK_FLAG_ROOT (1 << 2)
 
 struct _async_task {
+	zend_long id;
+
+	zval di;
+
 	/* Underlying fiber being used to run the task. */
 	async_fiber *fiber;
 	

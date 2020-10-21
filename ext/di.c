@@ -196,14 +196,11 @@ PHALCON_INIT_CLASS(Phalcon_Di){
  */
 PHP_METHOD(Phalcon_Di, __construct){
 
-	zval *_name = NULL, default_di = {}, name = {};
+	zval *_name = NULL, name = {};
 
 	phalcon_fetch_params(0, 0, 1, &_name);
 
-	phalcon_read_static_property_ce(&default_di, phalcon_di_ce, SL("_default"), PH_READONLY);
-	if (Z_TYPE(default_di) == IS_NULL) {
-		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), getThis());
-	}
+	PHALCON_CALL_METHOD(NULL, getThis(), "setdefault", getThis(), &PHALCON_GLOBAL(z_true));
 
 	if (!_name || Z_TYPE_P(_name) != IS_STRING) {
 		ZVAL_STR(&name, IS(di));
@@ -674,12 +671,28 @@ PHP_METHOD(Phalcon_Di, __call){
  */
 PHP_METHOD(Phalcon_Di, setDefault){
 
-	zval *dependency_injector;
+	zval *dependency_injector, *flag = NULL;
+	zval tmp = {};
+#if PHALCON_USE_ASYNC
+	async_task *task;
+#endif
 
-	phalcon_fetch_params(0, 1, 0, &dependency_injector);
+	phalcon_fetch_params(0, 1, 1, &dependency_injector, &flag);
 	PHALCON_VERIFY_INTERFACE_EX(dependency_injector, phalcon_diinterface_ce, phalcon_di_exception_ce);
 
-	phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), dependency_injector);
+	if (!flag) {
+		flag = &PHALCON_GLOBAL(z_false);
+	}
+#if PHALCON_USE_ASYNC
+	task = ASYNC_G(task);
+	if (task && Z_TYPE(task->di) != IS_OBJECT) {
+		ZVAL_COPY(&task->di, dependency_injector);
+	}
+#endif
+	phalcon_read_static_property_ce(&tmp, phalcon_di_ce, SL("_default"), PH_NOISY | PH_READONLY);
+	if (!zend_is_true(flag) || Z_TYPE(tmp) != IS_OBJECT) {
+		phalcon_update_static_property_ce(phalcon_di_ce, SL("_default"), dependency_injector);
+	}
 }
 
 /**
@@ -690,29 +703,20 @@ PHP_METHOD(Phalcon_Di, setDefault){
 PHP_METHOD(Phalcon_Di, getDefault){
 
 	zval *name = NULL;
-#if PHALCON_USE_ASYNC
-	zval context = {}, diName = {};
-#endif
 
 	phalcon_fetch_params(1, 0, 1, &name);
 
-#if PHALCON_USE_ASYNC
-	if (name && PHALCON_IS_NOT_EMPTY(name)) {
-		ZVAL_COPY_VALUE(&diName, name);
-	} else {
-		ZVAL_STR(&diName, IS(di));
-	}
-	PHALCON_MM_CALL_CE_STATIC(&context, async_context_ce, "current");
-	PHALCON_MM_ADD_ENTRY(&context);
-	PHALCON_MM_CALL_METHOD(return_value, &context, "getvar", &diName);
-
-	if (Z_TYPE_P(return_value) != IS_NULL) {
-		RETURN_MM();
-	}
-#endif
 	if (name && PHALCON_IS_NOT_EMPTY(name)) {
 		phalcon_read_static_property_array_ce(return_value, phalcon_di_ce, SL("_list"), name, PH_COPY);
 	} else {
+#if PHALCON_USE_ASYNC
+		async_task *task;
+
+		task = ASYNC_G(task);
+		if (task && Z_TYPE(task->di) == IS_OBJECT) {
+			RETURN_MM_CTOR(&task->di);
+		}
+#endif
 		phalcon_read_static_property_ce(return_value, phalcon_di_ce, SL("_default"), PH_COPY);
 		if (Z_TYPE_P(return_value) != IS_OBJECT) {
 			object_init_ex(return_value, phalcon_di_factorydefault_ce);

@@ -64,6 +64,7 @@ ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_diinterface_setdefault, 0, 0, 1)
 	ZEND_ARG_OBJ_INFO(0, dependencyInjector, Phalcon\\DiInterface, 0)
+	ZEND_ARG_TYPE_INFO(0, flag, _IS_BOOL, 1)
 ZEND_END_ARG_INFO()
 
 #endif /* PHALCON_DIINTERFACE_H */

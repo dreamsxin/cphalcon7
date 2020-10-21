@@ -59,6 +59,18 @@ int phalcon_get_class_constant(zval *return_value, const zend_class_entry *ce, c
 	return SUCCESS;
 }
 
+int phalcon_static_property_array_isset_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index)
+{
+	zval property_value = {};
+
+	phalcon_read_static_property_ce(&property_value, ce, property, property_length, PH_READONLY);
+
+	if (Z_TYPE(property_value) != IS_ARRAY || !phalcon_array_isset(&property_value, index)) {
+		return 0;
+	}
+	return 1;
+}
+
 /**
  * Query a static property value from a zend_class_entry
  */
@@ -282,6 +294,20 @@ int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, 
 	phalcon_read_static_property_ce(&value, ce, property, len, PH_READONLY);
 	phalcon_decrement(&value);
 	phalcon_update_static_property_ce(ce, property, len, &value);
+	return SUCCESS;
+}
+
+int phalcon_unset_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index) {
+
+	zval tmp = {};
+
+	phalcon_read_static_property_ce(&tmp, ce, property, property_length, PH_NOISY | PH_READONLY);
+
+	/** Convert the value to array if not is an array */
+	if (Z_TYPE(tmp) == IS_ARRAY) {
+		phalcon_array_unset(&tmp, index, 0);
+	}
+
 	return SUCCESS;
 }
 
@@ -1822,6 +1848,20 @@ int phalcon_property_isset_fetch(zval *return_value, zval *object, const char *p
 	return 1;
 }
 
+int phalcon_property_array_isset(zval *object, const char *property, size_t property_length, const zval *index)
+{
+	zval property_value = {};
+
+	if (!phalcon_property_isset_fetch(&property_value, object, property, property_length, PH_READONLY)) {
+		return 0;
+	}
+
+	if (Z_TYPE(property_value) != IS_ARRAY || !phalcon_array_isset(&property_value, index)) {
+		return 0;
+	}
+	return 1;
+}
+
 int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property, size_t property_length, const zval *index, int flags)
 {
 	zval property_value = {};
@@ -1830,7 +1870,7 @@ int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *
 		return 0;
 	}
 
-	if (!phalcon_array_isset_fetch(fetched, &property_value, index, flags)) {
+	if (Z_TYPE(property_value) != IS_ARRAY || !phalcon_array_isset_fetch(fetched, &property_value, index, flags)) {
 		return 0;
 	}
 	return 1;

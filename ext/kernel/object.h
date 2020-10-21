@@ -200,6 +200,8 @@ static inline int phalcon_isset_property_zval_array(zval *object, const zval *pr
 }
 
 /** Static properties */
+int phalcon_static_property_array_isset_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index);
+
 int phalcon_read_static_property(zval *return_value, const char *class_name, uint32_t class_length, const char *property_name, uint32_t property_length, int flags);
 int phalcon_read_static_property_ce(zval *return_value, zend_class_entry *ce, const char *property, uint32_t len, int flags);
 int phalcon_read_static_property_array_ce(zval *return_value, zend_class_entry *ce, const char *property_name, uint32_t property_length, const zval *index, int flags);
@@ -211,6 +213,8 @@ int phalcon_update_static_property_empty_array_ce(zend_class_entry *ce, const ch
 int phalcon_update_static_property_array_append_ce(zend_class_entry *ce, const char *name, uint32_t len, zval *value);
 int phalcon_static_property_incr_ce(zend_class_entry *ce, const char *property, uint32_t len);
 int phalcon_static_property_decr_ce(zend_class_entry *ce, const char *property, uint32_t len);
+
+int phalcon_unset_static_property_array_ce(zend_class_entry *ce, const char *property, uint32_t property_length, const zval *index);
 
 /**
  * Update a static property
@@ -249,6 +253,7 @@ static inline int phalcon_check_property_access_zval(zval *object, const zval *p
 }
 
 int phalcon_property_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, int flags);
+int phalcon_property_array_isset(zval *object, const char *property_name, size_t property_length, const zval *index);
 int phalcon_property_array_isset_fetch(zval *fetched, zval *object, const char *property_name, size_t property_length, const zval *index, int flags);
 int phalcon_property_array_pop(zval *fetched, zval *object, const char *property, size_t property_length);
 int phalcon_property_array_last(zval *fetched, zval *object, const char *property, size_t property_length, int flags);

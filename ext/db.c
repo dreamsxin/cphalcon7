@@ -88,9 +88,11 @@ PHALCON_INIT_CLASS(Phalcon_Db){
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_USE_DEFAULT"), (long int)PDO_FETCH_USE_DEFAULT);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_LAZY"),        (long int)PDO_FETCH_LAZY);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_ASSOC"),       (long int)PDO_FETCH_ASSOC);
+	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_ARRAY"),       (long int)PDO_FETCH_ASSOC);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_NUM"),         (long int)PDO_FETCH_NUM);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_BOTH"),        (long int)PDO_FETCH_BOTH);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_OBJ"),         (long int)PDO_FETCH_OBJ);
+	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_OBJECT"),      (long int)PDO_FETCH_OBJ);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_BOUND"),       (long int)PDO_FETCH_BOUND);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_COLUMN"),      (long int)PDO_FETCH_COLUMN);
 	zend_declare_class_constant_long(phalcon_db_ce, SL("FETCH_CLASS"),       (long int)PDO_FETCH_CLASS);

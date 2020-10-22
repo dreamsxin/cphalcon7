@@ -66,10 +66,10 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_View_Engine_Php){
  */
 PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 
-	zval *path, *params, *must_clean = NULL, *partial = NULL, contents = {}, view = {};
+	zval *path, *params, *must_clean = NULL, contents = {}, view = {};
 	int clean = 0;
 
-	phalcon_fetch_params(0, 2, 2, &path, &params, &must_clean, &partial);
+	phalcon_fetch_params(0, 2, 2, &path, &params, &must_clean);
 
 	PHALCON_ENSURE_IS_STRING(path);
 
@@ -77,37 +77,29 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		clean = PHALCON_IS_TRUE(must_clean);
 	}
 
-	if (!partial) {
-		partial = &PHALCON_GLOBAL(z_false);
-	}
-
-	if (clean) {
-		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
-			phalcon_ob_flush();
-		}
-
+	if (clean && phalcon_ob_get_level() >= 1) {
 		phalcon_ob_clean();
 	}
-
 
 	/**
 	 * Require the file
 	 */
-	if (phalcon_exec_file(NULL, NULL, path, params) == FAILURE) {
+	if (phalcon_exec_file(&contents, NULL, path, params) == FAILURE) {
 		RETURN_FALSE;
 	}
 
 	if (clean) {
 		int flag = 0;
-		phalcon_ob_get_contents(&contents);
-		phalcon_ob_clean();
 
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY|PH_READONLY);
-		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents);
+		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents, &PHALCON_GLOBAL(z_true));
 		zval_ptr_dtor(&contents);
 		if (flag == FAILURE) {
 			RETURN_FALSE;
 		}
+	} else {
+		zend_print_zval_r(&contents, 0);
+		zval_ptr_dtor(&contents);
 	}
 
 	RETURN_TRUE;

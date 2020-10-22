@@ -43,6 +43,7 @@ PHP_METHOD(Phalcon_Logger_Adapter, setFormatter);
 PHP_METHOD(Phalcon_Logger_Adapter, isTransaction);
 PHP_METHOD(Phalcon_Logger_Adapter, begin);
 PHP_METHOD(Phalcon_Logger_Adapter, commit);
+PHP_METHOD(Phalcon_Logger_Adapter, count);
 PHP_METHOD(Phalcon_Logger_Adapter, rollback);
 PHP_METHOD(Phalcon_Logger_Adapter, emergency);
 PHP_METHOD(Phalcon_Logger_Adapter, alert);
@@ -61,6 +62,7 @@ static const zend_function_entry phalcon_logger_adapter_method_entry[] = {
 	PHP_ME(Phalcon_Logger_Adapter, isTransaction, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter, begin, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter, commit, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Logger_Adapter, count, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Logger_Adapter, rollback, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_MALIAS(Phalcon_Logger_Adapter, emergence, emergency, arginfo_phalcon_logger_adapterinterface_emergency, ZEND_ACC_PUBLIC | ZEND_ACC_DEPRECATED)
 	PHP_ME(Phalcon_Logger_Adapter, log, arginfo_phalcon_logger_adapterinterface_log, ZEND_ACC_PUBLIC)
@@ -231,6 +233,20 @@ PHP_METHOD(Phalcon_Logger_Adapter, commit){
 	}
 
 	RETURN_THIS();
+}
+
+PHP_METHOD(Phalcon_Logger_Adapter, count){
+
+	zval queue = {};
+
+	/* Check if the queue has something to log */
+	phalcon_read_property(&queue, getThis(), SL("_queue"), PH_NOISY|PH_READONLY);
+	if (Z_TYPE(queue) == IS_ARRAY) {
+		phalcon_fast_count(return_value, &queue);
+		return;
+	}
+
+	RETURN_LONG(0);
 }
 
 /**

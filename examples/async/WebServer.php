@@ -8,16 +8,28 @@ $loader->registerDirs(
 		)
 )->register();
 
+$logfile = __DIR__ . '/mvc/debug.log';
+$logger = new \Phalcon\Logger\Adapter\File($logfile);
+
+function debug(string $data, $lineno = 'NULL') {
+
+	$message = ['data' => $data, 'line' => $lineno];
+	print_r($data);
+}
+
 $server = Phalcon\Async\Network\TcpServer::listen('localhost', 8080);
 
 try {
 	var_dump($server->getAddress(), $server->getPort());
+
+	$router = new \Phalcon\Mvc\Router();
 	while (true) {
 		$socket = $server->accept();
 		if ($socket === false) {
 			continue;
 		}
-		Phalcon\Async\Task::async(function () use ($socket) {
+		Phalcon\Async\Task::async(function () use ($socket, $router) {
+			//\Phalcon\Debug::enable();
 			try {
 				$uri = $chunk = '';
 				$ret = NULL;
@@ -39,7 +51,20 @@ try {
 					return;
 				}
 
-				$di = new \Phalcon\DI\FactoryDefault;
+				$di = new \Phalcon\DI;
+				$di->set('dispatcher', function () {
+					$dispatcher = new \Phalcon\Mvc\Dispatcher();
+					return $dispatcher;
+				}, TRUE);
+				$di->set('request', function () {
+					$request = new \Phalcon\Http\Request();
+					return $request;
+				}, TRUE);
+				$di->set('response', function () {
+					$response = new \Phalcon\Http\Response();
+					return $response;
+				}, TRUE);
+				$di->set('router', $router, TRUE);
 				$di->set('view', function () {
 					$view = new \Phalcon\Mvc\View();
 					$view->setBasePath(__DIR__.DIRECTORY_SEPARATOR.'mvc/views');
@@ -49,14 +74,16 @@ try {
 				$application = new \Phalcon\Mvc\Application;
 				$application->useImplicitView(false);
 				$sendchunk = $application->handle($uri)->getContent();
-				var_dump($sendchunk);
+
+				debug($sendchunk, __LINE__);
 				$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
 				$socket->write($sendchunk);
 			} catch (\Throwable $e) {
-				var_dump($e->getMessage());
+				debug($e->getMessage(), __LINE__);
 			} finally {
+				//\Phalcon\Debug::disable();
 				$socket->close();
-				var_dump('CLIENT DISCONNECTED');
+				//debug('CLIENT DISCONNECTED', __LINE__);
 			}
 		});
 	}

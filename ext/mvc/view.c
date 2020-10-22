@@ -434,8 +434,8 @@ PHP_METHOD(Phalcon_Mvc_View, setBasePath){
 	} else {
 		zval tmp = {};
 		phalcon_add_trailing_slash(&tmp, base_path);
+		phalcon_update_property(getThis(), SL("_basePath"), &tmp);
 		zval_ptr_dtor(&tmp);
-		phalcon_update_property(getThis(), SL("_basePath"), base_path);
 	}
 
 	RETURN_THIS();
@@ -1170,12 +1170,14 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			zval_ptr_dtor(&debug_message);
 		}
 
-		zval contents = {};
-		phalcon_ob_get_contents(&contents);
-		php_output_clean();
-		PHALCON_MM_ADD_ENTRY(&contents);
-		if (Z_TYPE(contents) == IS_STRING) {
-			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		if (phalcon_ob_get_level() >= 1) {
+			zval contents = {};
+			phalcon_ob_get_contents(&contents);
+			phalcon_ob_clean();
+			if (Z_TYPE(contents) > IS_NULL) {
+				PHALCON_MM_ADD_ENTRY(&contents);
+				PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+			}
 		}
 
 		/**
@@ -1351,15 +1353,18 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	 * If the view is disabled we simply update the buffer from any output produced in
 	 * the controller
 	 */
-	phalcon_read_property(&disabled, getThis(), SL("_disabled"), PH_NOISY|PH_READONLY);
-	if (PHALCON_IS_NOT_FALSE(&disabled)) {
-		phalcon_ob_get_contents(&contents);
-		php_output_clean();
-		PHALCON_MM_ADD_ENTRY(&contents);
-		if (Z_TYPE(contents) == IS_STRING) {
-			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+	 
+	if (phalcon_ob_get_level() >= 1) {
+		phalcon_read_property(&disabled, getThis(), SL("_disabled"), PH_NOISY|PH_READONLY);
+		if (PHALCON_IS_NOT_FALSE(&disabled)) {
+			phalcon_ob_get_contents(&contents);
+			phalcon_ob_clean();
+			PHALCON_MM_ADD_ENTRY(&contents);
+			if (Z_TYPE(contents) == IS_STRING) {
+				PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+			}
+			RETURN_MM_FALSE;
 		}
-		RETURN_MM_FALSE;
 	}
 
 	phalcon_update_property(getThis(), SL("_controllerName"), &controller_name);
@@ -1502,11 +1507,14 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	/**
 	 * Get the current content in the buffer maybe some output from the controller
 	 */
-	phalcon_ob_get_contents(&contents);
-	php_output_clean();
-	PHALCON_MM_ADD_ENTRY(&contents);
-	if (Z_TYPE(contents) == IS_STRING) {
-		PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+
+	if (phalcon_ob_get_level() >= 1) {
+		phalcon_ob_get_contents(&contents);
+		phalcon_ob_clean();
+		PHALCON_MM_ADD_ENTRY(&contents);
+		if (Z_TYPE(contents) == IS_STRING) {
+			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		}
 	}
 	ZVAL_TRUE(&silence);
 
@@ -1821,7 +1829,11 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	/**
 	 * Call engine render, this checks in every registered engine for the partial
 	 */
-	PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
+	if (!PHALCON_IS_TRUE(autorender)) {
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true), &enable_partials_absolute_path);
+	} else {
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
+	}
 
 	/**
 	 * Now we need to restore the original view parameters
@@ -1833,10 +1845,6 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 		phalcon_update_property(getThis(), SL("_viewParams"), &view_params);
 	}
 
-	if (!PHALCON_IS_TRUE(autorender)) {
-		phalcon_ob_get_contents(return_value);
-		phalcon_ob_clean();
-	}
 	RETURN_MM();
 }
 

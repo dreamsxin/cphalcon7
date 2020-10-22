@@ -192,6 +192,15 @@ void phalcon_gettype(zval *return_value, zval *arg);
 	zval_ptr_dtor(&phalcon_memory_entry); \
 	return;
 
+#define RETURN_STATIC_MEMBER(ce, member_name) \
+	phalcon_read_static_property_ce(return_value, ce, SL(member_name), PH_COPY); \
+	return;
+
+#define RETURN_MM_STATIC_MEMBER(ce, member_name) \
+	phalcon_read_static_property_ce(return_value, ce, SL(member_name), PH_COPY); \
+	zval_ptr_dtor(&phalcon_memory_entry); \
+	return;
+
 #define RETURN_ON_FAILURE(what) \
 	if (FAILURE == what) { \
 		return; \

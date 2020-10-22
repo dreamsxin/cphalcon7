@@ -1556,6 +1556,17 @@ PHP_METHOD(Phalcon_Debug, enable){
  */
 PHP_METHOD(Phalcon_Debug, disable){
 
+	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+		zval listen = {};
+		phalcon_read_static_property_ce(&listen, phalcon_debug_ce, SL("_listen"), PH_READONLY);
+		if (!zend_is_true(&listen)) {
+			zval logs = {};
+			phalcon_read_static_property_ce(&logs, phalcon_debug_ce, SL("_logs"), PH_READONLY);
+			phalcon_debug_print_r(&logs);
+		} else {
+			RETURN_STATIC_MEMBER(phalcon_debug_ce, "_logs");
+		}
+	}
 	PHALCON_GLOBAL(debug).enable_debug = 0;
 }
 
@@ -1578,7 +1589,7 @@ PHP_METHOD(Phalcon_Debug, isEnable){
  */
 PHP_METHOD(Phalcon_Debug, log){
 
-	zval *message, *_type = NULL, *context = NULL, type = {},  listen = {}, log_type = {}, log = {}, logger = {};
+	zval *message, *_type = NULL, *context = NULL, type = {},  log_type = {}, log = {}, logger = {};
 
 	phalcon_fetch_params(1, 1, 2, &message, &_type, &context);
 
@@ -1592,26 +1603,23 @@ PHP_METHOD(Phalcon_Debug, log){
 		context = &PHALCON_GLOBAL(z_null);
 	}
 
-	phalcon_read_static_property_ce(&listen, phalcon_debug_ce, SL("_listen"), PH_READONLY);
-	if (zend_is_true(&listen)) {
-		if (Z_TYPE_P(message) == IS_STRING) {
-			PHALCON_MM_CALL_CE_STATIC(&log_type, phalcon_logger_ce, "gettypestring", &type);
-			PHALCON_MM_ADD_ENTRY(&log_type);
-			PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
-			PHALCON_MM_ADD_ENTRY(&log);
-			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
-		} else {
-			phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
-		}
+
+	if (Z_TYPE_P(message) == IS_STRING) {
+		PHALCON_MM_CALL_CE_STATIC(&log_type, phalcon_logger_ce, "gettypestring", &type);
+		PHALCON_MM_ADD_ENTRY(&log_type);
+		PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
+		PHALCON_MM_ADD_ENTRY(&log);
+		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
+	} else {
+		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
 	}
 
 	phalcon_read_static_property_ce(&logger, phalcon_debug_ce, SL("_logger"), PH_READONLY);
 	if (Z_TYPE(logger) != IS_NULL) {
 		PHALCON_MM_VERIFY_INTERFACE_EX(&logger, phalcon_logger_adapterinterface_ce, phalcon_debug_exception_ce);
 		PHALCON_MM_CALL_METHOD(NULL, &logger, "log", &type, message, context);
-	} else if (!zend_is_true(&listen)) {
-		phalcon_debug_print_r(message);
 	}
+
 	RETURN_MM();
 }
 

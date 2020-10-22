@@ -1,5 +1,9 @@
 <?php
 
+/**
+ * curl http://localhost:8080/index/index
+ * curl http://localhost:8080/index/view
+ */
 $loader = new \Phalcon\Loader();
 
 $loader->registerDirs(
@@ -22,7 +26,6 @@ $server = Phalcon\Async\Network\TcpServer::listen('localhost', 8080);
 try {
 	var_dump($server->getAddress(), $server->getPort());
 
-	$router = new \Phalcon\Mvc\Router();
 	while (true) {
 		$socket = $server->accept();
 		if ($socket === false) {
@@ -64,7 +67,10 @@ try {
 					$response = new \Phalcon\Http\Response();
 					return $response;
 				}, TRUE);
-				$di->set('router', $router, TRUE);
+				$di->set('router', function () {
+					$router = new \Phalcon\Mvc\Router();
+					return $router;
+				}, TRUE);
 				$di->set('view', function () {
 					$view = new \Phalcon\Mvc\View();
 					$view->setBasePath(__DIR__.DIRECTORY_SEPARATOR.'mvc/views');

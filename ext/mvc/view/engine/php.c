@@ -92,7 +92,7 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 		int flag = 0;
 
 		phalcon_read_property(&view, getThis(), SL("_view"), PH_NOISY|PH_READONLY);
-		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents, &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_METHOD_FLAG(flag, NULL, &view, "setcontent", &contents);
 		zval_ptr_dtor(&contents);
 		if (flag == FAILURE) {
 			RETURN_FALSE;

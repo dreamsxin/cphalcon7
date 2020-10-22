@@ -2944,6 +2944,15 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 		return FAILURE;
 	}
 
+#if PHP_VERSION_ID >= 80000
+	php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
+	if (!formstr.s) {
+		ZVAL_EMPTY_STRING(return_value);
+	} else {
+		smart_str_0(&formstr);
+		ZVAL_NEW_STR(return_value, formstr.s);
+	}
+#else
 	res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 
 	if (res == FAILURE) {
@@ -2957,6 +2966,7 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 		smart_str_0(&formstr);
 		ZVAL_NEW_STR(return_value, formstr.s);
 	}
+#endif
 	return SUCCESS;
 }
 

@@ -41,7 +41,7 @@
 #  define ZEND_ACC_DTOR 0
 # endif
 # ifndef instanceof_function_ex
-#  define instanceof_function_ex(class_ce, interface_ce, loss) zend_class_implements_interface(class_ce, interface_ce)
+#  define instanceof_function_ex(class_ce, interface_ce, loss) instanceof_function(class_ce, interface_ce)
 # endif
 
 #endif

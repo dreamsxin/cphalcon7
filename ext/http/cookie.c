@@ -776,13 +776,14 @@ PHP_METHOD(Phalcon_Http_Cookie, __toString){
 			if (EG(exception)) {
 
 #if PHP_VERSION_ID >= 80000
-				ZVAL_OBJ(&exception, EG(exception));
+				ZVAL_OBJ(&exception, zend_objects_clone_obj(EG(exception)));
+				m = zend_read_property(Z_OBJCE(exception), EG(exception), SL("message"), 1, NULL);
 #else
 				zval e = {};
 				ZVAL_OBJ(&e, EG(exception));
 				ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
-#endif
 				m = zend_read_property(Z_OBJCE(exception), &exception, SL("message"), 1, NULL);
+#endif
 
 				Z_TRY_ADDREF_P(m);
 				if (Z_TYPE_P(m) != IS_STRING) {

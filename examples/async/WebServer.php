@@ -31,7 +31,7 @@ try {
 		if ($socket === false) {
 			continue;
 		}
-		Phalcon\Async\Task::async(function () use ($socket, $router) {
+		Phalcon\Async\Task::async(function () use ($socket) {
 			//\Phalcon\Debug::enable();
 			try {
 				$uri = $chunk = '';
@@ -81,7 +81,7 @@ try {
 				$application->useImplicitView(false);
 				$sendchunk = $application->handle($uri)->getContent();
 
-				debug($sendchunk, __LINE__);
+				//debug($sendchunk, __LINE__);
 				$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
 				$socket->write($sendchunk);
 			} catch (\Throwable $e) {

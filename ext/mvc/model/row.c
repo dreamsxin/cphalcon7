@@ -175,8 +175,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, offsetUnset){
 PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 
 	HashTable *properties;
-
+#if PHP_VERSION_ID >= 80000
+	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis() ? Z_OBJ_P(getThis()) : NULL);
+#else
 	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
+#endif
 
 	if (!properties) {
 		RETURN_FALSE;
@@ -194,7 +197,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Row, toArray){
 PHP_METHOD(Phalcon_Mvc_Model_Row, count)
 {
 	HashTable *properties;
+#if PHP_VERSION_ID >= 80000
+	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis() ? Z_OBJ_P(getThis()) : NULL);
+#else
 	properties = Z_OBJ_HT_P(getThis())->get_properties(getThis());
+#endif
 	if (properties) {
 		RETURN_LONG(zend_hash_num_elements(properties));
 	}

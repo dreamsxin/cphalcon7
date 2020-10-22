@@ -1055,7 +1055,11 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 						RETURN_MM();
 					}
 
+#if PHP_VERSION_ID >= 80000
+					ZVAL_OBJ(&exception, zend_objects_clone_obj( EG(exception)));
+#else
 					ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+#endif
 					PHALCON_MM_ADD_ENTRY(&exception);
 					phalcon_update_property(getThis(), SL("_lastException"), &exception);
 
@@ -1218,9 +1222,13 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {
+#if PHP_VERSION_ID >= 80000
+			ZVAL_OBJ(&exception, zend_objects_clone_obj(EG(exception)));
+#else
 			zval e = {};
 			ZVAL_OBJ(&e, EG(exception));
 			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+#endif
 			PHALCON_MM_ADD_ENTRY(&exception);
 			phalcon_update_property(getThis(), SL("_lastException"), &exception);
 

@@ -1830,7 +1830,11 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	 * Call engine render, this checks in every registered engine for the partial
 	 */
 	if (!PHALCON_IS_TRUE(autorender)) {
-		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_true), &enable_partials_absolute_path);
+		phalcon_ob_start();
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
+		phalcon_ob_get_contents(return_value);
+		phalcon_ob_clean();
+
 	} else {
 		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
 	}

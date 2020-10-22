@@ -1563,11 +1563,10 @@ PHP_METHOD(Phalcon_Debug, disable){
 			zval logs = {};
 			phalcon_read_static_property_ce(&logs, phalcon_debug_ce, SL("_logs"), PH_READONLY);
 			phalcon_debug_print_r(&logs);
-		} else {
-			RETURN_STATIC_MEMBER(phalcon_debug_ce, "_logs");
 		}
 	}
 	PHALCON_GLOBAL(debug).enable_debug = 0;
+	RETURN_STATIC_MEMBER(phalcon_debug_ce, "_logs");
 }
 
 /**

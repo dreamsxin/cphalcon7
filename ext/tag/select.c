@@ -508,7 +508,7 @@ PHP_METHOD(Phalcon_Tag_Select, _optionsFromArray){
 				zval array_options = {}, escaped = {};
 				phalcon_htmlspecialchars(&escaped, &option_value, NULL, NULL);
 				PHALCON_MM_ADD_ENTRY(&escaped);
-				PHALCON_MM_CALL_SELF(&array_options, "_optionsfromarray", option_text, using, value, close_option, callback);
+				PHALCON_MM_CALL_CE_STATIC(&array_options, phalcon_tag_select_ce, "_optionsfromarray", option_text, using, value, close_option, callback);
 				PHALCON_SCONCAT_SVSVS(&code, "\t<optgroup label=\"", &escaped, "\">" PHP_EOL, &array_options, "\t</optgroup>" PHP_EOL);
 				PHALCON_MM_ADD_ENTRY(&code);
 				zval_ptr_dtor(&array_options);

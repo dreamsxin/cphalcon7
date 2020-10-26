@@ -966,7 +966,7 @@ PHP_METHOD(Phalcon_Forms_Element, __toString)
 #else
 			zval e = {};
 			ZVAL_OBJ(&e, EG(exception));
-			m = zend_read_property(Z_OBJCE(exception), &e, SL("message"), 1, NULL);
+			m = zend_read_property(Z_OBJCE(e), &e, SL("message"), 1, NULL);
 #endif
 			Z_TRY_ADDREF_P(m);
 			if (Z_TYPE_P(m) != IS_STRING) {

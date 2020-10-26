@@ -159,7 +159,6 @@ PHP_METHOD(Phalcon_Mvc_Model, getUniqueParams);
 PHP_METHOD(Phalcon_Mvc_Model, getUniqueTypes);
 PHP_METHOD(Phalcon_Mvc_Model, _reBuild);
 PHP_METHOD(Phalcon_Mvc_Model, exists);
-PHP_METHOD(Phalcon_Mvc_Model, _groupResult);
 PHP_METHOD(Phalcon_Mvc_Model, group);
 PHP_METHOD(Phalcon_Mvc_Model, count);
 PHP_METHOD(Phalcon_Mvc_Model, sum);
@@ -429,7 +428,6 @@ static const zend_function_entry phalcon_mvc_model_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_Model, getUniqueTypes, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, exists, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_Model, _reBuild, arginfo_empty, ZEND_ACC_PROTECTED)
-	PHP_ME(Phalcon_Mvc_Model, _groupResult, arginfo_empty, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, group, arginfo_phalcon_mvc_model_group, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, count, arginfo_phalcon_mvc_modelinterface_count, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Mvc_Model, sum, arginfo_phalcon_mvc_modelinterface_sum, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
@@ -2545,19 +2543,19 @@ PHP_METHOD(Phalcon_Mvc_Model, exists){
  * @param array $parameters
  * @return mixed
  */
-PHP_METHOD(Phalcon_Mvc_Model, _groupResult){
+static void phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAMETERS, zval *function, zval *alias){
 
-	zval *function, *alias, *parameters, params = {}, group_column = {}, distinct_column = {}, columns = {}, group_columns = {};
+	zval *parameters = NULL, params = {}, group_column = {}, distinct_column = {}, columns = {}, group_columns = {};
 	zval event_name = {}, model_name = {}, dependency_injector = {}, service_name = {}, manager = {}, model = {}, builder = {}, query = {};
 	zval resultset = {}, first_row = {};
 
-	phalcon_fetch_params(1, 3, 0, &function, &alias, &parameters);
+	phalcon_fetch_params(1, 0, 1, &parameters);
 
-	if (Z_TYPE_P(parameters) != IS_ARRAY && Z_TYPE_P(parameters) != IS_NULL) {
+	if (parameters && Z_TYPE_P(parameters) != IS_ARRAY && Z_TYPE_P(parameters) != IS_NULL) {
 		array_init_size(&params, 1);
 		phalcon_array_append(&params, parameters, PH_COPY);
 	} else {
-		if (Z_TYPE_P(parameters) == IS_ARRAY) {
+		if (parameters && Z_TYPE_P(parameters) == IS_ARRAY) {
 			ZVAL_DUP(&params, parameters);
 		} else {
 			array_init(&params);
@@ -2790,19 +2788,15 @@ PHP_METHOD(Phalcon_Mvc_Model, group){
  */
 PHP_METHOD(Phalcon_Mvc_Model, count){
 
-	zval *parameters = NULL, function = {}, alias = {};
+	zval function = {}, alias = {};
 
-	phalcon_fetch_params(1, 0, 1, &parameters);
 
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
-	}
+	ZVAL_STRING(&function, "COUNT");
+	ZVAL_STRING(&alias, "rowcount");
 
-	PHALCON_MM_ZVAL_STRING(&function, "COUNT");
-	PHALCON_MM_ZVAL_STRING(&alias, "rowcount");
-
-	PHALCON_MM_CALL_SELF(return_value, "_groupresult", &function, &alias, parameters);
-	RETURN_MM();
+	phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAM_PASSTHRU, &function, &alias);
+	zval_ptr_dtor(&function);
+	zval_ptr_dtor(&alias);
 }
 
 /**
@@ -2825,18 +2819,13 @@ PHP_METHOD(Phalcon_Mvc_Model, count){
  */
 PHP_METHOD(Phalcon_Mvc_Model, sum){
 
-	zval *parameters = NULL, function = {}, alias = {};
+	zval function = {}, alias = {};
 
-	phalcon_fetch_params(0, 0, 1, &parameters);
-
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
-	}
 
 	ZVAL_STRING(&function, "SUM");
 	ZVAL_STRING(&alias, "sumatory");
 
-	PHALCON_CALL_SELF(return_value, "_groupresult", &function, &alias, parameters);
+	phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAM_PASSTHRU, &function, &alias);
 	zval_ptr_dtor(&function);
 	zval_ptr_dtor(&alias);
 }
@@ -2861,18 +2850,12 @@ PHP_METHOD(Phalcon_Mvc_Model, sum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, maximum){
 
-	zval *parameters = NULL, function = {}, alias = {};
-
-	phalcon_fetch_params(0, 0, 1, &parameters);
-
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
-	}
+	zval function = {}, alias = {};
 
 	ZVAL_STRING(&function, "MAX");
 	ZVAL_STRING(&alias, "maximum");
 
-	PHALCON_CALL_SELF(return_value, "_groupresult", &function, &alias, parameters);
+	phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAM_PASSTHRU, &function, &alias);
 	zval_ptr_dtor(&function);
 	zval_ptr_dtor(&alias);
 }
@@ -2897,18 +2880,12 @@ PHP_METHOD(Phalcon_Mvc_Model, maximum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, minimum){
 
-	zval *parameters = NULL, function = {}, alias = {};
-
-	phalcon_fetch_params(0, 0, 1, &parameters);
-
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
-	}
+	zval function = {}, alias = {};
 
 	ZVAL_STRING(&function, "MIN");
 	ZVAL_STRING(&alias, "minimum");
 
-	PHALCON_CALL_SELF(return_value, "_groupresult", &function, &alias, parameters);
+	phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAM_PASSTHRU, &function, &alias);
 	zval_ptr_dtor(&function);
 	zval_ptr_dtor(&alias);
 }
@@ -2933,18 +2910,12 @@ PHP_METHOD(Phalcon_Mvc_Model, minimum){
  */
 PHP_METHOD(Phalcon_Mvc_Model, average){
 
-	zval *parameters = NULL, function = {}, alias = {};
-
-	phalcon_fetch_params(0, 0, 1, &parameters);
-
-	if (!parameters) {
-		parameters = &PHALCON_GLOBAL(z_null);
-	}
+	zval function = {}, alias = {};
 
 	ZVAL_STRING(&function, "AVG");
 	ZVAL_STRING(&alias, "average");
 
-	PHALCON_CALL_SELF(return_value, "_groupresult", &function, &alias, parameters);
+	phalcon_mvc_model_groupresult(INTERNAL_FUNCTION_PARAM_PASSTHRU, &function, &alias);
 	zval_ptr_dtor(&function);
 	zval_ptr_dtor(&alias);
 }

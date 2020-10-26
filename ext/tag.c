@@ -799,7 +799,7 @@ PHP_METHOD(Phalcon_Tag, linkTo){
 		ZVAL_NULL(&query);
 	}
 
-	PHALCON_MM_CALL_SELF(&url, "geturlservice");
+	PHALCON_MM_CALL_CE_STATIC(&url, phalcon_tag_ce, "geturlservice");
 	PHALCON_MM_ADD_ENTRY(&url);
 	PHALCON_MM_CALL_METHOD(&internal_url, &url, "get", &action, &query, &z_local);
 	phalcon_array_update_str(&params, SL("href"), &internal_url, 0);
@@ -876,9 +876,9 @@ PHP_METHOD(Phalcon_Tag, _inputField){
 		}
 
 		if (zend_is_true(&id)) {
-			PHALCON_MM_CALL_SELF(&value, "getvalue", &id, &params);
+			PHALCON_MM_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 		} else {
-			PHALCON_MM_CALL_SELF(&value, "getvalue", &name, &params);
+			PHALCON_MM_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &name, &params);
 		}
 		phalcon_array_update_string(&params, IS(value), &value, 0);
 
@@ -991,7 +991,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 	if (phalcon_array_isset_fetch_str(&current_value, &params, SL("value"), PH_COPY)) {
 		phalcon_array_unset_str(&params, SL("value"), 0);
 
-		PHALCON_CALL_SELF(&value, "getvalue", &id, &params);
+		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 
 		if (Z_TYPE(value) != IS_NULL && PHALCON_IS_EQUAL(&current_value, &value)) {
 			phalcon_array_update_str_str(&params, SL("checked"), SL("checked"), 0);
@@ -1000,7 +1000,7 @@ PHP_METHOD(Phalcon_Tag, _inputFieldChecked){
 
 		phalcon_array_update_string(&params, IS(value), &current_value, 0);
 	} else {
-		PHALCON_CALL_SELF(&value, "getvalue", &id, &params);
+		PHALCON_CALL_CE_STATIC(&value, phalcon_tag_ce, "getvalue", &id, &params);
 
 		/**
 		 * Evaluate the value in POST
@@ -1040,9 +1040,9 @@ static void phalcon_tag_generic_field(INTERNAL_FUNCTION_PARAMETERS, const char* 
 
 	PHALCON_MM_ZVAL_STRING(&field_type, type);
 	if (as_value) {
-		PHALCON_MM_RETURN_CALL_SELF("_inputfield", &field_type, parameters, &PHALCON_GLOBAL(z_true));
+		PHALCON_MM_CALL_CE_STATIC(return_value, phalcon_tag_ce, "_inputfield", &field_type, parameters, &PHALCON_GLOBAL(z_true));
 	} else {
-		PHALCON_MM_RETURN_CALL_SELF("_inputfield", &field_type, parameters);
+		PHALCON_MM_CALL_CE_STATIC(return_value, phalcon_tag_ce, "_inputfield", &field_type, parameters);
 	}
 	RETURN_MM();
 }
@@ -1054,7 +1054,7 @@ static void phalcon_tag_generic_field_checked(INTERNAL_FUNCTION_PARAMETERS, cons
 	phalcon_fetch_params(1, 1, 0, &parameters);
 
 	PHALCON_MM_ZVAL_STRING(&field_type, type);
-	PHALCON_MM_RETURN_CALL_SELF("_inputfieldchecked", &field_type, parameters);
+	PHALCON_MM_CALL_CE_STATIC(return_value, phalcon_tag_ce, "_inputfieldchecked", &field_type, parameters);
 	RETURN_MM();
 }
 
@@ -1436,7 +1436,7 @@ PHP_METHOD(Phalcon_Tag, textArea){
 		phalcon_array_update_str(&params, SL("id"), &id, PH_COPY);
 	}
 
-	PHALCON_CALL_SELF(&content, "getvalue", &id, &params);
+	PHALCON_CALL_CE_STATIC(&content, phalcon_tag_ce, "getvalue", &id, &params);
 
 	phalcon_tag_get_escaper(&escaper, &params);
 
@@ -1510,7 +1510,7 @@ PHP_METHOD(Phalcon_Tag, form){
 	}
 
 	if (Z_TYPE(params_action) != IS_NULL) {
-		PHALCON_CALL_SELF(&url, "geturlservice");
+		PHALCON_CALL_CE_STATIC(&url, phalcon_tag_ce, "geturlservice");
 		PHALCON_CALL_METHOD(&action, &url, "get", &params_action);
 		zval_ptr_dtor(&url);
 	}
@@ -1754,7 +1754,7 @@ PHP_METHOD(Phalcon_Tag, stylesheetLink){
 	 * URLs are generated through the 'url' service
 	 */
 	if (zend_is_true(&z_local)) {
-		PHALCON_CALL_SELF(&url, "geturlservice");
+		PHALCON_CALL_CE_STATIC(&url, phalcon_tag_ce, "geturlservice");
 
 		phalcon_array_fetch_str(&url_href, &params, SL("href"), PH_NOISY|PH_READONLY);
 
@@ -1875,7 +1875,7 @@ PHP_METHOD(Phalcon_Tag, javascriptInclude){
 	 * URLs are generated through the 'url' service
 	 */
 	if (zend_is_true(&z_local)) {
-		PHALCON_MM_CALL_SELF(&url, "geturlservice");
+		PHALCON_MM_CALL_CE_STATIC(&url, phalcon_tag_ce, "geturlservice");
 		PHALCON_MM_ADD_ENTRY(&url);
 
 		phalcon_array_fetch_str(&params_src, &params, SL("src"), PH_NOISY|PH_READONLY);
@@ -1957,7 +1957,7 @@ PHP_METHOD(Phalcon_Tag, imageInput){
 	 * Use the 'url' service if the URI is local
 	 */
 	if (zend_is_true(local)) {
-		PHALCON_CALL_SELF(&url, "geturlservice");
+		PHALCON_CALL_CE_STATIC(&url, phalcon_tag_ce, "geturlservice");
 
 		phalcon_array_fetch_str(&url_src, &params, SL("src"), PH_NOISY|PH_READONLY);
 

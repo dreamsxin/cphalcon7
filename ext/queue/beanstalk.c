@@ -918,7 +918,7 @@ PHP_METHOD(Phalcon_Queue_Beanstalk, __wakeup){
 	zval params = {}, host = {}, port = {};
 	int fail;
 
-	zend_update_property_null(phalcon_queue_beanstalk_ce, getThis(), SL("_connection"));
+	phalcon_update_property_null(getThis(), SL("_connection"));
 
 	phalcon_read_property(&params, getThis(), SL("_parameters"), PH_NOISY|PH_READONLY);
 	if (

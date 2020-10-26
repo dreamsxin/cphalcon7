@@ -36,6 +36,7 @@
 #include "kernel/operators.h"
 #include "kernel/array.h"
 #include "kernel/file.h"
+#include "kernel/math.h"
 
 /**
  * Phalcon\Image\Adapter
@@ -733,15 +734,15 @@ PHP_METHOD(Phalcon_Image_Adapter, text){
 	}
 
 	phalcon_substr(&tmp, &color, 0, 2);
-	_php_math_basetozval(&tmp, 16, &r);
+	phalcon_math_basetozval(&tmp, 16, &r);
 	zval_ptr_dtor(&tmp);
 
 	phalcon_substr(&tmp, &color, 2, 2);
-	_php_math_basetozval(&tmp, 16, &g);
+	phalcon_math_basetozval(&tmp, 16, &g);
 	zval_ptr_dtor(&tmp);
 
 	phalcon_substr(&tmp, &color, 4, 2);
-	_php_math_basetozval(&tmp, 16, &b);
+	phalcon_math_basetozval(&tmp, 16, &b);
 	zval_ptr_dtor(&tmp);
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "_text", text, &offset_x, &offset_y, &opacity, &r, &g, &b, &size, fontfile);
@@ -818,13 +819,13 @@ PHP_METHOD(Phalcon_Image_Adapter, background){
 	}
 
 	phalcon_substr(&tmp, &color, 0, 2);
-	_php_math_basetozval(&tmp, 16, &r);
+	phalcon_math_basetozval(&tmp, 16, &r);
 
 	phalcon_substr(&tmp, &color, 2, 2);
-	_php_math_basetozval(&tmp, 16, &g);
+	phalcon_math_basetozval(&tmp, 16, &g);
 
 	phalcon_substr(&tmp, &color, 4, 2);
-	_php_math_basetozval(&tmp, 16, &b);
+	phalcon_math_basetozval(&tmp, 16, &b);
 
 	i = phalcon_get_intval(&opacity);
 
@@ -1047,13 +1048,13 @@ PHP_METHOD(Phalcon_Image_Adapter, getColorRBG){
 	}
 
 	phalcon_substr(&tmp, &color, 0, 2);
-	_php_math_basetozval(&tmp, 16, &r);
+	phalcon_math_basetozval(&tmp, 16, &r);
 
 	phalcon_substr(&tmp, &color, 2, 2);
-	_php_math_basetozval(&tmp, 16, &g);
+	phalcon_math_basetozval(&tmp, 16, &g);
 
 	phalcon_substr(&tmp, &color, 4, 2);
-	_php_math_basetozval(&tmp, 16, &b);
+	phalcon_math_basetozval(&tmp, 16, &b);
 
 	array_init_size(return_value, 3);
 	phalcon_array_append(return_value, &r, PH_COPY);

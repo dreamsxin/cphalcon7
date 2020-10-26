@@ -213,6 +213,479 @@ static int get_properties(PyObject *o, HashTable *ht)
     return status;
 }
 
+#if PHP_VERSION_ID >= 80000
+static zval *python_read_property(zend_object *object, zval *member, int type, void **cache_slot, zval *rv)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+
+	zval *return_value = NULL;
+	PyObject *attr;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	convert_to_string_ex(member);
+
+	attr = PyObject_GetAttrString(pip->obj, Z_STRVAL_P(member));
+	if (attr) {
+		pip_pyobject_to_zval(attr, rv);
+		Py_DECREF(attr);
+		return_value = rv;
+	} else {
+		return_value = &EG(uninitialized_zval);
+		PyErr_Clear();
+	}
+
+	/* TODO: Do something with the 'type' parameter? */
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return return_value;
+}
+
+static void python_write_property(zend_object *object, zval *member, zval *value, void **cache_slot)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	PyObject *val;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+	
+	val = pip_zval_to_pyobject(value);
+	if (val) {
+		convert_to_string_ex(member);
+		if (PyObject_SetAttrString(pip->obj, Z_STRVAL_P(member), val) == -1) {
+			PyErr_Clear();
+			php_error(E_ERROR, "Python: Failed to set attribute %s", Z_STRVAL_P(member));
+		}
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+static zval *python_read_dimension(zend_object *object, zval *offset, int type, zval *rv)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	zval *return_value = NULL;
+	PyObject *item = NULL;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/*
+	 * If we've been given a numeric value, start by attempting to use the
+	 * sequence protocol.  The value may be a valid index.
+	 */
+	if (Z_TYPE_P(offset) == IS_LONG)
+		item = PySequence_GetItem(pip->obj, Z_LVAL_P(offset));
+
+	/*
+	 * Otherwise, if this object provides the mapping protocol, our offset's
+	 * string representation may be a key value.
+	 */
+	if (!item && PyMapping_Check(pip->obj)) {
+		convert_to_string_ex(offset);
+		item = PyMapping_GetItemString(pip->obj, Z_STRVAL_P(offset));
+	}
+
+	/* If we successfully fetched an item, return its PHP representation. */
+	if (item) {
+		pip_pyobject_to_zval(item, rv);
+		Py_DECREF(item);
+		return_value = rv;
+	} else
+		PyErr_Clear();
+		return_value = &EG(uninitialized_zval);
+
+	/* TODO: Do something with the 'type' parameter? */
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return return_value;
+}
+
+static void python_write_dimension(zend_object *object, zval *offset, zval *value)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	PyObject *val;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	val = pip_zval_to_pyobject(value);
+
+	/*
+	 * If this offset is a numeric value, we'll start by attempting to use
+	 * the sequence protocol to set this item.
+	 */
+	if (Z_TYPE_P(offset) == IS_LONG && PySequence_Check(pip->obj)) {
+		if (PySequence_SetItem(pip->obj, Z_LVAL_P(offset), val) == -1) {
+			PyErr_Clear();
+			php_error(E_ERROR, "Python: Failed to set sequence item %ld", Z_LVAL_P(offset));
+		}
+	}
+
+	/*
+	 * Otherwise, if this object supports the mapping protocol, use the string
+	 * representation of the offset as the key value.
+	 */
+	else if (PyMapping_Check(pip->obj)) {
+		convert_to_string_ex(offset);
+		if (PyMapping_SetItemString(pip->obj, Z_STRVAL_P(offset), val) == -1) {
+			PyErr_Clear();
+			php_error(E_ERROR, "Python: Failed to set mapping item '%s'", Z_STRVAL_P(offset));
+		}
+	}
+
+	Py_XDECREF(val);
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+static int python_has_property(zend_object *object, zval *member, int has_set_exists, void **cache_slot)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	PyObject *attr;
+	int exists = 0;
+
+	/* We're only concerned with the string representation of this value. */
+	convert_to_string_ex(member);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	attr = PyObject_GetAttrString(pip->obj, Z_STRVAL_P(member));
+	if (!attr) {
+		PHP_PYTHON_THREAD_RELEASE();
+		return exists;
+	}
+
+	switch (has_set_exists) {
+	case 0:
+		exists = (PyObject_IsTrue(attr) == 1);
+		break;
+	default:
+		exists = (attr != Py_None);
+		break;
+	case 2:
+		exists = 1;
+		break;
+	}
+
+	Py_DECREF(attr);
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return exists;
+}
+
+static int python_has_dimension(zend_object *object, zval *member, int check_empty)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	PyObject *item = NULL;
+	int ret = 0;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/*
+	 * If we've been handed an integer value, check if this is a valid item
+	 * index.  PySequence_GetItem() will perform a PySequence_Check() test.
+	 */
+	if (Z_TYPE_P(member) == IS_LONG)
+		item = PySequence_GetItem(pip->obj, Z_LVAL_P(member));
+
+	/*
+	 * Otherwise, check if this object provides the mapping protocol.  If it
+	 * does, check if the string representation of our value is a valid key.
+	 */
+	if (!item && PyMapping_Check(pip->obj)) {
+		convert_to_string_ex(member);
+		item = PyMapping_GetItemString(pip->obj, Z_STRVAL_P(member));
+	}
+
+	/*
+	 * If we have a valid item at this point, we have a chance at success.  The
+	 * last thing we need to consider is whether or not the item's value is
+	 * considered "true" if check_empty has been specified.  We use Python's
+	 * notion of truth here for consistency, although it may be more correct to
+	 * use PHP's notion of truth (as determined by zend_is_true()) should we
+	 * encountered problems with this in the future.
+	 */
+	if (item) {
+		ret = (check_empty) ? (PyObject_IsTrue(item) == 1) : 1;
+		Py_DECREF(item);
+	} else
+		PyErr_Clear();
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return ret;
+}
+
+static void python_unset_property(zend_object *object, zval *member, void **cache_slot)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	convert_to_string_ex(member);
+
+	if (pip->std.properties) {
+		zend_hash_del(pip->std.properties, Z_STR_P(member));
+	}
+
+	if (PyObject_DelAttrString(pip->obj, Z_STRVAL_P(member)) == -1) {
+		PyErr_Clear();
+		php_error(E_ERROR, "Python: Failed to delete attribute '%s'", Z_STRVAL_P(member));
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+static void python_unset_dimension(zend_object *object, zval *offset)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	int deleted = 0;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/*
+	 * If we've been given a numeric offset and this object provides the
+	 * sequence protocol, attempt to delete the item using a sequence index.
+	 */
+	if (Z_TYPE_P(offset) == IS_LONG && PySequence_Check(pip->obj)) {
+		deleted = PySequence_DelItem(pip->obj, Z_LVAL_P(offset)) != -1;
+
+		if (pip->std.properties) {
+			zend_hash_index_del(pip->std.properties, Z_LVAL_P(offset));
+		}
+	}
+
+	/*
+	 * If we failed to delete the item using the sequence protocol, use the
+	 * offset's string representation and try the mapping protocol.
+	 */
+	if (PyMapping_Check(pip->obj)) {
+		convert_to_string_ex(offset);
+		deleted = PyMapping_DelItemString(pip->obj,Z_STRVAL_P(offset)) != -1;
+
+		if (pip->std.properties) {
+			zend_hash_del(pip->std.properties, Z_STR_P(offset));
+		}
+	}
+
+	/* If we still haven't deleted the requested item, trigger an error. */
+	if (!deleted) {
+		PyErr_Clear();
+		php_error(E_ERROR, "Python: Failed to delete item");
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+}
+
+static HashTable *python_get_properties(zend_object *object)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	if (!pip->std.properties) {
+		rebuild_object_properties(&pip->std);
+	} else {
+		zend_hash_clean(pip->std.properties);
+	}
+
+	//if (zend_hash_num_elements(pip->std.properties) == 0)
+	get_properties(pip->obj, pip->std.properties);
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+    return pip->std.properties;
+}
+
+static union _zend_function *python_get_method(zend_object **object, zend_string *method, const zval *key)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(*object);
+	zend_internal_function *f;
+	PyObject *func;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/* Quickly check if this object has a method with the requested name. */
+	if (PyObject_HasAttrString(pip->obj, ZSTR_VAL(method)) == 0) {
+		PHP_PYTHON_THREAD_RELEASE();
+		return NULL;
+	}
+
+	/* Attempt to fetch the requested method and verify that it's callable. */
+	func = PyObject_GetAttrString(pip->obj, ZSTR_VAL(method));
+	if (!func || PyMethod_Check(func) == 0 || PyCallable_Check(func) == 0) {
+		Py_XDECREF(func);
+		PHP_PYTHON_THREAD_RELEASE();
+		return NULL;
+	}
+
+	/*
+	 * Set up the function call structure for this method invokation.  We
+	 * allocate a bit of memory here which will be released later on in
+	 * python_call_method().
+	 */
+	f = emalloc(sizeof(zend_internal_function));
+	memset(f, 0, sizeof(zend_internal_function));
+	f->type = ZEND_OVERLOADED_FUNCTION_TEMPORARY;
+	f->function_name = zend_string_dup(method, 0);
+	f->scope = pip->std.ce;
+	f->fn_flags = 0;
+	f->prototype = NULL;
+	f->num_args = python_get_arg_info(func, &(f->arg_info));
+	zend_set_function_arg_flags((zend_function*)f);
+
+	Py_DECREF(func);
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return (union _zend_function *)f;
+}
+
+static int python_call_method(zend_string *method_name, zend_object *object, INTERNAL_FUNCTION_PARAMETERS)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	PyObject *method;
+	int ret = FAILURE;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/* Get a pointer to the requested method from this object. */
+	method = PyObject_GetAttrString(pip->obj, ZSTR_VAL(method_name));
+
+	/* If the method exists and is callable ... */
+	if (method && PyMethod_Check(method) && PyCallable_Check(method)) {
+		PyObject *args, *result;
+
+		/* Convert all of our PHP arguments into a Python-digestable tuple. */
+		args = pip_args_to_tuple(ZEND_NUM_ARGS(), 0);
+
+		/*
+		 * Invoke the requested method and store the result.  If we have a
+		 * tuple of arguments, remember to free (decref) it.
+		 */
+		result = PyObject_CallObject(method, args); 
+		Py_DECREF(method);
+		Py_XDECREF(args);
+
+		if (result) {
+			ret = pip_pyobject_to_zval(result, return_value);
+			Py_DECREF(result);
+		}
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	/* Release the memory that we allocated for this function in method_get. */
+	efree_function((zend_internal_function *)EG(current_execute_data)->func);
+
+	return ret;
+}
+/*
+static union _zend_function *python_constructor_get(zval *object)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
+	return pip->std.ce->constructor;
+}
+*/
+static zend_string* python_get_class_name(const zend_object *object)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj((zend_object*)object);
+	const char * const key = "__class__";
+	PyObject *attr, *str;
+	zend_string *retval;
+	char *class_name = NULL;
+	zend_ulong class_name_len = 0;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	/*
+	 * Attempt to use the Python object instance's special read-only attributes
+	 * to determine object's class name.  We use __class__ unless we've been
+	 * asked for the name of our parent, in which case we use __module__.  We
+	 * prefix the class name with "Python " to avoid confusion with native PHP
+	 * classes.
+	 */
+	if ((attr = PyObject_GetAttrString(pip->obj, key))) {
+		if ((str = PyObject_Str(attr))) {
+			class_name_len = sizeof("Python ") + PyString_GET_SIZE(str);
+			class_name = (char *)emalloc(sizeof(char) * class_name_len);
+			zend_sprintf(class_name, "Python %s", PyString_AS_STRING(str));
+			Py_DECREF(str);
+		}
+		Py_DECREF(attr);
+	}
+
+	/* If we still don't have a string, use the PHP class entry's name. */
+	if (class_name_len == 0) {
+		class_name = estrndup(ZSTR_VAL(pip->std.ce->name), ZSTR_LEN(pip->std.ce->name));
+		class_name_len = ZSTR_LEN(pip->std.ce->name);
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	retval = zend_string_init(class_name, class_name_len, 0);
+	efree(class_name);
+	return retval;
+}
+
+static int python_compare(zend_object *object1, zend_object *object2)
+{
+	phalcon_py_object_object *a = phalcon_py_object_object_from_obj(object1);
+	phalcon_py_object_object *b = phalcon_py_object_object_from_obj(object2);
+	int cmp;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+	cmp = PyObject_Compare(a->obj, b->obj);
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return cmp;
+}
+
+static int python_cast(zend_object *readobj, zval *writeobj, int type)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(readobj);
+	PyObject *val = NULL;
+	int ret = FAILURE;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	switch (type) {
+		case IS_STRING:
+			val = PyObject_Str(pip->obj);
+			break;
+		default:
+			return FAILURE;
+	}
+
+	if (val) {
+		ret = pip_pyobject_to_zval(val, writeobj);
+		Py_DECREF(val);
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return ret;
+}
+
+static int python_count_elements(zend_object *object, long *count)
+{
+	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(object);
+	int len, result = FAILURE;
+
+	PHP_PYTHON_THREAD_ACQUIRE();
+
+	len = PyObject_Length(pip->obj);
+	if (len != -1) {
+		*count = len;
+		result = SUCCESS;
+	}
+
+	PHP_PYTHON_THREAD_RELEASE();
+
+	return result;
+}
+#else
 static zval *python_read_property(zval *object, zval *member, int type, void **cache_slot, zval *rv)
 {
 	phalcon_py_object_object *pip = phalcon_py_object_object_from_obj(Z_OBJ_P(object));
@@ -684,6 +1157,7 @@ static int python_count_elements(zval *object, long *count)
 
 	return result;
 }
+#endif
 
 /**
  * Phalcon\Py\Object initializer

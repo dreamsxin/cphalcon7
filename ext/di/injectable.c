@@ -556,7 +556,7 @@ PHP_METHOD(Phalcon_Di_Injectable, __get){
 	}
 
 	if (Z_STRLEN_P(property_name) == sizeof("di")-1 && !memcmp(Z_STRVAL_P(property_name), "di", sizeof("di")-1)) {
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("di"), &dependency_injector);
+		phalcon_update_property(getThis(), SL("di"), &dependency_injector);
 		RETURN_MM_CTOR(&dependency_injector);
 	}
 
@@ -572,7 +572,7 @@ PHP_METHOD(Phalcon_Di_Injectable, __get){
 
 		ZVAL_STR(&service, IS(sessionBag));
 		PHALCON_MM_CALL_METHOD(return_value, &dependency_injector, "get", &service, &arguments);
-		zend_update_property(phalcon_di_injectable_ce, getThis(), SL("persistent"), return_value);
+		phalcon_update_property(getThis(), SL("persistent"), return_value);
 		RETURN_MM();
 	}
 

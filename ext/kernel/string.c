@@ -2937,7 +2937,6 @@ void phalcon_ucfirst(zval *return_value, zval *s)
 int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 {
 	smart_str formstr = { 0 };
-	int res;
 	
 	if (Z_TYPE_P(params) != IS_ARRAY && Z_TYPE_P(params) != IS_OBJECT) {
 		ZVAL_FALSE(return_value);
@@ -2953,7 +2952,7 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 		ZVAL_NEW_STR(return_value, formstr.s);
 	}
 #else
-	res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
+	int res = php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 
 	if (res == FAILURE) {
 		smart_str_free(&formstr);

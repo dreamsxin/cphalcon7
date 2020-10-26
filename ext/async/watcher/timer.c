@@ -496,11 +496,12 @@ static PHP_FUNCTION(asyncsleep)
 	zend_long num;
 
 	uv_timer_t *timer;
-	
+#ifdef PHP_SLEEP_NON_VOID
 #ifndef PHP_WIN32
 	time_t started;
 	
 	started = time(NULL);
+#endif
 #endif
 
 	ZEND_PARSE_PARAMETERS_START(1, 1)

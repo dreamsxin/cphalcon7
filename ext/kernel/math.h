@@ -32,4 +32,10 @@ long phalcon_mt_rand(long min, long max);
 
 #define phalcon_pow_function(result, op1, op2) pow_function(result, op1, op2)
 
+#if PHP_VERSION_ID >= 80000
+# define phalcon_math_basetozval(str, base, ret) _php_math_basetozval(Z_STR_P(str), base, ret)
+#else
+# define phalcon_math_basetozval(str, base, ret)  _php_math_basetozval(str, base, ret)
+#endif
+
 #endif

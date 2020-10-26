@@ -160,7 +160,9 @@ static inline void _zend_assign_to_variable_reference(zval *variable_ptr, zval *
 		if (--GC_REFCOUNT(garbage) == 0) {
 #endif
 			ZVAL_REF(variable_ptr, ref);
-#if PHP_VERSION_ID >= 70100
+#if PHP_VERSION_ID >= 80000
+			rc_dtor_func(garbage);
+#elif PHP_VERSION_ID >= 70100
 			zval_dtor_func(garbage);
 #else
 			zval_dtor_func_for_ptr(garbage);

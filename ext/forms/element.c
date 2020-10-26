@@ -957,18 +957,18 @@ PHP_METHOD(Phalcon_Forms_Element, render){
  */
 PHP_METHOD(Phalcon_Forms_Element, __toString)
 {
-	zval exception = {}, *m;
+	zval *m;
 
 	if (FAILURE == phalcon_call_method(return_value, getThis(), "render", 0, NULL)) {
 		if (EG(exception)) {
 #if PHP_VERSION_ID >= 80000
-			ZVAL_OBJ(&exception, zend_objects_clone_obj(EG(exception)));
+			m = zend_read_property(EG(exception)->ce, EG(exception), SL("message"), 1, NULL);
 #else
 			zval e = {};
 			ZVAL_OBJ(&e, EG(exception));
-			ZVAL_OBJ(&exception, zend_objects_clone_obj(&e));
+			m = zend_read_property(Z_OBJCE(exception), &e, SL("message"), 1, NULL);
 #endif
-			m = zend_read_property(Z_OBJCE(exception), &exception, SL("message"), 1, NULL);
+			Z_TRY_ADDREF_P(m);
 			if (Z_TYPE_P(m) != IS_STRING) {
 				convert_to_string_ex(m);
 			}

@@ -1,6 +1,6 @@
+os: linux
 language: php
 
-sudo: required
 dist: trusty
 
 addons:
@@ -25,7 +25,7 @@ php:
   - 7.4
   - nightly
 
-matrix:
+jobs:
   fast_finish: true
   allow_failures:
     - php: nightly
@@ -46,7 +46,7 @@ cache:
 services:
   - mongodb
   - memcached
-  - redis-server
+  - redis
   - postgresql
 
 env:

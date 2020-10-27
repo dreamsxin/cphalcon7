@@ -30,7 +30,6 @@
 #include "kernel/backtrace.h"
 #include "kernel/string.h"
 #include "kernel/array.h"
-#include "kernel/concat.h"
 
 #include "interned-strings.h"
 
@@ -258,11 +257,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				break;
 			case phalcon_fcall_parent:
 				assert(ce != NULL);
-				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
-					ZVAL_STRINGL(&func_name, method_name, method_len);
-				} else {
-					phalcon_concat_sss(&func_name, ISL(parent), SL("::"), method_name, method_len, 0);
-				}
+				array_init_size(&func_name, 2);
+				add_next_index_string(&func_name, ISV(parent));
+				add_next_index_stringl(&func_name, method_name, method_len);
 				break;
 			case phalcon_fcall_self:
 				array_init_size(&func_name, 2);
@@ -271,9 +268,11 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				break;
 			case phalcon_fcall_static:
 				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
-					ZVAL_STRINGL(&func_name, method_name, method_len);
+					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
 				} else {
-					phalcon_concat_sss(&func_name, ISL(static), SL("::"), method_name, method_len, 0);
+					array_init_size(&func_name, 2);
+					add_next_index_string(&func_name, ISV(static));
+					add_next_index_stringl(&func_name, method_name, method_len);
 				}
 				break;
 			case phalcon_fcall_method:

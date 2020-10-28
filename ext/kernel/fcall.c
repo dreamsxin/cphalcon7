@@ -307,7 +307,17 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		if (!ce && object && Z_TYPE_P(object) == IS_OBJECT) {
 			ce = Z_OBJCE_P(object);
 		}
-
+#if PHP_VERSION_ID >= 80000
+		if (ce) {
+			zend_string *str_methodname = zend_string_init(method_name, method_len, 0);
+			if (type != phalcon_fcall_parent) {
+				fbc = phalcon_get_function(ce, str_methodname);
+			} else {
+				fbc = phalcon_get_function(ce->parent, str_methodname);
+			}
+			zend_string_release(str_methodname);
+		}
+#endif
 		switch (type) {
 			case phalcon_fcall_ce:
 				assert(ce != NULL);
@@ -318,11 +328,6 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			case phalcon_fcall_parent:
 				assert(ce != NULL);
 
-#if PHP_VERSION_ID >= 80000
-				zend_string *str_methodname = zend_string_init(method_name, method_len, 0);
-				fbc = phalcon_get_function(ce->parent, str_methodname);
-				ZVAL_STR(&func_name, str_methodname);
-#else
 				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
 					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
 				} else {
@@ -330,7 +335,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 					add_next_index_string(&func_name, ISV(parent));
 					add_next_index_stringl(&func_name, method_name, method_len);
 				}
-#endif
+
 				break;
 			case phalcon_fcall_self:
 				array_init_size(&func_name, 2);
@@ -351,11 +356,6 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				Z_TRY_ADDREF_P(object);
 				add_next_index_zval(&func_name, object);
 				add_next_index_stringl(&func_name, method_name, method_len);
-#if PHP_VERSION_ID >= 80000
-				zend_string *str = zend_string_init(method_name, method_len, 0);
-				fbc = phalcon_get_function(ce, str);
-				zend_string_release(str);
-#endif
 				break;
 			default:
 				phalcon_throw_exception_format(spl_ce_RuntimeException, "Error call type %d for cmethod %s", type, method_name);

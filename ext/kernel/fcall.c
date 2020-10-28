@@ -257,9 +257,13 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 				break;
 			case phalcon_fcall_parent:
 				assert(ce != NULL);
-				array_init_size(&func_name, 2);
-				add_next_index_string(&func_name, ISV(parent));
-				add_next_index_stringl(&func_name, method_name, method_len);
+				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
+					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
+				} else {
+					array_init_size(&func_name, 2);
+					add_next_index_string(&func_name, ISV(parent));
+					add_next_index_stringl(&func_name, method_name, method_len);
+				}
 				break;
 			case phalcon_fcall_self:
 				array_init_size(&func_name, 2);
@@ -307,7 +311,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	if (
 #if PHP_VERSION_ID >= 70100
-	(status = call_user_function(NULL, object, &func_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
+	(status = call_user_function(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
 #else
 	(status = call_user_function_ex(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments, 1, NULL)) == FAILURE || EG(exception)
 #endif

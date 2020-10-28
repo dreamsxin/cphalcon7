@@ -677,6 +677,7 @@ void phalcon_get_object_members(zval *result, zval *object, int check_access) {
 	}
 }
 
+#if PHP_VERSION_ID < 80000
 static int same_name(zend_string *key, zend_string *name) /* {{{ */
 {
 	zend_string *lcname;
@@ -693,6 +694,7 @@ static int same_name(zend_string *key, zend_string *name) /* {{{ */
 	zend_string_release(lcname);
 	return ret;
 }
+#endif
 
 /**
  * Returns an array of method names for class or class instance

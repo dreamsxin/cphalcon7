@@ -61,6 +61,8 @@ env:
     - CC="ccache gcc"
 
 before_install:
+  - sudo apt-get install -y fonts-urw-base35 || true
+  - sudo apt-get install -y libfreetype6-dev || true
   - export PATH=$PATH:~/bin;
   - export LD_LIBRARY_PATH=/usr/lib:/usr/lib64:/lib:/lib64:/usr/local/lib:/usr/local/lib64:$LD_LIBRARY_PATH
   - composer self-update -q

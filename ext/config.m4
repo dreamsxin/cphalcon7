@@ -1087,22 +1087,18 @@ num/ndarray.c"
 	fi
 
 	AC_MSG_CHECKING([checking png support])
-	for i in /usr/local /usr; do
-		if test -r $i/include/png.h; then
-			PNG_CFLAGS=`pkg-config --cflags libpng`
-			PNG_LDFLAGS=`pkg-config --libs libpng`
+	if pkg-config --exists libpng; then
+		PNG_INCS=`pkg-config --cflags-only-I libpng`
+		PNG_LIBS=`pkg-config --libs libpng`
 
-			PHP_ADD_INCLUDE($i/include)
+		PHP_EVAL_INCLINE($PNG_INCS)
+		PHP_EVAL_LIBLINE($PNG_LIBS, PHALCON_SHARED_LIBADD)
 
-			CPPFLAGS="${CPPFLAGS} ${PNG_CFLAGS}"
-			EXTRA_LDFLAGS="${EXTRA_LDFLAGS} ${PNG_LDFLAGS}"
 
-			AC_MSG_RESULT(yes)
+		AC_MSG_RESULT(yes)
 
-			AC_DEFINE([PHALCON_USE_PNG], [1], [Have libpng support])
-			break
-		fi
-	done
+		AC_DEFINE([PHALCON_USE_PNG], [1], [Have libpng support])
+	fi
 
 	if test "$PHP_QRCODE" = "yes"; then
 		if test -z "$PNG_CFLAGS"; then

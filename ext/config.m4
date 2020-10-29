@@ -1368,7 +1368,7 @@ num/ndarray.c"
 		async_use_ucontext="no"
 	fi
 
-	AC_MSG_CHECKING(Check SSL lib support)
+	# Check SSL lib support.
 	PHP_SETUP_OPENSSL(PHALCON_SHARED_LIBADD, [
 		AC_MSG_CHECKING(for SSL support)
 		AC_MSG_RESULT(yes)

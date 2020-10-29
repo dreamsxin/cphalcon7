@@ -1,7 +1,7 @@
 os: linux
 language: php
 
-dist: trusty
+dist: xenial
 
 addons:
   apt:

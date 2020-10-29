@@ -20,6 +20,7 @@
 
 #include "pconfig.h"
 #include "config/adapter.h"
+#include "config/adapter/php.h"
 #include "config/adapterinterface.h"
 
 #include "kernel/main.h"
@@ -106,6 +107,10 @@ PHP_METHOD(Phalcon_Config_Adapter, factory){
 	ce0 = phalcon_fetch_class(&class_name, ZEND_FETCH_CLASS_DEFAULT);
 	zval_ptr_dtor(&class_name);
 
+	if (ce0 == phalcon_config_adapter_ce) {
+		ce0 = phalcon_config_adapter_php_ce;
+	}
+
 	if (!file_path || PHALCON_IS_EMPTY(file_path)) {
 		object_init_ex(return_value, ce0);
 		PHALCON_CALL_METHOD(NULL, return_value, "__construct");
@@ -172,8 +177,8 @@ PHP_METHOD(Phalcon_Config_Adapter, load){
 			absolute_path = &PHALCON_GLOBAL(z_false);
 		}
 
-		PHALCON_RETURN_CALL_CE_STATIC(phalcon_config_adapter_ce, "factory", file_path, absolute_path);
+		PHALCON_RETURN_CALL_METHOD(getThis(), "factory", file_path, absolute_path);
 	} else {
-		PHALCON_RETURN_CALL_CE_STATIC(phalcon_config_adapter_ce, "factory");
+		PHALCON_RETURN_CALL_METHOD(getThis(), "factory");
 	}
 }

@@ -1101,7 +1101,7 @@ num/ndarray.c"
 	fi
 
 	if test "$PHP_QRCODE" = "yes"; then
-		if test -z "$PNG_CFLAGS"; then
+		if test -z "$PNG_INCS"; then
 			AC_MSG_ERROR([Incorrect png library])
 		fi
 	fi

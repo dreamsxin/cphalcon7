@@ -241,6 +241,7 @@ static zend_always_inline zend_bool phalcon_is_derived_class(zend_class_entry *c
 	return 0;
 }
 
+#if PHP_VERSION_ID >= 70300
 static zend_never_inline zend_function *phalcon_get_function(zend_class_entry *scope, zend_string *function_name)
 {
 	zval *func;
@@ -254,7 +255,7 @@ static zend_never_inline zend_function *phalcon_get_function(zend_class_entry *s
 
 	return NULL;
 }
-#if PHP_VERSION_ID >= 70300
+
 #if PHP_VERSION_ID >= 80000
 static zend_result phalcon_call_user_function(zend_function *fn, zend_class_entry *called_scope, zval *object, zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[])
 #else

@@ -58,8 +58,8 @@ install_igbinary_php7() {
 
 phpenv config-rm xdebug.ini
 
-install_extension imagick
-enable_extension memcached
+# install_extension imagick
+# enable_extension memcached
 
 # See https://pear.php.net/bugs/bug.php?id=21007
 # printf "\n" | pecl install apcu

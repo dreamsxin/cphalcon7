@@ -254,7 +254,7 @@ static zend_never_inline zend_function *phalcon_get_function(zend_class_entry *s
 
 	return NULL;
 }
-
+#if PHP_VERSION_ID >= 70300
 #if PHP_VERSION_ID >= 80000
 static zend_result phalcon_call_user_function(zend_function *fn, zend_class_entry *called_scope, zval *object, zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[])
 #else
@@ -284,12 +284,15 @@ static int phalcon_call_user_function(zend_function *fn, zend_class_entry *calle
 	}
 	return zend_call_function(&fci, NULL);
 }
+#endif
 
 int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry *ce, phalcon_call_type type, const char *method_name, uint method_len, uint param_count, zval *params[])
 {
 	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, obj = {};
 	zval *arguments;
+#if PHP_VERSION_ID >= 70300
 	zend_function *fbc = NULL;
+#endif
 	int i, status;
 
 	if (type != phalcon_fcall_function) {
@@ -311,6 +314,8 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 			ce = Z_OBJCE_P(object);
 		}
 		assert(ce != NULL);
+
+#if PHP_VERSION_ID >= 70300
 		zend_string *str_methodname = zend_string_init(method_name, method_len, 0);
 		if (type != phalcon_fcall_parent) {
 			fbc = phalcon_get_function(ce, str_methodname);
@@ -320,6 +325,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		if (fbc) {
 			ZVAL_STR(&func_name, str_methodname);
 		} else {
+#endif
 			switch (type) {
 				case phalcon_fcall_ce:
 					array_init_size(&func_name, 2);
@@ -351,8 +357,9 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 					phalcon_throw_exception_format(spl_ce_RuntimeException, "Error call type %d for cmethod %s", type, method_name);
 					return FAILURE;
 			}
+#if PHP_VERSION_ID >= 70300
 		}
-
+#endif
 	} else {
 		ZVAL_STRINGL(&func_name, method_name, method_len);
 	}

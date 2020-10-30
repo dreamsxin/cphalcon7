@@ -228,7 +228,6 @@ int phalcon_call_user_func_array(zval *retval, zval *handler, zval *params)
 	return status;
 }
 
-#if PHP_VERSION_ID >= 80000
 static zend_always_inline zend_bool phalcon_is_derived_class(zend_class_entry *child_class, zend_class_entry *parent_class) /* {{{ */
 {
 	child_class = child_class->parent;
@@ -242,6 +241,7 @@ static zend_always_inline zend_bool phalcon_is_derived_class(zend_class_entry *c
 	return 0;
 }
 
+#if PHP_VERSION_ID >= 70300
 static zend_never_inline zend_function *phalcon_get_function(zend_class_entry *scope, zend_string *function_name)
 {
 	zval *func;
@@ -256,7 +256,11 @@ static zend_never_inline zend_function *phalcon_get_function(zend_class_entry *s
 	return NULL;
 }
 
+#if PHP_VERSION_ID >= 80000
 static zend_result phalcon_call_user_function(zend_function *fn, zend_class_entry *called_scope, zval *object, zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[])
+#else
+static int phalcon_call_user_function(zend_function *fn, zend_class_entry *called_scope, zval *object, zval *function_name, zval *retval_ptr, uint32_t param_count, zval params[])
+#endif
 {
 	zend_fcall_info fci;
 	zend_fcall_info_cache fcic;
@@ -267,8 +271,11 @@ static zend_result phalcon_call_user_function(zend_function *fn, zend_class_entr
 	fci.retval = retval_ptr;
 	fci.param_count = param_count;
 	fci.params = params;
+#if PHP_VERSION_ID >= 80000
 	fci.named_params = NULL;
-
+#else
+	fci.no_separation = 1;
+#endif
 	if (fn != NULL) {
 		fcic.function_handler = fn;
 		fcic.object = object ? Z_OBJ_P(object) : NULL;
@@ -284,7 +291,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 {
 	zval func_name = {}, ret = {}, *retval_ptr = (retval != NULL) ? retval : &ret, obj = {};
 	zval *arguments;
-#if PHP_VERSION_ID >= 80000
+#if PHP_VERSION_ID >= 70300
 	zend_function *fbc = NULL;
 #endif
 	int i, status;
@@ -307,61 +314,53 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		if (!ce && object && Z_TYPE_P(object) == IS_OBJECT) {
 			ce = Z_OBJCE_P(object);
 		}
-#if PHP_VERSION_ID >= 80000
-		if (ce) {
-			zend_string *str_methodname = zend_string_init(method_name, method_len, 0);
-			if (type != phalcon_fcall_parent) {
-				fbc = phalcon_get_function(ce, str_methodname);
-			} else {
-				fbc = phalcon_get_function(ce->parent, str_methodname);
+		assert(ce != NULL);
+
+#if PHP_VERSION_ID >= 70300
+		zend_string *str_methodname = zend_string_init(method_name, method_len, 0);
+		if (type != phalcon_fcall_parent) {
+			fbc = phalcon_get_function(ce, str_methodname);
+		} else {
+			fbc = phalcon_get_function(ce->parent, str_methodname);
+		}
+		if (fbc) {
+			ZVAL_STR(&func_name, str_methodname);
+		} else {
+#endif
+			switch (type) {
+				case phalcon_fcall_ce:
+					array_init_size(&func_name, 2);
+					add_next_index_string(&func_name, ce->name->val);
+					add_next_index_stringl(&func_name, method_name, method_len);
+					break;
+				case phalcon_fcall_parent:
+					if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
+						phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
+					} else {
+						array_init_size(&func_name, 2);
+						add_next_index_string(&func_name, ISV(parent));
+						add_next_index_stringl(&func_name, method_name, method_len);
+					}
+					break;
+				case phalcon_fcall_self:
+					assert(ce != NULL);
+					array_init_size(&func_name, 2);
+					add_next_index_string(&func_name, ISV(self));
+					add_next_index_stringl(&func_name, method_name, method_len);
+					break;
+				case phalcon_fcall_method:
+					array_init_size(&func_name, 2);
+					Z_TRY_ADDREF_P(object);
+					add_next_index_zval(&func_name, object);
+					add_next_index_stringl(&func_name, method_name, method_len);
+					break;
+				default:
+					phalcon_throw_exception_format(spl_ce_RuntimeException, "Error call type %d for cmethod %s", type, method_name);
+					return FAILURE;
 			}
-			zend_string_release(str_methodname);
+#if PHP_VERSION_ID >= 70300
 		}
 #endif
-		switch (type) {
-			case phalcon_fcall_ce:
-				assert(ce != NULL);
-				array_init_size(&func_name, 2);
-				add_next_index_string(&func_name, ce->name->val);
-				add_next_index_stringl(&func_name, method_name, method_len);
-				break;
-			case phalcon_fcall_parent:
-				assert(ce != NULL);
-
-				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
-					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
-				} else {
-					array_init_size(&func_name, 2);
-					add_next_index_string(&func_name, ISV(parent));
-					add_next_index_stringl(&func_name, method_name, method_len);
-				}
-
-				break;
-			case phalcon_fcall_self:
-				array_init_size(&func_name, 2);
-				add_next_index_string(&func_name, ISV(self));
-				add_next_index_stringl(&func_name, method_name, method_len);
-				break;
-			case phalcon_fcall_static:
-				if (phalcon_memnstr_str_str(method_name, method_len, SL("::"))) {
-					phalcon_fast_explode_str_str(&func_name, SL("::"), method_name, method_len);
-				} else {
-					array_init_size(&func_name, 2);
-					add_next_index_string(&func_name, ISV(static));
-					add_next_index_stringl(&func_name, method_name, method_len);
-				}
-				break;
-			case phalcon_fcall_method:
-				array_init_size(&func_name, 2);
-				Z_TRY_ADDREF_P(object);
-				add_next_index_zval(&func_name, object);
-				add_next_index_stringl(&func_name, method_name, method_len);
-				break;
-			default:
-				phalcon_throw_exception_format(spl_ce_RuntimeException, "Error call type %d for cmethod %s", type, method_name);
-				return FAILURE;
-		}
-
 	} else {
 		ZVAL_STRINGL(&func_name, method_name, method_len);
 	}
@@ -379,7 +378,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 	}
 
 	if (
-#if PHP_VERSION_ID >= 80000
+#if PHP_VERSION_ID >= 70300
 	(status = phalcon_call_user_function(fbc, ce, object, &func_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)
 #elif PHP_VERSION_ID >= 70100
 	(status = call_user_function(ce ? &(ce)->function_table : EG(function_table), object, &func_name, retval_ptr, param_count, arguments)) == FAILURE || EG(exception)

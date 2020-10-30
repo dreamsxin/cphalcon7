@@ -1,7 +1,7 @@
 os: linux
 language: php
 
-dist: trusty
+dist: xenial
 
 addons:
   apt:
@@ -44,6 +44,7 @@ cache:
     - $HOME/.composer/cache
 
 services:
+  - mysql
   - mongodb
   - memcached
   - redis

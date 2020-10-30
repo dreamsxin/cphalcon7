@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Cli_Color, colorize){
 
 	phalcon_fetch_params(1, 1, 3, &str, &fg, &at, &bg);
 
-	PHALCON_MM_CALL_STATIC(&ret, "issupportedshell");
+	PHALCON_MM_CALL_CE_STATIC(&ret, phalcon_cli_color_ce, "issupportedshell");
 
 	if (!zend_is_true(&ret)) {
 		RETURN_MM_CTOR(str);
@@ -265,7 +265,7 @@ PHP_METHOD(Phalcon_Cli_Color, head){
 
 	ZVAL_LONG(&fg, PHALCON_CLI_COLOR_FG_BROWN);
 
-	PHALCON_CALL_STATIC(&tmp, "colorize", str, &fg);
+	PHALCON_CALL_CE_STATIC(&tmp, phalcon_cli_color_ce, "colorize", str, &fg);
 	PHALCON_CONCAT_VS(return_value, &tmp, PHP_EOL);
 	zval_ptr_dtor(&tmp);
 }
@@ -299,8 +299,8 @@ PHP_METHOD(Phalcon_Cli_Color, error){
 	phalcon_pad_str(&out, &input, space, " ", PHALCON_PDA_RIGHT);
 	zval_ptr_dtor(&input);
 
-	PHALCON_CALL_STATIC(&line1, "colorize", &out, &fg, &at, &bg);
-	PHALCON_CALL_STATIC(&line2, "colorize", &msg, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line1, phalcon_cli_color_ce, "colorize", &out, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line2, phalcon_cli_color_ce, "colorize", &msg, &fg, &at, &bg);
 	zval_ptr_dtor(&out);
 	zval_ptr_dtor(&msg);
 
@@ -338,8 +338,8 @@ PHP_METHOD(Phalcon_Cli_Color, success){
 	phalcon_pad_str(&out, &input, space, " ", PHALCON_PDA_RIGHT);
 	zval_ptr_dtor(&input);
 
-	PHALCON_CALL_STATIC(&line1, "colorize", &out, &fg, &at, &bg);
-	PHALCON_CALL_STATIC(&line2, "colorize", &msg, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line1, phalcon_cli_color_ce, "colorize", &out, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line2, phalcon_cli_color_ce, "colorize", &msg, &fg, &at, &bg);
 	zval_ptr_dtor(&out);
 	zval_ptr_dtor(&msg);
 
@@ -377,8 +377,8 @@ PHP_METHOD(Phalcon_Cli_Color, info){
 	phalcon_pad_str(&out, &input, space, " ", PHALCON_PDA_RIGHT);
 	zval_ptr_dtor(&input);
 
-	PHALCON_CALL_STATIC(&line1, "colorize", &out, &fg, &at, &bg);
-	PHALCON_CALL_STATIC(&line2, "colorize", &msg, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line1, phalcon_cli_color_ce, "colorize", &out, &fg, &at, &bg);
+	PHALCON_CALL_CE_STATIC(&line2, phalcon_cli_color_ce, "colorize", &msg, &fg, &at, &bg);
 	zval_ptr_dtor(&out);
 	zval_ptr_dtor(&msg);
 

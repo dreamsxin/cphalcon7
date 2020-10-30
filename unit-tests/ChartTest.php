@@ -132,6 +132,10 @@ class ChartTest extends PHPUnit\Framework\TestCase
 {
 	public function testCaptcha()
 	{
+		if (!class_exists('Imagick')) {
+			$this->markTestSkipped('Imagick extension is required');
+			return;
+		}
 		if (!class_exists('Phalcon\Chart\Captcha')) {
 			$this->markTestSkipped('Class `Phalcon\Chart\Captcha` is not exists');
 			return false;

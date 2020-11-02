@@ -165,7 +165,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
 
 	// Environment Flags
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NOSUBDIR"),	MDBX_NOSUBDIR);
-	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NOSYNC"),		MDBX_NOSYNC);
+	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NOSYNC"),		MDBX_SAFE_NOSYNC);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("RDONLY"),		MDBX_RDONLY);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("NOMETASYNC"),	MDBX_NOMETASYNC);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("WRITEMAP"),	MDBX_WRITEMAP);
@@ -210,7 +210,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("TXN_FULL"),			MDBX_TXN_FULL);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("CURSOR_FULL"),			MDBX_CURSOR_FULL);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("PAGE_FULL"),			MDBX_PAGE_FULL);
-	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("MAP_RESIZED"),			MDBX_MAP_RESIZED);
+	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("UNABLE_EXTEND_MAPSIZE"),			MDBX_UNABLE_EXTEND_MAPSIZE);
 
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("INCOMPATIBLE"),		MDBX_INCOMPATIBLE);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("BAD_RSLOT"),			MDBX_BAD_RSLOT);
@@ -218,7 +218,7 @@ PHALCON_INIT_CLASS(Phalcon_Storage_Libmdbx){
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("BAD_VALSIZE"),			MDBX_BAD_VALSIZE);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("BAD_DBI"),				MDBX_BAD_DBI);
 	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("PROBLEM"),				MDBX_PROBLEM);
-	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("LAST_ERRCODE"),		MDBX_LAST_ERRCODE);
+	zend_declare_class_constant_long(phalcon_storage_libmdbx_ce, SL("LAST_LMDB_ERRCODE"),	MDBX_LAST_LMDB_ERRCODE);
 
 	return SUCCESS;
 }
@@ -239,6 +239,7 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 	zval *path, *name = NULL, *readers = NULL, *mapsize = NULL, *_envflags = NULL, *_flags = NULL, *frontend = NULL;
 	phalcon_storage_libmdbx_object *intern;
 	int envflags = 0, flags = MDBX_CREATE, rc;
+	size_t size;
 
 	phalcon_fetch_params(0, 1, 6, &path, &name, &readers, &mapsize, &_envflags, &_flags, &frontend);
 
@@ -280,10 +281,11 @@ PHP_METHOD(Phalcon_Storage_Libmdbx, __construct)
 	}
 
 	if (mapsize && Z_TYPE_P(mapsize) == IS_LONG) {
-		mdbx_env_set_mapsize(intern->env, Z_LVAL_P(mapsize));
+		size = Z_LVAL_P(mapsize);
 	} else {
-		mdbx_env_set_mapsize(intern->env, 1024 * 1024 * 1024);
+		size = 1024 * 1024 * 1024;
 	}
+	mdbx_env_set_geometry(intern->env, size, size, size, -1, -1, -1);
 
 	mdbx_env_set_maxdbs(intern->env, 256);
 

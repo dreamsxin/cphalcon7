@@ -6,6 +6,7 @@
  * curl -v -d "SET key value" http://localhost:8888/
  * curl -v -d "GET key" http://localhost:8888/
  * ab -n 1000 -c 10 -p task.log 'http://localhost:8888/set/key'
+ * ab -n 1000 -c 10 -T "value" 'http://localhost:8888/set/key'
  */
 $lmdb = new Phalcon\Storage\Libmdbx('./testdb');
 

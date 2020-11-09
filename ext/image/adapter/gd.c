@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 				return;
 		}
 
-		if (Z_TYPE(image) <= IS_OBJECT) {
+		if (Z_TYPE(image) < IS_OBJECT) {
 			assert(Z_TYPE(realpath) == IS_STRING);
 			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Failed to create image from file '%s'", Z_STRVAL(realpath));
 			zval_ptr_dtor(&realpath);
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 	} else if (width && height) {
 		PHALCON_CALL_FUNCTION(&image, "imagecreatetruecolor", width, height);
 
-		if (Z_TYPE(image) <= IS_OBJECT) {
+		if (Z_TYPE(image) < IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "imagecreatetruecolor() failed");
 			return;
 		}
@@ -1169,7 +1169,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _create) {
 
 	PHALCON_CALL_FUNCTION(&image, "imagecreatetruecolor", width, height);
 
-	if (Z_TYPE(image) <= IS_OBJECT) {
+	if (Z_TYPE(image) < IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "imagecreatetruecolor() failed");
 		return;
 	}

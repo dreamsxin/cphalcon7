@@ -6705,92 +6705,94 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 	zend_string *str_key;
 	ulong idx;
 
-	phalcon_fetch_params(0, 2, 0, &property, &value);
+	phalcon_fetch_params(1, 2, 0, &property, &value);
 	PHALCON_ENSURE_IS_STRING(property);
 
 	phalcon_fast_strtolower(&lower_property, property);
+	PHALCON_MM_ADD_ENTRY(&lower_property);
 
 	phalcon_get_class(&model_name, getThis(), 0);
+	PHALCON_MM_ADD_ENTRY(&model_name);
 
-	PHALCON_CALL_METHOD(&has, getThis(), "hasAttribute", property);
+	PHALCON_MM_CALL_METHOD(&has, getThis(), "hasattribute", property);
 	if (zend_is_true(&has)) {
 		if (PHALCON_GLOBAL(orm).enable_property_method) {
 			PHALCON_CONCAT_SV(&possible_setter, "__set", property);
 			phalcon_strtolower_inplace(&possible_setter);
+			PHALCON_MM_ADD_ENTRY(&possible_setter);
 
 			/*
 			 * Check method is not
 			 */
 			if (phalcon_method_exists_ce(phalcon_mvc_model_ce, &possible_setter) != SUCCESS) {
 				if (phalcon_method_exists(getThis(), &possible_setter) == SUCCESS) {
-					PHALCON_CALL_METHOD(NULL, getThis(), Z_STRVAL(possible_setter), value);
-					zval_ptr_dtor(&possible_setter);
-					RETURN_CTOR(value);
+					PHALCON_MM_CALL_METHOD(NULL, getThis(), Z_STRVAL(possible_setter), value);
+					RETURN_MM_CTOR(value);
 				}
 			}
-			zval_ptr_dtor(&possible_setter);
 		}
 
 		if (phalcon_isset_property_zval(getThis(), property)) {
 			if (PHALCON_PROPERTY_IS_PRIVATE_ZVAL(getThis(), property)) {
 				zend_error(E_ERROR, "Cannot access private property %s::%s", Z_STRVAL(model_name), Z_STRVAL_P(property));
-				return;
+				RETURN_MM();
 			}
 
 			if (PHALCON_PROPERTY_IS_PROTECTED_ZVAL(getThis(), property)) {
 				zend_error(E_ERROR, "Cannot access protected property %s::%s", Z_STRVAL(model_name), Z_STRVAL_P(property));
-				return;
+				RETURN_MM();
 			}
 		}
 
 		phalcon_update_property_zval_zval(getThis(), property, value);
-		zval_ptr_dtor(&model_name);
-		zval_ptr_dtor(&lower_property);
-		RETURN_CTOR(value);
+		RETURN_MM_CTOR(value);
 	}
 
-	PHALCON_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
-	PHALCON_CALL_METHOD(&relation, &manager, "getrelationbyalias", &model_name, &lower_property);
-	zval_ptr_dtor(&model_name);
+	PHALCON_MM_CALL_METHOD(&manager, getThis(), "getmodelsmanager");
+	PHALCON_MM_ADD_ENTRY(&manager);
+	PHALCON_MM_CALL_METHOD(&relation, &manager, "getrelationbyalias", &model_name, &lower_property);
+	PHALCON_MM_ADD_ENTRY(&relation);
 
 	/**
 	 * Values are probably relationships if they are objects
 	 */
 	if (Z_TYPE(relation) == IS_OBJECT) {
-		PHALCON_CALL_METHOD(&referenced_model_name, &relation, "getreferencedmodel");
+		PHALCON_MM_CALL_METHOD(&referenced_model_name, &relation, "getreferencedmodel");
+		PHALCON_MM_ADD_ENTRY(&referenced_model_name);
 
 		if (Z_TYPE_P(value) == IS_NULL) {
 			phalcon_unset_property_array(getThis(), SL("_related"), &lower_property);
 			phalcon_unset_property_array(getThis(), SL("_relatedResult"), &lower_property);
 		} else {
-			PHALCON_CALL_METHOD(&type, &relation, "gettype");
+			PHALCON_MM_CALL_METHOD(&type, &relation, "gettype");
+			PHALCON_MM_ADD_ENTRY(&type);
 
 			if (PHALCON_IS_LONG(&type, 0)) {
 				if (Z_TYPE_P(value) == IS_OBJECT) {
 					phalcon_get_class(&model_name, value, 0);
-
+					PHALCON_MM_ADD_ENTRY(&model_name);
 					if (instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 						phalcon_update_property_array(getThis(), SL("_relatedResult"), &lower_property, value);
 					} else if (!instanceof_function_ex(Z_OBJCE_P(value), phalcon_mvc_modelinterface_ce, 1) || !PHALCON_IS_EQUAL(&referenced_model_name, &model_name)) {
 						PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", &referenced_model_name, "`");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-						zval_ptr_dtor(&model_name);
-						goto end;
+						PHALCON_MM_ADD_ENTRY(&exception_message);
+						PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+						return;
 					} else {
 						phalcon_update_property_array(getThis(), SL("_related"), &lower_property, value);
 						phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
 					}
-					zval_ptr_dtor(&model_name);
 				} else if (Z_TYPE_P(value) == IS_ARRAY) {
-					PHALCON_CALL_METHOD(&referenced_model, &manager, "load", &referenced_model_name, &PHALCON_GLOBAL(z_false));
+					PHALCON_MM_CALL_METHOD(&referenced_model, &manager, "load", &referenced_model_name, &PHALCON_GLOBAL(z_false));
+					PHALCON_MM_ADD_ENTRY(&referenced_model);
 					if (Z_TYPE(referenced_model) == IS_OBJECT) {
-						PHALCON_CALL_METHOD(NULL, &referenced_model, "assign", value);
+						PHALCON_MM_CALL_METHOD(NULL, &referenced_model, "assign", value);
 					}
-					zval_ptr_dtor(&referenced_model);
 				} else {
 					PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", &referenced_model_name, "`");
-					PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-					goto end;
+					PHALCON_MM_ADD_ENTRY(&exception_message);
+					PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+					return;
 				}
 			} else {
 				if (Z_TYPE_P(value) != IS_ARRAY) {
@@ -6799,8 +6801,10 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 				} else {
 					ZVAL_COPY(&values, value);
 				}
+				PHALCON_MM_ADD_ENTRY(&values);
 
 				array_init(&related);
+				PHALCON_MM_ADD_ENTRY(&related);
 
 				ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(values), idx, str_key, item) {
 					zval tmp = {};
@@ -6812,7 +6816,7 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 
 					if (Z_TYPE_P(item) == IS_OBJECT) {
 						phalcon_get_class(&model_name, item, 0);
-
+						PHALCON_MM_ADD_ENTRY(&model_name);
 						if (instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_model_resultsetinterface_ce, 1)) {
 							phalcon_update_property_array(getThis(), SL("_relatedResult"), &lower_property, item);
 							continue;
@@ -6820,47 +6824,40 @@ PHP_METHOD(Phalcon_Mvc_Model, __set){
 
 						if (!instanceof_function_ex(Z_OBJCE_P(item), phalcon_mvc_modelinterface_ce, 1) || !PHALCON_IS_EQUAL(&referenced_model_name, &model_name)) {
 							PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", &referenced_model_name, "`");
-							PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-							zval_ptr_dtor(&model_name);
-							zval_ptr_dtor(&referenced_model_name);
-							goto end;
+							PHALCON_MM_ADD_ENTRY(&exception_message);
+							PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+							return;
 						}
-						zval_ptr_dtor(&model_name);
 
 						phalcon_array_append(&related, item, PH_COPY);
 					} else if (Z_TYPE_P(item) == IS_ARRAY) {
 						zval tmp_referenced_model_name = {};
-						PHALCON_CALL_METHOD(&tmp_referenced_model_name, &relation, "getreferencedmodel");
-						PHALCON_CALL_METHOD(&referenced_model, &manager, "load", &tmp_referenced_model_name, &PHALCON_GLOBAL(z_false));
-						zval_ptr_dtor(&tmp_referenced_model_name);
+						PHALCON_MM_CALL_METHOD(&tmp_referenced_model_name, &relation, "getreferencedmodel");
+						PHALCON_MM_ADD_ENTRY(&tmp_referenced_model_name);
+						PHALCON_MM_CALL_METHOD(&referenced_model, &manager, "load", &tmp_referenced_model_name, &PHALCON_GLOBAL(z_false));
+						PHALCON_MM_ADD_ENTRY(&referenced_model);
 						if (Z_TYPE(referenced_model) == IS_OBJECT) {
-							PHALCON_CALL_METHOD(NULL, &referenced_model, "assign", item);
+							PHALCON_MM_CALL_METHOD(NULL, &referenced_model, "assign", item);
 						}
-						zval_ptr_dtor(&referenced_model);
 					} else {
 						PHALCON_CONCAT_SVSVS(&exception_message, "Property \"", property, "\" must be an model `", &referenced_model_name, "`");
-						PHALCON_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
-						zval_ptr_dtor(&referenced_model_name);
-						goto end;
+						PHALCON_MM_ADD_ENTRY(&exception_message);
+						PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
+						return;
 					}
 				} ZEND_HASH_FOREACH_END();
-				zval_ptr_dtor(&values);
 
 				if (phalcon_fast_count_ev(&related)) {
 					phalcon_update_property_array(getThis(), SL("_related"), &lower_property, &related);
 					phalcon_update_property_long(getThis(), SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT);
 				}
-				zval_ptr_dtor(&related);
 			}
 		}
-		zval_ptr_dtor(&referenced_model_name);
 	} else {
 		phalcon_update_property_zval_zval(getThis(), property, value);
 	}
-end:
-	zval_ptr_dtor(&lower_property);
-	zval_ptr_dtor(&relation);
-	zval_ptr_dtor(&manager);
+
+	RETURN_MM();
 }
 
 /**

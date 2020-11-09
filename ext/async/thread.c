@@ -186,12 +186,15 @@ ASYNC_CALLBACK run_thread(void *arg)
 	PG(auto_globals_jit) = 1;
 	
 	php_request_startup();
-	
+#if PHP_VERSION_ID < 80000
 	zend_disable_function(ZEND_STRL("setlocale"));
 	zend_disable_function(ZEND_STRL("dl"));
 	
-#if PHP_VERSION_ID < 70400
+# if PHP_VERSION_ID < 70400
 	zend_disable_function(ZEND_STRL("putenv"));
+# endif
+#else
+	zend_disable_functions("setlocale,dl"));
 #endif
 	
 	PG(during_request_startup) = 0;

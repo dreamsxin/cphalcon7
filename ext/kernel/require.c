@@ -125,11 +125,11 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 #endif
 
 #if PHP_VERSION_ID >= 70400
-	call = zend_vm_stack_push_call_frame(call_info, func, 0, obj ? obj : NULL);
+	call = zend_vm_stack_push_call_frame(call_info, func, 0, (obj ? obj : NULL));
 #elif PHP_VERSION_ID >= 70100
-	call = zend_vm_stack_push_call_frame(call_info, func, 0, op_array->scope, obj ? obj : NULL);
+	call = zend_vm_stack_push_call_frame(call_info, func, 0, (op_array->scope, obj ? obj : NULL));
 #else
-	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE, func, 0, op_array->scope, obj ? obj : NULL);
+	call = zend_vm_stack_push_call_frame(ZEND_CALL_NESTED_CODE, func, 0, op_array->scope, (obj ? obj : NULL));
 #endif
 
 	call->symbol_table = symbol_table;

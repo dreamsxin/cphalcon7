@@ -56,8 +56,8 @@ typedef struct _phalcon_arr_aggregator {
 
   zend_string *alias;
   zend_string *selector;
-  ulong num_alias;
-  ulong num_selector;
+  zend_ulong num_alias;
+  zend_ulong num_selector;
 
   zend_bool is_callable;
   uint isa;

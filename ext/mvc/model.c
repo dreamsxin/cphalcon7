@@ -4403,6 +4403,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowInsert){
 	phalcon_fast_join_str(&phql_join_fields, SL(", "), &fields);
 	PHALCON_MM_ADD_ENTRY(&phql_join_fields);
 	PHALCON_CONCAT_SVSVS(&phql, "INSERT INTO [", &model_name, "] (", &phql_join_fields ,") VALUES ");
+	PHALCON_MM_ADD_ENTRY(&phql);
 
 	phalcon_fast_join_str(&phql_join_values, SL(":, :"), &fields);
 	PHALCON_MM_ADD_ENTRY(&phql_join_values);

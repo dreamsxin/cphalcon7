@@ -360,14 +360,6 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 	PHALCON_MM_ADD_ENTRY(&column_definition);
 	PHALCON_MM_CALL_METHOD(&column_type, column, "gettype");
 	PHALCON_MM_ADD_ENTRY(&column_type);
-	if (Z_TYPE(column_type) == IS_STRING) {
-		zval tmp = {};
-		PHALCON_MM_CALL_METHOD(&tmp, column, "gettypereference");
-		PHALCON_MM_ADD_ENTRY(&tmp);
-		if (zend_is_true(&tmp) && Z_TYPE(tmp) == IS_LONG) {
-			ZVAL_COPY_VALUE(&column_type, &tmp);
-		}
-	}
 
 	if (!current_column) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
@@ -405,15 +397,7 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 	PHALCON_MM_CALL_METHOD(&current_type, current_column, "gettype");
 	PHALCON_MM_ADD_ENTRY(&current_type);
 
-	if (Z_TYPE(current_type) == IS_STRING) {
-		zval tmp = {};
-		PHALCON_MM_CALL_METHOD(&tmp, current_column, "gettypereference");
-		PHALCON_MM_ADD_ENTRY(&tmp);
-		if (zend_is_true(&tmp) && Z_TYPE(tmp) == IS_LONG) {
-			ZVAL_COPY_VALUE(&current_type, &tmp);
-		}
-	}
-	if (!PHALCON_IS_EQUAL(&column_type, &current_type)) {
+	if (!PHALCON_IS_IDENTICAL(&column_type, &current_type)) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
 		PHALCON_MM_ADD_ENTRY(&sql);
 	}

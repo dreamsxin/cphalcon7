@@ -395,7 +395,11 @@ PHP_METHOD(Phalcon_Di_Injectable, fireEventCancel){
 	 */
 	if (phalcon_method_exists(getThis(), &name) == SUCCESS) {
 		zval prev_data = {};
-		PHALCON_MM_ZVAL_COPY(&prev_data, &status);
+		if (Z_TYPE(status) > IS_NULL) {
+			PHALCON_MM_ZVAL_COPY(&prev_data, &status);
+		} else {
+			ZVAL_NULL(&prev_data);
+		}
 		PHALCON_MM_CALL_METHOD(&status, getThis(), Z_STRVAL(name), &event, data, &prev_data);
 
 		if (PHALCON_IS_FALSE(&status)){

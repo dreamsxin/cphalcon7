@@ -26,12 +26,12 @@ class ViewModelTest extends PHPUnit\Framework\TestCase
 {
 	private $level;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->level = ob_get_level();
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		while (ob_get_level() > $this->level) {
 			ob_end_flush();

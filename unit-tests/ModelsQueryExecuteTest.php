@@ -31,12 +31,12 @@ class Issue_2019 extends \Phalcon\Mvc\Model
 class ModelsQueryExecuteTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

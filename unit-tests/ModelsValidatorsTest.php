@@ -26,13 +26,13 @@ function sqlite_now()
 class ModelsValidatorsTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		date_default_timezone_set('UTC');
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 	}

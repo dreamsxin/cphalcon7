@@ -112,7 +112,7 @@ class PHPUnit\Framework\TestCase
 
 			$class = new $className();
 			if (method_exists($class, 'setUp')) {
-				$class->setUp();
+				$class->setUp(): void;
 			}
 
 			$reflectionClass = new ReflectionClass($class);
@@ -128,7 +128,7 @@ class PHPUnit\Framework\TestCase
 				$methodName = $method->getName();
 				if (substr($methodName, 0, 4) == 'test') {
 					if ($hasSetup) {
-						$class->setUp();
+						$class->setUp(): void;
 					}
 					$class->$methodName();
 				}

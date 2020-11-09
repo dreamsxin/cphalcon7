@@ -22,7 +22,7 @@
 
 class DateTimeTest extends PHPUnit\Framework\TestCase
 {
-	public function setUp()
+	public function setUp(): void
 	{
 		date_default_timezone_set('PRC');
 	}

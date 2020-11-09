@@ -22,12 +22,12 @@
 class AclTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		spl_autoload_register(array($this, 'awaresAutoloader'));
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		spl_autoload_unregister(array($this, 'awaresAutoloader'));
 	}

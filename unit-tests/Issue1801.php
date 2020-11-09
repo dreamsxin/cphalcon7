@@ -25,12 +25,12 @@
 class Issue1801 extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		spl_autoload_register(array($this, 'modelsAutoloader'));
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		spl_autoload_unregister(array($this, 'modelsAutoloader'));
 		Phalcon\Mvc\Model::setup(array('columnRenaming' => true));

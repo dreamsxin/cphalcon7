@@ -66,7 +66,7 @@ class DiTest extends PHPUnit\Framework\TestCase
 
 	protected $_di;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		Phalcon\Di::reset();
 		$this->_di = new \Phalcon\Di();

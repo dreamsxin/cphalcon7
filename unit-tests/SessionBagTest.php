@@ -20,7 +20,7 @@
 
 class SessionBagTest extends PHPUnit\Framework\TestCase
 {
-	public function setUp()
+	public function setUp(): void
 	{
 		if (PHP_SESSION_ACTIVE == session_status()) {
 			session_destroy();

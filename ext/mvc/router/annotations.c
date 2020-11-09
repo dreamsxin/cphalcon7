@@ -270,6 +270,8 @@ PHP_METHOD(Phalcon_Mvc_Router_Annotations, handle){
 					 */
 					if (phalcon_array_isset_long(scope, 2)) {
 						phalcon_array_fetch_long(&module_name, scope, 2, PH_NOISY|PH_READONLY);
+					} else {
+						ZVAL_NULL(module_name);
 					}
 
 					PHALCON_CONCAT_VV(&suffixed, &handler, &controller_suffix);

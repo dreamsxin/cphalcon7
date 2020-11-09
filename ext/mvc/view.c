@@ -1338,10 +1338,14 @@ PHP_METHOD(Phalcon_Mvc_View, render){
 	PHALCON_MM_ZVAL_COPY(&controller_name, controller);
 	if (action) {
 		PHALCON_MM_ZVAL_COPY(&action_name, action);
+	} else {
+		ZVAL_NULL(&action_name);
 	}
 
 	if (namespace) {
 		PHALCON_MM_ZVAL_COPY(&namespace_name, namespace);
+	} else {
+		ZVAL_NULL(&namespace_name);
 	}
 
 	PHALCON_MM_ZVAL_STRING(&ds, slash);

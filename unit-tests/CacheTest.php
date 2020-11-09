@@ -21,7 +21,7 @@
 class CacheTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		date_default_timezone_set('UTC');
 		if (!file_exists('unit-tests/cache/')) {

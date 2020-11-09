@@ -22,12 +22,12 @@
 class ConsoleCliTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		spl_autoload_register(array($this, 'dispatcherAutoloader'));
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		spl_autoload_unregister(array($this, 'dispatcherAutoloader'));
 	}

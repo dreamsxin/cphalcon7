@@ -30,7 +30,7 @@ class ViewSimpleTest extends PHPUnit\Framework\TestCase
 {
 	private $level;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$this->level = ob_get_level();
 		foreach (new DirectoryIterator('unit-tests/cache/') as $item) {
@@ -48,7 +48,7 @@ class ViewSimpleTest extends PHPUnit\Framework\TestCase
 		return $di;
 	}
 
-	public function tearDown()
+	public function tearDown(): void
 	{
 		foreach (new DirectoryIterator('unit-tests/cache/') as $item)
 		{

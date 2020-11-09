@@ -23,7 +23,7 @@ class ResponseTest extends PHPUnit\Framework\TestCase
 
 	private $_response;
 
-	public function setUp()
+	public function setUp(): void
 	{
 		$di = new Phalcon\Di();
 

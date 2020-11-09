@@ -369,7 +369,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 
 	i = 0;
 	while(i < param_count) {
-		if (params[i]) {
+		if (params[i] && Z_TYPE_P(params[i]) > IS_NULL) {
 			ZVAL_COPY_VALUE(&arguments[i], params[i]);
 		} else {
 			ZVAL_NULL(&arguments[i]);

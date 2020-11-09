@@ -128,25 +128,25 @@ PHALCON_INIT_CLASS(Phalcon_Chart_QRcode){
     phalcon_qrcode_handle = zend_register_list_destructors_ex(phalcon_qr_dtor, NULL, phalcon_qrcode_handle_name, module_number);
 
 	/* Mode */
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUL"), QR_MODE_NUL TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUM"), QR_MODE_NUM TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_AN"), QR_MODE_AN TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_8"), QR_MODE_8 TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_KANJI"), QR_MODE_KANJI TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUL"), QR_MODE_NUL);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_NUM"), QR_MODE_NUM);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_AN"), QR_MODE_AN);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_8"), QR_MODE_8);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("MODE_KANJI"), QR_MODE_KANJI);
 
 	/* Level */
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_L"), QR_ECLEVEL_L TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_M"), QR_ECLEVEL_M TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_Q"), QR_ECLEVEL_Q TSRMLS_CC);
-	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_H"), QR_ECLEVEL_H TSRMLS_CC);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_L"), QR_ECLEVEL_L);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_M"), QR_ECLEVEL_M);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_Q"), QR_ECLEVEL_Q);
+	zend_declare_class_constant_long(phalcon_chart_qrcode_ce, SL("LEVEL_H"), QR_ECLEVEL_H);
 
-	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_qr"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_text"), ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_version"), 6, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_maxVersion"), MQRSPEC_VERSION_MAX, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_level"), QR_ECLEVEL_H, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_mode"), QR_MODE_8, ZEND_ACC_PROTECTED TSRMLS_CC);
-	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_casesensitive"), 1, ZEND_ACC_PROTECTED TSRMLS_CC);
+	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_qr"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_chart_qrcode_ce, SL("_text"), ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_version"), 6, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_maxVersion"), MQRSPEC_VERSION_MAX, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_level"), QR_ECLEVEL_H, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_mode"), QR_MODE_8, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_chart_qrcode_ce, SL("_casesensitive"), 1, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -434,14 +434,14 @@ PHP_METHOD(Phalcon_Chart_QRcode, save){
 		char buf[4096];
 		fseek (fp, 0, SEEK_SET);
 
-		phalcon_ob_start(TSRMLS_C);
+		phalcon_ob_start();
 
 		while ((len = fread(buf, 1, sizeof(buf), fp)) > 0) {
-			php_write(buf, len TSRMLS_CC);
+			php_write(buf, len);
 		}
 
-		phalcon_ob_get_contents(return_value TSRMLS_CC);
-		phalcon_ob_end_clean(TSRMLS_C);
+		phalcon_ob_get_contents(return_value);
+		phalcon_ob_end_clean();
 
 		fclose (fp);
 		VCWD_UNLINK((const char *)ZSTR_VAL(path));
@@ -528,7 +528,7 @@ static void _php_zbarcode_scan_page(zbar_image_scanner_t *scanner, zbar_image_t 
 		phalcon_convert_encoding(&totext, &fromtext, &to, &from);
 		phalcon_array_update_str(&symbol_array, SL("data"), &totext, PH_COPY);
 #else
-        if (phalcon_function_exists_ex(SS("mb_convert_encoding") TSRMLS_CC) == SUCCESS) {
+        if (phalcon_function_exists_ex(SS("mb_convert_encoding")) == SUCCESS) {
 			ZVAL_STRING(&fromtext, data);
 			ZVAL_STRING(&to, "shift-jis");
 			ZVAL_STRING(&from, "utf-8");

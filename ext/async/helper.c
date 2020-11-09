@@ -22,7 +22,10 @@
 #include "zend_smart_str.h"
 
 #if ASYNC_SOCKETS
+
+# if PHP_VERSION_ID < 80000
 static int (*le_socket)(void);
+# endif
 #endif
 
 char *async_status_label(zend_uchar status)
@@ -168,8 +171,12 @@ int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error)
 
 #if ASYNC_SOCKETS
 	php_socket *socket;
-
+# if PHP_VERSION_ID >= 80000
+	if (!stream && (socket = Z_SOCKET_P(val))) {
+# else
 	if (!stream && le_socket && (socket = (php_socket *) zend_fetch_resource_ex(val, NULL, php_sockets_le_socket()))) {
+# endif
+
 #ifdef PHP_WIN32
 		if (UNEXPECTED(socket->bsd_socket == INVALID_SOCKET)) {
 #else
@@ -236,6 +243,8 @@ int async_get_poll_fd(zval *val, php_socket_t *sock, zend_string **error)
 void async_helper_init()
 {
 #if ASYNC_SOCKETS
+
+# if PHP_VERSION_ID < 80000
 	zend_module_entry *sockets;
 
 	le_socket = NULL;
@@ -249,5 +258,6 @@ void async_helper_init()
 			}
 		}
 	}
+#endif
 #endif
 }

@@ -346,71 +346,86 @@ PHP_METHOD(Phalcon_Db_Dialect_Postgresql, modifyColumn){
 	zval column_definition = {}, column_type ={}, current_type = {}, is_not_null = {}, current_is_not_null = {}, default_value = {};
 	zval current_default_value = {};
 
-	phalcon_fetch_params(0, 3, 1, &table_name, &schema_name, &column, &current_column);
-	PHALCON_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
+	phalcon_fetch_params(1, 3, 1, &table_name, &schema_name, &column, &current_column);
+	PHALCON_MM_VERIFY_INTERFACE_EX(column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
 
-	PHALCON_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_MM_CALL_METHOD(&table, getThis(), "preparetable", table_name, schema_name);
+	PHALCON_MM_ADD_ENTRY(&table);
 	PHALCON_CONCAT_SV(&alter_table, "ALTER TABLE ", &table);
+	PHALCON_MM_ADD_ENTRY(&alter_table);
 
-	PHALCON_CALL_METHOD(&name, column, "getname");
-	PHALCON_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
-	PHALCON_CALL_METHOD(&column_type, column, "gettype");
+	PHALCON_MM_CALL_METHOD(&name, column, "getname");
+	PHALCON_MM_ADD_ENTRY(&name);
+	PHALCON_MM_CALL_METHOD(&column_definition, getThis(), "getcolumndefinition", column);
+	PHALCON_MM_ADD_ENTRY(&column_definition);
+	PHALCON_MM_CALL_METHOD(&column_type, column, "gettype");
+	PHALCON_MM_ADD_ENTRY(&column_type);
 
 	if (!current_column) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
+		PHALCON_MM_ADD_ENTRY(&sql);
 
-		PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
+		PHALCON_MM_CALL_METHOD(&is_not_null, column, "isnotnull");
 		if (zend_is_true(&is_not_null)) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET NOT NULL;");
 		} else {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP NOT NULL;");
 		}
+		PHALCON_MM_ADD_ENTRY(&sql);
 
-		PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
+		PHALCON_MM_CALL_METHOD(&default_value, column, "getdefaultvalue");
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_MM_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_MM_ADD_ENTRY(&default_value);
 			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
-		RETURN_ZVAL(&sql, 0, 0);
+		PHALCON_MM_ADD_ENTRY(&sql);
+		RETURN_MM_CTOR(&sql);
 	}
 
-	PHALCON_VERIFY_INTERFACE_EX(current_column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
-	PHALCON_CALL_METHOD(&current_name, current_column, "getname");
+	PHALCON_MM_VERIFY_INTERFACE_EX(current_column, phalcon_db_columninterface_ce, phalcon_db_exception_ce);
+	PHALCON_MM_CALL_METHOD(&current_name, current_column, "getname");
+	PHALCON_MM_ADD_ENTRY(&current_name);
 
 	if (!PHALCON_IS_EQUAL(&name, &current_name)) {
 		PHALCON_CONCAT_VSVSVS(&sql, &alter_table, " RENAME COLUMN \"", &current_name, "\" TO \"", &name, "\";");
+		PHALCON_MM_ADD_ENTRY(&sql);
 	}
 
-	PHALCON_CALL_METHOD(&current_type, current_column, "gettype");
+	PHALCON_MM_CALL_METHOD(&current_type, current_column, "gettype");
+	PHALCON_MM_ADD_ENTRY(&current_type);
 
-	if (!PHALCON_IS_EQUAL(&column_type, &current_type)) {
+	if (!PHALCON_IS_IDENTICAL(&column_type, &current_type)) {
 		PHALCON_SCONCAT_VSVSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" TYPE ", &column_definition, ";");
+		PHALCON_MM_ADD_ENTRY(&sql);
 	}
 
-	PHALCON_CALL_METHOD(&is_not_null, column, "isnotnull");
-	PHALCON_CALL_METHOD(&current_is_not_null, current_column, "isnotnull");
+	PHALCON_MM_CALL_METHOD(&is_not_null, column, "isnotnull");
+	PHALCON_MM_CALL_METHOD(&current_is_not_null, current_column, "isnotnull");
 	if (!PHALCON_IS_EQUAL(&is_not_null, &current_is_not_null)) {
 		if (zend_is_true(&is_not_null)) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET NOT NULL;");
 		} else {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP NOT NULL;");
 		}
+		PHALCON_MM_ADD_ENTRY(&sql);
 	}
 
-	PHALCON_CALL_METHOD(&default_value, column, "getdefaultvalue");
-	PHALCON_CALL_METHOD(&current_default_value, current_column, "getdefaultvalue");
+	PHALCON_MM_CALL_METHOD(&default_value, column, "getdefaultvalue");
+	PHALCON_MM_CALL_METHOD(&current_default_value, current_column, "getdefaultvalue");
 	if (!PHALCON_IS_EQUAL(&default_value, &current_default_value)) {
 		if (Z_TYPE(default_value) == IS_NULL) {
 			PHALCON_SCONCAT_VSVS(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" DROP DEFAULT;");
 		} else {
-			PHALCON_CALL_METHOD(&column_type, column, "gettype");
-			PHALCON_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
+			PHALCON_MM_CALL_METHOD(&column_type, column, "gettype");
+			PHALCON_MM_CALL_METHOD(&default_value, getThis(), "getdefaultvalue", &default_value, &column_type);
 			PHALCON_SCONCAT_VSVSV(&sql, &alter_table, " ALTER COLUMN \"", &name, "\" SET DEFAULT ", &default_value);
 		}
+		PHALCON_MM_ADD_ENTRY(&sql);
 	}
-	RETURN_CTOR(&sql);
+	RETURN_MM_CTOR(&sql);
 }
 
 /**

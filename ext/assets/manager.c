@@ -711,6 +711,8 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 		phalcon_fix_path(&complete_target_dir, &tmp, &ds_slash);
 		zval_ptr_dtor(&tmp);
 		PHALCON_MM_ADD_ENTRY(&complete_target_dir);
+	} else {
+		ZVAL_NULL(&complete_target_dir);
 	}
 
 	ZEND_HASH_FOREACH_VAL(Z_ARRVAL(resources), resource) {

@@ -1161,7 +1161,11 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 					ZVAL_LONG(&key, param_idx);
 				}
 
+#if PHP_VERSION_ID >= 80000
+				PHALCON_MM_CALL_METHOD(&reflection_class, reflection_parameter, "gettype");
+#else
 				PHALCON_MM_CALL_METHOD(&reflection_class, reflection_parameter, "getclass");
+#endif
 				PHALCON_MM_ADD_ENTRY(&reflection_class);
 				if (Z_TYPE(reflection_class) == IS_OBJECT) {
 					PHALCON_MM_CALL_METHOD(&logic_classname, &reflection_class, "getname");

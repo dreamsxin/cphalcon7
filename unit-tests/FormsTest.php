@@ -62,10 +62,9 @@ class ContactFormSettersGetters
 class FormsTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		Phalcon\Di::reset();
-		return new Phalcon\Di\FactoryDefault();
 	}
 
 	public function testFormElementEmpty()

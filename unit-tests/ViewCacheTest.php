@@ -27,7 +27,7 @@ use Phalcon\Mvc\View;
 class ViewCacheTest extends PHPUnit\Framework\TestCase
 {
 
-	public function setUp()
+	public function setUp(): void
 	{
 		foreach (new DirectoryIterator('unit-tests/cache/') as $item) {
 			$item->isDir() or unlink($item->getPathname());
@@ -178,7 +178,7 @@ class ViewCacheTest extends PHPUnit\Framework\TestCase
 		return $di;
 	}
 
-	public static function tearDownAfterClass()
+	public static function tearDownAfterClass(): void
 	{
 		foreach (new DirectoryIterator('unit-tests/cache/') as $item)
 		{

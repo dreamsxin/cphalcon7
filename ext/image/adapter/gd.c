@@ -226,7 +226,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 				return;
 		}
 
-		if (Z_TYPE(image) != IS_RESOURCE) {
+		if (Z_TYPE(image) <= IS_OBJECT) {
 			assert(Z_TYPE(realpath) == IS_STRING);
 			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Failed to create image from file '%s'", Z_STRVAL(realpath));
 			zval_ptr_dtor(&realpath);
@@ -243,7 +243,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __construct){
 	} else if (width && height) {
 		PHALCON_CALL_FUNCTION(&image, "imagecreatetruecolor", width, height);
 
-		if (Z_TYPE(image) != IS_RESOURCE) {
+		if (Z_TYPE(image) <= IS_OBJECT) {
 			PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "imagecreatetruecolor() failed");
 			return;
 		}
@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _resize) {
 
 	PHALCON_CALL_FUNCTION(&tmp_image, "imagescale", &image, width, height);
 
-	if (Z_TYPE(tmp_image) == IS_RESOURCE) {
+	if (Z_TYPE(tmp_image) >= IS_OBJECT) {
 		PHALCON_CALL_FUNCTION(NULL, "imagedestroy", &image);
 		phalcon_update_property(getThis(), SL("_image"), &tmp_image);
 
@@ -343,7 +343,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _crop)
 
 	PHALCON_CALL_FUNCTION(&tmp_image, "imagecrop", &image, &rect);
 
-	if (Z_TYPE(tmp_image) == IS_RESOURCE) {
+	if (Z_TYPE(tmp_image) >= IS_OBJECT) {
 		PHALCON_CALL_FUNCTION(NULL, "imagedestroy", &image);
 		phalcon_update_property(getThis(), SL("_image"), &tmp_image);
 		phalcon_update_property(getThis(), SL("_width"), width);
@@ -1169,7 +1169,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, _create) {
 
 	PHALCON_CALL_FUNCTION(&image, "imagecreatetruecolor", width, height);
 
-	if (Z_TYPE(image) != IS_RESOURCE) {
+	if (Z_TYPE(image) <= IS_OBJECT) {
 		PHALCON_THROW_EXCEPTION_STR(phalcon_image_exception_ce, "imagecreatetruecolor() failed");
 		return;
 	}
@@ -1192,7 +1192,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, __destruct){
 
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
 
-	if (Z_TYPE(image) == IS_RESOURCE) {
+	if (Z_TYPE(image) >= IS_OBJECT) {
 		PHALCON_CALL_FUNCTION(NULL, "imagedestroy", &image);
 	}
 }
@@ -1219,7 +1219,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, line){
 
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
 
-	if (Z_TYPE(image) == IS_RESOURCE) {
+	if (Z_TYPE(image) >= IS_OBJECT) {
 		PHALCON_CALL_METHOD(&rgb, getThis(), "getcolorrbg", color);
 		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY|PH_READONLY);
 		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY|PH_READONLY);
@@ -1261,7 +1261,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
 	}
 	phalcon_read_property(&image, getThis(), SL("_image"), PH_READONLY);
 
-	if (Z_TYPE(image) == IS_RESOURCE) {
+	if (Z_TYPE(image) >= IS_OBJECT) {
 		PHALCON_CALL_METHOD(&rgb, getThis(), "getcolorrbg", color);
 		phalcon_array_fetch_long(&r, &rgb, 0, PH_NOISY|PH_READONLY);
 		phalcon_array_fetch_long(&g, &rgb, 1, PH_NOISY|PH_READONLY);

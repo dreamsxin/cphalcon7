@@ -194,7 +194,7 @@ ASYNC_CALLBACK run_thread(void *arg)
 	zend_disable_function(ZEND_STRL("putenv"));
 # endif
 #else
-	zend_disable_functions("setlocale,dl"));
+	zend_disable_functions("setlocale,dl");
 #endif
 	
 	PG(during_request_startup) = 0;

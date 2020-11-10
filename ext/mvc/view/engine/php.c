@@ -84,8 +84,16 @@ PHP_METHOD(Phalcon_Mvc_View_Engine_Php, render){
 	/**
 	 * Require the file
 	 */
-	if (phalcon_exec_file(&contents, NULL, path, params) == FAILURE) {
-		RETURN_FALSE;
+	if (likely(PHALCON_GLOBAL(mvc).enable_view_strict)) {
+		if (phalcon_exec_file(&contents, NULL, path, params, NULL) == FAILURE) {
+			RETURN_FALSE;
+		}
+	} else {
+		zend_array *symbol_table = zend_rebuild_symbol_table();
+
+		if (phalcon_exec_file(&contents, NULL, path, params, symbol_table) == FAILURE) {
+			RETURN_FALSE;
+		}
 	}
 
 	if (clean) {

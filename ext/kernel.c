@@ -587,7 +587,7 @@ PHP_METHOD(Phalcon_Kernel, evalFile){
 
 	phalcon_fetch_params(0, 1, 2, &file, &vars, &object);
 
-	phalcon_exec_file(return_value, object, file, vars);
+	phalcon_exec_file(return_value, object, file, vars, NULL);
 }
 
 /**

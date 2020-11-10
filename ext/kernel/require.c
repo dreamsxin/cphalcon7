@@ -169,10 +169,9 @@ int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *
 	return 1;
 }
 
-int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
-	int status = 0;
+int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars, zend_array *symbol_table) {
+	int status = 0, destroy = 0;
 	zend_string *filename;
-	zend_array *symbol_table;
 	zend_file_handle file_handle;
 	zend_op_array 	*op_array;
 	char realpath[MAXPATHLEN];
@@ -187,7 +186,11 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 		zend_error_noreturn(E_CORE_ERROR, "Failed opening file %s: %s", ZSTR_VAL(filename), strerror(errno));
 		return 0;
 	}
-	symbol_table = phalcon_build_symtable(vars);
+
+	if (symbol_table == NULL) {
+		destroy = 1;
+		symbol_table = phalcon_build_symtable(vars);
+	}
 
 #if PHP_VERSION_ID < 70400
 	file_handle.filename = ZSTR_VAL(filename);
@@ -220,8 +223,9 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars) {
 	}
 
 	zend_destroy_file_handle(&file_handle);
-
-	phalcon_destroy_symtable(symbol_table);
+	if (destroy) {
+		phalcon_destroy_symtable(symbol_table);
+	}
 	return status;
 }
 

@@ -1600,7 +1600,7 @@ PHP_METHOD(Phalcon_Mvc_Model, assign){
 					if (phalcon_fast_in_array(&key, column_map)) {
 						ZVAL_COPY_VALUE(&attribute, &key);
 					} else {
-						if (PHALCON_GLOBAL(orm).enable_strict) {
+						if (unlikely(PHALCON_GLOBAL(orm).enable_strict)) {
 							PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
 							PHALCON_MM_ADD_ENTRY(&exception_message);
 							PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_mvc_model_exception_ce, &exception_message);
@@ -4615,7 +4615,7 @@ PHP_METHOD(Phalcon_Mvc_Model, _doLowUpdate){
 	 * If there is no fields to update we return true
 	 */
 	if (!phalcon_fast_count_ev(&phql_updates)) {
-		if (PHALCON_GLOBAL(orm).enable_strict) {
+		if (unlikely(PHALCON_GLOBAL(orm).enable_strict)) {
 			RETURN_MM_FALSE;
 		}
 		RETURN_MM_TRUE;
@@ -5310,7 +5310,7 @@ PHP_METHOD(Phalcon_Mvc_Model, save){
 	}
 
 	if (zend_is_true(&new_success)) {
-		if (PHALCON_GLOBAL(orm).enable_strict) {
+		if (unlikely(PHALCON_GLOBAL(orm).enable_strict)) {
 			RETURN_MM_CTOR(&success);
 		}
 	}

@@ -101,6 +101,8 @@ static PHP_INI_MH(OnUpdateThreadCount)
 PHP_INI_BEGIN()
 	/* Enables/Disables debug */
 	STD_PHP_INI_BOOLEAN("phalcon.debug.enable_debug",           "0",    PHP_INI_ALL,    OnUpdateBool, debug.enable_debug,           zend_phalcon_globals, phalcon_globals)
+	/* Enables/Disables view strict mode */
+	STD_PHP_INI_BOOLEAN("phalcon.mvc.enable_view_strict",       "1",    PHP_INI_ALL,    OnUpdateBool, mvc.enable_view_strict,       zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables globally the internal events */
 	STD_PHP_INI_BOOLEAN("phalcon.orm.events",                   "1",    PHP_INI_ALL,    OnUpdateBool, orm.events,                   zend_phalcon_globals, phalcon_globals)
 	/* Enables/Disables virtual foreign keys */

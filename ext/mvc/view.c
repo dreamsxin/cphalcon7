@@ -139,9 +139,14 @@ PHP_METHOD(Phalcon_Mvc_View, reset);
 PHP_METHOD(Phalcon_Mvc_View, __set);
 PHP_METHOD(Phalcon_Mvc_View, __get);
 PHP_METHOD(Phalcon_Mvc_View, __isset);
+PHP_METHOD(Phalcon_Mvc_View, setup);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_view___construct, 0, 0, 0)
 	ZEND_ARG_INFO(0, options)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_mvc_view_setup, 0, 0, 1)
+	ZEND_ARG_TYPE_INFO(0, options, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_mvc_view_method_entry[] = {
@@ -217,6 +222,7 @@ static const zend_function_entry phalcon_mvc_view_method_entry[] = {
 	PHP_ME(Phalcon_Mvc_View, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, __get, arginfo___get, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Mvc_View, __isset, arginfo___isset, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Mvc_View, setup, arginfo_phalcon_mvc_view_setup, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_MALIAS(Phalcon_Mvc_View, insert, partial, arginfo_phalcon_mvc_viewinterface_partial, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
@@ -2454,4 +2460,34 @@ PHP_METHOD(Phalcon_Mvc_View, __isset){
 	}
 
 	RETURN_FALSE;
+}
+
+/**
+ * Enables/disables options in the View
+ *
+ *<code>
+ *	\Phalcon\Mvc\View::setup(['strict' => false]);
+ *</code>
+ *
+ * @param array $options
+ * @return void
+ */
+PHP_METHOD(Phalcon_Mvc_View, setup){
+
+	zval *options, enable_strict = {};
+
+	phalcon_fetch_params(0, 1, 0, &options);
+
+	if (Z_TYPE_P(options) != IS_ARRAY) {
+		PHALCON_THROW_EXCEPTION_STR(phalcon_mvc_view_exception_ce, "Options must be an array");
+		return;
+	}
+
+	/**
+	 * Enables/Disables strict mode
+	 */
+	if (phalcon_array_isset_fetch_str(&enable_strict, options, SL("strict"), PH_READONLY)) {
+		PHALCON_GLOBAL(mvc).enable_view_strict = zend_is_true(&enable_strict);
+	}
+
 }

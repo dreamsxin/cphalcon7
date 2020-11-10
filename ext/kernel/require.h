@@ -28,7 +28,7 @@ static inline void phalcon_destroy_symtable(zend_array *symbol_table) {
 }
 
 int _phalcon_exec(zval* ret, zval *object, zend_op_array *op_array, zend_array *symbol_table);
-int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars);
+int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars, zend_array *symbol_table);
 int phalcon_exec_code(zval *ret, zval *object, zval *code, zval * vars);
 
 int phalcon_require_ret(zval *return_value_ptr, const char *require_path) PHALCON_ATTR_NONNULL1(2);

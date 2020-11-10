@@ -4247,7 +4247,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeUpdate){
 	PHALCON_MM_CALL_METHOD(&success, &connection, "execute", &update_sql, &processed, &processed_types);
 	PHALCON_MM_ADD_ENTRY(&success);
 	if (zend_is_true(&success)) {
-		if (PHALCON_GLOBAL(orm).enable_strict) {
+		if (unlikely(PHALCON_GLOBAL(orm).enable_strict)) {
 			PHALCON_CALL_METHOD(&success, &connection, "affectedrows");
 			PHALCON_MM_ADD_ENTRY(&success);
 		}
@@ -4399,7 +4399,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Query, _executeDelete){
 	PHALCON_MM_CALL_METHOD(&success, &connection, "execute", &delete_sql, &processed, &processed_types);
 
 	if (zend_is_true(&success)) {
-		if (PHALCON_GLOBAL(orm).enable_strict) {
+		if (unlikely(PHALCON_GLOBAL(orm).enable_strict)) {
 			PHALCON_MM_CALL_METHOD(&success, &connection, "affectedrows");
 		}
 	}

@@ -48,6 +48,11 @@ typedef struct _phalcon_debug_options {
 	zend_bool enable_debug;
 } phalcon_debug_options;
 
+/** MVC options */
+typedef struct _phalcon_mvc_options {
+	zend_bool enable_view_strict;
+} phalcon_mvc_options;
+
 /** ORM options */
 typedef struct _phalcon_orm_options {
 	HashTable *ast_cache;
@@ -317,6 +322,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	/** DEBUG */
 	phalcon_debug_options debug;
+
+	/** MVC */
+	phalcon_mvc_options mvc;
 
 	/** ORM */
 	phalcon_orm_options orm;

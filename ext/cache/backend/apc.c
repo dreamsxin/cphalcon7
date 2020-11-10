@@ -362,8 +362,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, queryKeys){
 		it->funcs->move_forward(it);
 	}
 
-	it->funcs->dtor(it);
-	//efree(it);
+	if (it) {
+		zend_iterator_dtor(it);
+	}
 	zval_ptr_dtor(&iterator);
 }
 
@@ -450,8 +451,9 @@ PHP_METHOD(Phalcon_Cache_Backend_Apc, flush){
 		it->funcs->move_forward(it);
 	}
 
-	it->funcs->dtor(it);
-	//efree(it);
+	if (it) {
+		zend_iterator_dtor(it);
+	}
 	zval_ptr_dtor(&iterator);
 	RETURN_TRUE;
 }

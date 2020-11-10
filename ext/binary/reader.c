@@ -260,6 +260,7 @@ PHP_METHOD(Phalcon_Binary_Reader, getContent){
 
 	ZVAL_NEW_STR(return_value, zend_string_alloc(Z_LVAL(eof_position), 0));
 	Z_STRLEN_P(return_value) = php_stream_read(stream, Z_STRVAL_P(return_value), Z_LVAL(eof_position));
+	Z_STRVAL_P(return_value)[Z_STRLEN_P(return_value)] = 0;
 
 	PHALCON_CALL_METHOD(NULL, getThis(), "setposition", &position);
 }
@@ -381,6 +382,7 @@ PHP_METHOD(Phalcon_Binary_Reader, read){
 	len = Z_LVAL_P(length);
 	ZVAL_NEW_STR(return_value, zend_string_alloc(len, 0));
 	Z_STRLEN_P(return_value) = php_stream_read(stream, Z_STRVAL_P(return_value), len);
+	Z_STRVAL_P(return_value)[Z_STRLEN_P(return_value)] = 0;
 
 	phalcon_update_property(getThis(), SL("_position"), &result);
 }
@@ -695,6 +697,7 @@ PHP_METHOD(Phalcon_Binary_Reader, readString){
 
 	ZVAL_NEW_STR(&data, zend_string_alloc(Z_LVAL(eof_position), 0));
 	Z_STRLEN(data) = php_stream_read(stream, Z_STRVAL(data), Z_LVAL(eof_position));
+	Z_STRVAL(data)[Z_STRLEN(data)] = 0;
 	PHALCON_MM_ADD_ENTRY(&data);
 
 	ZVAL_STRING(&format, "Z*");
@@ -766,6 +769,8 @@ PHP_METHOD(Phalcon_Binary_Reader, readHexString){
 
 		ZVAL_NEW_STR(&data, zend_string_alloc(Z_LVAL(eof_position), 0));
 		Z_STRLEN(data) = php_stream_read(stream, Z_STRVAL(data), Z_LVAL(eof_position));
+		Z_STRVAL(data)[Z_STRLEN(data)] = 0;
+
 		PHALCON_MM_ADD_ENTRY(&data);
 
 		// 低位是否在前半字节

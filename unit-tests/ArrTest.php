@@ -99,7 +99,7 @@ class ArrTest extends PHPUnit\Framework\TestCase
 		$mary = array('name' => 'mary', 'children' => array('jane'));
 
 		$this->assertEquals(\Phalcon\Arr::merge($john, $mary), array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane')));
-	$this->assertEquals(\Phalcon\Arr::merge($john, $mary, array('sex' => 1)), array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'), 'sex' => 1));
+		$this->assertEquals(\Phalcon\Arr::merge($john, $mary, array('sex' => 1)), array('name' => 'mary', 'children' => array('fred', 'paul', 'sally', 'jane'), 'sex' => 1));
 
 		// Overwrite
 		$a1 = array('name' => 'john', 'mood' => 'happy', 'food' => 'bacon');

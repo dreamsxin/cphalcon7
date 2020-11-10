@@ -31,6 +31,7 @@ class BinaryTest extends PHPUnit\Framework\TestCase
 		$this->assertEquals($bin->getPosition(), 0);
 		$this->assertEquals($bin->getEofPosition(), 26);
 		$data1 = $bin->getContent();
+		$this->assertEquals(strlen($data1), 26);
 
 		$this->assertEquals($bin->readUnsignedChar(), 160);
 		$this->assertEquals($bin->readUnsignedChar(), 177);

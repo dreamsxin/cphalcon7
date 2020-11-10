@@ -151,11 +151,13 @@ ZEND_END_ARG_INFO()
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_merge, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arrays, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_overwrite, 0, 0, 2)
 	ZEND_ARG_TYPE_INFO(0, array1, IS_ARRAY, 0)
 	ZEND_ARG_TYPE_INFO(0, array2, IS_ARRAY, 0)
+	ZEND_ARG_VARIADIC_TYPE_INFO(0, arrays, IS_ARRAY, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_arr_callback, 0, 0, 1)

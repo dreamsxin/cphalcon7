@@ -581,8 +581,8 @@ void phalcon_get_object_vars(zval *result, zval *object, int check_access) {
 			if (check_access && key && zend_check_property_access(zobj, key, is_dynamic) == FAILURE) {
 #else
 			if (check_access && key && zend_check_property_access(zobj, key) == FAILURE) {
-				continue;
 #endif
+				continue;
 			}
 			if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
 				value = Z_REFVAL_P(value);

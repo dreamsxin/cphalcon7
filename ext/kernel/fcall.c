@@ -326,6 +326,7 @@ int phalcon_call_method_with_params(zval *retval, zval *object, zend_class_entry
 		if (fbc) {
 			ZVAL_STR(&func_name, str_methodname);
 		} else {
+			zend_string_release(str_methodname);
 #endif
 			switch (type) {
 				case phalcon_fcall_ce:

@@ -320,6 +320,9 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 	zval z_one;
 	zval z_two;
 
+	/* Is set when the SAPI is cli. */
+	zend_bool cli;
+
 	/** DEBUG */
 	phalcon_debug_options debug;
 

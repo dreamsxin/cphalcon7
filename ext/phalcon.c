@@ -406,6 +406,8 @@ static PHP_MINIT_FUNCTION(phalcon)
 {
 	REGISTER_INI_ENTRIES();
 
+	PHALCON_GLOBAL(cli) = !strcmp(sapi_module.name, "cli");
+
 #if PHALCON_USE_SCALAR_OBJECTS
 	zend_set_user_opcode_handler(ZEND_INIT_METHOD_CALL, scalar_objects_method_call_handler);
 #endif

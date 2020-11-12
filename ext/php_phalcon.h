@@ -368,6 +368,10 @@ ZEND_BEGIN_MODULE_GLOBALS(phalcon)
 
 	phalcon_jwt_options jwt;
 
+#if PHALCON_USE_SCALAR_OBJECTS
+	zend_class_entry *handlers[IS_OBJECT];
+#endif
+
 ZEND_END_MODULE_GLOBALS(phalcon)
 
 

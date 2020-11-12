@@ -176,9 +176,239 @@ ASYNC_CALLBACK after_init_threads(uv_work_t *req, int status)
 }
 #endif
 
+#if PHALCON_USE_SCALAR_OBJECTS
+
+#if PHP_VERSION_ID >= 70300
+# define EX_LITERAL(opline, op) RT_CONSTANT(opline, op)
+#else
+# define EX_LITERAL(opline, op) EX_CONSTANT(op)
+#endif
+#define SO_THIS (Z_OBJ(EX(This)) ? &EX(This) : NULL)
+#define FREE_OP(op) \
+	if (opline->op##_type & (IS_TMP_VAR|IS_VAR)) { \
+		zval_ptr_dtor_nogc(EX_VAR(opline->op.var)); \
+	}
+
+static zval *get_zval_ptr_safe(
+	const zend_op *opline, int op_type, const znode_op *node,
+	const zend_execute_data *execute_data
+) {
+	switch (op_type) {
+		case IS_CONST:
+			return EX_LITERAL(opline, *node);
+		case IS_CV:
+		case IS_TMP_VAR:
+		case IS_VAR:
+		{
+			zval *zv = EX_VAR(node->var);
+			ZVAL_DEREF(zv);
+			return !Z_ISUNDEF_P(zv) ? zv : NULL;
+		}
+		default:
+			return NULL;
+	}
+}
+
+static zval *get_object_zval_ptr_safe(
+	const zend_op *opline, int op_type, const znode_op *node, zend_execute_data *execute_data
+) {
+	if (op_type == IS_UNUSED) {
+		return SO_THIS;
+	} else {
+		return get_zval_ptr_safe(opline, op_type, node, execute_data);
+	}
+}
+
+static zval *get_zval_ptr_real(
+	const zend_op *opline, int op_type, const znode_op *node,
+	const zend_execute_data *execute_data, int type
+) {
+#if PHP_VERSION_ID >= 80000
+	zval *zv = zend_get_zval_ptr(opline, op_type, node, execute_data);
+#elif PHP_VERSION_ID >= 70300
+	zend_free_op should_free;
+	zval *zv = zend_get_zval_ptr(opline, op_type, node, execute_data, &should_free, type);
+#else
+	zend_free_op should_free;
+	zval *zv = zend_get_zval_ptr(op_type, node, execute_data, &should_free, type);
+#endif
+	ZVAL_DEREF(zv);
+	return zv;
+}
+
+static zval *get_object_zval_ptr_real(
+	const zend_op *opline, int op_type, const znode_op *node, zend_execute_data *execute_data,
+	int type
+) {
+	if (op_type == IS_UNUSED) {
+		if (!SO_THIS) {
+			zend_error(E_ERROR, "Using $this when not in object context");
+		}
+
+		return SO_THIS;
+	} else {
+		return get_zval_ptr_real(opline, op_type, node, execute_data, type);
+	}
+}
+
+typedef struct _indirection_function {
+	zend_internal_function fn;
+	zend_function *fbc;        /* Handler that needs to be invoked */
+	zval obj;
+} indirection_function;
+
+static ZEND_NAMED_FUNCTION(scalar_objects_indirection_func)
+{
+	indirection_function *ind = (indirection_function *) execute_data->func;
+	zval *obj = &ind->obj;
+	zval *params = safe_emalloc(sizeof(zval), ZEND_NUM_ARGS() + 1, 0);
+	zval result;
+	zend_class_entry *ce = ind->fn.scope;
+	zend_fcall_info fci;
+	zend_fcall_info_cache fcc;
+
+	fci.size = sizeof(fci);
+#if PHP_VERSION_ID < 70100
+	fci.symbol_table = NULL;
+#endif
+	fci.param_count = ZEND_NUM_ARGS() + 1;
+	fci.params = params;
+#if PHP_VERSION_ID >= 80000
+	fci.named_params = NULL;
+#else
+	fci.no_separation = 1;
+#endif
+
+#if PHP_VERSION_ID < 70300
+	fcc.initialized = 1;
+#endif
+	fcc.calling_scope = ce;
+	fcc.function_handler = ind->fbc;
+
+	zend_get_parameters_array_ex(ZEND_NUM_ARGS(), &params[1]);
+
+	ZVAL_COPY_VALUE(&params[0], obj);
+	ZVAL_STR(&fci.function_name, ind->fn.function_name);
+	fci.retval = &result;
+	fci.object = NULL;
+
+	fcc.object = NULL;
+	fcc.called_scope = zend_get_called_scope(execute_data);
+
+	if (zend_call_function(&fci, &fcc) == SUCCESS && !Z_ISUNDEF(result)) {
+		ZVAL_COPY_VALUE(return_value, &result);
+	}
+	zval_ptr_dtor(obj);
+	execute_data->func = NULL;
+
+	zval_ptr_dtor(&fci.function_name);
+	efree(params);
+	efree(ind);
+}
+
+static zend_function *scalar_objects_get_indirection_func(
+	zend_class_entry *ce, zend_function *fbc, zval *method, zval *obj
+) {
+	indirection_function *ind = emalloc(sizeof(indirection_function));
+	zend_function *fn = (zend_function *) &ind->fn;
+	long keep_flags = ZEND_ACC_RETURN_REFERENCE | ZEND_ACC_VARIADIC;
+
+	ind->fn.type = ZEND_INTERNAL_FUNCTION;
+	ind->fn.module = (ce->type == ZEND_INTERNAL_CLASS) ? ce->info.internal.module : NULL;
+	ind->fn.handler = scalar_objects_indirection_func;
+	ind->fn.scope = ce;
+	ind->fn.fn_flags = ZEND_ACC_CALL_VIA_HANDLER | (fbc->common.fn_flags & keep_flags);
+	ind->fn.num_args = fbc->common.num_args - 1;
+	ind->fn.required_num_args = fbc->common.required_num_args - 1;
+
+	ind->fbc = fbc;
+	if (fbc->common.arg_info) {
+		fn->common.arg_info = &fbc->common.arg_info[1];
+	} else {
+		fn->common.arg_info = NULL;
+	}
+
+	ind->fn.function_name = zend_string_copy(Z_STR_P(method));
+	zend_set_function_arg_flags(fn);
+	ZVAL_COPY_VALUE(&ind->obj, obj);
+
+	return fn;
+}
+
+static int scalar_objects_method_call_handler(zend_execute_data *execute_data)
+{
+	const zend_op *opline = execute_data->opline;
+	zval *obj, *method;
+	zend_class_entry *ce;
+	zend_function *fbc;
+
+	/* First we fetch the ops without refcount changes or errors. Then we check whether we want
+	 * to handle this opcode ourselves or fall back to the original opcode. Only once we know for
+	 * certain that we will not fall back the ops are fetched for real. */
+	obj = get_object_zval_ptr_safe(opline, opline->op1_type, &opline->op1, execute_data);
+	method = get_zval_ptr_safe(opline, opline->op2_type, &opline->op2, execute_data);
+
+	if (!obj || Z_TYPE_P(obj) == IS_OBJECT || Z_TYPE_P(method) != IS_STRING) {
+		return ZEND_USER_OPCODE_DISPATCH;
+	}
+
+	ce = PHALCON_GLOBAL(handlers)[Z_TYPE_P(obj)];
+	if (!ce) {
+		return ZEND_USER_OPCODE_DISPATCH;
+	}
+
+	if (ce->get_static_method) {
+		fbc = ce->get_static_method(ce, Z_STR_P(method));
+	} else {
+		fbc = zend_std_get_static_method(
+			ce, Z_STR_P(method),
+			opline->op2_type == IS_CONST ? EX_LITERAL(opline, opline->op2) + 1 : NULL
+		);
+	}
+
+	method = get_zval_ptr_real(opline, opline->op2_type, &opline->op2, execute_data, BP_VAR_R);
+	obj = get_object_zval_ptr_real(opline, opline->op1_type, &opline->op1, execute_data, BP_VAR_R);
+
+	if (!fbc) {
+		if (!EG(exception)) {
+			zend_throw_error(NULL, "Call to undefined method %s::%s()",
+				ZSTR_VAL(ce->name), Z_STRVAL_P(method));
+		}
+		FREE_OP(op2);
+		FREE_OP(op1);
+		return ZEND_USER_OPCODE_CONTINUE;
+	}
+
+	Z_TRY_ADDREF_P(obj);
+	fbc = scalar_objects_get_indirection_func(ce, fbc, method, obj);
+
+	{
+#if PHP_VERSION_ID >= 70400
+		zend_execute_data *call = zend_vm_stack_push_call_frame(
+			ZEND_CALL_NESTED_FUNCTION, fbc, opline->extended_value, ce);
+#else
+		zend_execute_data *call = zend_vm_stack_push_call_frame(
+			ZEND_CALL_NESTED_FUNCTION, fbc, opline->extended_value, ce, NULL);
+#endif
+		call->prev_execute_data = EX(call);
+		EX(call) = call;
+	}
+
+	FREE_OP(op2);
+	FREE_OP(op1);
+
+	execute_data->opline++;
+	return ZEND_USER_OPCODE_CONTINUE;
+}
+#endif
+
 static PHP_MINIT_FUNCTION(phalcon)
 {
 	REGISTER_INI_ENTRIES();
+
+#if PHALCON_USE_SCALAR_OBJECTS
+	zend_set_user_opcode_handler(ZEND_INIT_METHOD_CALL, scalar_objects_method_call_handler);
+#endif
 
 #ifdef PHALCON_CACHE_YAC
 	if (!PHALCON_GLOBAL(cache).enable_yac_cli && !strcmp(sapi_module.name, "cli")) {

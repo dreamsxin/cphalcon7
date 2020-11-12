@@ -68,6 +68,10 @@ void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals) {
 
 	/* DB options */
 	phalcon_globals->db.escape_identifiers = 1;
+
+#if PHALCON_USE_SCALAR_OBJECTS
+	memset(phalcon_globals->handlers, 0, IS_OBJECT * sizeof(zend_class_entry *));
+#endif
 }
 
 /**

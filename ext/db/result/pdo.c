@@ -377,50 +377,26 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
-	zval *num, connection = {}, pdo = {}, sql_statement = {}, bind_params = {}, bind_types = {}, statement = {}, temp_statement = {};
+	zval *num, pdo_statement = {}, dataseek = {};
 	pdo_stmt_t *stmt;
 	long number = 0, n;
 
 	phalcon_fetch_params(0, 1, 0, &num);
 
 	number = phalcon_get_intval(num);
-	phalcon_read_property(&connection, getThis(), SL("_connection"), PH_NOISY|PH_READONLY);
-
-	PHALCON_CALL_METHOD(&pdo, &connection, "getinternalhandler");
-
-	phalcon_read_property(&sql_statement, getThis(), SL("_sqlStatement"), PH_NOISY|PH_READONLY);
-	phalcon_read_property(&bind_params, getThis(), SL("_bindParams"), PH_NOISY|PH_READONLY);
-
-	/**
-	 * PDO doesn't support scrollable cursors, so we need to re-execute the statement again
-	 */
-	if (Z_TYPE(bind_params) == IS_ARRAY) {
-		phalcon_read_property(&bind_types, getThis(), SL("_bindTypes"), PH_NOISY|PH_READONLY);
-
-		PHALCON_CALL_METHOD(&statement, &pdo, "prepare", &sql_statement);
-		if (Z_TYPE(statement) == IS_OBJECT) {
-			PHALCON_CALL_METHOD(&temp_statement, &connection, "executeprepared", &statement, &bind_params, &bind_types);
-			zval_ptr_dtor(&statement);
-			ZVAL_COPY_VALUE(&statement, &temp_statement);
-		}
-
-	} else {
-		PHALCON_CALL_METHOD(&statement, &pdo, "query", &sql_statement);
-	}
-	zval_ptr_dtor(&pdo);
-
-	phalcon_update_property(getThis(), SL("_pdoStatement"), &statement);
-	zval_ptr_dtor(&statement);
+	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records
 	 * maybe it may be very slow
 	 */
 
-	stmt = Z_PDO_STMT_P(&statement);
+	stmt = Z_PDO_STMT_P(&pdo_statement);
 	if (!stmt->dbh) {
 		RETURN_FALSE;
 	}
+
+	stmt->methods->fetcher(stmt, PDO_FETCH_ORI_FIRST, 0);
 
 	n = -1;
 	number--;

@@ -512,6 +512,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model){
 	zend_declare_property_long(phalcon_mvc_model_ce, SL("_operationMade"), PHALCON_MODEL_OP_NONE, ZEND_ACC_PROTECTED);
 	zend_declare_property_long(phalcon_mvc_model_ce, SL("_dirtyState"), PHALCON_MODEL_DIRTY_STATE_TRANSIENT, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_transaction"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_mvc_model_ce, SL("_readConnection"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_uniqueKey"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_uniqueParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_mvc_model_ce, SL("_uniqueTypes"), ZEND_ACC_PROTECTED);
@@ -1517,10 +1518,17 @@ PHP_METHOD(Phalcon_Mvc_Model, getReadConnection){
 		RETURN_MM();
 	}
 
-	PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
-	PHALCON_MM_ADD_ENTRY(&models_manager);
-	PHALCON_MM_CALL_METHOD(return_value, &models_manager, "getreadconnection", getThis());
-	PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
+	phalcon_read_property(return_value, getThis(), SL("_readConnection"), PH_COPY);
+	if (!zend_is_true(return_value)) {
+		PHALCON_MM_CALL_METHOD(&models_manager, getThis(), "getmodelsmanager");
+		PHALCON_MM_ADD_ENTRY(&models_manager);
+		PHALCON_MM_CALL_METHOD(return_value, &models_manager, "getreadconnection", getThis());
+		PHALCON_MM_VERIFY_INTERFACE(return_value, phalcon_db_adapterinterface_ce);
+
+		phalcon_update_property(getThis(), SL("_readConnection"), return_value);
+		RETURN_MM();
+	}
+
 	RETURN_MM();
 }
 
@@ -1817,7 +1825,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", &snapshot_data, column_map);
-		PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
+		//PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
 	}
 
 	/**

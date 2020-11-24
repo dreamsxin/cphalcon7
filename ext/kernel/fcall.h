@@ -27,6 +27,11 @@
 #include <Zend/zend_hash.h>
 #include <Zend/zend.h>
 
+int phalcon_call_user_method(zend_object *obj, zend_function *fbc, int num_args, zval *args, zval *ret);
+int phalcon_call_user_method_with_0_arguments(zend_object *obj, zend_function *fbc, zval *ret);
+int phalcon_call_user_method_with_1_arguments(zend_object *obj, zend_function *fbc, zval *arg, zval *ret);
+int phalcon_call_user_method_with_2_arguments(zend_object *obj, zend_function *fbc, zval *arg1, zval *arg2, zval *ret);
+
 typedef enum _phalcon_call_type {
 	phalcon_fcall_parent,
 	phalcon_fcall_self,

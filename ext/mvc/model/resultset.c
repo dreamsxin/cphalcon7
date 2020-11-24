@@ -171,7 +171,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, next){
 
 
 	phalcon_property_incr(getThis(), SL("_pointer"));
-
+	PHALCON_CALL_METHOD(NULL, getThis(), "valid");
 }
 
 /**

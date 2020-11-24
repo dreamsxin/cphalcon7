@@ -14,6 +14,14 @@ fi
 PHP_ARG_ENABLE(async, Whether to enable "async" support,
 [ --enable-async          Enable "async" support], yes, no)
 
+PHP_ARG_ENABLE(scalar-objects, whether to enable scalar_objects support,
+[  --enable-scalar-objects           Enable scalar-objects support], no, no)
+
+if test "$PHP_SCALAR_OBJECTS" == "yes"; then
+	AC_DEFINE([PHALCON_USE_SCALAR_OBJECTS], [1], [Whether scalar_objects are available])
+	AC_MSG_RESULT([yes, scalar_objects])
+fi
+
 PHP_ARG_ENABLE(vips, whether to enable vips support,
 [  --enable-vips   Enable vips support], no, no)
 

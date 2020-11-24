@@ -55,6 +55,9 @@ PHP_METHOD(Phalcon_Kernel, setAlias);
 PHP_METHOD(Phalcon_Kernel, getAlias);
 PHP_METHOD(Phalcon_Kernel, evalFile);
 PHP_METHOD(Phalcon_Kernel, evalString);
+#if PHALCON_USE_SCALAR_OBJECTS
+PHP_METHOD(Phalcon_Kernel, registerScalarHandler);
+#endif
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrKey)
@@ -107,6 +110,13 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_evalstring, 0, 0, 1)
 	ZEND_ARG_TYPE_INFO(0, object, IS_ARRAY, 1)
 ZEND_END_ARG_INFO()
 
+#if PHALCON_USE_SCALAR_OBJECTS
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_registerscalarhandler, 0, 0, 2)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
+	ZEND_ARG_TYPE_INFO(0, classname, IS_STRING, 0)
+ZEND_END_ARG_INFO()
+#endif
+
 static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, preComputeHashKey,   arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, preComputeHashKey32, arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -122,6 +132,10 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, getAlias, arginfo_empty, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalFile, arginfo_phalcon_kernel_evalfile, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalString, arginfo_phalcon_kernel_evalstring, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+
+#if PHALCON_USE_SCALAR_OBJECTS
+	PHP_ME(Phalcon_Kernel, registerScalarHandler, arginfo_phalcon_kernel_registerscalarhandler, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+#endif
 	PHP_FE_END
 };
 
@@ -140,6 +154,13 @@ PHALCON_INIT_CLASS(Phalcon_Kernel){
 	zend_declare_property_string(phalcon_kernel_ce, SL("_aliasDir"), "alias/", ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
 	zend_declare_class_constant_string(phalcon_kernel_ce, SL("EXT"), "php");
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_NULL"), IS_NULL);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_FALSE"), IS_FALSE);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_TRUE"), IS_TRUE);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_LONG"), IS_LONG);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_DOUBLE"), IS_DOUBLE);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_STRING"), IS_STRING);
+	zend_declare_class_constant_long(phalcon_kernel_ce, SL("TYPE_ARRAY"), IS_ARRAY);
 
 	return SUCCESS;
 }
@@ -605,3 +626,41 @@ PHP_METHOD(Phalcon_Kernel, evalString){
 
 	phalcon_exec_code(return_value, object, code, vars);
 }
+
+#if PHALCON_USE_SCALAR_OBJECTS
+/**
+ * Registering type handlers
+ *
+ * @param int $type
+ * @param string $classname
+ */
+PHP_METHOD(Phalcon_Kernel, registerScalarHandler){
+
+	int type;
+	zend_class_entry *ce = NULL;
+
+	if (zend_parse_parameters(ZEND_NUM_ARGS(), "lC", &type, &ce) == FAILURE) {
+		return;
+	}
+
+	switch (type) {
+		case IS_NULL:
+		case IS_FALSE:
+		case IS_TRUE:
+		case IS_LONG:
+		case IS_DOUBLE:
+		case IS_STRING:
+			break;
+		default:
+			zend_error(E_WARNING, "Invalid type \"%d\" specified", type);
+			return;
+	
+	}
+
+	if (PHALCON_GLOBAL(handlers)[type] != NULL) {
+		zend_error(E_WARNING, "Handler for type \"%d\" already exists, overriding", type);
+	}
+
+	PHALCON_GLOBAL(handlers)[type] = ce;
+}
+#endif

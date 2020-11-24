@@ -208,7 +208,7 @@ PHP_METHOD(Phalcon_Http_Response, setStatusCode)
 	 * Before that we would like to unset any existing HTTP/x.y headers
 	 */
 	PHALCON_MM_CALL_METHOD(&current_headers_raw, &headers, "toarray");
-	zval_ptr_dtor(&current_headers_raw);
+	PHALCON_MM_ADD_ENTRY(&current_headers_raw);
 
 	if (Z_TYPE(current_headers_raw) == IS_ARRAY) {
 		ZEND_HASH_FOREACH_STR_KEY(Z_ARRVAL(current_headers_raw), str_key) {

@@ -398,7 +398,7 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	}
 
 	if(!stmt->methods->fetcher(stmt, PDO_FETCH_ORI_FIRST, 0)) {
-		RETURN_FALSE();
+		RETURN_NULL();
 	}
 
 	n = -1;

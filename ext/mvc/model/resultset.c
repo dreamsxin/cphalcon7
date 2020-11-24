@@ -201,9 +201,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, rewind){
  */
 PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 
-	zval *position, type = {}, result = {}, rows = {}, pointer = {}, is_different = {};
-	HashTable *ah0;
-	long i;
+	zval *position, type = {}, pointer = {}, is_different = {};
 
 	phalcon_fetch_params(0, 1, 0, &position);
 

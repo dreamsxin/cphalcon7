@@ -173,13 +173,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			}
 		}
 
-		if (Z_TYPE(rows) == IS_ARRAY) {
-			phalcon_array_get_current(&row, &rows);
-			PHALCON_MM_ADD_ENTRY(&row);
-			if (PHALCON_IS_NOT_FALSE(&row)) {
-				zend_hash_move_forward(Z_ARRVAL(rows));
-			}
-		} else {
+		if (Z_TYPE(rows) != IS_ARRAY || !phalcon_property_array_isset_fetch(&row, getThis(), SL("_rows"), &key, PH_READONLY)) {
 			ZVAL_FALSE(&row);
 		}
 	}

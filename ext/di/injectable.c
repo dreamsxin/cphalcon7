@@ -190,6 +190,7 @@ PHP_METHOD(Phalcon_Di_Injectable, getEventsManager){
 	if (Z_TYPE_P(return_value) != IS_OBJECT) {
 		ZVAL_STR(&service_name, IS(eventsManager));
 		PHALCON_CALL_METHOD(return_value, getThis(), "getservice", &service_name);
+		phalcon_update_property(getThis(), SL("_eventsManager"), return_value);
 	}
 }
 

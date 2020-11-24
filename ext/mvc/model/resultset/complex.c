@@ -181,6 +181,9 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Complex, valid){
 			zval result = {};
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
+				zval fetch_assoc = {};
+				ZVAL_LONG(&fetch_assoc, PDO_FETCH_ORI_PRIOR);
+
 				PHALCON_MM_CALL_METHOD(NULL, &result, "dataseek", &key);
 				PHALCON_MM_CALL_METHOD(&row, &result, "fetch");
 				PHALCON_MM_ADD_ENTRY(&row);

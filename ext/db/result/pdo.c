@@ -97,6 +97,7 @@ PHALCON_INIT_CLASS(Phalcon_Db_Result_Pdo){
 	zend_declare_property_null(phalcon_db_result_pdo_ce, SL("_bindParams"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_db_result_pdo_ce, SL("_bindTypes"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_db_result_pdo_ce, SL("_rowCount"), 0, ZEND_ACC_PROTECTED);
+	zend_declare_property_long(phalcon_db_result_pdo_ce, SL("_dataseek"), 0, ZEND_ACC_PROTECTED);
 
 	return SUCCESS;
 }
@@ -383,8 +384,8 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
 	phalcon_fetch_params(0, 1, 0, &num);
 
-	number = phalcon_get_intval(num);
 	phalcon_read_property(&pdo_statement, getThis(), SL("_pdoStatement"), PH_NOISY|PH_READONLY);
+	phalcon_read_property(&dataseek, getThis(), SL("_dataseek"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records
@@ -396,8 +397,16 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 		RETURN_FALSE;
 	}
 
-	stmt->methods->fetcher(stmt, PDO_FETCH_ORI_FIRST, 0);
+	number = Z_LVAL(dataseek);
+	while (number-- >= 0) {
 
+		if(!stmt->methods->fetcher(stmt, PDO_FETCH_ORI_PRIOR, 0)) {
+			break;
+		}
+	}
+	phalcon_update_property(getThis(), SL("_dataseek"), num);
+
+	number = phalcon_get_intval(num);
 	n = -1;
 	number--;
 	while (n != number) {

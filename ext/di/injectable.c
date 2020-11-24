@@ -158,6 +158,8 @@ PHP_METHOD(Phalcon_Di_Injectable, getDI)
 		PHALCON_THROW_EXCEPTION_STR(phalcon_di_exception_ce, "A dependency injection container is not object");
 		return;
 	}
+
+	phalcon_update_property(getThis(), SL("_dependencyInjector"), return_value);
 }
 
 /**

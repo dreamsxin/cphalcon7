@@ -150,9 +150,11 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, valid){
 			zval result = {};
 			phalcon_read_property(&result, getThis(), SL("_result"), PH_NOISY|PH_READONLY);
 			if (Z_TYPE(result) == IS_OBJECT) {
-				zval fetch_assoc = {};
-				ZVAL_LONG(&fetch_assoc, PDO_FETCH_ORI_PRIOR);
-				PHALCON_MM_CALL_METHOD(&row, &result, "fetch", &fetch_assoc, &key);
+				zval fetch_assoc = {}, offset = {};
+				
+				ZVAL_LONG(&fetch_assoc, PDO_FETCH_ASSOC);
+				ZVAL_LONG(&offset, PDO_FETCH_ORI_PRIOR);
+				PHALCON_MM_CALL_METHOD(&row, &result, "fetch", &fetch_assoc, &offset &key);
 				PHALCON_MM_ADD_ENTRY(&row);
 			} else {
 				ZVAL_FALSE(&row);

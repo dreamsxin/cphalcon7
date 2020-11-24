@@ -1825,7 +1825,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", &snapshot_data, column_map);
-		//PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
+		PHALCON_MM_CALL_METHOD(NULL, return_value, "build");
 	}
 
 	/**

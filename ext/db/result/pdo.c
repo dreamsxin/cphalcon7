@@ -377,7 +377,6 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, numRows){
  */
 PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 
-
 	zval *num, connection = {}, pdo = {}, sql_statement = {}, bind_params = {}, bind_types = {}, statement = {}, temp_statement = {};
 	pdo_stmt_t *stmt;
 	long number = 0, n;
@@ -413,18 +412,17 @@ PHP_METHOD(Phalcon_Db_Result_Pdo, dataSeek){
 	phalcon_update_property(getThis(), SL("_pdoStatement"), &statement);
 	zval_ptr_dtor(&statement);
 
-
 	/**
 	 * This a fetch scroll to reach the desired position, however with a big number of records
-	 * This a fetch scroll to reach the desired position, however with a big number of records
-	 * maybe it may be very slow
 	 * maybe it may be very slow
 	 */
 
 	stmt = Z_PDO_STMT_P(&statement);
+	if (!stmt->dbh) {
+		RETURN_FALSE;
+	}
 
 	n = -1;
-	number = phalcon_get_intval(num);
 	number--;
 	while (n != number) {
 

@@ -217,7 +217,7 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset, seek){
 		phalcon_read_property(&type, getThis(), SL("_type"), PH_NOISY|PH_READONLY);
 
 		if (zend_is_true(&type)) {
-			if (PHALCON_GT(position, &pointer) && !phalcon_property_array_isset(getThis(), SL("_rows"), position, PH_READONLY)) {
+			if (PHALCON_GT(position, &pointer) && !phalcon_property_array_isset(getThis(), SL("_rows"), position)) {
 				zend_long pos = Z_LVAL_P(position)- Z_LVAL(pointer);
 				while(pos-->0) {
 					PHALCON_CALL_METHOD(NULL, getThis(), "next");

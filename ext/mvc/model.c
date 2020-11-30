@@ -1773,7 +1773,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 
 		if (str_key) {
 			ZVAL_STR(&key, str_key);
-			if (PHALCON_GLOBAL(orm).enable_auto_convert && zend_is_true(&data_types)) {
+			if (PHALCON_GLOBAL(orm).enable_auto_convert && zend_is_true(&data_types) && Z_TYPE_P(value) > IS_NULL) {
 				if (phalcon_array_isset_fetch(&field_type, &data_types, &key, PH_READONLY) && Z_TYPE(field_type) == IS_LONG) {
 					switch(Z_LVAL(field_type)) {
 						case PHALCON_DB_COLUMN_TYPE_JSON:

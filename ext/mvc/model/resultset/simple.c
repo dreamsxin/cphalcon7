@@ -100,14 +100,14 @@ PHP_METHOD(Phalcon_Mvc_Model_Resultset_Simple, __construct){
 
 	zval *column_map, *model, *result, *cache = NULL, *source_model = NULL, fetch_assoc = {};
 
-	phalcon_fetch_params(1, 3, 3, &column_map, &model, &result, &cache, &source_model);
+	phalcon_fetch_params(1, 3, 2, &column_map, &model, &result, &cache, &source_model);
 
 	if (!cache) {
 		cache = &PHALCON_GLOBAL(z_null);
 	}
 
 	if (!source_model) {
-		source_model = &PHALCON_GLOBAL(z_null);
+		source_model = model;
 	}
 
 	phalcon_update_property(getThis(), SL("_model"), model);

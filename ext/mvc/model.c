@@ -1753,7 +1753,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		return;
 	}
 
-	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
+	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT && instanceof_function(Z_OBJCE_P(source_model), phalcon_mvc_model_ce)) {
 		PHALCON_MM_CALL_METHOD(&data_types, source_model, "getdatatypes");
 		PHALCON_MM_ADD_ENTRY(&data_types);
 		PHALCON_MM_CALL_METHOD(&connection, source_model, "getreadconnection");
@@ -1874,7 +1874,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMapHydrate){
 		object_init(return_value);
 	}
 
-	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT) {
+	if (source_model && Z_TYPE_P(source_model) == IS_OBJECT && instanceof_function(Z_OBJCE_P(source_model), phalcon_mvc_model_ce)) {
 		PHALCON_MM_CALL_METHOD(&data_types, source_model, "getdatatypes");
 		PHALCON_MM_ADD_ENTRY(&data_types);
 		PHALCON_MM_CALL_METHOD(&connection, source_model, "getreadconnection");

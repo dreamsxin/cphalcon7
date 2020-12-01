@@ -73,6 +73,13 @@ $worker = static function ($socket) {
 	
 	$parser = new \Phalcon\Http\Parser();
 
+	$app = new \Phalcon\Mvc\Micro();
+
+	$app->get('/', function () {
+					
+		$sendchunk = "<h1>Welcome!</h1>";
+		return \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
+	});
 	try {
 		$buffer = '';
 		while (null !== ($chunk = $socket->read())) {
@@ -89,16 +96,8 @@ $worker = static function ($socket) {
 				$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
 				$socket->write($sendchunk);
 				/*
-				$app = new \Phalcon\Mvc\Micro();
 
-				$app->get('/', function () use ($socket) {
-					
-					$sendchunk = "<h1>Welcome!</h1>";
-					$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
-					$socket->write($sendchunk);
-				});
-
-				$app->handle($uri);
+				$socket->write($app->handle($uri));
 				*/
 				break;
 			}

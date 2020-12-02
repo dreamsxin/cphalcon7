@@ -111,10 +111,10 @@ class HttpServer
 			$pool = $this->pool;
 			$this->server = \Phalcon\Async\Network\HttpServer::bind($this->host, $this->port);
 			$this->server->on(\Phalcon\Async\Network\TcpServer::EVENT_ONCONNECT, function () use ($worker, $pool) {
-				echo 'connect'.PHP_EOL;
+				//echo 'connect'.PHP_EOL;
 			});
 			$this->server->on(\Phalcon\Async\Network\TcpServer::EVENT_ONREQUEST, function () use ($worker, $pool) {
-				echo 'request'.PHP_EOL;
+				//echo 'request'.PHP_EOL;
 				return 'hello world';
 			});
 			$this->server->start();

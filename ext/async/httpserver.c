@@ -322,13 +322,12 @@ void on_after_write(uv_write_t *req, int status){
     return;
 }
 
-int http_parser_on_message_complete(http_parser *parser) {
-
-    http_request_t *http_request = parser->data;
-	async_tcp_server *server = http_request->socket->server;
-	async_tcp_socket *client = http_request->socket;
+void job(uv_work_t *req) {
 	zval ret = {};
 
+	http_request_t *http_request = (http_request_t *)req->data;
+	async_tcp_server *server = http_request->socket->server;
+	async_tcp_socket *client = http_request->socket;
 	//zval arguments[1];ZVAL_COPY_VALUE(&arguments[0], &client->std);
 
 	http_request->resp_buf[0].base = HTTP_HEADER;
@@ -346,7 +345,7 @@ int http_parser_on_message_complete(http_parser *parser) {
 			if (Z_TYPE(ret) > IS_NULL) {
 				zval_ptr_dtor(&ret);
 			}
-			return 0;
+			return;
 		}
     }
 
@@ -356,9 +355,20 @@ int http_parser_on_message_complete(http_parser *parser) {
 	if (Z_TYPE(ret) > IS_NULL) {
 		zval_ptr_dtor(&ret);
 	}
-    return 0;
 }
 
+void after_job(uv_work_t *req, int status) {
+}
+
+int http_parser_on_message_complete(http_parser *parser) {
+
+    http_request_t *http_request = parser->data;
+
+	uv_work_t req = {};
+	req.data = (void *) http_request;
+	uv_queue_work(async_loop_get(), &req, job, after_job);
+    return 0;
+}
 
 /* uv event */
 void on_close(uv_handle_t *handle) {

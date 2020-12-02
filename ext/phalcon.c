@@ -545,6 +545,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	async_thread_ce_register();
 	async_timer_ce_register();
 	async_udp_socket_ce_register();
+	async_httpserver_ce_register();
 
 #ifdef HAVE_ASYNC_SSL
 	REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);

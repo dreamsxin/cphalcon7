@@ -16,9 +16,7 @@
   +----------------------------------------------------------------------+
 */
 
-#include "async/core.h"
-#include "async/async_ssl.h"
-#include "async/async_stream.h"
+#include "async/async_tcp.h"
 #include "async/async_socket.h"
 #include "async/async_pipe.h"
 #include <Zend/zend_inheritance.h>
@@ -41,91 +39,6 @@ static zend_object_handlers async_tcp_socket_handlers;
 static zend_object_handlers async_tcp_server_handlers;
 
 static zend_string *str_wildcard;
-
-#define ASYNC_TCP_SERVER_FLAG_LAZY 1
-
-typedef struct _async_tcp_server {
-	/* PHP object handle. */
-	zend_object std;
-
-	/* Task scheduler being used. */
-	async_task_scheduler *scheduler;
-
-	/* UV TCP handle. */
-	uv_tcp_t handle;
-	
-	uint8_t flags;
-
-	/* Hostname or IP address that was used to establish the connection. */
-	zend_string *name;
-
-	zend_string *addr;
-	uint16_t port;
-
-	/* Number of pending connection attempts queued in the backlog. */
-	zend_uchar pending;
-
-	/* Error being used to close the server. */
-	zval error;
-	
-	/* Number of referenced accept operations. */
-	zend_uchar ref_count;
-
-	/* Queue of tasks waiting to accept a socket connection. */
-	async_op_list accepts;
-	
-	async_cancel_cb cancel;
-
-#ifdef HAVE_ASYNC_SSL
-	/* TLS server encryption settings. */
-	async_tls_server_encryption *encryption;
-	
-	async_ssl_settings settings;
-
-	/* Server SSL context (shared between all socket connections). */
-	SSL_CTX *ctx;
-#endif
-} async_tcp_server;
-
-typedef struct _async_tcp_socket {
-	/* PHP object handle. */
-	zend_object std;
-
-	/* Task scheduler being used. */
-	async_task_scheduler *scheduler;
-
-	/* UV TCP handle. */
-	uv_tcp_t handle;
-	
-	async_cancel_cb cancel;
-
-	/* Hostname or IP address that was used to establish the connection. */
-	zend_string *name;
-	
-	zend_string *local_addr;
-	uint16_t local_port;
-	
-	zend_string *remote_addr;
-	uint16_t remote_port;
-
-	/* Refers to the (local) server that accepted the TCP socket connection. */
-	async_tcp_server *server;
-	
-	async_stream *stream;
-
-	/* Error being used to close the read stream. */
-	zval read_error;
-
-	/* Error being used to close the write stream. */
-	zval write_error;
-
-#ifdef HAVE_ASYNC_SSL
-	/* TLS client encryption settings. */
-	async_tls_client_encryption *encryption;
-#endif
-} async_tcp_socket;
-
-static async_tcp_socket *async_tcp_socket_object_create();
 
 #define ASYNC_TCP_SOCKET_CONST(name, value) \
 	zend_declare_class_constant_long(async_tcp_socket_ce, name, sizeof(name)-1, (zend_long)value);
@@ -188,7 +101,7 @@ ASYNC_CALLBACK shutdown_socket(void *arg, zval *error)
 }
 
 
-static async_tcp_socket *async_tcp_socket_object_create()
+async_tcp_socket *async_tcp_socket_object_create()
 {
 	async_tcp_socket *socket;
 
@@ -1008,7 +921,7 @@ ASYNC_CALLBACK server_connected(uv_stream_t *stream, int status)
 	}
 }
 
-static int setup_server_tls(async_tcp_server *server, zval *tls)
+int setup_server_tls(async_tcp_server *server, zval *tls)
 {
 #ifdef HAVE_ASYNC_SSL
 	int options;
@@ -1529,6 +1442,12 @@ void async_tcp_ce_register()
 	async_tcp_server_handlers.clone_obj = NULL;
 
 	ASYNC_TCP_SERVER_CONST("SIMULTANEOUS_ACCEPTS", ASYNC_SOCKET_TCP_SIMULTANEOUS_ACCEPTS);
+
+	ASYNC_TCP_SERVER_CONST("EVENT_ONCONNECT", ASYNC_SERVER_EVENT_ONCONNECT);
+	ASYNC_TCP_SERVER_CONST("EVENT_ONREAD", ASYNC_SERVER_EVENT_ONREAD);
+	ASYNC_TCP_SERVER_CONST("EVENT_ONREQUEST", ASYNC_SERVER_EVENT_ONREQUEST);
+	ASYNC_TCP_SERVER_CONST("EVENT_ONWRITE", ASYNC_SERVER_EVENT_ONWRITE);
+	ASYNC_TCP_SERVER_CONST("EVENT_ONCLOSE", ASYNC_SERVER_EVENT_ONCLOSE);
 
 	if (NULL != (func = (zend_function *) zend_hash_str_find_ptr(&async_tcp_socket_ce->function_table, ZEND_STRL("write")))) {
 		async_register_interceptor(func, intercept_write);

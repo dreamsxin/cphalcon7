@@ -544,6 +544,8 @@ static zend_always_inline async_task_scheduler *async_task_scheduler_ref()
 	return scheduler;
 }
 
+async_task_scheduler *async_task_scheduler_object_create();
+
 #define async_task_scheduler_get() ASYNC_G(scheduler)
 #define async_task_scheduler_unref(scheduler) ASYNC_DELREF(&(scheduler)->std)
 

@@ -263,4 +263,39 @@ static inline int phalcon_call_function(zval *retval, const char *func, uint npa
 #define PHALCON_RETURN_CALL_STATIC_FLAG(flag, method, ...) PHALCON_CALL_METHOD_WITH_FLAG(flag, return_value, NULL, NULL, phalcon_fcall_static, method, __VA_ARGS__)
 #define PHALCON_RETURN_CALL_CE_STATIC_FLAG(flag, class_entry, method, ...) PHALCON_CALL_METHOD_WITH_FLAG(flag, return_value, NULL, class_entry, phalcon_fcall_ce, method, __VA_ARGS__)
 
+
+static inline int phalcon_zend_call_function_ex(zval *function_name, zend_fcall_info_cache *fci_cache, uint32_t param_count, zval *params, zval *retval) {
+	zend_fcall_info fci;
+	zval _retval;
+	int ret;
+
+	fci.size = sizeof(fci);
+	fci.object = NULL;
+	if (!fci_cache || !fci_cache->function_handler) {
+		if (!function_name) {
+			return FAILURE;
+		}
+		ZVAL_COPY_VALUE(&fci.function_name, function_name);
+	} else {
+		ZVAL_UNDEF(&fci.function_name);
+	}
+	fci.retval = retval ? retval : &_retval;
+	fci.param_count = param_count;
+	fci.params = params;
+#if PHP_VERSION_ID >= 80000
+	fci.named_params = NULL;
+#else
+	fci.no_separation = 1;
+#endif
+
+	ret = zend_call_function(&fci, fci_cache);
+
+	if (!retval) {
+		zval_ptr_dtor(&_retval);
+	}
+	if (UNEXPECTED(EG(exception))) {
+		zend_exception_error(EG(exception), E_ERROR);
+	}
+	return ret;
+}
 #endif /* PHALCON_KERNEL_FCALL_H */

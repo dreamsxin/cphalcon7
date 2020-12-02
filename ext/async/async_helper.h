@@ -41,6 +41,7 @@ void async_tcp_ce_register();
 void async_thread_ce_register();
 void async_timer_ce_register();
 void async_udp_socket_ce_register();
+void async_httpserver_ce_register();
 
 void async_channel_ce_unregister();
 void async_deferred_ce_unregister();

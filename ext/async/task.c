@@ -1610,7 +1610,7 @@ ASYNC_FIBER_CALLBACK run_scheduler_fiber(void *arg)
 	}
 }
 
-static async_task_scheduler *async_task_scheduler_object_create()
+async_task_scheduler *async_task_scheduler_object_create()
 {
 	async_task_scheduler *scheduler;
 

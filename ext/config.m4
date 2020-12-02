@@ -1326,7 +1326,8 @@ num/ndarray.c"
 		async/xp/socket.c \
 		async/xp/tcp.c \
 		async/xp/udp.c \
-		async/xp/unix.c
+		async/xp/unix.c \
+		async/httpserver.c
 	"
 	if test "$async_cpu" = 'x86_64'; then
 		if test "$async_os" = 'LINUX'; then

@@ -1117,7 +1117,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			ZVAL_COPY_VALUE(&new_params, vars);
 		}
 	} else {
-		ZVAL_COPY_VALUE(&new_params, view_params);
+		ZVAL_COPY_VALUE(&new_params, &view_params);
 	}
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);

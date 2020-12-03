@@ -982,16 +982,19 @@ PHP_METHOD(Phalcon_Mvc_View, _loadTemplateEngines){
  */
 PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
-	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, debug_message = {}, render_level = {}, cache_level = {};
+	zval *engines, *view_path, *silence, *must_clean, *absolute_path = NULL, *vars = NULL, new_params = {}, debug_message = {}, render_level = {}, cache_level = {};
 	zval cache_mode = {}, cache = {}, not_exists = {}, views_dir_paths = {}, base_path = {}, views_dir = {}, *path;
 	zval key = {}, lifetime = {}, view_options = {}, cache_options = {}, cached_view = {};
 	zval view_params = {}, *engine, event_name = {}, status = {}, exception_message = {};
 	zend_string *str_key;
 
-	phalcon_fetch_params(1, 4, 1, &engines, &view_path, &silence, &must_clean, &absolute_path);
+	phalcon_fetch_params(1, 4, 2, &engines, &view_path, &silence, &must_clean, &absolute_path, &vars);
 
 	if (absolute_path == NULL) {
 		absolute_path = &PHALCON_GLOBAL(z_false);
+	}
+	if (vars == NULL) {
+		vars = &PHALCON_GLOBAL(z_null);
 	}
 
 	/**
@@ -1106,14 +1109,25 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 
 	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
+	if (Z_TYPE_P(vars) == IS_ARRAY) {
+		if (Z_TYPE(view_params) == IS_ARRAY) {
+			phalcon_fast_array_merge(&new_params, &view_params, vars);
+			PHALCON_MM_ADD_ENTRY(&new_params);
+		} else {
+			ZVAL_COPY_VALUE(&new_params, vars);
+		}
+	} else {
+		ZVAL_COPY_VALUE(&new_params, view_params);
+	}
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
+
 		ZVAL_STRING(&debug_message, "--vars: ");
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
-		PHALCON_DEBUG_LOG(&view_params);
+		PHALCON_DEBUG_LOG(&new_params);
 	}
 
 	/**
@@ -1156,7 +1170,7 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 			}
 			zval_ptr_dtor(&status);
 
-			PHALCON_MM_CALL_METHOD(NULL, engine, "render", &view_engine_path, &view_params, must_clean);
+			PHALCON_MM_CALL_METHOD(NULL, engine, "render", &view_engine_path, &new_params, must_clean);
 
 			/**
 			 * Call afterRenderView if there is a events manager available
@@ -1789,7 +1803,7 @@ PHP_METHOD(Phalcon_Mvc_View, pick){
  */
 PHP_METHOD(Phalcon_Mvc_View, partial){
 
-	zval *partial_path, *params = NULL, *autorender = NULL, view_params = {}, new_params = {}, partials_dir = {}, enable_partials_absolute_path = {};
+	zval *partial_path, *params = NULL, *autorender = NULL, partials_dir = {}, enable_partials_absolute_path = {};
 	zval real_path = {}, engines = {};
 
 	phalcon_fetch_params(1, 1, 2, &partial_path, &params, &autorender);
@@ -1800,28 +1814,6 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 
 	if (!autorender) {
 		autorender = &PHALCON_GLOBAL(z_true);
-	}
-
-	/**
-	 * If the developer pass an array of variables we create a new virtual symbol table
-	 */
-	if (Z_TYPE_P(params) == IS_ARRAY) {
-		phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_COPY);
-
-		/**
-		 * Merge or assign the new params as parameters
-		 */
-		if (Z_TYPE(view_params) == IS_ARRAY) {
-			phalcon_fast_array_merge(&new_params, &view_params, params);
-			PHALCON_MM_ADD_ENTRY(&new_params);
-		} else {
-			ZVAL_COPY_VALUE(&new_params, params);
-		}
-
-		/**
-		 * Update the parameters with the new ones
-		 */
-		phalcon_update_property(getThis(), SL("_viewParams"), &new_params);
 	}
 
 	phalcon_read_property(&partials_dir, getThis(), SL("_partialsDir"), PH_NOISY|PH_READONLY);
@@ -1845,22 +1837,12 @@ PHP_METHOD(Phalcon_Mvc_View, partial){
 	 */
 	if (!PHALCON_IS_TRUE(autorender)) {
 		phalcon_ob_start();
-		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path, params);
 		phalcon_ob_get_contents(return_value);
 		phalcon_ob_clean();
 
 	} else {
-		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path);
-	}
-
-	/**
-	 * Now we need to restore the original view parameters
-	 */
-	if (Z_TYPE_P(params) == IS_ARRAY) {
-		/**
-		 * Restore the original view params
-		 */
-		phalcon_update_property(getThis(), SL("_viewParams"), &view_params);
+		PHALCON_MM_CALL_METHOD(NULL, getThis(), "_enginerender", &engines, &real_path, &PHALCON_GLOBAL(z_false), &PHALCON_GLOBAL(z_false), &enable_partials_absolute_path, params);
 	}
 
 	RETURN_MM();

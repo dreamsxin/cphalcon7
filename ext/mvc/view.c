@@ -1104,13 +1104,17 @@ PHP_METHOD(Phalcon_Mvc_View, _engineRender){
 		}
 	}
 
+	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
+
 	if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 		PHALCON_CONCAT_SV(&debug_message, "Render View: ", view_path);
 		PHALCON_DEBUG_LOG(&debug_message);
 		zval_ptr_dtor(&debug_message);
+		ZVAL_STRING(&debug_message, "--vars: ");
+		PHALCON_DEBUG_LOG(&debug_message);
+		zval_ptr_dtor(&debug_message);
+		PHALCON_DEBUG_LOG(&view_params);
 	}
-
-	phalcon_read_property(&view_params, getThis(), SL("_viewParams"), PH_NOISY|PH_READONLY);
 
 	/**
 	 * Views are rendered in each engine

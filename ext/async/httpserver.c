@@ -73,11 +73,62 @@ typedef struct {
     char *body;
     size_t body_length;
     uv_buf_t resp_buf[2];
+	uv_work_t work;
+	QUEUE queue;
 } http_request_t;
 
 ASYNC_API zend_class_entry *async_httpserver_ce;
 
+static zend_object_handlers async_httpclient_handlers;
 static zend_object_handlers async_httpserver_handlers;
+
+/* declare */
+void on_close(uv_handle_t *handle);
+
+
+ASYNC_CALLBACK httpclient_disposed(uv_handle_t *handle)
+{
+	async_tcp_socket *socket;
+
+	socket = (async_tcp_socket *) handle->data;
+	
+	ZEND_ASSERT(socket != NULL);
+	
+	ASYNC_DELREF(&socket->std);
+}
+
+ASYNC_CALLBACK shutdown_httpclient(void *arg, zval *error)
+{
+	async_tcp_socket *socket;
+	
+	zval obj;
+
+	socket = (async_tcp_socket *) arg;
+	
+	ZEND_ASSERT(socket != NULL);
+	
+	socket->cancel.func = NULL;
+
+	if (error != NULL) {
+		if (Z_TYPE_P(&socket->read_error) == IS_UNDEF) {
+			ZVAL_COPY(&socket->read_error, error);
+		}
+		
+		if (Z_TYPE_P(&socket->write_error) == IS_UNDEF) {
+			ZVAL_COPY(&socket->write_error, error);
+		}
+	}
+	
+	if (socket->stream == NULL) {
+		socket->handle.data = socket;
+
+		ASYNC_UV_TRY_CLOSE_REF(&socket->std, &socket->handle, httpclient_disposed);
+	} else {
+		ZVAL_OBJ(&obj, &socket->std);
+		
+		async_stream_close(socket->stream, &obj);
+	}
+}
 
 ASYNC_CALLBACK httpserver_disposed(uv_handle_t *handle)
 {
@@ -127,6 +178,146 @@ static inline void phalcon_zend_fci_cache_release(zend_fcall_info_cache *fci_cac
     }
 }
 
+void on_after_write(uv_write_t *req, int status){
+    char *buf = NULL;
+    int i = 0;
+    http_header_t *header = NULL;
+    http_request_t *http_request = req->data;
+    buf = http_request->resp_buf[1].base;
+
+    if (NULL != buf) {
+        free(buf);
+        buf = NULL;
+    }
+
+    if (http_request->url != NULL) {
+        free(http_request->url);
+        http_request->url = NULL;
+    }
+
+    if (http_request->method != NULL) {
+        free(http_request->method);
+        http_request->method = NULL;
+    }
+
+    for (i = 0; i < http_request->header_lines; ++i) {
+        header = &http_request->headers[i];
+        if (header->field != NULL) {
+            free(header->field);
+            header->field = NULL;
+        }
+        if (header->value != NULL) {
+            free(header->value);
+            header->value = NULL;
+        }
+    }
+
+    if (!uv_is_closing((uv_handle_t*)req->handle)) {
+        uv_close((uv_handle_t *) req->handle, on_close);
+    }
+
+    return;
+}
+
+void close_cb(uv_handle_t* handle)
+{
+    printf("close the async handle!\n");
+}
+ 
+void async_cb(uv_async_t* handle)
+{
+	QUEUE* q;
+	async_tcp_server *server = container_of(handle, async_tcp_server, async);
+
+	//uv_mutex_lock(&server->writemutex);
+    while(!QUEUE_EMPTY(&server->writeQueue)) {
+		http_request_t *request;
+        q = QUEUE_HEAD(&server->writeQueue);
+        QUEUE_REMOVE(q);
+        QUEUE_INIT(q);
+
+        request = (http_request_t* )QUEUE_DATA(q, http_request_t, queue);
+		uv_write(&request->req, (uv_stream_t *)&request->socket->handle, request->resp_buf, 2, on_after_write);
+    }
+	//uv_mutex_unlock(&server->writemutex);
+}
+
+async_tcp_socket *async_httpclient_object_create(async_task_scheduler *scheduler)
+{
+	async_tcp_socket *socket;
+
+	socket = ecalloc(1, sizeof(async_tcp_socket));
+
+	zend_object_std_init(&socket->std, async_tcp_socket_ce);
+	socket->std.handlers = &async_httpclient_handlers;
+	
+	socket->scheduler = scheduler;
+	
+	socket->cancel.object = socket;
+	socket->cancel.func = shutdown_httpclient;
+
+	uv_tcp_init(&socket->scheduler->loop, &socket->handle);
+
+	socket->stream = async_stream_init((uv_stream_t *) &socket->handle, 0);
+
+	return socket;
+}
+
+static void async_httpclient_object_dtor(zend_object *object)
+{
+	async_tcp_socket *socket;
+
+	socket = (async_tcp_socket *) object;
+	
+	if (socket->cancel.func != NULL) {
+		socket->cancel.func(socket, NULL);
+	}
+}
+
+static void async_httpclient_object_destroy(zend_object *object)
+{
+	async_tcp_socket *socket;
+	
+	socket = (async_tcp_socket *) object;
+
+#ifdef HAVE_ASYNC_SSL
+	if (socket->stream->ssl.ssl != NULL) {
+		async_ssl_dispose_engine(&socket->stream->ssl, (socket->server == NULL) ? 1 : 0);
+	}
+
+	if (socket->encryption != NULL) {
+		ASYNC_DELREF(&socket->encryption->std);
+	}
+#endif
+
+	if (socket->stream != NULL) {
+		async_stream_free(socket->stream);
+	}
+
+	if (socket->server != NULL) {
+		ASYNC_DELREF(&socket->server->std);
+	}
+	
+	zval_ptr_dtor(&socket->read_error);
+	zval_ptr_dtor(&socket->write_error);
+
+	if (socket->name != NULL) {
+		zend_string_release(socket->name);
+	}
+	
+	if (socket->local_addr != NULL) {
+		zend_string_release(socket->local_addr);
+	}
+	
+	if (socket->remote_addr != NULL) {
+		zend_string_release(socket->remote_addr);
+	}
+	
+	async_task_scheduler_unref(socket->scheduler);
+
+	zend_object_std_dtor(&socket->std);
+}
+
 static async_tcp_server *async_httpserver_object_create(int domain)
 {
 	async_tcp_server *server;
@@ -136,7 +327,7 @@ static async_tcp_server *async_httpserver_object_create(int domain)
 	zend_object_std_init(&server->std, async_httpserver_ce);
 	server->std.handlers = &async_httpserver_handlers;
 	
-	server->scheduler = async_task_scheduler_ref();
+	server->scheduler = async_task_scheduler_object_create();
 	
 	server->cancel.object = server;
 	server->cancel.func = shutdown_httpserver;
@@ -148,6 +339,10 @@ static async_tcp_server *async_httpserver_object_create(int domain)
 #ifdef HAVE_ASYNC_SSL
 	server->settings.mode = ASYNC_SSL_MODE_SERVER;
 #endif
+	uv_mutex_init(&server->jobmutex);
+	uv_mutex_init(&server->writemutex);
+	uv_async_init(&server->scheduler->loop, &server->async, async_cb);
+	QUEUE_INIT(&server->writeQueue);
 
 	return server;
 }
@@ -155,6 +350,7 @@ static async_tcp_server *async_httpserver_object_create(int domain)
 static void async_httpserver_object_dtor(zend_object *object)
 {
 	async_tcp_server *server;
+	int i;
 
 	server = (async_tcp_server *) object;
 
@@ -162,7 +358,7 @@ static void async_httpserver_object_dtor(zend_object *object)
 		server->cancel.func(server, NULL);
 	}
 
-	for (int i=0; i<=ASYNC_SERVER_EVENT_ONCLOSE; i++) {
+	for (i=0; i<=ASYNC_SERVER_EVENT_ONCLOSE; i++) {
 		phalcon_zend_fci_cache_release(&server->server_callbacks[i]);
 	}
 }
@@ -173,6 +369,8 @@ static void async_httpserver_object_destroy(zend_object *object)
 
 	server = (async_tcp_server *) object;
 
+	uv_mutex_destroy(&server->jobmutex);
+	uv_mutex_destroy(&server->writemutex);
 #ifdef HAVE_ASYNC_SSL
 	if (server->ctx != NULL) {
 		SSL_CTX_free(server->ctx);
@@ -197,9 +395,6 @@ static void async_httpserver_object_destroy(zend_object *object)
 
 	zend_object_std_dtor(&server->std);
 }
-
-/* declare */
-void on_close(uv_handle_t *handle);
 
 /* http parser event */
 int http_parser_on_message_begin(http_parser *parser/*parser*/) {
@@ -281,47 +476,6 @@ int http_parser_on_body(http_parser *parser/*parser*/, const char *at, size_t le
     return 0;
 }
 
-void on_after_write(uv_write_t *req, int status){
-    char *buf = NULL;
-    int i = 0;
-    http_header_t *header = NULL;
-    http_request_t *http_request = req->data;
-    buf = http_request->resp_buf[1].base;
-
-    if (NULL != buf) {
-        free(buf);
-        buf = NULL;
-    }
-
-    if (http_request->url != NULL) {
-        free(http_request->url);
-        http_request->url = NULL;
-    }
-
-    if (http_request->method != NULL) {
-        free(http_request->method);
-        http_request->method = NULL;
-    }
-
-    for (i = 0; i < http_request->header_lines; ++i) {
-        header = &http_request->headers[i];
-        if (header->field != NULL) {
-            free(header->field);
-            header->field = NULL;
-        }
-        if (header->value != NULL) {
-            free(header->value);
-            header->value = NULL;
-        }
-    }
-
-    if (!uv_is_closing((uv_handle_t*)req->handle)) {
-        uv_close((uv_handle_t *) req->handle, on_close);
-    }
-
-    return;
-}
-
 void job(uv_work_t *req) {
 	zval ret = {};
 
@@ -333,28 +487,23 @@ void job(uv_work_t *req) {
 	http_request->resp_buf[0].base = HTTP_HEADER;
 	http_request->resp_buf[0].len = sizeof(HTTP_HEADER) - 1;
 
+	uv_mutex_lock(&server->jobmutex);
 	server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST].called_scope = client->std.ce;
 	server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST].object = &client->std;
 	if (UNEXPECTED(phalcon_zend_call_function_ex(NULL, &server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST], 0, NULL, &ret) == SUCCESS)) {
 		if (Z_TYPE(ret) == IS_STRING) {
 			http_request->resp_buf[1].base = strdup(Z_STRVAL(ret));
 			http_request->resp_buf[1].len = (size_t)Z_STRLEN(ret);
-			/* lets send our short http hello world response and close the socket */
-			uv_write(&http_request->req, (uv_stream_t *)&http_request->socket->handle, http_request->resp_buf, 2, on_after_write);
-
-			if (Z_TYPE(ret) > IS_NULL) {
-				zval_ptr_dtor(&ret);
-			}
-			return;
+		}
+		if (Z_TYPE(ret) > IS_NULL) {
+			zval_ptr_dtor(&ret);
 		}
     }
-
+	QUEUE_INSERT_TAIL(&server->writeQueue, &http_request->queue);
+	uv_async_send(&server->async);
 	/* lets send our short http hello world response and close the socket */
-	uv_write(&http_request->req, (uv_stream_t *)&http_request->socket->handle, http_request->resp_buf, 1, on_after_write);
-
-	if (Z_TYPE(ret) > IS_NULL) {
-		zval_ptr_dtor(&ret);
-	}
+	//uv_write(&http_request->req, (uv_stream_t *)&http_request->socket->handle, http_request->resp_buf, 1, on_after_write);
+	uv_mutex_unlock(&server->jobmutex);
 }
 
 void after_job(uv_work_t *req, int status) {
@@ -363,10 +512,34 @@ void after_job(uv_work_t *req, int status) {
 int http_parser_on_message_complete(http_parser *parser) {
 
     http_request_t *http_request = parser->data;
+	async_tcp_server *server = http_request->socket->server;
+	async_tcp_socket *client = http_request->socket;
+	zval ret = {};
 
-	uv_work_t req = {};
-	req.data = (void *) http_request;
-	uv_queue_work(async_loop_get(), &req, job, after_job);
+	// http_request->work.data = (void *) http_request;
+	//uv_queue_work(&http_request->socket->server->scheduler->loop, &http_request->work, job, after_job);
+
+	http_request->resp_buf[0].base = HTTP_HEADER;
+	http_request->resp_buf[0].len = sizeof(HTTP_HEADER) - 1;
+
+	uv_mutex_lock(&server->jobmutex);
+	server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST].called_scope = client->std.ce;
+	server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST].object = &client->std;
+	if (UNEXPECTED(phalcon_zend_call_function_ex(NULL, &server->server_callbacks[ASYNC_SERVER_EVENT_ONREQUEST], 0, NULL, &ret) == SUCCESS)) {
+		if (Z_TYPE(ret) == IS_STRING) {
+			http_request->resp_buf[1].base = strdup(Z_STRVAL(ret));
+			http_request->resp_buf[1].len = (size_t)Z_STRLEN(ret);
+		}
+		if (Z_TYPE(ret) > IS_NULL) {
+			zval_ptr_dtor(&ret);
+		}
+    }
+	QUEUE_INSERT_TAIL(&server->writeQueue, &http_request->queue);
+	uv_async_send(&server->async);
+	/* lets send our short http hello world response and close the socket */
+	//uv_write(&http_request->req, (uv_stream_t *)&http_request->socket->handle, http_request->resp_buf, 1, on_after_write);
+	uv_mutex_unlock(&server->jobmutex);
+
     return 0;
 }
 
@@ -423,7 +596,7 @@ ASYNC_CALLBACK httpserver_connected(uv_stream_t *stream, int status)
 	
 	ZEND_ASSERT(server != NULL);
 
-	socket = async_tcp_socket_object_create();
+	socket = async_httpclient_object_create(server->scheduler);
 
 	code = uv_accept((uv_stream_t *) &server->handle, (uv_stream_t *) &socket->handle);
 
@@ -449,7 +622,7 @@ ASYNC_CALLBACK httpserver_connected(uv_stream_t *stream, int status)
     }
 
     /* initialize a new http http_request struct */
-    http_request_t *http_request = malloc(sizeof(http_request_t));
+    http_request_t *http_request = calloc(1, sizeof(http_request_t));
 	http_request->socket = socket;
 
     socket->handle.data = http_request;
@@ -460,7 +633,9 @@ ASYNC_CALLBACK httpserver_connected(uv_stream_t *stream, int status)
 	http_request->method = NULL;
 	http_request->body = NULL;
 	http_request->header_lines = 0;
-	for (int i = 0; i < MAX_HTTP_HEADERS; ++i) {
+
+	int i;
+	for (i = 0; i < MAX_HTTP_HEADERS; ++i) {
 		http_request->headers[i].field = NULL;
 		http_request->headers[i].field_length = 0;
 		http_request->headers[i].value = NULL;
@@ -569,6 +744,7 @@ static PHP_METHOD(HttpServer, bind)
 }
 
 ZEND_BEGIN_ARG_WITH_RETURN_OBJ_INFO_EX(arginfo_httpserver_on, 0, 0, Phalcon\\Async\\Network\\HttpServer, 0)
+	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 0)
 	ZEND_ARG_CALLABLE_INFO(0, func, 0)
 ZEND_END_ARG_INFO();
 
@@ -621,7 +797,7 @@ static PHP_METHOD(HttpServer, start)
 		return;
 	}
 
-	uv_run(async_loop_get(), UV_RUN_DEFAULT);
+	uv_run(&server->scheduler->loop, UV_RUN_DEFAULT);
 }
 
 static PHP_METHOD(HttpServer, close)
@@ -672,6 +848,11 @@ static const zend_function_entry async_httpserver_functions[] = {
 void async_httpserver_ce_register()
 {
 	zend_class_entry ce;
+
+	memcpy(&async_httpclient_handlers, &std_object_handlers, sizeof(zend_object_handlers));
+	async_httpclient_handlers.dtor_obj = async_httpclient_object_dtor;
+	async_httpclient_handlers.free_obj = async_httpclient_object_destroy;
+	async_httpclient_handlers.clone_obj = NULL;
 
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "HttpServer", async_httpserver_functions);
 	async_httpserver_ce = zend_register_internal_class(&ce);

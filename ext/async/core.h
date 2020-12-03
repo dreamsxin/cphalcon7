@@ -53,6 +53,7 @@
 
 
 #include "uv.h"
+#include "uv-common.h"
 #include "php.h"
 
 #ifdef PHP_WIN32

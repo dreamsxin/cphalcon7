@@ -62,19 +62,11 @@ zend_class_entry *phalcon_paginator_adapter_sql_ce;
 
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, __construct);
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getPaginate);
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setCurrentPage);
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getCurrentPage);
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setLimit);
-PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getLimit);
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, setDb);
 PHP_METHOD(Phalcon_Paginator_Adapter_Sql, getDb);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapter_sql___construct, 0, 0, 1)
 	ZEND_ARG_INFO(0, config)
-ZEND_END_ARG_INFO()
-
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapter_sql_setlimit, 0, 0, 1)
-	ZEND_ARG_INFO(0, limit)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_paginator_adapter_sql_setdb, 0, 0, 1)

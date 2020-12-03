@@ -77,6 +77,11 @@ typedef struct _async_tcp_server {
 	/* Server SSL context (shared between all socket connections). */
 	SSL_CTX *ctx;
 #endif
+	uv_mutex_t jobmutex;
+	uv_mutex_t writemutex;
+	QUEUE writeQueue;
+	uv_async_t async;
+
 	zend_fcall_info_cache server_callbacks[ASYNC_SERVER_EVENT_ONCLOSE + 1];
 } async_tcp_server;
 

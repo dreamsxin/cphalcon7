@@ -791,13 +791,15 @@ static PHP_METHOD(ReadablePipe, read)
 	async_stream_read_req read;
 
 	zval *hint;
+	zend_long timeout = 0;
 	size_t len;
 
 	hint = NULL;
 
-	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 1)
+	ZEND_PARSE_PARAMETERS_START_EX(ZEND_PARSE_PARAMS_THROW, 0, 2)
 		Z_PARAM_OPTIONAL
 		Z_PARAM_ZVAL(hint)
+		Z_PARAM_LONG(timeout)
 	ZEND_PARSE_PARAMETERS_END();
 
 	pipe = (async_readable_process_pipe *) Z_OBJ_P(getThis());
@@ -819,7 +821,7 @@ static PHP_METHOD(ReadablePipe, read)
 	read.in.len = len;
 	read.in.buffer = NULL;
 	read.in.handle = NULL;
-	read.in.timeout = 0;
+	read.in.timeout = timeout;
 	read.in.flags = 0;
 	
 	if (EXPECTED(SUCCESS == async_stream_read(pipe->state->stream, &read))) {

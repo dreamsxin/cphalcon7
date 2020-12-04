@@ -120,10 +120,6 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_onuserdefinederror, 0, 0, 2)
 	ZEND_ARG_INFO(0, context)
 ZEND_END_ARG_INFO()
 
-ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_setcharset, 0, 0, 1)
-	ZEND_ARG_INFO(0, charset)
-ZEND_END_ARG_INFO()
-
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_setlines, 0, 0, 1)
 	ZEND_ARG_INFO(0, lines)
 ZEND_END_ARG_INFO()

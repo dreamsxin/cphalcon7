@@ -290,7 +290,7 @@ PHP_METHOD(Phalcon_Date, offset){
 PHP_METHOD(Phalcon_Date, seconds){
 
 	zval *step = NULL, *start = NULL, *end = NULL;
-	char buf[2];
+	char buf[3];
 	int i, p, s, e;
 
 	phalcon_fetch_params(0, 0, 3, &step, &start, &end);
@@ -361,7 +361,7 @@ PHP_METHOD(Phalcon_Date, minutes){
 PHP_METHOD(Phalcon_Date, hours){
 
 	zval *step = NULL, *is_long = NULL, *start = NULL;
-	char buf[2];
+	char buf[3];
 	int i, p, s, e;
 
 	phalcon_fetch_params(0, 0, 3, &step, &is_long, &start);
@@ -429,7 +429,7 @@ PHP_METHOD(Phalcon_Date, ampm){
 PHP_METHOD(Phalcon_Date, adjust){
 
 	zval *hour, *ampm, lower_ampm = {};
-	char buf[2];
+	char buf[3];
 	int h;
 
 	phalcon_fetch_params(0, 2, 0, &hour, &ampm);
@@ -465,7 +465,7 @@ PHP_METHOD(Phalcon_Date, adjust){
 PHP_METHOD(Phalcon_Date, days){
 
 	zval *month, *year = NULL, year2 = {}, months = {}, year_months = {}, format = {}, total = {}, tmp = {}, tmp1 = {}, tmp2 = {};
-	char buf[2];
+	char buf[3];
 	int y, m, i, t;
 
 	phalcon_fetch_params(0, 1, 1, &month, &year);

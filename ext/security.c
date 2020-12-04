@@ -190,7 +190,7 @@ static const zend_function_entry phalcon_security_method_entry[] = {
 	PHP_ME(Phalcon_Security, destroyToken, arginfo_phalcon_security_destroytoken, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, computeHmac, arginfo_phalcon_security_computehmac, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Security, deriveKey, arginfo_phalcon_security_derivekey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
-	PHP_ME(Phalcon_Security, pbkdf2, arginfo_phalcon_security_derivekey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Security, pbkdf2, arginfo_phalcon_security_pbkdf2, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Security, getDefaultHash, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Security, setDefaultHash, arginfo_phalcon_security_setdefaulthash, ZEND_ACC_PUBLIC)
 	PHP_FE_END

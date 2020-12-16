@@ -510,7 +510,7 @@ PHP_METHOD(Phalcon_Date, days){
 	phalcon_array_update_long(&months, y, &tmp, PH_COPY);
 
 	for (i = 1; i < t; i++) {
-		sprintf(buf, "%02d", i);
+		snprintf(buf, 3, "%02d", i);
 		phalcon_array_update_long_string(&tmp, i, buf, 2, PH_COPY);
 	}
 

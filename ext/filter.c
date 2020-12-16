@@ -159,12 +159,12 @@ PHP_METHOD(Phalcon_Filter, add){
  */
 PHP_METHOD(Phalcon_Filter, sanitize){
 
-	zval *value, *filters, *recursive = NULL, *options = NULL, *_recursive_level = NULL, recursive_level = {};
-	zval new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
+	zval *arr, *filters, *recursive = NULL, *options = NULL, *_recursive_level = NULL, recursive_level = {};
+	zval value = {}, new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
 	zend_string *filter_key, *item_key;
 	ulong item_idx;
 
-	phalcon_fetch_params(0, 2, 3, &value, &filters, &recursive, &options, &_recursive_level);
+	phalcon_fetch_params(1, 2, 3, &arr, &filters, &recursive, &options, &_recursive_level);
 
 	if (!recursive || Z_TYPE_P(recursive) == IS_NULL) {
 		recursive = &PHALCON_GLOBAL(z_true);
@@ -177,15 +177,26 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	if (!_recursive_level || Z_TYPE_P(_recursive_level) != IS_LONG) {
 		ZVAL_LONG(&recursive_level, 0);
 	} else {
-		ZVAL_COPY(&recursive_level, _recursive_level);
+		ZVAL_COPY_VALUE(&recursive_level, _recursive_level);
 	}
 
+	if (Z_TYPE_P(arr) == IS_OBJECT) {
+		if (phalcon_method_exists_ex(arr, SL("toarray")) == SUCCESS) {
+			PHALCON_MM_CALL_METHOD(&value, arr, "toarray");
+		} else {
+			phalcon_get_object_vars(&value, arr, 1);
+		}
+		PHALCON_MM_ADD_ENTRY(&value);
+	} else {
+		ZVAL_COPY_VALUE(&value, arr);
+	}
 	/**
 	 * Apply an array of filters
 	 */
 	if (Z_TYPE_P(filters) == IS_ARRAY) {
-		ZVAL_DUP(&new_value, value);
-		if (Z_TYPE_P(value) != IS_NULL) {
+		ZVAL_DUP(&new_value, &value);
+		PHALCON_MM_ADD_ENTRY(&new_value);
+		if (Z_TYPE(value) != IS_NULL) {
 			ZEND_HASH_FOREACH_STR_KEY_VAL(Z_ARRVAL_P(filters), filter_key, filter) {
 				zval real_filter = {}, real_options = {}, array_value = {};
 
@@ -194,8 +205,9 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 					if (Z_TYPE_P(filter) == IS_ARRAY) {
 						if (Z_TYPE_P(options) == IS_ARRAY) {
 							phalcon_fast_array_merge(&real_options, options, filter);
+							PHALCON_MM_ADD_ENTRY(&real_options);
 						} else {
-							ZVAL_COPY(&real_options, filter);
+							ZVAL_COPY_VALUE(&real_options, filter);
 						}
 					} else {
 						if (Z_TYPE_P(options) == IS_ARRAY) {
@@ -204,10 +216,11 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 							array_init(&real_options);
 						}
 						phalcon_array_update(&real_options, &real_filter, filter, PH_COPY);
+						PHALCON_MM_ADD_ENTRY(&real_options);
 					}
 				} else {
-					ZVAL_COPY(&real_filter, filter);
-					ZVAL_COPY(&real_options, options);
+					ZVAL_COPY_VALUE(&real_filter, filter);
+					ZVAL_COPY_VALUE(&real_options, options);
 				}
 
 				/**
@@ -215,13 +228,13 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 				 */
 				if (Z_TYPE(new_value) == IS_ARRAY && zend_is_true(recursive)) {
 					array_init(&array_value);
-
+					PHALCON_MM_ADD_ENTRY(&array_value);
 					phalcon_decrement(&recursive_level);
 					ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(new_value), item_idx, item_key, item_value) {
 						if (Z_TYPE_P(item_value) == IS_ARRAY && Z_LVAL(recursive_level) > 0) {
-							PHALCON_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
+							PHALCON_MM_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
 						} else {
-							PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, &real_filter, &real_options);
+							PHALCON_MM_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, &real_filter, &real_options);
 						}
 						if (item_key) {
 							phalcon_array_update_string(&array_value, item_key, &filter_value, 0);
@@ -229,31 +242,29 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 							phalcon_array_update_long(&array_value, item_idx, &filter_value, 0);
 						}
 					} ZEND_HASH_FOREACH_END();
-					zval_ptr_dtor(&new_value);
 					ZVAL_COPY_VALUE(&new_value, &array_value);
 				} else {
-					PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", &new_value, &real_filter, &real_options);
-					zval_ptr_dtor(&new_value);
+					PHALCON_MM_CALL_METHOD(&filter_value, getThis(), "_sanitize", &new_value, &real_filter, &real_options);
+					PHALCON_MM_ADD_ENTRY(&filter_value);
 					ZVAL_COPY_VALUE(&new_value, &filter_value);
 				}
-				zval_ptr_dtor(&real_filter);
-				zval_ptr_dtor(&real_options);
 			} ZEND_HASH_FOREACH_END();
 		}
-		RETURN_ZVAL(&new_value, 0, 0);
+		RETURN_MM_CTOR(&new_value);
 	}
 
 	/**
 	 * Apply a single filter value
 	 */
-	if (Z_TYPE_P(value) == IS_ARRAY && zend_is_true(recursive)) {
+	if (Z_TYPE(value) == IS_ARRAY && zend_is_true(recursive)) {
 		array_init(&sanizited_value);
+		PHALCON_MM_ADD_ENTRY(&sanizited_value);
 		phalcon_decrement(&recursive_level);
-		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL_P(value), item_idx, item_key, item_value) {
+		ZEND_HASH_FOREACH_KEY_VAL(Z_ARRVAL(value), item_idx, item_key, item_value) {
 			if (Z_TYPE_P(item_value) == IS_ARRAY && Z_LVAL(recursive_level) > 0) {
-				PHALCON_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
+				PHALCON_MM_CALL_METHOD(&filter_value, getThis(), "sanitize", item_value, filters, recursive, options, &recursive_level);
 			} else {
-				PHALCON_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters, options);
+				PHALCON_MM_CALL_METHOD(&filter_value, getThis(), "_sanitize", item_value, filters, options);
 			}
 			if (item_key) {
 				phalcon_array_update_string(&sanizited_value, item_key, &filter_value, 0);
@@ -263,10 +274,11 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 		} ZEND_HASH_FOREACH_END();
 
 	} else {
-		PHALCON_CALL_METHOD(&sanizited_value, getThis(), "_sanitize", value, filters, options);
+		PHALCON_MM_CALL_METHOD(&sanizited_value, getThis(), "_sanitize", &value, filters, options);
+		PHALCON_MM_ADD_ENTRY(&sanizited_value);
 	}
 
-	RETURN_ZVAL(&sanizited_value, 0, 0);
+	RETURN_MM_CTOR(&sanizited_value);
 }
 
 /**

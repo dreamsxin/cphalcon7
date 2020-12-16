@@ -444,7 +444,12 @@ PHP_METHOD(Phalcon_Filter, _sanitize){
 	}
 
 	if (PHALCON_IS_STRING(filter, "trim")) {
-		ZVAL_STR(&filtered, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH));
+		
+		if (Z_TYPE_P(value) == IS_STRING) {
+			ZVAL_STR(&filtered, phalcon_trim(value, NULL, PHALCON_TRIM_BOTH));
+		} else {
+			ZVAL_COPY(&filtered, value);
+		}
 		goto ph_end_0;
 	}
 

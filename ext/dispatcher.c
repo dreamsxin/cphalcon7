@@ -1227,6 +1227,9 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		/* Check if an exception has ocurred */
 		if (EG(exception)) {
 #if PHP_VERSION_ID >= 80000
+			if (zend_is_unwind_exit(EG(exception))) {
+				goto end;
+			}
 			ZVAL_OBJ(&exception, zend_objects_clone_obj(EG(exception)));
 #else
 			zval e = {};

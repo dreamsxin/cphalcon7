@@ -211,10 +211,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	if (Z_TYPE_P(message) != IS_STRING) {
 		zval tmp = {};
-		
-		ZVAL_COPY(&tmp, message);
-		convert_to_string(&tmp);
-		//PHALCON_CALL_FUNCTION(&tmp, "var_export", message, &PHALCON_GLOBAL(z_true));
+		PHALCON_CALL_FUNCTION(&tmp, "json_encode", message);
 		PHALCON_STR_REPLACE(&new_format, &message_wildcard, &tmp, &format);
 		zval_ptr_dtor(&tmp);
 	} else {

@@ -319,7 +319,7 @@ PHP_METHOD(Phalcon_Date, seconds){
 	array_init(return_value);
 
 	for (i = s; i < e; i += p) {
-		sprintf(buf, "%02d", i);
+		snprintf(buf, 2, "%02d", i);
 		phalcon_array_update_long_string(return_value, i, buf, 2, PH_COPY);
 	}
 }
@@ -390,7 +390,7 @@ PHP_METHOD(Phalcon_Date, hours){
 	array_init(return_value);
 
 	for (i = s; i <= e; i += p) {
-		sprintf(buf, "%02d", i);
+		snprintf(buf, 2, "%02d", i);
 		phalcon_array_update_long_string(return_value, i, buf, 2, PH_COPY);
 	}
 }
@@ -447,7 +447,7 @@ PHP_METHOD(Phalcon_Date, adjust){
 		}
 	}
 
-	sprintf(buf, "%02d", h);
+	snprintf(buf, 2, "%02d", h);
 
 	ZVAL_STRING(return_value, buf);
 }

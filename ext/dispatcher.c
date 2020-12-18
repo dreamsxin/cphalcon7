@@ -1007,9 +1007,6 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		 */
 		if (phalcon_method_exists_ex(&handler, SL("beforeexecuteroute")) == SUCCESS) {
 			PHALCON_MM_CALL_METHOD(&status, &handler, "beforeexecuteroute", getThis());
-			if (PHALCON_IS_FALSE(&status)) {
-				continue;
-			}
 
 			/**
 			 * Check if the user made a forward in the listener
@@ -1017,6 +1014,10 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 			phalcon_read_property(&finished, getThis(), SL("_finished"), PH_READONLY);
 			if (PHALCON_IS_FALSE(&finished)) {
 				continue;
+			}
+
+			if (PHALCON_IS_FALSE(&status)) {
+				break;
 			}
 		}
 

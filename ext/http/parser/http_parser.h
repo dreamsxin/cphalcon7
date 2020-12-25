@@ -155,7 +155,7 @@ typedef int (*http_cb) (http_parser*);
 
 enum http_status
   {
-#define XX(num, name, string) HTTP_STATUS_##name = num,
+#define XX(num, name, string) PHALCON_HTTP_STATUS_##name = num,
   HTTP_STATUS_MAP(XX)
 #undef XX
   };

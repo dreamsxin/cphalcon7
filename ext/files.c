@@ -204,12 +204,12 @@ PHP_METHOD(Phalcon_Files, list){
 
     /* parse parameters */
     if (zend_parse_parameters(ZEND_NUM_ARGS(), "s|l", &dirname, &dirname_len, &mode) == FAILURE) {
-        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Wrong parameters.");
+        php_error_docref(NULL, E_WARNING, "Wrong parameters.");
         RETURN_FALSE;
     }
 
     if (dirname_len < 1) {
-        php_error_docref(NULL TSRMLS_CC, E_WARNING, "Directory name cannot be empty");
+        php_error_docref(NULL, E_WARNING, "Directory name cannot be empty");
         RETURN_FALSE;
     }
 
@@ -240,7 +240,7 @@ PHP_METHOD(Phalcon_Files, list){
 				}
 				break;
 			case 2:	// dir
-				if (phalcon_is_dir2(&path)) {
+				if (phalcon_is_dir(&path)) {
 					add_next_index_string(return_value, entry.d_name);
 				}
 				break;
@@ -250,6 +250,7 @@ PHP_METHOD(Phalcon_Files, list){
 				break;
 
 		}
+		zval_ptr_dtor(&path);
     }
     php_stream_close(stream);
 }

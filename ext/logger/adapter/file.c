@@ -122,13 +122,12 @@ PHP_METHOD(Phalcon_Logger_Adapter_File, __construct){
 	) {
 		if (zend_is_true(&auto_create)) {
 			zend_string *ret;
-			zval path = {}, isdir = {};
+			zval path = {};
 
 			ret = zend_string_init(Z_STRVAL_P(name), Z_STRLEN_P(name), 0);
 			ZSTR_LEN(ret) = zend_dirname(ZSTR_VAL(ret), ZSTR_LEN(ret));
 			ZVAL_STR(&path, ret);
-			phalcon_is_dir(&isdir, &path);
-			if (!zend_is_true(&isdir)) {
+			if (!phalcon_is_dir(&path)) {
 				zend_long mode = 0777;
 				zend_bool recursive = 1;
 				php_stream_context *context;

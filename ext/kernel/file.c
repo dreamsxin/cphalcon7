@@ -78,7 +78,6 @@ int phalcon_is_file_str(char *filename)
 
     php_stat(filename, strlen(filename), FS_IS_FILE, &tmp);
     ret = zend_is_true(&tmp);
-    zval_dtor( &tmp );
     return ret;
 }
 
@@ -89,7 +88,6 @@ int phalcon_is_file(zval *filename)
 
     php_stat(Z_STRVAL_P(filename), Z_STRLEN_P(filename), FS_IS_FILE, &tmp);
     ret = zend_is_true(&tmp);
-    zval_dtor( &tmp );
     return ret;
 }
 
@@ -506,17 +504,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data)
 	}
 }
 
-void phalcon_is_dir(zval *return_value, zval *path)
-{
-	if (likely(Z_TYPE_P(path) == IS_STRING)) {
-		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_IS_DIR, return_value);
-	}
-	else {
-		ZVAL_FALSE(return_value);
-	}
-}
-
-int phalcon_is_dir2(zval *path)
+int phalcon_is_dir(zval *path)
 {
     zval tmp = {};
     int ret;

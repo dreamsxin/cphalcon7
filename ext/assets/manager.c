@@ -693,7 +693,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			return;
 		}
 
-		if (!phalcon_is_dir2(&complete_target_path)) {
+		if (phalcon_is_dir(&complete_target_path)) {
 			PHALCON_CONCAT_SVS(&exception_message, "Path '", &complete_target_path, "' is not a valid target path (2)");
 			PHALCON_MM_ADD_ENTRY(&exception_message);
 			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);
@@ -937,13 +937,12 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 
 		if (zend_is_true(&filter_needed)) {
 			zend_string *ret;
-			zval path = {}, isdir = {};
+			zval path = {};
 
 			ret = zend_string_init(Z_STRVAL(target_path), Z_STRLEN(target_path), 0);
 			ZSTR_LEN(ret) = zend_dirname(ZSTR_VAL(ret), ZSTR_LEN(ret));
 			ZVAL_STR(&path, ret);
-			phalcon_is_dir(&isdir, &path);
-			if (!zend_is_true(&isdir)) {
+			if (!phalcon_is_dir(&path)) {
 				zend_long mode = 0777;
 				zend_bool recursive = 1;
 				php_stream_context *context;

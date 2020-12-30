@@ -37,8 +37,7 @@ void phalcon_file_put_contents(zval *return_value, zval *filename, zval *data);
 void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *class_name, zval *virtual_separator, zval *separator);
 void phalcon_possible_autoload_filepath2(zval *return_value, zval *class_name, zval *virtual_separator, zval *separator);
 
-void phalcon_is_dir(zval *return_value, zval *path);
-int phalcon_is_dir2(zval *path);
+int phalcon_is_dir(zval *path);
 int phalcon_is_dir_str(char *path);
 void phalcon_unlink(zval *return_value, zval *path);
 void phalcon_filemtime(zval *return_value, zval *path);

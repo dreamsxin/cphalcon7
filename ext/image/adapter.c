@@ -951,7 +951,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		phalcon_file_realpath(&dir, &ret);
 		convert_to_string(&dir);
 
-		if (!phalcon_is_dir2(&dir)) {
+		if (!phalcon_is_dir(&dir)) {
 			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Directory must be exists: '%s'", Z_STRVAL(dir));
 			return;
 		}

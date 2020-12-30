@@ -192,7 +192,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Request){
 	PHALCON_REGISTER_CLASS_EX(Phalcon\\Http, Request, http_request, phalcon_di_injectable_ce, phalcon_http_request_method_entry, 0);
 
 	zend_declare_property_null(phalcon_http_request_ce, SL("_rawBody"), ZEND_ACC_PROTECTED);
-	zend_declare_property_null(phalcon_http_request_ce, SL("_JsonRawBody"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_http_request_ce, SL("_jsonRawBody"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_request_ce, SL("_put"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_http_request_ce, SL("_data"), ZEND_ACC_PROTECTED);
 

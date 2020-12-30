@@ -593,7 +593,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 	zval *collection, *callback, *z_type = NULL, *args = NULL, type = {}, output = {}, use_implicit_output = {}, exception_message = {};
 	zval options = {}, collection_source_path = {}, collection_target_path = {}, base_uri = {}, changed = {};
 	zval resources = {}, filters = {}, prefix = {}, type_css = {}, source_base_path = {}, target_base_path = {};
-	zval complete_target_base_uri = {}, complete_source_path = {}, complete_target_path = {}, complete_target_dir = {}, join = {}, is_directory = {};
+	zval complete_target_base_uri = {}, complete_source_path = {}, complete_target_path = {}, complete_target_dir = {}, join = {};
 	zval *resource, filtered_joined_content = {};
 	zval ds_slash = {}, tmp = {};
 	char slash[2] = {DEFAULT_SLASH, 0};
@@ -693,8 +693,7 @@ PHP_METHOD(Phalcon_Assets_Manager, output){
 			return;
 		}
 
-		phalcon_is_dir(&is_directory, &complete_target_path);
-		if (PHALCON_IS_TRUE(&is_directory)) {
+		if (!phalcon_is_dir2(&complete_target_path)) {
 			PHALCON_CONCAT_SVS(&exception_message, "Path '", &complete_target_path, "' is not a valid target path (2)");
 			PHALCON_MM_ADD_ENTRY(&exception_message);
 			PHALCON_MM_THROW_EXCEPTION_ZVAL(phalcon_assets_exception_ce, &exception_message);

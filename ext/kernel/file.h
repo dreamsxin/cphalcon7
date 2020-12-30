@@ -25,6 +25,8 @@
 
 int phalcon_file_exists_str(char *filename);
 int phalcon_file_exists(zval *filename);
+int phalcon_is_file_str(char *filename);
+int phalcon_is_file(zval *filename);
 int phalcon_compare_mtime(zval *filename1, zval *filename2);
 void phalcon_fix_path(zval *return_value, zval *path, zval *directory_separator);
 void phalcon_prepare_virtual_path(zval *return_value, zval *path, zval *virtual_separator);
@@ -36,6 +38,8 @@ void phalcon_possible_autoload_filepath(zval *return_value, zval *prefix, zval *
 void phalcon_possible_autoload_filepath2(zval *return_value, zval *class_name, zval *virtual_separator, zval *separator);
 
 void phalcon_is_dir(zval *return_value, zval *path);
+int phalcon_is_dir2(zval *path);
+int phalcon_is_dir_str(char *path);
 void phalcon_unlink(zval *return_value, zval *path);
 void phalcon_filemtime(zval *return_value, zval *path);
 void phalcon_basename(zval *return_value, zval *path);
@@ -47,6 +51,8 @@ int phalcon_feof(zval *stream_zval);
 int phalcon_fclose(zval *stream_zval);
 
 int phalcon_is_absolutepath(zval *path);
+
+void phalcon_path_concat(zval* return_value, char* path1, int len1, char * path2, int len2);
 
 #ifdef TSRM_WIN32
 #define PHALCON_DIRECTORY_SEPARATOR "\\"

@@ -951,10 +951,8 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 		phalcon_file_realpath(&dir, &ret);
 		convert_to_string(&dir);
 
-		phalcon_is_dir(&ret, &dir);
-
-		if (!zend_is_true(&ret)) {
-			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Directory must be writable: '%s'", Z_STRVAL(dir));
+		if (!phalcon_is_dir2(&dir)) {
+			zend_throw_exception_ex(phalcon_image_exception_ce, 0, "Directory must be exists: '%s'", Z_STRVAL(dir));
 			return;
 		}
 

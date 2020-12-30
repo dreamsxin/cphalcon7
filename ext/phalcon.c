@@ -998,6 +998,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Image_Adapter_Imagick);
 	PHALCON_INIT(Phalcon_Registry);
 	PHALCON_INIT(Phalcon_Arr);
+	PHALCON_INIT(Phalcon_Files);
 	PHALCON_INIT(Phalcon_Matrix);
 
 #ifdef PHALCON_CHART

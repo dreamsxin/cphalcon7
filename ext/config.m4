@@ -599,6 +599,7 @@ cryptinterface.c \
 db.c \
 text.c \
 arr.c \
+files.c \
 matrix.c \
 date.c \
 date/datetime.c \

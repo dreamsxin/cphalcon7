@@ -70,7 +70,7 @@ function debug(string $data, $lineno = 'NULL') {
 }
 
 $worker = static function ($socket) {
-	
+
 	$parser = new \Phalcon\Http\Parser();
 
 	$app = new \Phalcon\Mvc\Micro();
@@ -93,13 +93,13 @@ $worker = static function ($socket) {
 				$body = \Phalcon\Arr::get($ret, 'BODY');
 				
 				$sendchunk = 'hello world';
-				$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: close\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", \strlen($sendchunk), $sendchunk);
+				$sendchunk = \sprintf("HTTP/1.1 200 OK\r\nServer: webserver\r\nContent-Type: text/html\r\nTransfer-Encoding: chunked\r\nConnection: %s\r\n\r\n%x\r\n%s\r\n0\r\n\r\n", ($parser->isKeepAlive() ? 'Keep-Alive' : 'Closed'), \strlen($sendchunk), $sendchunk);
 				$socket->write($sendchunk);
-				/*
-
-				$socket->write($app->handle($uri));
-				*/
-				break;
+				if (!$parser->isKeepAlive()) {
+					break;
+				} else {
+					$parser = new \Phalcon\Http\Parser();
+				}
 			}
 		}
 	} catch (\Throwable $e) {

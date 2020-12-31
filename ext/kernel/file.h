@@ -40,6 +40,7 @@ void phalcon_possible_autoload_filepath2(zval *return_value, zval *class_name, z
 int phalcon_is_dir(zval *path);
 int phalcon_is_dir_str(char *path);
 void phalcon_unlink(zval *return_value, zval *path);
+int phalcon_unlink_str(char *path);
 void phalcon_filemtime(zval *return_value, zval *path);
 void phalcon_basename(zval *return_value, zval *path);
 

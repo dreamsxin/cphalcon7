@@ -554,6 +554,22 @@ void phalcon_unlink(zval *return_value, zval *path)
 	return;
 }
 
+int phalcon_unlink_str(char *path)
+{
+	php_stream_context *context;
+	php_stream_wrapper *wrapper;
+	zval *zctx = NULL;
+
+	context = php_stream_context_from_zval(zctx, 0);
+	wrapper = php_stream_locate_url_wrapper(path, NULL, 0);
+
+	if (!wrapper || !wrapper->wops || !wrapper->wops->unlink) {
+		return -1;
+	}
+
+	return wrapper->wops->unlink(wrapper, path, REPORT_ERRORS, context);
+}
+
 void phalcon_filemtime(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {

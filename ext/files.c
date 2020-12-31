@@ -180,9 +180,10 @@ PHP_METHOD(Phalcon_Files, RemoveDirectory){
 }
 
 /**
- * 
+ * Create a file
  *
  * @param string $filename
+ * @param string $data
  * @return boolean
  */
 PHP_METHOD(Phalcon_Files, create){

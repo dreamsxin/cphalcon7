@@ -83,6 +83,7 @@ PHP_METHOD(Phalcon_Http_Request, getHeader);
 PHP_METHOD(Phalcon_Http_Request, getScheme);
 PHP_METHOD(Phalcon_Http_Request, isAjax);
 PHP_METHOD(Phalcon_Http_Request, isSoapRequested);
+PHP_METHOD(Phalcon_Http_Request, isJsonRequested);
 PHP_METHOD(Phalcon_Http_Request, isSecureRequest);
 PHP_METHOD(Phalcon_Http_Request, getRawBody);
 PHP_METHOD(Phalcon_Http_Request, getJsonRawBody);
@@ -147,6 +148,7 @@ static const zend_function_entry phalcon_http_request_method_entry[] = {
 	PHP_ME(Phalcon_Http_Request, getScheme, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, isAjax, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, isSoapRequested, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Request, isJsonRequested, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, isSecureRequest, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getRawBody, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Request, getJsonRawBody, arginfo_empty, ZEND_ACC_PUBLIC)
@@ -789,6 +791,24 @@ PHP_METHOD(Phalcon_Http_Request, isSoapRequested)
 
 	if (phalcon_array_isset_fetch_str(&content_type, server, SL("CONTENT_TYPE"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&content_type, SL("application/soap+xml"))) {
+			RETURN_TRUE;
+		}
+	}
+
+	RETURN_FALSE;
+}
+
+/**
+ * Checks whether request has been made using JSON
+ *
+ * @return boolean
+ */
+PHP_METHOD(Phalcon_Http_Request, isSoapRequested)
+{
+	zval *server, content_type = {};
+
+	if (phalcon_array_isset_fetch_str(&content_type, server, SL("CONTENT_TYPE"), PH_READONLY)) {
+		if (phalcon_memnstr_str(&content_type, SL("application/json"))) {
 			RETURN_TRUE;
 		}
 	}

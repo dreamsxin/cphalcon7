@@ -803,7 +803,7 @@ PHP_METHOD(Phalcon_Http_Request, isSoapRequested)
  *
  * @return boolean
  */
-PHP_METHOD(Phalcon_Http_Request, isSoapRequested)
+PHP_METHOD(Phalcon_Http_Request, isJsonequested)
 {
 	zval *server, content_type = {};
 

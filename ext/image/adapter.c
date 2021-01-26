@@ -990,7 +990,7 @@ PHP_METHOD(Phalcon_Image_Adapter, render){
 	}
 
 	if (!_quality || Z_TYPE_P(_quality) == IS_NULL) {
-		ZVAL_LONG(&quality, 100);
+		ZVAL_NULL(&quality);
 	} else {
 		ZVAL_COPY_VALUE(&quality, _quality);
     }

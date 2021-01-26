@@ -920,7 +920,7 @@ PHP_METHOD(Phalcon_Image_Adapter, save){
 	}
 
 	if (!q || Z_TYPE_P(q) != IS_LONG) {
-		ZVAL_LONG(&quality, 100);
+		ZVAL_NULL(&quality);
 	} else if (Z_LVAL_P(q) > 100) {
 		ZVAL_LONG(&quality, 100);
 	} else if (Z_LVAL_P(q) < 1) {

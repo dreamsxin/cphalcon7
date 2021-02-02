@@ -1760,10 +1760,15 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 		PHALCON_MM_ADD_ENTRY(&connection);
 	}
 
+
+	if (phalcon_clone(return_value, base) == FAILURE) {
+		RETURN_MM();
+	}
+
 	/**
 	 * Change the dirty state to persistent
 	 */
-	PHALCON_MM_CALL_METHOD(NULL, base, "setdirtystate", dirty_state);
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "setdirtystate", dirty_state);
 
 	array_init(&snapshot_data);
 	PHALCON_MM_ADD_ENTRY(&snapshot_data);
@@ -1805,7 +1810,7 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 				 * Every field must be part of the column map
 				 */
 				if (phalcon_array_isset_fetch(&attribute, column_map, &key, PH_NOISY|PH_READONLY)) {
-					phalcon_update_property_zval_zval(base, &attribute, &convert_value);
+					phalcon_update_property_zval_zval(return_value, &attribute, &convert_value);
 				} else {
 					PHALCON_CONCAT_SVS(&exception_message, "Column \"", &key, "\" doesn't make part of the column map");
 					PHALCON_MM_ADD_ENTRY(&exception_message);
@@ -1813,15 +1818,11 @@ PHP_METHOD(Phalcon_Mvc_Model, cloneResultMap){
 					return;
 				}
 			} else {
-				phalcon_update_property_zval_zval(base, &key, &convert_value);
+				phalcon_update_property_zval_zval(return_value, &key, &convert_value);
 			}
 			phalcon_array_update(&snapshot_data, &key, &convert_value, PH_COPY);
 		}
 	} ZEND_HASH_FOREACH_END();
-
-	if (phalcon_clone(return_value, base) == FAILURE) {
-		RETURN_MM();
-	}
 
 	if (instanceof_function(Z_OBJCE_P(return_value), phalcon_mvc_model_ce)) {
 		PHALCON_MM_CALL_METHOD(NULL, return_value, "setsnapshotdata", &snapshot_data, column_map);

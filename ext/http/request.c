@@ -807,6 +807,8 @@ PHP_METHOD(Phalcon_Http_Request, isJsonRequested)
 {
 	zval *server, content_type = {};
 
+	server = phalcon_get_global_str(SL("_SERVER"));
+
 	if (phalcon_array_isset_fetch_str(&content_type, server, SL("CONTENT_TYPE"), PH_READONLY)) {
 		if (phalcon_memnstr_str(&content_type, SL("application/json"))) {
 			RETURN_TRUE;

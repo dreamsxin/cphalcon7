@@ -3,6 +3,8 @@ Phalcon7(Dao7) Framework
 
 Phalcon7 is a web framework implemented as a C extension offering high performance and lower resource consumption.
 
+Help: https://github.com/dreamsxin/cphalcon7/wiki
+
 Phalcon7 是什么？
 -----------------
 

@@ -231,6 +231,7 @@ typedef struct _async_task_scheduler                async_task_scheduler;
 typedef struct _async_tick_event                    async_tick_event;
 
 typedef struct _phalcon_async_options {
+	int enable_async;
 	zend_long nc;
 
 	/* Root fiber context used by the VM. */

@@ -73,27 +73,29 @@ static PHP_INI_MH(OnChangeValsMemoryLimit) {
 #if PHALCON_USE_ASYNC
 static PHP_INI_MH(OnUpdateFiberStackSize)
 {
-	OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
+	if (PHALCON_GLOBAL(async).enable_async) {
+		OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
 
-	if (ASYNC_G(stack_size) < 0) {
-		ASYNC_G(stack_size) = 0;
+		if (ASYNC_G(stack_size) < 0) {
+			ASYNC_G(stack_size) = 0;
+		}
 	}
-
 	return SUCCESS;
 }
 
 static PHP_INI_MH(OnUpdateThreadCount)
 {
-	OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
+	if (PHALCON_GLOBAL(async).enable_async) {
+		OnUpdateLong(entry, new_value, mh_arg1, mh_arg2, mh_arg3, stage);
 
-	if (ASYNC_G(threads) < 4) {
-		ASYNC_G(threads) = 4;
+		if (ASYNC_G(threads) < 4) {
+			ASYNC_G(threads) = 4;
+		}
+
+		if (ASYNC_G(threads) > 128) {
+			ASYNC_G(threads) = 128;
+		}
 	}
-
-	if (ASYNC_G(threads) > 128) {
-		ASYNC_G(threads) = 128;
-	}
-
 	return SUCCESS;
 }
 #endif
@@ -146,6 +148,7 @@ PHP_INI_BEGIN()
 #endif
 
 #if PHALCON_USE_ASYNC
+	STD_PHP_INI_ENTRY("phalcon.async.enable_async", "1", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.enable_async, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.dns",        "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.dns_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.filesystem", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
 	STD_PHP_INI_ENTRY("phalcon.async.fs_enabled", "0", PHP_INI_SYSTEM | PHP_INI_PERDIR, OnUpdateBool, async.fs_enabled, zend_phalcon_globals, phalcon_globals)
@@ -501,74 +504,76 @@ static PHP_MINIT_FUNCTION(phalcon)
 #endif
 
 #ifdef PHALCON_USE_ASYNC
-	ASYNC_G(cli) = !strcmp(sapi_module.name, "cli");
-	if (ASYNC_G(cli)) {
-		uv_work_t *req = malloc(sizeof(uv_work_t));
-		char entry[4];
 
-		sprintf(entry, "%d", (int) MAX(4, MIN(128, ASYNC_G(threads))));
-		uv_os_setenv("UV_THREADPOOL_SIZE", (const char *) entry);
+	if (PHALCON_GLOBAL(async).enable_async) {
+		ASYNC_G(cli) = !strcmp(sapi_module.name, "cli");
+		if (ASYNC_G(cli)) {
+			uv_work_t *req = malloc(sizeof(uv_work_t));
+			char entry[4];
 
-		uv_queue_work(uv_default_loop(), req, init_threads, after_init_threads);
-		uv_cancel((uv_req_t *) req);
-		uv_run(uv_default_loop(), UV_RUN_DEFAULT);
-	}
+			sprintf(entry, "%d", (int) MAX(4, MIN(128, ASYNC_G(threads))));
+			uv_os_setenv("UV_THREADPOOL_SIZE", (const char *) entry);
+
+			uv_queue_work(uv_default_loop(), req, init_threads, after_init_threads);
+			uv_cancel((uv_req_t *) req);
+			uv_run(uv_default_loop(), UV_RUN_DEFAULT);
+		}
 
 #ifdef HAVE_ASYNC_SSL
 #if OPENSSL_VERSION_NUMBER < 0x10100000L || defined (LIBRESSL_VERSION_NUMBER)
-	SSL_library_init();
-	OPENSSL_config(NULL);
-	SSL_load_error_strings();
+		SSL_library_init();
+		OPENSSL_config(NULL);
+		SSL_load_error_strings();
 #else
-	OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG, NULL);
+		OPENSSL_init_ssl(OPENSSL_INIT_LOAD_CONFIG, NULL);
 #endif
 #endif
 
-	async_task_ce_register();
-	async_stream_ce_register();
-	async_socket_ce_register();
+		async_task_ce_register();
+		async_stream_ce_register();
+		async_socket_ce_register();
 
-	async_channel_ce_register();
-	async_console_ce_register();
-	async_context_ce_register();
-	async_deferred_ce_register();
-	async_dns_ce_register();
-	async_event_ce_register();
-	async_monitor_ce_register();
-	async_pipe_ce_register();
-	async_poll_ce_register();
-	async_process_ce_register();
-	async_signal_ce_register();
-	async_ssl_ce_register();
-	async_sync_ce_register();
-	async_tcp_ce_register();
-	async_thread_ce_register();
-	async_timer_ce_register();
-	async_udp_socket_ce_register();
+		async_channel_ce_register();
+		async_console_ce_register();
+		async_context_ce_register();
+		async_deferred_ce_register();
+		async_dns_ce_register();
+		async_event_ce_register();
+		async_monitor_ce_register();
+		async_pipe_ce_register();
+		async_poll_ce_register();
+		async_process_ce_register();
+		async_signal_ce_register();
+		async_ssl_ce_register();
+		async_sync_ce_register();
+		async_tcp_ce_register();
+		async_thread_ce_register();
+		async_timer_ce_register();
+		async_udp_socket_ce_register();
 
 #ifdef HAVE_ASYNC_SSL
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
-	
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
 #ifdef ASYNC_TLS_SNI
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
 #else
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
 #endif
 	
 #ifdef ASYNC_TLS_ALPN
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 1, CONST_CS|CONST_PERSISTENT);
 #else
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
 #endif
 
 #else
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
-	REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_SNI_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
+		REGISTER_LONG_CONSTANT("ASYNC_SSL_ALPN_SUPPORTED", 0, CONST_CS|CONST_PERSISTENT);
 #endif
 
-	async_orig_execute_ex = zend_execute_ex;
-	zend_execute_ex = async_execute_ex;
+		async_orig_execute_ex = zend_execute_ex;
+		zend_execute_ex = async_execute_ex;
+	}
 #endif
 
 	/* 1. Register exceptions */
@@ -1137,6 +1142,7 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 #endif
 
 #if PHALCON_USE_ASYNC
+if (PHALCON_GLOBAL(async).enable_async) {
 	async_channel_ce_unregister();
 	async_deferred_ce_unregister();
 	async_dns_ce_unregister();
@@ -1147,16 +1153,19 @@ static PHP_MSHUTDOWN_FUNCTION(phalcon){
 
 	async_task_ce_unregister();
 	async_thread_ce_unregister();
+}
 #endif
 
 	UNREGISTER_INI_ENTRIES();
 
 #if PHALCON_USE_ASYNC
+if (PHALCON_GLOBAL(async).enable_async) {
 	zend_execute_ex = async_orig_execute_ex;
 
 	if (ASYNC_G(cli)) {
 		uv_tty_reset_mode();
 	}
+}
 #endif
 
 	return SUCCESS;
@@ -1204,6 +1213,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 #endif
 
 #if PHALCON_USE_ASYNC
+if (PHALCON_GLOBAL(async).enable_async) {
 	async_context_init();
 	async_task_scheduler_init();
 	async_helper_init();
@@ -1220,6 +1230,7 @@ static PHP_RINIT_FUNCTION(phalcon)
 	async_tcp_socket_init();
 	async_udp_socket_init();
 	async_unix_socket_init();
+}
 #endif
 	return SUCCESS;
 }
@@ -1283,6 +1294,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 #endif
 
 #if PHALCON_USE_ASYNC
+if (PHALCON_GLOBAL(async).enable_async) {
 	if (ASYNC_G(dns_enabled)) {
 		async_dns_shutdown();
 	}
@@ -1298,6 +1310,7 @@ static PHP_RSHUTDOWN_FUNCTION(phalcon){
 
 	async_task_scheduler_shutdown();
 	async_context_shutdown();
+}
 #endif
 	return SUCCESS;
 }

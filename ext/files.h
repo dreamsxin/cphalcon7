@@ -23,6 +23,13 @@
 
 #include "php_phalcon.h"
 
+#ifndef LOCK_EX
+#	define LOCK_SH 1
+#	define LOCK_EX 2
+#	define LOCK_NB 4
+#	define LOCK_UN 8
+#endif
+
 extern zend_class_entry *phalcon_files_ce;
 
 PHALCON_INIT_CLASS(Phalcon_Files);

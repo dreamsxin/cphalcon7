@@ -649,6 +649,7 @@ mvc/user/module.c \
 mvc/user/logic.c \
 mvc/user/logic/model.c \
 mvc/url.c \
+mvc/orm.c \
 mvc/model.c \
 mvc/view.c \
 mvc/modelinterface.c \

@@ -608,6 +608,7 @@ PHP_METHOD(Phalcon_Mvc_Model, register){
 		if (!target) {
 			RETURN_MM_FALSE;
 		}
+
 		if (table && Z_TYPE_P(table) == IS_STRING) {
 			zval model_name = {}, di = {}, service_name = {}, models_manager = {};
 			phalcon_strtolower(&model_name, model);

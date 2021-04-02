@@ -276,6 +276,7 @@
 #include "mvc/micro/exception.h"
 #include "mvc/micro/lazyloader.h"
 #include "mvc/micro/middlewareinterface.h"
+#include "mvc/orm.h"
 #include "mvc/model.h"
 #include "mvc/modelinterface.h"
 #include "mvc/model/behavior.h"

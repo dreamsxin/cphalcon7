@@ -941,6 +941,7 @@ static PHP_MINIT_FUNCTION(phalcon)
 	PHALCON_INIT(Phalcon_Mvc_Application);
 	PHALCON_INIT(Phalcon_Mvc_Controller);
 	PHALCON_INIT(Phalcon_Mvc_Dispatcher);
+	PHALCON_INIT(Phalcon_Mvc_ORM);
 	PHALCON_INIT(Phalcon_Mvc_Model);
 	PHALCON_INIT(Phalcon_Mvc_Model_Resultset);
 	PHALCON_INIT(Phalcon_Mvc_Model_Behavior);
@@ -1507,9 +1508,11 @@ static const zend_module_dep phalcon_deps[] = {
 #else
 	ZEND_MOD_OPTIONAL("hash")
 #endif
-
+#if PHALCON_USE_ASYNC
+	ZEND_MOD_REQUIRED("sockets")
+#else
 	ZEND_MOD_OPTIONAL("sockets")
-
+#endif
 #if PHALCON_USE_PHP_MBSTRING
 	ZEND_MOD_REQUIRED("mbstring")
 #else

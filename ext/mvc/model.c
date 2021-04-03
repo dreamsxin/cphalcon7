@@ -7277,6 +7277,9 @@ PHP_METHOD(Phalcon_Mvc_Model, toArray){
 		ZEND_HASH_FOREACH_STR_KEY_VAL(properties, key, value) {
 			zval field = {};
 			if (key) {
+				if (Z_TYPE_P(value) == IS_INDIRECT) {
+					value = Z_INDIRECT_P(value);
+				}
 				if (Z_ISREF_P(value) && Z_REFCOUNT_P(value) == 1) {
 					value = Z_REFVAL_P(value);
 				}

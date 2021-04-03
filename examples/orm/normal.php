@@ -18,8 +18,9 @@ var_dump($builder->execute('sqlite3 /tmp/phalcon_test.sqlite < '.__DIR__.'/../..
 var_dump(Phalcon\Mvc\ORM::factory('robots'), new Robots);
 
 $robot = Phalcon\Mvc\ORM::factory('robots')->findFirst();
-var_dump($robot);
+//var_dump($robot);
+var_dump($robot->toArray());
 
 // 实例化
 $robot = Phalcon\Mvc\ORM::factory('robots')->new();
-var_dump($robot);
+//var_dump($robot);

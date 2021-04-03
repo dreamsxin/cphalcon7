@@ -90,6 +90,9 @@ int phalcon_read_static_property_ce(zval *return_value, zend_class_entry *ce, co
 {
 	zval *value = zend_read_static_property(ce, property, len, (zend_bool)ZEND_FETCH_CLASS_SILENT);
 	if (value) {
+		if (Z_TYPE_P(value) == IS_INDIRECT) {
+			value = Z_INDIRECT_P(value);
+		}
 		if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
 			value = Z_REFVAL_P(value);
 		}
@@ -1835,6 +1838,9 @@ int phalcon_property_isset_fetch(zval *return_value, zval *object, const char *p
 #else
 	value = zend_read_property(ce, object, property_name, property_length, 1, NULL);
 #endif
+	if (Z_TYPE_P(value) == IS_INDIRECT) {
+		value = Z_INDIRECT_P(value);
+	}
 	if (EXPECTED(Z_TYPE_P(value) == IS_REFERENCE)) {
 		value = Z_REFVAL_P(value);
 	}

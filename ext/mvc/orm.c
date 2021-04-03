@@ -231,7 +231,7 @@ PHP_METHOD(Phalcon_Mvc_ORM, new){
 
 	PHALCON_MM_CALL_METHOD(return_value, &manager, "load", &class_name);
 
-	RETURN_MM_THIS();
+	RETURN_MM();
 }
 
 /**

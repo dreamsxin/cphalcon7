@@ -58,6 +58,8 @@ PHP_METHOD(Phalcon_Kernel, evalString);
 #if PHALCON_USE_SCALAR_OBJECTS
 PHP_METHOD(Phalcon_Kernel, registerScalarHandler);
 #endif
+PHP_METHOD(Phalcon_Kernel, getClassName);
+PHP_METHOD(Phalcon_Kernel, getNamespace);
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_precomputehashkey, 0, 0, 1)
 	ZEND_ARG_INFO(0, arrKey)
@@ -117,6 +119,16 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_registerscalarhandler, 0, 0, 2)
 ZEND_END_ARG_INFO()
 #endif
 
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_getclassname, 0, 0, 1)
+	ZEND_ARG_INFO(0, object)
+	ZEND_ARG_TYPE_INFO(0, lower, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
+ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_kernel_getnamespace, 0, 0, 1)
+	ZEND_ARG_INFO(0, object)
+	ZEND_ARG_TYPE_INFO(0, lower, _IS_BOOL, 1)
+ZEND_END_ARG_INFO()
+
 static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, preComputeHashKey,   arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, preComputeHashKey32, arginfo_phalcon_kernel_precomputehashkey, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -132,6 +144,8 @@ static const zend_function_entry phalcon_kernel_method_entry[] = {
 	PHP_ME(Phalcon_Kernel, getAlias, arginfo_empty, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalFile, arginfo_phalcon_kernel_evalfile, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Kernel, evalString, arginfo_phalcon_kernel_evalstring, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getClassName, arginfo_phalcon_kernel_getclassname, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
+	PHP_ME(Phalcon_Kernel, getNamespace, arginfo_phalcon_kernel_getnamespace, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
 
 #if PHALCON_USE_SCALAR_OBJECTS
 	PHP_ME(Phalcon_Kernel, registerScalarHandler, arginfo_phalcon_kernel_registerscalarhandler, ZEND_ACC_PUBLIC | ZEND_ACC_STATIC)
@@ -664,3 +678,43 @@ PHP_METHOD(Phalcon_Kernel, registerScalarHandler){
 	PHALCON_GLOBAL(handlers)[type] = ce;
 }
 #endif
+
+/**
+ * Returns a class name
+ *
+ * @param object|string $object
+ * @param boolean $lower
+ * @return string
+ */
+PHP_METHOD(Phalcon_Kernel, getClassName){
+
+	zval *object, *lower = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &object, &lower);
+
+	if (!lower) {
+		lower = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_get_class_ns(return_value, object, zend_is_true(lower));
+}
+
+/**
+ * Returns a namespace from a class name
+ *
+ * @param object|string $object
+ * @param boolean $lower
+ * @return string
+ */
+PHP_METHOD(Phalcon_Kernel, getNamespace){
+
+	zval *object, *lower = NULL;
+
+	phalcon_fetch_params(0, 1, 1, &object, &lower);
+
+	if (!lower) {
+		lower = &PHALCON_GLOBAL(z_false);
+	}
+
+	phalcon_get_ns_class(return_value, object, zend_is_true(lower));
+}

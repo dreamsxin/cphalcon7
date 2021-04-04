@@ -120,6 +120,7 @@ PHALCON_INIT_CLASS(Phalcon_Cli_Options){
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_descs"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_helps"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_required"), ZEND_ACC_PROTECTED);
+	zend_declare_property_null(phalcon_cli_options_ce, SL("_allowEmpty"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_defaultValues"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_names"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_cli_options_ce, SL("_shortNames"), ZEND_ACC_PROTECTED);
@@ -189,12 +190,12 @@ PHP_METHOD(Phalcon_Cli_Options, __construct){
  */
 PHP_METHOD(Phalcon_Cli_Options, add){
 
-	zval *arg, *_name = NULL, *_short_name = NULL, *_required = NULL, *_desc = NULL, *_help = NULL, *_default_value = NULL;
-	zval type = {}, names = {}, short_names = {}, name = {}, short_name = {}, required = {}, desc = {}, help = {}, default_value = {};
+	zval *arg, *_name = NULL, *_short_name = NULL, *_required = NULL, *_allow_empty = NULL, *_desc = NULL, *_help = NULL, *_default_value = NULL;
+	zval type = {}, names = {}, short_names = {}, name = {}, short_name = {}, required = {}, allow_empty = {}, desc = {}, help = {}, default_value = {};
 	zval key = {};
 	int t = 0;
 
-	phalcon_fetch_params(0, 1, 6, &arg, &_name, &_short_name, &_required, &_desc, &_help, &_default_value);
+	phalcon_fetch_params(0, 1, 6, &arg, &_name, &_short_name, &_required, &_allow_empty, &_desc, &_help, &_default_value);
 
 	if (Z_TYPE_P(arg) == IS_ARRAY) {
 		if (!phalcon_array_isset_fetch_str(&type, arg, SL("type"), PH_READONLY)) {
@@ -209,6 +210,9 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 		if (!phalcon_array_isset_fetch_str(&required, arg, SL("required"), PH_READONLY)) {
 			ZVAL_FALSE(&required);
 		}
+		if (!phalcon_array_isset_fetch_str(&allow_empty, arg, SL("allowEmpty"), PH_READONLY)) {
+			ZVAL_TRUE(&allow_empty);
+		} 
 		if (!phalcon_array_isset_fetch_str(&desc, arg, SL("desc"), PH_READONLY)) {
 			ZVAL_NULL(&desc);
 		}
@@ -231,6 +235,10 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 
 		if (_required) {
 			ZVAL_COPY_VALUE(&required, _required);
+		}
+
+		if (_allow_empty) {
+			ZVAL_COPY_VALUE(&allow_empty, _allow_empty);
 		}
 
 		if (_desc) {
@@ -273,9 +281,11 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 		case PHALCON_CLI_OPTIONS_TYPE_ANY:
 			PHALCON_CONCAT_VS(&key, &name, ":");
 			break;
+		/*
 		case PHALCON_CLI_OPTIONS_TYPE_BOOLEAN:
 			ZVAL_COPY(&key, &name);
 			break;
+		*/
 		default:
 			PHALCON_CONCAT_VS(&key, &name, "::");
 			break;
@@ -286,6 +296,9 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 
 	if (zend_is_true(&required)) {
 		phalcon_update_property_array_append(getThis(), SL("_required"), &name);
+	}
+	if (zend_is_true(&allow_empty)) {
+		phalcon_update_property_array_append(getThis(), SL("_allowEmpty"), &name);
 	}
 	
 	phalcon_read_property(&names, getThis(), SL("_names"), PH_READONLY);
@@ -306,10 +319,12 @@ PHP_METHOD(Phalcon_Cli_Options, add){
 
 		phalcon_update_property_array(getThis(), SL("_names"), &short_name, &name);
 		phalcon_update_property_array(getThis(), SL("_shortNames"), &name, &short_name);
-
+		/*
 		if (t == PHALCON_CLI_OPTIONS_TYPE_BOOLEAN) {
 			ZVAL_COPY(&key, &short_name);
-		} else if (zend_is_true(&required)) {
+		} else 
+		*/
+		if (zend_is_true(&required)) {
 			PHALCON_CONCAT_VS(&key, &short_name, ":");
 		} else {
 			PHALCON_CONCAT_VS(&key, &short_name, "::");
@@ -549,11 +564,18 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 	phalcon_read_property(&required, getThis(), SL("_required"), PH_READONLY);
 
 	if (Z_TYPE(required) == IS_ARRAY) {
+		zval allow_empty = {};
+		phalcon_read_property(&allow_empty, getThis(), SL("_allowEmpty"), PH_READONLY);
 		ZEND_HASH_FOREACH_VAL(Z_ARRVAL(required), name) {
-			if (!phalcon_array_isset(&values, name)) {
+			zval value = {};
+			if (!phalcon_array_isset_fetch(&value, &values, name, PH_READONLY)) {
 				zval short_name = {};
-				if (!phalcon_array_isset_fetch(&short_name, &short_names, name, PH_READONLY)
-					|| !phalcon_array_isset(&values, &short_name)) {
+				if (!phalcon_array_isset_fetch(&short_name, &short_names, name, PH_READONLY)) {
+					phalcon_array_fetch(&value, &values, &short_name, PH_READONLY);
+				}
+			}
+			if (Z_TYPE(value) == IS_FALSE || Z_TYPE(value) <= IS_NULL) {
+				if (Z_TYPE(default_values) !=IS_ARRAY || !phalcon_array_isset(&default_values, name)) {
 					zval msg = {}, out = {};
 					zval_ptr_dtor(&values);
 					PHALCON_CONCAT_VS(&msg, name, " is required");
@@ -564,6 +586,17 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 					PHALCON_CALL_METHOD(NULL, getThis(), "help");
 					RETURN_FALSE;
 				}
+				phalcon_array_unset(&values, name, 0);
+			} else if (PHALCON_IS_EMPTY(&value) && !phalcon_array_isset(&allow_empty, name)) {
+				zval msg = {}, out = {};
+				zval_ptr_dtor(&values);
+				PHALCON_CONCAT_VS(&msg, name, " is required");
+				PHALCON_CALL_CE_STATIC(&out, phalcon_cli_color_ce, "error", &msg);
+				zend_print_zval(&out, 0);
+				zval_ptr_dtor(&msg);
+				zval_ptr_dtor(&out);
+				PHALCON_CALL_METHOD(NULL, getThis(), "help");
+				RETURN_FALSE;
 			}
 		} ZEND_HASH_FOREACH_END();
 	}
@@ -572,7 +605,7 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 		zval short_name = {}, value = {};
 		ZVAL_STR(&short_name, str_key);
 
-		if (phalcon_array_isset_fetch(&value, &values, name, PH_COPY) || phalcon_array_isset_fetch(&value, &values, &short_name, PH_COPY)) {
+		if (phalcon_array_isset_fetch(&value, &values, name, PH_COPY) || phalcon_array_isset_fetch(&value, &values, &short_name, PH_COPY) || Z_TYPE(value) == IS_FALSE) {
 			zval type = {};
 			int t;
 			phalcon_array_fetch(&type, &types, name, PH_READONLY);
@@ -586,7 +619,22 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 					if (Z_TYPE(value) != IS_DOUBLE) convert_to_double_ex(&value);
 					break;
 				case PHALCON_CLI_OPTIONS_TYPE_BOOLEAN:
-					if (!PHALCON_IS_BOOL(&value)) convert_to_boolean_ex(&value);
+					if (!PHALCON_IS_BOOL(&value)) {
+						if (Z_TYPE(value) == IS_STRING) {
+							zend_string *str = Z_STR(value);
+
+							if (ZSTR_LEN(str) == 0 
+								|| (ZSTR_LEN(str) == 1 && ZSTR_VAL(str)[0] == '0') 
+								|| !strcasecmp("FALSE", ZSTR_VAL(str))) {
+								ZVAL_FALSE(&value);
+							} else {
+								ZVAL_TRUE(&value);
+							}
+							zend_string_release_ex(str, 0);
+						} else {
+							convert_to_boolean_ex(&value);
+						}
+					}
 					break;
 				case PHALCON_CLI_OPTIONS_TYPE_STRING:
 					if (Z_TYPE(value) != IS_STRING) convert_to_string_ex(&value);

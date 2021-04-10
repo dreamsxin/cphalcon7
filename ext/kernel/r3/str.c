@@ -15,7 +15,8 @@
 #include "kernel/r3/slug.h"
 
 static const char * strnchr(const char* str, unsigned int len, int ch) {
-    for (unsigned int i = 0; i < len; i++) {
+	unsigned int i = 0;
+    for (i = 0; i < len; i++) {
         if (str[i] == ch) return str + i;
     }
     return NULL;
@@ -94,10 +95,11 @@ const char * r3_slug_find_placeholder(const char *s1, unsigned int str_len, unsi
     const char *s2;
     int cnt = 0;
     if ((c = strnchr(s1, str_len, '{'))) {
+		unsigned int i = 0;
         // find closing '}'
         s2 = c;
         unsigned int j = str_len - (c - s1);
-        for (unsigned int i = 0; i < j; i++) {
+        for (i = 0; i < j; i++) {
             if (*s2 == '{' )
                 cnt++;
             else if (*s2 == '}' )
@@ -127,11 +129,12 @@ const char * r3_slug_find_pattern(const char *s1, unsigned int str_len, unsigned
     const char *s2;
     unsigned int cnt = 1;
     if ( (c = strnchr(s1, str_len, ':')) ) {
+		unsigned int i = 0;
         c++;
         // find closing '}'
         s2 = c;
         unsigned int j = str_len - (c - s1);
-        for (unsigned int i = 0; i < j; i++) {
+        for (i = 0; i < j; i++) {
             if (*s2 == '{' )
                 cnt++;
             else if (*s2 == '}' )

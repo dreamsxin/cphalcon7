@@ -5,10 +5,10 @@ PHP_ARG_ENABLE(phalcon-debug, for phalcon7 debug support,
 [  --enable-phalcon-debug  Enable enable phalcon7 debug support], no, no)
 
 if test "$PHP_PHALCON_DEBUG" != "no"; then
-	CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1 -std=c99"
+	CFLAGS="$CFLAGS -Wall -g3 -ggdb -O0 -DPHALCON_DEBUG=1"
 	AC_DEFINE(PHALCON_DEBUG, 1, [Enable phalcon7 debug support])
 else
-	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1 -std=c99"
+	CFLAGS="$CFLAGS -DPHALCON_RELEASE=1"
 fi
 
 PHP_ARG_ENABLE(async, Whether to enable "async" support,

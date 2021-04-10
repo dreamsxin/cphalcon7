@@ -1,7 +1,7 @@
 #ifndef R3_DEBUG_H
 #define R3_DEBUG_H 
 
-// #define DEBUG 1
+#define DEBUG 1
 #ifdef DEBUG
 
 #define info(fmt, ...) \

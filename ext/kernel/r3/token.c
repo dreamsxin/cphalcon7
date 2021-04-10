@@ -30,8 +30,9 @@ bool str_array_append(str_array * l, const char * token, unsigned int len) {
 
 void str_array_dump_slugs(const str_array *l) {
     if (l->tokens.size) {
+		int i = 0;
         printf("[");
-        for ( int i = 0; i < l->tokens.size ; i++ ) {
+        for (i = 0; i < l->tokens.size ; i++ ) {
             printf("\"%*.*s\"", l->slugs.entries[i].len,l->slugs.entries[i].len,l->slugs.entries[i].base );
             if ( i + 1 != l->tokens.size ) {
                 printf(", ");
@@ -44,8 +45,9 @@ void str_array_dump_slugs(const str_array *l) {
 }
 
 void str_array_dump(const str_array *l) {
+	int i = 0;
     printf("[");
-    for ( int i = 0; i < l->tokens.size ; i++ ) {
+    for ( i = 0; i < l->tokens.size ; i++ ) {
         printf("\"%*.*s\"", l->tokens.entries[i].len,l->tokens.entries[i].len,l->tokens.entries[i].base );
         // printf("\"%s\"", l->tokens.entries[i] );
         if ( i + 1 != l->tokens.size ) {

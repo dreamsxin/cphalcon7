@@ -12,10 +12,11 @@
 #include "kernel/r3/r3_gvc.h"
 
 void r3_tree_build_ag_nodes(Agraph_t * g, Agnode_t * ag_parent_node, const node * n, int * node_cnt) {
+	int i=0;
     if (!n)
         return;
 
-    for ( int i = 0 ; i < n->edges.size ; i++ ) {
+    for (i = 0 ; i < n->edges.size ; i++ ) {
         edge * e = n->edges.entries + i;
         (*node_cnt)++;
 

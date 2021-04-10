@@ -65,11 +65,12 @@ R3Node * r3_tree_create(int cap) {
 }
 
 void r3_tree_free(R3Node * tree) {
-    for (int j=0;j<tree->edges.size;j++) {
+	int j=0, k=0;
+    for (j=0;j<tree->edges.size;j++) {
         r3_edge_free(tree->edges.entries + j);
     }
     free(tree->edges.entries);
-    for (int k=0;k<tree->routes.size;k++) {
+    for (k=0;k<tree->routes.size;k++) {
         r3_route_free(tree->routes.entries + k);
     }
     free(tree->routes.entries);
@@ -862,6 +863,7 @@ bool r3_node_has_slug_edges(const R3Node *n) {
 
 
 void r3_tree_dump(const R3Node * n, int level) {
+	int i=0;
     print_indent(level);
 
     printf("(o)");
@@ -879,7 +881,8 @@ void r3_tree_dump(const R3Node * n, int level) {
     }
     printf("\n");
 
-    for ( int i = 0 ; i < n->edges.size ; i++ ) {
+    for ( i = 0 ; i < n->edges.size ; i++ ) {
+		int j=0;
         R3Edge * e = n->edges.entries + i;
         print_indent(level + 1);
         printf("|-\"%*.*s\"", e->pattern.len, e->pattern.len, e->pattern.base);
@@ -892,7 +895,7 @@ void r3_tree_dump(const R3Node * n, int level) {
         print_indent(level + 1);
         printf("||-routes num: |%d|", n->routes.size);
 
-        for ( int j = 0 ; j < n->routes.size ; j++ ) {
+        for ( j = 0 ; j < n->routes.size ; j++ ) {
             R3Route * rr = n->routes.entries + j;
             printf(" route path: |%*.*s|", rr->path.len,rr->path.len,rr->path.base);
         }

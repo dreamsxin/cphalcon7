@@ -193,6 +193,9 @@ fi
 PHP_ARG_ENABLE(jwt, whether to enable JWT support,
 [  --enable-jwt   Enable JWT support], yes, no)
 
+PHP_ARG_ENABLE(treerouter, whether to enable TreeRouter support,
+[  --enable-treerouter   Enable TreeRouter support], yes, no)
+
 AC_DEFUN([AC_TIDEWAYS_CLOCK],
 [
   have_clock_gettime=no
@@ -1392,8 +1395,34 @@ num/ndarray.c"
 	if test "$PHP_JWT" = "yes" && test "$PHP_OPENSSL" = "yes"; then
 		AC_DEFINE([PHALCON_JWT], [1], [Whether JWT are available])
 		AC_MSG_RESULT([yes, JWT])
-		
+
 		phalcon_sources="$phalcon_sources jwt.c "
+	else
+		AC_MSG_RESULT([no])
+	fi
+
+	AC_MSG_CHECKING([checking pcre support])
+	if pkg-config --exists libpcre; then
+		PCRE_INCS=`pkg-config --cflags-only-I libpcre`
+		PCRE_LIBS=`pkg-config --libs libpcre`
+
+		PHP_EVAL_INCLINE($PCRE_INCS)
+		PHP_EVAL_LIBLINE($PCRE_LIBS, PHALCON_SHARED_LIBADD)
+
+		AC_MSG_RESULT(yes)
+
+		AC_DEFINE([PHALCON_USE_PCRE], [1], [Have libpcre support])
+	else
+		AC_MSG_RESULT([no])
+	fi
+
+	AC_MSG_CHECKING([for TreeRouter support])
+	if test "$PHP_TREEROUTER" = "yes" && test -n "$PCRE_LIBS"; then
+
+		AC_DEFINE([PHALCON_TREEROUTER], [1], [Whether TreeRouter are available])
+		AC_MSG_RESULT([yes])
+		
+		phalcon_sources="$phalcon_sources kernel/r3/list.c kernel/r3/edge.c kernel/r3/match_entry.c kernel/r3/memory.c kernel/r3/node.c kernel/r3/slug.c kernel/r3/str.c kernel/r3/token.c "
 	else
 		AC_MSG_RESULT([no])
 	fi

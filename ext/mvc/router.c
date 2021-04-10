@@ -258,11 +258,12 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		 */
 		array_init_size(&paths, 1);
 		PHALCON_MM_ADD_ENTRY(&paths);
-#ifdef PHALCON_TREEROUTER
-		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
-#else
-		phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
-#endif
+
+		if (!zend_is_true(use_tree_routes)) {
+			phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
+		} else {
+			phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
+		}
 		PHALCON_MM_ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
@@ -282,15 +283,15 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		array_init_size(&paths, 3);
 		PHALCON_MM_ADD_ENTRY(&paths);
 
-#ifdef PHALCON_TREEROUTER
-		phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
-		phalcon_array_update_string_str(&paths, IS(action), ISL(action), 0);
-		phalcon_array_update_string_str(&paths, IS(params), ISL(params), 0);
-#else
-		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
-		phalcon_array_update_string_long(&paths, IS(action), 2, 0);
-		phalcon_array_update_string_long(&paths, IS(params), 3, 0);
-#endif
+		if (!zend_is_true(use_tree_routes)) {
+			phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
+			phalcon_array_update_string_long(&paths, IS(action), 2, 0);
+			phalcon_array_update_string_long(&paths, IS(params), 3, 0);
+		} else {
+			phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
+			phalcon_array_update_string_str(&paths, IS(action), ISL(action), 0);
+			phalcon_array_update_string_str(&paths, IS(params), ISL(params), 0);
+		}
 
 		PHALCON_MM_ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 

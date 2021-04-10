@@ -237,11 +237,10 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 	if (!default_routes) {
 		default_routes = &PHALCON_GLOBAL(z_true);
 	}
-#ifdef PHALCON_TREEROUTER
 	if (!use_tree_routes) {
 		use_tree_routes = &PHALCON_GLOBAL(z_false);
 	}
-#else
+#ifndef PHALCON_TREEROUTER
 	use_tree_routes = &PHALCON_GLOBAL(z_false);
 #endif
 	phalcon_update_property(getThis(), SL("_useTreeRouter"), use_tree_routes);

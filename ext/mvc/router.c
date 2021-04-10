@@ -296,6 +296,9 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		if (zend_is_true(use_tree_routes)) {
 			r3_tree_insert_routel(intern->tree, R3_METHOD_ANY, "/{controller}/{action}", sizeof("/{controller}/{action}") - 1, (void *)Z_LVAL(route_id));
 			r3_tree_insert_routel(intern->tree, R3_METHOD_ANY, "/{controller}/{action}/{param}", sizeof("/{controller}/{action}/{param}") - 1, (void *)Z_LVAL(route_id));
+		} 
+		if (r3_tree_compile(intern->tree, NULL) != 0) { //  != SUCCESS
+			phalcon_update_property(getThis(), SL("_useTreeRouter"), use_tree_routes);
 		}
 #endif
 	}
@@ -516,9 +519,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 #ifdef PHALCON_TREEROUTER
 	phalcon_read_property(&use_tree_routes, getThis(), SL("_useTreeRouter"), PH_NOISY|PH_READONLY);
 	intern = phalcon_mvc_router_object_from_obj(Z_OBJ_P(getThis()));
-    if (r3_tree_compile(intern->tree, NULL) != 0) { //  != SUCCESS
-		ZVAL_FALSE(&use_tree_routes);
-    }
 #endif
 
 	if (!uri || !zend_is_true(uri)) {

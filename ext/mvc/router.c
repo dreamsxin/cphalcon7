@@ -295,7 +295,7 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 #ifdef PHALCON_TREEROUTER
 		if (zend_is_true(use_tree_routes)) {
 			r3_tree_insert_routel(intern->tree, R3_METHOD_ANY, "/{controller}/{action}", sizeof("/{controller}/{action}") - 1, (void *)Z_LVAL(route_id));
-			r3_tree_insert_routel(intern->tree, R3_METHOD_ANY, "/{controller}/{action}/{param:.*}", sizeof("/{controller}/{action}/{param}") - 1, (void *)Z_LVAL(route_id));
+			r3_tree_insert_routel(intern->tree, R3_METHOD_ANY, "/{controller}/{action}/{param:.*}", sizeof("/{controller}/{action}/{param:.*}") - 1, (void *)Z_LVAL(route_id));
 		} 
 		if (r3_tree_compile(intern->tree, NULL) != 0) { //  != SUCCESS
 		}

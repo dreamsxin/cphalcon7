@@ -1176,9 +1176,6 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 #ifdef PHALCON_TREEROUTER
 	phalcon_read_property(&use_tree_routes, getThis(), SL("_useTreeRouter"), PH_NOISY|PH_READONLY);
 	intern = phalcon_mvc_router_object_from_obj(Z_OBJ_P(getThis()));
-    if (r3_tree_compile(intern->tree, NULL) != 0) { //  != SUCCESS
-		ZVAL_FALSE(&use_tree_routes);
-    }
 #endif
 
 	if (!paths) {

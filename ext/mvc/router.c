@@ -241,6 +241,8 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 	if (!use_tree_routes) {
 		use_tree_routes = &PHALCON_GLOBAL(z_false);
 	}
+#else
+	use_tree_routes = &PHALCON_GLOBAL(z_false);
 #endif
 	phalcon_update_property(getThis(), SL("_useTreeRouter"), use_tree_routes);
 
@@ -256,9 +258,11 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		 */
 		array_init_size(&paths, 1);
 		PHALCON_MM_ADD_ENTRY(&paths);
-
+#ifdef PHALCON_TREEROUTER
 		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
-
+#else
+		phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
+#endif
 		PHALCON_MM_ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/?+$#");
 
 		object_init_ex(&route, phalcon_mvc_router_route_ce);
@@ -278,9 +282,15 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 		array_init_size(&paths, 3);
 		PHALCON_MM_ADD_ENTRY(&paths);
 
+#ifdef PHALCON_TREEROUTER
+		phalcon_array_update_string_str(&paths, IS(controller), ISL(controller), 0);
+		phalcon_array_update_string_str(&paths, IS(action), ISL(action), 0);
+		phalcon_array_update_string_str(&paths, IS(params), ISL(params), 0);
+#else
 		phalcon_array_update_string_long(&paths, IS(controller), 1, 0);
 		phalcon_array_update_string_long(&paths, IS(action), 2, 0);
 		phalcon_array_update_string_long(&paths, IS(params), 3, 0);
+#endif
 
 		PHALCON_MM_ZVAL_STRING(&params_pattern, "#^/([a-zA-Z0-9_-]++)/([a-zA-Z0-9\\._]++)(/.*+)?+$#");
 
@@ -508,15 +518,15 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 	zval found_route = {}, paths = {};
 	zend_string *str_key;
 	ulong idx;
-#ifdef PHALCON_TREEROUTER
 	zval use_tree_routes = {};
+#ifdef PHALCON_TREEROUTER
 	phalcon_mvc_router_object *intern = NULL;
 #endif
 
 	phalcon_fetch_params(1, 0, 1, &uri);
 
-#ifdef PHALCON_TREEROUTER
 	phalcon_read_property(&use_tree_routes, getThis(), SL("_useTreeRouter"), PH_NOISY|PH_READONLY);
+#ifdef PHALCON_TREEROUTER
 	intern = phalcon_mvc_router_object_from_obj(Z_OBJ_P(getThis()));
 #endif
 
@@ -853,6 +863,7 @@ ROUTEFOUNDED:
 		/**
 		 * Check if the matches has variables
 		 */
+
 		if (Z_TYPE(matches) == IS_ARRAY && Z_TYPE(paths) == IS_ARRAY) {
 			zval converters = {}, *position;
 			/**

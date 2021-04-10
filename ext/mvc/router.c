@@ -790,7 +790,6 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 		 */
 		if (zend_is_true(&route_found)) {
 			ZVAL_COPY_VALUE(&found_route, route);
-			goto ROUTEFOUNDED;
 			PHALCON_MM_ZVAL_STRING(&event_name, "router:matchedRoute");
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "fireevent", &event_name, route);
 			PHALCON_MM_CALL_METHOD(&before_match, route, "getbeforematch");

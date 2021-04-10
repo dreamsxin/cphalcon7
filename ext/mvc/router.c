@@ -642,13 +642,14 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 			}
 			matched_route = r3_tree_match_route(intern->tree, entry);
 			if (matched_route != NULL) {
+				int i = 0;
 				if (phalcon_array_isset_fetch_long(&found_route, &routes, (zend_ulong)matched_route->data, PH_READONLY)) {
 					phalcon_update_property(getThis(), SL("_matchedRoute"), &found_route);
 					ZVAL_TRUE(&route_found);
 				}
 				array_init(&matches);
 				PHALCON_MM_ADD_ENTRY(&matches);
-				for (int i = 0; i < entry->vars.slugs.size; i++) {
+				for (i = 0; i < entry->vars.slugs.size; i++) {
 					phalcon_array_update_str_str(&matches, entry->vars.slugs.entries[i].base, entry->vars.slugs.entries[i].len, (char*)entry->vars.tokens.entries[i].base, entry->vars.tokens.entries[i].len, 0);
 				}
 			}

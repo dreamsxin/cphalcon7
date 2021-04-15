@@ -228,7 +228,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Router){
  */
 PHP_METHOD(Phalcon_Mvc_Router, __construct){
 
-	zval *default_routes = NULL, *use_tree_routes = NULL, routes = {}, paths = {}, route = {}, params_pattern = {};
+	zval *default_routes = NULL, *use_tree_routes = NULL, paths = {}, route = {}, params_pattern = {};
 
 	phalcon_fetch_params(1, 0, 2, &default_routes, &use_tree_routes);
 
@@ -245,7 +245,6 @@ PHP_METHOD(Phalcon_Mvc_Router, __construct){
 #endif
 	phalcon_update_property(getThis(), SL("_useTreeRouter"), use_tree_routes);
 
-	array_init(&routes);
 	if (PHALCON_IS_TRUE(default_routes)) {
 		zval route_id = {};
 #ifdef PHALCON_TREEROUTER

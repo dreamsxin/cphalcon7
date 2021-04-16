@@ -820,7 +820,7 @@ PHP_METHOD(Phalcon_Mvc_Router, handle){
 
 			if (zend_is_true(&route_found)) {
 				phalcon_update_property(getThis(), SL("_matchedRoute"), route);
-				break;
+				goto ROUTEFOUNDED;
 			}
 
 			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {

@@ -849,9 +849,6 @@ ROUTEFOUNDED:
 		 */
 		PHALCON_MM_CALL_METHOD(&paths, &found_route, "getpaths");
 		PHALCON_MM_ADD_ENTRY(&paths);
-		if (Z_TYPE(paths) == IS_ARRAY) {
-			PHALCON_MM_ZVAL_DUP(&parts, &paths);
-		}
 
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
 			ZVAL_STRING(&debug_message, "--Route paths: ");
@@ -867,6 +864,7 @@ ROUTEFOUNDED:
 		if (Z_TYPE(matches) == IS_ARRAY) {
 			if (Z_TYPE(paths) == IS_ARRAY) {
 				zval converters = {}, *position;
+				PHALCON_MM_ZVAL_DUP(&parts, &paths);
 				/**
 				 * Get the route converters if any
 				 */
@@ -904,7 +902,8 @@ ROUTEFOUNDED:
 						}
 					}
 				} ZEND_HASH_FOREACH_END();
-			} else {
+			}
+			if (PHALCON_IS_EMPTY(&parts)) {
 				PHALCON_MM_ZVAL_DUP(&parts, &matches);
 			}
 
@@ -914,6 +913,7 @@ ROUTEFOUNDED:
 			phalcon_update_property(getThis(), SL("_matches"), &matches);
 		} else if (Z_TYPE(paths) == IS_ARRAY) {
 			zval converters = {}, *position;
+			PHALCON_MM_ZVAL_DUP(&parts, &paths);
 			/**
 			 * Get the route converters if any
 			 */
@@ -951,7 +951,7 @@ ROUTEFOUNDED:
 		phalcon_update_property_null(getThis(), SL("_matches"));
 		phalcon_update_property_null(getThis(), SL("_matchedRoute"));
 		phalcon_read_property(&parts, getThis(), SL("_notFoundPaths"), PH_READONLY);
-		if (Z_TYPE(parts) != IS_NULL) {
+		if (Z_TYPE(parts) == IS_ARRAY) {
 			ZVAL_TRUE(&route_found);
 		}
 	}
@@ -1184,6 +1184,7 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 	zval *pattern, *paths = NULL, *regex = NULL, *http_methods = NULL;
 	zval route_id = {};
 #ifdef PHALCON_TREEROUTER
+	zval compiled_pattern = {};
 	zval use_tree_routes = {};
 	phalcon_mvc_router_object *intern = NULL;
 #endif
@@ -1217,6 +1218,7 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 #ifdef PHALCON_TREEROUTER
 	if (zend_is_true(&use_tree_routes)) {
 		int request_method = R3_METHOD_ANY;
+		ZVAL_COPY_VALUE(&compiled_pattern, pattern);
 		if (Z_TYPE_P(http_methods) == IS_STRING) {
 			if (!strcmp(Z_STRVAL_P(http_methods), "GET")) {
 				request_method = R3_METHOD_GET;
@@ -1235,7 +1237,54 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 			}
 		}
 
-		r3_tree_insert_routel(intern->tree, request_method, Z_STRVAL_P(pattern), Z_STRLEN_P(pattern), (void *)Z_LVAL(route_id));
+		/**
+		 * If a pattern contains ':', maybe there are placeholders to replace
+		 */
+		if (phalcon_memnstr_str(pattern, SL(":"))) {
+			zval wildcard = {}, id_pattern;
+
+			if (phalcon_memnstr_str(pattern, SL("/:module"))) {
+				PHALCON_MM_ZVAL_STRING(&wildcard, ":module");
+				PHALCON_MM_ZVAL_STRING(&id_pattern, "{module:[^/]+}");
+
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &compiled_pattern);
+				PHALCON_MM_ADD_ENTRY(&compiled_pattern);
+			}
+
+			if (phalcon_memnstr_str(pattern, SL("/:namespace"))) {
+				PHALCON_MM_ZVAL_STRING(&wildcard, ":namespace");
+				PHALCON_MM_ZVAL_STRING(&id_pattern, "{namespace:[^/]+}");
+
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &compiled_pattern);
+				PHALCON_MM_ADD_ENTRY(&compiled_pattern);
+			}
+
+			if (phalcon_memnstr_str(pattern, SL("/:controller"))) {
+				PHALCON_MM_ZVAL_STRING(&wildcard, ":controller");
+				PHALCON_MM_ZVAL_STRING(&id_pattern, "{controller:[^/]+}");
+
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &compiled_pattern);
+				PHALCON_MM_ADD_ENTRY(&compiled_pattern);
+			}
+
+			if (phalcon_memnstr_str(pattern, SL("/:action"))) {
+				PHALCON_MM_ZVAL_STRING(&wildcard, ":action");
+				PHALCON_MM_ZVAL_STRING(&id_pattern, "{action:[^/]+}");
+
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &compiled_pattern);
+				PHALCON_MM_ADD_ENTRY(&compiled_pattern);
+			}
+
+			if (phalcon_memnstr_str(pattern, SL("/:params"))) {
+				PHALCON_MM_ZVAL_STRING(&wildcard, ":params");
+				PHALCON_MM_ZVAL_STRING(&id_pattern, "{params:.*}");
+
+				PHALCON_STR_REPLACE(&compiled_pattern, &wildcard, &id_pattern, &compiled_pattern);
+				PHALCON_MM_ADD_ENTRY(&compiled_pattern);
+			}
+		}
+
+		r3_tree_insert_routel(intern->tree, request_method, Z_STRVAL(compiled_pattern), Z_STRLEN(compiled_pattern), (void *)Z_LVAL(route_id));
 		if (r3_tree_compile(intern->tree, NULL) != 0) { //  != SUCCESS
 		}
 	}

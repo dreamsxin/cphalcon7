@@ -139,7 +139,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_enable, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_log, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, message, IS_STRING, 0)
+	ZEND_ARG_INFO(0, message)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 	ZEND_ARG_INFO(0, context)
 ZEND_END_ARG_INFO()
@@ -1578,7 +1578,7 @@ PHP_METHOD(Phalcon_Debug, isEnable){
 /**
  * Logs messages
  *
- * @param string $message
+ * @param mixed $message
  * @param mixed $type
  * @param array $context
  */

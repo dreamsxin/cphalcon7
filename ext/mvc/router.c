@@ -1189,7 +1189,7 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 	phalcon_mvc_router_object *intern = NULL;
 #endif
 
-	phalcon_fetch_params(0, 1, 3, &pattern, &paths, &regex, &http_methods);
+	phalcon_fetch_params(1, 1, 3, &pattern, &paths, &regex, &http_methods);
 
 #ifdef PHALCON_TREEROUTER
 	phalcon_read_property(&use_tree_routes, getThis(), SL("_useTreeRouter"), PH_NOISY|PH_READONLY);
@@ -1212,8 +1212,9 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 	 * Every route is internally stored as a Phalcon\Mvc\Router\Route
 	 */
 	object_init_ex(return_value, phalcon_mvc_router_route_ce);
-	PHALCON_CALL_METHOD(NULL, return_value, "__construct", pattern, paths, http_methods, regex);
-	PHALCON_CALL_METHOD(&route_id, return_value, "getrouteid");
+	PHALCON_MM_CALL_METHOD(NULL, return_value, "__construct", pattern, paths, http_methods, regex);
+	PHALCON_MM_CALL_METHOD(&route_id, return_value, "getrouteid");
+	PHALCON_MM_ADD_ENTRY(&route_id);
 	phalcon_update_property_array(getThis(), SL("_routes"), &route_id, return_value);
 #ifdef PHALCON_TREEROUTER
 	if (zend_is_true(&use_tree_routes)) {
@@ -1289,6 +1290,7 @@ PHP_METHOD(Phalcon_Mvc_Router, add){
 		}
 	}
 #endif
+	RETURN_MM();
 }
 
 static void phalcon_mvc_router_add_helper(INTERNAL_FUNCTION_PARAMETERS, zend_string *method)

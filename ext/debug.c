@@ -139,7 +139,7 @@ ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_enable, 0, 0, 0)
 ZEND_END_ARG_INFO()
 
 ZEND_BEGIN_ARG_INFO_EX(arginfo_phalcon_debug_log, 0, 0, 1)
-	ZEND_ARG_TYPE_INFO(0, message, IS_STRING, 0)
+	ZEND_ARG_INFO(0, message)
 	ZEND_ARG_TYPE_INFO(0, type, IS_LONG, 1)
 	ZEND_ARG_INFO(0, context)
 ZEND_END_ARG_INFO()
@@ -1605,6 +1605,10 @@ PHP_METHOD(Phalcon_Debug, log){
 		PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
 		PHALCON_MM_ADD_ENTRY(&log);
 		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
+	} else if (Z_TYPE_P(message) == IS_ARRAY) {
+		zval tmp = {};
+		PHALCON_MM_ZVAL_DUP(&tmp, message);
+		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &tmp);
 	} else {
 		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
 	}

@@ -972,9 +972,9 @@ ROUTEFOUNDED:
 		/**
 		 * Check for a namespace
 		 */
-		if (phalcon_array_isset_fetch_str(&namespace_name, &parts, SL("namespace"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&namespace_name, &parts, SL("namespace"), PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&namespace_name);
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setnamespacename", &namespace_name);
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("namespace"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
@@ -990,9 +990,9 @@ ROUTEFOUNDED:
 		/**
 		 * Check for a module
 		 */
-		if (phalcon_array_isset_fetch_str(&module, &parts, SL("module"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&module, &parts, SL("module"), PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&module);
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setmodulename", &module);
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("module"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
@@ -1005,9 +1005,9 @@ ROUTEFOUNDED:
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setmodulename", &default_module);
 		}
 
-		if (phalcon_array_isset_fetch_str(&exact, &parts, SL("\0exact"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&exact, &parts, SL("\0exact"), PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&exact);
 			phalcon_update_property(getThis(), SL("_isExactControllerName"), &exact);
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("\0exact"), 0);
 		} else {
 			ZVAL_FALSE(&exact);
@@ -1017,9 +1017,9 @@ ROUTEFOUNDED:
 		/**
 		 * Check for a controller
 		 */
-		if (phalcon_array_isset_fetch_str(&controller, &parts, SL("controller"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&controller, &parts, SL("controller"), PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&controller);
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontrollername", &controller);
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("controller"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
@@ -1037,7 +1037,6 @@ ROUTEFOUNDED:
 		 */
 		if (phalcon_array_isset_fetch_str(&action, &parts, SL("action"), PH_COPY)) {
 			PHALCON_MM_ADD_ENTRY(&action);
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("action"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
@@ -1071,7 +1070,8 @@ ROUTEFOUNDED:
 		/**
 		 * Check for parameters
 		 */
-		if (phalcon_array_isset_fetch_str(&params_str, &parts, SL("params"), PH_READONLY)) {
+		if (phalcon_array_isset_fetch_str(&params_str, &parts, SL("params"), PH_COPY)) {
+			PHALCON_MM_ADD_ENTRY(&params_str);
 			if (Z_TYPE(params_str) == IS_STRING) {
 				if (phalcon_start_with_str(&params_str, SL("/"))) {
 					phalcon_substr(&str_params, &params_str, 1, 0);
@@ -1095,7 +1095,6 @@ ROUTEFOUNDED:
 				array_init(&params);
 			}
 
-			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("params"), 0);
 		} else {
 			array_init(&params);

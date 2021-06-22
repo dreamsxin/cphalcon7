@@ -948,10 +948,12 @@ ROUTEFOUNDED:
 	 * The route wasn't found, try to use the not-found paths
 	 */
 	if (!zend_is_true(&route_found)) {
+		zval notfoundpaths = {};
 		phalcon_update_property_null(getThis(), SL("_matches"));
 		phalcon_update_property_null(getThis(), SL("_matchedRoute"));
-		phalcon_read_property(&parts, getThis(), SL("_notFoundPaths"), PH_READONLY);
-		if (Z_TYPE(parts) == IS_ARRAY) {
+		phalcon_read_property(&notfoundpaths, getThis(), SL("_notFoundPaths"), PH_READONLY);
+		if (Z_TYPE(&notfoundpaths) == IS_ARRAY) {
+			PHALCON_MM_ZVAL_DUP(&parts, &&notfoundpaths);
 			ZVAL_TRUE(&route_found);
 		}
 	}
@@ -966,6 +968,7 @@ ROUTEFOUNDED:
 			ZVAL_STRING(&debug_message, "--Route Parts: ");
 			PHALCON_DEBUG_LOG(&debug_message);
 			zval_ptr_dtor(&debug_message);
+			PHALCON_DEBUG_SIMPLE_ZVAL(&parts);
 			PHALCON_DEBUG_LOG(&parts);
 		}
 

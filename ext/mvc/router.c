@@ -952,7 +952,7 @@ ROUTEFOUNDED:
 		phalcon_update_property_null(getThis(), SL("_matches"));
 		phalcon_update_property_null(getThis(), SL("_matchedRoute"));
 		phalcon_read_property(&notfoundpaths, getThis(), SL("_notFoundPaths"), PH_READONLY);
-		if (Z_TYPE(&notfoundpaths) == IS_ARRAY) {
+		if (Z_TYPE(notfoundpaths) == IS_ARRAY) {
 			PHALCON_MM_ZVAL_DUP(&parts, &notfoundpaths);
 			ZVAL_TRUE(&route_found);
 		}

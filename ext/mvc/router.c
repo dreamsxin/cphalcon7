@@ -992,8 +992,8 @@ ROUTEFOUNDED:
 		 */
 		if (phalcon_array_isset_fetch_str(&module, &parts, SL("module"), PH_READONLY)) {
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setmodulename", &module);
-			phalcon_array_unset_str(&parts, SL("module"), PH_SEPARATE);
-			PHALCON_MM_ADD_ENTRY(&parts);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("module"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
 				PHALCON_MM_CALL_METHOD(&default_module, &found_route, "getdefaultmodule");
@@ -1007,8 +1007,8 @@ ROUTEFOUNDED:
 
 		if (phalcon_array_isset_fetch_str(&exact, &parts, SL("\0exact"), PH_READONLY)) {
 			phalcon_update_property(getThis(), SL("_isExactControllerName"), &exact);
-			phalcon_array_unset_str(&parts, SL("\0exact"), PH_SEPARATE);
-			PHALCON_MM_ADD_ENTRY(&parts);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("\0exact"), 0);
 		} else {
 			ZVAL_FALSE(&exact);
 			phalcon_update_property(getThis(), SL("_isExactControllerName"), &exact);
@@ -1019,8 +1019,8 @@ ROUTEFOUNDED:
 		 */
 		if (phalcon_array_isset_fetch_str(&controller, &parts, SL("controller"), PH_READONLY)) {
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setcontrollername", &controller);
-			phalcon_array_unset_str(&parts, SL("controller"), PH_SEPARATE);
-			PHALCON_MM_ADD_ENTRY(&parts);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("controller"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
 				PHALCON_MM_CALL_METHOD(&default_handler, &found_route, "getdefaultcontroller");
@@ -1037,8 +1037,8 @@ ROUTEFOUNDED:
 		 */
 		if (phalcon_array_isset_fetch_str(&action, &parts, SL("action"), PH_COPY)) {
 			PHALCON_MM_ADD_ENTRY(&action);
-			phalcon_array_unset_str(&parts, SL("action"), PH_SEPARATE);
-			PHALCON_MM_ADD_ENTRY(&parts);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("action"), 0);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
 				PHALCON_MM_CALL_METHOD(&action, &found_route, "getdefaultaction");
@@ -1095,7 +1095,8 @@ ROUTEFOUNDED:
 				array_init(&params);
 			}
 
-			phalcon_array_unset_str(&parts, SL("params"), PH_SEPARATE);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("params"), 0);
 		} else {
 			array_init(&params);
 		}

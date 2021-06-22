@@ -976,7 +976,6 @@ ROUTEFOUNDED:
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setnamespacename", &namespace_name);
 			PHALCON_MM_SEPARATE(&parts);
 			phalcon_array_unset_str(&parts, SL("namespace"), 0);
-			PHALCON_MM_ADD_ENTRY(&parts);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {
 				PHALCON_MM_CALL_METHOD(&default_namespace, &found_route, "getdefaultnamespace");

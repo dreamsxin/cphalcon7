@@ -974,7 +974,8 @@ ROUTEFOUNDED:
 		 */
 		if (phalcon_array_isset_fetch_str(&namespace_name, &parts, SL("namespace"), PH_READONLY)) {
 			PHALCON_MM_CALL_METHOD(NULL, getThis(), "setnamespacename", &namespace_name);
-			phalcon_array_unset_str(&parts, SL("namespace"), PH_SEPARATE);
+			PHALCON_MM_SEPARATE(&parts);
+			phalcon_array_unset_str(&parts, SL("namespace"), 0);
 			PHALCON_MM_ADD_ENTRY(&parts);
 		} else {
 			if (Z_TYPE(found_route) == IS_OBJECT) {

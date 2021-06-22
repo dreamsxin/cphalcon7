@@ -1605,12 +1605,10 @@ PHP_METHOD(Phalcon_Debug, log){
 		PHALCON_CONCAT_SVSV(&log, "[", &log_type, "] ", message);
 		PHALCON_MM_ADD_ENTRY(&log);
 		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
-	} else if (Z_TYPE_P(message) == IS_ARRAY) {
-		zval tmp = {};
-		PHALCON_MM_ZVAL_DUP(&tmp, message);
-		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &tmp);
 	} else {
-		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), message);
+		phalcon_strval(&tmp, message);
+		PHALCON_MM_ADD_ENTRY(&tmp);
+		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &tmp);
 	}
 
 	phalcon_read_static_property_ce(&logger, phalcon_debug_ce, SL("_logger"), PH_READONLY);

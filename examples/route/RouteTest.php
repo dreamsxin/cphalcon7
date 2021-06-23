@@ -1,6 +1,6 @@
 <?php
 
-//Phalcon\Debug::enable();
+Phalcon\Debug::enable();
 $router = new Phalcon\Mvc\Router(FALSE, TRUE); // Use TreeRoute
 $router->add('/{controller}/{action}/{int:.*}', ['controller' => 'controller', 'action' => 'action']);
 $router->handle('/hello/world/1');

@@ -1607,7 +1607,7 @@ PHP_METHOD(Phalcon_Debug, log){
 		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &log);
 	} else {
 		zval tmp = {};
-		phalcon_strval(&tmp, message);
+		phalcon_json_encode(&tmp, message, PHP_JSON_UNESCAPED_UNICODE);
 		PHALCON_MM_ADD_ENTRY(&tmp);
 		phalcon_update_static_property_array_append_ce(phalcon_debug_ce, SL("_logs"), &tmp);
 	}

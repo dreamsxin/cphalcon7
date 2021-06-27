@@ -131,7 +131,7 @@ zval* phalcon_hash_get(HashTable *ht, const zval *key, int type)
 		case IS_DOUBLE:
 		case IS_TRUE:
 		case IS_FALSE: {
-			ulong index = 0;
+			zend_ulong index = 0;
 			if ((Z_TYPE_P(key) == IS_TRUE)) {
 				index = 1;
 			} else if ((Z_TYPE_P(key) == IS_FALSE)) {

@@ -154,7 +154,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, send)
 	zval headers = {}, *value;
 	sapi_header_line ctr = { NULL, 0, 0 };
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	if (!SG(headers_sent)) {
 		phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
@@ -232,7 +232,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, toString)
 	zval headers = {}, *value;
 	smart_str buffer = {0};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_read_property(&headers, getThis(), SL("_headers"), PH_NOISY|PH_READONLY);
 
@@ -278,7 +278,7 @@ PHP_METHOD(Phalcon_Http_Response_Headers, __set_state){
 
 	zval *data, headers = {}, data_headers = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &data);
 

@@ -553,7 +553,7 @@ PHP_METHOD(Phalcon_Forms_Form, bind){
 
 	zval *data, *entity, *whitelist = NULL, elements = {}, service_name = {}, dependency_injector = {}, filter = {}, filter_data = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 2, &data, &entity, &whitelist);
 
@@ -851,7 +851,7 @@ PHP_METHOD(Phalcon_Forms_Form, add){
 
 	zval *element, *pos = NULL, *type = NULL, name = {}, values = {}, elements = {}, elements_indexed = {}, tmp0 = {}, tmp1 = {}, offset = {}, new_elements = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	int found = 0, i = 0;
 
 	phalcon_fetch_params(0, 1, 2, &element, &pos, &type);

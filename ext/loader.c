@@ -582,7 +582,7 @@ PHP_METHOD(Phalcon_Loader, autoLoad){
 	zval *class_name, events_manager = {}, event_name = {}, classes = {}, file_path = {}, found = {}, ds = {}, namespace_separator = {};
 	zval extensions = {}, *directory, pseudo_separator = {}, directories = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	char slash[2] = {DEFAULT_SLASH, 0};
 
 	phalcon_fetch_params(1, 1, 0, &class_name);

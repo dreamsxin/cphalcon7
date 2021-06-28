@@ -223,7 +223,7 @@ PHP_METHOD(Phalcon_Debug_Dump, output){
 	zval *variable, *name = NULL, *tab = NULL, space = {}, str = {}, type = {}, style = {}, count = {}, replace_pairs = {}, output = {}, new_tab = {}, tmp = {};
 	zval *value, class_name = {}, objects = {}, detailed = {}, properties = {}, methods = {}, *method;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 2, &variable, &name, &tab);
 

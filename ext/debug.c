@@ -410,7 +410,7 @@ PHP_METHOD(Phalcon_Debug, _getArrayDump){
 
 	zval *argument, *n = NULL, number_arguments = {}, dump = {}, *v, joined_dump = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 1, &argument, &n);
 
@@ -949,7 +949,7 @@ PHP_METHOD(Phalcon_Debug, onUncaughtException){
 	zend_bool ini_exists = 1;
 	zend_class_entry *ce;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	char* link_format;
 
 	phalcon_fetch_params(1, 1, 0, &exception);

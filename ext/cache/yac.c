@@ -366,7 +366,7 @@ void phalcon_cache_yac_delete_impl(char *prefix, uint32_t prefix_len, char *key,
 	}
 
 	if (ttl) {
-		tv = (ulong)time(NULL);
+		tv = (zend_ulong)time(NULL);
 	}
 
 	phalcon_cache_yac_storage_delete(key, len, ttl, tv);

@@ -309,7 +309,7 @@ PHP_METHOD(Phalcon_Http_Client_Header, build)
 {
 	zval *flags = NULL, messages = {}, status_code = {}, lines = {}, message = {}, version = {}, fields = {}, *value, join_filed = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	int f = 0;
 
 	phalcon_fetch_params(0, 0, 1, &flags);

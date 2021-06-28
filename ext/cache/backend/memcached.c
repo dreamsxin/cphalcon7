@@ -185,7 +185,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, _connect){
 
 	zval options = {}, memcache = {}, servers = {}, status = {}, client = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	zend_class_entry *ce0;
 
 	phalcon_read_property(&options, getThis(), SL("_options"), PH_READONLY);
@@ -485,7 +485,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, queryKeys){
 
 	zval *prefix = NULL, memcache = {}, options = {}, special_key = {}, keys = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
@@ -558,7 +558,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memcached, flush){
 
 	zval memcache = {}, options = {}, special_key = {}, keys = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	PHALCON_MM_INIT();
 

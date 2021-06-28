@@ -1553,7 +1553,7 @@ PHP_METHOD(Phalcon_Http_Request, getUploadedFiles){
 
 	zval *dst_index = NULL, *not_errored = NULL, *_FILES, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	int only_successful;
 
 	phalcon_fetch_params(0, 0, 2, &not_errored, &dst_index);

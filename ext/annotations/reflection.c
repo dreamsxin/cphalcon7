@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getMethodsAnnotations){
 
 	zval annotations = {}, reflection_data = {}, reflection_methods = {}, *reflection_method;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_read_property(&annotations, getThis(), SL("_methodAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {
@@ -187,7 +187,7 @@ PHP_METHOD(Phalcon_Annotations_Reflection, getPropertiesAnnotations){
 
 	zval annotations = {}, reflection_data = {}, reflection_properties = {}, *reflection_property;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_read_property(&annotations, getThis(), SL("_propertyAnnotations"), PH_READONLY);
 	if (Z_TYPE(annotations) != IS_OBJECT) {

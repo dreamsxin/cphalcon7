@@ -209,7 +209,7 @@ PHP_METHOD(Phalcon_Flash_Session, output){
 
 	zval *type = NULL, *remove = NULL, messages = {}, *message;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 0, 2, &type, &remove);
 

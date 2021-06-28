@@ -133,7 +133,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 	zval *constant, header = {}, *constant1, curl_data = {}, *file, body = {}, boundary = {}, *value, key = {}, key_value = {}, headers = {};
 	zval content = {}, errorno = {}, error = {}, headersize = {}, headerstr = {}, bodystr = {}, response = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	PHALCON_MM_INIT();
 

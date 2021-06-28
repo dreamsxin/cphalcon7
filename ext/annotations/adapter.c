@@ -236,7 +236,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getMethod){
 
 	zval *class_name, *method_name, class_annotations = {}, methods = {}, *method;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 0, &class_name, &method_name);
 
@@ -316,7 +316,7 @@ PHP_METHOD(Phalcon_Annotations_Adapter, getProperty){
 
 	zval *class_name, *property_name, class_annotations = {}, properties = {}, *property;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 2, 0, &class_name, &property_name);
 

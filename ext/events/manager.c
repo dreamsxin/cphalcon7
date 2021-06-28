@@ -291,7 +291,7 @@ PHP_METHOD(Phalcon_Events_Manager, detach){
 
 	zval *type, *handler, events = {}, queue = {}, priority_queue = {}, *listener;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 0, &type, &handler);
 

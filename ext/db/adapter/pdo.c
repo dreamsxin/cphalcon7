@@ -190,7 +190,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, connect)
 	zval *desc = NULL, descriptor = {}, username = {}, password = {}, options = {}, dsn_parts = {}, *value, dsn_attributes = {}, pdo_type = {}, dsn = {}, persistent = {}, pdo = {};
 	zend_class_entry *ce;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 0, 1, &desc);
 
@@ -330,7 +330,7 @@ PHP_METHOD(Phalcon_Db_Adapter_Pdo, executePrepared){
 	zval *statement, *_placeholders = NULL, *_data_types = NULL, placeholders = {}, data_types = {}, event_name = {}, status = {};
 	zval *value = NULL, profiler = {}, sql_statement = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 2, &statement, &_placeholders, &_data_types);
 

@@ -942,7 +942,7 @@ PHP_METHOD(Phalcon_Arr, map){
 
 	zval *array, *callbacks, *keys = NULL, *val;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 1, &array, &callbacks, &keys);
 	PHALCON_SEPARATE_PARAM(array);
@@ -1005,7 +1005,7 @@ PHP_METHOD(Phalcon_Arr, merge){
 
 	zval *array1, *array2, *value, *args;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 	uint32_t i;
 
 	phalcon_fetch_params(0, 2, 0, &array1, &array2);
@@ -1077,7 +1077,7 @@ PHP_METHOD(Phalcon_Arr, overwrite){
 
 	zval *array1, *array2, array = {}, *value, *args;
 	zend_string *key;
-	ulong idx;
+	zend_ulong idx;
 	uint32_t i;
 
 	phalcon_fetch_params(0, 2, 0, &array1, &array2);
@@ -1197,7 +1197,7 @@ PHP_METHOD(Phalcon_Arr, flatten){
 
 	zval *array, is_assoc = {}, *value;
 	zend_string *key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &array);
 
@@ -1299,7 +1299,7 @@ PHP_METHOD(Phalcon_Arr, filter){
 
 	zval *array, *filters = NULL, *strict = NULL, *allow_empty = NULL, dependency_injector = {}, service = {}, filter = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 3, &array, &filters, &strict, &allow_empty);
 
@@ -1418,7 +1418,7 @@ PHP_METHOD(Phalcon_Arr, toArray){
 
 	zval *object, *properties = NULL, *recursive = NULL, *negate = NULL, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 3, &object, &properties, &recursive, &negate);
 
@@ -1682,7 +1682,7 @@ static zend_always_inline int phalcon_arr_compile_aggregator_function(phalcon_ar
 	return 0;
 }
 
-static zend_always_inline int phalcon_arr_compile_aggregator(phalcon_arr_aggregator *agt, zval *agt_def, ulong num_alias, zend_string *alias)
+static zend_always_inline int phalcon_arr_compile_aggregator(phalcon_arr_aggregator *agt, zval *agt_def, zend_ulong num_alias, zend_string *alias)
 {
 	if (Z_TYPE_P(agt_def) == IS_LONG) {
 		agt->is_callable = 0;
@@ -1720,7 +1720,7 @@ static zend_always_inline int phalcon_arr_compile_aggregator(phalcon_arr_aggrega
 static zend_always_inline int phalcon_arr_compile_aggregators(phalcon_arr_aggregator *agts, zval *aggregators)
 {
 	uint agt_idx = 0;
-	ulong num_alias;
+	zend_ulong num_alias;
 	zend_string *alias;
 	zval *arg;
 

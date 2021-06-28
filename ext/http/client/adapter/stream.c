@@ -143,7 +143,7 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Stream, buildBody){
 	zval nc = {}, cnonce = {}, qoc = {}, digest_value = {}, path = {}, md5_entity_body = {};
 	zval http = {}, option = {}, body = {}, headers = {}, uniqid = {}, boundary = {}, *value, *file;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	PHALCON_MM_INIT();
 

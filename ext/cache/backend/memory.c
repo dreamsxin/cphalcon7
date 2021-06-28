@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 
 	zval *_prefix = NULL, prefix = {}, data = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &prefix);
 
@@ -240,8 +240,8 @@ PHP_METHOD(Phalcon_Cache_Backend_Memory, queryKeys){
 						Z_TRY_ADDREF(key);
 						zend_hash_next_index_insert(Z_ARRVAL_P(return_value), &key);
 					} else {
-						char buf[8 * sizeof(ulong) + 2];
-						int buflength = 8 * sizeof(ulong) + 2;
+						char buf[8 * sizeof(zend_ulong) + 2];
+						int buflength = 8 * sizeof(zend_ulong) + 2;
 						int size;
 						size = snprintf(buf, buflength, "%ld", (long) idx);
 						if (size >= Z_STRLEN(prefix) && !memcmp(Z_STRVAL(prefix), buf, size)) {

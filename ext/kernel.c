@@ -189,7 +189,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey){
 
 	char *arKey, *strKey;
 	unsigned int nKeyLength;
-	register ulong hash = 5381;
+	register zend_ulong hash = 5381;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arKey, &nKeyLength) == FAILURE) {
 		RETURN_NULL();
@@ -241,7 +241,7 @@ PHP_METHOD(Phalcon_Kernel, preComputeHashKey32){
 
 	char *arKey, *strKey;
 	unsigned int nKeyLength;
-	ulong hash;
+	zend_ulong hash;
 
 	if (zend_parse_parameters(ZEND_NUM_ARGS(), "s", &arKey, &nKeyLength) == FAILURE) {
 		RETURN_NULL();

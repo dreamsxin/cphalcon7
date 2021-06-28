@@ -162,7 +162,7 @@ PHP_METHOD(Phalcon_Filter, sanitize){
 	zval *arr, *filters, *recursive = NULL, *options = NULL, *_recursive_level = NULL, recursive_level = {};
 	zval value = {}, new_value = {}, *item_value, *filter, filter_value = {}, sanizited_value = {};
 	zend_string *filter_key, *item_key;
-	ulong item_idx;
+	zend_ulong item_idx;
 
 	phalcon_fetch_params(1, 2, 3, &arr, &filters, &recursive, &options, &_recursive_level);
 

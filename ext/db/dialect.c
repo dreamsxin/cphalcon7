@@ -1198,7 +1198,7 @@ PHP_METHOD(Phalcon_Db_Dialect, update){
 	zval updated_fields = {}, *column, columns_sql = {}, where_conditions = {}, where_expression = {};
 	zval order_fields = {}, limit_value = {}, number = {}, offset = {}, tmp1 = {}, tmp2 = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 0, &definition);
 

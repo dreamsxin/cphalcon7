@@ -503,7 +503,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insert){
 	zval *table, *values, *fields = NULL, *data_types = NULL, exception_message = {}, placeholders = {}, insert_values = {}, bind_data_types = {}, *value;
 	zval escaped_table = {}, joined_values = {}, escaped_fields = {}, *field, insert_sql = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 2, &table, &values, &fields, &data_types);
 
@@ -643,7 +643,7 @@ PHP_METHOD(Phalcon_Db_Adapter, insertAsDict){
 
 	zval *table, *data, *data_types = NULL, fields = {}, values = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 1, &table, &data, &data_types);
 
@@ -702,7 +702,7 @@ PHP_METHOD(Phalcon_Db_Adapter, update){
 	zval *table, *fields, *_values = NULL, *where_condition = NULL, *data_types = NULL, values = {}, placeholders = {}, update_values = {}, bind_data_types = {}, *value;
 	zval escaped_table = {}, set_clause = {}, update_sql = {}, conditions = {}, where_bind = {}, where_types = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 3, &table, &fields, &_values, &where_condition, &data_types);
 
@@ -1499,7 +1499,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeIndexes){
 
 	zval *table, *schema = NULL, dialect = {}, fetch_num = {}, sql = {}, describe = {}, *index, indexes = {}, *index_columns;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 
@@ -1572,7 +1572,7 @@ PHP_METHOD(Phalcon_Db_Adapter, describeReferences){
 
 	zval *table, *schema = NULL, dialect = {}, fetch_num = {}, sql = {}, empty_arr = {}, references = {}, describe = {}, *reference, *array_reference;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 1, &table, &schema);
 

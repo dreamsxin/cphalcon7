@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Config_Adapter_Ini, read){
 
 	zval *file_path, *absolute_path = NULL, *scanner_mode = NULL, config_dir_path = {}, base_path = {}, ini_config = {}, config = {}, *directives;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 2, &file_path, &absolute_path, &scanner_mode);
 	PHALCON_ENSURE_IS_STRING(file_path);

@@ -174,7 +174,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, _buildParameters){
 
 	zval *dependency_injector, *arguments, build_arguments = {}, *argument;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 0, &dependency_injector, &arguments);
 
@@ -216,7 +216,7 @@ PHP_METHOD(Phalcon_Di_Service_Builder, build){
 	zval *dependency_injector, *definition, *parameters = NULL, class_name = {}, instance = {}, arguments = {}, build_arguments = {};
 	zval param_calls = {}, *method, exception_message = {}, *property;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 2, 1, &dependency_injector, &definition, &parameters);
 

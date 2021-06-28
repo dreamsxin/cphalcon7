@@ -158,7 +158,7 @@ PHP_METHOD(Phalcon_Config, val){
 
 	zval *array_config, *value, recursive = {};
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(1, 1, 0, &array_config);
 
@@ -303,7 +303,7 @@ PHP_METHOD(Phalcon_Config, merge){
 
 	zval *config, array_config = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 1, 0, &config);
 
@@ -366,7 +366,7 @@ PHP_METHOD(Phalcon_Config, toArray){
 
 	zval *recursive = NULL, *value, values = {};
 	zend_string *key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &recursive);
 

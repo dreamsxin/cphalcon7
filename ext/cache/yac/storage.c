@@ -65,7 +65,7 @@ void phalcon_cache_yac_storage_shutdown(void) /* {{{ */ {
 
 /* {{{ MurmurHash2 (Austin Appleby)
  */
-static inline ulong phalcon_cache_yac_inline_hash_func1(char *data, unsigned int len) {
+static inline zend_ulong phalcon_cache_yac_inline_hash_func1(char *data, unsigned int len) {
     unsigned int h, k;
 
     h = 0 ^ len;
@@ -137,8 +137,8 @@ static inline ulong phalcon_cache_yac_inline_hash_func1(char *data, unsigned int
  *                  -- Ralf S. Engelschall <rse@engelschall.com>
  */
 
-static inline ulong phalcon_cache_yac_inline_hash_func2(char *key, uint len) {
-	register ulong hash = 5381;
+static inline zend_ulong phalcon_cache_yac_inline_hash_func2(char *key, uint len) {
+	register zend_ulong hash = 5381;
 
 	/* variant with the hash unrolled eight times */
 	for (; len >= 8; len -= 8) {
@@ -291,7 +291,7 @@ static inline unsigned int phalcon_cache_yac_crc32(char *data, unsigned int size
 /* }}} */
 
 int phalcon_cache_yac_storage_find(char *key, unsigned int len, char **data, unsigned int *size, unsigned int *flag, unsigned long tv) /* {{{ */ {
-	ulong h, hash, seed;
+	zend_ulong h, hash, seed;
 	phalcon_cache_yac_kv_key k, *p;
 	phalcon_cache_yac_kv_val v;
 
@@ -359,7 +359,7 @@ do_verify:
 /* }}} */
 
 void phalcon_cache_yac_storage_delete(char *key, unsigned int len, int ttl, unsigned long tv) /* {{{ */ {
-	ulong hash, h, seed;
+	zend_ulong hash, h, seed;
 	phalcon_cache_yac_kv_key k, *p;
 
 	hash = h = phalcon_cache_yac_inline_hash_func1(key, len);
@@ -395,11 +395,11 @@ void phalcon_cache_yac_storage_delete(char *key, unsigned int len, int ttl, unsi
 /* }}} */
 
 int phalcon_cache_yac_storage_update(char *key, unsigned int len, char *data, unsigned int size, unsigned int flag, int ttl, int add, unsigned long tv) /* {{{ */ {
-	ulong hash, h;
+	zend_ulong hash, h;
 	int idx = 0, is_valid;
 	phalcon_cache_yac_kv_key *p, k, *paths[4];
 	phalcon_cache_yac_kv_val *val, *s;
-	unsigned long real_size;
+	zend_ulong real_size;
 
 	hash = h = phalcon_cache_yac_inline_hash_func1(key, len);
 	paths[idx++] = p = &(PHALCON_CACHE_YAC_SG(slots)[h & PHALCON_CACHE_YAC_SG(slots_mask)]);
@@ -419,7 +419,7 @@ do_update:
 				s = emalloc(sizeof(phalcon_cache_yac_kv_val) + size - 1);
 				memcpy(s->data, data, size);
 				if (ttl) {
-					k.ttl = (ulong)tv + ttl;
+					k.ttl = (zend_ulong)tv + ttl;
 				} else {
 					k.ttl = 0;
 				}
@@ -469,7 +469,7 @@ do_update:
 			}
 		} else {
 			uint i;
-			ulong seed, max_atime;
+			zend_ulong seed, max_atime;
 
 			seed = phalcon_cache_yac_inline_hash_func2(key, len);
 			for (i = 0; i < 3; i++) {

@@ -745,7 +745,7 @@ PHP_METHOD(Phalcon_Dispatcher, dispatch){
 		zval reflection_parameters = {}, *reflection_parameter, call_object = {}, value = {}, exception = {};
 		zend_class_entry *reflection_method_ce;
 		zend_string *param_key;
-		ulong param_idx;
+		zend_ulong param_idx;
 		long int count_action_params = 0;
 
 		if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {

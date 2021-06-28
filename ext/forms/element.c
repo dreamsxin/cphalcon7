@@ -642,7 +642,7 @@ PHP_METHOD(Phalcon_Forms_Element, label){
 
 	zval *attributes = NULL, label = {}, name = {}, escaped = {}, html = {}, *value;
 	zend_string *str_key;
-	ulong idx;
+	zend_ulong idx;
 
 	phalcon_fetch_params(0, 0, 1, &attributes);
 

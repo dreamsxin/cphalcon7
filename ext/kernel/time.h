@@ -107,6 +107,12 @@ static zend_always_inline uint64 phalcon_time_milliseconds(int source, double ti
             (val) = ((uint64)a) | (((uint64)d)<<32);
 #elif defined(__powerpc__) || defined(__ppc__)
             asm volatile ("mftb %0" : "=r" (val));
+#elif defined(__aarch64__)
+            int64_t virtual_timer_value;
+            //int64_t timer_frequency;
+            asm volatile("mrs %0, cntvct_el0" : "=r"(virtual_timer_value));
+            //asm volatile("mrs %0, cntfrq_el0" : "=r" (timer_frequency));
+            return virtual_timer_value;
 #else
 #error You need to define CycleTimer for your OS and CPU
 #endif

@@ -211,7 +211,7 @@ PHP_METHOD(Phalcon_Logger_Formatter_Line, format){
 
 	if (Z_TYPE_P(message) != IS_STRING) {
 		zval tmp = {};
-		ZVAL_STR(&tmp, zval_get_string_func(message));
+		ZVAL_STR(&tmp, zval_get_string(message));
 		PHALCON_STR_REPLACE(&new_format, &message_wildcard, &tmp, &format);
 		zval_ptr_dtor(&tmp);
 	} else {

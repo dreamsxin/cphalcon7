@@ -44,9 +44,13 @@ int phalcon_file_exists_str(char *filename){
     if (!filename) {
  	   return FAILURE;
     }
-
+#if PHP_VERSION_ID >= 80100
+	new_str = zend_string_init(filename, strlen(filename), 0);
+    php_stat(new_str, FS_EXISTS, &exists_flag);
+	zend_string_release(new_str);
+#else
     php_stat(filename, (php_stat_len) strlen(filename), FS_EXISTS, &exists_flag);
-
+#endif
     if (Z_TYPE(exists_flag) == IS_TRUE) {
  	   return SUCCESS;
     }
@@ -61,9 +65,11 @@ int phalcon_file_exists(zval *filename){
 	if (Z_TYPE_P(filename) != IS_STRING) {
 		return FAILURE;
 	}
-
+#if PHP_VERSION_ID >= 80100
+	php_stat(Z_STR_P(filename), FS_EXISTS, &exists_flag);
+#else
 	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_EXISTS, &exists_flag);
-
+#endif
 	if (Z_TYPE(exists_flag) == IS_TRUE) {
 		return SUCCESS;
 	}
@@ -75,8 +81,13 @@ int phalcon_is_file_str(char *filename)
 {
     zval tmp = {};
     int ret;
-
+#if PHP_VERSION_ID >= 80100
+	new_str = zend_string_init(filename, strlen(filename), 0);
+    php_stat(new_str, FS_EXISTS, &tmp);
+	zend_string_release(new_str);
+#else
     php_stat(filename, strlen(filename), FS_IS_FILE, &tmp);
+#endif
     ret = zend_is_true(&tmp);
     return ret;
 }
@@ -85,8 +96,11 @@ int phalcon_is_file(zval *filename)
 {
     zval tmp = {};
     int ret;
-
+#if PHP_VERSION_ID >= 80100
+    php_stat(Z_STR_P(filename), FS_EXISTS, &tmp);
+#else
     php_stat(Z_STRVAL_P(filename), Z_STRLEN_P(filename), FS_IS_FILE, &tmp);
+#endif
     ret = zend_is_true(&tmp);
     return ret;
 }
@@ -125,8 +139,11 @@ void phalcon_fast_filemtime(zval *return_value, zval *filename){
 		php_error_docref(NULL, E_WARNING, "Invalid arguments supplied for fast_filemtime()");
 		return;
 	}
-
+#if PHP_VERSION_ID >= 80100
+	php_stat(Z_STR_P(filename), FS_MTIME, return_value);
+#else
 	php_stat(Z_STRVAL_P(filename), (php_stat_len) Z_STRLEN_P(filename), FS_MTIME, return_value);
+#endif
 }
 
 /**
@@ -508,8 +525,11 @@ int phalcon_is_dir(zval *path)
 {
     zval tmp = {};
     int ret;
-
+#if PHP_VERSION_ID >= 80100
+    php_stat(Z_STR_P(path), FS_IS_DIR, &tmp);
+#else
     php_stat(Z_STRVAL_P(path), Z_STRLEN_P(path), FS_IS_DIR, &tmp);
+#endif
     ret = zend_is_true(&tmp);
     zval_dtor( &tmp );
     return ret;
@@ -519,8 +539,13 @@ int phalcon_is_dir_str(char *path)
 {
     zval tmp = {};
     int ret;
-
+#if PHP_VERSION_ID >= 80100
+	new_str = zend_string_init(path, strlen(path), 0);
+    php_stat(new_str, FS_IS_DIR, &tmp);
+	zend_string_release(new_str);
+#else
     php_stat(path, strlen(path), FS_IS_DIR, &tmp);
+#endif
     ret = zend_is_true(&tmp);
     zval_dtor( &tmp );
     return ret;
@@ -573,7 +598,11 @@ int phalcon_unlink_str(char *path)
 void phalcon_filemtime(zval *return_value, zval *path)
 {
 	if (likely(Z_TYPE_P(path) == IS_STRING)) {
+#if PHP_VERSION_ID >= 80100
+		php_stat(Z_STR_P(path), FS_MTIME, return_value);
+#else
 		php_stat(Z_STRVAL_P(path), (php_stat_len)(Z_STRLEN_P(path)), FS_MTIME, return_value);
+#endif
 	}
 	else {
 		ZVAL_FALSE(return_value);

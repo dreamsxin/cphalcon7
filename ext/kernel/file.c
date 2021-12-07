@@ -45,6 +45,7 @@ int phalcon_file_exists_str(char *filename){
  	   return FAILURE;
     }
 #if PHP_VERSION_ID >= 80100
+	zend_string *new_str;
 	new_str = zend_string_init(filename, strlen(filename), 0);
     php_stat(new_str, FS_EXISTS, &exists_flag);
 	zend_string_release(new_str);
@@ -82,6 +83,7 @@ int phalcon_is_file_str(char *filename)
     zval tmp = {};
     int ret;
 #if PHP_VERSION_ID >= 80100
+	zend_string *new_str;
 	new_str = zend_string_init(filename, strlen(filename), 0);
     php_stat(new_str, FS_EXISTS, &tmp);
 	zend_string_release(new_str);
@@ -540,6 +542,7 @@ int phalcon_is_dir_str(char *path)
     zval tmp = {};
     int ret;
 #if PHP_VERSION_ID >= 80100
+	zend_string *new_str;
 	new_str = zend_string_init(path, strlen(path), 0);
     php_stat(new_str, FS_IS_DIR, &tmp);
 	zend_string_release(new_str);

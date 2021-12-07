@@ -85,11 +85,16 @@ static void run_bootstrap(async_thread *thread)
 	zend_op_array *ops;
 	
 	zval retval;
-	
+#if PHP_VERSION_ID >= 80100
+	zend_stream_init_filename_ex(&handle, thread->bootstrap);
+	if (SUCCESS != php_stream_open_for_zend_ex(&handle, USE_PATH | REPORT_ERRORS | STREAM_OPEN_FOR_INCLUDE)) {
+		return;
+	}
+#else
 	if (SUCCESS != php_stream_open_for_zend_ex(ZSTR_VAL(thread->bootstrap), &handle, USE_PATH | REPORT_ERRORS | STREAM_OPEN_FOR_INCLUDE)) {
 		return;
 	}
-	
+#endif
 	if (!handle.opened_path) {
 		handle.opened_path = zend_string_dup(thread->bootstrap, 0);
 	}

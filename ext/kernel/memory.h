@@ -110,7 +110,15 @@ int phalcon_del_symbol_str(zend_array *symbol_table, char *key_name, unsigned in
 #define PHALCON_SEPARATE_PARAM(z) \
 	do { \
 		ZVAL_DEREF(z); \
-		SEPARATE_ZVAL_IF_NOT_REF(z); \
+		zval *__zv = (z);								\
+		if (Z_TYPE_P(__zv) == IS_ARRAY) {				\
+			if (Z_REFCOUNT_P(__zv) > 1) {				\
+				if (Z_REFCOUNTED_P(__zv)) {				\
+					Z_DELREF_P(__zv);					\
+				}										\
+				ZVAL_ARR(__zv, zend_array_dup(Z_ARR_P(__zv)));\
+			}											\
+		}												\
 	} while (0)
 
 #define PHALCON_COPY_TO_STACK(a, b) \

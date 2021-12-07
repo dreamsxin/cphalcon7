@@ -1138,9 +1138,12 @@ void async_udp_socket_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "UdpSocket", async_udp_socket_functions);
 	async_udp_socket_ce = zend_register_internal_class(&ce);
 	async_udp_socket_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_udp_socket_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_udp_socket_ce->serialize = zend_class_serialize_deny;
 	async_udp_socket_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_udp_socket_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_udp_socket_handlers.free_obj = async_udp_socket_object_destroy;
 	async_udp_socket_handlers.dtor_obj = async_udp_socket_object_dtor;
@@ -1156,9 +1159,12 @@ void async_udp_socket_ce_register()
 	async_udp_datagram_ce = zend_register_internal_class(&ce);
 	async_udp_datagram_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_udp_datagram_ce->create_object = async_udp_datagram_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_udp_datagram_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_udp_datagram_ce->serialize = zend_class_serialize_deny;
 	async_udp_datagram_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_udp_datagram_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_udp_datagram_handlers.offset = XtOffsetOf(async_udp_datagram, std);
 	async_udp_datagram_handlers.free_obj = async_udp_datagram_object_destroy;

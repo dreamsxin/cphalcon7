@@ -2232,9 +2232,12 @@ void async_task_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "AwaitableImpl", empty_funcs);
 	async_awaitable_impl_ce = zend_register_internal_class(&ce);
 	async_awaitable_impl_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_awaitable_impl_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_awaitable_impl_ce->serialize = zend_class_serialize_deny;
 	async_awaitable_impl_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_awaitable_impl_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_awaitable_impl_handlers.offset = XtOffsetOf(async_awaitable_impl, std);
 	async_awaitable_impl_handlers.free_obj = async_awaitable_impl_object_destroy;
@@ -2266,9 +2269,12 @@ void async_task_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Task", task_functions);
 	async_task_ce = zend_register_internal_class(&ce);
 	async_task_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_task_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_task_ce->serialize = zend_class_serialize_deny;
 	async_task_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_task_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_task_handlers.offset = XtOffsetOf(async_task, std);
 	async_task_handlers.free_obj = async_task_object_destroy;
@@ -2300,9 +2306,12 @@ void async_task_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "TaskScheduler", task_scheduler_functions);
 	async_task_scheduler_ce = zend_register_internal_class(&ce);
 	async_task_scheduler_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_task_scheduler_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_task_scheduler_ce->serialize = zend_class_serialize_deny;
 	async_task_scheduler_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_task_scheduler_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_task_scheduler_handlers.free_obj = async_task_scheduler_object_destroy;
 	async_task_scheduler_handlers.clone_obj = NULL;

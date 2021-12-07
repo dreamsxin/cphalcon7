@@ -1019,9 +1019,12 @@ void async_process_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Process", "Process", async_process_functions);
 	async_process_ce = zend_register_internal_class(&ce);
 	async_process_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_process_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_process_ce->serialize = zend_class_serialize_deny;
 	async_process_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_process_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_process_handlers.dtor_obj = async_process_object_dtor;
 	async_process_handlers.free_obj = async_process_object_destroy;
@@ -1031,9 +1034,12 @@ void async_process_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Process", "ReadablePipe", async_readable_process_pipe_functions);
 	async_readable_process_pipe_ce = zend_register_internal_class(&ce);
 	async_readable_process_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_readable_process_pipe_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_readable_process_pipe_ce->serialize = zend_class_serialize_deny;
 	async_readable_process_pipe_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_readable_process_pipe_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_readable_process_pipe_handlers.free_obj = async_readable_process_pipe_object_destroy;
 	async_readable_process_pipe_handlers.clone_obj = NULL;
@@ -1043,9 +1049,12 @@ void async_process_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Process", "WritablePipe", async_writable_process_pipe_functions);
 	async_writable_process_pipe_ce = zend_register_internal_class(&ce);
 	async_writable_process_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_writable_process_pipe_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_writable_process_pipe_ce->serialize = zend_class_serialize_deny;
 	async_writable_process_pipe_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_writable_process_pipe_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_writable_process_pipe_handlers.free_obj = async_writable_process_pipe_object_destroy;
 	async_writable_process_pipe_handlers.clone_obj = NULL;

@@ -140,7 +140,7 @@ PHALCON_INIT_CLASS(Phalcon_Session_Bag){
 
 	phalcon_session_bag_ce->get_iterator = phalcon_session_bag_get_iterator;
 
-	zend_class_implements(phalcon_session_bag_ce, 4, phalcon_session_baginterface_ce, zend_ce_aggregate, zend_ce_arrayaccess, spl_ce_Countable);
+	zend_class_implements(phalcon_session_bag_ce, 4, phalcon_session_baginterface_ce, zend_ce_aggregate, zend_ce_arrayaccess, zend_ce_countable);
 
 	return SUCCESS;
 }

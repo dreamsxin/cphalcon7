@@ -119,7 +119,7 @@ PHALCON_INIT_CLASS(Phalcon_Http_Client_Header){
 	zend_declare_class_constant_long(phalcon_http_client_header_ce, SL("BUILD_STATUS"), PHALCON_HTTP_CLIENT_HEADER_BUILD_STATUS);
 	zend_declare_class_constant_long(phalcon_http_client_header_ce, SL("BUILD_FIELDS"), PHALCON_HTTP_CLIENT_HEADER_BUILD_FIELDS);
 
-	zend_class_implements(phalcon_http_client_header_ce, 1, spl_ce_Countable);
+	zend_class_implements(phalcon_http_client_header_ce, 1, zend_ce_countable);
 
 	return SUCCESS;
 }

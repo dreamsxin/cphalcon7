@@ -104,7 +104,7 @@ PHALCON_INIT_CLASS(Phalcon_Annotations_Collection){
 	zend_declare_property_long(phalcon_annotations_collection_ce, SL("_position"), 0, ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_annotations_collection_ce, SL("_annotations"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_annotations_collection_ce, 2, zend_ce_iterator, spl_ce_Countable);
+	zend_class_implements(phalcon_annotations_collection_ce, 2, zend_ce_iterator, zend_ce_countable);
 
 	return SUCCESS;
 }

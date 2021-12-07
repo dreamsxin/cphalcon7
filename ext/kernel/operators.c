@@ -425,10 +425,13 @@ int phalcon_is_equal_object(zval *obj1, zval *obj2) {
 	if (Z_TYPE_P(obj1) != IS_OBJECT && Z_TYPE_P(obj1) != IS_OBJECT) {
 		return 0;
 	}
-
+#if PHP_VERSION_ID >= 80100
+	md5str = php_spl_object_hash(Z_OBJ_P(obj1));
+	md5str2 = php_spl_object_hash(Z_OBJ_P(obj2));
+#else
 	md5str = php_spl_object_hash(obj1);
 	md5str2 = php_spl_object_hash(obj2);
-
+#endif
 	return zend_string_equals(md5str, md5str2);
 }
 
@@ -852,7 +855,7 @@ zend_long phalcon_fast_count_int(zval *value)
 			}
 		}
 
-		if (instanceof_function_ex(Z_OBJCE_P(value), spl_ce_Countable, 1)) {
+		if (instanceof_function_ex(Z_OBJCE_P(value), zend_ce_countable, 1)) {
 #if PHP_VERSION_ID >= 80000
 			zend_call_method_with_0_params(Z_OBJ_P(value), Z_OBJCE_P(value), NULL, "count", &retval);
 #else
@@ -901,7 +904,7 @@ void phalcon_fast_count(zval *result, zval *value)
 			}
 		}
 
-		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+		if (instanceof_function(Z_OBJCE_P(value), zend_ce_countable)) {
 #if PHP_VERSION_ID >= 80000
 			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
 #else
@@ -950,7 +953,7 @@ int phalcon_fast_count_ev(zval *value)
 			return (int) count > 0;
 		}
 
-		if (instanceof_function(Z_OBJCE_P(value), spl_ce_Countable)) {
+		if (instanceof_function(Z_OBJCE_P(value), zend_ce_countable)) {
 #if PHP_VERSION_ID >= 80000
 			zend_call_method_with_0_params(Z_OBJ_P(value), NULL, NULL, "count", &retval);
 #else

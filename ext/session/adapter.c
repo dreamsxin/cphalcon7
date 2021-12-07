@@ -130,7 +130,7 @@ PHALCON_INIT_CLASS(Phalcon_Session_Adapter){
 	zend_class_implements(
 		phalcon_session_adapter_ce, 4,
 		phalcon_session_adapterinterface_ce,
-		spl_ce_Countable,
+		zend_ce_countable,
 		zend_ce_aggregate,
 		zend_ce_arrayaccess
 	);

@@ -132,7 +132,7 @@ PHALCON_INIT_CLASS(Phalcon_Registry){
 
 	zend_declare_property_null(phalcon_registry_ce, SL("_data"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_registry_ce, 4, zend_ce_arrayaccess, zend_ce_iterator, zend_ce_serializable, spl_ce_Countable);
+	zend_class_implements(phalcon_registry_ce, 4, zend_ce_arrayaccess, zend_ce_iterator, zend_ce_serializable, zend_ce_countable);
 
 	return SUCCESS;
 }

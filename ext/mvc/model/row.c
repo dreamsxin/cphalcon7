@@ -82,7 +82,7 @@ PHALCON_INIT_CLASS(Phalcon_Mvc_Model_Row){
 
 	PHALCON_REGISTER_CLASS(Phalcon\\Mvc\\Model, Row, mvc_model_row, phalcon_mvc_model_row_method_entry, 0);
 
-	zend_class_implements(phalcon_mvc_model_row_ce, 3, zend_ce_arrayaccess, spl_ce_Countable, phalcon_mvc_model_resultinterface_ce);
+	zend_class_implements(phalcon_mvc_model_row_ce, 3, zend_ce_arrayaccess, zend_ce_countable, phalcon_mvc_model_resultinterface_ce);
 
 	return SUCCESS;
 }

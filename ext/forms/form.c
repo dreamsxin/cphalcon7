@@ -271,7 +271,7 @@ PHALCON_INIT_CLASS(Phalcon_Forms_Form){
 	zend_declare_class_constant_long(phalcon_forms_form_ce, SL("VALUES_RAW"), PHALCON_FROM_VALUES_RAW);
 	zend_declare_class_constant_long(phalcon_forms_form_ce, SL("VALUES_AS_ARRAY"), PHALCON_FROM_VALUES_AS_ARRAY);
 
-	zend_class_implements(phalcon_forms_form_ce, 2, spl_ce_Countable, zend_ce_iterator);
+	zend_class_implements(phalcon_forms_form_ce, 2, zend_ce_countable, zend_ce_iterator);
 
 	return SUCCESS;
 }

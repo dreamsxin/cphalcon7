@@ -131,7 +131,7 @@ PHALCON_INIT_CLASS(Phalcon_Validation_Message_Group){
 	zend_declare_property_null(phalcon_validation_message_group_ce, SL("_position"), ZEND_ACC_PROTECTED);
 	zend_declare_property_null(phalcon_validation_message_group_ce, SL("_messages"), ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_validation_message_group_ce, 3, spl_ce_Countable, zend_ce_arrayaccess, zend_ce_iterator);
+	zend_class_implements(phalcon_validation_message_group_ce, 3, zend_ce_countable, zend_ce_arrayaccess, zend_ce_iterator);
 #ifdef PHALCON_USE_PHP_JSON
 	zend_class_implements(phalcon_validation_message_group_ce, 1, php_json_serializable_ce);
 #endif

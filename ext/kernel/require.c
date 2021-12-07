@@ -209,7 +209,7 @@ int phalcon_exec_file(zval *ret, zval *object, zval *file, zval *vars, zend_arra
 #if PHP_VERSION_ID >= 80100
 	zend_stream_init_filename_ex(&file_handle, filename);
 	if (SUCCESS != php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE)) {
-		return;
+		return FAILURE;
 	}
 #elif PHP_VERSION_ID >= 70400
 	status = php_stream_open_for_zend_ex(ZSTR_VAL(filename), &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);
@@ -306,7 +306,7 @@ int phalcon_require_ret(zval *return_value_ptr, const char *require_path)
 #if PHP_VERSION_ID >= 80100
 	zend_stream_init_filename(&file_handle, require_path);
 	if (SUCCESS != php_stream_open_for_zend_ex(&file_handle, USE_PATH | STREAM_OPEN_FOR_INCLUDE)) {
-		return;
+		return FAILURE;
 	}
 #elif PHP_VERSION_ID >= 70400
 	ret = php_stream_open_for_zend_ex(require_path, &file_handle, USE_PATH|STREAM_OPEN_FOR_INCLUDE);

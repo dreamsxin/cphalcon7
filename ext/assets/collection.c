@@ -184,7 +184,7 @@ PHALCON_INIT_CLASS(Phalcon_Assets_Collection){
 	zend_declare_property_null(phalcon_assets_collection_ce, SL("_sourcePath"), ZEND_ACC_PROTECTED);
 	zend_declare_property_bool(phalcon_assets_collection_ce, SL("_targetLocal"), 1, ZEND_ACC_PROTECTED);
 
-	zend_class_implements(phalcon_assets_collection_ce, 2, spl_ce_Countable, zend_ce_iterator);
+	zend_class_implements(phalcon_assets_collection_ce, 2, zend_ce_countable, zend_ce_iterator);
 
 	return SUCCESS;
 }

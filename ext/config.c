@@ -128,7 +128,7 @@ PHALCON_INIT_CLASS(Phalcon_Config){
 
 	zend_declare_property_bool(phalcon_config_ce, SL("_recursive"), 1, ZEND_ACC_PROTECTED|ZEND_ACC_STATIC);
 
-	zend_class_implements(phalcon_config_ce, 2, zend_ce_arrayaccess, spl_ce_Countable);
+	zend_class_implements(phalcon_config_ce, 2, zend_ce_arrayaccess, zend_ce_countable);
 
 	return SUCCESS;
 }

@@ -382,9 +382,12 @@ void async_signal_ce_register()
 	async_signal_ce = zend_register_internal_class(&ce);
 	async_signal_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_signal_ce->create_object = async_signal_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_signal_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_signal_ce->serialize = zend_class_serialize_deny;
 	async_signal_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_signal_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_signal_handlers.free_obj = async_signal_object_destroy;
 	async_signal_handlers.dtor_obj = async_signal_object_dtor;

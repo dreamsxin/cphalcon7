@@ -356,9 +356,12 @@ void async_monitor_ce_register()
 	async_monitor_ce = zend_register_internal_class(&ce);
 	async_monitor_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_monitor_ce->create_object = async_monitor_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_monitor_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_monitor_ce->serialize = zend_class_serialize_deny;
 	async_monitor_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_monitor_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_monitor_handlers.free_obj = async_monitor_object_destroy;
 	async_monitor_handlers.dtor_obj = async_monitor_object_dtor;
@@ -368,9 +371,12 @@ void async_monitor_ce_register()
 	async_monitor_event_ce = zend_register_internal_class(&ce);
 	async_monitor_event_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_monitor_event_ce->create_object = NULL;
+#if PHP_VERSION_ID >= 80100
+	async_monitor_event_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_monitor_event_ce->serialize = zend_class_serialize_deny;
 	async_monitor_event_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_monitor_event_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_monitor_event_handlers.offset = XtOffsetOf(async_monitor_event, std);
 	async_monitor_event_handlers.free_obj = async_monitor_event_object_destroy;

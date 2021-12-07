@@ -1283,8 +1283,12 @@ void async_deferred_ce_register()
 	async_deferred_ce = zend_register_internal_class(&ce);
 	async_deferred_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_deferred_ce->create_object = async_deferred_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_deferred_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_deferred_ce->serialize = zend_class_serialize_deny;
 	async_deferred_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_deferred_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_deferred_handlers.offset = XtOffsetOf(async_deferred, std);
@@ -1325,8 +1329,12 @@ void async_deferred_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "DeferredAwaitable", deferred_awaitable_functions);
 	async_deferred_awaitable_ce = zend_register_internal_class(&ce);
 	async_deferred_awaitable_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_deferred_awaitable_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_deferred_awaitable_ce->serialize = zend_class_serialize_deny;
 	async_deferred_awaitable_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_deferred_awaitable_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_deferred_awaitable_handlers.offset = XtOffsetOf(async_deferred_awaitable, std);

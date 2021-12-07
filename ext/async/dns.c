@@ -1315,8 +1315,12 @@ void async_dns_ce_register()
 	async_dns_query_ce = zend_register_internal_class(&ce);
 	async_dns_query_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_dns_query_ce->create_object = async_dns_query_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_dns_query_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_dns_query_ce->serialize = zend_class_serialize_deny;
 	async_dns_query_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_dns_query_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_dns_query_handlers.offset = XtOffsetOf(async_dns_query, std);

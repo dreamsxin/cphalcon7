@@ -1487,9 +1487,12 @@ void async_channel_ce_register()
 	async_channel_ce = zend_register_internal_class(&ce);
 	async_channel_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_channel_ce->create_object = async_channel_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_channel_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_channel_ce->serialize = zend_class_serialize_deny;
 	async_channel_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_channel_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_channel_handlers.free_obj = async_channel_object_destroy;
 	async_channel_handlers.dtor_obj = async_channel_object_dtor;
@@ -1501,9 +1504,12 @@ void async_channel_ce_register()
 	async_channel_group_ce = zend_register_internal_class(&ce);
 	async_channel_group_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_channel_group_ce->create_object = async_channel_group_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_channel_group_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_channel_group_ce->serialize = zend_class_serialize_deny;
 	async_channel_group_ce->unserialize = zend_class_unserialize_deny;
-	
+#endif
 	memcpy(&async_channel_group_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_channel_group_handlers.free_obj = async_channel_group_object_destroy;
 	async_channel_group_handlers.dtor_obj = async_channel_group_object_dtor;
@@ -1514,8 +1520,12 @@ void async_channel_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "ChannelIterator", channel_iterator_functions);
 	async_channel_iterator_ce = zend_register_internal_class(&ce);
 	async_channel_iterator_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_channel_iterator_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_channel_iterator_ce->serialize = zend_class_serialize_deny;
 	async_channel_iterator_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_channel_iterator_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_channel_iterator_handlers.free_obj = async_channel_iterator_object_destroy;
@@ -1527,9 +1537,13 @@ void async_channel_ce_register()
 	async_channel_select_ce = zend_register_internal_class(&ce);
 	async_channel_select_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_channel_select_ce->create_object = NULL;
+#if PHP_VERSION_ID >= 80100
+	async_channel_select_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_channel_select_ce->serialize = zend_class_serialize_deny;
 	async_channel_select_ce->unserialize = zend_class_unserialize_deny;
-	
+#endif
+
 	memcpy(&async_channel_select_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_channel_select_handlers.offset = XtOffsetOf(async_channel_select, std);
 	async_channel_select_handlers.free_obj = async_channel_select_object_destroy;

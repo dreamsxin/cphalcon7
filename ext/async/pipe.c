@@ -1361,8 +1361,12 @@ void async_pipe_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "Pipe", async_pipe_functions);
 	async_pipe_ce = zend_register_internal_class(&ce);
 	async_pipe_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_pipe_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_pipe_ce->serialize = zend_class_serialize_deny;
 	async_pipe_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	zend_class_implements(async_pipe_ce, 1, async_socket_stream_ce);
 
@@ -1374,9 +1378,12 @@ void async_pipe_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "PipeServer", async_pipe_server_functions);
 	async_pipe_server_ce = zend_register_internal_class(&ce);
 	async_pipe_server_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_pipe_server_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_pipe_server_ce->serialize = zend_class_serialize_deny;
 	async_pipe_server_ce->unserialize = zend_class_unserialize_deny;
-	
+#endif
 	zend_class_implements(async_pipe_server_ce, 1, async_server_ce);
 
 	memcpy(&async_pipe_server_handlers, &std_object_handlers, sizeof(zend_object_handlers));

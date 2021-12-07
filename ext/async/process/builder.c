@@ -663,9 +663,12 @@ void async_process_builder_ce_register()
 	async_process_builder_ce = zend_register_internal_class(&ce);
 	async_process_builder_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_process_builder_ce->create_object = async_process_builder_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_process_builder_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_process_builder_ce->serialize = zend_class_serialize_deny;
 	async_process_builder_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_process_builder_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_process_builder_handlers.free_obj = async_process_builder_object_destroy;
 	async_process_builder_handlers.clone_obj = NULL;

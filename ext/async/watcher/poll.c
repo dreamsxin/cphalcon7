@@ -398,9 +398,12 @@ void async_poll_ce_register()
 	async_poll_ce = zend_register_internal_class(&ce);
 	async_poll_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_poll_ce->create_object = async_poll_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_poll_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_poll_ce->serialize = zend_class_serialize_deny;
 	async_poll_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_poll_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_poll_handlers.free_obj = async_poll_object_destroy;
 	async_poll_handlers.dtor_obj = async_poll_object_dtor;

@@ -807,8 +807,12 @@ void async_event_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "PollEvent", poll_event_functions);
 	async_poll_event_ce = zend_register_internal_class(&ce);
 	async_poll_event_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_poll_event_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_poll_event_ce->serialize = zend_class_serialize_deny;
 	async_poll_event_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_poll_event_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_poll_event_handlers.dtor_obj = async_poll_event_object_dtor;
@@ -822,8 +826,12 @@ void async_event_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "TickEvent", tick_event_functions);
 	async_tick_event_ce = zend_register_internal_class(&ce);
 	async_tick_event_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_tick_event_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_tick_event_ce->serialize = zend_class_serialize_deny;
 	async_tick_event_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_tick_event_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_tick_event_handlers.free_obj = async_tick_event_object_destroy;
@@ -832,8 +840,12 @@ void async_event_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "TimerEvent", timer_event_functions);
 	async_timer_event_ce = zend_register_internal_class(&ce);
 	async_timer_event_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_timer_event_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_timer_event_ce->serialize = zend_class_serialize_deny;
 	async_timer_event_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_timer_event_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_timer_event_handlers.dtor_obj = async_timer_event_object_dtor;

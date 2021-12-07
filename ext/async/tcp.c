@@ -1502,9 +1502,12 @@ void async_tcp_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "TcpSocket", async_tcp_socket_functions);
 	async_tcp_socket_ce = zend_register_internal_class(&ce);
 	async_tcp_socket_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_tcp_socket_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_tcp_socket_ce->serialize = zend_class_serialize_deny;
 	async_tcp_socket_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	zend_class_implements(async_tcp_socket_ce, 1, async_socket_stream_ce);
 
 	memcpy(&async_tcp_socket_handlers, &std_object_handlers, sizeof(zend_object_handlers));
@@ -1518,9 +1521,12 @@ void async_tcp_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Network", "TcpServer", async_tcp_server_functions);
 	async_tcp_server_ce = zend_register_internal_class(&ce);
 	async_tcp_server_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_tcp_server_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_tcp_server_ce->serialize = zend_class_serialize_deny;
 	async_tcp_server_ce->unserialize = zend_class_unserialize_deny;
-	
+#endif
 	zend_class_implements(async_tcp_server_ce, 1, async_server_ce);
 
 	memcpy(&async_tcp_server_handlers, &std_object_handlers, sizeof(zend_object_handlers));

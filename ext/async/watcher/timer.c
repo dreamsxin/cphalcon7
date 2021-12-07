@@ -564,8 +564,12 @@ void async_timer_ce_register()
 	async_timer_ce = zend_register_internal_class(&ce);
 	async_timer_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_timer_ce->create_object = async_timer_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_timer_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_timer_ce->serialize = zend_class_serialize_deny;
 	async_timer_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_timer_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_timer_handlers.free_obj = async_timer_object_destroy;
@@ -575,9 +579,12 @@ void async_timer_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Timeout", async_timeout_functions);
 	async_timeout_ce = zend_register_internal_class(&ce);
 	async_timeout_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_timeout_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_timeout_ce->serialize = zend_class_serialize_deny;
 	async_timeout_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_timeout_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_timeout_handlers.free_obj = async_timeout_object_destroy;
 	async_timeout_handlers.dtor_obj = async_timeout_object_dtor;

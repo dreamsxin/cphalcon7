@@ -806,8 +806,12 @@ void async_context_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async", "Context", async_context_functions);
 	async_context_ce = zend_register_internal_class(&ce);
 	async_context_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_context_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_context_ce->serialize = zend_class_serialize_deny;
 	async_context_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_context_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_context_handlers.free_obj = async_context_object_destroy;
@@ -817,9 +821,12 @@ void async_context_ce_register()
 	async_context_var_ce = zend_register_internal_class(&ce);
 	async_context_var_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_context_var_ce->create_object = async_context_var_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_context_var_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_context_var_ce->serialize = zend_class_serialize_deny;
 	async_context_var_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_context_var_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_context_var_handlers.free_obj = async_context_var_object_destroy;
 	async_context_var_handlers.clone_obj = NULL;
@@ -828,8 +835,12 @@ void async_context_ce_register()
 	async_cancellation_handler_ce = zend_register_internal_class(&ce);
 	async_cancellation_handler_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_cancellation_handler_ce->create_object = NULL;
+#if PHP_VERSION_ID >= 80100
+	async_cancellation_handler_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_cancellation_handler_ce->serialize = zend_class_serialize_deny;
 	async_cancellation_handler_ce->unserialize = zend_class_unserialize_deny;
+#endif
 
 	memcpy(&async_cancellation_handler_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_cancellation_handler_handlers.free_obj = async_cancellation_handler_object_destroy;

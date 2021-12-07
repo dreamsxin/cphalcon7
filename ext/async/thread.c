@@ -745,9 +745,12 @@ void async_thread_ce_register()
 	async_thread_ce = zend_register_internal_class(&ce);
 	async_thread_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_thread_ce->create_object = async_thread_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_thread_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_thread_ce->serialize = zend_class_serialize_deny;
 	async_thread_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_thread_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_thread_handlers.free_obj = async_thread_object_destroy;
 	async_thread_handlers.dtor_obj = async_thread_object_dtor;

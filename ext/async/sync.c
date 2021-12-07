@@ -263,9 +263,12 @@ void async_sync_ce_register()
 	async_sync_condition_ce = zend_register_internal_class(&ce);
 	async_sync_condition_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_sync_condition_ce->create_object = async_sync_condition_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_sync_condition_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_sync_condition_ce->serialize = zend_class_serialize_deny;
 	async_sync_condition_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	memcpy(&async_sync_condition_handlers, &std_object_handlers, sizeof(zend_object_handlers));
 	async_sync_condition_handlers.free_obj = async_sync_condition_object_destroy;
 	async_sync_condition_handlers.dtor_obj = async_sync_condition_object_dtor;

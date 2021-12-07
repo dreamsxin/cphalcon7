@@ -1986,9 +1986,12 @@ void async_stream_ce_register()
 	async_readable_memory_stream_ce = zend_register_internal_class(&ce);
 	async_readable_memory_stream_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_readable_memory_stream_ce->create_object = async_readable_memory_stream_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_readable_memory_stream_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_readable_memory_stream_ce->serialize = zend_class_serialize_deny;
 	async_readable_memory_stream_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	zend_class_implements(async_readable_memory_stream_ce, 1, async_readable_stream_ce);
 
 	memcpy(&async_readable_memory_stream_handlers, &std_object_handlers, sizeof(zend_object_handlers));
@@ -1999,9 +2002,12 @@ void async_stream_ce_register()
 	async_writable_memory_stream_ce = zend_register_internal_class(&ce);
 	async_writable_memory_stream_ce->ce_flags |= ZEND_ACC_FINAL;
 	async_writable_memory_stream_ce->create_object = async_writable_memory_stream_object_create;
+#if PHP_VERSION_ID >= 80100
+	async_writable_memory_stream_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_writable_memory_stream_ce->serialize = zend_class_serialize_deny;
 	async_writable_memory_stream_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	zend_class_implements(async_writable_memory_stream_ce, 1, async_writable_stream_ce);
 
 	memcpy(&async_writable_memory_stream_handlers, &std_object_handlers, sizeof(zend_object_handlers));
@@ -2011,9 +2017,12 @@ void async_stream_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream", "StreamReader", async_stream_reader_functions);
 	async_stream_reader_ce = zend_register_internal_class(&ce);
 	async_stream_reader_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_stream_reader_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_stream_reader_ce->serialize = zend_class_serialize_deny;
 	async_stream_reader_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	zend_class_implements(async_stream_reader_ce, 1, async_readable_stream_ce);
 
 	memcpy(&async_stream_reader_handlers, &std_object_handlers, sizeof(zend_object_handlers));
@@ -2023,9 +2032,12 @@ void async_stream_ce_register()
 	INIT_NS_CLASS_ENTRY(ce, "Phalcon\\Async\\Stream", "StreamWriter", async_stream_writer_functions);
 	async_stream_writer_ce = zend_register_internal_class(&ce);
 	async_stream_writer_ce->ce_flags |= ZEND_ACC_FINAL;
+#if PHP_VERSION_ID >= 80100
+	async_stream_writer_ce->ce_flags |= ZEND_ACC_NOT_SERIALIZABLE;
+#else
 	async_stream_writer_ce->serialize = zend_class_serialize_deny;
 	async_stream_writer_ce->unserialize = zend_class_unserialize_deny;
-
+#endif
 	zend_class_implements(async_stream_writer_ce, 1, async_writable_stream_ce);
 
 	memcpy(&async_stream_writer_handlers, &std_object_handlers, sizeof(zend_object_handlers));

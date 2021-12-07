@@ -295,7 +295,7 @@ PHPAPI int php_copy_file_ctx(const char *src, const char *dest, int src_flg, php
 		return FAILURE;
 	}
 
-	switch (php_stream_stat_path_ex(dest, PHP_STREAM_URL_STAT_QUIET | PHP_STREAM_URL_STAT_NOCACHE, &dest_s, ctx)) {
+	switch (php_stream_stat_path_ex(dest, PHP_STREAM_URL_STAT_QUIET, &dest_s, ctx)) {
 		case -1:
 			/* non-statable stream */
 			goto safe_to_copy;
@@ -474,9 +474,15 @@ int rmtree_iterator(zend_object_iterator *iter, void *puser)
 				case SPL_FS_DIR:
 				case SPL_FS_FILE:
 				case SPL_FS_INFO:
+#if PHP_VERSION_ID >= 80100
+					php_stat(intern->file_name, FS_IS_DIR, &dummy);
+					is_dir = zend_is_true(&dummy);
+					fname = expand_filepath(ZSTR_VAL(intern->file_name), NULL);
+#else
 					php_stat(intern->file_name, intern->file_name_len, FS_IS_DIR, &dummy);
 					is_dir = zend_is_true(&dummy);
 					fname = expand_filepath(intern->file_name, NULL);
+#endif
 					if (!fname) {
 						zend_throw_exception_ex(spl_ce_UnexpectedValueException, 0, "Could not resolve file path");
 						return ZEND_HASH_APPLY_STOP;
@@ -608,7 +614,11 @@ int list_iterator(zend_object_iterator *iter, void *puser)
 		{
 			zval filename = {};
 			spl_filesystem_object *intern = (spl_filesystem_object*)spl_filesystem_from_obj(Z_OBJ_P(value));
+#if PHP_VERSION_ID >= 80100
+			ZVAL_STR(&filename, intern->file_name);
+#else
 			ZVAL_STRINGL(&filename, intern->file_name, intern->file_name_len);
+#endif
 			phalcon_array_append(return_value, &filename, 0);
 			break;
 		}
@@ -644,11 +654,19 @@ int list_file_iterator(zend_object_iterator *iter, void *puser)
 				case SPL_FS_DIR:
 				case SPL_FS_FILE:
 				case SPL_FS_INFO:
+#if PHP_VERSION_ID >= 80100
+					php_stat(intern->file_name, FS_IS_FILE, &dummy);
+					if (zend_is_true(&dummy)) {
+						ZVAL_STR(&filename, intern->file_name);
+						phalcon_array_append(return_value, &filename, 0);
+					}
+#else
 					php_stat(intern->file_name, intern->file_name_len, FS_IS_FILE, &dummy);
 					if (zend_is_true(&dummy)) {
 						ZVAL_STRINGL(&filename, intern->file_name, intern->file_name_len);
 						phalcon_array_append(return_value, &filename, 0);
 					}
+#endif
 					break;
 				default:
 					break;
@@ -688,7 +706,11 @@ int list_dir_iterator(zend_object_iterator *iter, void *puser)
 				case SPL_FS_INFO:
 					php_stat(intern->file_name, intern->file_name_len, FS_IS_DIR, &dummy);
 					if (zend_is_true(&dummy)) {
+#if PHP_VERSION_ID >= 80100
+						ZVAL_STR(&filename, intern->file_name);
+#else
 						ZVAL_STRINGL(&filename, intern->file_name, intern->file_name_len);
+#endif
 						phalcon_array_append(return_value, &filename, 0);
 					}
 					break;

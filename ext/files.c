@@ -704,7 +704,11 @@ int list_dir_iterator(zend_object_iterator *iter, void *puser)
 				case SPL_FS_DIR:
 				case SPL_FS_FILE:
 				case SPL_FS_INFO:
+#if PHP_VERSION_ID >= 80100
+					php_stat(intern->file_name, FS_IS_DIR, &dummy);
+#else
 					php_stat(intern->file_name, intern->file_name_len, FS_IS_DIR, &dummy);
+#endif
 					if (zend_is_true(&dummy)) {
 #if PHP_VERSION_ID >= 80100
 						ZVAL_STR(&filename, intern->file_name);

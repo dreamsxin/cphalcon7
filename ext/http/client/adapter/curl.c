@@ -246,10 +246,23 @@ PHP_METHOD(Phalcon_Http_Client_Adapter_Curl, sendInternal){
 		}
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POST"))) != NULL) {
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				zval debug_message = {};
+				ZVAL_STRING(&debug_message, "CURLOPT_POST");
+				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
+			}
 			PHALCON_MM_CALL_FUNCTION(NULL, "curl_setopt", &curl, constant, &PHALCON_GLOBAL(z_one));
 		}
 
 		if ((constant = zend_get_constant_str(SL("CURLOPT_POSTFIELDS"))) != NULL) {
+
+			if (unlikely(PHALCON_GLOBAL(debug).enable_debug)) {
+				zval debug_message = {};
+				ZVAL_STRING(&debug_message, "CURLOPT_POSTFIELDS");
+				PHALCON_DEBUG_LOG(&debug_message);
+				zval_ptr_dtor(&debug_message);
+			}
 			PHALCON_MM_CALL_FUNCTION(NULL, "curl_setopt", &curl, constant, &data);
 		}
 	} else if (phalcon_class_str_exists(SL("CURLFile"), 0) != NULL) {

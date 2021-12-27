@@ -1362,7 +1362,7 @@ num/ndarray.c"
 	fi
 
 	AC_MSG_CHECKING(checking php version >= 7.1)
-	if test "$PHP_ASYNC" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
+	if test "$PHP_ASYNC" = "yes" && test "$PHP_SOCKETS" = "yes" && test "$phalcon_php_version" -ge "7001000"; then
 		AC_MSG_RESULT(yes)
 		if test "$async_use_asm" = 'yes'; then
 			async_source_files="$async_source_files \

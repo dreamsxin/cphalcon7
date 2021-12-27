@@ -106,7 +106,7 @@ typedef size_t uv_buf_size_t;
 #include <main/php_network.h>
 #include <main/php_streams.h>
 
-#if defined(HAVE_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
+#if defined(PHALCON_USE_PHP_SOCKETS) && !defined(COMPILE_DL_SOCKETS)
 #define ASYNC_SOCKETS 1
 #include <ext/sockets/php_sockets.h>
 #elif !defined(PHP_WIN32)

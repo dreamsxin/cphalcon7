@@ -630,7 +630,11 @@ PHP_METHOD(Phalcon_Cli_Options, parse){
 							} else {
 								ZVAL_TRUE(&value);
 							}
+#if PHP_VERSION_ID >= 70300
 							zend_string_release_ex(str, 0);
+#else
+							zend_string_release(str);
+#endif
 						} else {
 							convert_to_boolean_ex(&value);
 						}

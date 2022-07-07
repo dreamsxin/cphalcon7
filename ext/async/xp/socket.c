@@ -535,7 +535,7 @@ static char *cipher_get_version(const SSL_CIPHER *c, char *buffer, size_t max_le
 	
 	version = SSL_CIPHER_get_version(c);
 
-	strncpy(buffer, version, max_len);
+	strncpy(buffer, version, max_len-1);
 	if (max_len <= strlen(version)) {
 		buffer[max_len - 1] = 0;
 	}

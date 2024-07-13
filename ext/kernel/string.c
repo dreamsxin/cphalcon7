@@ -2386,7 +2386,11 @@ void phalcon_random_string(zval *return_value, const zval *type, const zval *len
 	}
 
 	/** Generate seed */
+#if PHP_VERSION_ID < 80200
 	if (!BG(mt_rand_is_seeded)) {
+#else
+	if (!RANDOM_G(mt19937_seeded)) {
+#endif
 		php_mt_srand(GENERATE_SEED());
 	}
 
@@ -2943,7 +2947,12 @@ int phalcon_http_build_query(zval *return_value, zval *params, char *sep)
 		return FAILURE;
 	}
 
-#if PHP_VERSION_ID >= 80000
+
+#if PHP_VERSION_ID >= 80300
+    auto _arg_sep = zend_string_init(sep, strlen(sep), 0);
+    php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, NULL, _arg_sep, PHP_QUERY_RFC1738);
+    zend_string_release(_arg_sep);
+#elif PHP_VERSION_ID >= 80000
 	php_url_encode_hash_ex(HASH_OF(params), &formstr, NULL, 0, NULL, 0, NULL, 0, (Z_TYPE_P(params) == IS_OBJECT ? params : NULL), sep, PHP_QUERY_RFC1738);
 	if (!formstr.s) {
 		ZVAL_EMPTY_STRING(return_value);

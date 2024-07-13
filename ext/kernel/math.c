@@ -106,7 +106,11 @@ long phalcon_mt_rand(long min, long max) {
 		return 0;
 	}
 
+#if PHP_VERSION_ID < 80200
 	if (!BG(mt_rand_is_seeded)) {
+#else
+	if (!RANDOM_G(mt19937_seeded)) {
+#endif
 		php_mt_srand(GENERATE_SEED());
 	}
 

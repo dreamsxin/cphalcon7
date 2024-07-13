@@ -1287,9 +1287,7 @@ PHP_METHOD(Phalcon_Image_Adapter_GD, polygon){
 				phalcon_array_append(&points, &x, PH_COPY);
 				phalcon_array_append(&points, &y, PH_COPY);
 			} else {
-				phalcon_array_append(&points, &_p->val, PH_COPY);
-				_p++;
-				phalcon_array_append(&points, &_p->val, PH_COPY);
+				phalcon_array_append(&points, point, PH_COPY);
 			}
 			phalcon_increment(&num_points);
 		} ZEND_HASH_FOREACH_END();

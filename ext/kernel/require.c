@@ -265,10 +265,12 @@ int phalcon_exec_code(zval *ret, zval *object, zval *code, zval * vars) {
 		/* eval require code mustn't be wrapped in opening and closing PHP tags */
 		ZVAL_STR(&phtml, strpprintf(0, "?>%s", Z_STRVAL_P(code)));
 
-#if PHP_VERSION_ID >= 80000
-		op_array = zend_compile_string(Z_STR(phtml), eval_desc);
-#else
+#if PHP_VERSION_ID < 80000
 		op_array = zend_compile_string(&phtml, eval_desc);
+#elif PHP_VERSION_ID < 80200
+        op_array = zend_compile_string(Z_STR(phtml), eval_desc);
+#else
+		op_array = zend_compile_string(Z_STR(phtml), eval_desc, ZEND_COMPILE_POSITION_AFTER_OPEN_TAG);
 #endif
 		zval_ptr_dtor(&phtml);
 		efree(eval_desc);

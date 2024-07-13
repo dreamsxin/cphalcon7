@@ -70,6 +70,11 @@
 #define SSL(str)   zend_string_init(SL(str), 0)
 #define SSS(str)   zend_string_init(SS(str), 0)
 
+/* removed in 8.3 */
+#ifndef ZEND_HOT
+#define ZEND_HOT
+#endif
+
 /* Startup functions */
 void php_phalcon_init_globals(zend_phalcon_globals *phalcon_globals);
 zend_class_entry *phalcon_register_internal_interface_ex(zend_class_entry *orig_ce, zend_class_entry *parent_ce);

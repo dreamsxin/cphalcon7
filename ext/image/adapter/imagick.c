@@ -1444,9 +1444,7 @@ PHP_METHOD(Phalcon_Image_Adapter_Imagick, polygon){
 				phalcon_array_fetch_str(&y, point, SL("y"), PH_NOISY|PH_READONLY);
 			}
 		} else {
-			ZVAL_COPY_VALUE(&x, &_p->val);
-			_p++;
-			ZVAL_COPY_VALUE(&y, &_p->val);
+			ZVAL_COPY_VALUE(&x, point);
 		}
 		phalcon_array_update_str(&newpoint, SL("x"), &x, PH_COPY);
 		phalcon_array_update_str(&newpoint, SL("y"), &y, PH_COPY);

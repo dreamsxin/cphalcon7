@@ -109,6 +109,8 @@ extension=phalcon.so
 Test:
 
 ```shell
+# 查看扩展所在目录
+php -i |grep extension
 php --ri phalcon7
 
 cd cphalcon7

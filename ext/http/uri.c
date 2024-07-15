@@ -114,7 +114,7 @@ ZEND_END_ARG_INFO()
 
 static const zend_function_entry phalcon_http_uri_method_entry[] = {
 	PHP_ME(Phalcon_Http_Uri, __construct, arginfo_phalcon_http_uri___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Http_Uri, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Uri, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Uri, __unset, arginfo_phalcon_http_uri___unset, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Uri, __set, arginfo_phalcon_http_uri___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Uri, __get, arginfo_phalcon_http_uri___get, ZEND_ACC_PUBLIC)

@@ -71,7 +71,7 @@ static const zend_function_entry phalcon_validation_message_method_entry[] = {
 	PHP_ME(Phalcon_Validation_Message, getMessage, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message, setField, arginfo_phalcon_validation_messageinterface_setfield, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message, getField, arginfo_empty, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Validation_Message, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Validation_Message, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Validation_Message, __set_state, arginfo_phalcon_validation_message___set_state, ZEND_ACC_PUBLIC|ZEND_ACC_STATIC)
 	PHP_ME(Phalcon_Validation_Message, jsonSerialize, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_FE_END

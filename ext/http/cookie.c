@@ -128,7 +128,7 @@ static const zend_function_entry phalcon_http_cookie_method_entry[] = {
 	PHP_ME(Phalcon_Http_Cookie, getSecure, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, setHttpOnly, arginfo_phalcon_http_cookie_sethttponly, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Http_Cookie, getHttpOnly, arginfo_empty, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Http_Cookie, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Http_Cookie, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -249,7 +249,7 @@ static const zend_function_entry phalcon_forms_form_method_entry[] = {
 	PHP_ME(Phalcon_Forms_Form, appendMessage, arginfo_phalcon_forms_form_appendmessage, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, appendMessages, arginfo_phalcon_forms_form_appendmessages, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Forms_Form, toArray, arginfo_empty, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Forms_Form, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Forms_Form, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 	PHP_FE_END
 };
 

@@ -31,7 +31,7 @@ static const zend_function_entry phalcon_validation_messageinterface_method_entr
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getMessage, arginfo_empty)
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, setField, arginfo_phalcon_validation_messageinterface_setfield)
 	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, getField, arginfo_empty)
-	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, __toString, arginfo_empty)
+	PHP_ABSTRACT_ME(Phalcon_Validation_MessageInterface, __toString, arginfo___tostring)
 	PHP_FE_END
 };
 

@@ -1536,7 +1536,7 @@ static const zend_function_entry phalcon_image_vips_method_entry[] = {
 	PHP_ME(Phalcon_Image_Vips, __get, arginfo___getref, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __set, arginfo___set, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, __isset, arginfo___isset, ZEND_ACC_PUBLIC)
-	PHP_ME(Phalcon_Image_Vips, __toString, arginfo_empty, ZEND_ACC_PUBLIC)
+	PHP_ME(Phalcon_Image_Vips, __toString, arginfo___tostring, ZEND_ACC_PUBLIC)
 
 	PHP_ME(Phalcon_Image_Vips, identity, arginfo_phalcon_image_vips_identity, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Image_Vips, black, arginfo_phalcon_image_vips_black, ZEND_ACC_STATIC|ZEND_ACC_PUBLIC)

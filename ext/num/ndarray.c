@@ -224,7 +224,7 @@ ZEND_END_ARG_INFO()
 
 zend_function_entry phalcon_num_ndarray_method_entry[] = {
 	PHP_ME(Phalcon_Num_Ndarray, __construct, arginfo_phalcon_num_ndarray___construct, ZEND_ACC_PUBLIC|ZEND_ACC_CTOR)
-	PHP_ME(Phalcon_Num_Ndarray, __toString, arginfo_empty, ZEND_ACC_PUBLIC )
+	PHP_ME(Phalcon_Num_Ndarray, __toString, arginfo___tostring, ZEND_ACC_PUBLIC )
 	PHP_ME(Phalcon_Num_Ndarray, getData, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Num_Ndarray, getShape, arginfo_empty, ZEND_ACC_PUBLIC)
 	PHP_ME(Phalcon_Num_Ndarray, getNdim, arginfo_empty, ZEND_ACC_PUBLIC)

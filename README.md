@@ -70,7 +70,7 @@ Compilation
 Follow these instructions to generate a binary extension for your platform:
 
 ```bash
-git clone git://github.com/dreamsxin/cphalcon7.git
+git clone https://github.com/dreamsxin/cphalcon7.git
 cd cphalcon7/ext
 phpize
 

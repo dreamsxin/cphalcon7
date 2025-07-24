@@ -442,11 +442,15 @@ PHP_METHOD(Phalcon_Files, move){
 	RETURN_BOOL(wrapper->wops->rename(wrapper, old_name, new_name, 0, context));
 }
 
-// typedef enum {
-// 	RIT_LEAVES_ONLY = 0,
-// 	RIT_SELF_FIRST  = 1,
-// 	RIT_CHILD_FIRST = 2
-// } RecursiveIteratorMode;
+#if PHP_VERSION_ID < 80200
+
+typedef enum {
+        RIT_LEAVES_ONLY = 0,
+        RIT_SELF_FIRST  = 1,
+        RIT_CHILD_FIRST = 2
+} RecursiveIteratorMode;
+
+#endif
 
 int rmtree_iterator(zend_object_iterator *iter, void *puser)
 {
